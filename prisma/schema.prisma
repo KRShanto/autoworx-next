@@ -1,0 +1,312 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  workOrders WorkOrder[]
+  users      User[]
+  tasks      Task[]
+  customers  Customer[]
+  services   Service[]
+  vehicles   Vehicle[]
+  invoices   Invoice[]
+  settings   Setting[]
+  payments   Payment[]
+  invoiceAdditionals InvoiceAdditional[]
+
+}
+
+model WorkOrder {
+  id           Int      @id @default(autoincrement())
+  invoiceId    Int
+  activeStatus ActiveStatus
+  deletedAt    DateTime? @map("deleted_at")
+  companyId    Int?     @map("company_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  company      Company? @relation(fields: [companyId], references: [id])
+  users        User[]
+  tasks        Task[]
+  
+  @@index([companyId], name: "fk_work_orders_company")
+}
+
+enum ActiveStatus {
+  Active
+  Archived
+}
+
+model User {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  email              String   @unique
+  emailVerifiedAt    DateTime? @map("email_verified_at")
+  image              String   @default("/images/default.png")
+  password           String
+  provider           Provider @default(email)
+  timezone           String   @default("UTC")
+  phone              String?
+  address            String?
+  city               String?
+  state              String?
+  zip                String?
+  role               Role     @default(admin)
+  employeeType       EmployeeType @default(None)
+  employeeDepartment EmployeeDepartment @default(None)
+  workOrderId        Int?  @map("work_order_id")
+  companyId          Int?     @map("company_id")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  company            Company? @relation(fields: [companyId], references: [id])
+  workOrder          WorkOrder? @relation(fields: [workOrderId], references: [id])
+  tasks              Task[]
+  oauthTokens        OAuthToken[]
+  taskUsers          TaskUser[]
+  
+  @@index([companyId], name: "fk_users_company")
+  @@index([workOrderId], name: "fk_users_work_order")
+}
+
+enum Provider {
+  google
+  apple
+  email
+}
+
+enum Role {
+  admin
+  employee
+}
+
+enum EmployeeType {
+  Salary
+  Hourly
+  ContractBased @map("Contract Based")
+  None
+}
+
+enum EmployeeDepartment {
+  Sales
+  Management
+  Workshop
+  None
+}
+
+model Task {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  title       String   @db.VarChar(100)
+  date        DateTime
+  startTime   DateTime @map("start_time")
+  endTime     DateTime @map("end_time")
+  type        TaskType
+  companyId   Int?     @map("company_id")
+  workOrderId Int?     @map("work_order_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  user        User     @relation(fields: [userId], references: [id])
+  company     Company? @relation(fields: [companyId], references: [id])
+  workOrder   WorkOrder? @relation(fields: [workOrderId], references: [id])
+  taskUsers   TaskUser[]
+
+
+  @@index([userId], name: "fk_tasks_user")
+  @@index([companyId], name: "fk_tasks_company")
+  @@index([workOrderId], name: "fk_tasks_work_order")
+}
+
+enum TaskType {
+  event
+  appointment
+  task
+}
+
+model OAuthToken {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  provider     String
+  accessToken  String   @map("access_token")
+  refreshToken String?  @map("refresh_token")
+  expiresIn    DateTime? @map("expires_in")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@index([userId], name: "fk_oauth_tokens_user")
+}
+
+model TaskUser {
+  id        Int      @id @default(autoincrement())
+  taskId    Int      @map("task_id")
+  userId    Int      @map("user_id")
+  eventId   String   @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  task      Task     @relation(fields: [taskId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([taskId], name: "fk_task_users_task")
+  @@index([userId], name: "fk_task_users_user")
+}
+model Customer {
+  id        Int      @id @default(autoincrement())
+  name      String
+  mobile    String   @unique
+  email     String
+  address   String
+  city      String
+  state     String
+  zip       String
+  companyId Int?     @map("company_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  @@index([companyId], name: "fk_customers_company")
+}
+
+model Service {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  name        String
+  description String
+  price       Decimal
+  quantity    Int
+  discount    Decimal
+  total       Decimal
+  companyId   Int?     @map("company_id")
+  company     Company? @relation(fields: [companyId], references: [id])
+
+  @@index([companyId], name: "fk_services_company")
+}
+
+model Vehicle {
+  id        Int      @id @default(autoincrement())
+  year      Int
+  make      String
+  model     String
+  vin       String
+  license   String
+  companyId Int?     @map("company_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  @@index([companyId], name: "fk_vehicles_company")
+}
+
+model Invoice {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  invoiceId   String   @map("invoice_id")
+  customerId  Int      @map("customer_id")
+  vehicleId   Int      @map("vehicle_id")
+  serviceIds  Json     @map("service_ids")
+  photo       String?  
+  subtotal    Decimal  @db.Decimal(8, 2)
+  discount    Decimal  @db.Decimal(8, 2)
+  tax         Decimal  @db.Decimal(8, 2)
+  grandTotal  Decimal  @db.Decimal(8, 2) @map("grand_total")
+  deposit     Decimal  @db.Decimal(8, 2)
+  due         Decimal  @db.Decimal(8, 2)
+  status      Status
+  sendMail    Boolean  @default(false) @map("send_mail")
+  notes       String?  
+  terms       String?  
+  policy      String?  
+  issueDate   DateTime @default(now()) @map("issue_date")
+  companyId   Int?     @map("company_id")
+  salesperson String
+  company     Company? @relation(fields: [companyId], references: [id])
+  payment     Payment[]
+
+  @@index([companyId], name: "fk_invoices_company")
+}
+
+enum Status {
+  Delivered
+  Consultations
+  Confirmed
+  InProgress @map("In Progress")
+  FollowUp @map("Follow Up")
+  Scheduled
+  Pending
+  NoShow @map("No show")
+  Cancelled
+}
+
+model Setting {
+  id        Int      @id @default(autoincrement())
+  contact   String
+  companyId Int?     @map("company_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  @@index([companyId], name: "fk_settings_company")
+}
+
+model Payment {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  invoiceId Int      @map("invoice_id")
+  type      Type
+  method    Method
+  amount    Decimal  @db.Decimal(8, 2)
+  note      String?  
+  date      DateTime @default(now())
+  companyId Int?     @map("company_id")
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id])
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  @@index([invoiceId], name: "fk_payments_invoice")
+  @@index([companyId], name: "fk_payments_company")
+}
+
+enum Type {
+  Payment
+  Deposit
+  Refund
+}
+
+enum Method {
+  Cash
+  Card
+  Zelle
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  message   String
+  from      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId], name: "fk_messages_user")
+}
+
+model InvoiceAdditional {
+  id        Int      @id @default(autoincrement())
+  companyId Int      @map("company_id")
+  note      String
+  terms     String
+  policy    String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  company   Company  @relation(fields: [companyId], references: [id])
+
+  @@index([companyId], name: "fk_invoice_additionals_company")
+}
