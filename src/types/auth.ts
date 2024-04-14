@@ -5,5 +5,8 @@ export interface AuthSession extends Session {
     id: string;
     name: string;
     email: string;
+    image: string;
+    role: string;
+    companyId: number;
   };
 }

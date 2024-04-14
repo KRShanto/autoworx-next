@@ -10,8 +10,7 @@ export default function Input({
   defaultValue,
   autoFocus,
   className,
-  value,
-  onChange,
+  placeholder,
 }: {
   name: string;
   type?: string;
@@ -19,8 +18,7 @@ export default function Input({
   defaultValue?: string;
   autoFocus?: boolean;
   className?: string;
-  value?: any;
-  onChange?: (e: any) => void;
+  placeholder?: string;
 }) {
   const [inputValue, setInputValue] = useState(defaultValue || "");
   const { error } = useFormErrorStore();
@@ -36,10 +34,11 @@ export default function Input({
         autoFocus={autoFocus}
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
+        placeholder={placeholder}
       />
 
       {error && error.field === name && (
-        <p className="error">{error.message}</p>
+        <p className="text-red-500">{error.message}</p>
       )}
     </>
   );

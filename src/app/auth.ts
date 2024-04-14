@@ -88,6 +88,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.email = token.email;
         // @ts-ignore
         session.user.role = token.role;
+        // @ts-ignore
+        session.user.companyId = token.companyId;
       }
       return session;
     },
@@ -109,6 +111,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         name: dbUser.name,
         email: dbUser.email,
         role: dbUser.role,
+        companyId: dbUser.companyId,
       };
     },
   },

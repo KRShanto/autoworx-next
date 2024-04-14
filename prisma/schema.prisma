@@ -54,7 +54,7 @@ model User {
   password           String
   provider           Provider @default(email)
   timezone           String   @default("UTC")
-  phone              String?
+  phone              Int?
   address            String?
   city               String?
   state              String?
