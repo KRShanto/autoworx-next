@@ -11,3 +11,162 @@
 body {
   background-color: white;
 }
+
+html {
+  scroll-behavior: smooth;
+  font-family: "Inter", sans-serif;
+}
+
+.app-shadow {
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+.invoice-link {
+  position: relative;
+  z-index: 1;
+  /* TODO: fix shadow design */
+  box-shadow:
+    5px 0 10px rgba(0, 0, 0, 0.2),
+    -5px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.invoice-link::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -2px;
+  bottom: 0;
+  width: 50px;
+  background-color: inherit;
+  transform: skew(40deg);
+  transform-origin: top right;
+  border-radius: 0.2rem;
+  z-index: -1;
+}
+
+.invoice-inner-shadow {
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25) inset;
+}
+
+.calender-time-shadow {
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+@media (max-height: 850px) {
+  .invoice-display {
+    height: 70vh;
+  }
+}
+@media (max-height: 915px) {
+  .invoice-create {
+    padding-top: 0.5rem;
+  }
+
+  .invoice-create .services {
+    height: 10rem;
+  }
+
+  .invoice-create .services table tr,
+  .invoice-create .services table td {
+    font-size: 0.7rem;
+  }
+
+  .invoice-create .services table tr input,
+  .invoice-create .services table td input {
+    font-size: 0.7rem;
+  }
+
+  .invoice-create .service-form {
+    margin-top: 0.5rem;
+  }
+
+  .invoice-create .service-form select {
+    font-size: 0.7rem;
+    height: 1.5rem;
+  }
+
+  .invoice-create .service-form .checkbox input {
+    width: 0.7rem;
+    height: 0.7rem;
+  }
+
+  .invoice-create .service-form .checkbox label {
+    font-size: 0.7rem;
+  }
+
+  .invoice-create .service-form button {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+  }
+
+  .invoice-create .payment h2 {
+    font-size: 0.7rem;
+  }
+
+  .invoice-create .payment button {
+    font-size: 0.6rem;
+    padding: 0.3rem 1rem;
+  }
+
+  .invoice-create .payment .payment-table {
+    margin-top: 0.2rem;
+    height: 5rem;
+  }
+
+  .invoice-create .payment .payment-table tr,
+  .invoice-create .payment .payment-table td {
+    font-size: 0.6rem;
+  }
+
+  .invoice-create .payment .payment-table th,
+  .invoice-create .payment .payment-table td {
+    padding: 0.2rem 0.4rem;
+  }
+
+  .invoice-create .additional {
+    height: 7rem;
+    font-size: 0.8rem;
+  }
+
+  .invoice-create .form {
+    margin-top: 0.4rem;
+  }
+
+  .invoice-create .form label {
+    font-size: 0.7rem;
+  }
+
+  .invoice-create .form input {
+    font-size: 0.7rem;
+  }
+
+  .invoice-create .form p {
+    font-size: 0.7rem;
+  }
+
+  .invoice-create .form .form-divide {
+    gap: 0.5rem;
+  }
+
+  .invoice-create .form .form-divide-input {
+    gap: 0.4rem;
+  }
+
+  .invoice-create .form-head h2 {
+    font-size: 0.8rem;
+  }
+
+  .invoice-create .form-head button {
+    font-size: 0.6rem;
+    padding: 0.3rem 0.8rem;
+  }
+
+  .invoice-create .invoice-to {
+    height: 58%;
+  }
+
+  .invoice-create .vehicle {
+    margin-top: 0.4rem;
+    height: 40%;
+  }
+}
