@@ -160,7 +160,7 @@ model TaskUser {
 model Customer {
   id        Int      @id @default(autoincrement())
   name      String
-  mobile    String   @unique
+  mobile    Int   @unique
   email     String
   address   String
   city      String

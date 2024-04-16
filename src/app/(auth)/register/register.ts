@@ -2,8 +2,6 @@
 
 import { db } from "@/lib/db";
 import bcrypt from "bcrypt";
-import { nanoid } from "nanoid";
-import slugify from "slugify";
 import * as EmailValidator from "email-validator";
 import { FormErrorType } from "@/types/form-errror";
 import { MIN_PASSWORD_LENGTH } from "@/lib/consts";
