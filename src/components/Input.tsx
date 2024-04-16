@@ -11,6 +11,8 @@ export default function Input({
   autoFocus,
   className,
   placeholder,
+  value,
+  onChange,
 }: {
   name: string;
   type?: string;
@@ -19,6 +21,8 @@ export default function Input({
   autoFocus?: boolean;
   className?: string;
   placeholder?: string;
+  value?: any;
+  onChange?: (e: any) => void;
 }) {
   const [inputValue, setInputValue] = useState(defaultValue || "");
   const { error } = useFormErrorStore();
@@ -32,8 +36,10 @@ export default function Input({
         className={className}
         required={required}
         autoFocus={autoFocus}
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
+        value={value || inputValue}
+        onChange={(e) => {
+          onChange ? onChange(e) : setInputValue(e.target.value);
+        }}
         placeholder={placeholder}
       />
 
