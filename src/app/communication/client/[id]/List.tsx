@@ -3,6 +3,7 @@ import { cn } from "@/lib/cn";
 import { tempClients } from "@/lib/tempClients";
 import Image from "next/image";
 
+// TODO: use layout for this component
 export default function List({ id }: { id: number }) {
   return (
     <div className="app-shadow h-[83vh] w-[20%] rounded-lg bg-white p-3">

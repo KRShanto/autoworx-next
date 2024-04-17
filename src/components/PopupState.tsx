@@ -1,7 +1,7 @@
 "use client";
 
 import { usePopupStore } from "../stores/popup";
-// import AddTask from "./Task/calendar/AddTask";
+import AddTaskPopup from "../app/task/[type]/Calendar/AddTaskPopup";
 // import AddUser from "./AddUser";
 // import AssignTask from "./Task/users/AssignTask";
 // import EditTask from "./Task/calendar/EditTask";
@@ -20,7 +20,7 @@ import EditService from "@/app/inventory/service/EditService";
 export default function PopupState() {
   const { popup } = usePopupStore();
 
-  // if (popup === "ADD_TASK") return <AddTask />;
+  if (popup === "ADD_TASK") return <AddTaskPopup />;
   // if (popup === "EDIT_TASK") return <EditTask />;
   // if (popup === "ADD_USER") return <AddUser />;
   // if (popup === "ASSIGN_TASK") return <AssignTask />;

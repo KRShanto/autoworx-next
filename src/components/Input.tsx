@@ -13,6 +13,8 @@ export default function Input({
   placeholder,
   value,
   onChange,
+  min,
+  max,
 }: {
   name: string;
   type?: string;
@@ -23,6 +25,8 @@ export default function Input({
   placeholder?: string;
   value?: any;
   onChange?: (e: any) => void;
+  min?: string;
+  max?: string;
 }) {
   const [inputValue, setInputValue] = useState(defaultValue || "");
   const { error } = useFormErrorStore();
@@ -41,6 +45,8 @@ export default function Input({
           onChange ? onChange(e) : setInputValue(e.target.value);
         }}
         placeholder={placeholder}
+        min={min}
+        max={max}
       />
 
       {error && error.field === name && (

@@ -106,8 +106,8 @@ model Task {
   userId      Int      @map("user_id")
   title       String   @db.VarChar(100)
   date        DateTime
-  startTime   DateTime @map("start_time")
-  endTime     DateTime @map("end_time")
+  startTime   String   @map("start_time")
+  endTime     String   @map("end_time")  
   type        TaskType
   companyId   Int?     @map("company_id")
   workOrderId Int?     @map("work_order_id")
@@ -117,7 +117,6 @@ model Task {
   company     Company? @relation(fields: [companyId], references: [id])
   workOrder   WorkOrder? @relation(fields: [workOrderId], references: [id])
   taskUsers   TaskUser[]
-
 
   @@index([userId], name: "fk_tasks_user")
   @@index([companyId], name: "fk_tasks_company")
@@ -151,8 +150,8 @@ model TaskUser {
   eventId   String   @db.VarChar(100)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  task      Task     @relation(fields: [taskId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([taskId], name: "fk_task_users_task")
   @@index([userId], name: "fk_task_users_user")
