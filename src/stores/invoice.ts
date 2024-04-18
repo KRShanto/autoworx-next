@@ -6,7 +6,7 @@ import {
   AdditionalInfo,
   Status,
   Payment,
-} from "@/types/invoice";
+} from "@/types/db";
 import { customAlphabet, nanoid } from "nanoid";
 import { create } from "zustand";
 
@@ -39,10 +39,11 @@ interface InvoiceStore {
   removePayment: (tnx: string) => void;
   setIssueDate: (date: Date) => void;
   setPhoto: (photo: File | null) => void;
+  reset: () => void;
 }
 
 export const useInvoiceStore = create<InvoiceStore>((set) => ({
-  invoiceId: customAlphabet("1234567890", 14)(),
+  invoiceId: "",
   customer: {
     name: "",
     email: "",
@@ -128,4 +129,39 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
     })),
   setIssueDate: (date) => set({ issueDate: date }),
   setPhoto: (photo) => set({ photo }),
+  reset: () =>
+    set({
+      invoiceId: "",
+      customer: {
+        name: "",
+        email: "",
+        mobile: "",
+        address: "",
+        city: "",
+        state: "",
+        zip: "",
+      },
+      vehicle: {
+        make: "",
+        model: "",
+        year: "",
+        vin: "",
+        license: "",
+      },
+      services: [],
+      pricing: {
+        subtotal: 0,
+        discount: 0,
+        tax: 0,
+        grand_total: 0,
+        deposit: 0,
+        due: 0,
+      },
+      status: "Consultations",
+      sendMail: false,
+      created_at: new Date(),
+      payments: [],
+      issueDate: new Date(),
+      photo: null,
+    }),
 }));

@@ -159,7 +159,7 @@ model TaskUser {
 model Customer {
   id        Int      @id @default(autoincrement())
   name      String
-  mobile    Int   @unique
+  mobile    Int      @unique
   email     String
   address   String
   city      String
@@ -194,8 +194,8 @@ model Vehicle {
   year      Int
   make      String
   model     String
-  vin       String
-  license   String
+  vin       String   @unique  
+  license   String   @unique
   companyId Int?     @map("company_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -261,6 +261,8 @@ model Payment {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   invoiceId Int      @map("invoice_id")
+  // TODO: improve this field name
+  invoiceInvoiceId String @map("invoice_invoice_id")
   type      Type
   method    Method
   amount    Decimal  @db.Decimal(8, 2)
