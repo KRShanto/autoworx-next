@@ -4,10 +4,6 @@ import Title from "@/components/Title";
 import { useEffect, useState } from "react";
 import { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Sales Funnel Management",
-};
-
 const hotLeads = [
   {
     name: "",
