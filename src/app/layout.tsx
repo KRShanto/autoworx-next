@@ -5,6 +5,7 @@ import SideNavbar from "@/components/SideNavbar";
 import TopNavbar from "@/components/TopNavbar";
 import PopupState from "@/components/PopupState";
 import Layout from "@/components/Layout";
+import TopLoader from "./TopLoader";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <TopLoader />
         <Layout>{children}</Layout>
       </body>
     </html>
