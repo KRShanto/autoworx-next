@@ -1,4 +1,5 @@
 import Input from "@/components/Input";
+import Password from "@/components/Password";
 import SubmitButton from "./SubmitButton";
 import Link from "next/link";
 import FormError from "@/components/FormError";
@@ -61,8 +62,7 @@ export default function Page() {
             Password
           </label>
 
-          <Input
-            type="password"
+          <Password
             name="password"
             className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required

@@ -1,4 +1,5 @@
 import FormError from "@/components/FormError";
+import Password from "@/components/Password";
 import SubmitButton from "./SubmitButton";
 import Link from "next/link";
 import Input from "@/components/Input";
@@ -36,9 +37,8 @@ export default function Page() {
           <label htmlFor="password" className="mb-2 block">
             Password
           </label>
-          <Input
+          <Password
             name="password"
-            type="password"
             required
             className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
