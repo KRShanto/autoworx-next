@@ -3,9 +3,7 @@
 import { FaTimes } from "react-icons/fa";
 import Popup from "@/components/Popup";
 import { usePopupStore } from "../../stores/popup";
-import { ThreeDots } from "react-loader-spinner";
 import FormError from "@/components/FormError";
-import { useState } from "react";
 import { useFormErrorStore } from "@/stores/form-error";
 import Submit from "@/components/Submit";
 import { addEmployee } from "./add";

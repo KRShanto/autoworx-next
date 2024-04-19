@@ -1,7 +1,7 @@
 "use client";
 
 import { usePopupStore } from "../../stores/popup";
-import Popup from "@/Components/Popup";
+import Popup from "@/components/Popup";
 import { useInvoiceStore } from "../../stores/invoice";
 import { FaTimes } from "react-icons/fa";
 import { useState } from "react";

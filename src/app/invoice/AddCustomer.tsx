@@ -1,5 +1,5 @@
 import { FaTimes } from "react-icons/fa";
-import Popup from "@/Components/Popup";
+import Popup from "@/components/Popup";
 import { useState } from "react";
 import { usePopupStore } from "../../stores/popup";
 import { ThreeDots } from "react-loader-spinner";

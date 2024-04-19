@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 let db: PrismaClient;
 
-if (!db) {
+if (!db!) {
   db = new PrismaClient();
 }
 

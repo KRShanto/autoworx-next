@@ -2,7 +2,7 @@ import { useInvoiceStore } from "../../stores/invoice";
 import { usePopupStore } from "../../stores/popup";
 import { VehicleType } from "@/types/db";
 import { useState } from "react";
-import Popup from "@/Components/Popup";
+import Popup from "@/components/Popup";
 import { FaTimes } from "react-icons/fa";
 import FormError from "@/components/FormError";
 import Input from "@/components/Input";
