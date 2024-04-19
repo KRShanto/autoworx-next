@@ -4,7 +4,7 @@
 
 - [ ] Create components for forms
 - [ ] Use middleware to protect routes
-- [ ] Set title for each page and favicon
+- [x] Set title for each page and favicon
 - [ ] Return a common type from every server actions.
 - [ ] Store server action files in `actions` folder
 

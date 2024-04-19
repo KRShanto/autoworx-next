@@ -2,6 +2,11 @@ import Input from "@/components/Input";
 import SubmitButton from "./SubmitButton";
 import Link from "next/link";
 import FormError from "@/components/FormError";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Register",
+};
 
 export default function Page() {
   return (

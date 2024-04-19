@@ -4,6 +4,11 @@ import { auth } from "../auth";
 import { AuthSession } from "@/types/auth";
 import { db } from "@/lib/db";
 import Image from "next/image";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Invoices",
+};
 
 export default async function Page() {
   const sessoin = (await auth()) as AuthSession;

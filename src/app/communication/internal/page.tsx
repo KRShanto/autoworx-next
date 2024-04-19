@@ -3,6 +3,11 @@ import { db } from "@/lib/db";
 import { AuthSession } from "@/types/auth";
 import { useState } from "react";
 import Body from "./Body";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Communication Hub - Internal",
+};
 
 export default async function InternalPage() {
   const session = (await auth()) as AuthSession;

@@ -3,6 +3,11 @@ import React from "react";
 import List from "./List";
 import MessageBox from "./MessageBox";
 import Details from "./Details";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Communication Hub - Client",
+};
 
 // TODO: handle `id` not found
 export default function Page({ params }: { params: { id: number } }) {

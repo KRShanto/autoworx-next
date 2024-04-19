@@ -6,6 +6,11 @@ import Payment from "./Payment";
 import { AuthSession } from "@/types/auth";
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Create Invoice",
+};
 
 export default async function Page() {
   const session = (await auth()) as AuthSession;
