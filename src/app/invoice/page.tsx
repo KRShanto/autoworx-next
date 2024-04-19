@@ -101,7 +101,7 @@ export default async function Page() {
               className="max-[1600px]:text-sm max-[1500px]:text-xs"
             >
               <td className="px-2 py-4 text-[#6571FF]">
-                <Link href={`/invoice/${invoice.invoiceId}`}>
+                <Link href={`/invoice/view/${invoice.invoiceId}`}>
                   {invoice.invoiceId}
                 </Link>
               </td>

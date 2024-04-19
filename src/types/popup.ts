@@ -13,6 +13,4 @@ export type PopupType =
   | "ADD_SERVICE"
   | "EDIT_SERVICE"
   | "ADD_PAYMENT"
-  | "ADD_WORK_ORDER"
-  | "CHOOSE_EMPLOYEE"
   | null;

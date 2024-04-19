@@ -19,8 +19,11 @@
 - [ ] Upload photo
 - [ ] Send mail
 - [ ] Change the `invoiceId` field name or make it primary key
-- [ ] Show user image in messages
 
 ## Sales
 
 - [ ] Fix `/sales` page UI.
+
+## Internal
+
+- [ ] Show user image in messages

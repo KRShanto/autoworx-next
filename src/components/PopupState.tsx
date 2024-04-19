@@ -11,8 +11,6 @@ import AddVehicle from "../app/invoice/AddVehicle";
 import AddEmployee from "../app/employee/AddEmployee";
 import AddService from "../app/inventory/service/AddService";
 import AddPayment from "../app/invoice/AddPayment";
-import AddWorkOrder from "../app/invoice/AddWorkOrder";
-import ChooseEmployee from "../app/invoice/ChooseEmployee";
 import EditCustomer from "../app/customer/EditCustomer";
 import EditEmployee from "@/app/employee/EditEmployee";
 import EditService from "@/app/inventory/service/EditService";
@@ -30,8 +28,6 @@ export default function PopupState() {
   if (popup === "ADD_NEW_CUSTOMER") return <AddNewCustomer />;
   if (popup === "ADD_SERVICE") return <AddService />;
   if (popup === "ADD_PAYMENT") return <AddPayment />;
-  if (popup === "CHOOSE_EMPLOYEE") return <ChooseEmployee />;
-  if (popup === "ADD_WORK_ORDER") return <AddWorkOrder />;
   if (popup === "EDIT_CUSTOMER") return <EditCustomer />;
   if (popup === "EDIT_EMPLOYEE") return <EditEmployee />;
   if (popup === "EDIT_SERVICE") return <EditService />;
