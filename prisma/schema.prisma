@@ -208,7 +208,7 @@ model Invoice {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
-  invoiceId   String   @map("invoice_id")
+  invoiceId   String   @map("invoice_id") @unique
   customerId  Int      @map("customer_id")
   vehicleId   Int      @map("vehicle_id")
   serviceIds  Json     @map("service_ids")
@@ -290,13 +290,15 @@ enum Method {
 
 model Message {
   id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
+  to        Int     
   message   String
-  from      String
+  from      Int
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@index([userId], name: "fk_messages_user")
+  @@index([to], name: "fk_messages_to")
+  @@index([from], name: "fk_messages_from")
+  
 }
 
 model InvoiceAdditional {

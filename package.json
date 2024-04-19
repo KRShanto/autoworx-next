@@ -21,6 +21,8 @@
     "nextjs-toploader": "^1.6.11",
     "nodemailer": "^6.9.13",
     "nprogress": "^0.2.0",
+    "pusher": "^5.2.0",
+    "pusher-js": "^8.4.0-rc2",
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^5.0.1",
