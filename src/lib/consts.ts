@@ -42,7 +42,7 @@ export const NAV_LINKS: NavItem[] = [
   },
   {
     name: "Task and Activity Management",
-    path: "/task",
+    path: "/task/day",
   },
   {
     name: "Analytics and Reporting",

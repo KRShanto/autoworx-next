@@ -6,11 +6,13 @@
 - [ ] Use middleware to protect routes
 - [ ] Set title for each page and favicon
 - [ ] Return a common type from every server actions.
+- [ ] Store server action files in `actions` folder
 
 ## Task And Activity Management
 
 - [ ] Edit feature for Tasks
 - [ ] Google Calendar API integration
+- [ ] Instead of using popups, use modals for task creation and other actions
 
 ## Invoice
 
