@@ -302,7 +302,7 @@ export default function Week({
                 className="mt-2 flex items-center rounded-md bg-[#24a0ff] px-2 py-1 text-white"
                 onClick={() => {
                   setHoveredTask(null);
-                  open("EDIT_TASK", { ...task });
+                  open("EDIT_TASK", { ...task, companyUsers });
                 }}
               >
                 <MdModeEdit />

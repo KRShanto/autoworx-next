@@ -1,7 +1,5 @@
 // NOTE: these properties are optional for prisma's select statement. But they aren't optional in the db.
 
-import { $Enums, Prisma } from "@prisma/client";
-
 export interface UserType {
   id?: string;
   name?: string;
@@ -96,11 +94,11 @@ export interface Payment {
 }
 
 export interface TaskType {
-  id: number;
+  id?: number;
   title: string;
   date: string;
-  start_time: string;
-  end_time: string;
+  startTime: string;
+  endTime: string;
   type: "task" | "appointment" | "event";
-  assigned_users: number[];
+  assignedUsers: number[];
 }

@@ -1,27 +1,10 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { Task } from "@prisma/client";
-import { auth } from "../auth";
-import { AuthSession } from "@/types/auth";
 import { revalidatePath } from "next/cache";
+import { TaskType } from "@/types/db";
 
-export async function editTask({
-  task,
-  id,
-}: {
-  task: Task & { assignedUsers: number[] };
-  id: number;
-}) {
-  const session = (await auth()) as AuthSession;
-
-  // Find the task
-  const existingTask = await db.task.findUnique({
-    where: {
-      id,
-    },
-  });
-
+export async function editTask({ id, task }: { id: number; task: TaskType }) {
   // Find the task users
   const taskUsers = await db.taskUser.findMany({
     where: {
@@ -54,12 +37,7 @@ export async function editTask({
   for (const user of toAdd) {
     // TODO: Add the task to the user's Google Calendar
 
-    const assignedUser = await db.user.findUnique({
-      where: {
-        id: user,
-      },
-    });
-
+    // Create the task user
     await db.taskUser.create({
       data: {
         taskId: id,
@@ -75,7 +53,11 @@ export async function editTask({
       id,
     },
     data: {
-      ...task,
+      title: task.title,
+      type: task.type,
+      startTime: task.startTime,
+      endTime: task.endTime,
+      date: new Date(task.date),
     },
   });
 

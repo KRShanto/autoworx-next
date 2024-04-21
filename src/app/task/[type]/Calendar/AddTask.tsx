@@ -52,6 +52,8 @@ export default function AddTask({
     }
   }
 
+  console.log();
+
   function getCurrentDate() {
     const now = new Date();
     const year = now.getFullYear();
@@ -100,7 +102,7 @@ export default function AddTask({
         </label>
         <Input
           type="time"
-          name="start_time"
+          name="startTime"
           className="mt-2 rounded-md border border-gray-300 p-2"
           value={startTime}
           onChange={(e) => setStartTime(e.target.value)}
@@ -113,7 +115,7 @@ export default function AddTask({
         </label>
         <Input
           type="time"
-          name="end_time"
+          name="endTime"
           className="mt-2 rounded-md border border-gray-300 p-2"
           value={endTime}
           onChange={(e) => setEndTime(e.target.value)}
