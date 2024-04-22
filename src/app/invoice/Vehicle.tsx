@@ -1,8 +1,8 @@
 "use client";
 
 import type { Vehicle } from "@prisma/client";
-import { useInvoiceStore } from "../../../stores/invoice";
-import { usePopupStore } from "../../../stores/popup";
+import { useInvoiceStore } from "../../stores/invoice";
+import { usePopupStore } from "../../stores/popup";
 import { FaPlus } from "react-icons/fa";
 
 export default function Vehicle({ vehicles }: { vehicles: Vehicle[] }) {

@@ -1,8 +1,8 @@
 import React from "react";
-import InvoiceTo from "./InvoiceTo";
-import Vehicle from "./Vehicle";
-import ServiceSection from "./ServiceSection";
-import Payment from "./Payment";
+import InvoiceTo from "../InvoiceTo";
+import Vehicle from "../Vehicle";
+import ServiceSection from "../ServiceSection";
+import Payment from "../Payment";
 import { AuthSession } from "@/types/auth";
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
@@ -44,7 +44,7 @@ export default async function Page() {
     },
   });
 
-  const { note, terms, policy } = additional || {};
+  const { note, terms } = additional || {};
 
   return (
     <div className="app-shadow invoice-create flex h-[80vh] w-[77vw] gap-5 rounded-xl bg-white px-5 pb-5 pt-8 text-[#66738C]">
@@ -58,7 +58,6 @@ export default async function Page() {
           allServices={services}
           notes={note || ""}
           terms={terms || ""}
-          policy={policy || ""}
           user={session.user}
         />
         <Payment />

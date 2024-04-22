@@ -1,11 +1,11 @@
 "use client";
 
 import { ThreeDots } from "react-loader-spinner";
-import { useInvoiceStore } from "../../../stores/invoice";
+import { useInvoiceStore } from "../../stores/invoice";
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { User } from "next-auth";
-import { createInvoice } from "./create";
+import { createInvoice } from "./create/create";
 import { useFormErrorStore } from "@/stores/form-error";
 
 export default function OrderButton({ user }: { user: User }) {
@@ -93,9 +93,20 @@ export default function OrderButton({ user }: { user: User }) {
       }
       setLoading(false);
     } else if (lastPath === "edit") {
-      // TODO: edit invoice
+      // TODO: Edit invoice
     } else if (lastPath === "estimate") {
-      // TODO: create estimate
+      // TODO: For now, we will use the same function as create
+      setLoading(true);
+      const res = await createInvoice(data);
+
+      // @ts-ignore
+      if (res && res.field) {
+        // @ts-ignore
+        showError(res);
+      } else {
+        reset();
+        router.push(`/invoice/view/${data.invoiceId}`);
+      }
     } else {
       console.error("Invalid route");
     }

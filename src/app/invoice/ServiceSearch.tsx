@@ -1,4 +1,4 @@
-import { useInvoiceStore } from "../../../stores/invoice";
+import { useInvoiceStore } from "../../stores/invoice";
 import { ServiceType } from "@/types/db";
 import { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";

@@ -8,6 +8,7 @@
 - [ ] Return a common type from every server actions.
 - [ ] Store server action files in `actions` folder
 - [ ] Write docs
+- [ ] Place files in appropriate folders
 
 ## Task And Activity Management
 

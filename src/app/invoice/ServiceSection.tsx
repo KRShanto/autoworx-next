@@ -3,7 +3,7 @@
 import ServiceSearch from "./ServiceSearch";
 import Services from "./Services";
 import AdditionalInfo from "./AdditionalInfo";
-import { useInvoiceStore } from "../../../stores/invoice";
+import { useInvoiceStore } from "../../stores/invoice";
 import OrderButton from "./OrderButton";
 import { useEffect, useState } from "react";
 import { Status } from "@/types/db";
@@ -13,13 +13,11 @@ export default function ServiceSection({
   allServices,
   notes,
   terms,
-  policy,
   user,
 }: {
   allServices: any[];
   notes: string;
   terms: string;
-  policy: string;
   user: User;
 }) {
   const {
@@ -179,7 +177,7 @@ export default function ServiceSection({
 
       {/* Notes, Terms, Policy, Create order */}
       <div className="mt-3 flex flex-row gap-4">
-        <AdditionalInfo notes={notes} terms={terms} policy={policy} />
+        <AdditionalInfo notes={notes} terms={terms} />
         {/* Create order button */}
         <div className="service-form w-[23%]">
           {/* Select Status */}
