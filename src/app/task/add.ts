@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { Task, TaskType } from "@prisma/client";
+import { TaskType } from "@prisma/client";
 import { auth } from "../auth";
 import { AuthSession } from "@/types/auth";
 import { revalidatePath } from "next/cache";
@@ -54,5 +54,5 @@ export async function addTask(task: {
 
   revalidatePath("/task");
 
-  return true;
+  return newTask;
 }

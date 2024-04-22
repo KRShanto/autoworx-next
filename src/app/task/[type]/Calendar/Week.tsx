@@ -11,6 +11,8 @@ import { ThreeDots } from "react-loader-spinner";
 import { Task, User } from "@prisma/client";
 import Image from "next/image";
 import { deleteTask } from "../../delete";
+import { useDrop } from "react-dnd";
+import { addTask } from "../../add";
 
 export default function Week({
   tasks,
@@ -21,22 +23,31 @@ export default function Week({
 }) {
   const [hoveredTask, setHoveredTask] = useState<number | null>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const scrollableDivRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
 
   const { open } = usePopupStore();
 
+  const [{ canDrop, isOver }, dropRef] = useDrop({
+    accept: "task",
+    drop: (item, monitor) => {
+      // Update your state here
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+    }),
+  }) as [{ canDrop: boolean; isOver: boolean }, any];
+
   useEffect(() => {
     const handleScroll = () => {
-      setScrollPosition(scrollableDivRef.current!.scrollTop);
+      setScrollPosition(dropRef.current!.scrollTop);
     };
 
-    scrollableDivRef.current &&
-      scrollableDivRef.current.addEventListener("scroll", handleScroll);
+    dropRef.current && dropRef.current.addEventListener("scroll", handleScroll);
 
     return () => {
-      scrollableDivRef.current &&
-        scrollableDivRef.current.removeEventListener("scroll", handleScroll);
+      dropRef.current &&
+        dropRef.current.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -75,7 +86,7 @@ export default function Week({
   const hourlyRows = Array.from({ length: 24 }, (_, i) => [
     `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
     // empty cells
-    ...Array.from({ length: 7 }),
+    ...Array.from({ length: 7 }, () => ""),
   ]);
 
   // Format the date
@@ -98,35 +109,87 @@ export default function Week({
   const endOfWeek = moment().endOf("week").toDate();
 
   // Filter out the tasks that are within the current week
-  const weekTasks = tasks
-    .filter((task) => {
-      const taskDate = new Date(task.date);
-      return taskDate >= startOfWeek && taskDate <= endOfWeek;
-    })
-    .map((task) => {
-      const taskDate = new Date(task.date);
-      const columnIndex = taskDate.getDay() - startOfWeek.getDay();
+  const [weekTasks, setWeekTasks] = useState<
+    (Task & {
+      rowStartIndex: number;
+      rowEndIndex: number;
+      assignedUsers: User[];
+      columnIndex: number;
+    })[]
+  >([]);
 
-      // Convert the taskStartTime and taskEndTime to a format like "1 PM" or "11 AM"
-      const taskStartTime = moment(task.startTime, "HH:mm").format("h A");
-      const taskEndTime = moment(task.endTime, "HH:mm").format("h A");
+  useEffect(() => {
+    setWeekTasks(
+      tasks
+        .filter((task) => {
+          const taskDate = new Date(task.date);
+          return taskDate >= startOfWeek && taskDate <= endOfWeek;
+        })
+        .map((task) => {
+          const taskDate = new Date(task.date);
+          const columnIndex = taskDate.getDay() - startOfWeek.getDay();
 
-      // Find the rowStartIndex and rowEndIndex by looping over the hourlyRows
-      const rowStartIndex = hourlyRows.findIndex((row) =>
-        row.includes(taskStartTime),
+          // Convert the taskStartTime and taskEndTime to a format like "1 PM" or "11 AM"
+          const taskStartTime = moment(task.startTime, "HH:mm").format("h A");
+          const taskEndTime = moment(task.endTime, "HH:mm").format("h A");
+
+          // Find the rowStartIndex and rowEndIndex by looping over the hourlyRows
+          const rowStartIndex = hourlyRows.findIndex((row) =>
+            row.includes(taskStartTime),
+          );
+          const rowEndIndex = hourlyRows.findIndex((row) =>
+            row.includes(taskEndTime),
+          );
+
+          return { ...task, columnIndex, rowStartIndex, rowEndIndex };
+        }),
+    );
+  }, [tasks]);
+
+  async function handleDrop(
+    event: React.DragEvent,
+    rowIndex: number,
+    columnIndex: number,
+  ) {
+    // Get the id of the task from the dataTransfer object
+    const taskId = parseInt(event.dataTransfer.getData("text/plain"));
+
+    // Find the task in your state
+    const task = weekTasks.find((task) => task.id == taskId);
+
+    if (task) {
+      // Update the task's start and end times based on the rowIndex
+      // const newStartTime = formatTime(rows[rowIndex]);
+      // const newEndTime = formatTime(rows[rowIndex + 1]);
+
+      const newStartTime = formatTime(hourlyRows[rowIndex - 1][0]);
+      const newEndTime = formatTime(hourlyRows[rowIndex][0]);
+      const date = formatDate(
+        new Date(
+          today.setDate(today.getDate() - today.getDay() + columnIndex - 1),
+        ),
       );
-      const rowEndIndex = hourlyRows.findIndex((row) =>
-        row.includes(taskEndTime),
-      );
 
-      return { ...task, columnIndex, rowStartIndex, rowEndIndex };
-    });
+      // Add task to database
+      await addTask({
+        title: task.title,
+        date,
+        startTime: newStartTime,
+        endTime: newEndTime,
+        type: task.type,
+        assignedUsers: [],
+      });
+    }
+  }
 
   return (
     <>
       <div
         className="relative mt-3 h-[90%] overflow-auto border border-b border-l border-t border-[#797979]"
-        ref={scrollableDivRef}
+        style={{
+          backgroundColor: isOver ? "rgba(0, 0, 0, 0.1)" : "transparent",
+        }}
+        ref={dropRef}
       >
         {rows.map((row: any, rowIndex: number) => (
           <div
@@ -171,6 +234,8 @@ export default function Week({
                   className={cellClasses}
                   disabled={isHeaderCell}
                   onClick={isHeaderCell ? undefined : handleClick}
+                  onDrop={(event) => handleDrop(event, rowIndex, columnIndex)}
+                  onDragOver={(event) => event.preventDefault()}
                 >
                   {column}
                 </button>

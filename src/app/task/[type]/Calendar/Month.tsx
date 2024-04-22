@@ -5,9 +5,22 @@ import { TASK_COLOR } from "@/lib/consts";
 import { usePopupStore } from "../../../../stores/popup";
 import moment from "moment";
 import { Task } from "@prisma/client";
+import { useDrop } from "react-dnd";
+import { addTask } from "../../add";
 
 export default function Month({ tasks }: { tasks: Task[] }) {
   const { open } = usePopupStore();
+
+  const [{ canDrop, isOver }, dropRef] = useDrop({
+    accept: "task",
+    drop: (item, monitor) => {
+      // Update your state here
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+    }),
+  }) as [{ canDrop: boolean; isOver: boolean }, any];
 
   // Initialize an array to hold the dates
   const dates: [Date, Task[] | undefined][] = [];
@@ -71,8 +84,36 @@ export default function Month({ tasks }: { tasks: Task[] }) {
     ...dates,
   ];
 
+  async function handleDrop(event: React.DragEvent, date: string) {
+    // Get the id of the task from the dataTransfer object
+    const taskId = parseInt(event.dataTransfer.getData("text/plain"));
+
+    // Find the task in your state
+    const task = tasks.find((task) => task.id === taskId);
+
+    if (task) {
+      // 10 am
+      const startTime = "10:00";
+      // 6 pm
+      const endTime = "18:00";
+
+      // Add task to database
+      await addTask({
+        title: task.title,
+        date,
+        startTime,
+        endTime,
+        type: task.type,
+        assignedUsers: [],
+      });
+    }
+  }
+
   return (
-    <div className="mt-3 h-[90.8%] border-l border-t border-[#797979]">
+    <div
+      className="mt-3 h-[90.8%] border-l border-t border-[#797979]"
+      ref={dropRef}
+    >
       <div className="grid h-full grid-cols-7">
         {cells.map((cell: any, i) => {
           if (i < 7)
@@ -98,6 +139,10 @@ export default function Month({ tasks }: { tasks: Task[] }) {
                   date: moment(cell[0]).format("YYYY-MM-DD"),
                 });
               }}
+              onDrop={(event) =>
+                handleDrop(event, moment(cell[0]).format("YYYY-MM-DD"))
+              }
+              onDragOver={(event) => event.preventDefault()}
             >
               {cell[0].getDate()}
 

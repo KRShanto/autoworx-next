@@ -4,7 +4,7 @@ import { cn } from "../../../../lib/cn";
 import { TASK_COLOR } from "@/lib/consts";
 import { usePopupStore } from "../../../../stores/popup";
 import moment from "moment";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { HiCalendar, HiClock } from "react-icons/hi";
 import { useMediaQuery } from "react-responsive";
 import { MdModeEdit, MdDelete } from "react-icons/md";
@@ -12,6 +12,8 @@ import { ThreeDots } from "react-loader-spinner";
 import { Task, User } from "@prisma/client";
 import Image from "next/image";
 import { deleteTask } from "../../delete";
+import { useDrop } from "react-dnd";
+import { addTask } from "../../add";
 
 export default function Day({
   tasks,
@@ -23,23 +25,32 @@ export default function Day({
 }) {
   const [hoveredTask, setHoveredTask] = useState<number | null>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const scrollableDivRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
 
   const { open } = usePopupStore();
   const is1300 = useMediaQuery({ query: "(max-width: 1300px)" });
 
+  const [{ canDrop, isOver }, dropRef] = useDrop({
+    accept: "task",
+    drop: (item, monitor) => {
+      // Update your state here
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+    }),
+  }) as [{ canDrop: boolean; isOver: boolean }, any];
+
   useEffect(() => {
     const handleScroll = () => {
-      setScrollPosition(scrollableDivRef.current!.scrollTop);
+      setScrollPosition(dropRef.current.scrollTop);
     };
 
-    scrollableDivRef.current &&
-      scrollableDivRef.current.addEventListener("scroll", handleScroll);
+    dropRef.current && dropRef.current.addEventListener("scroll", handleScroll);
 
     return () => {
-      scrollableDivRef.current &&
-        scrollableDivRef.current.removeEventListener("scroll", handleScroll);
+      dropRef.current &&
+        dropRef.current.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -59,29 +70,41 @@ export default function Day({
     ),
   ];
 
-  const dayTasks = tasks
-    .filter((task) => {
-      // return today's tasks
-      // also filter by month and year
-      const taskDate = moment(task.date);
-      const today = moment();
-      return (
-        taskDate.date() === today.date() &&
-        taskDate.month() === today.month() &&
-        taskDate.year() === today.year()
-      );
-    })
-    .map((task) => {
-      const taskStartTime = moment(task.startTime, "HH:mm").format("h A");
-      const taskEndTime = moment(task.endTime, "HH:mm").format("h A");
+  const [dayTasks, setDayTasks] = useState<
+    (Task & {
+      rowStartIndex: number;
+      rowEndIndex: number;
+      assignedUsers: User[];
+    })[]
+  >([]);
 
-      // Find the rowStartIndex and rowEndIndex by looping through the rows array
-      const rowStartIndex = rows.findIndex((row) => row === taskStartTime);
-      const rowEndIndex = rows.findIndex((row) => row === taskEndTime);
+  useEffect(() => {
+    setDayTasks(
+      tasks
+        .filter((task) => {
+          // return today's tasks
+          // also filter by month and year
+          const taskDate = moment(task.date);
+          const today = moment();
+          return (
+            taskDate.date() === today.date() &&
+            taskDate.month() === today.month() &&
+            taskDate.year() === today.year()
+          );
+        })
+        .map((task) => {
+          const taskStartTime = moment(task.startTime, "HH:mm").format("h A");
+          const taskEndTime = moment(task.endTime, "HH:mm").format("h A");
 
-      // Return the task with the rowStartIndex and rowEndIndex
-      return { ...task, rowStartIndex, rowEndIndex };
-    });
+          // Find the rowStartIndex and rowEndIndex by looping through the rows array
+          const rowStartIndex = rows.findIndex((row) => row === taskStartTime);
+          const rowEndIndex = rows.findIndex((row) => row === taskEndTime);
+
+          // Return the task with the rowStartIndex and rowEndIndex
+          return { ...task, rowStartIndex, rowEndIndex };
+        }),
+    );
+  }, [tasks]);
 
   function formatDate(date: Date) {
     return moment(date).format("YYYY-MM-DD");
@@ -93,15 +116,42 @@ export default function Day({
     return moment(time, "hh:mm A").format("HH:mm");
   }
 
+  async function handleDrop(event: React.DragEvent, rowIndex: number) {
+    // Get the id of the task from the dataTransfer object
+    const taskId = parseInt(event.dataTransfer.getData("text/plain"));
+
+    // Find the task in your state
+    const task = tasks.find((task) => task.id == taskId);
+
+    if (task) {
+      // Update the task's start and end times based on the rowIndex
+      const newStartTime = formatTime(rows[rowIndex]);
+      const newEndTime = formatTime(rows[rowIndex + 1]);
+
+      // Add task to database
+      await addTask({
+        title: task.title,
+        date: new Date().toISOString(),
+        startTime: newStartTime,
+        endTime: newEndTime,
+        type: task.type,
+        assignedUsers: [],
+      });
+    }
+  }
+
   return (
     <>
       <div
+        ref={dropRef}
+        style={{ backgroundColor: isOver ? "lightgreen" : "white" }}
         className="relative mt-3 h-[90%] overflow-auto border border-[#797979]"
-        ref={scrollableDivRef}
       >
         {rows.map((row, i) => (
           <button
             key={i}
+            onDrop={(event) => handleDrop(event, i)}
+            onDragOver={(event) => event.preventDefault()}
             className={cn(
               "block h-[45px] w-full border-[#797979]",
               i !== rows.length - 1 && "border-b",

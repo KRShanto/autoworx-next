@@ -2,6 +2,7 @@ import { TASK_COLOR } from "@/lib/consts";
 import { usePopupStore } from "../../../../stores/popup";
 import { FaPlus } from "react-icons/fa";
 import { Task, User } from "@prisma/client";
+import TaskComponent from "./Task";
 
 export default function Tasks({
   tasks,
@@ -18,13 +19,7 @@ export default function Tasks({
 
       <div className="mt-3 flex max-h-[92%] flex-wrap gap-3 overflow-y-auto">
         {tasks.map((task) => (
-          <div
-            key={task.id}
-            className="rounded-full px-4 py-2 text-[17px] text-white max-[1300px]:px-2 max-[1300px]:py-1 max-[1300px]:text-[14px]"
-            style={{ backgroundColor: TASK_COLOR[task.type] }}
-          >
-            {task.title}
-          </div>
+          <TaskComponent key={task.id} task={task} />
         ))}
 
         <button
