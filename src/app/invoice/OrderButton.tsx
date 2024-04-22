@@ -115,7 +115,7 @@ export default function OrderButton({ user }: { user: User }) {
   return (
     <button
       type="submit"
-      className="mx-auto mt-4 block rounded-md bg-blue-500 px-10 py-2 text-white"
+      className="mx-auto mt-4 block rounded-md bg-blue-500 px-10 py-2 text-white max-[1635px]:px-5 max-[1635px]:py-1 max-[1200px]:px-3 max-[1200px]:py-1 max-[1200px]:text-xs"
       onClick={handleSubmit}
     >
       {loading ? (

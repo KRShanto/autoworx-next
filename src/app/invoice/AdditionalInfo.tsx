@@ -45,7 +45,7 @@ export default function AdditionalInfo({
       ></textarea>
 
       {/* Tags */}
-      <div className="flex w-[45%] flex-wrap items-start gap-2 max-[1500px]:text-xs">
+      <div className="flex w-[45%] flex-wrap items-start gap-2 border max-[1500px]:text-xs">
         {INVOICE_TAGS.map((tag, index) => (
           <div key={index} className="flex items-center gap-2">
             <input
