@@ -23,6 +23,7 @@ interface InvoiceStore {
   created_at: Date;
   issueDate: Date;
   photo: File | null;
+  tags: string[];
 
   setInvoiceId: (id: string) => void;
   setCustomer: (customer: CustomerType) => void;
@@ -39,6 +40,7 @@ interface InvoiceStore {
   removePayment: (tnx: string) => void;
   setIssueDate: (date: Date) => void;
   setPhoto: (photo: File | null) => void;
+  setTags: (tags: string[]) => void;
   reset: () => void;
 }
 
@@ -72,7 +74,6 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
   additional: {
     notes: "",
     terms: "",
-    policy: "",
   },
   status: "Consultations",
   sendMail: false,
@@ -80,6 +81,7 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
   payments: [],
   issueDate: new Date(),
   photo: null,
+  tags: [],
 
   setInvoiceId: (id) => set({ invoiceId: id }),
   setCustomer: (customer) => set({ customer }),
@@ -129,6 +131,7 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
     })),
   setIssueDate: (date) => set({ issueDate: date }),
   setPhoto: (photo) => set({ photo }),
+  setTags: (tags) => set({ tags }),
   reset: () =>
     set({
       invoiceId: "",

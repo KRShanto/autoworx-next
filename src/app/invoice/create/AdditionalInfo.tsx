@@ -1,24 +1,22 @@
+import { INVOICE_TAGS } from "@/lib/consts";
 import { useInvoiceStore } from "../../../stores/invoice";
 import { useEffect } from "react";
 
 export default function AdditionalInfo({
   notes,
   terms,
-  policy,
 }: {
   notes: string;
   terms: string;
-  policy: string;
 }) {
-  const { additional, setAdditional } = useInvoiceStore();
+  const { additional, tags, setTags, setAdditional } = useInvoiceStore();
 
   useEffect(() => {
     setAdditional({
-      notes: notes,
-      terms: terms,
-      policy: policy,
+      notes,
+      terms,
     });
-  }, [notes, terms, policy]);
+  }, [notes, terms]);
 
   return (
     <>
@@ -26,7 +24,7 @@ export default function AdditionalInfo({
       <textarea
         name="notes"
         id="notes"
-        className="w-[15%] resize-none h-24 p-1 px-2 invoice-inner-shadow border-none text-black additional"
+        className="invoice-inner-shadow additional h-24 w-[15%] resize-none border-none p-1 px-2 text-black"
         placeholder="Add Notes"
         value={additional.notes}
         onChange={(e) =>
@@ -38,7 +36,7 @@ export default function AdditionalInfo({
       <textarea
         name="terms"
         id="terms"
-        className="w-[15%] resize-none h-24 p-1 px-2 invoice-inner-shadow border-none text-black additional"
+        className="invoice-inner-shadow additional h-24 w-[15%] resize-none border-none p-1 px-2 text-black"
         placeholder="Terms & Conditions"
         value={additional.terms}
         onChange={(e) =>
@@ -46,27 +44,26 @@ export default function AdditionalInfo({
         }
       ></textarea>
 
-      <div className="w-[45%] flex flex-wrap gap-2 items-start max-[1500px]:text-xs">
-        <div className="flex items-center gap-2">
-          <input type="checkbox" name="order" id="order" className="text-sm" />
-          <label htmlFor="order">Order Material</label>
-        </div>
-        <div className="flex items-center gap-2">
-          <input type="checkbox" name="deposit" id="deposit" />
-          <label htmlFor="deposit">Get Deposit</label>
-        </div>
-        <div className="flex items-center gap-2">
-          <input type="checkbox" name="send" id="send" />
-          <label htmlFor="send">Send Invoice</label>
-        </div>
-        <div className="flex items-center gap-2">
-          <input type="checkbox" name="procurement" id="procurement" />
-          <label htmlFor="procurement ">Part Procurement</label>
-        </div>
-        <div className="flex items-center gap-2">
-          <input type="checkbox" name="schedule" id="schedule" />
-          <label htmlFor="schedule">Schedule for Followup</label>
-        </div>
+      {/* Tags */}
+      <div className="flex w-[45%] flex-wrap items-start gap-2 max-[1500px]:text-xs">
+        {INVOICE_TAGS.map((tag, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name={tag.name}
+              id={tag.name}
+              checked={tags.includes(tag.name)}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setTags([...tags, tag.name]);
+                } else {
+                  setTags(tags.filter((t) => t !== tag.name));
+                }
+              }}
+            />
+            <label htmlFor={tag.name}>{tag.title}</label>
+          </div>
+        ))}
       </div>
     </>
   );

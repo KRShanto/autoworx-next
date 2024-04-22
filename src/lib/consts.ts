@@ -70,3 +70,26 @@ export const NAV_LINKS: NavItem[] = [
     ],
   },
 ];
+
+export const INVOICE_TAGS = [
+  {
+    title: "Order Material",
+    name: "order",
+  },
+  {
+    title: "Get Deposit",
+    name: "deposit",
+  },
+  {
+    title: "Send Invoice",
+    name: "send",
+  },
+  {
+    title: "Part Procurement",
+    name: "procurement",
+  },
+  {
+    title: "Schedule for Followup",
+    name: "schedule",
+  },
+];

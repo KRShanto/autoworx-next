@@ -117,6 +117,7 @@ model Task {
   company     Company? @relation(fields: [companyId], references: [id])
   workOrder   WorkOrder? @relation(fields: [workOrderId], references: [id])
   taskUsers   TaskUser[]
+  invoiceTag  String?  @map("invoice_tag")
 
   @@index([userId], name: "fk_tasks_user")
   @@index([companyId], name: "fk_tasks_company")
@@ -229,6 +230,7 @@ model Invoice {
   salesperson String
   company     Company? @relation(fields: [companyId], references: [id])
   payment     Payment[]
+  tags        String   @default("")
 
   @@index([companyId], name: "fk_invoices_company")
 }
@@ -306,7 +308,6 @@ model InvoiceAdditional {
   companyId Int      @map("company_id")
   note      String
   terms     String
-  policy    String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   company   Company  @relation(fields: [companyId], references: [id])

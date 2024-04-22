@@ -24,6 +24,7 @@ export default function OrderButton({ user }: { user: User }) {
     payments,
     photo,
     reset,
+    tags,
   } = useInvoiceStore();
   const { showError } = useFormErrorStore();
   const router = useRouter();
@@ -63,13 +64,13 @@ export default function OrderButton({ user }: { user: User }) {
 
       notes: additional.notes,
       terms: additional.terms,
-      policy: additional.policy,
 
       services: services.map((service) => service.id),
       status,
       sendMail,
       payments,
       issueDate,
+      tags,
     };
 
     // check if any service is empty

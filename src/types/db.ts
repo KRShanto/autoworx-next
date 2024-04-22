@@ -67,7 +67,6 @@ export interface Pricing {
 export interface AdditionalInfo {
   notes: string;
   terms: string;
-  policy: string;
 }
 
 export type Status =

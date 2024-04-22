@@ -43,7 +43,6 @@ const InvoiceSchema = z.object({
 
   notes: z.string(),
   terms: z.string(),
-  policy: z.string(),
 
   payments: z.array(
     z.object({
@@ -57,6 +56,7 @@ const InvoiceSchema = z.object({
   status: z.string(),
   sendMail: z.boolean(),
   issueDate: z.date(),
+  tags: z.array(z.string()),
 });
 
 export async function createInvoice(data: {
@@ -95,13 +95,13 @@ export async function createInvoice(data: {
 
   notes: string;
   terms: string;
-  policy: string;
 
   payments: Payment[];
 
   status: string;
   sendMail: boolean;
   issueDate: Date;
+  tags: string[];
 }) {
   try {
     InvoiceSchema.parse(data);
@@ -156,10 +156,10 @@ export async function createInvoice(data: {
         sendMail: data.sendMail,
         notes: data.notes,
         terms: data.terms,
-        policy: data.policy,
         issueDate: data.issueDate,
         salesperson: session.user.name,
         companyId,
+        tags: data.tags.join(","),
       },
     });
 
@@ -189,7 +189,6 @@ export async function createInvoice(data: {
         data: {
           note: data.notes,
           terms: data.terms,
-          policy: data.policy,
           companyId,
         },
       });
@@ -201,7 +200,6 @@ export async function createInvoice(data: {
         data: {
           note: data.notes,
           terms: data.terms,
-          policy: data.policy,
         },
       });
     }
