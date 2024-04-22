@@ -132,7 +132,7 @@ enum TaskType {
 
 model OAuthToken {
   id           Int      @id @default(autoincrement())
-  userId       Int      @map("user_id")
+  userId       Int      @map("user_id") @unique
   provider     String
   accessToken  String   @map("access_token")
   refreshToken String?  @map("refresh_token")

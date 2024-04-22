@@ -1,11 +1,11 @@
 export default function GoogleConnectButton() {
-  const redirectGoogle = () => {};
-
-  return null;
+  const redirectGoogle = () => {
+    window.location.href = "/api/google/redirect";
+  };
 
   return (
     <button
-      className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded cursor-pointer"
+      className="cursor-pointer rounded bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-500"
       onClick={redirectGoogle}
     >
       Connect Google Calendar
