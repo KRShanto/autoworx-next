@@ -4,11 +4,18 @@ import { cn } from "@/lib/cn";
 import { TASK_COLOR } from "@/lib/consts";
 import { usePopupStore } from "../../../../stores/popup";
 import moment from "moment";
-import { Task } from "@prisma/client";
+import { Task, TaskType } from "@prisma/client";
 import { useDrop } from "react-dnd";
 import { addTask } from "../../add";
+import { CalendarTask } from "@/types/db";
 
-export default function Month({ tasks }: { tasks: Task[] }) {
+export default function Month({
+  tasks,
+  tasksWithoutTime,
+}: {
+  tasks: CalendarTask[];
+  tasksWithoutTime: Task[];
+}) {
   const { open } = usePopupStore();
 
   const [{ canDrop, isOver }, dropRef] = useDrop({
@@ -23,7 +30,7 @@ export default function Month({ tasks }: { tasks: Task[] }) {
   }) as [{ canDrop: boolean; isOver: boolean }, any];
 
   // Initialize an array to hold the dates
-  const dates: [Date, Task[] | undefined][] = [];
+  const dates: [Date, CalendarTask[] | undefined][] = [];
   // Define the total number of dates to be displayed
   const totalDates = 35;
   // Get the current date
@@ -89,7 +96,7 @@ export default function Month({ tasks }: { tasks: Task[] }) {
     const taskId = parseInt(event.dataTransfer.getData("text/plain"));
 
     // Find the task in your state
-    const task = tasks.find((task) => task.id === taskId);
+    const task = tasksWithoutTime.find((task) => task.id === taskId);
 
     if (task) {
       // 10 am
@@ -99,12 +106,10 @@ export default function Month({ tasks }: { tasks: Task[] }) {
 
       // Add task to database
       await addTask({
-        title: task.title,
+        id: task.id,
         date,
         startTime,
         endTime,
-        type: task.type,
-        assignedUsers: [],
       });
     }
   }
@@ -147,7 +152,7 @@ export default function Month({ tasks }: { tasks: Task[] }) {
               {cell[0].getDate()}
 
               <div className="absolute bottom-2 flex flex-wrap justify-end gap-4">
-                {cell[1]?.map((task: Task, i: number) => (
+                {cell[1]?.map((task: CalendarTask, i: number) => (
                   <div
                     key={i}
                     className="h-[15px] w-[15px] rounded-full max-[1472px]:h-[12px] max-[1472px]:w-[12px]"

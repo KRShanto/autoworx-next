@@ -6,53 +6,82 @@ import { auth } from "../auth";
 import { AuthSession } from "@/types/auth";
 import { revalidatePath } from "next/cache";
 
-export async function addTask(task: {
+interface TaskToUpdate {
+  id: number;
+  date: string;
+  startTime: string;
+  endTime: string;
+}
+
+interface TaskToAdd {
   title: string;
   date: string;
   startTime: string;
   endTime: string;
   type: TaskType;
   assignedUsers: number[];
-}) {
+}
+
+export async function addTask(task: TaskToAdd | TaskToUpdate) {
   const session = (await auth()) as AuthSession;
 
-  if (!task.title) {
-    return { message: "Title is required", field: "title" };
-  }
-
-  const newTask = await db.task.create({
-    data: {
-      title: task.title,
-      type: task.type,
-      startTime: task.startTime,
-      endTime: task.endTime,
-      date: new Date(task.date),
-      userId: parseInt(session.user.id),
-      companyId: session.user.companyId,
-    },
-  });
-
-  // Loop the assigned users and add them to the Google Calendar
-  for (const user of task.assignedUsers) {
-    const assignedUser = await db.user.findUnique({
+  if ("id" in task) {
+    // Check if the task exist
+    const existingTask = await db.task.findFirst({
       where: {
-        id: user,
+        id: task.id,
       },
     });
 
-    // TODO: Add the task to the user's Google Calendar
+    if (!existingTask) {
+      return { message: "Task not found", field: "all" };
+    }
 
-    // Create the task user
-    await db.taskUser.create({
+    // Update the task
+    await db.task.update({
+      where: {
+        id: task.id,
+      },
       data: {
-        taskId: newTask.id,
-        userId: user,
-        eventId: "null-for-now",
+        startTime: task.startTime,
+        endTime: task.endTime,
+        date: new Date(task.date!),
       },
     });
-  }
+  } else {
+    const newTask = await db.task.create({
+      data: {
+        title: task.title,
+        type: task.type!,
+        startTime: task.startTime,
+        endTime: task.endTime,
+        date: task.date && new Date(task.date!),
+        userId: parseInt(session.user.id),
+        companyId: session.user.companyId,
+      },
+    });
 
+    // Loop the assigned users and add them to the Google Calendar
+    for (const user of task.assignedUsers) {
+      const assignedUser = await db.user.findUnique({
+        where: {
+          id: user,
+        },
+      });
+
+      // TODO: Add the task to the user's Google Calendar
+
+      // Create the task user
+      await db.taskUser.create({
+        data: {
+          taskId: newTask.id,
+          userId: user,
+          eventId: "null-for-now",
+        },
+      });
+    }
+  }
   revalidatePath("/task");
 
-  return newTask;
+  return true;
 }

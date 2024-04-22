@@ -105,9 +105,9 @@ model Task {
   id          Int      @id @default(autoincrement())
   userId      Int      @map("user_id")
   title       String   @db.VarChar(100)
-  date        DateTime
-  startTime   String   @map("start_time")
-  endTime     String   @map("end_time")  
+  date        DateTime?
+  startTime   String?   @map("start_time")
+  endTime     String?   @map("end_time")  
   type        TaskType
   companyId   Int?     @map("company_id")
   workOrderId Int?     @map("work_order_id")

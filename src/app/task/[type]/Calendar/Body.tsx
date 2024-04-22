@@ -3,19 +3,35 @@ import Week from "./Week";
 import Month from "./Month";
 import { CalendarType } from "@/types/calendar";
 import { Task, User } from "@prisma/client";
+import { CalendarTask } from "@/types/db";
 
 export default function Body({
   type,
-  taskWithAssignedUsers,
+  tasks,
   companyUsers,
+  tasksWithoutTime,
 }: {
   type: CalendarType;
-  taskWithAssignedUsers: (Task & { assignedUsers: User[] })[];
+  tasks: CalendarTask[];
   companyUsers: User[];
+  tasksWithoutTime: Task[];
 }) {
   if (type === "day")
-    return <Day tasks={taskWithAssignedUsers} companyUsers={companyUsers} />;
+    return (
+      <Day
+        tasks={tasks}
+        companyUsers={companyUsers}
+        tasksWithoutTime={tasksWithoutTime}
+      />
+    );
   if (type === "week")
-    return <Week tasks={taskWithAssignedUsers} companyUsers={companyUsers} />;
-  if (type === "month") return <Month tasks={taskWithAssignedUsers} />;
+    return (
+      <Week
+        tasks={tasks}
+        companyUsers={companyUsers}
+        tasksWithoutTime={tasksWithoutTime}
+      />
+    );
+  if (type === "month")
+    return <Month tasks={tasks} tasksWithoutTime={tasksWithoutTime} />;
 }

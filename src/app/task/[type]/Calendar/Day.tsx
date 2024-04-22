@@ -9,19 +9,22 @@ import { HiCalendar, HiClock } from "react-icons/hi";
 import { useMediaQuery } from "react-responsive";
 import { MdModeEdit, MdDelete } from "react-icons/md";
 import { ThreeDots } from "react-loader-spinner";
-import { Task, User } from "@prisma/client";
+import { Task, TaskType, User } from "@prisma/client";
 import Image from "next/image";
 import { deleteTask } from "../../delete";
 import { useDrop } from "react-dnd";
 import { addTask } from "../../add";
+import { CalendarTask } from "@/types/db";
 
 export default function Day({
   tasks,
   companyUsers,
+  tasksWithoutTime,
 }: {
   // tasks with assigned users
-  tasks: (Task & { assignedUsers: User[] })[];
+  tasks: CalendarTask[];
   companyUsers: User[];
+  tasksWithoutTime: Task[];
 }) {
   const [hoveredTask, setHoveredTask] = useState<number | null>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -71,10 +74,9 @@ export default function Day({
   ];
 
   const [dayTasks, setDayTasks] = useState<
-    (Task & {
+    (CalendarTask & {
       rowStartIndex: number;
       rowEndIndex: number;
-      assignedUsers: User[];
     })[]
   >([]);
 
@@ -121,7 +123,9 @@ export default function Day({
     const taskId = parseInt(event.dataTransfer.getData("text/plain"));
 
     // Find the task in your state
-    const task = tasks.find((task) => task.id == taskId);
+    const task = tasksWithoutTime.find((task) => task.id == taskId);
+
+    console.log("Task droped: ", task);
 
     if (task) {
       // Update the task's start and end times based on the rowIndex
@@ -130,12 +134,10 @@ export default function Day({
 
       // Add task to database
       await addTask({
-        title: task.title,
+        id: task.id,
         date: new Date().toISOString(),
         startTime: newStartTime,
         endTime: newEndTime,
-        type: task.type,
-        assignedUsers: [],
       });
     }
   }

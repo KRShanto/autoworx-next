@@ -8,18 +8,21 @@ import { useEffect, useRef, useState } from "react";
 import { HiCalendar, HiClock } from "react-icons/hi";
 import { MdDelete, MdModeEdit } from "react-icons/md";
 import { ThreeDots } from "react-loader-spinner";
-import { Task, User } from "@prisma/client";
+import { Task, TaskType, User } from "@prisma/client";
 import Image from "next/image";
 import { deleteTask } from "../../delete";
 import { useDrop } from "react-dnd";
 import { addTask } from "../../add";
+import { CalendarTask } from "@/types/db";
 
 export default function Week({
   tasks,
   companyUsers,
+  tasksWithoutTime,
 }: {
-  tasks: (Task & { assignedUsers: User[] })[];
+  tasks: CalendarTask[];
   companyUsers: User[];
+  tasksWithoutTime: Task[];
 }) {
   const [hoveredTask, setHoveredTask] = useState<number | null>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -110,10 +113,9 @@ export default function Week({
 
   // Filter out the tasks that are within the current week
   const [weekTasks, setWeekTasks] = useState<
-    (Task & {
+    (CalendarTask & {
       rowStartIndex: number;
       rowEndIndex: number;
-      assignedUsers: User[];
       columnIndex: number;
     })[]
   >([]);
@@ -155,13 +157,9 @@ export default function Week({
     const taskId = parseInt(event.dataTransfer.getData("text/plain"));
 
     // Find the task in your state
-    const task = weekTasks.find((task) => task.id == taskId);
+    const task = tasksWithoutTime.find((task) => task.id == taskId);
 
     if (task) {
-      // Update the task's start and end times based on the rowIndex
-      // const newStartTime = formatTime(rows[rowIndex]);
-      // const newEndTime = formatTime(rows[rowIndex + 1]);
-
       const newStartTime = formatTime(hourlyRows[rowIndex - 1][0]);
       const newEndTime = formatTime(hourlyRows[rowIndex][0]);
       const date = formatDate(
@@ -172,12 +170,10 @@ export default function Week({
 
       // Add task to database
       await addTask({
-        title: task.title,
+        id: task.id,
         date,
         startTime: newStartTime,
         endTime: newEndTime,
-        type: task.type,
-        assignedUsers: [],
       });
     }
   }

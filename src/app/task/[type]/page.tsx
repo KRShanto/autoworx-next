@@ -10,6 +10,7 @@ import { AuthSession } from "@/types/auth";
 import { auth } from "@/app/auth";
 import { CalendarType } from "@/types/calendar";
 import TaskPage from "./TaskPage";
+import { CalendarTask } from "@/types/db";
 
 export const metadata: Metadata = {
   title: "Task and Activity Management",
@@ -23,6 +24,7 @@ export default async function Page({ params }: { params: { type: string } }) {
   const taskWithAssignedUsers = [];
 
   // Get all the tasks for the company
+  // where startTime, endTime, and date are not null
   const tasks = await db.task.findMany({
     where: {
       companyId: session.user.companyId,
