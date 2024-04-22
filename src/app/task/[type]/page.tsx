@@ -91,6 +91,27 @@ export default async function Page({ params }: { params: { type: string } }) {
     });
   }
 
+  // Get all invoices
+  const invoices = await db.invoice.findMany({
+    where: {
+      companyId: session.user.companyId,
+    },
+  });
+
+  // filter tags from invoices
+  // tags is ['tag1,tag2', 'tag2,tag4']
+
+  const tags = invoices.map((invoice) => invoice.tags).flat();
+  // split tags into array
+  const tagsArray = tags.map((tag) => tag.split(",")).flat();
+
+  // Find unique tags
+  const uniqueTags = tagsArray.filter(
+    (tag, index) => tagsArray.indexOf(tag) === index,
+  );
+
+  console.log("tags: ", uniqueTags);
+
   return (
     <>
       <Title>Task and Activity Management</Title>
@@ -102,6 +123,7 @@ export default async function Page({ params }: { params: { type: string } }) {
           companyUsers={companyUsers}
           usersWithTasks={usersWithTasks}
           tasks={tasks}
+          tags={uniqueTags}
         />
       </div>
     </>

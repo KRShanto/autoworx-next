@@ -9,7 +9,7 @@ import { HiCalendar, HiClock } from "react-icons/hi";
 import { useMediaQuery } from "react-responsive";
 import { MdModeEdit, MdDelete } from "react-icons/md";
 import { ThreeDots } from "react-loader-spinner";
-import { Task, TaskType, User } from "@prisma/client";
+import { Task, User } from "@prisma/client";
 import Image from "next/image";
 import { deleteTask } from "../../delete";
 import { useDrop } from "react-dnd";
@@ -34,7 +34,7 @@ export default function Day({
   const is1300 = useMediaQuery({ query: "(max-width: 1300px)" });
 
   const [{ canDrop, isOver }, dropRef] = useDrop({
-    accept: "task",
+    accept: ["task", "tag"],
     drop: (item, monitor) => {
       // Update your state here
     },
@@ -119,26 +119,35 @@ export default function Day({
   }
 
   async function handleDrop(event: React.DragEvent, rowIndex: number) {
-    // Get the id of the task from the dataTransfer object
-    const taskId = parseInt(event.dataTransfer.getData("text/plain"));
+    const startTime = formatTime(rows[rowIndex]);
+    const endTime = formatTime(rows[rowIndex + 1]);
+    const date = new Date().toISOString();
 
-    // Find the task in your state
-    const task = tasksWithoutTime.find((task) => task.id == taskId);
+    // Get the task type
+    const type = event.dataTransfer.getData("text/plain").split("|")[0];
 
-    console.log("Task droped: ", task);
+    if (type === "tag") {
+      const tag = event.dataTransfer.getData("text/plain").split("|")[1];
 
-    if (task) {
-      // Update the task's start and end times based on the rowIndex
-      const newStartTime = formatTime(rows[rowIndex]);
-      const newEndTime = formatTime(rows[rowIndex + 1]);
+      await addTask({ tag, date, startTime, endTime });
+    } else {
+      // Get the id of the task from the dataTransfer object
+      const taskId = parseInt(
+        event.dataTransfer.getData("text/plain").split("|")[1],
+      );
 
-      // Add task to database
-      await addTask({
-        id: task.id,
-        date: new Date().toISOString(),
-        startTime: newStartTime,
-        endTime: newEndTime,
-      });
+      // Find the task in your state
+      const task = tasksWithoutTime.find((task) => task.id == taskId);
+
+      if (task) {
+        // Add task to database
+        await addTask({
+          id: task.id,
+          date,
+          startTime,
+          endTime,
+        });
+      }
     }
   }
 

@@ -14,7 +14,7 @@ export default function TaskComponent({ task }: { task: Task }) {
   });
 
   const handleDragStart = (event: React.DragEvent) => {
-    event.dataTransfer.setData("text/plain", task.id.toLocaleString());
+    event.dataTransfer.setData("text/plain", `task|${task.id}`);
   };
 
   if (!task.date) {

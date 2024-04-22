@@ -14,12 +14,14 @@ export default function TaskPage({
   companyUsers,
   usersWithTasks,
   tasks,
+  tags,
 }: {
   type: CalendarType;
   taskWithAssignedUsers: (Task & { assignedUsers: User[] })[];
   companyUsers: User[];
   usersWithTasks: any; // TODO: Fix this type
   tasks: Task[];
+  tags: string[];
 }) {
   // Filter the tasks where startTime, endTime, and date are not null
   const calendarTasks = taskWithAssignedUsers.filter(
@@ -38,7 +40,7 @@ export default function TaskPage({
         tasksWithoutTime={tasksWithoutTime}
         companyUsers={companyUsers}
       />
-      <CalendarUser usersWithTasks={usersWithTasks} tasks={tasks} />
+      <CalendarUser usersWithTasks={usersWithTasks} tasks={tasks} tags={tags} />
     </DndProvider>
   );
 }

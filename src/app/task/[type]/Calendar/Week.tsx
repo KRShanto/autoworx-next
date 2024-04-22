@@ -4,11 +4,11 @@ import { cn } from "@/lib/cn";
 import { TASK_COLOR } from "@/lib/consts";
 import { usePopupStore } from "../../../../stores/popup";
 import moment from "moment";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { HiCalendar, HiClock } from "react-icons/hi";
 import { MdDelete, MdModeEdit } from "react-icons/md";
 import { ThreeDots } from "react-loader-spinner";
-import { Task, TaskType, User } from "@prisma/client";
+import { Task, User } from "@prisma/client";
 import Image from "next/image";
 import { deleteTask } from "../../delete";
 import { useDrop } from "react-dnd";
@@ -31,7 +31,7 @@ export default function Week({
   const { open } = usePopupStore();
 
   const [{ canDrop, isOver }, dropRef] = useDrop({
-    accept: "task",
+    accept: ["task", "tag"],
     drop: (item, monitor) => {
       // Update your state here
     },
@@ -153,28 +153,37 @@ export default function Week({
     rowIndex: number,
     columnIndex: number,
   ) {
-    // Get the id of the task from the dataTransfer object
-    const taskId = parseInt(event.dataTransfer.getData("text/plain"));
+    const startTime = formatTime(hourlyRows[rowIndex - 1][0]);
+    const endTime = formatTime(hourlyRows[rowIndex][0]);
+    const date = formatDate(
+      new Date(
+        today.setDate(today.getDate() - today.getDay() + columnIndex - 1),
+      ),
+    );
 
-    // Find the task in your state
-    const task = tasksWithoutTime.find((task) => task.id == taskId);
+    // Get the task type
+    const type = event.dataTransfer.getData("text/plain").split("|")[0];
 
-    if (task) {
-      const newStartTime = formatTime(hourlyRows[rowIndex - 1][0]);
-      const newEndTime = formatTime(hourlyRows[rowIndex][0]);
-      const date = formatDate(
-        new Date(
-          today.setDate(today.getDate() - today.getDay() + columnIndex - 1),
-        ),
-      );
+    if (type === "tag") {
+      const tag = event.dataTransfer.getData("text/plain").split("|")[1];
 
-      // Add task to database
-      await addTask({
-        id: task.id,
-        date,
-        startTime: newStartTime,
-        endTime: newEndTime,
-      });
+      await addTask({ tag, date, startTime, endTime });
+    } else {
+      // Get the id of the task from the dataTransfer object
+      const taskId = parseInt(event.dataTransfer.getData("text/plain"));
+
+      // Find the task in your state
+      const task = tasksWithoutTime.find((task) => task.id == taskId);
+
+      if (task) {
+        // Add task to database
+        await addTask({
+          id: task.id,
+          date,
+          startTime,
+          endTime,
+        });
+      }
     }
   }
 

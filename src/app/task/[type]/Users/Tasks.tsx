@@ -3,13 +3,16 @@ import { usePopupStore } from "../../../../stores/popup";
 import { FaPlus } from "react-icons/fa";
 import { Task, User } from "@prisma/client";
 import TaskComponent from "./Task";
+import TagComponent from "./Tag";
 
 export default function Tasks({
   tasks,
   users,
+  tags,
 }: {
   tasks: Task[];
   users: User[];
+  tags: string[];
 }) {
   const { open } = usePopupStore();
 
@@ -20,6 +23,10 @@ export default function Tasks({
       <div className="mt-3 flex max-h-[92%] flex-wrap gap-3 overflow-y-auto">
         {tasks.map((task) => (
           <TaskComponent key={task.id} task={task} />
+        ))}
+
+        {tags.map((tag, index) => (
+          <TagComponent key={index} tag={tag} />
         ))}
 
         <button

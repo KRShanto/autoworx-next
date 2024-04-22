@@ -22,10 +22,52 @@ interface TaskToAdd {
   assignedUsers: number[];
 }
 
-export async function addTask(task: TaskToAdd | TaskToUpdate) {
+interface TagTask {
+  tag: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+}
+
+export async function addTask(task: TaskToAdd | TaskToUpdate | TagTask) {
   const session = (await auth()) as AuthSession;
 
-  if ("id" in task) {
+  if ("tag" in task) {
+    // Find the invoices
+    const invoices = await db.invoice.findMany({
+      where: {
+        companyId: session.user.companyId,
+      },
+    });
+
+    const taggedInvoices = invoices.filter((invoice) => {
+      return invoice.tags.includes(task.tag);
+    });
+
+    for (const invoice of taggedInvoices) {
+      const serviceId = (invoice.serviceIds as number[])[0];
+
+      const service = await db.service.findUnique({
+        where: {
+          id: serviceId,
+        },
+      });
+
+      await db.task.create({
+        data: {
+          title: service?.name!,
+          date: new Date(task.date),
+          startTime: task.startTime,
+          endTime: task.endTime,
+          type: TaskType.task,
+          userId: parseInt(session.user.id),
+          companyId: session.user.companyId,
+        },
+      });
+
+      // TODO: Add the task to the user's Google Calendar
+    }
+  } else if ("id" in task) {
     // Check if the task exist
     const existingTask = await db.task.findFirst({
       where: {
@@ -81,6 +123,7 @@ export async function addTask(task: TaskToAdd | TaskToUpdate) {
       });
     }
   }
+
   revalidatePath("/task");
 
   return true;

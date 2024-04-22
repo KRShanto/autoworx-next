@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 import { TASK_COLOR } from "@/lib/consts";
 import { usePopupStore } from "../../../../stores/popup";
 import moment from "moment";
-import { Task, TaskType } from "@prisma/client";
+import { Task } from "@prisma/client";
 import { useDrop } from "react-dnd";
 import { addTask } from "../../add";
 import { CalendarTask } from "@/types/db";
@@ -19,7 +19,7 @@ export default function Month({
   const { open } = usePopupStore();
 
   const [{ canDrop, isOver }, dropRef] = useDrop({
-    accept: "task",
+    accept: ["task", "tag"],
     drop: (item, monitor) => {
       // Update your state here
     },
@@ -92,25 +92,34 @@ export default function Month({
   ];
 
   async function handleDrop(event: React.DragEvent, date: string) {
-    // Get the id of the task from the dataTransfer object
-    const taskId = parseInt(event.dataTransfer.getData("text/plain"));
+    // 10 am
+    const startTime = "10:00";
+    // 6 pm
+    const endTime = "18:00";
 
-    // Find the task in your state
-    const task = tasksWithoutTime.find((task) => task.id === taskId);
+    // Get the task type
+    const type = event.dataTransfer.getData("text/plain").split("|")[0];
 
-    if (task) {
-      // 10 am
-      const startTime = "10:00";
-      // 6 pm
-      const endTime = "18:00";
+    if (type === "tag") {
+      const tag = event.dataTransfer.getData("text/plain").split("|")[1];
 
-      // Add task to database
-      await addTask({
-        id: task.id,
-        date,
-        startTime,
-        endTime,
-      });
+      await addTask({ tag, date, startTime, endTime });
+    } else {
+      // Get the id of the task from the dataTransfer object
+      const taskId = parseInt(event.dataTransfer.getData("text/plain"));
+
+      // Find the task in your state
+      const task = tasksWithoutTime.find((task) => task.id === taskId);
+
+      if (task) {
+        // Add task to database
+        await addTask({
+          id: task.id,
+          date,
+          startTime,
+          endTime,
+        });
+      }
     }
   }
 
