@@ -18,11 +18,9 @@ export default function TaskComponent({ task }: { task: Task }) {
   };
 
   if (!task.date) {
-    console.log("taskid: ", task.id);
-
     return (
       <div
-        className="cursor-move rounded-full px-4 py-2 text-[17px] text-white max-[1300px]:px-2 max-[1300px]:py-1 max-[1300px]:text-[14px]"
+        className="cursor-move rounded-md px-4 py-2 text-[17px] text-white max-[1300px]:px-2 max-[1300px]:py-1 max-[1300px]:text-[14px]"
         style={{
           backgroundColor: TASK_COLOR[task.type],
           opacity: isDragging ? 0.5 : 1,
@@ -38,7 +36,7 @@ export default function TaskComponent({ task }: { task: Task }) {
 
   return (
     <div
-      className="rounded-full px-4 py-2 text-[17px] text-white max-[1300px]:px-2 max-[1300px]:py-1 max-[1300px]:text-[14px]"
+      className="rounded-md px-4 py-2 text-[17px] text-white max-[1300px]:px-2 max-[1300px]:py-1 max-[1300px]:text-[14px]"
       style={{
         backgroundColor: TASK_COLOR[task.type],
       }}

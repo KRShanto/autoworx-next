@@ -106,7 +106,9 @@ export default function Month({
       await addTask({ tag, date, startTime, endTime });
     } else {
       // Get the id of the task from the dataTransfer object
-      const taskId = parseInt(event.dataTransfer.getData("text/plain"));
+      const taskId = parseInt(
+        event.dataTransfer.getData("text/plain").split("|")[1],
+      );
 
       // Find the task in your state
       const task = tasksWithoutTime.find((task) => task.id === taskId);

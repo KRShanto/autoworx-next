@@ -164,16 +164,20 @@ export default function Week({
     // Get the task type
     const type = event.dataTransfer.getData("text/plain").split("|")[0];
 
+    console.log(type);
+
     if (type === "tag") {
       const tag = event.dataTransfer.getData("text/plain").split("|")[1];
 
       await addTask({ tag, date, startTime, endTime });
     } else {
       // Get the id of the task from the dataTransfer object
-      const taskId = parseInt(event.dataTransfer.getData("text/plain"));
+      const taskId = parseInt(
+        event.dataTransfer.getData("text/plain").split("|")[1],
+      );
 
       // Find the task in your state
-      const task = tasksWithoutTime.find((task) => task.id == taskId);
+      const task = tasksWithoutTime.find((task) => task.id === taskId);
 
       if (task) {
         // Add task to database

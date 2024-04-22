@@ -34,7 +34,7 @@ export default function Day({
   const is1300 = useMediaQuery({ query: "(max-width: 1300px)" });
 
   const [{ canDrop, isOver }, dropRef] = useDrop({
-    accept: ["task", "tag"],
+    accept: ["tag", "task"],
     drop: (item, monitor) => {
       // Update your state here
     },

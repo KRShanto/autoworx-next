@@ -16,7 +16,7 @@ export default function TagComponent({ tag }: { tag: string }) {
 
   return (
     <div
-      className="cursor-move rounded-full bg-blue-400 px-4 py-2 text-[17px] text-white max-[1300px]:px-2 max-[1300px]:py-1 max-[1300px]:text-[14px]"
+      className="cursor-move rounded-md bg-blue-600 px-4 py-2 text-[17px] text-white max-[1300px]:px-2 max-[1300px]:py-1 max-[1300px]:text-[14px]"
       style={{
         opacity: isDragging ? 0.5 : 1,
       }}

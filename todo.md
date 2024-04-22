@@ -11,7 +11,7 @@
 
 ## Task And Activity Management
 
-- [ ] Edit feature for Tasks
+- [x] Edit feature for Tasks
 - [ ] Google Calendar API integration
 - [ ] Instead of using popups, use modals for task creation and other actions
 - [ ] Implement new UI in **Month** view
