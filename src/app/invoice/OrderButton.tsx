@@ -7,9 +7,11 @@ import { usePathname, useRouter } from "next/navigation";
 import { User } from "next-auth";
 import { createInvoice } from "./create/create";
 import { useFormErrorStore } from "@/stores/form-error";
+import { editInvoice } from "./edit/edit";
 
 export default function OrderButton({ user }: { user: User }) {
-  const lastPath = usePathname().split("/").pop();
+  const pathname = usePathname();
+  const lastPath = pathname.split("/").pop();
   const [loading, setLoading] = useState(false);
   const {
     invoiceId,
@@ -38,7 +40,7 @@ export default function OrderButton({ user }: { user: User }) {
       customer: {
         name: customer.name,
         email: customer.email,
-        mobile: parseInt(customer.mobile),
+        mobile: customer.mobile,
         address: customer.address,
         city: customer.city,
         state: customer.state,
@@ -48,7 +50,7 @@ export default function OrderButton({ user }: { user: User }) {
       vehicle: {
         make: vehicle.make,
         model: vehicle.model,
-        year: parseInt(vehicle.year),
+        year: vehicle.year,
         vin: vehicle.vin,
         license: vehicle.license,
       },
@@ -81,19 +83,35 @@ export default function OrderButton({ user }: { user: User }) {
 
     if (lastPath === "create") {
       setLoading(true);
+      console.log("gonna create invoice");
       const res = await createInvoice(data);
 
       // @ts-ignore
       if (res && res.field) {
         // @ts-ignore
         showError(res);
+        setLoading(false);
       } else {
-        reset();
-        router.push(`/invoice/view/${data.invoiceId}`);
+        // NOTE: router.push takes time to redirect, so we will use window
+        window.location.href = `/invoice/view/${data.invoiceId}`;
       }
-      setLoading(false);
-    } else if (lastPath === "edit") {
-      // TODO: Edit invoice
+    } else if (pathname.split("/")[2] === "edit") {
+      setLoading(true);
+      console.log("gonna update invoice");
+      const res = await editInvoice(data);
+
+      console.log("amount: ", payments[0].amount);
+
+      // @ts-ignore
+      if (res && res.field) {
+        console.log("error", res);
+
+        // @ts-ignore
+        showError(res);
+        setLoading(false);
+      } else {
+        window.location.href = `/invoice`;
+      }
     } else if (lastPath === "estimate") {
       // TODO: For now, we will use the same function as create
       setLoading(true);
@@ -108,7 +126,7 @@ export default function OrderButton({ user }: { user: User }) {
         router.push(`/invoice/view/${data.invoiceId}`);
       }
     } else {
-      console.error("Invalid route");
+      alert("Invalid path");
     }
   };
 
@@ -120,11 +138,11 @@ export default function OrderButton({ user }: { user: User }) {
     >
       {loading ? (
         <ThreeDots color="#fff" height={20} width={40} />
-      ) : lastPath === "edit" ? (
-        "Update Invoice"
-      ) : (
+      ) : lastPath === "create" ? (
         "Create Invoice"
-      )}{" "}
+      ) : (
+        "Update Invoice"
+      )}
     </button>
   );
 }

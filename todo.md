@@ -9,6 +9,8 @@
 - [ ] Store server action files in `actions` folder
 - [ ] Write docs
 - [ ] Place files in appropriate folders
+- [ ] Try to optimize the code
+- [ ] Add loaders for every page that requires data from the server
 
 ## Task And Activity Management
 
@@ -16,7 +18,7 @@
 - [ ] Google Calendar API integration
 - [ ] Instead of using popups, use modals for task creation and other actions
 - [ ] Implement new UI in **Month** view
-- [ ] Implement new UI in **Tasks** view
+- [x] Implement new UI in **Tasks** view
 - [x] Drag and Drop from **Tasks** to **Calendar**
 - [ ] Drag and Drop from **Tasks** to **Tasks**
 - [ ] Task resize

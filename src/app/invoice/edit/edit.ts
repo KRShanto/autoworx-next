@@ -46,6 +46,7 @@ const InvoiceSchema = z.object({
 
   payments: z.array(
     z.object({
+      tnx: z.string(),
       method: z.string(),
       amount: z.number(),
       type: z.string(),
@@ -59,7 +60,7 @@ const InvoiceSchema = z.object({
   tags: z.array(z.string()),
 });
 
-export async function createInvoice(data: {
+export async function editInvoice(data: {
   invoiceId: string;
 
   customer: {
@@ -106,108 +107,118 @@ export async function createInvoice(data: {
   try {
     InvoiceSchema.parse(data);
 
+    console.log("InvoiceId: ", data.invoiceId);
+
     const session = (await auth()) as AuthSession;
     const companyId = session.user.companyId;
-
-    // Search customers by mobile, if not found, create a new customer
-    const customer = await db.customer.upsert({
+    const invoice = await db.invoice.findFirst({
       where: {
-        mobile: data.customer.mobile,
-      },
-      create: {
-        ...data.customer,
-        companyId,
-      },
-      update: {
-        ...data.customer,
-      },
-    });
-
-    // Create a vehicle if not found
-    const vehicle = await db.vehicle.upsert({
-      where: {
-        vin: data.vehicle.vin,
-      },
-      create: {
-        ...data.vehicle,
-        companyId,
-      },
-      update: {
-        ...data.vehicle,
-      },
-    });
-
-    // Create Invoice
-    const invoice = await db.invoice.create({
-      data: {
         invoiceId: data.invoiceId,
-        customerId: customer.id,
-        vehicleId: vehicle.id,
-        serviceIds: data.services,
-        photo: data.photo,
+      },
+    });
+
+    if (!invoice) {
+      return {
+        message: "Invoice not found",
+        field: "invoiceId",
+      };
+    }
+
+    // Update customer
+    await db.customer.update({
+      where: {
+        id: invoice.customerId,
+      },
+      data: {
+        name: data.customer.name,
+        email: data.customer.email,
+        mobile: data.customer.mobile,
+        address: data.customer.address,
+        city: data.customer.city,
+        state: data.customer.state,
+        zip: data.customer.zip,
+      },
+    });
+
+    // Update vehicle
+    await db.vehicle.update({
+      where: {
+        id: invoice.vehicleId,
+      },
+      data: {
+        make: data.vehicle.make,
+        model: data.vehicle.model,
+        year: data.vehicle.year,
+        vin: data.vehicle.vin,
+        license: data.vehicle.license,
+      },
+    });
+
+    // Delete existing services
+    const serviceIds = invoice.serviceIds as number[];
+    serviceIds.forEach(async (serviceId) => {
+      await db.service.delete({
+        where: {
+          id: serviceId,
+        },
+      });
+    });
+
+    // Update invoice
+    await db.invoice.update({
+      where: {
+        invoiceId: data.invoiceId,
+      },
+      data: {
         subtotal: data.pricing.subtotal,
         discount: data.pricing.discount,
         tax: data.pricing.tax,
         grandTotal: data.pricing.grandTotal,
         deposit: data.pricing.deposit,
         due: data.pricing.due,
-        status: data.status as Status,
-        // TODO: not sure if `sendMail` is required here
-        sendMail: data.sendMail,
         notes: data.notes,
         terms: data.terms,
+        status: data.status as Status,
+        sendMail: data.sendMail,
         issueDate: data.issueDate,
-        salesperson: session.user.name,
-        companyId,
         tags: data.tags.join(","),
+        photo: data.photo,
       },
     });
 
-    // Create payments
+    // Delete existing payments
+    await db.payment.deleteMany({
+      where: {
+        invoiceId: invoice.id,
+      },
+    });
+
+    // Create new payments
     await db.payment.createMany({
       data: data.payments.map((payment) => ({
+        invoiceId: invoice.id,
         method: payment.method as Method,
         amount: payment.amount,
         type: payment.type as Type,
         note: payment.note,
         invoiceInvoiceId: data.invoiceId,
         companyId,
-        invoiceId: invoice.id,
         tnx: payment.tnx!,
-        date: payment.date,
       })),
     });
 
-    // Get the InvoiceAdditional model
-    const additional = await db.invoiceAdditional.findFirst({
+    // Update additional data
+    const additional = await db.invoiceAdditional.update({
       where: {
         companyId,
       },
+      data: {
+        note: data.notes,
+        terms: data.terms,
+      },
     });
 
-    // If the model does not exist, create a new one, otherwise update the existing one
-    if (!additional) {
-      await db.invoiceAdditional.create({
-        data: {
-          note: data.notes,
-          terms: data.terms,
-          companyId,
-        },
-      });
-    } else {
-      await db.invoiceAdditional.update({
-        where: {
-          id: additional.id,
-        },
-        data: {
-          note: data.notes,
-          terms: data.terms,
-        },
-      });
-    }
-
-    // TODO: Upload photo
-    // TODO: Send email
+    // TODO: UPload photo
 
     return true;
   } catch (error: any) {

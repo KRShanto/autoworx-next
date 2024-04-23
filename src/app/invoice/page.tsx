@@ -123,13 +123,12 @@ export default async function Page() {
               <td className="px-2 py-4">{invoice.status}</td>
               <td className="px-2 py-4">
                 <Link
-                  href={`/invoice/${invoice.invoiceId}/edit`}
+                  href={`/invoice/edit/${invoice.invoiceId}`}
                   className="text-blue-500"
                 >
                   <Image
                     src="/icons/Edit.svg"
                     alt="edit"
-                    // className="h-5 max-[1600px]:h-4 max-[1500px]:h-3"
                     width={20}
                     height={20}
                     className="max-[1600px]:h-4 max-[1500px]:h-3"

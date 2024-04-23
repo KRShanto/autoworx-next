@@ -270,6 +270,7 @@ model Payment {
   amount    Decimal  @db.Decimal(8, 2)
   note      String?  
   date      DateTime @default(now())
+  tnx       String
   companyId Int?     @map("company_id")
   invoice   Invoice  @relation(fields: [invoiceId], references: [id])
   company   Company? @relation(fields: [companyId], references: [id])
@@ -305,7 +306,7 @@ model Message {
 
 model InvoiceAdditional {
   id        Int      @id @default(autoincrement())
-  companyId Int      @map("company_id")
+  companyId Int      @map("company_id") @unique
   note      String
   terms     String
   createdAt DateTime @default(now()) @map("created_at")

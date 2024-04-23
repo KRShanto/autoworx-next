@@ -7,6 +7,7 @@ import { FaPlus } from "react-icons/fa";
 import { User } from "next-auth";
 import { customAlphabet, nanoid } from "nanoid";
 import { useEffect } from "react";
+import { useParams } from "next/navigation";
 
 export default function InvoiceTo({
   customers,
@@ -24,9 +25,14 @@ export default function InvoiceTo({
     setInvoiceId,
   } = useInvoiceStore();
   const { open } = usePopupStore();
+  const params = useParams();
+
+  console.log(params);
 
   // Generate a new invoice ID
   useEffect(() => {
+    // If the invoice is being edited, don't generate a new invoice ID
+    if (params.id) return;
     setInvoiceId(customAlphabet("1234567890", 10)());
   }, []);
 
@@ -89,7 +95,7 @@ export default function InvoiceTo({
             className="app-shadow rounded-md border-none p-1 px-3 text-xs text-black"
             value={customer.mobile}
             onChange={(e) =>
-              setCustomer({ ...customer, mobile: e.target.value })
+              setCustomer({ ...customer, mobile: parseInt(e.target.value) })
             }
           />
 

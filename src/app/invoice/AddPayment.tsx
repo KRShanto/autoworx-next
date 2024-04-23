@@ -4,16 +4,20 @@ import { usePopupStore } from "../../stores/popup";
 import Popup from "@/components/Popup";
 import { useInvoiceStore } from "../../stores/invoice";
 import { FaTimes } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function AddPayment() {
   const { close } = usePopupStore();
   const { pricing, addPayment } = useInvoiceStore();
 
   const [type, setType] = useState<"Payment" | "Refund" | "Deposit">("Payment");
-  const [amount, setAmount] = useState(pricing.deposit);
+  const [amount, setAmount] = useState(0);
   const [method, setMethod] = useState<"Cash" | "Card" | "Zelle">("Cash");
   const [note, setNote] = useState("");
+
+  useEffect(() => {
+    setAmount(pricing.due);
+  }, [pricing.due]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();

@@ -4,11 +4,11 @@ import {
   VehicleType,
   Pricing,
   AdditionalInfo,
-  Status,
   Payment,
 } from "@/types/db";
 import { customAlphabet, nanoid } from "nanoid";
 import { create } from "zustand";
+import { Status } from "@prisma/client";
 
 interface InvoiceStore {
   invoiceId: string;
@@ -42,14 +42,15 @@ interface InvoiceStore {
   setPhoto: (photo: File | null) => void;
   setTags: (tags: string[]) => void;
   reset: () => void;
+  calculatePricing: (dicsountType: "PERCENTAGE" | "AMOUNT") => void;
 }
 
-export const useInvoiceStore = create<InvoiceStore>((set) => ({
+export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
   invoiceId: "",
   customer: {
     name: "",
     email: "",
-    mobile: "",
+    mobile: 0,
     address: "",
     city: "",
     state: "",
@@ -58,7 +59,8 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
   vehicle: {
     make: "",
     model: "",
-    year: "",
+    // current year
+    year: new Date().getFullYear(),
     vin: "",
     license: "",
   },
@@ -138,7 +140,7 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
       customer: {
         name: "",
         email: "",
-        mobile: "",
+        mobile: 0,
         address: "",
         city: "",
         state: "",
@@ -147,7 +149,7 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
       vehicle: {
         make: "",
         model: "",
-        year: "",
+        year: new Date().getFullYear(),
         vin: "",
         license: "",
       },
@@ -167,4 +169,41 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
       issueDate: new Date(),
       photo: null,
     }),
+  calculatePricing: (dicsountType: "PERCENTAGE" | "AMOUNT") => {
+    const { services, pricing } = get();
+    // subtotal would be the sum of all services
+    // cast to number and then sum
+    const subtotal = services
+      .map((service) => Number(service.total))
+      .reduce((acc, total) => acc + total, 0);
+
+    // Grand total
+    let gt;
+
+    // calculate grand total with tax
+    if (pricing.tax > 0) {
+      gt = subtotal + subtotal * (pricing.tax / 100);
+    } else {
+      gt = subtotal;
+    }
+
+    // calculate grand total with discount
+    if (dicsountType === "PERCENTAGE") {
+      gt = gt - subtotal * ((pricing.discount ? pricing.discount : 0) / 100);
+    } else {
+      gt = gt - (pricing.discount ? pricing.discount : 0);
+    }
+
+    // calculate due
+    const due = gt - (pricing.deposit ? pricing.deposit : 0);
+
+    set({
+      pricing: {
+        ...pricing,
+        subtotal,
+        grand_total: gt,
+        due,
+      },
+    });
+  },
 }));

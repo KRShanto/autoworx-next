@@ -29,7 +29,7 @@ export interface CustomerType {
   id?: number;
   name: string;
   email: string;
-  mobile: string;
+  mobile: number;
   address: string;
   city: string;
   state: string;
@@ -40,7 +40,7 @@ export interface CustomerType {
 export interface VehicleType {
   make: string;
   model: string;
-  year: string;
+  year: number;
   vin: string;
   license: string;
 }
@@ -69,24 +69,13 @@ export interface AdditionalInfo {
   terms: string;
 }
 
-export type Status =
-  | "Delivered"
-  | "Consultations"
-  | "Confirmed"
-  | "In Progress"
-  | "Follow Up"
-  | "Scheduled"
-  | "Pending"
-  | "No show"
-  | "Cancelled";
-
 export interface Payment {
   tnx?: string;
   method: "Cash" | "Card" | "Zelle";
   date?: Date;
   name?: string;
   email?: string;
-  mobile?: string;
+  mobile?: number;
   type?: "Payment" | "Deposit" | "Refund"; // ??
   address?: string;
   note?: string;

@@ -6,7 +6,6 @@ import AdditionalInfo from "./AdditionalInfo";
 import { useInvoiceStore } from "../../stores/invoice";
 import OrderButton from "./OrderButton";
 import { useEffect, useState } from "react";
-import { Status } from "@/types/db";
 import { User } from "next-auth";
 
 export default function ServiceSection({
@@ -31,6 +30,7 @@ export default function ServiceSection({
     payments,
     photo,
     setPhoto,
+    calculatePricing,
   } = useInvoiceStore();
 
   const [discountType, setDiscountType] = useState<"PERCENTAGE" | "AMOUNT">(
@@ -38,37 +38,7 @@ export default function ServiceSection({
   );
 
   useEffect(() => {
-    // subtotal would be the sum of all services
-    // const subtotal = services.reduce((acc, service) => acc + service.total, 0);
-    // cast to number and then sum
-    const subtotal = services
-      .map((service) => Number(service.total))
-      .reduce((acc, total) => acc + total, 0);
-    let gt;
-
-    // calculate grand total with tax
-    if (pricing.tax > 0) {
-      gt = subtotal + subtotal * (pricing.tax / 100);
-    } else {
-      gt = subtotal;
-    }
-
-    // calculate grand total with discount
-    if (discountType === "PERCENTAGE") {
-      gt = gt - subtotal * ((pricing.discount ? pricing.discount : 0) / 100);
-    } else {
-      gt = gt - (pricing.discount ? pricing.discount : 0);
-    }
-
-    // calculate due
-    const due = gt - (pricing.deposit ? pricing.deposit : 0);
-
-    setPricing({
-      ...pricing,
-      subtotal,
-      grand_total: gt,
-      due,
-    });
+    calculatePricing(discountType);
   }, [
     services,
     payments,
@@ -186,7 +156,7 @@ export default function ServiceSection({
             id="status"
             className="app-shadow h-7 w-full rounded-md border-none p-1 px-2 text-sm text-black"
             value={status}
-            onChange={(e) => setStatus(e.target.value as Status)}
+            onChange={(e) => setStatus(e.target.value as any)}
           >
             <option value="Consultations">Consultations</option>
             <option value="Confirmed">Confirmed</option>
