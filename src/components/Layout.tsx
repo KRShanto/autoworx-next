@@ -31,7 +31,7 @@ export default function Layout({
   return (
     <div>
       <SideNavbar />
-      <div className="ml-[20%]">
+      <div className="ml-[5%]">
         <TopNavbar />
         <PopupState />
 

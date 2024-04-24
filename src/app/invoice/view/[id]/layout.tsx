@@ -4,6 +4,8 @@ import Invoice from "./Invoice";
 import WorkOrder from "./WorkOrder";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
+import { Tailwind } from "@onedoc/react-print";
+import View from "./View";
 
 export default async function Layout({
   params,
@@ -55,25 +57,14 @@ export default async function Layout({
     <div>
       {children}
 
-      <div>
-        <Header invoice={invoice} />
-
-        <div className="flex flex-row gap-7 max-[1500px]:flex-col max-[1500px]:items-center max-[1500px]:gap-0">
-          <Invoice
-            invoice={invoice}
-            customer={customer!}
-            setting={setting!}
-            vehicle={vehicle!}
-            services={services}
-          />
-
-          <WorkOrder
-            workOrders={workOrders}
-            invoice={invoice}
-            customer={customer!}
-          />
-        </div>
-      </div>
+      <View
+        invoice={invoice}
+        customer={customer}
+        setting={setting}
+        vehicle={vehicle}
+        services={services}
+        workOrders={workOrders}
+      />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Layout from "@/components/Layout";
-import TopLoader from "./TopLoader";
+import TopLoader from "../components/TopLoader";
 import { auth } from "./auth";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -19,7 +19,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // check if the user is valid
   const session = await auth();
 
   return (
