@@ -1,4 +1,3 @@
-import { TASK_COLOR } from "@/lib/consts";
 import { usePopupStore } from "../../../../stores/popup";
 import { FaPlus } from "react-icons/fa";
 import { Task, User } from "@prisma/client";

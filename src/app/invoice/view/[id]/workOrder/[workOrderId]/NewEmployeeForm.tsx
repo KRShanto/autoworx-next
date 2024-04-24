@@ -1,6 +1,6 @@
 "use client";
 
-import { addEmployee } from "@/app/invoice/add";
+import { addEmployee } from "@/app/invoice/view/[id]/workOrder/[workOrderId]/addEmployee";
 import { User } from "@prisma/client";
 import { useState } from "react";
 import { FaTimes, FaPlus } from "react-icons/fa";

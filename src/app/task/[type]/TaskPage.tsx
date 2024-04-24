@@ -1,12 +1,11 @@
 "use client";
 
 import Calendar from "./Calendar/Calendar";
-import CalendarUser from "./Users/CalendarUser";
+import CalendarSidebar from "./CalendarSidebar/CalendarSidebar";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Task, User } from "@prisma/client";
 import { CalendarType } from "@/types/calendar";
-import { CalendarTask } from "@/types/db";
 
 export default function TaskPage({
   type,
@@ -40,7 +39,11 @@ export default function TaskPage({
         tasksWithoutTime={tasksWithoutTime}
         companyUsers={companyUsers}
       />
-      <CalendarUser usersWithTasks={usersWithTasks} tasks={tasks} tags={tags} />
+      <CalendarSidebar
+        usersWithTasks={usersWithTasks}
+        tasks={tasks}
+        tags={tags}
+      />
     </DndProvider>
   );
 }

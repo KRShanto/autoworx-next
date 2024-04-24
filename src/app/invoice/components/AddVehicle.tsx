@@ -1,5 +1,5 @@
-import { useInvoiceStore } from "../../stores/invoice";
-import { usePopupStore } from "../../stores/popup";
+import { useInvoiceStore } from "../../../stores/invoice";
+import { usePopupStore } from "../../../stores/popup";
 import { VehicleType } from "@/types/db";
 import { useState } from "react";
 import Popup from "@/components/Popup";
@@ -44,7 +44,7 @@ export default function AddVehicle() {
       setVehicle({
         make,
         model,
-        year,
+        year: parseInt(year),
         vin,
         license,
       });

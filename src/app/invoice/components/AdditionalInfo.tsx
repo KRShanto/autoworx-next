@@ -1,5 +1,5 @@
 import { INVOICE_TAGS } from "@/lib/consts";
-import { useInvoiceStore } from "../../stores/invoice";
+import { useInvoiceStore } from "../../../stores/invoice";
 import { useEffect } from "react";
 
 export default function AdditionalInfo({

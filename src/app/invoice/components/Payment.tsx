@@ -1,7 +1,7 @@
 "use client";
 
-import { useInvoiceStore } from "../../stores/invoice";
-import { usePopupStore } from "../../stores/popup";
+import { useInvoiceStore } from "../../../stores/invoice";
+import { usePopupStore } from "../../../stores/popup";
 import moment from "moment";
 import { useEffect } from "react";
 import { FaTrash } from "react-icons/fa";

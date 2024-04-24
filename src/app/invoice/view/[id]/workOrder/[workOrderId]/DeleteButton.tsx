@@ -1,6 +1,6 @@
 "use client";
 
-import { removeEmployee } from "@/app/invoice/remove";
+import { removeEmployee } from "./removeEmployee";
 import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { ThreeDots } from "react-loader-spinner";

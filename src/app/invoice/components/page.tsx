@@ -1,6 +1,6 @@
 import moment from "moment";
 import Link from "next/link";
-import { auth } from "../auth";
+import { auth } from "../../auth";
 import { AuthSession } from "@/types/auth";
 import { db } from "@/lib/db";
 import Image from "next/image";

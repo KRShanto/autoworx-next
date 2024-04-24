@@ -19,8 +19,6 @@ export default function SubmitButton() {
       redirect: false,
     });
 
-    console.log(res);
-
     if (res?.error) {
       showError({ message: "Invalid credentials", field: "all" });
       return;

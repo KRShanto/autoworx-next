@@ -1,14 +1,14 @@
 import { FaTimes } from "react-icons/fa";
 import Popup from "@/components/Popup";
 import { useState } from "react";
-import { usePopupStore } from "../../stores/popup";
+import { usePopupStore } from "../../../stores/popup";
 import { ThreeDots } from "react-loader-spinner";
 import { CustomerType } from "@/types/db";
-import { useInvoiceStore } from "../../stores/invoice";
+import { useInvoiceStore } from "../../../stores/invoice";
 import FormError from "@/components/FormError";
 import Input from "@/components/Input";
 import Submit from "@/components/Submit";
-import { addCustomer as newCustomer } from "../customer/add";
+import { addCustomer as newCustomer } from "../../customer/add";
 import { useFormErrorStore } from "@/stores/form-error";
 
 export default function AddInvoice() {
@@ -46,7 +46,7 @@ export default function AddInvoice() {
       setCustomer({
         name,
         email,
-        mobile,
+        mobile: parseInt(mobile),
         address,
         city,
         state,

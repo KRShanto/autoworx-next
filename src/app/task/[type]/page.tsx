@@ -1,16 +1,11 @@
 import Title from "@/components/Title";
-import Calendar from "./Calendar/Calendar";
-import CalendarUser from "./Users/CalendarUser";
 import { Metadata } from "next";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import { db } from "@/lib/db";
 import { User } from "@prisma/client";
 import { AuthSession } from "@/types/auth";
 import { auth } from "@/app/auth";
 import { CalendarType } from "@/types/calendar";
 import TaskPage from "./TaskPage";
-import { CalendarTask } from "@/types/db";
 
 export const metadata: Metadata = {
   title: "Task and Activity Management",

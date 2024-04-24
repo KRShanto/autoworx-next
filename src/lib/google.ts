@@ -47,37 +47,37 @@ export async function getGoogleToken(code: string) {
 //   return res.data.items;
 // }
 
-// Add an event to Google Calendar
-export async function addGoogleEvent({
-  userId,
-  taskId,
-}: {
-  userId: number;
-  taskId: number;
-}) {
-  const task = await db.task.findUnique({ where: { id: taskId } });
-  const oauthTokens = await db.oAuthToken.findFirst({
-    where: { userId },
-  });
+// TODO: // Add an event to Google Calendar
+// export async function addGoogleEvent({
+//   userId,
+//   taskId,
+// }: {
+//   userId: number;
+//   taskId: number;
+// }) {
+//   const task = await db.task.findUnique({ where: { id: taskId } });
+//   const oauthTokens = await db.oAuthToken.findFirst({
+//     where: { userId },
+//   });
 
-  if (!oauthTokens) return;
+//   if (!oauthTokens) return;
 
-  oauth2Client.setCredentials({
-    refresh_token: oauthTokens.refreshToken,
-    access_token: oauthTokens.accessToken,
-  });
+//   oauth2Client.setCredentials({
+//     refresh_token: oauthTokens.refreshToken,
+//     access_token: oauthTokens.accessToken,
+//   });
 
-  const calendar = google.calendar({ version: "v3", auth: oauth2Client });
-  const res = calendar.events.insert({
-    calendarId: "primary",
-    requestBody: {
-      summary: task?.title,
-      start: { dateTime: task?.startTime, date: task?.date },
-      end: { dateTime: task?.endTime, date: task?.date },
-    },
-  });
+//   const calendar = google.calendar({ version: "v3", auth: oauth2Client });
+//   const res = calendar.events.insert({
+//     calendarId: "primary",
+//     requestBody: {
+//       summary: task?.title,
+//       start: { dateTime: task?.startTime, date: task?.date },
+//       end: { dateTime: task?.endTime, date: task?.date },
+//     },
+//   });
 
-  console.log("response: ", res);
+//   console.log("response: ", res);
 
-  return res.data;
-}
+//   return res.data;
+// }

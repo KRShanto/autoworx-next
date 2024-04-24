@@ -2,15 +2,15 @@
 
 import { usePopupStore } from "../stores/popup";
 import AddTaskPopup from "../app/task/[type]/Calendar/AddTaskPopup";
-import AddUser from "../app/task/[type]/Users/AddUser";
-import AssignTask from "@/app/task/[type]/Users/AssignTask";
+import AddUser from "../app/task/[type]/CalendarSidebar/AddUser";
+import AssignTask from "@/app/task/[type]/CalendarSidebar/AssignTask";
 import EditTask from "@/app/task/[type]/Calendar/EditTaskPopup";
 import AddNewCustomer from "../app/customer/AddCustomer";
-import AddCustomer from "../app/invoice/AddCustomer";
-import AddVehicle from "../app/invoice/AddVehicle";
+import AddCustomer from "../app/invoice/components/AddCustomer";
+import AddVehicle from "../app/invoice/components/AddVehicle";
 import AddEmployee from "../app/employee/AddEmployee";
 import AddService from "../app/inventory/service/AddService";
-import AddPayment from "../app/invoice/AddPayment";
+import AddPayment from "../app/invoice/components/AddPayment";
 import EditCustomer from "../app/customer/EditCustomer";
 import EditEmployee from "@/app/employee/EditEmployee";
 import EditService from "@/app/inventory/service/EditService";

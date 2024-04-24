@@ -33,7 +33,7 @@ export default function Submit({
   return (
     <button type="submit" formAction={handler} className={className}>
       {pending ? (
-        <RotatingLines strokeColor="#fff" strokeWidth="5" width="40" />
+        <RotatingLines strokeColor="#fff" strokeWidth="5" width="25" />
       ) : (
         children
       )}

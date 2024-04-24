@@ -1,9 +1,8 @@
 import Heading from "./Heading";
 import Body from "./Body";
-import { db } from "@/lib/db";
 import { Task } from "@prisma/client";
 
-export default async function CalendarUser({
+export default async function CalendarSidebar({
   usersWithTasks,
   tasks,
   tags,
@@ -12,7 +11,6 @@ export default async function CalendarUser({
   tasks: Task[];
   tags: string[];
 }) {
-  console.log("Task from calendar user: ", tasks);
   return (
     <div className="ml-5 mt-5 w-[270px]">
       <Heading />

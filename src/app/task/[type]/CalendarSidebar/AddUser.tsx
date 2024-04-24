@@ -1,7 +1,6 @@
-import { FormEventHandler, useState } from "react";
+import { useState } from "react";
 import Popup from "@/components/Popup";
 import { usePopupStore } from "@/stores/popup";
-import { ThreeDots } from "react-loader-spinner";
 import FormError from "@/components/FormError";
 import Submit from "@/components/Submit";
 

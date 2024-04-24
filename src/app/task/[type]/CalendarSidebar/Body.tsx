@@ -1,6 +1,6 @@
 "use client";
 
-import { useCalendarUserTypeStore } from "../../../../stores/calendarUserType";
+import { useCalendarSidebarStore } from "../../../../stores/calendarSidebar";
 import Users from "./Users";
 import { Task } from "@prisma/client";
 import Tasks from "./Tasks";
@@ -14,10 +14,9 @@ export default function Body({
   tasks: Task[];
   tags: string[];
 }) {
-  const { calendarUserType } = useCalendarUserTypeStore();
+  const { type } = useCalendarSidebarStore();
 
-  if (calendarUserType === "USERS")
-    return <Users users={usersWithTasks} tasks={tasks} />;
-  if (calendarUserType === "TASKS")
+  if (type === "USERS") return <Users users={usersWithTasks} tasks={tasks} />;
+  if (type === "TASKS")
     return <Tasks tasks={tasks} users={usersWithTasks} tags={tags} />;
 }

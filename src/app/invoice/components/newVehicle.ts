@@ -1,7 +1,7 @@
 "use server";
 
 import { AuthSession } from "@/types/auth";
-import { auth } from "../auth";
+import { auth } from "../../auth";
 import { db } from "@/lib/db";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";

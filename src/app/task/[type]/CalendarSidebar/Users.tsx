@@ -4,7 +4,6 @@ import { useState } from "react";
 import UserComponent from "./User";
 import { usePopupStore } from "../../../../stores/popup";
 import { Task, User } from "@prisma/client";
-// import { useUsersStore } from "../../../../stores/users";
 
 export default function Users({
   users,
@@ -13,13 +12,8 @@ export default function Users({
   users: (User & { tasks: Task[] })[];
   tasks: Task[];
 }) {
-  // const { users, current } = useUsersStore();
-
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
   const { open } = usePopupStore();
-
-  // exclude the current user from the list
-  // const usersToShow = users.filter((user) => user.id !== current?.id);
 
   return (
     <div className="app-shadow mt-5 h-[93%] rounded-[12px] bg-white p-3">

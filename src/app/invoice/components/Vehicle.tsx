@@ -1,8 +1,8 @@
 "use client";
 
 import type { Vehicle } from "@prisma/client";
-import { useInvoiceStore } from "../../stores/invoice";
-import { usePopupStore } from "../../stores/popup";
+import { useInvoiceStore } from "../../../stores/invoice";
+import { usePopupStore } from "../../../stores/popup";
 import { FaPlus } from "react-icons/fa";
 
 export default function Vehicle({ vehicles }: { vehicles: Vehicle[] }) {
@@ -40,7 +40,9 @@ export default function Vehicle({ vehicles }: { vehicles: Vehicle[] }) {
             required
             className="app-shadow rounded-md border-none p-1 px-3 text-xs text-black"
             value={vehicle.year}
-            onChange={(e) => setVehicle({ ...vehicle, year: e.target.value })}
+            onChange={(e) =>
+              setVehicle({ ...vehicle, year: parseInt(e.target.value) })
+            }
           />
           <input
             type="text"

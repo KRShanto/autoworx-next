@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import { AuthSession } from "@/types/auth";
 import { revalidatePath } from "next/cache";
-import { auth } from "../auth";
+import { auth } from "../../../../../auth";
 import { Service } from "@prisma/client";
 
 export async function addEmployee({

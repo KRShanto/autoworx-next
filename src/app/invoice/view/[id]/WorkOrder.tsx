@@ -6,9 +6,9 @@ import { useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { ThreeDots } from "react-loader-spinner";
-import { deleteWorkOrder } from "../../delete";
+import { deleteWorkOrder } from "./deleteWorkOrder";
 import { Customer, Invoice, WorkOrder } from "@prisma/client";
-import createWorkOrder from "../../create";
+import { createWorkOrder } from "./createWorkOrder";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 

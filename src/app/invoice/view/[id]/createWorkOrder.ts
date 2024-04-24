@@ -2,11 +2,11 @@
 
 import { db } from "@/lib/db";
 import { AuthSession } from "@/types/auth";
-import { auth } from "../auth";
+import { auth } from "../../../auth";
 import { revalidatePath } from "next/cache";
 import { Service } from "@prisma/client";
 
-export default async function createWorkOrder(invoiceId: number) {
+export async function createWorkOrder(invoiceId: number) {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
 

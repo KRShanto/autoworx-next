@@ -1,14 +1,14 @@
 import React from "react";
-import InvoiceTo from "../../InvoiceTo";
-import Vehicle from "../../Vehicle";
-import ServiceSection from "../../ServiceSection";
-import Payment from "../../Payment";
+import InvoiceTo from "../../components/InvoiceTo";
+import Vehicle from "../../components/Vehicle";
+import ServiceSection from "../../components/ServiceSection";
+import Payment from "../../components/Payment";
 import { AuthSession } from "@/types/auth";
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import InsertDefaultInvoiceData from "../../InsertDefaultInvoiceData";
+import InsertDefaultInvoiceData from "../../components/InsertDefaultInvoiceData";
 import { Service } from "@prisma/client";
 
 export const metadata: Metadata = {
