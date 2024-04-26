@@ -12,7 +12,7 @@ export default async function CalendarSidebar({
   tags: string[];
 }) {
   return (
-    <div className="ml-5 mt-5 w-[270px]">
+    <div className="ml-5 mt-5 w-[15%]">
       <Heading />
       <Body usersWithTasks={usersWithTasks} tasks={tasks} tags={tags} />
     </div>

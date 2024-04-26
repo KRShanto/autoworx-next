@@ -33,16 +33,16 @@ export default function TaskPage({
 
   return (
     <DndProvider backend={HTML5Backend}>
+      <CalendarSidebar
+        usersWithTasks={usersWithTasks}
+        tasks={tasks}
+        tags={tags}
+      />
       <Calendar
         type={type}
         tasks={calendarTasks as any}
         tasksWithoutTime={tasksWithoutTime}
         companyUsers={companyUsers}
-      />
-      <CalendarSidebar
-        usersWithTasks={usersWithTasks}
-        tasks={tasks}
-        tags={tags}
       />
     </DndProvider>
   );

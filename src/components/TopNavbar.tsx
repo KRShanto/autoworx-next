@@ -1,6 +1,5 @@
 import { ImSearch } from "react-icons/im";
 import TopNavbarIcons from "./TopNavbarIcons";
-import GoogleConnectButton from "./GoogleConnectButton";
 
 export default function TopNavbar() {
   return (
@@ -16,8 +15,6 @@ export default function TopNavbar() {
           placeholder="Search here..."
         />
       </form>
-
-      <GoogleConnectButton />
 
       <TopNavbarIcons />
     </div>

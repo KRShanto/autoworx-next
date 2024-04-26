@@ -2,6 +2,13 @@ import Link from "next/link";
 import { cn } from "../../../../lib/cn";
 import moment from "moment";
 import { CalendarType } from "@/types/calendar";
+import { GoGear } from "react-icons/go";
+import {
+  IoIosArrowForward,
+  IoIosArrowDown,
+  IoIosArrowBack,
+  IoIosArrowUp,
+} from "react-icons/io";
 
 export default function Heading({ type }: { type: CalendarType }) {
   return (
@@ -15,35 +22,37 @@ export default function Heading({ type }: { type: CalendarType }) {
           : moment().format("MMMM YYYY")}
       </h2>
 
-      {/* Calender type selector */}
-      <div className="calender-time-shadow flex h-[42px] w-[263px] items-center justify-center gap-2 rounded-[6px] bg-[#D9D9D9] max-[1300px]:w-[210px]">
-        <Link
-          className={cn(
-            "h-[34px] w-[78px] rounded-[4px] text-center text-[19px] text-[#797979] max-[1300px]:h-[30px] max-[1300px]:w-[60px] max-[1300px]:text-[17px]",
-            type === "day" && "bg-white",
-          )}
-          href="/task/day"
-        >
-          Day
-        </Link>
-        <Link
-          className={cn(
-            "h-[34px] w-[78px] rounded-[4px] text-center text-[19px] text-[#797979] max-[1300px]:h-[30px] max-[1300px]:w-[60px] max-[1300px]:text-[17px]",
-            type === "week" && "bg-white",
-          )}
-          href="/task/week"
-        >
-          Week
-        </Link>
-        <Link
-          className={cn(
-            "h-[34px] w-[78px] rounded-[4px] text-center text-[19px] text-[#797979] max-[1300px]:h-[30px] max-[1300px]:w-[60px] max-[1300px]:text-[17px]",
-            type === "month" && "bg-white",
-          )}
-          href="/task/month"
-        >
-          Month
-        </Link>
+      {/* Calender options */}
+      <div className="flex items-center gap-3 ">
+        {/* Day selector */}
+        <button className="app-shadow rounded-md p-2 text-[#797979]">
+          Today
+        </button>
+
+        {/* Left Arrow */}
+        <button className="app-shadow rounded-md p-2 text-[#797979]">
+          <IoIosArrowBack />
+        </button>
+
+        {/* Right Arrow */}
+        <button className="app-shadow rounded-md p-2 text-[#797979]">
+          <IoIosArrowForward />
+        </button>
+
+        {/* Month selector */}
+        <button className="app-shadow flex items-center gap-1 rounded-md p-2 text-[#797979]">
+          Month <IoIosArrowDown />
+        </button>
+
+        {/* New Appointment button */}
+        <button className="app-shadow rounded-md bg-[#6571FF] p-2 text-white">
+          New Appointment
+        </button>
+
+        {/* Settings */}
+        <button className="app-shadow rounded-md p-2 text-xl text-[#797979]">
+          <GoGear />
+        </button>
       </div>
     </div>
   );
