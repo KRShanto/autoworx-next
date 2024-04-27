@@ -1,8 +1,12 @@
+"use client";
+
 import Heading from "./Heading";
 import Body from "./Body";
-import { Task } from "@prisma/client";
+import type { Task } from "@prisma/client";
+import { cn } from "@/lib/cn";
+import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
 
-export default async function CalendarSidebar({
+export default function CalendarSidebar({
   usersWithTasks,
   tasks,
   tags,
@@ -11,8 +15,15 @@ export default async function CalendarSidebar({
   tasks: Task[];
   tags: string[];
 }) {
+  const minimized = useCalendarSidebarStore((x) => x.minimized);
+
   return (
-    <div className="ml-5 mt-5 w-[15%]">
+    <div
+      className={cn(
+        "ml-5 mt-5 flex flex-col overflow-x-clip transition-[width] ease-in",
+        minimized ? "w-16" : "w-[15%] max-[1300px]:w-[210px] 2xl:w-[263px]",
+      )}
+    >
       <Heading />
       <Body usersWithTasks={usersWithTasks} tasks={tasks} tags={tags} />
     </div>
