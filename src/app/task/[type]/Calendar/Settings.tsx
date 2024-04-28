@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { updateCalendarSettings } from "./updateCalendarSettings";
 import {
   Dialog,
@@ -18,6 +18,8 @@ export default function Settings({
 }: {
   settings?: CalendarSettings;
 }) {
+  const [open, setOpen] = useState(false);
+
   async function handleSave(data: FormData) {
     const weekStart = data.get("week-start") as string;
     const dayStart = data.get("day-start") as string;
@@ -28,10 +30,12 @@ export default function Settings({
       dayStart,
       dayEnd,
     });
+
+    setOpen(false);
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button className="app-shadow rounded-md p-2 text-xl text-[#797979]">
           <GoGear />

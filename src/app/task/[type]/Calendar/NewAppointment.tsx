@@ -328,12 +328,12 @@ export function NewAppointment({
         </div>
         <DialogFooter className="justify-end">
           <DialogClose asChild>
-            <button type="button" className="rounded border px-4 py-1">
+            <button type="button" className="rounded-md border px-4 py-1">
               Cancel
             </button>
           </DialogClose>
           <Submit
-            className="rounded border bg-[#6571FF] px-4 py-1 text-white"
+            className="rounded-md border bg-[#6571FF] px-4 py-1 text-white"
             formAction={handleSubmit}
           >
             Save
