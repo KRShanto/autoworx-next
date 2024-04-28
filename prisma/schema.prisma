@@ -22,7 +22,8 @@ model Company {
   settings   Setting[]
   payments   Payment[]
   invoiceAdditionals InvoiceAdditional[]
-
+  calendarSettings CalendarSettings[]
+  orders     Order[]
 }
 
 model WorkOrder {
@@ -111,6 +112,10 @@ model Task {
   type        TaskType
   companyId   Int?     @map("company_id")
   workOrderId Int?     @map("work_order_id")
+  customerId  Int?     @map("customer_id")
+  vehicleId   Int?     @map("vehicle_id")
+  orderId     Int?     @map("order_id")
+  notes       String?
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   user        User     @relation(fields: [userId], references: [id])
@@ -118,6 +123,10 @@ model Task {
   workOrder   WorkOrder? @relation(fields: [workOrderId], references: [id])
   taskUsers   TaskUser[]
   invoiceTag  String?  @map("invoice_tag")
+  customer    Customer? @relation(fields: [customerId], references: [id])
+  vehicle     Vehicle? @relation(fields: [vehicleId], references: [id])
+    order      Order? @relation(fields: [orderId], references: [id])
+
 
   @@index([userId], name: "fk_tasks_user")
   @@index([companyId], name: "fk_tasks_company")
@@ -157,19 +166,36 @@ model TaskUser {
   @@index([taskId], name: "fk_task_users_task")
   @@index([userId], name: "fk_task_users_user")
 }
-model Customer {
+
+model Order {
   id        Int      @id @default(autoincrement())
   name      String
-  mobile    Int      @unique
-  email     String
-  address   String
-  city      String
-  state     String
-  zip       String
+  comment String
   companyId Int?     @map("company_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  tasks     Task[]
   company   Company? @relation(fields: [companyId], references: [id])
+}
+
+model Customer {
+  id        Int      @id @default(autoincrement())
+  firstName      String @map("first_name")
+  lastName       String? @map("last_name")
+  mobile    Int?      @unique
+  email     String?
+  address   String?
+  city      String?
+  state     String?
+  zip       String?
+  photo     String? @default("/images/default.png")
+  companyId Int?     @map("company_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")  
+  company   Company? @relation(fields: [companyId], references: [id])
+  customerCompany String? @map("customer_company")
+  tag    String? @default("")
+  tasks  Task[]
 
   @@index([companyId], name: "fk_customers_company")
 }
@@ -195,12 +221,15 @@ model Vehicle {
   year      Int
   make      String
   model     String
-  vin       String   @unique  
+  submodel  String
+  vin       String   @unique
+  type      String?
   license   String   @unique
   companyId Int?     @map("company_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   company   Company? @relation(fields: [companyId], references: [id])
+  tasks     Task[]
 
   @@index([companyId], name: "fk_vehicles_company")
 }
@@ -314,4 +343,17 @@ model InvoiceAdditional {
   company   Company  @relation(fields: [companyId], references: [id])
 
   @@index([companyId], name: "fk_invoice_additionals_company")
+}
+
+model CalendarSettings {
+  id        Int      @id @default(autoincrement())
+  companyId Int      @map("company_id") @unique
+  weekStart String
+  dayStart  String
+  dayEnd    String
+  weekends  Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  company   Company  @relation(fields: [companyId], references: [id])
+
 }
