@@ -1,11 +1,17 @@
 import { create } from "zustand";
 
 interface CalendarSidebarStore {
-  type: "USERS" | "TASKS";
-  setType: (calenderType: "USERS" | "TASKS") => void;
+	type: "USERS" | "TASKS";
+	minimized: boolean;
+	setType: (calenderType: "USERS" | "TASKS") => void;
+	toggleMinimized: () => void;
+	setMinimized: (minimized: boolean) => void;
 }
 
 export const useCalendarSidebarStore = create<CalendarSidebarStore>((set) => ({
-  type: "USERS",
-  setType: (type) => set({ type }),
+	type: "USERS",
+	minimized: false,
+	setType: (type) => set({ type }),
+	toggleMinimized: () => set((state) => ({ minimized: !state.minimized })),
+	setMinimized: (minimized) => set({ minimized }),
 }));

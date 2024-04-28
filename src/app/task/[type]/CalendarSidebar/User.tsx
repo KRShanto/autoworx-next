@@ -5,6 +5,7 @@ import { TASK_COLOR } from "@/lib/consts";
 import { usePopupStore } from "../../../../stores/popup";
 import { Task, User } from "@prisma/client";
 import Image from "next/image";
+import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
 
 export default function UserComponent({
   isSelected,
@@ -22,6 +23,7 @@ export default function UserComponent({
   tasks: Task[];
 }) {
   const { open } = usePopupStore();
+  const minimized = useCalendarSidebarStore((x) => x.minimized);
 
   return (
     <>
@@ -44,13 +46,14 @@ export default function UserComponent({
           className={cn(
             "ml-2 text-[14px] font-bold",
             isSelected ? "text-white" : "text-[#797979]",
+            minimized && "sr-only",
           )}
         >
           {user.name}
         </p>
       </button>
 
-      {isSelected && (
+      {isSelected && !minimized && (
         <div className="my-3">
           {user.tasks.map((task, index) => (
             <div className="ml-4 mt-2 flex items-center gap-2" key={index}>

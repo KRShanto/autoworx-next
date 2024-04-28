@@ -9,6 +9,7 @@ import {
   IoIosArrowBack,
   IoIosArrowUp,
 } from "react-icons/io";
+import { NewAppointment } from "./NewAppointment";
 
 export default function Heading({ type }: { type: CalendarType }) {
   return (
@@ -45,9 +46,7 @@ export default function Heading({ type }: { type: CalendarType }) {
         </button>
 
         {/* New Appointment button */}
-        <button className="app-shadow rounded-md bg-[#6571FF] p-2 text-white">
-          New Appointment
-        </button>
+        <NewAppointment />
 
         {/* Settings */}
         <button className="app-shadow rounded-md p-2 text-xl text-[#797979]">

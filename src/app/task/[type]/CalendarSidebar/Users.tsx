@@ -4,6 +4,9 @@ import { useState } from "react";
 import UserComponent from "./User";
 import { usePopupStore } from "../../../../stores/popup";
 import { Task, User } from "@prisma/client";
+import { MinimizeButton } from "./MinimiseButton";
+import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
+import { FaPlus } from "react-icons/fa";
 
 export default function Users({
   users,
@@ -14,25 +17,34 @@ export default function Users({
 }) {
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
   const { open } = usePopupStore();
+  const minimized = useCalendarSidebarStore((x) => x.minimized);
+  const setMinimized = useCalendarSidebarStore((x) => x.setMinimized);
 
   return (
-    <div className="app-shadow mt-5 h-[93%] rounded-[12px] bg-white p-3">
-      <div className="h-[10%]">
-        <h2 className="text-[16px] text-[#797979]">User List</h2>
+    <div className="app-shadow mt-5 flex flex-col flex-grow rounded-[12px] bg-white p-3">
+      <div>
+        <h2 className="flex items-center justify-between">
+          {!minimized && (
+            <div className="text-[16px] text-[#797979]">User List</div>
+          )}
+          <MinimizeButton />
+        </h2>
 
-        <form className="mt-3 flex items-center justify-center gap-2">
-          <input
-            type="search"
-            className="w-[70%] border-none"
-            placeholder="Search here..."
-          />
-          <button className="w-[30%] rounded-[5px] bg-[#797979] p-2 text-[13px] text-white">
-            Filter
-          </button>
-        </form>
+        {!minimized && (
+          <form className="mt-3 flex items-center justify-center gap-2">
+            <input
+              type="search"
+              className="w-[70%] border-none"
+              placeholder="Search here..."
+            />
+            <button className="w-[30%] rounded-[5px] bg-[#797979] p-2 text-[13px] text-white">
+              Filter
+            </button>
+          </form>
+        )}
       </div>
 
-      <div className="h-[82%] overflow-scroll py-2">
+      <div className="flex-grow overflow-scroll py-2">
         {users.map((user, index) => {
           const isSelected = selectedUser === index;
 
@@ -42,6 +54,7 @@ export default function Users({
             } else {
               setSelectedUser(index);
             }
+            setMinimized(false);
           }
 
           return (
@@ -59,10 +72,11 @@ export default function Users({
       </div>
 
       <button
-        className="mt-4 h-[5%] w-full rounded-[5px] bg-blue-600 py-2 text-[15px] text-white"
+        type="button"
+        className="mt-4 w-full rounded-[5px] bg-blue-600 py-2 text-[15px] text-white"
         onClick={() => open("ADD_USER")}
       >
-        Add User
+        {minimized ? <FaPlus className="block mx-auto" /> : "Add User"}
       </button>
     </div>
   );
