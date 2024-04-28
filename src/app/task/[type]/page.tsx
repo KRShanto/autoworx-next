@@ -1,7 +1,7 @@
 import Title from "@/components/Title";
 import { Metadata } from "next";
 import { db } from "@/lib/db";
-import { User } from "@prisma/client";
+import { CalendarSettings, User } from "@prisma/client";
 import { AuthSession } from "@/types/auth";
 import { auth } from "@/app/auth";
 import { CalendarType } from "@/types/calendar";
@@ -118,6 +118,12 @@ export default async function Page({ params }: { params: { type: string } }) {
     where: { companyId },
   });
 
+  const settings = (await db.calendarSettings.findFirst({
+    where: {
+      companyId,
+    },
+  })) as CalendarSettings;
+
   return (
     <>
       <Title>Task and Activity Management</Title>
@@ -133,6 +139,7 @@ export default async function Page({ params }: { params: { type: string } }) {
           customers={customers}
           vehicles={vehicles}
           orders={orders}
+          settings={settings}
         />
       </div>
     </>

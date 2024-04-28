@@ -11,6 +11,7 @@
 - [ ] Place files in appropriate folders
 - [ ] Try to optimize the code
 - [ ] Add loaders for every page that requires data from the server
+- [ ] Error handling on every form
 
 ## Task And Activity Management
 
@@ -22,6 +23,7 @@
 - [x] Drag and Drop from **Tasks** to **Calendar**
 - [ ] Drag and Drop from **Tasks** to **Tasks**
 - [ ] Task resize
+- [ ] Stop state lifting and use store for tasks and users
 
 ## Invoice
 

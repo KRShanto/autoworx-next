@@ -4,7 +4,14 @@ import Calendar from "./Calendar/Calendar";
 import CalendarSidebar from "./CalendarSidebar/CalendarSidebar";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { Customer, Order, Task, User, Vehicle } from "@prisma/client";
+import {
+  CalendarSettings,
+  Customer,
+  Order,
+  Task,
+  User,
+  Vehicle,
+} from "@prisma/client";
 import { CalendarType } from "@/types/calendar";
 
 export default function TaskPage({
@@ -17,6 +24,7 @@ export default function TaskPage({
   customers,
   vehicles,
   orders,
+  settings,
 }: {
   type: CalendarType;
   taskWithAssignedUsers: (Task & { assignedUsers: User[] })[];
@@ -27,6 +35,7 @@ export default function TaskPage({
   customers: Customer[];
   vehicles: Vehicle[];
   orders: Order[];
+  settings: CalendarSettings;
 }) {
   // Filter the tasks where startTime, endTime, and date are not null
   const calendarTasks = taskWithAssignedUsers.filter(
@@ -52,6 +61,7 @@ export default function TaskPage({
         customers={customers}
         vehicles={vehicles}
         orders={orders}
+        settings={settings}
       />
     </DndProvider>
   );

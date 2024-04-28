@@ -1,7 +1,14 @@
 import { CalendarType } from "@/types/calendar";
 import Body from "./Body";
 import Heading from "./Heading";
-import { Customer, Order, Task, User, Vehicle } from "@prisma/client";
+import {
+  CalendarSettings,
+  Customer,
+  Order,
+  Task,
+  User,
+  Vehicle,
+} from "@prisma/client";
 import { CalendarTask } from "@/types/db";
 
 export default function Calender({
@@ -12,6 +19,7 @@ export default function Calender({
   customers,
   vehicles,
   orders,
+  settings,
 }: {
   type: CalendarType;
   tasks: CalendarTask[];
@@ -20,6 +28,7 @@ export default function Calender({
   customers: Customer[];
   vehicles: Vehicle[];
   orders: Order[];
+  settings: CalendarSettings;
 }) {
   console.log("Task from calendar: ", tasks);
   return (
@@ -29,6 +38,7 @@ export default function Calender({
         customers={customers}
         vehicles={vehicles}
         orders={orders}
+        settings={settings}
       />
       <Body
         type={type as any}

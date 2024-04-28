@@ -13,18 +13,27 @@ import { NewAppointment } from "./NewAppointment";
 import { db } from "@/lib/db";
 import { auth } from "@/app/auth";
 import { AuthSession } from "@/types/auth";
-import { Customer, Order, Vehicle } from "@prisma/client";
+import {
+  Customer,
+  Order,
+  Vehicle,
+  Setting,
+  CalendarSettings,
+} from "@prisma/client";
+import Settings from "./Settings";
 
 export default function Heading({
   type,
   customers,
   vehicles,
   orders,
+  settings,
 }: {
   type: CalendarType;
   customers: Customer[];
   vehicles: Vehicle[];
   orders: Order[];
+  settings: CalendarSettings;
 }) {
   return (
     <div className="flex items-center justify-between">
@@ -67,9 +76,10 @@ export default function Heading({
         />
 
         {/* Settings */}
-        <button className="app-shadow rounded-md p-2 text-xl text-[#797979]">
+        {/* <button className="app-shadow rounded-md p-2 text-xl text-[#797979]">
           <GoGear />
-        </button>
+        </button> */}
+        <Settings settings={settings} />
       </div>
     </div>
   );
