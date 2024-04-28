@@ -73,12 +73,9 @@ export default function Heading({
           customers={customers}
           vehicles={vehicles}
           orders={orders}
+          settings={settings}
         />
 
-        {/* Settings */}
-        {/* <button className="app-shadow rounded-md p-2 text-xl text-[#797979]">
-          <GoGear />
-        </button> */}
         <Settings settings={settings} />
       </div>
     </div>

@@ -13,9 +13,14 @@ import FormError from "@/components/FormError";
 import { SlimInput, slimInputClassName } from "@/components/SlimInput";
 import { cn } from "@/lib/cn";
 import { usePopupStore } from "@/stores/popup";
-import type { Customer, Order, Vehicle } from "@prisma/client";
+import type {
+  CalendarSettings,
+  Customer,
+  Order,
+  Vehicle,
+} from "@prisma/client";
 import Image from "next/image";
-import { useCallback, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { FaArrowRight, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { TbBell, TbCalendar } from "react-icons/tb";
 import NewCustomer from "./NewCustomer";
@@ -32,10 +37,12 @@ export function NewAppointment({
   customers,
   vehicles,
   orders,
+  settings,
 }: {
   customers: Customer[];
   vehicles: Vehicle[];
   orders: Order[];
+  settings: CalendarSettings;
 }) {
   const { popup, open, close } = usePopupStore();
   const { showError } = useFormErrorStore();
@@ -52,6 +59,7 @@ export function NewAppointment({
   const [clientList, setClientList] = useState(customers);
   const [vehicleList, setVehicleList] = useState(vehicles);
   const [orderList, setOrderList] = useState(orders);
+  const [allDay, setAllDay] = useState(false);
 
   const [client, setClient] = useState<Customer | null>(null);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
@@ -62,6 +70,14 @@ export function NewAppointment({
     d.setDate(d.getDate() + (operator === "+" ? 1 : -1));
     setDate(d.toISOString().split("T")[0]);
   };
+
+  // Change start and end time based on settings
+  useEffect(() => {
+    if (allDay) {
+      setStartTime(settings.dayStart);
+      setEndTime(settings.dayEnd);
+    }
+  }, [allDay]);
 
   const handleSubmit = async (data: FormData) => {
     const title = data.get("title") as string;
@@ -160,9 +176,9 @@ export function NewAppointment({
             </div>
 
             <div className="flex items-center">
-              {/* TODO */}
               <input
-                // checked
+                checked={allDay}
+                onChange={() => setAllDay(!allDay)}
                 id="all-day"
                 type="checkbox"
                 value="true"
