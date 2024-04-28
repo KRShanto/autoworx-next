@@ -12,16 +12,15 @@ export const slimInputClassName =
 
 export function SlimInput({
   label,
-  name,
   className,
   ...props
 }: SlimInputProps & ComponentProps<"input">) {
   return (
     <label className="block">
-      <div className="mb-1 px-2 font-medium">{label ?? sentenceCase(name)}</div>
+      <div className="mb-1 px-2 font-medium">{label ?? sentenceCase(props.name)}</div>
       <input
         type="text"
-        name={name}
+        required
         className={cn(slimInputClassName, className)}
         {...props}
       />
