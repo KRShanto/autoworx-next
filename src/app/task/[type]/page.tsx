@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 
 export default async function Page({ params }: { params: { type: string } }) {
   const session = (await auth()) as AuthSession;
+  const companyId = session.user.companyId;
 
   // Tasks with assigned users
   // Here we will store both the task and the assigned users
@@ -22,7 +23,7 @@ export default async function Page({ params }: { params: { type: string } }) {
   // where startTime, endTime, and date are not null
   const tasks = await db.task.findMany({
     where: {
-      companyId: session.user.companyId,
+      companyId,
     },
   });
 
@@ -59,7 +60,7 @@ export default async function Page({ params }: { params: { type: string } }) {
   // Get all the users for the company
   const companyUsers = await db.user.findMany({
     where: {
-      companyId: session.user.companyId,
+      companyId,
     },
   });
 
@@ -89,7 +90,7 @@ export default async function Page({ params }: { params: { type: string } }) {
   // Get all invoices
   const invoices = await db.invoice.findMany({
     where: {
-      companyId: session.user.companyId,
+      companyId,
     },
   });
 
@@ -105,7 +106,17 @@ export default async function Page({ params }: { params: { type: string } }) {
     (tag, index) => tagsArray.indexOf(tag) === index,
   );
 
-  console.log("tags: ", uniqueTags);
+  const customers = await db.customer.findMany({
+    where: { companyId },
+  });
+
+  const vehicles = await db.vehicle.findMany({
+    where: { companyId },
+  });
+
+  const orders = await db.order.findMany({
+    where: { companyId },
+  });
 
   return (
     <>
@@ -119,6 +130,9 @@ export default async function Page({ params }: { params: { type: string } }) {
           usersWithTasks={usersWithTasks}
           tasks={tasks}
           tags={uniqueTags}
+          customers={customers}
+          vehicles={vehicles}
+          orders={orders}
         />
       </div>
     </>

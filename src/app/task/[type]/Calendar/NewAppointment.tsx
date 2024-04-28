@@ -10,19 +10,25 @@ import {
   DialogClose,
 } from "@/components/Dialog";
 import { usePopupStore } from "@/stores/popup";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { TbBell, TbCalendar } from "react-icons/tb";
 import FormError from "@/components/FormError";
-import Input from "@/components/Input";
-import type { TaskType, User } from "@prisma/client";
+import type { Customer, Order, Vehicle } from "@prisma/client";
 import Image from "next/image";
-import Submit from "@/components/Submit";
-import { addTask } from "../../add";
-import { useFormErrorStore } from "@/stores/form-error";
 import { SlimInput, slimInputClassName } from "@/components/SlimInput";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import Selector from "./Selector";
+import NewCustomer from "./NewCustomer";
 
-export function NewAppointment() {
+export function NewAppointment({
+  customers,
+  vehicles,
+  orders,
+}: {
+  customers: Customer[];
+  vehicles: Vehicle[];
+  orders: Order[];
+}) {
   const { popup, open, close } = usePopupStore();
   const setOpen = useCallback(
     (value: boolean) => {
@@ -30,6 +36,14 @@ export function NewAppointment() {
     },
     [open, close],
   );
+
+  const [clientList, setClientList] = useState(customers);
+  const [vehicleList, setVehicleList] = useState(vehicles);
+  const [orderList, setOrderList] = useState(orders);
+
+  const [client, setClient] = useState<Customer | null>(null);
+  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const [order, setOrder] = useState<Order | null>(null);
 
   return (
     <Dialog open={popup === "ADD_TASK"} onOpenChange={setOpen}>
@@ -42,9 +56,12 @@ export function NewAppointment() {
         </button>
       </DialogTrigger>
       <DialogContent className="max-h-full max-w-3xl grid-rows-[auto,1fr,auto]">
+        {/* Heading */}
         <DialogHeader>
           <div className="grid grid-cols-2 items-center">
             <DialogTitle>New Appointment</DialogTitle>
+
+            {/* Options */}
             <div className="flex items-center justify-self-center rounded-full bg-primary p-1">
               <button
                 type="button"
@@ -53,6 +70,7 @@ export function NewAppointment() {
                 <TbCalendar className="mr-2 inline" size={24} />
                 Schedule
               </button>
+
               <button
                 type="button"
                 className="rounded-full px-4 py-1 font-semibold"
@@ -63,16 +81,21 @@ export function NewAppointment() {
             </div>
           </div>
         </DialogHeader>
+
         <div className="-mx-6 grid grid-cols-2 gap-px overflow-y-auto border-y border-solid bg-border">
           <div className="space-y-4 bg-background p-6">
             <FormError />
+
             <SlimInput name="title" label="Appointment Title" />
+
             <div className="flex items-end">
               <SlimInput name="date" label="Time" />
             </div>
+
             <div className="flex items-center">
+              {/* TODO */}
               <input
-                checked
+                // checked
                 id="all-day"
                 type="checkbox"
                 value=""
@@ -86,10 +109,12 @@ export function NewAppointment() {
                 All day
               </label>
             </div>
+
             <button type="button" className="text-indigo-500">
               + Assign sales person
             </button>
           </div>
+
           <div className="relative row-span-2 bg-background p-6">
             <div className="absolute inset-0 divide-y overflow-y-auto">
               <div className="sticky top-0 flex items-center gap-4  bg-background px-8 py-2">
@@ -110,22 +135,92 @@ export function NewAppointment() {
               ))}
             </div>
           </div>
+
           <div className="space-y-4 bg-background p-6">
-            <select className={slimInputClassName} name="client">
-              <option disabled selected>
-                Client
-              </option>
-            </select>
-            <select className={slimInputClassName} name="vehicle">
-              <option disabled selected>
-                Vehicle
-              </option>
-            </select>
-            <select className={slimInputClassName} name="order">
-              <option disabled selected>
-                Order
-              </option>
-            </select>
+            <Selector
+              newButton={<NewCustomer setCustomers={setClientList} />}
+              label={
+                client ? client.firstName + " " + client.lastName : "Client"
+              }
+            >
+              <div className="">
+                {clientList.map((client) => (
+                  <div
+                    key={client.id}
+                    className="flex cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100 "
+                    onClick={() => setClient(client)}
+                  >
+                    <Image
+                      src={client.photo!}
+                      alt="Client Image"
+                      width={30}
+                      height={30}
+                      className="rounded-full"
+                    />
+
+                    <div>
+                      <p className="text-sm font-bold">
+                        {client.firstName + client.lastName}
+                      </p>
+                      <p className="text-xs">{client.email}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Selector>
+
+            <Selector
+              newButton={
+                <button type="button" className="text-xs text-[#6571FF]">
+                  + New Vehicle
+                </button>
+              }
+              label={
+                vehicle ? vehicle.model || `Vehicle ${vehicle.id}` : "Vehicle"
+              }
+            >
+              <div className="">
+                {vehicleList.map((vehicle) => (
+                  <div
+                    key={vehicle.id}
+                    className="flex cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100 "
+                    onClick={() => setVehicle(vehicle)}
+                  >
+                    <div>
+                      <p className="text-sm font-bold">
+                        {vehicle.model + " " + vehicle.id}
+                      </p>
+                      <p className="text-xs">Owner</p>{" "}
+                      {/* TODO: Add owner name */}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Selector>
+
+            <Selector
+              label={order ? order.name : "Order"}
+              newButton={
+                <button type="button" className="text-xs text-[#6571FF]">
+                  + New Order
+                </button>
+              }
+            >
+              <div className="">
+                {orderList.map((order) => (
+                  <div
+                    key={order.id}
+                    className="flex cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100 "
+                    onClick={() => setOrder(order)}
+                  >
+                    <div>
+                      <p className="text-sm font-bold">{order.name}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Selector>
+
             <textarea
               name="notes"
               placeholder="Notes"

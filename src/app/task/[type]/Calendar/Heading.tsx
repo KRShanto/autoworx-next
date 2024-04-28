@@ -10,8 +10,22 @@ import {
   IoIosArrowUp,
 } from "react-icons/io";
 import { NewAppointment } from "./NewAppointment";
+import { db } from "@/lib/db";
+import { auth } from "@/app/auth";
+import { AuthSession } from "@/types/auth";
+import { Customer, Order, Vehicle } from "@prisma/client";
 
-export default function Heading({ type }: { type: CalendarType }) {
+export default function Heading({
+  type,
+  customers,
+  vehicles,
+  orders,
+}: {
+  type: CalendarType;
+  customers: Customer[];
+  vehicles: Vehicle[];
+  orders: Order[];
+}) {
   return (
     <div className="flex items-center justify-between">
       {/* Month name */}
@@ -46,7 +60,11 @@ export default function Heading({ type }: { type: CalendarType }) {
         </button>
 
         {/* New Appointment button */}
-        <NewAppointment />
+        <NewAppointment
+          customers={customers}
+          vehicles={vehicles}
+          orders={orders}
+        />
 
         {/* Settings */}
         <button className="app-shadow rounded-md p-2 text-xl text-[#797979]">

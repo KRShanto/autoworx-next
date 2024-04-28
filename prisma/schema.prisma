@@ -218,13 +218,13 @@ model Service {
 
 model Vehicle {
   id        Int      @id @default(autoincrement())
-  year      Int
-  make      String
-  model     String
-  submodel  String
-  vin       String   @unique
+  year      Int?
+  make      String?
+  model     String?
+  submodel  String?
+  vin       String?   @unique
   type      String?
-  license   String   @unique
+  license   String?   @unique
   companyId Int?     @map("company_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
