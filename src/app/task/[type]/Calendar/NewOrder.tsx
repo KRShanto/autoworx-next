@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/Dialog";
-import { SlimInput } from "@/components/SlimInput";
+import { SlimInput, slimInputClassName } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { useState } from "react";
 import { addOrder } from "./addOrder";
@@ -49,13 +49,21 @@ export default function NewOrder({ setOrders }: { setOrders: any }) {
         form
       >
         <DialogHeader>
-          <DialogTitle>Create Order</DialogTitle>
+          <DialogTitle>Add Order</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 overflow-y-auto">
           <FormError />
-          <SlimInput name="name" />
-          <SlimInput name="comment" />
+          <SlimInput name="name" label="Order Name" />
+          <label className="block">
+            <div className="mb-1 px-2 font-medium">Client Comments</div>
+            <textarea
+              name="comment"
+              required
+              rows={3}
+              className={slimInputClassName}
+            />
+          </label>
         </div>
 
         <DialogFooter>
