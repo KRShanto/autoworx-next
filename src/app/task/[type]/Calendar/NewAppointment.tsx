@@ -25,6 +25,7 @@ import NewOrder from "./NewOrder";
 import NewVehicle from "./NewVehicle";
 import { addTask } from "@/app/task/add";
 import { useFormErrorStore } from "@/stores/form-error";
+import { addAppointment } from "./addAppointment";
 
 export function NewAppointment({
   customers,
@@ -60,24 +61,22 @@ export function NewAppointment({
     const date = data.get("date") as string;
     const startTime = data.get("start") as string;
     const endTime = data.get("end") as string;
+    const notes = data.get("notes") as string;
 
-    const res = (await addTask({
+    const res = await addAppointment({
       title,
       date,
       startTime,
       endTime,
       type: "appointment",
       assignedUsers: [],
-    })) as { message?: string; field?: string };
+      clientId: client ? client.id : undefined,
+      vehicleId: vehicle ? vehicle.id : undefined,
+      orderId: order ? order.id : undefined,
+      notes,
+    });
 
-    if (res.message) {
-      showError({
-        field: res.field || "title",
-        message: res.message,
-      });
-    } else {
-      close();
-    }
+    close();
   };
 
   return (
@@ -225,12 +224,12 @@ export function NewAppointment({
                 client ? `${client.firstName} ${client.lastName}` : "Client"
               }
             >
-              <div className="">
+              <div>
                 {clientList.map((client) => (
                   <button
                     type="button"
                     key={client.id}
-                    className="flex cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100 "
+                    className="flex w-full cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100"
                     onClick={() => setClient(client)}
                   >
                     <Image
@@ -243,7 +242,7 @@ export function NewAppointment({
                     />
 
                     <div>
-                      <p className="text-sm font-bold">
+                      <p className="text-start text-sm font-bold">
                         {client.firstName} {client.lastName}
                       </p>
                       <p className="text-xs">{client.email}</p>
@@ -264,7 +263,7 @@ export function NewAppointment({
                   <button
                     type="button"
                     key={vehicle.id}
-                    className="flex cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100 "
+                    className="flex w-full cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100"
                     onClick={() => setVehicle(vehicle)}
                   >
                     <div>
@@ -288,7 +287,7 @@ export function NewAppointment({
                   <button
                     type="button"
                     key={order.id}
-                    className="flex cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100 "
+                    className="flex w-full cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100"
                     onClick={() => setOrder(order)}
                   >
                     <div>
