@@ -7,23 +7,22 @@ import { revalidatePath } from "next/cache";
 import { AuthSession } from "@/types/auth";
 
 const CustomerSchema = z.object({
-  name: z.string(),
-  email: z.string().email(),
-  mobile: z.number(),
-  address: z.string(),
-  city: z.string(),
-  state: z.string(),
-  zip: z.string(),
+  firstName: z.string(),
+  email: z.string().email().nullable(),
 });
 
 export async function addCustomer(data: {
-  name: string;
-  email: string;
-  mobile: number;
-  address: string;
-  city: string;
-  state: string;
-  zip: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  mobile?: number;
+  address?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  customerCompany?: string;
+  tag?: string;
+  image?: string;
 }) {
   try {
     CustomerSchema.parse(data);
@@ -31,7 +30,7 @@ export async function addCustomer(data: {
     const session = (await auth()) as AuthSession;
     const companyId = session.user.companyId;
 
-    await db.customer.create({
+    const newCustomer = await db.customer.create({
       data: {
         ...data,
         companyId,
@@ -39,7 +38,11 @@ export async function addCustomer(data: {
     });
 
     revalidatePath("/customer");
+
+    return newCustomer;
   } catch (error: any) {
+    console.log(error);
+
     if (error instanceof z.ZodError) {
       return {
         message: error.errors[0].message,
