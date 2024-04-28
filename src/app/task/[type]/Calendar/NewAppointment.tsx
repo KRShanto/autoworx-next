@@ -26,6 +26,7 @@ import NewVehicle from "./NewVehicle";
 import { addTask } from "@/app/task/add";
 import { useFormErrorStore } from "@/stores/form-error";
 import { addAppointment } from "./addAppointment";
+import moment from "moment";
 
 export function NewAppointment({
   customers,
@@ -45,9 +46,9 @@ export function NewAppointment({
     [open, close],
   );
 
-  const [date, setDate] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [startTime, setStartTime] = useState("10:00");
+  const [endTime, setEndTime] = useState("18:00");
   const [clientList, setClientList] = useState(customers);
   const [vehicleList, setVehicleList] = useState(vehicles);
   const [orderList, setOrderList] = useState(orders);
@@ -56,11 +57,14 @@ export function NewAppointment({
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [order, setOrder] = useState<Order | null>(null);
 
+  const handleDate = (operator: "+" | "-") => {
+    const d = new Date(date);
+    d.setDate(d.getDate() + (operator === "+" ? 1 : -1));
+    setDate(d.toISOString().split("T")[0]);
+  };
+
   const handleSubmit = async (data: FormData) => {
     const title = data.get("title") as string;
-    const date = data.get("date") as string;
-    const startTime = data.get("start") as string;
-    const endTime = data.get("end") as string;
     const notes = data.get("notes") as string;
 
     const res = await addAppointment({
@@ -181,13 +185,13 @@ export function NewAppointment({
           <div className="relative row-span-2 bg-background p-6">
             <div className="absolute inset-0 divide-y overflow-y-auto">
               <div className="sticky top-0 z-10 flex items-center gap-4  bg-background px-8 py-2">
-                <button type="button">
+                <button type="button" onClick={() => handleDate("-")}>
                   <FaChevronLeft />
                 </button>
                 <div className="mx-auto text-center text-primary-foreground">
-                  Sunday, April 21
+                  {moment(date).format("dddd, MMMM YYYY")}
                 </div>
-                <button type="button">
+                <button type="button" onClick={() => handleDate("+")}>
                   <FaChevronRight />
                 </button>
               </div>
@@ -301,8 +305,8 @@ export function NewAppointment({
             <textarea
               name="notes"
               placeholder="Notes"
-              className={slimInputClassName}
-              rows={2}
+              className={slimInputClassName + " border-2 border-slate-400"}
+              rows={3}
             />
           </div>
         </div>
