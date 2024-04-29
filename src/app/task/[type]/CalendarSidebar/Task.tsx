@@ -3,7 +3,6 @@ import React, { LegacyRef } from "react";
 import { Task } from "@prisma/client";
 import { useDrag } from "react-dnd";
 import { IoMdCheckmarkCircleOutline as CheckIcon } from "react-icons/io";
-import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
 
 export default function TaskComponent({ task }: { task: Task }) {
   const [{ isDragging }, drag] = useDrag({
@@ -13,7 +12,6 @@ export default function TaskComponent({ task }: { task: Task }) {
       isDragging: !!monitor.isDragging(),
     }),
   });
-  const minimized = useCalendarSidebarStore((x) => x.minimized);
 
   const handleDragStart = (event: React.DragEvent) => {
     event.dataTransfer.setData("text/plain", `task|${task.id}`);
@@ -31,7 +29,7 @@ export default function TaskComponent({ task }: { task: Task }) {
         draggable
         onDragStart={handleDragStart}
       >
-        {!minimized && task.title}
+        {task.title}
       </div>
     );
   }
@@ -44,7 +42,7 @@ export default function TaskComponent({ task }: { task: Task }) {
       }}
     >
       <CheckIcon className="mr-1 inline-block text-cyan-300" />
-      {!minimized && task.title}
+      {task.title}
     </div>
   );
 }

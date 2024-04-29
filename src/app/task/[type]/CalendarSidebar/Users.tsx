@@ -21,7 +21,7 @@ export default function Users({
   const setMinimized = useCalendarSidebarStore((x) => x.setMinimized);
 
   return (
-    <div className="app-shadow mt-5 flex flex-col flex-grow rounded-[12px] bg-white p-3">
+    <div className="app-shadow mt-5 flex flex-grow flex-col rounded-[12px] bg-white p-3">
       <div>
         <h2 className="flex items-center justify-between">
           {!minimized && (
@@ -45,39 +45,42 @@ export default function Users({
       </div>
 
       <div className="flex-grow overflow-scroll py-2">
-        {users.map((user, index) => {
-          const isSelected = selectedUser === index;
+        {!minimized &&
+          users.map((user, index) => {
+            const isSelected = selectedUser === index;
 
-          function handleClick() {
-            if (isSelected) {
-              setSelectedUser(null);
-            } else {
-              setSelectedUser(index);
+            function handleClick() {
+              if (isSelected) {
+                setSelectedUser(null);
+              } else {
+                setSelectedUser(index);
+              }
+              setMinimized(false);
             }
-            setMinimized(false);
-          }
 
-          return (
-            <UserComponent
-              key={index}
-              isSelected={isSelected}
-              handleClick={handleClick}
-              user={user}
-              users={users}
-              index={index}
-              tasks={tasks}
-            />
-          );
-        })}
+            return (
+              <UserComponent
+                key={index}
+                isSelected={isSelected}
+                handleClick={handleClick}
+                user={user}
+                users={users}
+                index={index}
+                tasks={tasks}
+              />
+            );
+          })}
       </div>
 
-      <button
-        type="button"
-        className="mt-4 w-full rounded-[5px] bg-blue-600 py-2 text-[15px] text-white"
-        onClick={() => open("ADD_USER")}
-      >
-        {minimized ? <FaPlus className="block mx-auto" /> : "Add User"}
-      </button>
+      {!minimized && (
+        <button
+          type="button"
+          className="mt-4 w-full rounded-[5px] bg-blue-600 py-2 text-[15px] text-white"
+          onClick={() => open("ADD_USER")}
+        >
+          Add User
+        </button>
+      )}
     </div>
   );
 }
