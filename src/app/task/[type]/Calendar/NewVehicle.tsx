@@ -61,15 +61,13 @@ export default function NewVehicle({ setVehicles }: { setVehicles: any }) {
           <DialogTitle>Create Vehicle</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 overflow-y-auto">
+        <div className="grid sm:grid-cols-2 gap-2 overflow-y-auto">
           <FormError />
-          <SlimInput name="name" />
-          <SlimInput name="comment" />
           <SlimInput name="make" />
           <SlimInput name="model" />
           <SlimInput name="year" type="number" />
-          <SlimInput name="submodel" />
-          <SlimInput name="type" />
+          <SlimInput name="submodel" label="Sub Model" />
+          <SlimInput name="type" className="row-span-full" />
         </div>
 
         <DialogFooter>
