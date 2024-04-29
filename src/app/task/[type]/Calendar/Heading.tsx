@@ -19,6 +19,7 @@ import {
   Vehicle,
   Setting,
   CalendarSettings,
+  User,
 } from "@prisma/client";
 import Settings from "./Settings";
 
@@ -28,12 +29,14 @@ export default function Heading({
   vehicles,
   orders,
   settings,
+  employees,
 }: {
   type: CalendarType;
   customers: Customer[];
   vehicles: Vehicle[];
   orders: Order[];
   settings: CalendarSettings;
+  employees: User[];
 }) {
   return (
     <div className="flex items-center justify-between">
@@ -74,6 +77,7 @@ export default function Heading({
           vehicles={vehicles}
           orders={orders}
           settings={settings}
+          employees={employees}
         />
 
         <Settings settings={settings} />

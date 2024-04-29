@@ -95,7 +95,6 @@ export default function NewCustomer({ setCustomers }: { setCustomers: any }) {
                 className="rounded-md border-2 border-slate-400 p-1"
               />
             </div>
-            F
           </div>
 
           <div className="flex">

@@ -17,11 +17,18 @@ import type {
   CalendarSettings,
   Customer,
   Order,
+  User,
   Vehicle,
 } from "@prisma/client";
 import Image from "next/image";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { FaArrowRight, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import {
+  FaArrowRight,
+  FaChevronLeft,
+  FaChevronRight,
+  FaSearch,
+  FaTimes,
+} from "react-icons/fa";
 import { TbBell, TbCalendar } from "react-icons/tb";
 import NewCustomer from "./NewCustomer";
 import Selector from "./Selector";
@@ -38,11 +45,13 @@ export function NewAppointment({
   vehicles,
   orders,
   settings,
+  employees,
 }: {
   customers: Customer[];
   vehicles: Vehicle[];
   orders: Order[];
   settings: CalendarSettings;
+  employees: User[];
 }) {
   const { popup, open, close } = usePopupStore();
   const { showError } = useFormErrorStore();
@@ -64,6 +73,19 @@ export function NewAppointment({
   const [client, setClient] = useState<Customer | null>(null);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [order, setOrder] = useState<Order | null>(null);
+  const [assignedUsers, setAssignedUsers] = useState<User[]>([]);
+
+  const [addSalesPersonOpen, setAddSalesPersonOpen] = useState(false);
+  const [employeesToDisplay, setEmployeesToDisplay] =
+    useState<User[]>(employees);
+
+  const handleSearch = (search: string) => {
+    setEmployeesToDisplay(
+      employees.filter((employee) =>
+        employee.name.toLowerCase().includes(search.toLowerCase()),
+      ),
+    );
+  };
 
   const handleDate = (operator: "+" | "-") => {
     const d = new Date(date);
@@ -89,7 +111,7 @@ export function NewAppointment({
       startTime,
       endTime,
       type: "appointment",
-      assignedUsers: [],
+      assignedUsers: assignedUsers.map((user) => user.id),
       clientId: client ? client.id : undefined,
       vehicleId: vehicle ? vehicle.id : undefined,
       orderId: order ? order.id : undefined,
@@ -193,9 +215,72 @@ export function NewAppointment({
               </label>
             </div>
 
-            <button type="button" className="text-indigo-500">
+            <button
+              type="button"
+              className="text-indigo-500"
+              onClick={() => setAddSalesPersonOpen(true)}
+            >
               + Assign sales person
             </button>
+
+            {
+              // Assigned users
+              assignedUsers.map((user) => (
+                <div key={user.id} className="flex items-center gap-4">
+                  <Image
+                    src={user.image}
+                    alt="Employee Image"
+                    width={30}
+                    height={30}
+                    className="rounded-full"
+                  />
+                  <p>{user.name}</p>
+                </div>
+              ))
+            }
+
+            {addSalesPersonOpen && (
+              <div className="w-[200px] space-y-4 rounded-lg border-2 border-slate-400">
+                {/* Search */}
+                <div className="relative mx-auto my-3 h-[35px] w-[90%] rounded-lg border-2 border-slate-400">
+                  <FaSearch className="absolute left-2 top-1/2 -translate-y-1/2 transform text-slate-400" />
+                  <input
+                    name="search"
+                    className="h-full w-[85%] rounded-lg pl-7 pr-2 focus:outline-none"
+                    type="text"
+                    placeholder="Search"
+                    onChange={(e) => handleSearch(e.target.value)}
+                  />
+                  <FaTimes
+                    className="absolute right-2 top-1/2 -translate-y-1/2 transform cursor-pointer text-slate-400"
+                    onClick={() => setAddSalesPersonOpen(false)}
+                  />
+                </div>
+
+                {employeesToDisplay
+                  .filter((employee) => !assignedUsers.includes(employee))
+                  .map((employee) => (
+                    <button
+                      key={employee.id}
+                      className="flex w-full cursor-pointer items-center gap-3 rounded-md p-2 hover:bg-gray-100"
+                      onClick={() => {
+                        setAssignedUsers([...assignedUsers, employee]);
+                        setAddSalesPersonOpen(false);
+                      }}
+                      type="button"
+                    >
+                      <Image
+                        src={employee.image}
+                        alt="Employee Image"
+                        width={50}
+                        height={50}
+                        className="rounded-full"
+                      />
+                      <p className="font-medium">{employee.name}</p>
+                    </button>
+                  ))}
+              </div>
+            )}
           </div>
 
           <div className="relative row-span-2 bg-background p-6">
