@@ -24,7 +24,6 @@ export default function Month({
   tasks: CalendarTask[];
   tasksWithoutTime: Task[];
 }) {
-  // const { open } = usePopupStore();
   const router = useRouter();
 
   const [{ canDrop, isOver }, dropRef] = useDrop({
@@ -43,8 +42,8 @@ export default function Month({
   // Define the total number of dates to be displayed
   const totalDates = 35;
   // Get the current date
-  // const today = new Date();
   const month = useMonth();
+  const today = moment().toDate();
 
   // Get the index of today's date
   const todayIndex = month.getDate() - month.getDay() + 1;
@@ -158,13 +157,12 @@ export default function Month({
               key={i}
               className={cn(
                 "relative flex h-[100%] flex-col items-end gap-2 border-b border-r border-[#797979] p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
-                // check if the cell is today
-                month === cell[0] ? "text-[#6571FF]" : "text-[#797979]",
+                // highlight today's date
+                today == cell[0].getDate()
+                  ? "text-[#6571FF]"
+                  : "text-[#797979]",
               )}
               onClick={() => {
-                // open("ADD_TASK", {
-                //   date: moment(cell[0]).format("YYYY-MM-DD"),
-                // });
                 router.push(
                   `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`,
                 );
@@ -176,11 +174,11 @@ export default function Month({
             >
               {cell[0].getDate()}
 
-              <div className="absolute bottom-2 left-2 right-2 flex flex-col gap-1 max-h-[calc(100%-3rem)]">
+              <div className="absolute bottom-2 left-2 right-2 flex max-h-[calc(100%-3rem)] flex-col gap-1">
                 {cell[1]?.slice(0, 3).map((task: CalendarTask, i: number) => (
                   <div
                     key={i}
-                    className="h-4 rounded max-h-[33.33%]"
+                    className="h-4 max-h-[33.33%] rounded"
                     style={{
                       backgroundColor: TASK_COLOR[task.type],
                     }}

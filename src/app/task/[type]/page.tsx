@@ -66,7 +66,11 @@ export default async function Page({ params }: { params: { type: string } }) {
 
   const usersWithTasks = [];
 
-  const users = await db.user.findMany();
+  const users = await db.user.findMany({
+    where: {
+      companyId,
+    },
+  });
 
   for (const user of users) {
     const taskUsers = await db.taskUser.findMany({
@@ -78,6 +82,7 @@ export default async function Page({ params }: { params: { type: string } }) {
         id: {
           in: taskUsers.map((taskUser) => taskUser.taskId),
         },
+        companyId,
       },
     });
 

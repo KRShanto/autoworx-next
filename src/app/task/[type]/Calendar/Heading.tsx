@@ -54,8 +54,11 @@ export default function Heading({
 
       {/* Calender options */}
       <div className="flex items-center gap-3 ">
-        {/* Day selector */}
-        <Link className="app-shadow rounded-md p-2 text-[#797979]" href="/task/day">
+        {/* Highlight day's date in Month section */}
+        <Link
+          className="app-shadow rounded-md p-2 text-[#797979]"
+          href="/task/month"
+        >
           Today
         </Link>
 
@@ -89,7 +92,7 @@ export default function Heading({
           <IoIosArrowForward />
         </button>
 
-        {/* Month selector */}
+        {/* Type selector */}
         <select
           className="app-shadow rounded-md bg-white p-2 text-[#797979]"
           value={type}
