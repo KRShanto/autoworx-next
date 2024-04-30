@@ -26,7 +26,7 @@ export async function addAppointment(task: TaskToAdd) {
   const newTask = await db.task.create({
     data: {
       title: task.title,
-      date: task.date,
+      date: task.date ? new Date(task.date) : undefined,
       startTime: task.startTime,
       endTime: task.endTime,
       type: task.type || TaskType.appointment,

@@ -100,7 +100,7 @@ export function NewAppointment({
 
   // Change start and end time based on settings
   useEffect(() => {
-    if (allDay) {
+    if (allDay && settings) {
       setStartTime(settings.dayStart);
       setEndTime(settings.dayEnd);
     }

@@ -94,7 +94,7 @@ export default function SideNavbar() {
                 </button>
 
                 {openNav === item.title && (
-                  <div className="relative top-0 flex flex-col gap-4">
+                  <div className="relative top-0 mt-2 flex flex-col gap-4">
                     {item.subnav.map((subnavItem, index) => (
                       <Link
                         key={index}
