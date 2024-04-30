@@ -124,16 +124,24 @@ export async function createInvoice(data: {
     });
 
     // Create a vehicle if not found
-    const vehicle = await db.vehicle.upsert({
-      where: {
-        vin: data.vehicle.vin,
-      },
-      create: {
+    // const vehicle = await db.vehicle.upsert({
+    //   where: {
+    //     vin: data.vehicle.vin,
+    //   },
+    //   create: {
+    //     ...data.vehicle,
+    //     companyId,
+    //   },
+    //   update: {
+    //     ...data.vehicle,
+    //   },
+    // });
+
+    // Create a vehicle
+    const vehicle = await db.vehicle.create({
+      data: {
         ...data.vehicle,
         companyId,
-      },
-      update: {
-        ...data.vehicle,
       },
     });
 
