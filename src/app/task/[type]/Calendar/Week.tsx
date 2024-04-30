@@ -2,18 +2,32 @@
 
 import { cn } from "@/lib/cn";
 import { TASK_COLOR } from "@/lib/consts";
-import { usePopupStore } from "../../../../stores/popup";
+import { usePopupStore } from "@/stores/popup";
+import type { CalendarTask } from "@/types/db";
+import type { Task, User } from "@prisma/client";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useDrop } from "react-dnd";
 import { HiCalendar, HiClock } from "react-icons/hi";
 import { MdDelete, MdModeEdit } from "react-icons/md";
 import { ThreeDots } from "react-loader-spinner";
-import { Task, User } from "@prisma/client";
-import Image from "next/image";
-import { deleteTask } from "../../delete";
-import { useDrop } from "react-dnd";
 import { addTask } from "../../add";
-import { CalendarTask } from "@/types/db";
+import { deleteTask } from "../../delete";
+
+function useWeek() {
+  const searchParams = useSearchParams();
+  const week = moment(searchParams.get("week"), moment.HTML5_FMT.WEEK);
+  return week.isValid() ? week : moment();
+}
+
+// Generate the hourly rows
+const hourlyRows = Array.from({ length: 24 }, (_, i) => [
+  `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
+  // empty cells
+  ...Array.from({ length: 7 }, () => ""),
+]);
 
 export default function Week({
   tasks,
@@ -60,8 +74,8 @@ export default function Week({
     setLoading(false);
   };
 
-  // Get the current date
-  const today = new Date();
+  const week = useWeek();
+  const today = week.toDate();
 
   // Define the days of the week
   const days = [
@@ -85,13 +99,6 @@ export default function Week({
     }),
   ];
 
-  // Generate the hourly rows
-  const hourlyRows = Array.from({ length: 24 }, (_, i) => [
-    `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
-    // empty cells
-    ...Array.from({ length: 7 }, () => ""),
-  ]);
-
   // Format the date
   function formatDate(date: Date) {
     return moment(date).format("YYYY-MM-DD");
@@ -107,46 +114,42 @@ export default function Week({
   // Combine the all-day row and the hourly rows into a single array
   const rows = [allDayRow, ...hourlyRows];
 
-  // Get the start and end of the current week
-  const startOfWeek = moment().startOf("week").toDate();
-  const endOfWeek = moment().endOf("week").toDate();
-
   // Filter out the tasks that are within the current week
-  const [weekTasks, setWeekTasks] = useState<
+  const weekTasks = useMemo<
     (CalendarTask & {
       rowStartIndex: number;
       rowEndIndex: number;
       columnIndex: number;
     })[]
-  >([]);
+  >(() => {
+    // Get the start and end of the current week
+    const startOfWeek = week.startOf("week").toDate();
+    const endOfWeek = week.endOf("week").toDate();
 
-  useEffect(() => {
-    setWeekTasks(
-      tasks
-        .filter((task) => {
-          const taskDate = new Date(task.date);
-          return taskDate >= startOfWeek && taskDate <= endOfWeek;
-        })
-        .map((task) => {
-          const taskDate = new Date(task.date);
-          const columnIndex = taskDate.getDay() - startOfWeek.getDay();
+    return tasks
+      .filter((task) => {
+        const taskDate = new Date(task.date);
+        return taskDate >= startOfWeek && taskDate <= endOfWeek;
+      })
+      .map((task) => {
+        const taskDate = new Date(task.date);
+        const columnIndex = taskDate.getDay() - startOfWeek.getDay();
 
-          // Convert the taskStartTime and taskEndTime to a format like "1 PM" or "11 AM"
-          const taskStartTime = moment(task.startTime, "HH:mm").format("h A");
-          const taskEndTime = moment(task.endTime, "HH:mm").format("h A");
+        // Convert the taskStartTime and taskEndTime to a format like "1 PM" or "11 AM"
+        const taskStartTime = moment(task.startTime, "HH:mm").format("h A");
+        const taskEndTime = moment(task.endTime, "HH:mm").format("h A");
 
-          // Find the rowStartIndex and rowEndIndex by looping over the hourlyRows
-          const rowStartIndex = hourlyRows.findIndex((row) =>
-            row.includes(taskStartTime),
-          );
-          const rowEndIndex = hourlyRows.findIndex((row) =>
-            row.includes(taskEndTime),
-          );
+        // Find the rowStartIndex and rowEndIndex by looping over the hourlyRows
+        const rowStartIndex = hourlyRows.findIndex((row) =>
+          row.includes(taskStartTime),
+        );
+        const rowEndIndex = hourlyRows.findIndex((row) =>
+          row.includes(taskEndTime),
+        );
 
-          return { ...task, columnIndex, rowStartIndex, rowEndIndex };
-        }),
-    );
-  }, [tasks]);
+        return { ...task, columnIndex, rowStartIndex, rowEndIndex };
+      });
+  }, [tasks, week]);
 
   async function handleDrop(
     event: React.DragEvent,

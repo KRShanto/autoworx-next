@@ -10,6 +10,7 @@ import {
   Vehicle,
 } from "@prisma/client";
 import { CalendarTask } from "@/types/db";
+import { Suspense } from "react";
 
 export default function Calender({
   type,
@@ -41,12 +42,14 @@ export default function Calender({
         settings={settings}
         employees={companyUsers}
       />
-      <Body
-        type={type as any}
-        tasks={tasks}
-        companyUsers={companyUsers}
-        tasksWithoutTime={tasksWithoutTime}
-      />
+      <Suspense>
+        <Body
+          type={type as any}
+          tasks={tasks}
+          companyUsers={companyUsers}
+          tasksWithoutTime={tasksWithoutTime}
+        />
+      </Suspense>
     </div>
   );
 }

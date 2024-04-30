@@ -2,12 +2,19 @@
 
 import { cn } from "@/lib/cn";
 import { TASK_COLOR } from "@/lib/consts";
-import { usePopupStore } from "../../../../stores/popup";
+import { usePopupStore } from "@/stores/popup";
+import type { CalendarTask } from "@/types/db";
+import type { Task } from "@prisma/client";
 import moment from "moment";
-import { Task } from "@prisma/client";
+import { useSearchParams } from "next/navigation";
 import { useDrop } from "react-dnd";
 import { addTask } from "../../add";
-import { CalendarTask } from "@/types/db";
+
+function useMonth() {
+  const searchParams = useSearchParams();
+  const month = moment(searchParams.get("month"), moment.HTML5_FMT.MONTH);
+  return (month.isValid() ? month : moment()).toDate();
+}
 
 export default function Month({
   tasks,
@@ -34,17 +41,18 @@ export default function Month({
   // Define the total number of dates to be displayed
   const totalDates = 35;
   // Get the current date
-  const today = new Date();
+  // const today = new Date();
+  const month = useMonth();
 
   // Get the index of today's date
-  const todayIndex = today.getDate() - today.getDay() + 1;
+  const todayIndex = month.getDate() - month.getDay() + 1;
 
   // Generate the dates before today
   for (let index = 0; index < todayIndex; index++) {
     // Calculate the date number
-    const dateNumber = today.getDate() - index - 1;
+    const dateNumber = month.getDate() - index - 1;
     // Create a new date object
-    const date = new Date(today.getFullYear(), today.getMonth(), dateNumber);
+    const date = new Date(month.getFullYear(), month.getMonth(), dateNumber);
     const tasks = getTasks(date);
     // Add the date to the dates array
     dates.push([date, tasks]);
@@ -54,7 +62,7 @@ export default function Month({
   dates.reverse();
 
   // Add today's date to the dates array
-  dates.push([today, getTasks(today)]);
+  dates.push([month, getTasks(month)]);
 
   // Calculate the number of dates to be generated after today
   const rest = totalDates - todayIndex - 1;
@@ -62,9 +70,9 @@ export default function Month({
   // Generate the dates after today
   for (let index = 0; index < rest; index++) {
     // Calculate the date number
-    const dateNumber = today.getDate() + index + 1;
+    const dateNumber = month.getDate() + index + 1;
     // Create a new date object
-    const date = new Date(today.getFullYear(), today.getMonth(), dateNumber);
+    const date = new Date(month.getFullYear(), month.getMonth(), dateNumber);
     // Add the date to the dates array
     dates.push([date, getTasks(date)]);
   }
@@ -148,7 +156,7 @@ export default function Month({
               className={cn(
                 "relative flex h-[100%] flex-col items-end gap-2 border-b border-r border-[#797979] p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
                 // check if the cell is today
-                today === cell[0] ? "text-[#6571FF]" : "text-[#797979]",
+                month === cell[0] ? "text-[#6571FF]" : "text-[#797979]",
               )}
               onClick={() => {
                 open("ADD_TASK", {
