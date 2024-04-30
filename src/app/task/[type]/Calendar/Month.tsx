@@ -25,7 +25,6 @@ export default function Month({
   tasksWithoutTime: Task[];
 }) {
   const router = useRouter();
-
   const [{ canDrop, isOver }, dropRef] = useDrop({
     accept: ["task", "tag"],
     drop: (item, monitor) => {
@@ -43,7 +42,7 @@ export default function Month({
   const totalDates = 35;
   // Get the current date
   const month = useMonth();
-  const today = moment().date();
+  const today = new Date();
 
   // Get the index of today's date
   const todayIndex = month.getDate() - month.getDay() + 1;
@@ -151,9 +150,6 @@ export default function Month({
               </div>
             );
 
-          console.log("today: ", today);
-          console.log("cell[0].getDate(): ", cell[0].getDate());
-
           return (
             <button
               type="button"
@@ -161,7 +157,10 @@ export default function Month({
               className={cn(
                 "relative flex h-[100%] flex-col items-end gap-2 border-b border-r border-[#797979] p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
                 // highlight today's date
-                today == cell[0].getDate()
+                // today === cell[0]
+                today.getFullYear() === cell[0].getFullYear() &&
+                  today.getMonth() === cell[0].getMonth() &&
+                  today.getDate() === cell[0].getDate()
                   ? "text-[#6571FF]"
                   : "text-[#797979]",
               )}
