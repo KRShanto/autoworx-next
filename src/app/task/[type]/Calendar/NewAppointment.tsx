@@ -137,55 +137,53 @@ export function NewAppointment({
         </button>
       </DialogTrigger>
       <DialogContent
-        className="max-h-full max-w-4xl grid-rows-[auto,1fr,auto]"
+        className="max-h-full max-w-5xl grid-rows-[auto,1fr,auto]"
         form
       >
         {/* Heading */}
-        <DialogHeader>
-          <div className="grid grid-cols-2 items-center">
-            <DialogTitle>New Appointment</DialogTitle>
+        <DialogHeader className="grid items-center gap-4 sm:grid-cols-2">
+          <DialogTitle>New Appointment</DialogTitle>
 
-            {/* Options */}
-            <div className="flex items-center justify-self-center rounded-full bg-primary p-1">
-              <button
-                type="button"
-                className={cn(
-                  "rounded-full px-4 py-1 font-semibold",
-                  tab === Tab.Schedule && "bg-background",
-                )}
-                onClick={() => setTab(Tab.Schedule)}
-              >
-                <TbCalendar className="mr-2 inline" size={24} />
-                Schedule
-              </button>
+          {/* Options */}
+          <div className="flex items-center justify-self-center rounded-full bg-primary p-1">
+            <button
+              type="button"
+              className={cn(
+                "rounded-full px-4 py-1 font-semibold",
+                tab === Tab.Schedule && "bg-background",
+              )}
+              onClick={() => setTab(Tab.Schedule)}
+            >
+              <TbCalendar className="mr-2 inline" size={24} />
+              Schedule
+            </button>
 
-              <button
-                type="button"
-                className={cn(
-                  "rounded-full px-4 py-1 font-semibold",
-                  tab === Tab.Reminder && "bg-background",
-                )}
-                onClick={() => setTab(Tab.Reminder)}
-              >
-                <TbBell className="mr-2 inline" size={24} />
-                Reminder
-              </button>
-            </div>
+            <button
+              type="button"
+              className={cn(
+                "rounded-full px-4 py-1 font-semibold",
+                tab === Tab.Reminder && "bg-background",
+              )}
+              onClick={() => setTab(Tab.Reminder)}
+            >
+              <TbBell className="mr-2 inline" size={24} />
+              Reminder
+            </button>
           </div>
         </DialogHeader>
 
         {tab === Tab.Schedule ? (
-          <div className="-mx-6 grid grid-cols-2 gap-px overflow-y-auto border-y border-solid bg-border">
+          <div className="-mx-6 grid gap-px overflow-y-auto border-y border-solid bg-border sm:grid-cols-2">
             <div className="space-y-4 bg-background p-6">
               <FormError />
 
               <SlimInput name="title" label="Appointment Title" required />
 
-              <div className="flex items-end gap-1">
+              <div className="flex flex-wrap items-end gap-1">
                 <SlimInput
                   name="date"
                   label="Time"
-                  className="grow"
+                  rootClassName="grow"
                   type="date"
                   value={date}
                   required={false}
@@ -193,7 +191,7 @@ export function NewAppointment({
                 />
                 <div className="flex grow items-center gap-1">
                   <input
-                    className={cn(slimInputClassName, "grow")}
+                    className={cn(slimInputClassName, "flex-auto")}
                     type="time"
                     name="start"
                     value={startTime}
@@ -203,7 +201,7 @@ export function NewAppointment({
                   />
                   <FaArrowRight className="shrink-0" />
                   <input
-                    className={cn(slimInputClassName, "grow")}
+                    className={cn(slimInputClassName, "flex-auto")}
                     type="time"
                     name="end"
                     value={endTime}
@@ -298,7 +296,7 @@ export function NewAppointment({
               )}
             </div>
 
-            <div className="relative row-span-2 bg-background p-6">
+            <div className="relative row-span-2 min-h-36 bg-background p-6">
               <div className="absolute inset-0 divide-y overflow-y-auto">
                 <div className="sticky top-0 z-10 flex items-center gap-4  bg-background px-8 py-2">
                   <button type="button" onClick={() => handleDate("-")}>

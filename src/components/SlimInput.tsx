@@ -5,6 +5,7 @@ import { cn } from "@/lib/cn";
 export type SlimInputProps = {
   label?: ReactNode;
   name: string;
+  rootClassName?: string;
 };
 
 export const slimInputClassName =
@@ -13,10 +14,11 @@ export const slimInputClassName =
 export function SlimInput({
   label,
   className,
+  rootClassName,
   ...props
 }: SlimInputProps & ComponentProps<"input">) {
   return (
-    <label className="block">
+    <label className={cn("block", rootClassName)}>
       <div className="mb-1 px-2 font-medium">{label ?? sentenceCase(props.name)}</div>
       <input
         type="text"
