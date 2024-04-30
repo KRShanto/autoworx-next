@@ -103,7 +103,10 @@ export default function SideNavbar() {
                         title={subnavItem.title}
                       >
                         {/* ball */}
-                        <div className="mx-auto mt-1 h-4 w-4 rounded-full bg-[white]"></div>
+                        <div
+                          className="mx-auto mt-1 h-4 w-4 rounded-full bg-[white]"
+                          title={subnavItem.title}
+                        ></div>
                       </Link>
                     ))}
                   </div>
