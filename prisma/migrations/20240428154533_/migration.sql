@@ -1,7 +1,0 @@
--- AlterTable
-ALTER TABLE `vehicle` MODIFY `year` INTEGER NULL,
-    MODIFY `make` VARCHAR(191) NULL,
-    MODIFY `model` VARCHAR(191) NULL,
-    MODIFY `vin` VARCHAR(191) NULL,
-    MODIFY `license` VARCHAR(191) NULL,
-    MODIFY `submodel` VARCHAR(191) NULL;
