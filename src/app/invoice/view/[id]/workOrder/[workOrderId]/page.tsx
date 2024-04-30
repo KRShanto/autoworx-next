@@ -90,7 +90,7 @@ export default async function Page({
         <div className="flex flex-row items-start justify-between p-5">
           <div>
             <h3 className="font-bold">Invoice To:</h3>
-            <p>{customer.name}</p>
+            <p>{customer.firstName}</p>
             <p>{customer.mobile}</p>
             <p>{customer.email}</p>
           </div>

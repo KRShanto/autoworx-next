@@ -25,7 +25,7 @@ export default async function CustomerList() {
       <tbody className="bg-gray-200">
         {customers.map((customer, index) => (
           <tr key={index} className={index % 2 === 0 ? "bg-gray-300" : ""}>
-            <td className="px-4 py-2">{customer.name}</td>
+            <td className="px-4 py-2">{customer.firstName}</td> {/* TODO */}
             <td className="px-4 py-2">{customer.email}</td>
             <td className="px-4 py-2">
               {moment(customer.createdAt).format("DD/MM/YYYY")}

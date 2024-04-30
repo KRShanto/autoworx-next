@@ -11,7 +11,7 @@ const InvoiceSchema = z.object({
   invoiceId: z.string(),
 
   customer: z.object({
-    name: z.string(),
+    firstName: z.string(),
     email: z.string(),
     mobile: z.number(),
     address: z.string(),
@@ -63,7 +63,7 @@ export async function createInvoice(data: {
   invoiceId: string;
 
   customer: {
-    name: string;
+    firstName: string;
     email: string;
     mobile: number;
     address: string;

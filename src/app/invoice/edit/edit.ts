@@ -11,7 +11,7 @@ const InvoiceSchema = z.object({
   invoiceId: z.string(),
 
   customer: z.object({
-    name: z.string(),
+    firstName: z.string(),
     email: z.string(),
     mobile: z.number(),
     address: z.string(),
@@ -64,7 +64,7 @@ export async function editInvoice(data: {
   invoiceId: string;
 
   customer: {
-    name: string;
+    firstName: string;
     email: string;
     mobile: number;
     address: string;
@@ -130,7 +130,7 @@ export async function editInvoice(data: {
         id: invoice.customerId,
       },
       data: {
-        name: data.customer.name,
+        firstName: data.customer.firstName,
         email: data.customer.email,
         mobile: data.customer.mobile,
         address: data.customer.address,

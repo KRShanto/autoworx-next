@@ -23,7 +23,7 @@ export default function AddNewCustomer() {
     const zip = data.get("zip") as string;
 
     const error = (await addCustomer({
-      name,
+      firstName: name, // TODO: Change to firstName and lastName
       email,
       mobile,
       address,

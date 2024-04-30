@@ -92,7 +92,7 @@ export default function WorkOrderComponent({
                         key={index}
                       >
                         <td className={`text-left ${bgColor} w-[40%] p-2`}>
-                          {customer.name}
+                          {customer.firstName}
                         </td>
                         <td className={`text-left ${bgColor} w-[25%] p-2`}>
                           {invoice.status}
@@ -163,7 +163,7 @@ export default function WorkOrderComponent({
                           key={index}
                         >
                           <td className={`text-left ${bgColor} w-[50%] p-2`}>
-                            {customer.name}
+                            {customer.firstName}
                           </td>
                           <td className={`text-left ${bgColor} w-[30%] p-2`}>
                             {invoice.status}

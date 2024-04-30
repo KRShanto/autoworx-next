@@ -37,7 +37,7 @@ export default async function Page() {
           id: invoice.customerId,
         },
         select: {
-          name: true,
+          firstName: true,
           email: true,
         },
       });
@@ -54,7 +54,7 @@ export default async function Page() {
       return {
         invoiceId: invoice.invoiceId,
         customerId: invoice.customerId,
-        customerName: customer!.name,
+        customerName: customer!.firstName,
         customerEmail: customer!.email,
         vehicleModel: vehicle!.model,
         grandTotal: invoice.grandTotal,

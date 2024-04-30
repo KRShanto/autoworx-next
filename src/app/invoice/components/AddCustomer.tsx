@@ -31,7 +31,7 @@ export default function AddInvoice() {
     const zip = data.get("zip") as string;
 
     const error = await newCustomer({
-      name,
+      firstName: name, // TODO: Change to firstName and lastName
       email,
       mobile: parseInt(mobile),
       address,
@@ -40,7 +40,9 @@ export default function AddInvoice() {
       zip,
     });
 
+    // @ts-ignore
     if (error && error.field) {
+      // @ts-ignore
       showError({ field: error.field as string, message: error.message });
     } else {
       setCustomer({

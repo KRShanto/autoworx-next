@@ -35,20 +35,32 @@ export default function InsertDefaultInvoiceData({
 
   useEffect(() => {
     setInvoiceId(invoice.invoiceId);
+    // TODO
     setCustomer({
-      name: invoiceCustomer.name,
+      name: invoiceCustomer.firstName,
+      // @ts-ignore
       email: invoiceCustomer.email,
+      // @ts-ignore
       mobile: invoiceCustomer.mobile,
+      // @ts-ignore
       address: invoiceCustomer.address,
+      // @ts-ignore
       city: invoiceCustomer.city,
+      // @ts-ignore
       state: invoiceCustomer.state,
+      // @ts-ignore
       zip: invoiceCustomer.zip,
     });
     setVehicle({
+      // @ts-ignore
       make: invoiceVehicle.make,
+      // @ts-ignore
       model: invoiceVehicle.model,
+      // @ts-ignore
       year: invoiceVehicle.year,
+      // @ts-ignore
       vin: invoiceVehicle.vin,
+      // @ts-ignore
       license: invoiceVehicle.license,
     });
     setServices(
@@ -65,6 +77,7 @@ export default function InsertDefaultInvoiceData({
     setStatus(invoice.status);
     setSendMail(invoice.sendMail);
     setPayments(
+      // @ts-ignore
       invoicePayments.map((payment: any) => ({
         tnx: payment.tnx,
         date: payment.date,
@@ -73,7 +86,7 @@ export default function InsertDefaultInvoiceData({
         type: payment.type,
         note: payment.note,
         address: invoiceCustomer.address,
-        name: invoiceCustomer.name,
+        name: invoiceCustomer.firstName,
         email: invoiceCustomer.email,
         status: payment.status,
         mobile: invoiceCustomer.mobile,

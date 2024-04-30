@@ -38,7 +38,7 @@ export default function OrderButton({ user }: { user: User }) {
       invoiceId,
 
       customer: {
-        name: customer.name,
+        firstName: customer.name,
         email: customer.email,
         mobile: customer.mobile,
         address: customer.address,

@@ -71,7 +71,7 @@ export default function Invoice({
             {/* Invoice To */}
             <div className="mt-5">
               <h3 className="font-bold">Invoice To:</h3>
-              <p>{customer.name}</p>
+              <p>{customer.firstName}</p>
               <p>{customer.email}</p>
               <p>{customer.mobile}</p>
             </div>
