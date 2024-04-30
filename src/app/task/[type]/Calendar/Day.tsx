@@ -1,20 +1,36 @@
 "use client";
 
-import { cn } from "../../../../lib/cn";
+import { cn } from "@/lib/cn";
 import { TASK_COLOR } from "@/lib/consts";
-import { usePopupStore } from "../../../../stores/popup";
+import { usePopupStore } from "@/stores/popup";
+import type { CalendarTask } from "@/types/db";
+import type { Task, User } from "@prisma/client";
 import moment from "moment";
-import { useEffect, useState } from "react";
-import { HiCalendar, HiClock } from "react-icons/hi";
-import { useMediaQuery } from "react-responsive";
-import { MdModeEdit, MdDelete } from "react-icons/md";
-import { ThreeDots } from "react-loader-spinner";
-import { Task, User } from "@prisma/client";
 import Image from "next/image";
-import { deleteTask } from "../../delete";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { useDrop } from "react-dnd";
+import { HiCalendar, HiClock } from "react-icons/hi";
+import { MdDelete, MdModeEdit } from "react-icons/md";
+import { ThreeDots } from "react-loader-spinner";
+import { useMediaQuery } from "react-responsive";
 import { addTask } from "../../add";
-import { CalendarTask } from "@/types/db";
+import { deleteTask } from "../../delete";
+
+const rows = [
+  "All Day",
+  // 1am to 12pm
+  ...Array.from(
+    { length: 24 },
+    (_, i) => `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
+  ),
+];
+
+function useDate() {
+  const searchParams = useSearchParams();
+  const date = moment(searchParams.get("date"), moment.HTML5_FMT.DATE);
+  return date.isValid()? date : moment();
+}
 
 export default function Day({
   tasks,
@@ -29,6 +45,7 @@ export default function Day({
   const [hoveredTask, setHoveredTask] = useState<number | null>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [loading, setLoading] = useState(false);
+  const date = useDate();
 
   const { open } = usePopupStore();
   const is1300 = useMediaQuery({ query: "(max-width: 1300px)" });
@@ -63,35 +80,22 @@ export default function Day({
     setLoading(false);
   };
 
-  const rows = [
-    "All Day",
-    // 1am to 12pm
-    ...Array.from(
-      { length: 24 },
-      (_, i) =>
-        `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
-    ),
-  ];
-
-  const [dayTasks, setDayTasks] = useState<
+  const dayTasks = useMemo<
     (CalendarTask & {
       rowStartIndex: number;
       rowEndIndex: number;
     })[]
-  >([]);
-
-  useEffect(() => {
-    setDayTasks(
+  >(
+    () =>
       tasks
         .filter((task) => {
           // return today's tasks
           // also filter by month and year
           const taskDate = moment(task.date);
-          const today = moment();
           return (
-            taskDate.date() === today.date() &&
-            taskDate.month() === today.month() &&
-            taskDate.year() === today.year()
+            taskDate.date() === date.date() &&
+            taskDate.month() === date.month() &&
+            taskDate.year() === date.year()
           );
         })
         .map((task) => {
@@ -105,8 +109,8 @@ export default function Day({
           // Return the task with the rowStartIndex and rowEndIndex
           return { ...task, rowStartIndex, rowEndIndex };
         }),
-    );
-  }, [tasks]);
+    [tasks, date],
+  );
 
   function formatDate(date: Date) {
     return moment(date).format("YYYY-MM-DD");

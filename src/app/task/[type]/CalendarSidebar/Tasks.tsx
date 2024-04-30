@@ -25,25 +25,27 @@ export default function Tasks({
         <MinimizeButton />
       </h2>
 
-      <div className="space-y-2 overflow-y-auto">
-        {tasks.map((task) => (
-          <TaskComponent key={task.id} task={task} />
-        ))}
-        {tags.map((tag, index) => (
-          <TagComponent key={index} tag={tag} />
-        ))}
-        <button
-          type="button"
-          className="w-full rounded-md bg-[#797979] p-2 text-[17px] text-white max-[1300px]:py-1 max-[1300px]:text-[14px]"
-          onClick={() =>
-            open("ADD_TASK", {
-              companyUsers: users,
-            })
-          }
-        >
-          <FaPlus className="mx-auto block" />
-        </button>
-      </div>
+      {!minimized && (
+        <div className="space-y-2 overflow-y-auto">
+          {tasks.map((task) => (
+            <TaskComponent key={task.id} task={task} />
+          ))}
+          {tags.map((tag, index) => (
+            <TagComponent key={index} tag={tag} />
+          ))}
+          <button
+            type="button"
+            className="w-full rounded-md bg-[#797979] p-2 text-[17px] text-white max-[1300px]:py-1 max-[1300px]:text-[14px]"
+            onClick={() =>
+              open("ADD_TASK", {
+                companyUsers: users,
+              })
+            }
+          >
+            <FaPlus className="mx-auto block" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
