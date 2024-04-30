@@ -43,7 +43,7 @@ export default function Month({
   const totalDates = 35;
   // Get the current date
   const month = useMonth();
-  const today = moment().toDate();
+  const today = moment().date();
 
   // Get the index of today's date
   const todayIndex = month.getDate() - month.getDay() + 1;
@@ -150,6 +150,9 @@ export default function Month({
                 {cell}
               </div>
             );
+
+          console.log("today: ", today);
+          console.log("cell[0].getDate(): ", cell[0].getDate());
 
           return (
             <button
