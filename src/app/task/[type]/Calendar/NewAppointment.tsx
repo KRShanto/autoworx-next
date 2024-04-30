@@ -195,6 +195,7 @@ export function NewAppointment({
                     type="time"
                     name="start"
                     value={startTime}
+                    max={endTime}
                     onChange={(event) =>
                       setStartTime(event.currentTarget.value)
                     }
@@ -205,6 +206,7 @@ export function NewAppointment({
                     type="time"
                     name="end"
                     value={endTime}
+                    min={startTime}
                     onChange={(event) => setEndTime(event.currentTarget.value)}
                   />
                 </div>
