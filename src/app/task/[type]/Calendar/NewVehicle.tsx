@@ -19,6 +19,7 @@ import { useFormErrorStore } from "@/stores/form-error";
 export default function NewVehicle({ setVehicles }: { setVehicles: any }) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
+
   async function handleSubmit(data: FormData) {
     const make = data.get("make") as string;
     const model = data.get("model") as string;
@@ -26,15 +27,16 @@ export default function NewVehicle({ setVehicles }: { setVehicles: any }) {
     const submodel = data.get("submodel") as string;
     const type = data.get("type") as string;
 
-    const res = await addVehicle({
+    const res = (await addVehicle({
       make,
       model,
       year,
       submodel,
       type,
-    }) as any;
+    })) as any;
 
     if (res.message) {
+      console.log(res);
       showError({
         field: res.field || "make",
         message: res.message,
@@ -61,13 +63,17 @@ export default function NewVehicle({ setVehicles }: { setVehicles: any }) {
           <DialogTitle>Create Vehicle</DialogTitle>
         </DialogHeader>
 
-        <div className="grid sm:grid-cols-2 gap-2 overflow-y-auto">
+        <div className="grid gap-2 overflow-y-auto sm:grid-cols-2">
           <FormError />
           <SlimInput name="year" type="number" />
           <SlimInput name="make" />
           <SlimInput name="model" />
-          <SlimInput name="submodel" label="Sub Model" />
-          <SlimInput name="type" rootClassName="col-span-full" />
+          <SlimInput name="submodel" required={false} label="Sub Model" />
+          <SlimInput
+            name="type"
+            rootClassName="col-span-full"
+            required={false}
+          />
         </div>
 
         <DialogFooter>

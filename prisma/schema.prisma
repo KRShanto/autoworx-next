@@ -222,9 +222,9 @@ model Vehicle {
   make      String?
   model     String?
   submodel  String?
-  vin       String?   @unique
+  vin       String?   
   type      String?
-  license   String?   @unique
+  license   String?   
   companyId Int?     @map("company_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
