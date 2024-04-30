@@ -33,5 +33,11 @@ export default function Body({
       />
     );
   if (type === "month")
-    return <Month tasks={tasks} tasksWithoutTime={tasksWithoutTime} />;
+    return (
+      <Month
+        tasks={tasks}
+        companyUsers={companyUsers}
+        tasksWithoutTime={tasksWithoutTime}
+      />
+    );
 }

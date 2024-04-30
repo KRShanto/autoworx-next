@@ -13,6 +13,7 @@
     "@onedoc/react-print": "^0.1.131",
     "@prisma/client": "^5.11.0",
     "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-tooltip": "^1.0.7",
     "@react-pdf/renderer": "^3.4.2",
     "bcrypt": "^5.1.1",
     "change-case": "^5.4.4",
