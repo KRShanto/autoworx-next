@@ -26,9 +26,9 @@ export async function addAppointment(task: TaskToAdd) {
   const newTask = await db.task.create({
     data: {
       title: task.title,
-      date: task.date ? new Date(task.date) : new Date(),
-      startTime: task.startTime || "10:00",
-      endTime: task.endTime || "18:00",
+      date: task.date,
+      startTime: task.startTime,
+      endTime: task.endTime,
       type: task.type || TaskType.appointment,
       customerId: task.clientId,
       vehicleId: task.vehicleId,

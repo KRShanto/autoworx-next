@@ -170,7 +170,7 @@ model TaskUser {
 model Order {
   id        Int      @id @default(autoincrement())
   name      String
-  comment String
+  comment   String?
   companyId Int?     @map("company_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

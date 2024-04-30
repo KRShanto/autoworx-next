@@ -9,7 +9,7 @@ const OrderSchema = z.object({
   name: z.string(),
 });
 
-export async function addOrder(data: { name: string; comment: string }) {
+export async function addOrder(data: { name: string; comment?: string }) {
   try {
     OrderSchema.parse(data);
 

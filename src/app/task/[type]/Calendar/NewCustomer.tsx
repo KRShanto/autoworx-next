@@ -19,6 +19,7 @@ import { useState } from "react";
 export default function NewCustomer({ setCustomers }: { setCustomers: any }) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
+
   async function handleSubmit(data: FormData) {
     const firstName = data.get("first-name") as string;
     const lastName = data.get("last-name") as string;
@@ -104,7 +105,7 @@ export default function NewCustomer({ setCustomers }: { setCustomers: any }) {
               </label>
               <Input
                 type="text"
-                name="email"
+                name="text"
                 className="rounded-md border-2 border-slate-400 p-1"
               />
             </div>

@@ -57,12 +57,7 @@ export default function NewOrder({ setOrders }: { setOrders: any }) {
           <SlimInput name="name" label="Order Name" />
           <label className="block">
             <div className="mb-1 px-2 font-medium">Client Comments</div>
-            <textarea
-              name="comment"
-              required
-              rows={3}
-              className={slimInputClassName}
-            />
+            <textarea name="comment" rows={3} className={slimInputClassName} />
           </label>
         </div>
 

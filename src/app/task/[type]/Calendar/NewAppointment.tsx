@@ -62,9 +62,9 @@ export function NewAppointment({
     [open, close],
   );
 
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [startTime, setStartTime] = useState("10:00");
-  const [endTime, setEndTime] = useState("18:00");
+  const [date, setDate] = useState<string | undefined>();
+  const [startTime, setStartTime] = useState<string | undefined>();
+  const [endTime, setEndTime] = useState<string | undefined>();
   const [clientList, setClientList] = useState(customers);
   const [vehicleList, setVehicleList] = useState(vehicles);
   const [orderList, setOrderList] = useState(orders);
@@ -88,7 +88,7 @@ export function NewAppointment({
   };
 
   const handleDate = (operator: "+" | "-") => {
-    const d = new Date(date);
+    const d = new Date();
     d.setDate(d.getDate() + (operator === "+" ? 1 : -1));
     setDate(d.toISOString().split("T")[0]);
   };
@@ -174,6 +174,7 @@ export function NewAppointment({
                 className="grow"
                 type="date"
                 value={date}
+                required={false}
                 onChange={(event) => setDate(event.currentTarget.value)}
               />
               <div className="flex grow items-center gap-1">
@@ -181,7 +182,6 @@ export function NewAppointment({
                   className={cn(slimInputClassName, "grow")}
                   type="time"
                   name="start"
-                  required
                   value={startTime}
                   onChange={(event) => setStartTime(event.currentTarget.value)}
                 />
@@ -190,7 +190,6 @@ export function NewAppointment({
                   className={cn(slimInputClassName, "grow")}
                   type="time"
                   name="end"
-                  required
                   value={endTime}
                   onChange={(event) => setEndTime(event.currentTarget.value)}
                 />
@@ -300,7 +299,6 @@ export function NewAppointment({
               <div className="relative divide-y">
                 {Array.from({ length: 24 }, (_, i) => (
                   <div
-                    // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
                     key={i}
                     className="ml-16 flex h-16 items-start border-l border-solid"
                   >
@@ -311,13 +309,15 @@ export function NewAppointment({
                     )}
                   </div>
                 ))}
-                <div
-                  className="absolute left-16 right-0 rounded border border-solid border-indigo-500 bg-indigo-500/30"
-                  style={{
-                    top: `${getHours(startTime) * 4}rem`,
-                    bottom: `${(24 - getHours(endTime)) * 4}rem`,
-                  }}
-                />
+                {startTime && endTime && (
+                  <div
+                    className="absolute left-16 right-0 rounded border border-solid border-indigo-500 bg-indigo-500/30"
+                    style={{
+                      top: `${getHours(startTime) * 4}rem`,
+                      bottom: `${(24 - getHours(endTime)) * 4}rem`,
+                    }}
+                  />
+                )}
               </div>
             </div>
           </div>

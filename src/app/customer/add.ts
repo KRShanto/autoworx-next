@@ -13,7 +13,7 @@ const CustomerSchema = z.object({
 
 export async function addCustomer(data: {
   firstName: string;
-  lastName: string;
+  lastName?: string;
   email?: string;
   mobile?: number;
   address?: string;
