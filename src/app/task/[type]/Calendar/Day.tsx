@@ -29,7 +29,7 @@ const rows = [
 function useDate() {
   const searchParams = useSearchParams();
   const date = moment(searchParams.get("date"), moment.HTML5_FMT.DATE);
-  return date.isValid()? date : moment();
+  return date.isValid() ? date : moment();
 }
 
 export default function Day({
@@ -193,22 +193,23 @@ export default function Day({
 
         {/* Tasks */}
         {dayTasks.map((task, index) => {
-          const left = "130px";
-          let top = `${task.rowStartIndex * 45}px`;
-          // if the previous task starts at the same time as this task
-          // then move this task down
+          // TODO: fix overlapping tasks
+          const top = `${task.rowStartIndex * 45}px`;
+          let left = "130px";
+          const height = `${
+            (task.rowEndIndex - task.rowStartIndex + 1) * 45
+          }px`;
+          const widthNumber = is1300 ? 300 : 500;
+          const width = `${widthNumber}px`;
+          const backgroundColor = TASK_COLOR[task.type];
+          // if the previous task ends at the same time as this task
+          // then move this task right
           if (
             index > 0 &&
             task.rowStartIndex === dayTasks[index - 1].rowStartIndex
           ) {
-            top = `${task.rowStartIndex * 45 + 20}px`;
+            left = `${widthNumber + 130}px`;
           }
-          const height = `${
-            (task.rowEndIndex - task.rowStartIndex + 1) * 45
-          }px`;
-          const width = is1300 ? "300px" : "500px";
-          const backgroundColor = TASK_COLOR[task.type];
-
           // Define a function to truncate the task title based on the height
           const truncateTitle = (title: string, maxLength: number) => {
             return title.length > maxLength
