@@ -3,13 +3,20 @@
 import { cn } from "@/lib/cn";
 import { TASK_COLOR } from "@/lib/consts";
 // import { usePopupStore } from "@/stores/popup";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/Tooltip";
 import type { CalendarTask } from "@/types/db";
-import type { Task } from "@prisma/client";
+import type { Task, User } from "@prisma/client";
 import moment from "moment";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useDrop } from "react-dnd";
 import { addTask } from "../../add";
-import { useRouter } from "next/navigation";
+import { TaskDetails } from "./TaskDetails";
 
 function useMonth() {
   const searchParams = useSearchParams();
@@ -19,9 +26,11 @@ function useMonth() {
 
 export default function Month({
   tasks,
+  companyUsers,
   tasksWithoutTime,
 }: {
   tasks: CalendarTask[];
+  companyUsers: User[];
   tasksWithoutTime: Task[];
 }) {
   const router = useRouter();
@@ -164,10 +173,14 @@ export default function Month({
                   ? "text-[#6571FF]"
                   : "text-[#797979]",
               )}
-              onClick={() => {
-                router.push(
-                  `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`,
-                );
+              onClick={(event) => {
+                if (
+                  event.target instanceof Node &&
+                  event.currentTarget.contains(event.target)
+                )
+                  router.push(
+                    `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`,
+                  );
               }}
               onDrop={(event) =>
                 handleDrop(event, moment(cell[0]).format("YYYY-MM-DD"))
@@ -178,13 +191,24 @@ export default function Month({
 
               <div className="absolute bottom-2 left-2 right-2 flex max-h-[calc(100%-3rem)] flex-col gap-1">
                 {cell[1]?.slice(0, 3).map((task: CalendarTask, i: number) => (
-                  <div
-                    key={i}
-                    className="h-4 max-h-[33.33%] rounded"
-                    style={{
-                      backgroundColor: TASK_COLOR[task.type],
-                    }}
-                  />
+                  <TooltipProvider key={i}>
+                    <Tooltip delayDuration={150}>
+                      <TooltipTrigger
+                        className="h-4 max-h-[33.33%] rounded"
+                        style={{
+                          backgroundColor: TASK_COLOR[task.type],
+                        }}
+                      />
+                      <TooltipPortal>
+                        <TooltipContent>
+                          <TaskDetails
+                            task={task}
+                            companyUsers={companyUsers}
+                          />
+                        </TooltipContent>
+                      </TooltipPortal>
+                    </Tooltip>
+                  </TooltipProvider>
                 ))}
               </div>
             </button>
