@@ -145,16 +145,16 @@ export default function Month({
 
   return (
     <div
-      className="mt-3 h-[90.8%] border-l border-t border-[#797979]"
+      className="mt-3 h-[90.8%] border-l border-t border-neutral-200"
       ref={dropRef}
     >
-      <div className="grid h-full grid-cols-7">
+      <div className="grid h-full grid-cols-7 grid-rows-[auto,repeat(6,1fr)]">
         {cells.map((cell: any, i) => {
           if (i < 7)
             return (
               <div
                 key={i}
-                className="flex items-center justify-center border-b border-r border-[#797979] p-2  text-[17px] font-bold text-[#797979] max-[1300px]:text-[15px] max-[1150px]:text-[12px]"
+                className="flex items-center justify-center border-b border-r border-neutral-200 p-2  text-[17px] font-bold text-[#797979] max-[1300px]:text-[15px] max-[1150px]:text-[12px]"
               >
                 {cell}
               </div>
@@ -168,7 +168,7 @@ export default function Month({
               type="button"
               key={i}
               className={cn(
-                "relative flex h-[100%] flex-col items-end gap-2 border-b border-r border-[#797979] p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
+                "relative flex h-[100%] flex-col items-end gap-2 border-b border-r border-neutral-200 p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
                 // highlight today's date
                 today == cell[0].getDate()
                   ? "text-[#6571FF]"

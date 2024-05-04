@@ -33,7 +33,7 @@ export default function Calender({
 }) {
   console.log("Task from calendar: ", tasks);
   return (
-    <div className="app-shadow relative ml-5 mt-4 h-[98%] w-full overflow-hidden rounded-[18px] bg-white p-4">
+    <div className="app-shadow relative w-full overflow-hidden rounded-[18px] bg-white p-4">
       <Heading
         type={type as any}
         customers={customers}

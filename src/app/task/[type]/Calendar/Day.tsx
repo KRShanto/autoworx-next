@@ -160,15 +160,16 @@ export default function Day({
       <div
         ref={dropRef}
         style={{ backgroundColor: isOver ? "lightgreen" : "white" }}
-        className="relative mt-3 h-[90%] overflow-auto border border-[#797979]"
+        className="relative mt-3 h-[90%] overflow-auto border border-neutral-200"
       >
         {rows.map((row, i) => (
           <button
+            type="button"
             key={i}
             onDrop={(event) => handleDrop(event, i)}
             onDragOver={(event) => event.preventDefault()}
             className={cn(
-              "block h-[45px] w-full border-[#797979]",
+              "block h-[45px] w-full border-neutral-200",
               i !== rows.length - 1 && "border-b",
               i !== 0 && "cursor-pointer",
             )}
@@ -182,7 +183,7 @@ export default function Day({
             {/* Row heading */}
             <div
               className={cn(
-                "flex h-full w-[100px] items-center justify-center border-r border-[#797979] text-[19px] text-[#797979]",
+                "flex h-full w-[100px] items-center justify-center border-r border-neutral-200 text-[19px] text-[#797979]",
                 i === 0 && "font-bold",
               )}
             >

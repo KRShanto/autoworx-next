@@ -133,7 +133,7 @@ export default async function Page({ params }: { params: { type: string } }) {
     <>
       <Title>Task and Activity Management</Title>
 
-      <div className="relative flex h-[81vh]">
+      <div className="relative flex h-[81vh] gap-4 pt-4">
         <TaskPage
           type={params.type as CalendarType}
           taskWithAssignedUsers={taskWithAssignedUsers}
