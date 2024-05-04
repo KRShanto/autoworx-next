@@ -191,9 +191,9 @@ export default function Month({
               {cell[0].getDate()}
 
               <div className="absolute bottom-2 left-2 right-2 flex max-h-[calc(100%-3rem)] flex-col gap-1">
-                {cell[1]?.slice(0, 3).map((task: CalendarTask, i: number) => (
-                  <TooltipProvider key={i}>
-                    <Tooltip delayDuration={150}>
+                <TooltipProvider delayDuration={150}>
+                  {cell[1]?.slice(0, 3).map((task: CalendarTask, i: number) => (
+                    <Tooltip key={i}>
                       <TooltipTrigger
                         className="h-4 max-h-[33.33%] rounded"
                         style={{
@@ -209,8 +209,8 @@ export default function Month({
                         </TooltipContent>
                       </TooltipPortal>
                     </Tooltip>
-                  </TooltipProvider>
-                ))}
+                  ))}
+                </TooltipProvider>
               </div>
             </button>
           );

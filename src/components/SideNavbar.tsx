@@ -2,7 +2,21 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./Tooltip";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/cn";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./DropdownMenu";
 
 const navList = [
   {
@@ -67,80 +81,145 @@ const navList = [
 
 export default function SideNavbar() {
   const [openNav, setOpenNav] = useState<string | null>(null);
+  const pathName = usePathname();
 
   return (
-    <nav className="fixed flex h-screen w-[5%] flex-col items-center bg-[#0C1427] px-2 py-12">
-      {/* logo */}
-      <Image src="/icons/Logo.png" alt="Company Logo" width={40} height={40} />
+    <TooltipProvider delayDuration={500}>
+      <nav className="fixed z-10 flex h-screen w-[5%] flex-col items-center gap-8 overflow-y-auto bg-[#0C1427] px-2 py-12">
+        {/* logo */}
+        <Image
+          src="/icons/Logo.png"
+          alt="Company Logo"
+          width={40}
+          height={40}
+        />
 
-      {/* Links */}
-      <div className="mt-16 flex flex-col items-center gap-8">
-        {navList.map((item, index) => {
-          if (item.subnav) {
-            return (
-              <div key={index} className="relative">
-                <button
-                  className="hover:opacity-50"
-                  onClick={() =>
-                    setOpenNav(openNav === item.title ? null : item.title)
-                  }
-                >
+        {/* Links */}
+        <div className="my-auto flex flex-col items-center gap-4">
+          {navList.map((item, index) =>
+            item.subnav ? (
+              <Dropdown
+                key={index}
+                title={item.title}
+                icon={
                   <Image
                     src={item.icon}
                     alt={item.title}
                     width={20}
                     height={20}
                   />
-                </button>
+                }
+              >
+                {item.subnav.map((subnavItem, index) => (
+                  <DropdownMenuItem
+                    key={index}
+                    asChild
+                    className="border-solid border-white bg-white shadow-lg hover:border hover:bg-slate-500/80 hover:text-white"
+                  >
+                    <Link href={subnavItem.link}>{subnavItem.title}</Link>
+                  </DropdownMenuItem>
+                ))}
+              </Dropdown>
+            ) : (
+              <Tooltip key={index}>
+                <TooltipTrigger asChild>
+                  <Link
+                    className={cn(
+                      "rounded-sm p-2 hover:bg-white/25",
+                      pathName === item.link && "!bg-black invert",
+                    )}
+                    href={item.link}
+                  >
+                    <Image
+                      src={item.icon}
+                      alt={item.title}
+                      width={20}
+                      height={20}
+                    />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="right"
+                  sideOffset={8}
+                  className="border border-solid border-white bg-slate-500/80 text-white"
+                >
+                  {item.title}
+                </TooltipContent>
+              </Tooltip>
+            ),
+          )}
+        </div>
 
-                {openNav === item.title && (
-                  <div className="relative top-0 mt-2 flex flex-col gap-4">
-                    {item.subnav.map((subnavItem, index) => (
-                      <Link
-                        key={index}
-                        href={subnavItem.link}
-                        className="hover:opacity-50"
-                        title={subnavItem.title}
-                      >
-                        {/* ball */}
-                        <div
-                          className="mx-auto mt-1 h-4 w-4 rounded-full bg-[white]"
-                          title={subnavItem.title}
-                        ></div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          }
-
-          return (
-            <Link
-              className="hover:opacity-50"
-              key={index}
-              href={item.link}
-              title={item.title}
-            >
-              <Image src={item.icon} alt={item.title} width={20} height={20} />
+        {/* Settings */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link href="/settings" className="hover:opacity-50">
+              <Image
+                src="/icons/navbar/Settings.svg"
+                alt="Settings"
+                width={20}
+                height={20}
+              />
             </Link>
-          );
-        })}
-      </div>
+          </TooltipTrigger>
+          <TooltipContent
+            side="right"
+            sideOffset={8}
+            className="border border-solid border-white bg-slate-500/80 text-white"
+          >
+            Settings
+          </TooltipContent>
+        </Tooltip>
+      </nav>
+    </TooltipProvider>
+  );
+}
 
-      {/* Settings */}
-      <Link
-        href="/settings"
-        className="mt-auto hover:opacity-50"
-        title="Settings"
+function Dropdown({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: ReactNode;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const [toolTip, setTooltip] = useState(false);
+
+  return (
+    <DropdownMenu open={open} onOpenChange={setOpen}>
+      <Tooltip open={!open && toolTip} onOpenChange={setTooltip}>
+        <TooltipTrigger asChild>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className={cn(
+                "rounded-sm p-2 hover:bg-white/25",
+                open && "!bg-black invert",
+              )}
+            >
+              {icon}
+            </button>
+          </DropdownMenuTrigger>
+        </TooltipTrigger>
+        <TooltipContent
+          side="right"
+          sideOffset={8}
+          className="border border-solid border-white bg-slate-500/80 text-white"
+        >
+          {title}
+        </TooltipContent>
+      </Tooltip>
+
+      <DropdownMenuContent
+        side="right"
+        align="start"
+        sideOffset={8}
+        className="space-y-1 border-none bg-transparent p-0 shadow-none"
       >
-        <Image
-          src="/icons/navbar/Settings.svg"
-          alt="Settings"
-          width={20}
-          height={20}
-        />
-      </Link>
-    </nav>
+        {children}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
