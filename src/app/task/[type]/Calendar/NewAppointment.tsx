@@ -38,6 +38,7 @@ import NewOrder from "./NewOrder";
 import NewVehicle from "./NewVehicle";
 import Selector from "./Selector";
 import { addAppointment } from "./addAppointment";
+import { Reminder } from "./Reminder";
 
 enum Tab {
   Schedule = 0,
@@ -172,133 +173,219 @@ export function NewAppointment({
           </div>
         </DialogHeader>
 
-        {tab === Tab.Schedule ? (
-          <div className="-mx-6 grid gap-px overflow-y-auto border-y border-solid bg-border sm:grid-cols-2">
-            <div className="space-y-4 bg-background p-6">
-              <FormError />
+        <div className="-mx-6 grid gap-px overflow-y-auto border-y border-solid bg-border sm:grid-cols-2">
+          <div className="space-y-4 bg-background p-6">
+            <FormError />
 
-              <SlimInput name="title" label="Appointment Title" required />
+            <SlimInput name="title" label="Appointment Title" required />
 
-              <div className="flex flex-wrap items-end gap-1">
-                <SlimInput
-                  name="date"
-                  label="Time"
-                  rootClassName="grow"
-                  type="date"
-                  value={date}
-                  required={false}
-                  onChange={(event) => setDate(event.currentTarget.value)}
+            <div className="flex flex-wrap items-end gap-1">
+              <SlimInput
+                name="date"
+                label="Time"
+                rootClassName="grow"
+                type="date"
+                value={date}
+                required={false}
+                onChange={(event) => setDate(event.currentTarget.value)}
+              />
+              <div className="flex grow items-center gap-1">
+                <input
+                  className={cn(slimInputClassName, "flex-auto")}
+                  type="time"
+                  name="start"
+                  value={startTime}
+                  max={endTime}
+                  onChange={(event) => setStartTime(event.currentTarget.value)}
                 />
-                <div className="flex grow items-center gap-1">
-                  <input
-                    className={cn(slimInputClassName, "flex-auto")}
-                    type="time"
-                    name="start"
-                    value={startTime}
-                    max={endTime}
-                    onChange={(event) =>
-                      setStartTime(event.currentTarget.value)
-                    }
+                <FaArrowRight className="shrink-0" />
+                <input
+                  className={cn(slimInputClassName, "flex-auto")}
+                  type="time"
+                  name="end"
+                  value={endTime}
+                  min={startTime}
+                  onChange={(event) => setEndTime(event.currentTarget.value)}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <input
+                checked={allDay}
+                onChange={() => setAllDay(!allDay)}
+                id="all-day"
+                type="checkbox"
+                value="true"
+                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
+                name="all-day"
+              />
+              <label
+                htmlFor="all-day"
+                className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+              >
+                All day
+              </label>
+            </div>
+
+            <button
+              type="button"
+              className="text-indigo-500"
+              onClick={() => setAddSalesPersonOpen(true)}
+            >
+              + Assign sales person
+            </button>
+
+            {
+              // Assigned users
+              assignedUsers.map((user) => (
+                <div key={user.id} className="flex items-center gap-4">
+                  <Image
+                    src={user.image}
+                    alt="Employee Image"
+                    width={30}
+                    height={30}
+                    className="rounded-full"
                   />
-                  <FaArrowRight className="shrink-0" />
+                  <p>{user.name}</p>
+                </div>
+              ))
+            }
+
+            {addSalesPersonOpen && (
+              <div className="w-[200px] space-y-4 rounded-lg border-2 border-slate-400">
+                {/* Search */}
+                <div className="relative mx-auto my-3 h-[35px] w-[90%] rounded-lg border-2 border-slate-400">
+                  <FaSearch className="absolute left-2 top-1/2 -translate-y-1/2 transform text-slate-400" />
                   <input
-                    className={cn(slimInputClassName, "flex-auto")}
-                    type="time"
-                    name="end"
-                    value={endTime}
-                    min={startTime}
-                    onChange={(event) => setEndTime(event.currentTarget.value)}
+                    name="search"
+                    className="h-full w-[85%] rounded-lg pl-7 pr-2 focus:outline-none"
+                    type="text"
+                    placeholder="Search"
+                    onChange={(e) => handleSearch(e.target.value)}
+                  />
+                  <FaTimes
+                    className="absolute right-2 top-1/2 -translate-y-1/2 transform cursor-pointer text-slate-400"
+                    onClick={() => setAddSalesPersonOpen(false)}
                   />
                 </div>
+
+                {employeesToDisplay
+                  .filter((employee) => !assignedUsers.includes(employee))
+                  .map((employee) => (
+                    <button
+                      key={employee.id}
+                      className="flex w-full cursor-pointer items-center gap-3 rounded-md p-2 hover:bg-gray-100"
+                      onClick={() => {
+                        setAssignedUsers([...assignedUsers, employee]);
+                        setAddSalesPersonOpen(false);
+                      }}
+                      type="button"
+                    >
+                      <Image
+                        src={employee.image}
+                        alt="Employee Image"
+                        width={50}
+                        height={50}
+                        className="rounded-full"
+                      />
+                      <p className="font-medium">{employee.name}</p>
+                    </button>
+                  ))}
               </div>
+            )}
+          </div>
 
-              <div className="flex items-center">
-                <input
-                  checked={allDay}
-                  onChange={() => setAllDay(!allDay)}
-                  id="all-day"
-                  type="checkbox"
-                  value="true"
-                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
-                  name="all-day"
-                />
-                <label
-                  htmlFor="all-day"
-                  className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                >
-                  All day
-                </label>
-              </div>
-
-              <button
-                type="button"
-                className="text-indigo-500"
-                onClick={() => setAddSalesPersonOpen(true)}
-              >
-                + Assign sales person
-              </button>
-
-              {
-                // Assigned users
-                assignedUsers.map((user) => (
-                  <div key={user.id} className="flex items-center gap-4">
+          <div className="row-start-2 space-y-4 bg-background p-6">
+            <Selector
+              newButton={<NewCustomer setCustomers={setClientList} />}
+              label={
+                client ? `${client.firstName} ${client.lastName}` : "Client"
+              }
+            >
+              <div>
+                {clientList.map((client) => (
+                  <button
+                    type="button"
+                    key={client.id}
+                    className="flex w-full cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100"
+                    onClick={() => setClient(client)}
+                  >
                     <Image
-                      src={user.image}
-                      alt="Employee Image"
+                      src={client.photo!}
+                      alt="Client Image"
                       width={30}
                       height={30}
                       className="rounded-full"
                     />
-                    <p>{user.name}</p>
-                  </div>
-                ))
+
+                    <div>
+                      <p className="text-start text-sm font-bold">
+                        {client.firstName} {client.lastName}
+                      </p>
+                      <p className="text-xs">{client.email}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </Selector>
+
+            <Selector
+              newButton={<NewVehicle setVehicles={setVehicleList} />}
+              label={
+                vehicle ? vehicle.model || `Vehicle ${vehicle.id}` : "Vehicle"
               }
+            >
+              <div className="">
+                {vehicleList.map((vehicle) => (
+                  <button
+                    type="button"
+                    key={vehicle.id}
+                    className="flex w-full cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100"
+                    onClick={() => setVehicle(vehicle)}
+                  >
+                    <div>
+                      <p className="text-sm font-bold">
+                        {`${vehicle.model} ${vehicle.id}`}
+                      </p>
+                      <p className="text-xs">Owner</p>{" "}
+                      {/* TODO: Add owner name */}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </Selector>
 
-              {addSalesPersonOpen && (
-                <div className="w-[200px] space-y-4 rounded-lg border-2 border-slate-400">
-                  {/* Search */}
-                  <div className="relative mx-auto my-3 h-[35px] w-[90%] rounded-lg border-2 border-slate-400">
-                    <FaSearch className="absolute left-2 top-1/2 -translate-y-1/2 transform text-slate-400" />
-                    <input
-                      name="search"
-                      className="h-full w-[85%] rounded-lg pl-7 pr-2 focus:outline-none"
-                      type="text"
-                      placeholder="Search"
-                      onChange={(e) => handleSearch(e.target.value)}
-                    />
-                    <FaTimes
-                      className="absolute right-2 top-1/2 -translate-y-1/2 transform cursor-pointer text-slate-400"
-                      onClick={() => setAddSalesPersonOpen(false)}
-                    />
-                  </div>
+            <Selector
+              label={order ? order.name : "Order"}
+              newButton={<NewOrder setOrders={setOrderList} />}
+            >
+              <div className="">
+                {orderList.map((order) => (
+                  <button
+                    type="button"
+                    key={order.id}
+                    className="flex w-full cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100"
+                    onClick={() => setOrder(order)}
+                  >
+                    <div>
+                      <p className="text-sm font-bold">{order.name}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </Selector>
 
-                  {employeesToDisplay
-                    .filter((employee) => !assignedUsers.includes(employee))
-                    .map((employee) => (
-                      <button
-                        key={employee.id}
-                        className="flex w-full cursor-pointer items-center gap-3 rounded-md p-2 hover:bg-gray-100"
-                        onClick={() => {
-                          setAssignedUsers([...assignedUsers, employee]);
-                          setAddSalesPersonOpen(false);
-                        }}
-                        type="button"
-                      >
-                        <Image
-                          src={employee.image}
-                          alt="Employee Image"
-                          width={50}
-                          height={50}
-                          className="rounded-full"
-                        />
-                        <p className="font-medium">{employee.name}</p>
-                      </button>
-                    ))}
-                </div>
-              )}
-            </div>
+            <textarea
+              name="notes"
+              placeholder="Notes"
+              className={cn(slimInputClassName, "border-2 border-slate-400")}
+              rows={3}
+            />
+          </div>
 
-            <div className="relative row-span-2 min-h-36 bg-background p-6">
+          <div className="relative row-span-2 min-h-36 divide-y bg-background">
+            {tab === Tab.Schedule ? (
               <div className="absolute inset-0 divide-y overflow-y-auto">
                 <div className="sticky top-0 z-10 flex items-center gap-4  bg-background px-8 py-2">
                   <button type="button" onClick={() => handleDate("-")}>
@@ -336,104 +423,13 @@ export function NewAppointment({
                   )}
                 </div>
               </div>
-            </div>
-
-            <div className="space-y-4 bg-background p-6">
-              <Selector
-                newButton={<NewCustomer setCustomers={setClientList} />}
-                label={
-                  client ? `${client.firstName} ${client.lastName}` : "Client"
-                }
-              >
-                <div>
-                  {clientList.map((client) => (
-                    <button
-                      type="button"
-                      key={client.id}
-                      className="flex w-full cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100"
-                      onClick={() => setClient(client)}
-                    >
-                      <Image
-                        src={client.photo!}
-                        alt="Client Image"
-                        width={30}
-                        height={30}
-                        className="rounded-full"
-                      />
-
-                      <div>
-                        <p className="text-start text-sm font-bold">
-                          {client.firstName} {client.lastName}
-                        </p>
-                        <p className="text-xs">{client.email}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </Selector>
-
-              <Selector
-                newButton={<NewVehicle setVehicles={setVehicleList} />}
-                label={
-                  vehicle ? vehicle.model || `Vehicle ${vehicle.id}` : "Vehicle"
-                }
-              >
-                <div className="">
-                  {vehicleList.map((vehicle) => (
-                    <button
-                      type="button"
-                      key={vehicle.id}
-                      className="flex w-full cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100"
-                      onClick={() => setVehicle(vehicle)}
-                    >
-                      <div>
-                        <p className="text-sm font-bold">
-                          {`${vehicle.model} ${vehicle.id}`}
-                        </p>
-                        <p className="text-xs">Owner</p>{" "}
-                        {/* TODO: Add owner name */}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </Selector>
-
-              <Selector
-                label={order ? order.name : "Order"}
-                newButton={<NewOrder setOrders={setOrderList} />}
-              >
-                <div className="">
-                  {orderList.map((order) => (
-                    <button
-                      type="button"
-                      key={order.id}
-                      className="flex w-full cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100"
-                      onClick={() => setOrder(order)}
-                    >
-                      <div>
-                        <p className="text-sm font-bold">{order.name}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </Selector>
-
-              <textarea
-                name="notes"
-                placeholder="Notes"
-                className={cn(slimInputClassName, "border-2 border-slate-400")}
-                rows={3}
-              />
-            </div>
+            ) : tab === Tab.Reminder ? (
+              <Reminder client={client} />
+            ) : null}
           </div>
-        ) : tab === Tab.Reminder ? (
-          <div className="overflow-y-auto">
-            <div className="h-96" />
-          </div>
-        ) : null}
-        <DialogFooter
-          className={cn("justify-end", tab !== Tab.Schedule && "invisible")}
-        >
+        </div>
+
+        <DialogFooter className="justify-end">
           <DialogClose asChild>
             <button type="button" className="rounded-md border px-4 py-1">
               Cancel
