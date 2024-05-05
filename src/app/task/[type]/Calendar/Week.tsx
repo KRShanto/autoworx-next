@@ -197,7 +197,7 @@ export default function Week({
   return (
     <>
       <div
-        className="relative mt-3 h-[90%] overflow-auto border border-b border-l border-t border-[#797979]"
+        className="relative mt-3 h-[90%] overflow-auto border border-b border-l border-t border-neutral-200"
         style={{
           backgroundColor: isOver ? "rgba(0, 0, 0, 0.1)" : "transparent",
         }}
@@ -206,7 +206,7 @@ export default function Week({
         {rows.map((row: any, rowIndex: number) => (
           <div
             className={cn(
-              "flex h-[45px] overflow-hidden border-[#797979]",
+              "flex h-[45px] overflow-hidden border-neutral-200",
               rowIndex !== rows.length - 1 && "border-b",
             )}
             key={rowIndex}
@@ -223,7 +223,7 @@ export default function Week({
                   ? "font-bold text-[19px] max-[1600px]:text-[15px]"
                   : "text-[17px] max-[1600px]:text-[13px]";
               const cellClasses = cn(
-                "border-r border-[#797979] h-full text-[#797979] flex justify-center items-center",
+                "border-r border-neutral-200 h-full text-[#797979] flex justify-center items-center",
                 cellWidth,
                 fontSize,
               );

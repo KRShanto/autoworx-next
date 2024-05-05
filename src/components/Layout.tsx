@@ -23,7 +23,7 @@ export default function Layout({
   // Don't show the navbar if the user is on the login or register page
   if (pathname === "/login" || pathname === "/register")
     return (
-      <main className="relative h-[93vh] bg-[#F8F9FA] p-2 px-7">
+      <main className="relative h-[93vh] bg-[#F8F9FA] p-2 px-4">
         {children}
       </main>
     );
@@ -35,7 +35,7 @@ export default function Layout({
         <TopNavbar />
         <PopupState />
 
-        <main className="relative h-[93vh] bg-[#F8F9FA] p-2 px-7">
+        <main className="relative h-[93vh] bg-[#F8F9FA] p-2 px-4">
           {children}
         </main>
       </div>

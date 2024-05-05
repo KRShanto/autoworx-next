@@ -7,6 +7,7 @@ import { Task, User } from "@prisma/client";
 import { MinimizeButton } from "./MinimiseButton";
 import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
 import { FaPlus } from "react-icons/fa";
+import { cn } from "@/lib/cn";
 
 export default function Users({
   users,
@@ -21,7 +22,12 @@ export default function Users({
   const setMinimized = useCalendarSidebarStore((x) => x.setMinimized);
 
   return (
-    <div className="app-shadow mt-5 flex flex-grow flex-col rounded-[12px] bg-white p-3">
+    <div
+      className={cn(
+        "app-shadow mt-5 flex flex-grow flex-col rounded-[12px] bg-white",
+        minimized || "p-3",
+      )}
+    >
       <div>
         <h2 className="flex items-center justify-between">
           {!minimized && (

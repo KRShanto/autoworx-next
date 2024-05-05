@@ -7,7 +7,7 @@ export default function Heading() {
   const { type, minimized, setType } = useCalendarSidebarStore();
 
   return (
-    <div className="calender-time-shadow flex p-0.5 items-center justify-center gap-2 rounded-[6px] bg-[#D9D9D9]">
+    <div className="calender-time-shadow flex min-h-8 items-center justify-center gap-2 rounded-[6px] bg-[#D9D9D9] p-0.5">
       {!minimized && (
         <>
           <button
