@@ -227,8 +227,10 @@ export default function Month({
                       .slice(0, 1)
                       .map((appointment: CalendarAppointment, i: number) => (
                         <Tooltip key={i}>
-                          <TooltipTrigger className="h-10 max-h-10 rounded border text-sm text-slate-500">
-                            {appointment.title}
+                          <TooltipTrigger asChild>
+                            <div className="h-10 max-h-10 rounded border text-sm text-slate-500">
+                              {appointment.title}
+                            </div>
                           </TooltipTrigger>
 
                           <TooltipPortal>
@@ -251,17 +253,14 @@ export default function Month({
                                 </p>
 
                                 <p>
-                                  <p>
-                                    {moment(
-                                      appointment.startTime,
-                                      "HH:mm",
-                                    ).format("hh:mm A")}{" "}
-                                    To{" "}
-                                    {moment(
-                                      appointment.endTime,
-                                      "HH:mm",
-                                    ).format("hh:mm A")}
-                                  </p>
+                                  {moment(
+                                    appointment.startTime,
+                                    "HH:mm",
+                                  ).format("hh:mm A")}{" "}
+                                  To{" "}
+                                  {moment(appointment.endTime, "HH:mm").format(
+                                    "hh:mm A",
+                                  )}
                                 </p>
                               </div>
                             </TooltipContent>

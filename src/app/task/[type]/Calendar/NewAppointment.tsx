@@ -144,8 +144,8 @@ export function NewAppointment({
       vehicleId: vehicle ? vehicle.id : undefined,
       orderId: order ? order.id : undefined,
       notes,
-      confirmationEmailTemplateId: confirmationTemplate!.id,
-      reminderEmailTemplateId: reminderTemplate!.id,
+      confirmationEmailTemplateId: confirmationTemplate?.id,
+      reminderEmailTemplateId: reminderTemplate?.id,
       confirmationEmailTemplateStatus: confirmationTemplateStatus,
       reminderEmailTemplateStatus: reminderTemplateStatus,
       times,
@@ -228,7 +228,7 @@ export function NewAppointment({
                 label="Time"
                 rootClassName="grow"
                 type="date"
-                value={date}
+                value={date ?? ""}
                 required={false}
                 onChange={(event) => setDate(event.currentTarget.value)}
               />
