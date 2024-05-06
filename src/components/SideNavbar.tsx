@@ -95,7 +95,7 @@ export default function SideNavbar() {
         />
 
         {/* Links */}
-        <div className="my-auto flex flex-col items-center gap-4">
+        <div className="mt-16 flex flex-col items-center gap-4">
           {navList.map((item, index) =>
             item.subnav ? (
               <Dropdown
