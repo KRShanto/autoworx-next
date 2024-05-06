@@ -33,7 +33,7 @@ export default function EditTaskComponent({
   const [date, setDate] = useState(taskData.date);
   const [startTime, setStartTime] = useState(taskData.startTime);
   const [endTime, setEndTime] = useState(taskData.endTime);
-  const [type, setType] = useState<TaskType>(taskData.type);
+  // const [type, setType] = useState<TaskType>(taskData.type);
   const [assignedUsers, setAssignedUsers] = useState<number[]>(
     taskData.assignedUsers || [],
   );
@@ -48,7 +48,7 @@ export default function EditTaskComponent({
         date,
         startTime: startTime,
         endTime: endTime,
-        type,
+        type: "task",
         assignedUsers,
       },
       id: taskData.id,
@@ -117,22 +117,24 @@ export default function EditTaskComponent({
           />
         </div>
 
+        {/*
         <div className="mb-4 flex flex-col">
           <label htmlFor="type" className="font-bold">
             Type
           </label>
-          <select
+           <select
             name="type"
             id="type"
-            className="mt-2 rounded-md border border-gray-300 p-2"
-            value={type}
-            onChange={(e) => setType(e.target.value as TaskType)}
+            className="mt-2 rounded-md border border-gray-300 p-2" 
+             value={type}
+             onChange={(e) => setType(e.target.value as TaskType)}
           >
             <option value="task">Task</option>
             <option value="appointment">Appointment</option>
             <option value="event">Event</option>
           </select>
         </div>
+        */}
 
         {/* custom radio. show user name and image (column)*/}
         <div className="mb-4 flex flex-col">

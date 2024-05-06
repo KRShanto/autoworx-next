@@ -21,31 +21,32 @@ export async function deleteWorkOrder(id: number) {
     },
   });
 
+  // TODO: skipped this part
   // Get the task
-  const task = await db.task.findFirst({
-    where: { workOrderId: id },
-  });
+  // const task = await db.task.findFirst({
+  //   where: { workOrderId: id },
+  // });
 
-  // Get the task users
-  const taskUsers = await db.taskUser.findMany({
-    where: { taskId: task?.id },
-  });
+  // // Get the task users
+  // const taskUsers = await db.taskUser.findMany({
+  //   where: { taskId: task?.id },
+  // });
 
-  // Delete task from Google Calendar
-  for (const taskUser of taskUsers) {
-    // TODO: Delete task from Google Calendar
-  }
-  // Delete task users if task is present
-  if (task) {
-    await db.taskUser.deleteMany({
-      where: { taskId: task.id },
-    });
+  // // Delete task from Google Calendar
+  // for (const taskUser of taskUsers) {
+  //   // TODO: Delete task from Google Calendar
+  // }
+  // // Delete task users if task is present
+  // if (task) {
+  //   await db.taskUser.deleteMany({
+  //     where: { taskId: task.id },
+  //   });
 
-    // Delete task
-    await db.task.delete({
-      where: { id: task.id },
-    });
-  }
+  //   // Delete task
+  //   await db.task.delete({
+  //     where: { id: task.id },
+  //   });
+  // }
 
   revalidatePath("/invoice");
   return true;

@@ -5,61 +5,63 @@ import { revalidatePath } from "next/cache";
 import { TaskType } from "@/types/db";
 
 export async function editTask({ id, task }: { id: number; task: TaskType }) {
-  // Find the task users
-  const taskUsers = await db.taskUser.findMany({
-    where: {
-      taskId: id,
-    },
-  });
+  // TODO: skipped this part
 
-  const assignedUsers = task.assignedUsers;
+  // // Find the task users
+  // const taskUsers = await db.taskUser.findMany({
+  //   where: {
+  //     taskId: id,
+  //   },
+  // });
 
-  // Find the difference between the existing users and the new users
-  const toRemove = taskUsers.filter(
-    (taskUser) => !assignedUsers.includes(taskUser.userId),
-  );
-  const toAdd = assignedUsers.filter(
-    (userId) => !taskUsers.find((taskUser) => taskUser.userId === userId),
-  );
+  // const assignedUsers = task.assignedUsers;
 
-  // Remove the users
-  for (const user of toRemove) {
-    // TODO: Remove the task from the user's Google Calendar
+  // // Find the difference between the existing users and the new users
+  // const toRemove = taskUsers.filter(
+  //   (taskUser) => !assignedUsers.includes(taskUser.userId),
+  // );
+  // const toAdd = assignedUsers.filter(
+  //   (userId) => !taskUsers.find((taskUser) => taskUser.userId === userId),
+  // );
 
-    await db.taskUser.delete({
-      where: {
-        id: user.id,
-      },
-    });
-  }
+  // // Remove the users
+  // for (const user of toRemove) {
+  //   // TODO: Remove the task from the user's Google Calendar
 
-  // Add the users
-  for (const user of toAdd) {
-    // TODO: Add the task to the user's Google Calendar
+  //   await db.taskUser.delete({
+  //     where: {
+  //       id: user.id,
+  //     },
+  //   });
+  // }
 
-    // Create the task user
-    await db.taskUser.create({
-      data: {
-        taskId: id,
-        userId: user,
-        eventId: "null-for-now",
-      },
-    });
-  }
+  // // Add the users
+  // for (const user of toAdd) {
+  //   // TODO: Add the task to the user's Google Calendar
 
-  // Update the task
-  await db.task.update({
-    where: {
-      id,
-    },
-    data: {
-      title: task.title,
-      type: task.type,
-      startTime: task.startTime,
-      endTime: task.endTime,
-      date: new Date(task.date),
-    },
-  });
+  //   // Create the task user
+  //   await db.taskUser.create({
+  //     data: {
+  //       taskId: id,
+  //       userId: user,
+  //       eventId: "null-for-now",
+  //     },
+  //   });
+  // }
+
+  // // Update the task
+  // await db.task.update({
+  //   where: {
+  //     id,
+  //   },
+  //   data: {
+  //     title: task.title,
+  //     type: task.type,
+  //     startTime: task.startTime,
+  //     endTime: task.endTime,
+  //     date: new Date(task.date),
+  //   },
+  // });
 
   revalidatePath("/task");
 

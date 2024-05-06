@@ -30,19 +30,20 @@ export async function createWorkOrder(invoiceId: number) {
     where: { id: serviceId },
   })) as Service;
 
-  // Create Task
-  const task = await db.task.create({
-    data: {
-      title: service.name,
-      date: new Date(),
-      startTime: "10:00",
-      endTime: "18:00",
-      type: "task",
-      companyId,
-      userId: parseInt(session.user.id),
-      workOrderId: workOrder.id,
-    },
-  });
+  // TODO: skipped this part
+  // // Create Task
+  // const task = await db.task.create({
+  //   data: {
+  //     title: service.name,
+  //     date: new Date(),
+  //     startTime: "10:00",
+  //     endTime: "18:00",
+  //     type: "task",
+  //     companyId,
+  //     userId: parseInt(session.user.id),
+  //     workOrderId: workOrder.id,
+  //   },
+  // });
 
   // TODO: Google Calendar Integration
 

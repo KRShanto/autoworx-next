@@ -36,20 +36,21 @@ export async function addEmployee({
   });
 
   // Find the task
-  const task = await db.task.findFirst({
-    where: { workOrderId },
-  });
+  // TODO: skipped this part
+  // const task = await db.task.findFirst({
+  //   where: { workOrderId },
+  // });
 
-  // TODO: Add task to google calendar
+  // // TODO: Add task to google calendar
 
-  // Create TaskUser
-  await db.taskUser.create({
-    data: {
-      taskId: task?.id!,
-      userId: employeeId,
-      eventId: "null-for-now",
-    },
-  });
+  // // Create TaskUser
+  // await db.taskUser.create({
+  //   data: {
+  //     taskId: task?.id!,
+  //     userId: employeeId,
+  //     eventId: "null-for-now",
+  //   },
+  // });
 
   revalidatePath("/invoice");
 }
