@@ -59,7 +59,7 @@ export default function UserComponent({
             <div className="ml-4 mt-2 flex items-center gap-2" key={index}>
               <div
                 className="h-[10px] w-[10px] rounded-full"
-                style={{ backgroundColor: TASK_COLOR[task.type] }}
+                style={{ backgroundColor: TASK_COLOR[task.priority] }}
               ></div>
               <p className="text-[16px]">{task.title}</p>
             </div>

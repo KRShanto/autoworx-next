@@ -6,6 +6,7 @@ import TagComponent from "./Tag";
 import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
 import { MinimizeButton } from "./MinimiseButton";
 import { cn } from "@/lib/cn";
+import NewTask from "./NewTask";
 
 export default function Tasks({
   tasks,
@@ -39,17 +40,8 @@ export default function Tasks({
           {tags.map((tag, index) => (
             <TagComponent key={index} tag={tag} />
           ))}
-          <button
-            type="button"
-            className="w-full rounded-md bg-[#797979] p-2 text-[17px] text-white max-[1300px]:py-1 max-[1300px]:text-[14px]"
-            onClick={() =>
-              open("ADD_TASK", {
-                companyUsers: users,
-              })
-            }
-          >
-            <FaPlus className="mx-auto block" />
-          </button>
+
+          <NewTask companyUsers={users} />
         </div>
       )}
     </div>

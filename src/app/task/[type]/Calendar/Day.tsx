@@ -202,7 +202,7 @@ export default function Day({
           }px`;
           const widthNumber = is1300 ? 300 : 500;
           const width = `${widthNumber}px`;
-          const backgroundColor = TASK_COLOR[task.type];
+          const backgroundColor = TASK_COLOR[task.priority];
           // if the previous task ends at the same time as this task
           // then move this task right
           if (

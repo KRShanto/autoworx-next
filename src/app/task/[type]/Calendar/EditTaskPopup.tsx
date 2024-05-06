@@ -2,7 +2,6 @@ import { usePopupStore } from "@/stores/popup";
 import { ThreeDots } from "react-loader-spinner";
 import { useState } from "react";
 import { useFormErrorStore } from "@/stores/form-error";
-import { TaskType } from "@prisma/client";
 import { User } from "next-auth";
 import { editTask } from "../../edit";
 import Input from "@/components/Input";

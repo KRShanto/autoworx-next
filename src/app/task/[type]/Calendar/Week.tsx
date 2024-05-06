@@ -273,7 +273,7 @@ export default function Week({
           }px`;
           // width according to the cell width
           const width = "12.9%";
-          const backgroundColor = TASK_COLOR[task.type];
+          const backgroundColor = TASK_COLOR[task.priority];
 
           // Define a function to truncate the task title based on the height
           const truncateTitle = (title: string, maxLength: number) => {

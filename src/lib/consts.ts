@@ -1,9 +1,9 @@
 export const MIN_PASSWORD_LENGTH = 6;
 
 export const TASK_COLOR = {
-  task: "#6571FF",
-  event: "#006D77",
-  appointment: "#25AADD",
+  Low: "#6571FF",
+  Medium: "#006D77",
+  High: "#25AADD",
 };
 
 export const INVOICE_TAGS = [

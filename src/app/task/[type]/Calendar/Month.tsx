@@ -163,10 +163,9 @@ export default function Month({
             <button
               type="button"
               key={i}
+              // TODO: fix height issue
               className={cn(
-                "relative flex h-[100%] flex-col items-end gap-2 border-b border-r border-neutral-200 p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
-                // highlight today's date
-                // today === cell[0]
+                "relative flex h-full flex-col items-end gap-2 border-b border-r border-neutral-200 p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
                 today.getFullYear() === cell[0].getFullYear() &&
                   today.getMonth() === cell[0].getMonth() &&
                   today.getDate() === cell[0].getDate()
@@ -196,7 +195,7 @@ export default function Month({
                       <TooltipTrigger
                         className="h-4 max-h-[33.33%] rounded"
                         style={{
-                          backgroundColor: TASK_COLOR[task.type],
+                          backgroundColor: TASK_COLOR[task.priority],
                         }}
                       />
                       <TooltipPortal>

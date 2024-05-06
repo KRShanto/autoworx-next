@@ -24,6 +24,7 @@ model Company {
   invoiceAdditionals InvoiceAdditional[]
   calendarSettings CalendarSettings[]
   orders     Order[]
+  appointments Appointment[]
 }
 
 model WorkOrder {
@@ -36,7 +37,8 @@ model WorkOrder {
   updatedAt    DateTime @updatedAt @map("updated_at")
   company      Company? @relation(fields: [companyId], references: [id])
   users        User[]
-  tasks        Task[]
+  // tasks        Task[]
+  appointments Appointment[]
   
   @@index([companyId], name: "fk_work_orders_company")
 }
@@ -64,14 +66,17 @@ model User {
   employeeType       EmployeeType @default(None)
   employeeDepartment EmployeeDepartment @default(None)
   workOrderId        Int?  @map("work_order_id")
-  companyId          Int?     @map("company_id")
+  companyId          Int     @map("company_id")
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @updatedAt @map("updated_at")
-  company            Company? @relation(fields: [companyId], references: [id])
+  company            Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   workOrder          WorkOrder? @relation(fields: [workOrderId], references: [id])
   tasks              Task[]
   oauthTokens        OAuthToken[]
   taskUsers          TaskUser[]
+  appointments       Appointment[]
+  appointmentUsers   AppointmentUser[]
+  
   
   @@index([companyId], name: "fk_users_company")
   @@index([workOrderId], name: "fk_users_work_order")
@@ -102,42 +107,42 @@ enum EmployeeDepartment {
   None
 }
 
-model Task {
-  id          Int      @id @default(autoincrement())
-  userId      Int      @map("user_id")
-  title       String   @db.VarChar(100)
-  date        DateTime?
-  startTime   String?   @map("start_time")
-  endTime     String?   @map("end_time")  
-  type        TaskType
-  companyId   Int?     @map("company_id")
-  workOrderId Int?     @map("work_order_id")
-  customerId  Int?     @map("customer_id")
-  vehicleId   Int?     @map("vehicle_id")
-  orderId     Int?     @map("order_id")
-  notes       String?
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  user        User     @relation(fields: [userId], references: [id])
-  company     Company? @relation(fields: [companyId], references: [id])
-  workOrder   WorkOrder? @relation(fields: [workOrderId], references: [id])
-  taskUsers   TaskUser[]
-  invoiceTag  String?  @map("invoice_tag")
-  customer    Customer? @relation(fields: [customerId], references: [id])
-  vehicle     Vehicle? @relation(fields: [vehicleId], references: [id])
-    order      Order? @relation(fields: [orderId], references: [id])
+// model Task {
+//   id          Int      @id @default(autoincrement())
+//   userId      Int      @map("user_id")
+//   title       String   @db.VarChar(100)
+//   date        DateTime?
+//   startTime   String?   @map("start_time")
+//   endTime     String?   @map("end_time")  
+//   type        TaskType
+//   companyId   Int?     @map("company_id")
+//   workOrderId Int?     @map("work_order_id")
+//   customerId  Int?     @map("customer_id")
+//   vehicleId   Int?     @map("vehicle_id")
+//   orderId     Int?     @map("order_id")
+//   notes       String?
+//   createdAt   DateTime @default(now()) @map("created_at")
+//   updatedAt   DateTime @updatedAt @map("updated_at")
+//   user        User     @relation(fields: [userId], references: [id])
+//   company     Company? @relation(fields: [companyId], references: [id])
+//   workOrder   WorkOrder? @relation(fields: [workOrderId], references: [id])
+//   taskUsers   TaskUser[]
+//   invoiceTag  String?  @map("invoice_tag")
+//   customer    Customer? @relation(fields: [customerId], references: [id])
+//   vehicle     Vehicle? @relation(fields: [vehicleId], references: [id])
+//     order      Order? @relation(fields: [orderId], references: [id])
 
 
-  @@index([userId], name: "fk_tasks_user")
-  @@index([companyId], name: "fk_tasks_company")
-  @@index([workOrderId], name: "fk_tasks_work_order")
-}
+//   @@index([userId], name: "fk_tasks_user")
+//   @@index([companyId], name: "fk_tasks_company")
+//   @@index([workOrderId], name: "fk_tasks_work_order")
+// }
 
-enum TaskType {
-  event
-  appointment
-  task
-}
+// enum TaskType {
+//   event
+//   appointment
+//   task
+// }
 
 model OAuthToken {
   id           Int      @id @default(autoincrement())
@@ -148,24 +153,24 @@ model OAuthToken {
   expiresIn    DateTime? @map("expires_in")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
-  user         User     @relation(fields: [userId], references: [id])
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], name: "fk_oauth_tokens_user")
 }
 
-model TaskUser {
-  id        Int      @id @default(autoincrement())
-  taskId    Int      @map("task_id")
-  userId    Int      @map("user_id")
-  eventId   String   @db.VarChar(100)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+// model TaskUser {
+//   id        Int      @id @default(autoincrement())
+//   taskId    Int      @map("task_id")
+//   userId    Int      @map("user_id")
+//   eventId   String   @db.VarChar(100)
+//   createdAt DateTime @default(now()) @map("created_at")
+//   updatedAt DateTime @updatedAt @map("updated_at")
+//   task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+//   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([taskId], name: "fk_task_users_task")
-  @@index([userId], name: "fk_task_users_user")
-}
+//   @@index([taskId], name: "fk_task_users_task")
+//   @@index([userId], name: "fk_task_users_user")
+// }
 
 model Order {
   id        Int      @id @default(autoincrement())
@@ -174,8 +179,9 @@ model Order {
   companyId Int?     @map("company_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  tasks     Task[]
-  company   Company? @relation(fields: [companyId], references: [id])
+  // tasks     Task[]
+  appointments Appointment[]
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model Customer {
@@ -189,13 +195,14 @@ model Customer {
   state     String?
   zip       String?
   photo     String? @default("/images/default.png")
-  companyId Int?     @map("company_id")
+  companyId Int    @map("company_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")  
-  company   Company? @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id] , onDelete: Cascade)
   customerCompany String? @map("customer_company")
   tag    String? @default("")
-  tasks  Task[]
+  // tasks  Task[]
+  appointments Appointment[]
 
   @@index([companyId], name: "fk_customers_company")
 }
@@ -210,8 +217,8 @@ model Service {
   quantity    Int
   discount    Decimal
   total       Decimal
-  companyId   Int?     @map("company_id")
-  company     Company? @relation(fields: [companyId], references: [id])
+  companyId   Int     @map("company_id")
+  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId], name: "fk_services_company")
 }
@@ -225,11 +232,12 @@ model Vehicle {
   vin       String?   
   type      String?
   license   String?   
-  companyId Int?     @map("company_id")
+  companyId Int     @map("company_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  company   Company? @relation(fields: [companyId], references: [id])
-  tasks     Task[]
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  // tasks     Task[]
+  appointments Appointment[]
 
   @@index([companyId], name: "fk_vehicles_company")
 }
@@ -255,9 +263,9 @@ model Invoice {
   terms       String?  
   policy      String?  
   issueDate   DateTime @default(now()) @map("issue_date")
-  companyId   Int?     @map("company_id")
+  companyId   Int     @map("company_id")
   salesperson String
-  company     Company? @relation(fields: [companyId], references: [id])
+  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   payment     Payment[]
   tags        String   @default("")
 
@@ -279,10 +287,10 @@ enum Status {
 model Setting {
   id        Int      @id @default(autoincrement())
   contact   String
-  companyId Int?     @map("company_id")
+  companyId Int     @map("company_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  company   Company? @relation(fields: [companyId], references: [id])
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId], name: "fk_settings_company")
 }
@@ -300,9 +308,9 @@ model Payment {
   note      String?  
   date      DateTime @default(now())
   tnx       String
-  companyId Int?     @map("company_id")
-  invoice   Invoice  @relation(fields: [invoiceId], references: [id])
-  company   Company? @relation(fields: [companyId], references: [id])
+  companyId Int     @map("company_id")
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([invoiceId], name: "fk_payments_invoice")
   @@index([companyId], name: "fk_payments_company")
@@ -340,7 +348,7 @@ model InvoiceAdditional {
   terms     String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  company   Company  @relation(fields: [companyId], references: [id])
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId], name: "fk_invoice_additionals_company")
 }
@@ -354,6 +362,81 @@ model CalendarSettings {
   weekends  Json
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  company   Company  @relation(fields: [companyId], references: [id])
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
 
+model Task {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(100)
+  description String?
+  date        DateTime?
+  startTime   String?   @map("start_time")
+  endTime     String?   @map("end_time")  
+  priority    Priority
+  taskUser    TaskUser[]
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  userId      Int      @map("user_id")
+  companyId   Int    @map("company_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+ 
+}
+
+enum Priority {
+  Low
+  Medium
+  High
+}
+
+model TaskUser {
+  id        Int      @id @default(autoincrement())
+  taskId    Int      @map("task_id")
+  userId    Int      @map("user_id")
+  eventId   String?   @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Appointment {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  title       String   @db.VarChar(100)
+  date        DateTime?
+  startTime   String?   @map("start_time")
+  endTime     String?   @map("end_time")  
+  companyId   Int      @map("company_id")
+  workOrderId Int?     @map("work_order_id")
+  customerId  Int?     @map("customer_id")
+  vehicleId   Int?     @map("vehicle_id")
+  orderId     Int?     @map("order_id")
+  notes       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  user        User     @relation(fields: [userId], references: [id])
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  workOrder   WorkOrder? @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  appointmentUsers AppointmentUser[]
+  invoiceTag  String?  @map("invoice_tag")
+  customer    Customer? @relation(fields: [customerId], references: [id])
+  vehicle     Vehicle? @relation(fields: [vehicleId], references: [id])
+  order      Order? @relation(fields: [orderId], references: [id])
+
+
+  @@index([userId], name: "fk_tasks_user")
+  @@index([companyId], name: "fk_tasks_company")
+  @@index([workOrderId], name: "fk_tasks_work_order")
+}
+
+model AppointmentUser {
+  id            Int      @id @default(autoincrement())
+  appointmentId Int      @map("appointment_id")
+  userId        Int      @map("user_id")
+  eventId       String   @db.VarChar(100)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
