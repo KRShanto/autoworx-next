@@ -1,5 +1,8 @@
-import type { Key } from "react";
+import { EmailTemplateType } from "@prisma/client";
 
-export type EmailTemplateType = "CONFIRMATION" | "REMINDER";
-
-export type EmailTemplate = { id: Key; name: string; type: EmailTemplateType };
+export type EmailTemplate = {
+  id: number;
+  subject: string;
+  message: string;
+  type: EmailTemplateType;
+};

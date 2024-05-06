@@ -161,6 +161,12 @@ export default async function Page({ params }: { params: { type: string } }) {
     },
   })) as CalendarSettings;
 
+  const emailTemplates = await db.emailTemplate.findMany({
+    where: {
+      companyId,
+    },
+  });
+
   return (
     <>
       <Title>Task and Activity Management</Title>
@@ -178,6 +184,7 @@ export default async function Page({ params }: { params: { type: string } }) {
           orders={orders}
           settings={settings}
           appointments={calendarAppointments!}
+          templates={emailTemplates as any}
         />
       </div>
     </>

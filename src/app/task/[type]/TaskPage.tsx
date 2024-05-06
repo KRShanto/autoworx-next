@@ -15,6 +15,7 @@ import {
 } from "@prisma/client";
 import { CalendarType } from "@/types/calendar";
 import { CalendarAppointment } from "@/types/db";
+import { EmailTemplate } from "@/types/email-template";
 
 export default function TaskPage({
   type,
@@ -28,6 +29,7 @@ export default function TaskPage({
   orders,
   settings,
   appointments,
+  templates,
 }: {
   type: CalendarType;
   taskWithAssignedUsers: (Task & { assignedUsers: User[] })[];
@@ -40,6 +42,7 @@ export default function TaskPage({
   orders: Order[];
   settings: CalendarSettings;
   appointments: CalendarAppointment[];
+  templates: EmailTemplate[];
 }) {
   // Filter the tasks where startTime, endTime, and date are not null
   const calendarTasks = taskWithAssignedUsers.filter(
@@ -68,6 +71,7 @@ export default function TaskPage({
         orders={orders}
         settings={settings}
         appointments={appointments}
+        templates={templates}
       />
     </DndProvider>
   );

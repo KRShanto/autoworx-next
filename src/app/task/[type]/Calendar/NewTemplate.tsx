@@ -15,28 +15,31 @@ import { useState } from "react";
 // import { addTemplate } from "./addTemplate";
 import FormError from "@/components/FormError";
 import { useFormErrorStore } from "@/stores/form-error";
-import type { EmailTemplateType } from "@/types/email-template";
+import type { EmailTemplate } from "@/types/email-template";
 import { useEmailTemplateStore } from "@/stores/email-template";
+import { addTemplate } from "./addTemplate";
+import { EmailTemplateType } from "@prisma/client";
 
-export default function NewTemplate({ type }: { type:EmailTemplateType, }) {
+export default function NewTemplate({ type }: { type: EmailTemplateType }) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
-  const {setTemplates} = useEmailTemplateStore();
+  const { templates, setTemplates } = useEmailTemplateStore();
+
   async function handleSubmit(data: FormData) {
     const subject = data.get("subject") as string;
     const message = data.get("message") as string;
 
-    // const res = (await addTemplate({ subject, message })) as any;
+    const res = (await addTemplate({ subject, message, type })) as any;
 
-    // if (res.message) {
-    //   showError({
-    //     field: res.field || "subject",
-    //     message: res.message,
-    //   });
-    // } else {
-      // setTemplates((prev) => [...prev, res]);
+    if (res.error) {
+      showError({
+        field: res.field || "subject",
+        message: res.message,
+      });
+    } else {
+      setTemplates([...templates, { id: res.id, subject, message, type }]);
       setOpen(false);
-    // }
+    }
   }
 
   return (
@@ -61,7 +64,12 @@ export default function NewTemplate({ type }: { type:EmailTemplateType, }) {
           <SlimInput name="subject" />
           <label className="block">
             <div className="mb-1 px-2 font-medium">Message</div>
-            <textarea name="message" rows={10} className={slimInputClassName} required />
+            <textarea
+              name="message"
+              rows={10}
+              className={slimInputClassName}
+              required
+            />
           </label>
         </div>
 

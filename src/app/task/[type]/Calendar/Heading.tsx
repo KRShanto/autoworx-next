@@ -14,6 +14,7 @@ import Settings from "./Settings";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
+import { EmailTemplate } from "@/types/email-template";
 
 function DisplayDate({ type }: { type: CalendarType }) {
   const searchParams = useSearchParams();
@@ -32,6 +33,7 @@ export default function Heading({
   orders,
   settings,
   employees,
+  templates,
 }: {
   type: CalendarType;
   customers: Customer[];
@@ -39,6 +41,8 @@ export default function Heading({
   orders: Order[];
   settings: CalendarSettings;
   employees: User[];
+  templates: EmailTemplate[];
+
 }) {
   const router = useRouter();
   const q = type === "day" ? "date" : type;
@@ -112,6 +116,7 @@ export default function Heading({
           orders={orders}
           settings={settings}
           employees={employees}
+          templates={templates}
         />
 
         <Settings settings={settings} />

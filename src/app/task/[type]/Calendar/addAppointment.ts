@@ -16,6 +16,11 @@ interface AppointmentToAdd {
   vehicleId?: number;
   orderId?: number;
   notes?: string;
+  confirmationEmailTemplateId?: number;
+  reminderEmailTemplateId?: number;
+  confirmationEmailTemplateStatus?: boolean;
+  reminderEmailTemplateStatus?: boolean;
+  times?: { date: string; time: string }[];
 }
 
 export async function addAppointment(appointment: AppointmentToAdd) {
@@ -33,6 +38,12 @@ export async function addAppointment(appointment: AppointmentToAdd) {
       orderId: appointment.orderId,
       notes: appointment.notes,
       userId: parseInt(session.user.id),
+      confirmationEmailTemplateId: appointment.confirmationEmailTemplateId,
+      confirmationEmailTemplateStatus:
+        appointment.confirmationEmailTemplateStatus,
+      reminderEmailTemplateId: appointment.reminderEmailTemplateId,
+      reminderEmailTemplateStatus: appointment.reminderEmailTemplateStatus,
+      times: appointment.times,
       companyId,
     },
   });

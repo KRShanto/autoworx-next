@@ -39,6 +39,8 @@ import NewVehicle from "./NewVehicle";
 import Selector from "./Selector";
 import { addAppointment } from "./addAppointment";
 import { Reminder } from "./Reminder";
+import { EmailTemplate } from "@/types/email-template";
+import { useEmailTemplateStore } from "@/stores/email-template";
 
 enum Tab {
   Schedule = 0,
@@ -51,12 +53,14 @@ export function NewAppointment({
   orders,
   settings,
   employees,
+  templates,
 }: {
   customers: Customer[];
   vehicles: Vehicle[];
   orders: Order[];
   settings: CalendarSettings;
   employees: User[];
+  templates: EmailTemplate[];
 }) {
   const { popup, open, close } = usePopupStore();
   const { showError } = useFormErrorStore();
@@ -85,6 +89,17 @@ export function NewAppointment({
   const [employeesToDisplay, setEmployeesToDisplay] =
     useState<User[]>(employees);
 
+  const [times, setTimes] = useState<{ time: string; date: string }[]>([]);
+  const [confirmationTemplate, setConfirmationTemplate] =
+    useState<EmailTemplate | null>(null);
+  const [reminderTemplate, setReminderTemplate] =
+    useState<EmailTemplate | null>(null);
+  const [confirmationTemplateStatus, setConfirmationTemplateStatus] =
+    useState(true);
+  const [reminderTemplateStatus, setReminderTemplateStatus] = useState(true);
+
+  const { setTemplates } = useEmailTemplateStore();
+
   const handleSearch = (search: string) => {
     setEmployeesToDisplay(
       employees.filter((employee) =>
@@ -107,6 +122,14 @@ export function NewAppointment({
     }
   }, [allDay, settings]);
 
+  useEffect(() => {
+    console.log("Templates; ", templates);
+
+    if (templates) {
+      setTemplates(templates);
+    }
+  }, [templates]);
+
   const handleSubmit = async (data: FormData) => {
     const title = data.get("title") as string;
     const notes = data.get("notes") as string;
@@ -121,7 +144,28 @@ export function NewAppointment({
       vehicleId: vehicle ? vehicle.id : undefined,
       orderId: order ? order.id : undefined,
       notes,
+      confirmationEmailTemplateId: confirmationTemplate!.id,
+      reminderEmailTemplateId: reminderTemplate!.id,
+      confirmationEmailTemplateStatus: confirmationTemplateStatus,
+      reminderEmailTemplateStatus: reminderTemplateStatus,
+      times,
     });
+
+    // log everything
+    console.log("Title:", title);
+    console.log("Date:", date);
+    console.log("Start Time:", startTime);
+    console.log("End Time:", endTime);
+    console.log("Assigned Users:", assignedUsers);
+    console.log("Client ID:", client ? client.id : undefined);
+    console.log("Vehicle ID:", vehicle ? vehicle.id : undefined);
+    console.log("Order ID:", order ? order.id : undefined);
+    console.log("Notes:", notes);
+    console.log("Times:", times);
+    console.log("Confirmation Template:", confirmationTemplate);
+    console.log("Reminder Template:", reminderTemplate);
+    console.log("Confirmation Template Status:", confirmationTemplateStatus);
+    console.log("Reminder Template Status:", reminderTemplateStatus);
 
     close();
   };
@@ -423,7 +467,21 @@ export function NewAppointment({
                 </div>
               </div>
             ) : tab === Tab.Reminder ? (
-              <Reminder client={client} />
+              <Reminder
+                client={client}
+                endTime={endTime!}
+                date={date!}
+                times={times}
+                setTimes={setTimes}
+                confirmationTemplate={confirmationTemplate}
+                setConfirmationTemplate={setConfirmationTemplate}
+                reminderTemplate={reminderTemplate}
+                setReminderTemplate={setReminderTemplate}
+                confirmationTemplateStatus={confirmationTemplateStatus}
+                setConfirmationTemplateStatus={setConfirmationTemplateStatus}
+                reminderTemplateStatus={reminderTemplateStatus}
+                setReminderTemplateStatus={setReminderTemplateStatus}
+              />
             ) : null}
           </div>
         </div>

@@ -4,6 +4,7 @@ import Month from "./Month";
 import { CalendarType } from "@/types/calendar";
 import { Appointment, Task, User } from "@prisma/client";
 import { CalendarAppointment, CalendarTask } from "@/types/db";
+import { EmailTemplate } from "@/types/email-template";
 
 export default function Body({
   type,

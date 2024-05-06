@@ -12,6 +12,7 @@ import {
 } from "@prisma/client";
 import { CalendarAppointment, CalendarTask } from "@/types/db";
 import { Suspense } from "react";
+import { EmailTemplate } from "@/types/email-template";
 
 export default function Calender({
   type,
@@ -23,6 +24,7 @@ export default function Calender({
   orders,
   settings,
   appointments,
+  templates,
 }: {
   type: CalendarType;
   tasks: CalendarTask[];
@@ -33,8 +35,8 @@ export default function Calender({
   orders: Order[];
   settings: CalendarSettings;
   appointments: CalendarAppointment[];
+  templates: EmailTemplate[];
 }) {
-  console.log("Task from calendar: ", tasks);
   return (
     <div className="app-shadow relative w-full overflow-hidden rounded-[18px] bg-white p-4">
       <Heading
@@ -44,6 +46,7 @@ export default function Calender({
         orders={orders}
         settings={settings}
         employees={companyUsers}
+        templates={templates}
       />
       <Suspense>
         <Body
