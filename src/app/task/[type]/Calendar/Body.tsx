@@ -24,6 +24,7 @@ export default function Body({
         tasks={tasks}
         companyUsers={companyUsers}
         tasksWithoutTime={tasksWithoutTime}
+        appointments={appointments as any}
       />
     );
   if (type === "week")
@@ -32,6 +33,7 @@ export default function Body({
         tasks={tasks}
         companyUsers={companyUsers}
         tasksWithoutTime={tasksWithoutTime}
+        appointments={appointments as any}
       />
     );
   if (type === "month")

@@ -2,7 +2,7 @@
 
 import Heading from "./Heading";
 import Body from "./Body";
-import type { Task } from "@prisma/client";
+import type { Appointment, Task } from "@prisma/client";
 import { cn } from "@/lib/cn";
 import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
 
@@ -10,10 +10,12 @@ export default function CalendarSidebar({
   usersWithTasks,
   tasks,
   tags,
+  appointments,
 }: {
   usersWithTasks: any;
   tasks: Task[];
   tags: string[];
+  appointments: Appointment[];
 }) {
   const minimized = useCalendarSidebarStore((x) => x.minimized);
 
@@ -25,7 +27,12 @@ export default function CalendarSidebar({
       )}
     >
       <Heading />
-      <Body usersWithTasks={usersWithTasks} tasks={tasks} tags={tags} />
+      <Body
+        usersWithTasks={usersWithTasks}
+        tasks={tasks}
+        tags={tags}
+        appointments={appointments}
+      />
     </div>
   );
 }

@@ -1,21 +1,24 @@
 import { usePopupStore } from "../../../../stores/popup";
 import { FaPlus } from "react-icons/fa";
-import { Task, User } from "@prisma/client";
+import { Appointment, Task, User } from "@prisma/client";
 import TaskComponent from "./Task";
 import TagComponent from "./Tag";
 import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
 import { MinimizeButton } from "./MinimiseButton";
 import { cn } from "@/lib/cn";
 import NewTask from "./NewTask";
+import AppointmentComponent from "./Appointment";
 
 export default function Tasks({
   tasks,
   users,
   tags,
+  appointments,
 }: {
   tasks: Task[];
   users: User[];
   tags: string[];
+  appointments: Appointment[];
 }) {
   const { open } = usePopupStore();
   const minimized = useCalendarSidebarStore((x) => x.minimized);
@@ -39,6 +42,12 @@ export default function Tasks({
           ))}
           {tags.map((tag, index) => (
             <TagComponent key={index} tag={tag} />
+          ))}
+          {appointments.map((appointment) => (
+            <AppointmentComponent
+              key={appointment.id}
+              appointment={appointment}
+            />
           ))}
 
           <NewTask companyUsers={users} />

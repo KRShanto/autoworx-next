@@ -3,8 +3,8 @@
 import { cn } from "@/lib/cn";
 import { TASK_COLOR } from "@/lib/consts";
 import { usePopupStore } from "@/stores/popup";
-import type { CalendarTask } from "@/types/db";
-import type { Task, User } from "@prisma/client";
+import type { CalendarAppointment, CalendarTask } from "@/types/db";
+import type { Appointment, Task, User } from "@prisma/client";
 import moment from "moment";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -15,6 +15,7 @@ import { MdDelete, MdModeEdit } from "react-icons/md";
 import { ThreeDots } from "react-loader-spinner";
 import { addTask } from "../../add";
 import { deleteTask } from "../../delete";
+import { assignAppointmentDate } from "./assignAppointmentDate";
 
 function useWeek() {
   const searchParams = useSearchParams();
@@ -33,10 +34,12 @@ export default function Week({
   tasks,
   companyUsers,
   tasksWithoutTime,
+  appointments,
 }: {
   tasks: CalendarTask[];
   companyUsers: User[];
   tasksWithoutTime: Task[];
+  appointments: CalendarAppointment[];
 }) {
   const [hoveredTask, setHoveredTask] = useState<number | null>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -45,7 +48,7 @@ export default function Week({
   const { open } = usePopupStore();
 
   const [{ canDrop, isOver }, dropRef] = useDrop({
-    accept: ["task", "tag"],
+    accept: ["task", "tag", "appointment"],
     drop: (item, monitor) => {
       // Update your state here
     },
@@ -67,12 +70,6 @@ export default function Week({
         dropRef.current.removeEventListener("scroll", handleScroll);
     };
   }, []);
-
-  const handleDelete = async (id: number) => {
-    setLoading(true);
-    await deleteTask(id);
-    setLoading(false);
-  };
 
   const week = useWeek();
   const today = week.toDate();
@@ -115,29 +112,36 @@ export default function Week({
   const rows = [allDayRow, ...hourlyRows];
 
   // Filter out the tasks that are within the current week
-  const weekTasks = useMemo<
-    (CalendarTask & {
+  const events = useMemo<
+    ((CalendarTask | CalendarAppointment) & {
       rowStartIndex: number;
       rowEndIndex: number;
       columnIndex: number;
+      type: "task" | "appointment";
     })[]
   >(() => {
     // Get the start and end of the current week
     const startOfWeek = week.startOf("week").toDate();
     const endOfWeek = week.endOf("week").toDate();
 
-    return tasks
+    return [
+      ...tasks.map((task) => ({ ...task, type: "task" as any })),
+      ...appointments.map((appointment) => ({
+        ...appointment,
+        type: "appointment" as any,
+      })),
+    ]
       .filter((task) => {
-        const taskDate = new Date(task.date);
+        const taskDate = new Date(task.date as any);
         return taskDate >= startOfWeek && taskDate <= endOfWeek;
       })
-      .map((task) => {
-        const taskDate = new Date(task.date);
+      .map((event) => {
+        const taskDate = new Date(event.date as any);
         const columnIndex = taskDate.getDay() - startOfWeek.getDay();
 
         // Convert the taskStartTime and taskEndTime to a format like "1 PM" or "11 AM"
-        const taskStartTime = moment(task.startTime, "HH:mm").format("h A");
-        const taskEndTime = moment(task.endTime, "HH:mm").format("h A");
+        const taskStartTime = moment(event.startTime, "HH:mm").format("h A");
+        const taskEndTime = moment(event.endTime, "HH:mm").format("h A");
 
         // Find the rowStartIndex and rowEndIndex by looping over the hourlyRows
         const rowStartIndex = hourlyRows.findIndex((row) =>
@@ -147,7 +151,7 @@ export default function Week({
           row.includes(taskEndTime),
         );
 
-        return { ...task, columnIndex, rowStartIndex, rowEndIndex };
+        return { ...event, columnIndex, rowStartIndex, rowEndIndex };
       });
   }, [tasks, week]);
 
@@ -167,13 +171,11 @@ export default function Week({
     // Get the task type
     const type = event.dataTransfer.getData("text/plain").split("|")[0];
 
-    console.log(type);
-
     if (type === "tag") {
       const tag = event.dataTransfer.getData("text/plain").split("|")[1];
 
       await addTask({ tag, date, startTime, endTime });
-    } else {
+    } else if (type === "task") {
       // Get the id of the task from the dataTransfer object
       const taskId = parseInt(
         event.dataTransfer.getData("text/plain").split("|")[1],
@@ -186,6 +188,26 @@ export default function Week({
         // Add task to database
         await addTask({
           id: task.id,
+          date,
+          startTime,
+          endTime,
+        });
+      }
+    } else {
+      // Get the id of the appointment from the dataTransfer object
+      const appointmentId = parseInt(
+        event.dataTransfer.getData("text/plain").split("|")[1],
+      );
+
+      // Find the appointment in your state
+      const appointment = appointments.find(
+        (appointment) => appointment.id == appointmentId,
+      );
+
+      if (appointment) {
+        // Add appointment to database
+        await assignAppointmentDate({
+          id: appointment.id,
           date,
           startTime,
           endTime,
@@ -256,24 +278,28 @@ export default function Week({
           </div>
         ))}
 
-        {weekTasks.map((task, index) => {
+        {events.map((event, index) => {
           // left according to the cell width
-          const left = `calc(10% + 12.9% * ${task.columnIndex})`;
-          let top = `${45 * task.rowStartIndex + 45}px`;
+          const left = `calc(10% + 12.9% * ${event.columnIndex})`;
+          let top = `${45 * event.rowStartIndex + 45}px`;
           // if the previous task starts at the same time as this task
           // then move this task down
           if (
             index > 0 &&
-            task.rowStartIndex === weekTasks[index - 1].rowStartIndex
+            event.rowStartIndex === events[index - 1].rowStartIndex
           ) {
-            top = `${45 * task.rowStartIndex + 45 + 20}px`;
+            top = `${45 * event.rowStartIndex + 45 + 20}px`;
           }
           const height = `${
-            45 * (task.rowEndIndex - task.rowStartIndex + 1)
+            45 * (event.rowEndIndex - event.rowStartIndex + 1)
           }px`;
           // width according to the cell width
           const width = "12.9%";
-          const backgroundColor = TASK_COLOR[task.priority];
+          // @ts-ignore
+          const backgroundColor = event.priority
+            ? // @ts-ignore
+              TASK_COLOR[event.priority]
+            : "rgb(100, 116, 139)";
 
           // Define a function to truncate the task title based on the height
           const truncateTitle = (title: string, maxLength: number) => {
@@ -285,7 +311,11 @@ export default function Week({
           // TODO
           // Define the maximum title length based on the height
           const maxTitleLength =
-            height === "45px" ? 13 : height === "90px" ? 30 : task.title.length;
+            height === "45px"
+              ? 13
+              : height === "90px"
+                ? 30
+                : event.title.length;
 
           return (
             <div
@@ -302,16 +332,16 @@ export default function Week({
               onMouseLeave={() => setHoveredTask(null)}
             >
               <p className="z-30 p-1 text-[17px] text-white max-[1600px]:text-[12px]">
-                {truncateTitle(task.title, maxTitleLength)}
+                {truncateTitle(event.title, maxTitleLength)}
               </p>
             </div>
           );
         })}
       </div>
 
-      {weekTasks.map((task, index) => {
-        const rowIndex = task.rowStartIndex;
-        const columnIndex = task.columnIndex;
+      {events.map((event, index) => {
+        const rowIndex = event.rowStartIndex;
+        const columnIndex = event.columnIndex;
         const MOVE_FROM_TOP =
           rowIndex === 0
             ? 260
@@ -332,17 +362,21 @@ export default function Week({
               : columnIndex === 0
                 ? 50
                 : 120;
-        const height = 300;
+        const height = 150;
         // left according to the cell width
-        const left = `calc(10% + 12.9% * ${task.columnIndex} - ${MOVE_FROM_LEFT}px)`;
+        const left = `calc(10% + 12.9% * ${event.columnIndex} - ${MOVE_FROM_LEFT}px)`;
         const top = `${
-          45 * task.rowStartIndex + 45 - scrollPosition + MOVE_FROM_TOP - height
+          45 * event.rowStartIndex +
+          45 -
+          scrollPosition +
+          MOVE_FROM_TOP -
+          height
         }px`;
 
         return (
           <div
             className={cn(
-              "absolute w-[400px] rounded-md border border-slate-400 bg-white p-3 transition-all duration-300",
+              "absolute w-[300px] rounded-md border border-slate-400 bg-white p-3 transition-all duration-300",
             )}
             style={{
               left,
@@ -355,73 +389,41 @@ export default function Week({
             onMouseEnter={() => setHoveredTask(index)}
             onMouseLeave={() => setHoveredTask(null)}
           >
-            <p className="text-[19px] font-bold text-slate-600">{task.title}</p>
-            <hr />
+            {event.type === "appointment" ? (
+              <div>
+                <h3 className="font-semibold">{event.title}</h3>
 
-            <div className="mt-2 flex items-center justify-between">
-              <p className="flex items-center text-[17px] text-slate-600">
-                <HiCalendar />
-                {moment(task.date).format("MMM DD, YYYY")}
-              </p>
+                <p>
+                  Client:
+                  {/* @ts-ignore */}
+                  {event.customer &&
+                    // @ts-ignore
+                    event.customer.firstName + " " + event.customer.lastName}
+                </p>
 
-              <p className="flex items-center text-[17px] text-slate-600">
-                <HiClock />
-                {moment(task.startTime, "HH:mm").format("hh:mm A")}
-                <span className="mx-1">-</span>
-                <HiClock />
-                {moment(task.endTime, "HH:mm").format("hh:mm A")}
-              </p>
-            </div>
+                <p>
+                  Assigned To:{" "}
+                  {event.assignedUsers
+                    .slice(0, 1)
+                    .map((user: User) => user.name)}
+                </p>
 
-            {/* Options */}
-            <div className="flex justify-end text-[14px]">
-              <button
-                className="mt-2 flex items-center rounded-md bg-[#24a0ff] px-2 py-1 text-white"
-                onClick={() => {
-                  setHoveredTask(null);
-                  open("EDIT_TASK", { ...task, companyUsers });
-                }}
-              >
-                <MdModeEdit />
-                Edit
-              </button>
-              <button
-                className="ml-2 mt-2 flex items-center rounded-md bg-[#ff4d4f] px-2 py-1 text-white"
-                onClick={() => handleDelete(task.id)}
-              >
-                {loading ? (
-                  <ThreeDots color="#fff" height={10} width={30} />
-                ) : (
-                  <>
-                    <MdDelete />
-                    Delete
-                  </>
-                )}
-              </button>
-            </div>
+                <p>
+                  {moment(event.startTime, "HH:mm").format("hh:mm A")} To{" "}
+                  {moment(event.endTime, "HH:mm").format("hh:mm A")}
+                </p>
+              </div>
+            ) : (
+              <div>
+                <h3 className="font-semibold">{event.title}</h3>
 
-            {/* Show users */}
-            <div className="mt-3 h-[10rem] overflow-auto">
-              {task.assignedUsers.map((user) => {
-                return (
-                  <div
-                    className="mt-2 flex items-center bg-[#F8F9FA] px-1 py-3"
-                    key={user.id}
-                  >
-                    <Image
-                      src={user.image}
-                      alt="avatar"
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
-                    <p className="ml-2 text-[18px] font-bold text-slate-600">
-                      {user.name}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
+                {/* @ts-ignore */}
+                <p className="mt-3">{event.description}</p>
+
+                {/* @ts-ignore */}
+                <p className="mt-3">Task Priority: {event.priority}</p>
+              </div>
+            )}
           </div>
         );
       })}

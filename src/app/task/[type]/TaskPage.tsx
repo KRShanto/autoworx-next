@@ -56,6 +56,7 @@ export default function TaskPage({
         usersWithTasks={usersWithTasks}
         tasks={tasks}
         tags={tags}
+        appointments={appointments as any}
       />
       <Calendar
         type={type}

@@ -17,6 +17,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useDrop } from "react-dnd";
 import { addTask } from "../../add";
 import { TaskDetails } from "./TaskDetails";
+import { assignAppointmentDate } from "./assignAppointmentDate";
 
 function useMonth() {
   const searchParams = useSearchParams();
@@ -37,7 +38,7 @@ export default function Month({
 }) {
   const router = useRouter();
   const [{ canDrop, isOver }, dropRef] = useDrop({
-    accept: ["task", "tag"],
+    accept: ["task", "tag", "appointment"],
     drop: (item, monitor) => {
       // Update your state here
     },
@@ -131,7 +132,7 @@ export default function Month({
       const tag = event.dataTransfer.getData("text/plain").split("|")[1];
 
       await addTask({ tag, date, startTime, endTime });
-    } else {
+    } else if (type === "task") {
       // Get the id of the task from the dataTransfer object
       const taskId = parseInt(
         event.dataTransfer.getData("text/plain").split("|")[1],
@@ -144,6 +145,26 @@ export default function Month({
         // Add task to database
         await addTask({
           id: task.id,
+          date,
+          startTime,
+          endTime,
+        });
+      }
+    } else {
+      // Get the id of the appointment from the dataTransfer object
+      const appointmentId = parseInt(
+        event.dataTransfer.getData("text/plain").split("|")[1],
+      );
+
+      // Find the appointment in your state
+      const appointment = appointments.find(
+        (appointment) => appointment.id == appointmentId,
+      );
+
+      if (appointment) {
+        // Add appointment to database
+        await assignAppointmentDate({
+          id: appointment.id,
           date,
           startTime,
           endTime,
