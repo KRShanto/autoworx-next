@@ -15,6 +15,41 @@ export default async function Page({ params }: { params: { type: string } }) {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
 
+  const calendarAppointments = [];
+
+  // Get all appointments
+  const appointments = await db.appointment.findMany({
+    where: {
+      companyId,
+    },
+  });
+
+  for (const appointment of appointments) {
+    const appointmentUsers = await db.appointmentUser.findMany({
+      where: { appointmentId: appointment.id },
+    });
+
+    const users = await db.user.findMany({
+      where: {
+        id: {
+          in: appointmentUsers.map((appointmentUser) => appointmentUser.userId),
+        },
+      },
+    });
+
+    const customer = appointment.customerId
+      ? await db.customer.findUnique({
+          where: { id: appointment.customerId },
+        })
+      : null;
+
+    calendarAppointments.push({
+      ...appointment,
+      assignedUsers: users,
+      customer,
+    });
+  }
+
   // Tasks with assigned users
   // Here we will store both the task and the assigned users
   const taskWithAssignedUsers = [];
@@ -99,9 +134,6 @@ export default async function Page({ params }: { params: { type: string } }) {
     },
   });
 
-  // filter tags from invoices
-  // tags is ['tag1,tag2', 'tag2,tag4']
-
   const tags = invoices.map((invoice) => invoice.tags).flat();
   // split tags into array
   const tagsArray = tags.map((tag) => tag.split(",")).flat();
@@ -145,6 +177,7 @@ export default async function Page({ params }: { params: { type: string } }) {
           vehicles={vehicles}
           orders={orders}
           settings={settings}
+          appointments={calendarAppointments!}
         />
       </div>
     </>

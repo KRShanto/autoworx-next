@@ -10,7 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/Tooltip";
-import type { CalendarTask } from "@/types/db";
+import type { CalendarAppointment, CalendarTask } from "@/types/db";
 import type { Task, User } from "@prisma/client";
 import moment from "moment";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -28,10 +28,12 @@ export default function Month({
   tasks,
   companyUsers,
   tasksWithoutTime,
+  appointments,
 }: {
   tasks: CalendarTask[];
   companyUsers: User[];
   tasksWithoutTime: Task[];
+  appointments: CalendarAppointment[];
 }) {
   const router = useRouter();
   const [{ canDrop, isOver }, dropRef] = useDrop({
@@ -46,7 +48,7 @@ export default function Month({
   }) as [{ canDrop: boolean; isOver: boolean }, any];
 
   // Initialize an array to hold the dates
-  const dates: [Date, CalendarTask[] | undefined][] = [];
+  const dates: [Date, CalendarTask[], CalendarAppointment[]][] = [];
   // Define the total number of dates to be displayed
   const totalDates = 35;
   // Get the current date
@@ -63,15 +65,16 @@ export default function Month({
     // Create a new date object
     const date = new Date(month.getFullYear(), month.getMonth(), dateNumber);
     const tasks = getTasks(date);
+    const appointments = getAppointments(date);
     // Add the date to the dates array
-    dates.push([date, tasks]);
+    dates.push([date, tasks, appointments]);
   }
 
   // Reverse the dates array to get the dates in ascending order
   dates.reverse();
 
   // Add today's date to the dates array
-  dates.push([month, getTasks(month)]);
+  dates.push([month, getTasks(month), getAppointments(month)]);
 
   // Calculate the number of dates to be generated after today
   const rest = totalDates - todayIndex - 1;
@@ -83,18 +86,25 @@ export default function Month({
     // Create a new date object
     const date = new Date(month.getFullYear(), month.getMonth(), dateNumber);
     // Add the date to the dates array
-    dates.push([date, getTasks(date)]);
+    dates.push([date, getTasks(date), getAppointments(date)]);
   }
 
   function getTasks(date: Date) {
-    return tasks.filter((task) => {
-      // return new Date(task.date).getDate() === date.getDate();
-      return (
+    return tasks.filter(
+      (task) =>
         new Date(task.date).getFullYear() === date.getFullYear() &&
         new Date(task.date).getMonth() === date.getMonth() &&
-        new Date(task.date).getDate() === date.getDate()
-      );
-    });
+        new Date(task.date).getDate() === date.getDate(),
+    );
+  }
+
+  function getAppointments(date: Date) {
+    return appointments.filter(
+      (appointment) =>
+        new Date(appointment.date!).getFullYear() === date.getFullYear() &&
+        new Date(appointment.date!).getMonth() === date.getMonth() &&
+        new Date(appointment.date!).getDate() === date.getDate(),
+    );
   }
 
   const cells = [
@@ -147,73 +157,168 @@ export default function Month({
       className="mt-3 h-[90.8%] border-l border-t border-neutral-200"
       ref={dropRef}
     >
-      <div className="grid h-full grid-cols-7 grid-rows-[auto,repeat(6,1fr)]">
-        {cells.map((cell: any, i) => {
-          if (i < 7)
-            return (
-              <div
-                key={i}
-                className="flex items-center justify-center border-b border-r border-neutral-200 p-2  text-[17px] font-bold text-[#797979] max-[1300px]:text-[15px] max-[1150px]:text-[12px]"
-              >
-                {cell}
-              </div>
-            );
-
-          return (
-            <button
-              type="button"
-              key={i}
-              // TODO: fix height issue
-              className={cn(
-                "relative flex h-full flex-col items-end gap-2 border-b border-r border-neutral-200 p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
-                today.getFullYear() === cell[0].getFullYear() &&
-                  today.getMonth() === cell[0].getMonth() &&
-                  today.getDate() === cell[0].getDate()
-                  ? "text-[#6571FF]"
-                  : "text-[#797979]",
-              )}
-              onClick={(event) => {
-                if (
-                  event.target instanceof Node &&
-                  event.currentTarget.contains(event.target)
-                )
-                  router.push(
-                    `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`,
-                  );
-              }}
-              onDrop={(event) =>
-                handleDrop(event, moment(cell[0]).format("YYYY-MM-DD"))
-              }
-              onDragOver={(event) => event.preventDefault()}
-            >
-              {cell[0].getDate()}
-
-              <div className="absolute bottom-2 left-2 right-2 flex max-h-[calc(100%-3rem)] flex-col gap-1">
-                <TooltipProvider delayDuration={150}>
-                  {cell[1]?.slice(0, 3).map((task: CalendarTask, i: number) => (
-                    <Tooltip key={i}>
-                      <TooltipTrigger
-                        className="h-4 max-h-[33.33%] rounded"
-                        style={{
-                          backgroundColor: TASK_COLOR[task.priority],
-                        }}
-                      />
-                      <TooltipPortal>
-                        <TooltipContent>
-                          <TaskDetails
-                            task={task}
-                            companyUsers={companyUsers}
-                          />
-                        </TooltipContent>
-                      </TooltipPortal>
-                    </Tooltip>
-                  ))}
-                </TooltipProvider>
-              </div>
-            </button>
-          );
-        })}
+      <div className="flex w-full">
+        {/* cells 0-6 */}
+        {cells.slice(0, 7).map((cell, i) => (
+          <div
+            key={i}
+            className="flex w-full items-center justify-center border-b border-r border-neutral-200 p-2  text-[17px] font-bold text-[#797979] max-[1300px]:text-[15px] max-[1150px]:text-[12px]"
+          >
+            {cell.toLocaleString()}
+          </div>
+        ))}
       </div>
+
+      <TooltipProvider delayDuration={150}>
+        <div className="grid h-[93%] grid-cols-7 grid-rows-5">
+          {/* cells 7-41 */}
+          {cells.slice(7).map((cell: any, i) => (
+            <Tooltip key={i}>
+              <TooltipTrigger
+                type="button"
+                className={cn(
+                  "relative flex h-full flex-col items-end gap-2 border-b border-r border-neutral-200 p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
+                  today.getFullYear() === cell[0].getFullYear() &&
+                    today.getMonth() === cell[0].getMonth() &&
+                    today.getDate() === cell[0].getDate()
+                    ? "text-[#6571FF]"
+                    : "text-[#797979]",
+                )}
+                onClick={(event) => {
+                  if (
+                    event.target instanceof Node &&
+                    event.currentTarget.contains(event.target)
+                  )
+                    router.push(
+                      `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`,
+                    );
+                }}
+                onDrop={(event) =>
+                  handleDrop(event, moment(cell[0]).format("YYYY-MM-DD"))
+                }
+                onDragOver={(event) => event.preventDefault()}
+              >
+                {cell[0].getDate()}
+
+                <div className="absolute bottom-2 left-2 right-2 flex max-h-[calc(100%-3rem)] flex-col gap-1">
+                  <TooltipProvider delayDuration={150}>
+                    {cell[2]
+                      .slice(0, 1)
+                      .map((appointment: CalendarAppointment, i: number) => (
+                        <Tooltip key={i}>
+                          <TooltipTrigger className="h-10 max-h-10 rounded border text-sm text-slate-500">
+                            {appointment.title}
+                          </TooltipTrigger>
+
+                          <TooltipPortal>
+                            <TooltipContent>
+                              <div className="w-[300px] rounded-lg bg-white p-3">
+                                <h3 className="font-semibold">
+                                  {appointment.title}
+                                </h3>
+
+                                <p>
+                                  Client: {appointment.customer?.firstName}{" "}
+                                  {appointment.customer?.lastName}
+                                </p>
+
+                                <p>
+                                  Assigned To:{" "}
+                                  {appointment.assignedUsers
+                                    .slice(0, 1)
+                                    .map((user: User) => user.name)}
+                                </p>
+
+                                <p>
+                                  <p>
+                                    {moment(
+                                      appointment.startTime,
+                                      "HH:mm",
+                                    ).format("hh:mm A")}{" "}
+                                    To{" "}
+                                    {moment(
+                                      appointment.endTime,
+                                      "HH:mm",
+                                    ).format("hh:mm A")}
+                                  </p>
+                                </p>
+                              </div>
+                            </TooltipContent>
+                          </TooltipPortal>
+                        </Tooltip>
+                      ))}
+                  </TooltipProvider>
+                  <TooltipProvider delayDuration={150}>
+                    {cell[1]
+                      ?.slice(0, 3)
+                      .map((task: CalendarTask, i: number) => (
+                        <Tooltip key={i}>
+                          <TooltipTrigger
+                            className="h-2 max-h-[33.33%] rounded"
+                            style={{
+                              backgroundColor: TASK_COLOR[task.priority],
+                            }}
+                          />
+                          <TooltipPortal>
+                            <TooltipContent>
+                              <div className="w-[300px] rounded-lg bg-white p-3">
+                                <h3 className="font-semibold">{task.title}</h3>
+
+                                <p className="mt-3">{task.description}</p>
+
+                                <p className="mt-3">
+                                  Task Priority: {task.priority}
+                                </p>
+                              </div>
+                            </TooltipContent>
+                          </TooltipPortal>
+                        </Tooltip>
+                      ))}
+                  </TooltipProvider>
+                </div>
+              </TooltipTrigger>
+
+              <TooltipPortal>
+                {/* check if either tasks or appointments are present */}
+                {(cell[1]?.length || cell[2]?.length) && (
+                  <TooltipContent>
+                    <div className="w-[350px]">
+                      <h3 className="text-lg font-bold">Tasks</h3>
+                      <div className="flex flex-col gap-1">
+                        {cell[1]?.map((task: CalendarTask, i: number) => (
+                          <div
+                            key={i}
+                            className="flex items-center gap-2 rounded p-2 text-white"
+                            style={{
+                              backgroundColor: TASK_COLOR[task.priority],
+                            }}
+                          >
+                            <p>{task.title}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <h3 className="mt-3 text-lg font-bold">Appointments</h3>
+                      <div className="flex flex-col gap-1">
+                        {cell[2]?.map(
+                          (appointment: CalendarAppointment, i: number) => (
+                            <div
+                              key={i}
+                              className="flex items-center gap-2 rounded bg-gray-600 p-2 text-white"
+                            >
+                              <p>{appointment.title}</p>
+                            </div>
+                          ),
+                        )}
+                      </div>
+                    </div>
+                  </TooltipContent>
+                )}
+              </TooltipPortal>
+            </Tooltip>
+          ))}
+        </div>
+      </TooltipProvider>
     </div>
   );
 }

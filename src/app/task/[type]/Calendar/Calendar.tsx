@@ -2,6 +2,7 @@ import { CalendarType } from "@/types/calendar";
 import Body from "./Body";
 import Heading from "./Heading";
 import {
+  Appointment,
   CalendarSettings,
   Customer,
   Order,
@@ -9,7 +10,7 @@ import {
   User,
   Vehicle,
 } from "@prisma/client";
-import { CalendarTask } from "@/types/db";
+import { CalendarAppointment, CalendarTask } from "@/types/db";
 import { Suspense } from "react";
 
 export default function Calender({
@@ -21,6 +22,7 @@ export default function Calender({
   vehicles,
   orders,
   settings,
+  appointments,
 }: {
   type: CalendarType;
   tasks: CalendarTask[];
@@ -30,6 +32,7 @@ export default function Calender({
   vehicles: Vehicle[];
   orders: Order[];
   settings: CalendarSettings;
+  appointments: CalendarAppointment[];
 }) {
   console.log("Task from calendar: ", tasks);
   return (
@@ -48,6 +51,7 @@ export default function Calender({
           tasks={tasks}
           companyUsers={companyUsers}
           tasksWithoutTime={tasksWithoutTime}
+          appointments={appointments}
         />
       </Suspense>
     </div>
