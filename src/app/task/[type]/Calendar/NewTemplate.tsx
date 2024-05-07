@@ -11,7 +11,7 @@ import {
 } from "@/components/Dialog";
 import { SlimInput, slimInputClassName } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // import { addTemplate } from "./addTemplate";
 import FormError from "@/components/FormError";
 import { useFormErrorStore } from "@/stores/form-error";
@@ -20,15 +20,40 @@ import { useEmailTemplateStore } from "@/stores/email-template";
 import { addTemplate } from "./addTemplate";
 import { EmailTemplateType } from "@prisma/client";
 
-export default function NewTemplate({ type }: { type: EmailTemplateType }) {
+export default function NewTemplate({
+  type,
+  clientName,
+  vehicleModel,
+}: {
+  type: EmailTemplateType;
+  clientName: string;
+  vehicleModel: string;
+}) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
   const { templates, setTemplates } = useEmailTemplateStore();
+  const [subject, setSubject] = useState(
+    "Appointment Confirmation at TC CUSTOMS ATLANTA",
+  );
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    setMessage(
+      `Hi ${clientName},
+    
+This is a friendly reminder that you have an upcoming appointment on Wednesday, May 8 at 12:30 PM EDT.
+  
+Location
+TC CUSTOMS ATLANTA
+6350 MCDONOUGH DRIVE NORTHWEST
+NORCROSS GA 30093
+  
+Vehicle
+${vehicleModel}`,
+    );
+  }, [clientName, vehicleModel]);
 
   async function handleSubmit(data: FormData) {
-    const subject = data.get("subject") as string;
-    const message = data.get("message") as string;
-
     const res = (await addTemplate({ subject, message, type })) as any;
 
     if (res.error) {
@@ -61,14 +86,21 @@ export default function NewTemplate({ type }: { type: EmailTemplateType }) {
         <div className="space-y-4 overflow-y-auto">
           <FormError />
           <input type="hidden" name="type" value={type} />
-          <SlimInput name="subject" />
+          <SlimInput
+            name="subject"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            required
+          />
+          Subject
           <label className="block">
             <div className="mb-1 px-2 font-medium">Message</div>
             <textarea
               name="message"
               rows={10}
               className={slimInputClassName}
-              required
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
             />
           </label>
         </div>

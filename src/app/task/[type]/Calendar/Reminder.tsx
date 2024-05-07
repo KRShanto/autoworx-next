@@ -1,5 +1,5 @@
 import { Switch } from "@/components/Switch";
-import type { Customer } from "@prisma/client";
+import type { Customer, Vehicle } from "@prisma/client";
 import { useState, type Key } from "react";
 import { TbUserX } from "react-icons/tb";
 import NewTemplate from "./NewTemplate";
@@ -8,9 +8,11 @@ import { useEmailTemplateStore } from "@/stores/email-template";
 import { EmailTemplate } from "@/types/email-template";
 import { FaTimes } from "react-icons/fa";
 import moment from "moment";
+import { deleteTemplate } from "./deleteTemplate";
 
 export function Reminder({
   client,
+  vehicle,
   endTime,
   date,
   times,
@@ -25,12 +27,13 @@ export function Reminder({
   setReminderTemplateStatus,
 }: {
   client: Customer | null;
+  vehicle: Vehicle | null;
   endTime: string;
   date: string;
   times: { time: string; date: string }[];
   setTimes: (times: { time: string; date: string }[]) => void;
   confirmationTemplate: EmailTemplate | null;
-  setConfirmationTemplate: (template: EmailTemplate) => void;
+  setConfirmationTemplate: (template: EmailTemplate | null) => void;
   reminderTemplate: EmailTemplate | null;
   setReminderTemplate: (template: EmailTemplate | null) => void;
   confirmationTemplateStatus: boolean;
@@ -41,7 +44,22 @@ export function Reminder({
   const [time, setTime] = useState<string>("");
   const [dateInput, setDateInput] = useState<string>("");
 
-  const { templates } = useEmailTemplateStore();
+  const { templates, setTemplates } = useEmailTemplateStore();
+
+  async function handleDelete({ id, type }: { id: number; type: string }) {
+    await deleteTemplate(id);
+
+    if (type === "Confirmation") {
+      // remove this template from the array
+      setConfirmationTemplate(null);
+    } else {
+      // remove this template from the array
+      setReminderTemplate(null);
+    }
+
+    // remove this template from the array
+    setTemplates(templates.filter((template) => template.id !== id));
+  }
 
   return client === null ? (
     <div className="grid h-full place-content-center place-items-center gap-2 border-[1.5rem] border-solid border-white bg-neutral-300 text-center text-slate-500">
@@ -64,7 +82,13 @@ export function Reminder({
           label={
             confirmationTemplate ? confirmationTemplate.subject : "Template"
           }
-          newButton={<NewTemplate type="Confirmation" />}
+          newButton={
+            <NewTemplate
+              type="Confirmation"
+              clientName={client.firstName + " " + client.lastName}
+              vehicleModel={vehicle?.model!}
+            />
+          }
         >
           <div>
             {templates
@@ -83,7 +107,12 @@ export function Reminder({
                     <button type="button" className="text-[#6571FF]">
                       Edit
                     </button>
-                    <button type="button">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleDelete({ id: template.id, type: "Confirmation" })
+                      }
+                    >
                       <FaTimes />
                     </button>
                   </div>
@@ -104,7 +133,13 @@ export function Reminder({
         </label>
         <Selector
           label={reminderTemplate ? reminderTemplate.subject : "Template"}
-          newButton={<NewTemplate type="Reminder" />}
+          newButton={
+            <NewTemplate
+              type="Reminder"
+              clientName={client.firstName + " " + client.lastName}
+              vehicleModel={vehicle?.model!}
+            />
+          }
         >
           <div className="">
             {templates
@@ -122,7 +157,12 @@ export function Reminder({
                     <button type="button" className="text-[#6571FF]">
                       Edit
                     </button>
-                    <button type="button">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleDelete({ id: template.id, type: "Reminder" })
+                      }
+                    >
                       <FaTimes />
                     </button>
                   </div>
