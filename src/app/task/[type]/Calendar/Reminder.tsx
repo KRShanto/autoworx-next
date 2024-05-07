@@ -9,6 +9,7 @@ import { EmailTemplate } from "@/types/email-template";
 import { FaTimes } from "react-icons/fa";
 import moment from "moment";
 import { deleteTemplate } from "./deleteTemplate";
+import UpdateTemplate from "./UpdateTemplateComponent";
 
 export function Reminder({
   client,
@@ -104,9 +105,11 @@ export function Reminder({
                 >
                   <p className="text-sm font-bold">{template.subject}</p>
                   <div className="flex items-center gap-2">
-                    <button type="button" className="text-[#6571FF]">
-                      Edit
-                    </button>
+                    <UpdateTemplate
+                      id={template.id}
+                      subject={template.subject}
+                      message={template.message}
+                    />
                     <button
                       type="button"
                       onClick={() =>
@@ -154,9 +157,11 @@ export function Reminder({
                   <p className="text-sm font-bold">{template.subject}</p>
 
                   <div className="flex items-center gap-2">
-                    <button type="button" className="text-[#6571FF]">
-                      Edit
-                    </button>
+                    <UpdateTemplate
+                      id={template.id}
+                      subject={template.subject}
+                      message={template.message}
+                    />
                     <button
                       type="button"
                       onClick={() =>
