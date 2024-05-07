@@ -18,6 +18,7 @@ import { useMediaQuery } from "react-responsive";
 import { addTask } from "../../add";
 import { deleteTask } from "../../delete";
 import { assignAppointmentDate } from "./assignAppointmentDate";
+import { dragTask } from "./dragTask";
 
 const rows = [
   "All Day",
@@ -151,7 +152,7 @@ export default function Day({
 
       if (task) {
         // Add task to database
-        await addTask({
+        await dragTask({
           id: task.id,
           date,
           startTime,

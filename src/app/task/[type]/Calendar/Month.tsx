@@ -18,6 +18,7 @@ import { useDrop } from "react-dnd";
 import { addTask } from "../../add";
 import { TaskDetails } from "./TaskDetails";
 import { assignAppointmentDate } from "./assignAppointmentDate";
+import { dragTask } from "./dragTask";
 
 function useMonth() {
   const searchParams = useSearchParams();
@@ -143,7 +144,7 @@ export default function Month({
 
       if (task) {
         // Add task to database
-        await addTask({
+        await dragTask({
           id: task.id,
           date,
           startTime,

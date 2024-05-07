@@ -32,7 +32,6 @@ interface TagTask {
 export async function addTask(task: TaskToAdd | TaskToUpdate | TagTask) {
   const session = (await auth()) as AuthSession;
 
-  // TODO: skipped this part
   // if ("tag" in task) {
   //   // Find the invoices
   //   const invoices = await db.invoice.findMany({

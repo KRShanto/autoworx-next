@@ -16,6 +16,7 @@ import { ThreeDots } from "react-loader-spinner";
 import { addTask } from "../../add";
 import { deleteTask } from "../../delete";
 import { assignAppointmentDate } from "./assignAppointmentDate";
+import { dragTask } from "./dragTask";
 
 function useWeek() {
   const searchParams = useSearchParams();
@@ -186,7 +187,7 @@ export default function Week({
 
       if (task) {
         // Add task to database
-        await addTask({
+        await dragTask({
           id: task.id,
           date,
           startTime,
