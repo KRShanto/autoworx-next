@@ -39,7 +39,7 @@ export default function NewTemplate({
 
   useEffect(() => {
     setMessage(
-      `Hi ${clientName},
+      `Hi <CLIENT>,
     
 This is a friendly reminder that you have an upcoming appointment on Wednesday, May 8 at 12:30 PM EDT.
   
@@ -49,7 +49,7 @@ TC CUSTOMS ATLANTA
 NORCROSS GA 30093
   
 Vehicle
-${vehicleModel}`,
+<VEHICLE>`,
     );
   }, [clientName, vehicleModel]);
 

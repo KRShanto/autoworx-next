@@ -2,6 +2,7 @@
 
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
+import { sendEmail } from "@/lib/email";
 import { AuthSession } from "@/types/auth";
 import { Appointment } from "@prisma/client";
 import { revalidatePath } from "next/cache";
@@ -69,4 +70,58 @@ export async function addAppointment(appointment: AppointmentToAdd) {
   }
 
   revalidatePath("/task");
+
+  const vehicle = await db.vehicle.findFirst({
+    where: {
+      id: appointment.vehicleId,
+    },
+  });
+
+  const customer = await db.customer.findFirst({
+    where: {
+      id: appointment.customerId,
+    },
+  });
+
+  // get the confirmation email template
+  const confirmationEmailTemplate = await db.emailTemplate.findUnique({
+    where: {
+      id: appointment.confirmationEmailTemplateId,
+    },
+  });
+
+  let confirmationSubject = confirmationEmailTemplate?.subject || "";
+  let confirmationMessage = confirmationEmailTemplate?.message || "";
+
+  // replace the placeholders: <VEHICLE>, <CLIENT>
+  confirmationSubject = confirmationSubject?.replace(
+    "<VEHICLE>",
+    vehicle ? vehicle.model! : "",
+  );
+  confirmationSubject = confirmationSubject?.replace(
+    "<CLIENT>",
+    customer ? customer.firstName + " " + customer.lastName : "",
+  );
+
+  confirmationMessage = confirmationMessage?.replace(
+    "<VEHICLE>",
+    vehicle ? vehicle.model! : "",
+  );
+  confirmationMessage = confirmationMessage?.replace(
+    "<CLIENT>",
+    customer ? customer.firstName + " " + customer.lastName : "",
+  );
+
+  // send the confirmation email
+  if (appointment.confirmationEmailTemplateStatus) {
+    // send email
+    if (customer) {
+      sendEmail({
+        from: "Autoworx",
+        to: customer.email || "",
+        subject: confirmationSubject,
+        text: confirmationMessage,
+      });
+    }
+  }
 }
