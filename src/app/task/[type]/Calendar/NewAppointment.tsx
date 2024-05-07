@@ -228,7 +228,7 @@ export function NewAppointment({
                 label="Time"
                 rootClassName="grow"
                 type="date"
-                value={date}
+                value={date ?? ""}
                 required={false}
                 onChange={(event) => setDate(event.currentTarget.value)}
               />
