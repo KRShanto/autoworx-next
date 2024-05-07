@@ -18,7 +18,7 @@
 - [x] Edit feature for Tasks
 - [ ] Google Calendar API integration
 - [ ] Instead of using popups, use modals for task creation and other actions
-- [ ] Implement new UI in **Month** view
+- [x] Implement new UI in **Month** view
 - [x] Implement new UI in **Tasks** view
 - [x] Drag and Drop from **Tasks** to **Calendar**
 - [ ] Drag and Drop from **Tasks** to **Tasks**
