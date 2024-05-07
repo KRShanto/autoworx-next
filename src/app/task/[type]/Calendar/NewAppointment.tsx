@@ -469,6 +469,7 @@ export function NewAppointment({
             ) : tab === Tab.Reminder ? (
               <Reminder
                 client={client}
+                // @ts-ignore
                 vehicle={vehicle}
                 endTime={endTime!}
                 date={date!}
