@@ -144,8 +144,8 @@ export function NewAppointment({
       vehicleId: vehicle ? vehicle.id : undefined,
       orderId: order ? order.id : undefined,
       notes,
-      confirmationEmailTemplateId: confirmationTemplate!.id,
-      reminderEmailTemplateId: reminderTemplate!.id,
+      confirmationEmailTemplateId: confirmationTemplate?.id,
+      reminderEmailTemplateId: reminderTemplate?.id,
       confirmationEmailTemplateStatus: confirmationTemplateStatus,
       reminderEmailTemplateStatus: reminderTemplateStatus,
       times,
@@ -469,6 +469,7 @@ export function NewAppointment({
             ) : tab === Tab.Reminder ? (
               <Reminder
                 client={client}
+                vehicle={vehicle}
                 endTime={endTime!}
                 date={date!}
                 times={times}
