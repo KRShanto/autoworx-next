@@ -1,33 +1,29 @@
 "use client";
 
-import Input from "@/components/Input";
-import { Priority, Task, User } from "@prisma/client";
-import { useState } from "react";
 import {
   Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
   DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
 } from "@/components/Dialog";
 import Submit from "@/components/Submit";
-import { FaCheck, FaPen, FaPlus } from "react-icons/fa6";
+import { usePopupStore } from "@/stores/popup";
+import type { CalendarTask } from "@/types/db";
+import type { Priority, User } from "@prisma/client";
 import Image from "next/image";
-import { CalendarTask, TaskType } from "@/types/db";
-import { FaChevronUp, FaChevronDown } from "react-icons/fa";
-import { createTask } from "./createTask";
+import { useState } from "react";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa6";
 import { editTask } from "./editTask";
 
-export default function UpdateTask({
-  companyUsers,
-  task,
-}: {
-  companyUsers: User[];
-  task: CalendarTask;
-}) {
-  const [open, setOpen] = useState(false);
+export default function UpdateTask() {
+  const {popup, data, close } = usePopupStore();
+  const { companyUsers, task } = data as {
+    companyUsers: User[];
+    task: CalendarTask;
+  };
   const [showUsers, setShowUsers] = useState(false);
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description);
@@ -47,16 +43,11 @@ export default function UpdateTask({
       },
     });
 
-    setOpen(false);
+    close();
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        <button className="text- rounded-full bg-[#6571FF] p-2 text-white">
-          <FaPen className="mx-auto text-[10px]" />
-        </button>
-      </DialogTrigger>
+    <Dialog open={popup === "UPDATE_TASK"} onOpenChange={close}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Update Task</DialogTitle>
@@ -178,10 +169,8 @@ export default function UpdateTask({
           </div>
 
           <DialogFooter>
-            <DialogClose asChild>
-              <button type="button" className="rounded-md border px-4 py-1">
-                Cancel
-              </button>
+            <DialogClose className="rounded-md border px-4 py-1">
+              Cancel
             </DialogClose>
             <Submit
               className="rounded-md border bg-[#6571FF] px-4 py-1 text-white"

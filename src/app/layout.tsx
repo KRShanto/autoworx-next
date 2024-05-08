@@ -4,6 +4,7 @@ import "./globals.css";
 import Layout from "@/components/Layout";
 import TopLoader from "../components/TopLoader";
 import { auth } from "./auth";
+import { TooltipProvider } from "@/components/Tooltip";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,7 +26,9 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <TopLoader />
-        <Layout session={session}>{children}</Layout>
+        <TooltipProvider delayDuration={150}>
+          <Layout session={session}>{children}</Layout>
+        </TooltipProvider>
       </body>
     </html>
   );
