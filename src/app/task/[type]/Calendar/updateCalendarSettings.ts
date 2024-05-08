@@ -9,7 +9,8 @@ export async function updateCalendarSettings(data: {
   weekStart: string;
   dayStart: string;
   dayEnd: string;
-  // TODO: show weekends
+  weekend1: string;
+  weekend2: string;
 }) {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
@@ -23,13 +24,16 @@ export async function updateCalendarSettings(data: {
       weekStart: data.weekStart,
       dayStart: data.dayStart,
       dayEnd: data.dayEnd,
+      weekend1: data.weekend1,
+      weekend2: data.weekend2,
     },
     create: {
       companyId,
       weekStart: data.weekStart,
       dayStart: data.dayStart,
       dayEnd: data.dayEnd,
-      weekends: ["Saturday", "Sunday"],
+      weekend1: data.weekend1,
+      weekend2: data.weekend2,
     },
   });
 

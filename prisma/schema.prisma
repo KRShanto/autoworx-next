@@ -310,7 +310,8 @@ model CalendarSettings {
   weekStart String
   dayStart  String
   dayEnd    String
-  weekends  Json
+  weekend1  String   @default("Saturday")
+  weekend2  String   @default("Sunday")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)

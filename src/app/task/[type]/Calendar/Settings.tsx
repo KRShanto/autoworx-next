@@ -13,6 +13,16 @@ import { CalendarSettings } from "@prisma/client";
 import { GoGear } from "react-icons/go";
 import Submit from "@/components/Submit";
 
+const week = [
+  "Saturday",
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+];
+
 export default function Settings({
   settings,
 }: {
@@ -24,11 +34,15 @@ export default function Settings({
     const weekStart = data.get("week-start") as string;
     const dayStart = data.get("day-start") as string;
     const dayEnd = data.get("day-end") as string;
+    const weekend1 = data.get("weekend-1") as string;
+    const weekend2 = data.get("weekend-2") as string;
 
     await updateCalendarSettings({
       weekStart,
       dayStart,
       dayEnd,
+      weekend1,
+      weekend2,
     });
 
     setOpen(false);
@@ -101,11 +115,35 @@ export default function Settings({
             <div>
               <p className="font-medium">Show Weekends</p>
               <div className="flex gap-5">
-                <div className="w-full rounded-md border border-[#6571FF] bg-[#DDE0FF] p-1 text-center text-[#6571FF]">
-                  Saturday
+                <div className="w-full">
+                  <select
+                    id="weekend-1"
+                    name="weekend-1"
+                    className="w-full rounded-md border border-[#6571FF] bg-[#DDE0FF] p-1 text-center text-[#6571FF] focus:border-[#6571FF] focus:bg-white focus:text-black"
+                    defaultValue={settings && settings.weekend1}
+                  >
+                    {week.map((day) => (
+                      <option key={day} value={day}>
+                        {day}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <div className="w-full rounded-md border border-[#6571FF] bg-[#DDE0FF] p-1 text-center text-[#6571FF]">
-                  Sunday
+
+                <div className="w-full ">
+                  <select
+                    id="weekend-2"
+                    name="weekend-2"
+                    className="w-full rounded-md border border-[#6571FF] bg-[#DDE0FF] p-1 text-center text-[#6571FF] focus:border-[#6571FF] focus:bg-white focus:text-black"
+                    defaultValue={settings && settings.weekend2}
+                  >
+                    {/* start from 2nd element */}
+                    {week.slice(1).map((day) => (
+                      <option key={day} value={day}>
+                        {day}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
