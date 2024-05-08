@@ -419,7 +419,11 @@ export default function Week({
               <div>
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold">{event.title}</h3>
-                  <UpdateTask task={event} companyUsers={companyUsers} />
+                  <UpdateTask
+                    // @ts-ignore
+                    task={event}
+                    companyUsers={companyUsers}
+                  />
                 </div>
 
                 {/* @ts-ignore */}
