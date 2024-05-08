@@ -2,8 +2,16 @@ import Day from "./Day";
 import Week from "./Week";
 import Month from "./Month";
 import { CalendarType } from "@/types/calendar";
-import { Appointment, Task, User } from "@prisma/client";
-import { CalendarAppointment, CalendarTask } from "@/types/db";
+import {
+  Appointment,
+  CalendarSettings,
+  Customer,
+  Order,
+  Task,
+  User,
+  Vehicle,
+} from "@prisma/client";
+import { AppointmentFull, CalendarAppointment, CalendarTask } from "@/types/db";
 import { EmailTemplate } from "@/types/email-template";
 
 export default function Body({
@@ -12,20 +20,38 @@ export default function Body({
   companyUsers,
   tasksWithoutTime,
   appointments,
+  appointmentsFull,
+  customers,
+  vehicles,
+  orders,
+  settings,
+  templates,
 }: {
   type: CalendarType;
   tasks: CalendarTask[];
   companyUsers: User[];
   tasksWithoutTime: Task[];
   appointments: CalendarAppointment[];
+  appointmentsFull: AppointmentFull[];
+  customers: Customer[];
+  vehicles: Vehicle[];
+  orders: Order[];
+  settings: CalendarSettings;
+  templates: EmailTemplate[];
 }) {
   if (type === "day")
     return (
       <Day
         tasks={tasks}
         companyUsers={companyUsers}
+        vehicles={vehicles}
+        orders={orders}
+        settings={settings}
+        templates={templates}
+        customers={customers}
         tasksWithoutTime={tasksWithoutTime}
         appointments={appointments as any}
+        appointmentsFull={appointmentsFull}
       />
     );
   if (type === "week")
@@ -35,6 +61,7 @@ export default function Body({
         companyUsers={companyUsers}
         tasksWithoutTime={tasksWithoutTime}
         appointments={appointments as any}
+        appointmentsFull={appointmentsFull}
       />
     );
   if (type === "month")
@@ -44,6 +71,7 @@ export default function Body({
         companyUsers={companyUsers}
         tasksWithoutTime={tasksWithoutTime}
         appointments={appointments}
+        appointmentsFull={appointmentsFull}
       />
     );
 }

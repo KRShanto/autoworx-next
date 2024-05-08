@@ -6,6 +6,7 @@ import { AuthSession } from "@/types/auth";
 import { auth } from "@/app/auth";
 import { CalendarType } from "@/types/calendar";
 import TaskPage from "./TaskPage";
+import { AppointmentFull } from "@/types/db";
 
 export const metadata: Metadata = {
   title: "Task and Activity Management",
@@ -167,6 +168,80 @@ export default async function Page({ params }: { params: { type: string } }) {
     },
   });
 
+  let appointmentsFull: AppointmentFull[] = [];
+
+  for (const appointment of appointments) {
+    const customer = appointment.customerId
+      ? await db.customer.findUnique({
+          where: { id: appointment.customerId },
+        })
+      : null;
+
+    const vehicle = appointment.vehicleId
+      ? await db.vehicle.findUnique({
+          where: { id: appointment.vehicleId },
+        })
+      : null;
+
+    const order = appointment.orderId
+      ? await db.order.findUnique({
+          where: { id: appointment.orderId },
+        })
+      : null;
+
+    // const confirmationEmailTemplate = await db.emailTemplate.findFirst({
+    //   where: {
+    //     id: appointment.confirmationEmailTemplateId || undefined,
+    //   },
+    // });
+
+    const confirmationEmailTemplate = appointment.confirmationEmailTemplateId
+      ? await db.emailTemplate.findUnique({
+          where: { id: appointment.confirmationEmailTemplateId },
+        })
+      : null;
+
+    // const reminderEmailTemplate = await db.emailTemplate.findFirst({
+    //   where: {
+    //     id: appointment.reminderEmailTemplateId || undefined,
+    //   },
+    // });
+
+    const reminderEmailTemplate = appointment.reminderEmailTemplateId
+      ? await db.emailTemplate.findUnique({
+          where: { id: appointment.reminderEmailTemplateId },
+        })
+      : null;
+
+    console.log(
+      "Reminder Email Template: ",
+      appointment.reminderEmailTemplateId,
+    );
+
+    const appointmentUsers = await db.appointmentUser.findMany({
+      where: { appointmentId: appointment.id },
+    });
+
+    const assignedUsers = await db.user.findMany({
+      where: {
+        id: {
+          in: appointmentUsers.map((appointmentUser) => appointmentUser.userId),
+        },
+      },
+    });
+
+    appointmentsFull.push({
+      ...appointment,
+      times: appointment.times as string[],
+      customer,
+      vehicle,
+      order,
+      confirmationEmailTemplate,
+      reminderEmailTemplate,
+      assignedUsers,
+    });
+  }
+
   return (
     <>
       <Title>Task and Activity Management</Title>
@@ -185,6 +260,7 @@ export default async function Page({ params }: { params: { type: string } }) {
           settings={settings}
           appointments={calendarAppointments!}
           templates={emailTemplates as any}
+          appointmentsFull={appointmentsFull}
         />
       </div>
     </>

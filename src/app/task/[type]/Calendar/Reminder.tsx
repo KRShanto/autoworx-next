@@ -5,7 +5,7 @@ import { TbUserX } from "react-icons/tb";
 import NewTemplate from "./NewTemplate";
 import Selector from "./Selector";
 import { useEmailTemplateStore } from "@/stores/email-template";
-import { EmailTemplate } from "@/types/email-template";
+import { EmailTemplate } from "@prisma/client";
 import { FaTimes } from "react-icons/fa";
 import moment from "moment";
 import { deleteTemplate } from "./deleteTemplate";
@@ -108,7 +108,7 @@ export function Reminder({
                     <UpdateTemplate
                       id={template.id}
                       subject={template.subject}
-                      message={template.message}
+                      message={template.message || ""}
                     />
                     <button
                       type="button"
@@ -160,7 +160,7 @@ export function Reminder({
                     <UpdateTemplate
                       id={template.id}
                       subject={template.subject}
-                      message={template.message}
+                      message={template.message || ""}
                     />
                     <button
                       type="button"

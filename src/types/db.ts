@@ -1,6 +1,13 @@
 // NOTE: these properties are optional for prisma's select statement. But they aren't optional in the db.
 
-import { User, Priority, Customer } from "@prisma/client";
+import {
+  User,
+  Priority,
+  Customer,
+  Vehicle,
+  Order,
+  EmailTemplate,
+} from "@prisma/client";
 
 export interface UserType {
   id?: string;
@@ -116,4 +123,22 @@ export interface CalendarAppointment {
   customer: Customer | null;
   companyId: number;
   assignedUsers: User[];
+}
+
+export interface AppointmentFull {
+  id: number;
+  title: string;
+  date: Date | null;
+  startTime: string | null;
+  endTime: string | null;
+  customer: Customer | null;
+  vehicle: Vehicle | null;
+  order: Order | null;
+  notes: string | null;
+  confirmationEmailTemplate: EmailTemplate | null;
+  reminderEmailTemplate: EmailTemplate | null;
+  confirmationEmailTemplateStatus: boolean;
+  reminderEmailTemplateStatus: boolean;
+  assignedUsers: User[];
+  times: string[];
 }

@@ -366,9 +366,9 @@ model Appointment {
   orderId     Int?     @map("order_id")
   notes       String?
   confirmationEmailTemplateId Int? @map("confirmation_email_template_id")
-  confirmationEmailTemplateStatus Boolean? @map("confirmation_email_template_status") @default(false)
+  confirmationEmailTemplateStatus Boolean @map("confirmation_email_template_status") @default(false)
   reminderEmailTemplateId     Int? @map("reminder_email_template_id")
-  reminderEmailTemplateStatus Boolean? @map("reminder_email_template_status") @default(false)
+  reminderEmailTemplateStatus Boolean @map("reminder_email_template_status") @default(false)
   times       Json? // { time: string; date: string }
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")

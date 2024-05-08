@@ -14,4 +14,5 @@ export type PopupType =
   | "EDIT_SERVICE"
   | "ADD_PAYMENT"
   | "UPDATE_TASK"
+  | "UPDATE_APPOINTMENT"
   | null;
