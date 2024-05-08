@@ -84,44 +84,46 @@ export async function addAppointment(appointment: AppointmentToAdd) {
   });
 
   // get the confirmation email template
-  const confirmationEmailTemplate = await db.emailTemplate.findUnique({
+  const confirmationEmailTemplate = await db.emailTemplate.findFirst({
     where: {
       id: appointment.confirmationEmailTemplateId,
     },
   });
 
-  let confirmationSubject = confirmationEmailTemplate?.subject || "";
-  let confirmationMessage = confirmationEmailTemplate?.message || "";
+  if (confirmationEmailTemplate) {
+    let confirmationSubject = confirmationEmailTemplate?.subject || "";
+    let confirmationMessage = confirmationEmailTemplate?.message || "";
 
-  // replace the placeholders: <VEHICLE>, <CLIENT>
-  confirmationSubject = confirmationSubject?.replace(
-    "<VEHICLE>",
-    vehicle ? vehicle.model! : "",
-  );
-  confirmationSubject = confirmationSubject?.replace(
-    "<CLIENT>",
-    customer ? customer.firstName + " " + customer.lastName : "",
-  );
+    // replace the placeholders: <VEHICLE>, <CLIENT>
+    confirmationSubject = confirmationSubject?.replace(
+      "<VEHICLE>",
+      vehicle ? vehicle.model! : "",
+    );
+    confirmationSubject = confirmationSubject?.replace(
+      "<CLIENT>",
+      customer ? customer.firstName + " " + customer.lastName : "",
+    );
 
-  confirmationMessage = confirmationMessage?.replace(
-    "<VEHICLE>",
-    vehicle ? vehicle.model! : "",
-  );
-  confirmationMessage = confirmationMessage?.replace(
-    "<CLIENT>",
-    customer ? customer.firstName + " " + customer.lastName : "",
-  );
+    confirmationMessage = confirmationMessage?.replace(
+      "<VEHICLE>",
+      vehicle ? vehicle.model! : "",
+    );
+    confirmationMessage = confirmationMessage?.replace(
+      "<CLIENT>",
+      customer ? customer.firstName + " " + customer.lastName : "",
+    );
 
-  // send the confirmation email
-  if (appointment.confirmationEmailTemplateStatus) {
-    // send email
-    if (customer) {
-      sendEmail({
-        from: "Autoworx",
-        to: customer.email || "",
-        subject: confirmationSubject,
-        text: confirmationMessage,
-      });
+    // send the confirmation email
+    if (appointment.confirmationEmailTemplateStatus) {
+      // send email
+      if (customer) {
+        sendEmail({
+          from: "Autoworx",
+          to: customer.email || "",
+          subject: confirmationSubject,
+          text: confirmationMessage,
+        });
+      }
     }
   }
 }

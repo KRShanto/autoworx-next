@@ -22,29 +22,18 @@ export default function TaskComponent({ task }: { task: Task }) {
     await deleteTask(task.id);
   };
 
-  if (!task.date) {
-    return (
-      <div
-        className="cursor-move rounded-md px-4 py-2 text-[17px] text-white max-[1300px]:px-2 max-[1300px]:py-1 max-[1300px]:text-[14px]"
-        style={{
-          backgroundColor: TASK_COLOR[task.priority],
-          opacity: isDragging ? 0.5 : 1,
-        }}
-        ref={drag as unknown as LegacyRef<HTMLDivElement>}
-        draggable
-        onDragStart={handleDragStart}
-      >
-        {task.title}
-      </div>
-    );
-  }
-
   return (
     <div
       className="flex items-center rounded-md px-4 py-2 text-[17px] text-white max-[1300px]:px-2 max-[1300px]:py-1 max-[1300px]:text-[14px]"
       style={{
         backgroundColor: TASK_COLOR[task.priority],
+        cursor: task.date ? "default" : "move",
       }}
+      ref={
+        task.date ? undefined : (drag as unknown as LegacyRef<HTMLDivElement>)
+      }
+      draggable={task.date ? false : true}
+      onDragStart={task.date ? undefined : handleDragStart}
     >
       <p className="w-[90%]">{task.title}</p>
       <FaRegCheckCircle

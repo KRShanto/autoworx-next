@@ -5,6 +5,7 @@ import { useDrag } from "react-dnd";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { deleteTask } from "../../delete";
 import { deleteAppointment } from "../../deleteAppointment";
+import { cn } from "@/lib/cn";
 
 export default function AppointmentComponent({
   appointment,
@@ -27,24 +28,22 @@ export default function AppointmentComponent({
     await deleteAppointment(appointment.id);
   };
 
-  if (!appointment.date) {
-    return (
-      <div
-        className="cursor-move rounded-md bg-slate-500 px-4 py-2 text-[17px] text-white max-[1300px]:px-2 max-[1300px]:py-1 max-[1300px]:text-[14px]"
-        style={{
-          opacity: isDragging ? 0.5 : 1,
-        }}
-        ref={drag as unknown as LegacyRef<HTMLDivElement>}
-        draggable
-        onDragStart={handleDragStart}
-      >
-        {appointment.title}
-      </div>
-    );
-  }
-
   return (
-    <div className="flex items-center rounded-md bg-slate-500 px-4 py-2 text-[17px] text-white max-[1300px]:px-2 max-[1300px]:py-1 max-[1300px]:text-[14px]">
+    <div
+      className={cn(
+        "flex items-center rounded-md bg-slate-500 px-4 py-2 text-[17px] text-white max-[1300px]:px-2 max-[1300px]:py-1 max-[1300px]:text-[14px]",
+        {
+          "cursor-move": !appointment.date,
+        },
+      )}
+      ref={
+        appointment.date
+          ? undefined
+          : (drag as unknown as LegacyRef<HTMLDivElement>)
+      }
+      draggable={appointment.date ? false : true}
+      onDragStart={appointment.date ? undefined : handleDragStart}
+    >
       <p className="w-[90%]">{appointment.title}</p>
       <FaRegCheckCircle
         className="cursor-pointer text-xl text-white"
