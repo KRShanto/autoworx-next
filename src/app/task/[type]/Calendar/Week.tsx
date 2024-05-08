@@ -17,6 +17,7 @@ import { addTask } from "../../add";
 import { deleteTask } from "../../delete";
 import { assignAppointmentDate } from "./assignAppointmentDate";
 import { dragTask } from "./dragTask";
+import UpdateTask from "../CalendarSidebar/UpdateTask";
 
 function useWeek() {
   const searchParams = useSearchParams();
@@ -416,7 +417,10 @@ export default function Week({
               </div>
             ) : (
               <div>
-                <h3 className="font-semibold">{event.title}</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">{event.title}</h3>
+                  <UpdateTask task={event} companyUsers={companyUsers} />
+                </div>
 
                 {/* @ts-ignore */}
                 <p className="mt-3">{event.description}</p>

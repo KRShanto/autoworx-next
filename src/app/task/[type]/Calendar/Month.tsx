@@ -19,6 +19,7 @@ import { addTask } from "../../add";
 import { TaskDetails } from "./TaskDetails";
 import { assignAppointmentDate } from "./assignAppointmentDate";
 import { dragTask } from "./dragTask";
+import UpdateTask from "../CalendarSidebar/UpdateTask";
 
 function useMonth() {
   const searchParams = useSearchParams();
@@ -283,7 +284,15 @@ export default function Month({
                           <TooltipPortal>
                             <TooltipContent>
                               <div className="w-[300px] rounded-lg bg-white p-3">
-                                <h3 className="font-semibold">{task.title}</h3>
+                                <div className="flex items-center justify-between">
+                                  <h3 className="font-semibold">
+                                    {task.title}
+                                  </h3>
+                                  <UpdateTask
+                                    task={task}
+                                    companyUsers={companyUsers}
+                                  />
+                                </div>
 
                                 <p className="mt-3">{task.description}</p>
 
