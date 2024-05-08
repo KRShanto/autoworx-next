@@ -1,25 +1,20 @@
 "use client";
 
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/Tooltip";
 import { cn } from "@/lib/cn";
 import { TASK_COLOR } from "@/lib/consts";
 import { usePopupStore } from "@/stores/popup";
-import type { CalendarTask } from "@/types/db";
+import type { CalendarAppointment, CalendarTask } from "@/types/db";
 import type { Task, User } from "@prisma/client";
-import type { CalendarAppointment } from "@/types/db";
 import moment from "moment";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useDrop } from "react-dnd";
-import { HiCalendar, HiClock } from "react-icons/hi";
-import { MdDelete, MdModeEdit } from "react-icons/md";
-import { ThreeDots } from "react-loader-spinner";
+import { FaPen } from "react-icons/fa6";
 import { useMediaQuery } from "react-responsive";
 import { addTask } from "../../add";
-import { deleteTask } from "../../delete";
 import { assignAppointmentDate } from "./assignAppointmentDate";
 import { dragTask } from "./dragTask";
-import UpdateTask from "../CalendarSidebar/UpdateTask";
 
 const rows = [
   "All Day",
@@ -48,7 +43,6 @@ export default function Day({
   tasksWithoutTime: Task[];
   appointments: CalendarAppointment[];
 }) {
-  const [hoveredTask, setHoveredTask] = useState<number | null>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [loading, setLoading] = useState(false);
   const date = useDate();
@@ -72,27 +66,28 @@ export default function Day({
       setScrollPosition(dropRef.current.scrollTop);
     };
 
-    dropRef.current && dropRef.current.addEventListener("scroll", handleScroll);
+    dropRef.current?.addEventListener("scroll", handleScroll);
 
     return () => {
-      dropRef.current &&
-        dropRef.current.removeEventListener("scroll", handleScroll);
+      dropRef.current?.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [dropRef]);
 
   const events = useMemo<
-    ((CalendarTask | CalendarAppointment) & {
+    ((
+      | (CalendarTask & { type: "task" })
+      | (CalendarAppointment & { type: "appointment" })
+    ) & {
       rowStartIndex: number;
       rowEndIndex: number;
-      type: "task" | "appointment";
     })[]
   >(
     () =>
       [
-        ...tasks.map((task) => ({ ...task, type: "task" as any })),
+        ...tasks.map((task) => ({ ...task, type: "task" as const })),
         ...appointments.map((appointment) => ({
           ...appointment,
-          type: "appointment" as any,
+          type: "appointment" as const,
         })),
       ]
         // include type before mapping
@@ -117,7 +112,7 @@ export default function Day({
           // Return the task with the rowStartIndex and rowEndIndex
           return { ...event, rowStartIndex, rowEndIndex };
         }),
-    [tasks, date],
+    [tasks, appointments, date],
   );
 
   function formatDate(date: Date) {
@@ -162,13 +157,13 @@ export default function Day({
       }
     } else {
       // Get the id of the appointment from the dataTransfer object
-      const appointmentId = parseInt(
+      const appointmentId = Number.parseInt(
         event.dataTransfer.getData("text/plain").split("|")[1],
       );
 
       // Find the appointment in your state
       const appointment = appointments.find(
-        (appointment) => appointment.id == appointmentId,
+        (appointment) => appointment.id === appointmentId,
       );
 
       if (appointment) {
@@ -184,83 +179,78 @@ export default function Day({
   }
 
   return (
-    <>
-      <div
-        ref={dropRef}
-        style={{ backgroundColor: isOver ? "lightgreen" : "white" }}
-        className="relative mt-3 h-[90%] overflow-auto border border-neutral-200"
-      >
-        {rows.map((row, i) => (
-          <button
-            type="button"
-            key={i}
-            onDrop={(event) => handleDrop(event, i)}
-            onDragOver={(event) => event.preventDefault()}
+    <div
+      ref={dropRef}
+      style={{ backgroundColor: isOver ? "lightgreen" : "white" }}
+      className="relative mt-3 h-[90%] overflow-auto border border-neutral-200"
+    >
+      {rows.map((row, i) => (
+        <button
+          type="button"
+          key={row}
+          onDrop={(event) => handleDrop(event, i)}
+          onDragOver={(event) => event.preventDefault()}
+          className={cn(
+            "block h-[45px] w-full border-neutral-200",
+            i !== rows.length - 1 && "border-b",
+            i !== 0 && "cursor-pointer",
+          )}
+          onClick={() => {
+            const date = formatDate(new Date());
+            const startTime = formatTime(row);
+            open("ADD_TASK", { date, startTime, companyUsers });
+          }}
+          disabled={i === 0}
+        >
+          {/* Row heading */}
+          <div
             className={cn(
-              "block h-[45px] w-full border-neutral-200",
-              i !== rows.length - 1 && "border-b",
-              i !== 0 && "cursor-pointer",
+              "flex h-full w-[100px] items-center justify-center border-r border-neutral-200 text-[19px] text-[#797979]",
+              i === 0 && "font-bold",
             )}
-            onClick={() => {
-              const date = formatDate(new Date());
-              const startTime = formatTime(row);
-              open("ADD_TASK", { date, startTime, companyUsers });
-            }}
-            disabled={i === 0}
           >
-            {/* Row heading */}
-            <div
-              className={cn(
-                "flex h-full w-[100px] items-center justify-center border-r border-neutral-200 text-[19px] text-[#797979]",
-                i === 0 && "font-bold",
-              )}
-            >
-              {row}
-            </div>
-          </button>
-        ))}
+            {row}
+          </div>
+        </button>
+      ))}
 
-        {/* Tasks */}
-        {events.map((event, index) => {
-          // TODO: fix overlapping tasks
-          const top = `${event.rowStartIndex * 45}px`;
-          let left = "130px";
-          const height = `${
-            (event.rowEndIndex - event.rowStartIndex + 1) * 45
-          }px`;
-          const widthNumber = is1300 ? 300 : 500;
-          const width = `${widthNumber}px`;
-          // @ts-ignore
-          const backgroundColor = event.priority
-            ? // @ts-ignore
-              TASK_COLOR[event.priority]
-            : "rgb(100, 116, 139)";
-          // if the previous task ends at the same time as this task
-          // then move this task right
-          if (
-            index > 0 &&
-            event.rowStartIndex === events[index - 1].rowStartIndex
-          ) {
-            left = `${widthNumber + 130}px`;
-          }
-          // Define a function to truncate the task title based on the height
-          const truncateTitle = (title: string, maxLength: number) => {
-            return title.length > maxLength
-              ? title.slice(0, maxLength) + "..."
-              : title;
-          };
+      {/* Tasks */}
+      {events.map((event, index) => {
+        // TODO: fix overlapping tasks
+        const top = `${event.rowStartIndex * 45}px`;
+        let left = "130px";
+        const height = `${
+          (event.rowEndIndex - event.rowStartIndex + 1) * 45
+        }px`;
+        const widthNumber = is1300 ? 300 : 500;
+        const width = `${widthNumber}px`;
+        // @ts-ignore
+        const backgroundColor = event.priority
+          ? // @ts-ignore
+            TASK_COLOR[event.priority]
+          : "rgb(100, 116, 139)";
+        // if the previous task ends at the same time as this task
+        // then move this task right
+        if (
+          index > 0 &&
+          event.rowStartIndex === events[index - 1].rowStartIndex
+        ) {
+          left = `${widthNumber + 130}px`;
+        }
+        // Define a function to truncate the task title based on the height
+        const truncateTitle = (title: string, maxLength: number) => {
+          return title.length > maxLength
+            ? `${title.slice(0, maxLength)}...`
+            : title;
+        };
 
-          // Define the maximum title length based on the height
-          const maxTitleLength =
-            height === "45px"
-              ? 60
-              : height === "90px"
-                ? 120
-                : event.title.length;
+        // Define the maximum title length based on the height
+        const maxTitleLength =
+          height === "45px" ? 60 : height === "90px" ? 120 : event.title.length;
 
-          return (
-            <div
-              key={event.id}
+        return (
+          <Tooltip key={event.id}>
+            <TooltipTrigger
               className="absolute top-0 z-10 rounded-lg border px-2 py-1 text-[17px] text-white"
               style={{
                 left,
@@ -270,100 +260,62 @@ export default function Day({
                 maxWidth: width,
                 minWidth: width,
               }}
-              onMouseEnter={() => setHoveredTask(index)}
-              onMouseLeave={() => setHoveredTask(null)}
             >
               {truncateTitle(event.title, maxTitleLength)}
-            </div>
-          );
-        })}
-      </div>
-
-      {events.map((event, index) => {
-        const rowIndex = event.rowStartIndex;
-        const MOVE_FROM_TOP =
-          rowIndex === 0
-            ? 260
-            : rowIndex === 1
-              ? 220
-              : rowIndex === 2
-                ? 180
-                : rowIndex === 3
-                  ? 140
-                  : rowIndex === 4
-                    ? 100
-                    : 25;
-        const height = 200;
-        const left = "130px";
-        const top = `${
-          45 * event.rowStartIndex +
-          45 -
-          scrollPosition +
-          MOVE_FROM_TOP -
-          height
-        }px`;
-
-        return (
-          <div
-            className={cn(
-              "absolute w-[300px] rounded-md border border-slate-400 bg-white p-3 transition-all duration-300",
-            )}
-            style={{
-              left,
-              top,
-              height,
-              opacity: hoveredTask === index ? 1 : 0,
-              zIndex: hoveredTask === index ? 40 : -10,
-            }}
-            key={index}
-            onMouseEnter={() => setHoveredTask(index)}
-            onMouseLeave={() => setHoveredTask(null)}
-          >
-            {event.type === "appointment" ? (
-              <div>
-                <h3 className="font-semibold">{event.title}</h3>
-
-                <p>
-                  Client:
-                  {/* @ts-ignore */}
-                  {event.customer &&
-                    // @ts-ignore
-                    event.customer.firstName + " " + event.customer.lastName}
-                </p>
-
-                <p>
-                  Assigned To:{" "}
-                  {event.assignedUsers
-                    .slice(0, 1)
-                    .map((user: User) => user.name)}
-                </p>
-
-                <p>
-                  {moment(event.startTime, "HH:mm").format("hh:mm A")} To{" "}
-                  {moment(event.endTime, "HH:mm").format("hh:mm A")}
-                </p>
-              </div>
-            ) : (
-              <div>
-                <div className="flex items-center justify-between">
+            </TooltipTrigger>
+            <TooltipContent className="h-48 w-72 rounded-md border border-slate-400 bg-white p-3">
+              {event.type === "appointment" ? (
+                <div>
                   <h3 className="font-semibold">{event.title}</h3>
-                  <UpdateTask
-                    // @ts-ignore
-                    task={event}
-                    companyUsers={companyUsers}
-                  />
+
+                  <p>
+                    Client:
+                    {event.customer &&
+                      `${event.customer.firstName} ${event.customer.lastName}`}
+                  </p>
+
+                  <p>
+                    Assigned To:{" "}
+                    {event.assignedUsers
+                      .slice(0, 1)
+                      .map((user: User) => user.name)}
+                  </p>
+
+                  <p>
+                    {moment(event.startTime, "HH:mm").format("hh:mm A")} To{" "}
+                    {moment(event.endTime, "HH:mm").format("hh:mm A")}
+                  </p>
                 </div>
+              ) : (
+                <div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold">{event.title}</h3>
 
-                {/* @ts-ignore */}
-                <p className="mt-3">{event.description}</p>
+                    <button
+                      type="button"
+                      className="text- rounded-full bg-[#6571FF] p-2 text-white"
+                      onClick={() =>
+                        open("UPDATE_TASK", {
+                          task: event,
+                          companyUsers,
+                        })
+                      }
+                    >
+                      <FaPen className="mx-auto text-[10px]" />
+                    </button>
+                  </div>
 
-                {/* @ts-ignore */}
-                <p className="mt-3">Task Priority: {event.priority}</p>
-              </div>
-            )}
-          </div>
+                  {/* @ts-ignore */}
+                  <p className="mt-3">{event.description}</p>
+
+                  {/* @ts-ignore */}
+                  <p className="mt-3">Task Priority: {event.priority}</p>
+                </div>
+              )}
+            </TooltipContent>
+          </Tooltip>
         );
       })}
-    </>
+    </div>
   );
 }

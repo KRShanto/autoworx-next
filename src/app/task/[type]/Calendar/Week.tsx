@@ -1,23 +1,19 @@
 "use client";
 
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/Tooltip";
 import { cn } from "@/lib/cn";
 import { TASK_COLOR } from "@/lib/consts";
 import { usePopupStore } from "@/stores/popup";
 import type { CalendarAppointment, CalendarTask } from "@/types/db";
-import type { Appointment, Task, User } from "@prisma/client";
+import type { Task, User } from "@prisma/client";
 import moment from "moment";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useDrop } from "react-dnd";
-import { HiCalendar, HiClock } from "react-icons/hi";
-import { MdDelete, MdModeEdit } from "react-icons/md";
-import { ThreeDots } from "react-loader-spinner";
+import { FaPen } from "react-icons/fa6";
 import { addTask } from "../../add";
-import { deleteTask } from "../../delete";
 import { assignAppointmentDate } from "./assignAppointmentDate";
 import { dragTask } from "./dragTask";
-import UpdateTask from "../CalendarSidebar/UpdateTask";
 
 function useWeek() {
   const searchParams = useSearchParams();
@@ -43,7 +39,6 @@ export default function Week({
   tasksWithoutTime: Task[];
   appointments: CalendarAppointment[];
 }) {
-  const [hoveredTask, setHoveredTask] = useState<number | null>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -115,7 +110,10 @@ export default function Week({
 
   // Filter out the tasks that are within the current week
   const events = useMemo<
-    ((CalendarTask | CalendarAppointment) & {
+    ((
+      | (CalendarTask & { type: "task" })
+      | (CalendarAppointment & { type: "appointment" })
+    ) & {
       rowStartIndex: number;
       rowEndIndex: number;
       columnIndex: number;
@@ -155,7 +153,7 @@ export default function Week({
 
         return { ...event, columnIndex, rowStartIndex, rowEndIndex };
       });
-  }, [tasks, week]);
+  }, [tasks, appointments, week]);
 
   async function handleDrop(
     event: React.DragEvent,
@@ -306,7 +304,7 @@ export default function Week({
           // Define a function to truncate the task title based on the height
           const truncateTitle = (title: string, maxLength: number) => {
             return title.length > maxLength
-              ? title.slice(0, maxLength) + "..."
+              ? `${title.slice(0, maxLength)}...`
               : title;
           };
 
@@ -320,122 +318,75 @@ export default function Week({
                 : event.title.length;
 
           return (
-            <div
-              className="absolute top-0 rounded-lg border"
-              style={{
-                left,
-                top,
-                height,
-                backgroundColor,
-                width,
-              }}
-              key={index}
-              onMouseEnter={() => setHoveredTask(index)}
-              onMouseLeave={() => setHoveredTask(null)}
-            >
-              <p className="z-30 p-1 text-[17px] text-white max-[1600px]:text-[12px]">
-                {truncateTitle(event.title, maxTitleLength)}
-              </p>
-            </div>
+            <Tooltip key={event.id}>
+              <TooltipTrigger
+                className="absolute top-0 rounded-lg border"
+                style={{
+                  left,
+                  top,
+                  height,
+                  backgroundColor,
+                  width,
+                }}
+              >
+                <p className="z-30 p-1 text-[17px] text-white max-[1600px]:text-[12px]">
+                  {truncateTitle(event.title, maxTitleLength)}
+                </p>
+              </TooltipTrigger>
+              <TooltipContent className="h-48 w-72 rounded-md border border-slate-400 bg-white p-3">
+                {event.type === "appointment" ? (
+                  <div>
+                    <h3 className="font-semibold">{event.title}</h3>
+
+                    <p>
+                      Client:
+                      {event.customer &&
+                        `${event.customer.firstName} ${event.customer.lastName}`}
+                    </p>
+
+                    <p>
+                      Assigned To:{" "}
+                      {event.assignedUsers
+                        .slice(0, 1)
+                        .map((user: User) => user.name)}
+                    </p>
+
+                    <p>
+                      {moment(event.startTime, "HH:mm").format("hh:mm A")} To{" "}
+                      {moment(event.endTime, "HH:mm").format("hh:mm A")}
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">{event.title}</h3>
+
+                      <button
+                        type="button"
+                        className="text- rounded-full bg-[#6571FF] p-2 text-white"
+                        onClick={() =>
+                          open("UPDATE_TASK", {
+                            task: event,
+                            companyUsers,
+                          })
+                        }
+                      >
+                        <FaPen className="mx-auto text-[10px]" />
+                      </button>
+                    </div>
+
+                    {/* @ts-ignore */}
+                    <p className="mt-3">{event.description}</p>
+
+                    {/* @ts-ignore */}
+                    <p className="mt-3">Task Priority: {event.priority}</p>
+                  </div>
+                )}
+              </TooltipContent>
+            </Tooltip>
           );
         })}
       </div>
-
-      {events.map((event, index) => {
-        const rowIndex = event.rowStartIndex;
-        const columnIndex = event.columnIndex;
-        const MOVE_FROM_TOP =
-          rowIndex === 0
-            ? 260
-            : rowIndex === 1
-              ? 220
-              : rowIndex === 2
-                ? 180
-                : rowIndex === 3
-                  ? 140
-                  : rowIndex === 4
-                    ? 100
-                    : 70;
-        const MOVE_FROM_LEFT =
-          columnIndex === 6
-            ? 270
-            : columnIndex === 5
-              ? 150
-              : columnIndex === 0
-                ? 50
-                : 120;
-        const height = 150;
-        // left according to the cell width
-        const left = `calc(10% + 12.9% * ${event.columnIndex} - ${MOVE_FROM_LEFT}px)`;
-        const top = `${
-          45 * event.rowStartIndex +
-          45 -
-          scrollPosition +
-          MOVE_FROM_TOP -
-          height
-        }px`;
-
-        return (
-          <div
-            className={cn(
-              "absolute w-[300px] rounded-md border border-slate-400 bg-white p-3 transition-all duration-300",
-            )}
-            style={{
-              left,
-              top,
-              height,
-              opacity: hoveredTask === index ? 1 : 0,
-              zIndex: hoveredTask === index ? 40 : -10,
-            }}
-            key={index}
-            onMouseEnter={() => setHoveredTask(index)}
-            onMouseLeave={() => setHoveredTask(null)}
-          >
-            {event.type === "appointment" ? (
-              <div>
-                <h3 className="font-semibold">{event.title}</h3>
-
-                <p>
-                  Client:
-                  {/* @ts-ignore */}
-                  {event.customer &&
-                    // @ts-ignore
-                    event.customer.firstName + " " + event.customer.lastName}
-                </p>
-
-                <p>
-                  Assigned To:{" "}
-                  {event.assignedUsers
-                    .slice(0, 1)
-                    .map((user: User) => user.name)}
-                </p>
-
-                <p>
-                  {moment(event.startTime, "HH:mm").format("hh:mm A")} To{" "}
-                  {moment(event.endTime, "HH:mm").format("hh:mm A")}
-                </p>
-              </div>
-            ) : (
-              <div>
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">{event.title}</h3>
-                  <UpdateTask
-                    // @ts-ignore
-                    task={event}
-                    companyUsers={companyUsers}
-                  />
-                </div>
-
-                {/* @ts-ignore */}
-                <p className="mt-3">{event.description}</p>
-
-                {/* @ts-ignore */}
-                <p className="mt-3">Task Priority: {event.priority}</p>
-              </div>
-            )}
-          </div>
-        );
-      })}
     </>
   );
 }

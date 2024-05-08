@@ -13,11 +13,13 @@ import AddPayment from "../app/invoice/components/AddPayment";
 import EditCustomer from "../app/customer/EditCustomer";
 import EditEmployee from "@/app/employee/EditEmployee";
 import EditService from "@/app/inventory/service/EditService";
+import UpdateTask from "@/app/task/[type]/CalendarSidebar/UpdateTask";
 
 export default function PopupState() {
   const { popup } = usePopupStore();
 
   if (popup === "EDIT_TASK") return <EditTask />;
+  if (popup === "UPDATE_TASK") return <UpdateTask />;
   if (popup === "ADD_USER") return <AddUser />;
   if (popup === "ASSIGN_TASK") return <AssignTask />;
   if (popup === "ADD_CUSTOMER") return <AddCustomer />;

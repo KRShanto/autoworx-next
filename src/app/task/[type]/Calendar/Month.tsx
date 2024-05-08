@@ -20,6 +20,8 @@ import { TaskDetails } from "./TaskDetails";
 import { assignAppointmentDate } from "./assignAppointmentDate";
 import { dragTask } from "./dragTask";
 import UpdateTask from "../CalendarSidebar/UpdateTask";
+import { FaPen } from "react-icons/fa6";
+import { usePopupStore } from "@/stores/popup";
 
 function useMonth() {
   const searchParams = useSearchParams();
@@ -49,6 +51,7 @@ export default function Month({
       canDrop: monitor.canDrop(),
     }),
   }) as [{ canDrop: boolean; isOver: boolean }, any];
+  const { open } = usePopupStore();
 
   // Initialize an array to hold the dates
   const dates: [Date, CalendarTask[], CalendarAppointment[]][] = [];
@@ -192,163 +195,161 @@ export default function Month({
         ))}
       </div>
 
-      <TooltipProvider delayDuration={150}>
-        <div className="grid h-[93%] grid-cols-7 grid-rows-5">
-          {/* cells 7-41 */}
-          {cells.slice(7).map((cell: any, i) => (
-            <Tooltip key={i}>
-              <TooltipTrigger
-                type="button"
-                className={cn(
-                  "relative flex h-full flex-col items-end gap-2 border-b border-r border-neutral-200 p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
-                  today.getFullYear() === cell[0].getFullYear() &&
-                    today.getMonth() === cell[0].getMonth() &&
-                    today.getDate() === cell[0].getDate()
-                    ? "text-[#6571FF]"
-                    : "text-[#797979]",
-                )}
-                onClick={(event) => {
-                  if (
-                    event.target instanceof Node &&
-                    event.currentTarget.contains(event.target)
-                  )
-                    router.push(
-                      `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`,
-                    );
-                }}
-                onDrop={(event) =>
-                  handleDrop(event, moment(cell[0]).format("YYYY-MM-DD"))
-                }
-                onDragOver={(event) => event.preventDefault()}
-              >
-                {cell[0].getDate()}
+      <div className="grid h-[93%] grid-cols-7 grid-rows-5">
+        {/* cells 7-41 */}
+        {cells.slice(7).map((cell: any, i) => (
+          <Tooltip key={i}>
+            <TooltipTrigger
+              type="button"
+              className={cn(
+                "relative flex h-full flex-col items-end gap-2 border-b border-r border-neutral-200 p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
+                today.getFullYear() === cell[0].getFullYear() &&
+                  today.getMonth() === cell[0].getMonth() &&
+                  today.getDate() === cell[0].getDate()
+                  ? "text-[#6571FF]"
+                  : "text-[#797979]",
+              )}
+              onClick={(event) => {
+                if (
+                  event.target instanceof Node &&
+                  event.currentTarget.contains(event.target)
+                )
+                  router.push(
+                    `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`,
+                  );
+              }}
+              onDrop={(event) =>
+                handleDrop(event, moment(cell[0]).format("YYYY-MM-DD"))
+              }
+              onDragOver={(event) => event.preventDefault()}
+            >
+              {cell[0].getDate()}
 
-                <div className="absolute bottom-2 left-2 right-2 flex max-h-[calc(100%-3rem)] flex-col gap-1">
-                  <TooltipProvider delayDuration={150}>
-                    {cell[2]
-                      .slice(0, 1)
-                      .map((appointment: CalendarAppointment, i: number) => (
-                        <Tooltip key={i}>
-                          <TooltipTrigger asChild>
-                            <div className="h-10 max-h-10 rounded border text-sm text-slate-500">
+              <div className="absolute bottom-2 left-2 right-2 flex max-h-[calc(100%-3rem)] flex-col gap-1">
+                {cell[2]
+                  .slice(0, 1)
+                  .map((appointment: CalendarAppointment, i: number) => (
+                    <Tooltip key={i}>
+                      <TooltipTrigger asChild>
+                        <div className="h-10 max-h-10 rounded border text-sm text-slate-500">
+                          {appointment.title}
+                        </div>
+                      </TooltipTrigger>
+
+                      <TooltipPortal>
+                        <TooltipContent>
+                          <div className="w-[300px] rounded-lg bg-white p-3">
+                            <h3 className="font-semibold">
                               {appointment.title}
-                            </div>
-                          </TooltipTrigger>
+                            </h3>
 
-                          <TooltipPortal>
-                            <TooltipContent>
-                              <div className="w-[300px] rounded-lg bg-white p-3">
-                                <h3 className="font-semibold">
-                                  {appointment.title}
-                                </h3>
+                            <p>
+                              Client: {appointment.customer?.firstName}{" "}
+                              {appointment.customer?.lastName}
+                            </p>
 
-                                <p>
-                                  Client: {appointment.customer?.firstName}{" "}
-                                  {appointment.customer?.lastName}
-                                </p>
+                            <p>
+                              Assigned To:{" "}
+                              {appointment.assignedUsers
+                                .slice(0, 1)
+                                .map((user: User) => user.name)}
+                            </p>
 
-                                <p>
-                                  Assigned To:{" "}
-                                  {appointment.assignedUsers
-                                    .slice(0, 1)
-                                    .map((user: User) => user.name)}
-                                </p>
+                            <p>
+                              {moment(appointment.startTime, "HH:mm").format(
+                                "hh:mm A",
+                              )}{" "}
+                              To{" "}
+                              {moment(appointment.endTime, "HH:mm").format(
+                                "hh:mm A",
+                              )}
+                            </p>
+                          </div>
+                        </TooltipContent>
+                      </TooltipPortal>
+                    </Tooltip>
+                  ))}
+                {cell[1]?.slice(0, 3).map((task: CalendarTask, i: number) => (
+                  <Tooltip key={i}>
+                    <TooltipTrigger asChild>
+                      <div
+                        className="h-2 max-h-[33.33%] rounded"
+                        style={{
+                          backgroundColor: TASK_COLOR[task.priority],
+                        }}
+                      />
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                      <TooltipContent>
+                        <div className="w-[300px] rounded-lg bg-white p-3">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-semibold">{task.title}</h3>
 
-                                <p>
-                                  {moment(
-                                    appointment.startTime,
-                                    "HH:mm",
-                                  ).format("hh:mm A")}{" "}
-                                  To{" "}
-                                  {moment(appointment.endTime, "HH:mm").format(
-                                    "hh:mm A",
-                                  )}
-                                </p>
-                              </div>
-                            </TooltipContent>
-                          </TooltipPortal>
-                        </Tooltip>
+                            <button
+                              type="button"
+                              className="text- rounded-full bg-[#6571FF] p-2 text-white"
+                              onClick={() =>
+                                open("UPDATE_TASK", {
+                                  task,
+                                  companyUsers,
+                                })
+                              }
+                            >
+                              <FaPen className="mx-auto text-[10px]" />
+                            </button>
+                          </div>
+
+                          <p className="mt-3">{task.description}</p>
+
+                          <p className="mt-3">Task Priority: {task.priority}</p>
+                        </div>
+                      </TooltipContent>
+                    </TooltipPortal>
+                  </Tooltip>
+                ))}
+              </div>
+            </TooltipTrigger>
+
+            <TooltipPortal>
+              {/* check if either tasks or appointments are present */}
+              {(cell[1]?.length || cell[2]?.length) && (
+                <TooltipContent>
+                  <div className="w-[350px]">
+                    <h3 className="text-lg font-bold">Tasks</h3>
+                    <div className="flex flex-col gap-1">
+                      {cell[1]?.map((task: CalendarTask, i: number) => (
+                        <div
+                          key={i}
+                          className="flex items-center gap-2 rounded p-2 text-white"
+                          style={{
+                            backgroundColor: TASK_COLOR[task.priority],
+                          }}
+                        >
+                          <p>{task.title}</p>
+                        </div>
                       ))}
-                  </TooltipProvider>
-                  <TooltipProvider delayDuration={150}>
-                    {cell[1]
-                      ?.slice(0, 3)
-                      .map((task: CalendarTask, i: number) => (
-                        <Tooltip key={i}>
-                          <TooltipTrigger
-                            className="h-2 max-h-[33.33%] rounded"
-                            style={{
-                              backgroundColor: TASK_COLOR[task.priority],
-                            }}
-                          />
-                          <TooltipPortal>
-                            <TooltipContent>
-                              <div className="w-[300px] rounded-lg bg-white p-3">
-                                <div className="flex items-center justify-between">
-                                  <h3 className="font-semibold">
-                                    {task.title}
-                                  </h3>
-                                  <UpdateTask
-                                    task={task}
-                                    companyUsers={companyUsers}
-                                  />
-                                </div>
+                    </div>
 
-                                <p className="mt-3">{task.description}</p>
-
-                                <p className="mt-3">
-                                  Task Priority: {task.priority}
-                                </p>
-                              </div>
-                            </TooltipContent>
-                          </TooltipPortal>
-                        </Tooltip>
-                      ))}
-                  </TooltipProvider>
-                </div>
-              </TooltipTrigger>
-
-              <TooltipPortal>
-                {/* check if either tasks or appointments are present */}
-                {(cell[1]?.length || cell[2]?.length) && (
-                  <TooltipContent>
-                    <div className="w-[350px]">
-                      <h3 className="text-lg font-bold">Tasks</h3>
-                      <div className="flex flex-col gap-1">
-                        {cell[1]?.map((task: CalendarTask, i: number) => (
+                    <h3 className="mt-3 text-lg font-bold">Appointments</h3>
+                    <div className="flex flex-col gap-1">
+                      {cell[2]?.map(
+                        (appointment: CalendarAppointment, i: number) => (
                           <div
                             key={i}
-                            className="flex items-center gap-2 rounded p-2 text-white"
-                            style={{
-                              backgroundColor: TASK_COLOR[task.priority],
-                            }}
+                            className="flex items-center gap-2 rounded bg-gray-600 p-2 text-white"
                           >
-                            <p>{task.title}</p>
+                            <p>{appointment.title}</p>
                           </div>
-                        ))}
-                      </div>
-
-                      <h3 className="mt-3 text-lg font-bold">Appointments</h3>
-                      <div className="flex flex-col gap-1">
-                        {cell[2]?.map(
-                          (appointment: CalendarAppointment, i: number) => (
-                            <div
-                              key={i}
-                              className="flex items-center gap-2 rounded bg-gray-600 p-2 text-white"
-                            >
-                              <p>{appointment.title}</p>
-                            </div>
-                          ),
-                        )}
-                      </div>
+                        ),
+                      )}
                     </div>
-                  </TooltipContent>
-                )}
-              </TooltipPortal>
-            </Tooltip>
-          ))}
-        </div>
-      </TooltipProvider>
+                  </div>
+                </TooltipContent>
+              )}
+            </TooltipPortal>
+          </Tooltip>
+        ))}
+      </div>
     </div>
   );
 }
