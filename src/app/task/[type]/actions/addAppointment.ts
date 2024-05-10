@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 import { AuthSession } from "@/types/auth";
 import { revalidatePath } from "next/cache";
+import cron from "node-cron";
 
 interface AppointmentToAdd {
   title: string;
@@ -89,6 +90,13 @@ export async function addAppointment(appointment: AppointmentToAdd) {
     },
   });
 
+  // get the reminder email template
+  const reminderEmailTemplate = await db.emailTemplate.findFirst({
+    where: {
+      id: appointment.reminderEmailTemplateId,
+    },
+  });
+
   if (confirmationEmailTemplate) {
     let confirmationSubject = confirmationEmailTemplate?.subject || "";
     let confirmationMessage = confirmationEmailTemplate?.message || "";
@@ -121,6 +129,59 @@ export async function addAppointment(appointment: AppointmentToAdd) {
           to: customer.email || "",
           subject: confirmationSubject,
           text: confirmationMessage,
+        });
+      }
+    }
+  }
+
+  if (reminderEmailTemplate) {
+    let reminderSubject = reminderEmailTemplate?.subject || "";
+    let reminderMessage = reminderEmailTemplate?.message || "";
+
+    // replace the placeholders: <VEHICLE>, <CLIENT>
+    reminderSubject = reminderSubject?.replace(
+      "<VEHICLE>",
+      vehicle ? vehicle.model! : "",
+    );
+    reminderSubject = reminderSubject?.replace(
+      "<CLIENT>",
+      customer ? customer.firstName + " " + customer.lastName : "",
+    );
+
+    reminderMessage = reminderMessage?.replace(
+      "<VEHICLE>",
+      vehicle ? vehicle.model! : "",
+    );
+    reminderMessage = reminderMessage?.replace(
+      "<CLIENT>",
+      customer ? customer.firstName + " " + customer.lastName : "",
+    );
+
+    const times = appointment.times;
+
+    if (!times || times.length === 0) return;
+
+    for (const time of times) {
+      const date = new Date(time.date);
+      const splitTime = time.time.split(":");
+      date.setHours(parseInt(splitTime[0]));
+      date.setMinutes(parseInt(splitTime[1]));
+
+      // schedule the reminder email
+      if (appointment.reminderEmailTemplateStatus) {
+        // calculate the cron expression for the date and time
+        const cronExpression = `${date.getMinutes()} ${date.getHours()} ${date.getDate()} ${date.getMonth() + 1} *`;
+
+        // schedule the email
+        cron.schedule(cronExpression, () => {
+          if (customer) {
+            sendEmail({
+              from: "Autoworx",
+              to: customer.email || "",
+              subject: reminderSubject,
+              text: reminderMessage,
+            });
+          }
         });
       }
     }
