@@ -3,7 +3,7 @@ import React, { LegacyRef } from "react";
 import { Task } from "@prisma/client";
 import { useDrag } from "react-dnd";
 import { FaRegCheckCircle } from "react-icons/fa";
-import { deleteTask } from "../../delete";
+import { deleteTask } from "../actions/deleteTask";
 
 export default function TaskComponent({ task }: { task: Task }) {
   const [{ isDragging }, drag] = useDrag({

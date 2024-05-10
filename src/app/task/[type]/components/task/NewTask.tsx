@@ -1,6 +1,5 @@
 "use client";
 
-import Input from "@/components/Input";
 import { Priority, User } from "@prisma/client";
 import { useState } from "react";
 import {
@@ -15,9 +14,8 @@ import {
 import Submit from "@/components/Submit";
 import { FaCheck, FaPlus } from "react-icons/fa6";
 import Image from "next/image";
-import { TaskType } from "@/types/db";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
-import { createTask } from "./createTask";
+import { createTask } from "../../actions/createTask";
 
 export default function NewTask({
   companyUsers,

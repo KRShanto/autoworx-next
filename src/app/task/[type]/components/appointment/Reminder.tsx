@@ -1,6 +1,6 @@
 import { Switch } from "@/components/Switch";
 import type { Customer, Vehicle } from "@prisma/client";
-import { useState, type Key } from "react";
+import { useState } from "react";
 import { TbUserX } from "react-icons/tb";
 import NewTemplate from "./NewTemplate";
 import Selector from "./Selector";
@@ -8,7 +8,7 @@ import { useEmailTemplateStore } from "@/stores/email-template";
 import { EmailTemplate } from "@/types/db";
 import { FaTimes } from "react-icons/fa";
 import moment from "moment";
-import { deleteTemplate } from "./deleteTemplate";
+import { deleteTemplate } from "../../actions/deleteTemplate";
 import UpdateTemplate from "./UpdateTemplateComponent";
 
 export function Reminder({

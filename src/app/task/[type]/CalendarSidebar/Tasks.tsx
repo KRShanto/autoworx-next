@@ -1,12 +1,11 @@
 import { usePopupStore } from "../../../../stores/popup";
-import { FaPlus } from "react-icons/fa";
 import { Appointment, Task, User } from "@prisma/client";
 import TaskComponent from "./Task";
 import TagComponent from "./Tag";
 import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
 import { MinimizeButton } from "./MinimiseButton";
 import { cn } from "@/lib/cn";
-import NewTask from "./NewTask";
+import NewTask from "../components/task/NewTask";
 import AppointmentComponent from "./Appointment";
 
 export default function Tasks({

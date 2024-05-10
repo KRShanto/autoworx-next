@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dialog,
   DialogClose,
@@ -10,37 +12,47 @@ import {
 import { SlimInput, slimInputClassName } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { useEffect, useState } from "react";
-// import { addTemplate } from "./addTemplate";
 import FormError from "@/components/FormError";
 import { useFormErrorStore } from "@/stores/form-error";
-import type { EmailTemplate } from "@/types/db";
 import { useEmailTemplateStore } from "@/stores/email-template";
-import { addTemplate } from "./addTemplate";
+import { addTemplate } from "../../actions/addTemplate";
 import { EmailTemplateType } from "@prisma/client";
-import { updateTemplate } from "./updateTemplate";
 
-export default function UpdateTemplate({
-  id,
-  subject,
-  message,
+export default function NewTemplate({
+  type,
+  clientName,
+  vehicleModel,
 }: {
-  id: number;
-  subject: string;
-  message: string;
+  type: EmailTemplateType;
+  clientName: string;
+  vehicleModel: string;
 }) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
   const { templates, setTemplates } = useEmailTemplateStore();
+  const [subject, setSubject] = useState(
+    "Appointment Confirmation at TC CUSTOMS ATLANTA",
+  );
+  const [message, setMessage] = useState("");
 
-  const [subjectInput, setSubjectInput] = useState(subject);
-  const [messageInput, setMessageInput] = useState(message);
+  useEffect(() => {
+    setMessage(
+      `Hi <CLIENT>,
+    
+This is a friendly reminder that you have an upcoming appointment on Wednesday, May 8 at 12:30 PM EDT.
+  
+Location
+TC CUSTOMS ATLANTA
+6350 MCDONOUGH DRIVE NORTHWEST
+NORCROSS GA 30093
+  
+Vehicle
+<VEHICLE>`,
+    );
+  }, [clientName, vehicleModel]);
 
-  async function handleSubmit() {
-    const res = (await updateTemplate({
-      id,
-      subject: subjectInput,
-      message: messageInput,
-    })) as any;
+  async function handleSubmit(data: FormData) {
+    const res = (await addTemplate({ subject, message, type })) as any;
 
     if (res.error) {
       showError({
@@ -48,18 +60,7 @@ export default function UpdateTemplate({
         message: res.message,
       });
     } else {
-      setTemplates(
-        templates.map((template) => {
-          if (template.id === id) {
-            return {
-              ...template,
-              subject: subjectInput,
-              message: messageInput,
-            };
-          }
-          return template;
-        }),
-      );
+      setTemplates([...templates, { id: res.id, subject, message, type }]);
       setOpen(false);
     }
   }
@@ -68,7 +69,7 @@ export default function UpdateTemplate({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button type="button" className="text-xs text-[#6571FF]">
-          Edit
+          + Add New Template
         </button>
       </DialogTrigger>
 
@@ -77,16 +78,16 @@ export default function UpdateTemplate({
         form
       >
         <DialogHeader>
-          <DialogTitle>Custom Template: Edit</DialogTitle>
+          <DialogTitle>Custom Template</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 overflow-y-auto">
           <FormError />
-
+          <input type="hidden" name="type" value={type} />
           <SlimInput
             name="subject"
-            value={subjectInput}
-            onChange={(e) => setSubjectInput(e.target.value)}
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
             required
           />
           <label className="block">
@@ -95,8 +96,8 @@ export default function UpdateTemplate({
               name="message"
               rows={10}
               className={slimInputClassName}
-              value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
             />
           </label>
         </div>

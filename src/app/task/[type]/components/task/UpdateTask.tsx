@@ -6,7 +6,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/Dialog";
 import Submit from "@/components/Submit";
 import { usePopupStore } from "@/stores/popup";
@@ -16,10 +16,10 @@ import Image from "next/image";
 import { useState } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa6";
-import { editTask } from "./editTask";
+import { editTask } from "../../actions/editTask";
 
 export default function UpdateTask() {
-  const {popup, data, close } = usePopupStore();
+  const { popup, data, close } = usePopupStore();
   const { companyUsers, task } = data as {
     companyUsers: User[];
     task: CalendarTask;

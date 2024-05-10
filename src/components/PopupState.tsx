@@ -1,9 +1,8 @@
 "use client";
 
 import { usePopupStore } from "../stores/popup";
-import AddUser from "../app/task/[type]/CalendarSidebar/AddUser";
-import AssignTask from "@/app/task/[type]/CalendarSidebar/AssignTask";
-import EditTask from "@/app/task/[type]/Calendar/EditTaskPopup";
+import AddUser from "../app/task/[type]/components/user/AddUser";
+import AssignTask from "@/app/task/[type]/components/task/AssignTask";
 import AddNewCustomer from "../app/customer/AddCustomer";
 import AddCustomer from "../app/invoice/components/AddCustomer";
 import AddVehicle from "../app/invoice/components/AddVehicle";
@@ -13,13 +12,12 @@ import AddPayment from "../app/invoice/components/AddPayment";
 import EditCustomer from "../app/customer/EditCustomer";
 import EditEmployee from "@/app/employee/EditEmployee";
 import EditService from "@/app/inventory/service/EditService";
-import UpdateTask from "@/app/task/[type]/CalendarSidebar/UpdateTask";
-import { UpdateAppointment } from "@/app/task/[type]/Calendar/UpdateAppointment";
+import UpdateTask from "@/app/task/[type]/components/task/UpdateTask";
+import { UpdateAppointment } from "@/app/task/[type]/components/appointment/UpdateAppointment";
 
 export default function PopupState() {
   const { popup } = usePopupStore();
 
-  if (popup === "EDIT_TASK") return <EditTask />;
   if (popup === "UPDATE_TASK") return <UpdateTask />;
   if (popup === "UPDATE_APPOINTMENT") return <UpdateAppointment />;
   if (popup === "ADD_USER") return <AddUser />;

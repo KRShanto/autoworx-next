@@ -1,10 +1,8 @@
-import { TASK_COLOR } from "@/lib/consts";
 import React, { LegacyRef } from "react";
-import { Appointment, Task } from "@prisma/client";
+import { Appointment } from "@prisma/client";
 import { useDrag } from "react-dnd";
 import { FaRegCheckCircle } from "react-icons/fa";
-import { deleteTask } from "../../delete";
-import { deleteAppointment } from "../../deleteAppointment";
+import { deleteAppointment } from "../actions/deleteAppointment";
 import { cn } from "@/lib/cn";
 
 export default function AppointmentComponent({

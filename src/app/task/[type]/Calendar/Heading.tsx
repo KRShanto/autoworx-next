@@ -9,8 +9,8 @@ import {
 import { sentenceCase } from "change-case";
 import moment from "moment";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import { NewAppointment } from "./NewAppointment";
-import Settings from "./Settings";
+import { NewAppointment } from "../components/appointment/NewAppointment";
+import Settings from "../components/appointment/Settings";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";

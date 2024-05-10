@@ -37,77 +37,66 @@ import NewCustomer from "./NewCustomer";
 import NewOrder from "./NewOrder";
 import NewVehicle from "./NewVehicle";
 import Selector from "./Selector";
-import { addAppointment } from "./addAppointment";
+import { addAppointment } from "../../actions/addAppointment";
 import { Reminder } from "./Reminder";
-import { useEmailTemplateStore } from "@/stores/email-template";
-import { AppointmentFull } from "@/types/db";
-import { editAppointment } from "./editAppointment";
 import { EmailTemplate } from "@/types/db";
+import { useEmailTemplateStore } from "@/stores/email-template";
 
 enum Tab {
   Schedule = 0,
   Reminder = 1,
 }
 
-export function UpdateAppointment() {
-  const { popup, data, close } = usePopupStore();
-  const {
-    appointment,
-    customers,
-    vehicles,
-    orders,
-    settings,
-    employees,
-    templates,
-  } = data as {
-    appointment: AppointmentFull;
-    customers: Customer[];
-    vehicles: Vehicle[];
-    orders: Order[];
-    settings: CalendarSettings;
-    employees: User[];
-    templates: EmailTemplate[];
-  };
-
+export function NewAppointment({
+  customers,
+  vehicles,
+  orders,
+  settings,
+  employees,
+  templates,
+}: {
+  customers: Customer[];
+  vehicles: Vehicle[];
+  orders: Order[];
+  settings: CalendarSettings;
+  employees: User[];
+  templates: EmailTemplate[];
+}) {
+  const { popup, open, close } = usePopupStore();
+  const { showError } = useFormErrorStore();
+  const setOpen = useCallback(
+    (value: boolean) => {
+      value ? open("ADD_TASK") : close();
+    },
+    [open, close],
+  );
   const [tab, setTab] = useState(Tab.Schedule);
 
-  const [title, setTitle] = useState(appointment.title);
-  const [notes, setNotes] = useState(appointment.notes || "");
-  const [date, setDate] = useState<string | null>(
-    moment(appointment.date).format("YYYY-MM-DD"),
-  );
-  const [startTime, setStartTime] = useState<string | null>(
-    appointment.startTime,
-  );
-  const [endTime, setEndTime] = useState<string | null>(appointment.endTime);
+  const [date, setDate] = useState<string | undefined>();
+  const [startTime, setStartTime] = useState<string | undefined>();
+  const [endTime, setEndTime] = useState<string | undefined>();
   const [clientList, setClientList] = useState(customers);
   const [vehicleList, setVehicleList] = useState(vehicles);
   const [orderList, setOrderList] = useState(orders);
   const [allDay, setAllDay] = useState(false);
 
-  const [client, setClient] = useState<Customer | null>(appointment.customer);
-  const [vehicle, setVehicle] = useState<Vehicle | null>(appointment.vehicle);
-  const [order, setOrder] = useState<Order | null>(appointment.order);
-  const [assignedUsers, setAssignedUsers] = useState<User[]>(
-    appointment.assignedUsers,
-  );
+  const [client, setClient] = useState<Customer | null>(null);
+  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const [order, setOrder] = useState<Order | null>(null);
+  const [assignedUsers, setAssignedUsers] = useState<User[]>([]);
 
   const [addSalesPersonOpen, setAddSalesPersonOpen] = useState(false);
   const [employeesToDisplay, setEmployeesToDisplay] =
     useState<User[]>(employees);
 
-  const [times, setTimes] = useState<{ time: string; date: string }[]>(
-    appointment.times as any,
-  );
+  const [times, setTimes] = useState<{ time: string; date: string }[]>([]);
   const [confirmationTemplate, setConfirmationTemplate] =
-    useState<EmailTemplate | null>(appointment.confirmationEmailTemplate);
+    useState<EmailTemplate | null>(null);
   const [reminderTemplate, setReminderTemplate] =
-    useState<EmailTemplate | null>(appointment.reminderEmailTemplate);
+    useState<EmailTemplate | null>(null);
   const [confirmationTemplateStatus, setConfirmationTemplateStatus] =
-    useState<boolean>(appointment.confirmationEmailTemplateStatus);
-  const [reminderTemplateStatus, setReminderTemplateStatus] = useState<boolean>(
-    appointment.reminderEmailTemplateStatus,
-  );
+    useState(true);
+  const [reminderTemplateStatus, setReminderTemplateStatus] = useState(true);
 
   const { setTemplates } = useEmailTemplateStore();
 
@@ -142,31 +131,55 @@ export function UpdateAppointment() {
   }, [templates]);
 
   const handleSubmit = async (data: FormData) => {
-    const res = await editAppointment({
-      id: appointment.id,
-      appointment: {
-        title,
-        date: date as string,
-        startTime: startTime as string,
-        endTime: endTime as string,
-        assignedUsers: assignedUsers.map((user) => user.id),
-        customerId: client ? client.id : undefined,
-        vehicleId: vehicle ? vehicle.id : undefined,
-        orderId: order ? order.id : undefined,
-        notes,
-        confirmationEmailTemplateId: confirmationTemplate?.id,
-        reminderEmailTemplateId: reminderTemplate?.id,
-        confirmationEmailTemplateStatus: confirmationTemplateStatus,
-        reminderEmailTemplateStatus: reminderTemplateStatus,
-        times,
-      },
+    const title = data.get("title") as string;
+    const notes = data.get("notes") as string;
+
+    const res = await addAppointment({
+      title,
+      date,
+      startTime,
+      endTime,
+      assignedUsers: assignedUsers.map((user) => user.id),
+      customerId: client ? client.id : undefined,
+      vehicleId: vehicle ? vehicle.id : undefined,
+      orderId: order ? order.id : undefined,
+      notes,
+      confirmationEmailTemplateId: confirmationTemplate?.id,
+      reminderEmailTemplateId: reminderTemplate?.id,
+      confirmationEmailTemplateStatus: confirmationTemplateStatus,
+      reminderEmailTemplateStatus: reminderTemplateStatus,
+      times,
     });
+
+    // log everything
+    console.log("Title:", title);
+    console.log("Date:", date);
+    console.log("Start Time:", startTime);
+    console.log("End Time:", endTime);
+    console.log("Assigned Users:", assignedUsers);
+    console.log("Client ID:", client ? client.id : undefined);
+    console.log("Vehicle ID:", vehicle ? vehicle.id : undefined);
+    console.log("Order ID:", order ? order.id : undefined);
+    console.log("Notes:", notes);
+    console.log("Times:", times);
+    console.log("Confirmation Template:", confirmationTemplate);
+    console.log("Reminder Template:", reminderTemplate);
+    console.log("Confirmation Template Status:", confirmationTemplateStatus);
+    console.log("Reminder Template Status:", reminderTemplateStatus);
 
     close();
   };
 
   return (
-    <Dialog open={popup === "UPDATE_APPOINTMENT"} onOpenChange={close}>
+    <Dialog open={popup === "ADD_TASK"} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          className="app-shadow rounded-md bg-[#6571FF] p-2 text-white"
+        >
+          New Appointment
+        </button>
+      </DialogTrigger>
       <DialogContent
         className="max-h-full max-w-5xl grid-rows-[auto,1fr,auto]"
         form
@@ -207,13 +220,7 @@ export function UpdateAppointment() {
           <div className="space-y-4 bg-background p-6">
             <FormError />
 
-            <SlimInput
-              name="title"
-              label="Appointment Title"
-              required
-              value={title}
-              onChange={(event) => setTitle(event.currentTarget.value)}
-            />
+            <SlimInput name="title" label="Appointment Title" required />
 
             <div className="flex flex-wrap items-end gap-1">
               <SlimInput
@@ -230,8 +237,8 @@ export function UpdateAppointment() {
                   className={cn(slimInputClassName, "flex-auto")}
                   type="time"
                   name="start"
-                  value={startTime!}
-                  max={endTime!}
+                  value={startTime}
+                  max={endTime}
                   onChange={(event) => setStartTime(event.currentTarget.value)}
                 />
                 <FaArrowRight className="shrink-0" />
@@ -239,8 +246,8 @@ export function UpdateAppointment() {
                   className={cn(slimInputClassName, "flex-auto")}
                   type="time"
                   name="end"
-                  value={endTime!}
-                  min={startTime!}
+                  value={endTime}
+                  min={startTime}
                   onChange={(event) => setEndTime(event.currentTarget.value)}
                 />
               </div>
@@ -417,8 +424,6 @@ export function UpdateAppointment() {
               placeholder="Notes"
               className={cn(slimInputClassName, "border-2 border-slate-400")}
               rows={3}
-              value={notes}
-              onChange={(event) => setNotes(event.currentTarget.value)}
             />
           </div>
 
@@ -484,8 +489,10 @@ export function UpdateAppointment() {
         </div>
 
         <DialogFooter className="justify-end">
-          <DialogClose className="rounded-md border px-4 py-1">
-            Cancel
+          <DialogClose asChild>
+            <button type="button" className="rounded-md border px-4 py-1">
+              Cancel
+            </button>
           </DialogClose>
           <Submit
             className="rounded-md border bg-[#6571FF] px-4 py-1 text-white"

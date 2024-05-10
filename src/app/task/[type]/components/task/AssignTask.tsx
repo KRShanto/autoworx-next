@@ -1,11 +1,11 @@
 import Popup from "@/components/Popup";
-import { usePopupStore } from "../../../../stores/popup";
+import { usePopupStore } from "../../../../../stores/popup";
 import { useState } from "react";
 import FormError from "@/components/FormError";
 import Image from "next/image";
 import { Task, User } from "@prisma/client";
 import Submit from "@/components/Submit";
-import { assignTask } from "../../assign";
+import { assignTask } from "../../actions/assignTask";
 
 export default function AssignTask() {
   const { data, close } = usePopupStore();

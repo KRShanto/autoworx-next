@@ -24,10 +24,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useDrop } from "react-dnd";
 import { FaPen } from "react-icons/fa6";
 import { useMediaQuery } from "react-responsive";
-import { addTask } from "../../add";
-import { assignAppointmentDate } from "./assignAppointmentDate";
-import { dragTask } from "./dragTask";
-import { UpdateAppointment } from "./UpdateAppointment";
+import { assignAppointmentDate } from "../actions/assignAppointmentDate";
+import { dragTask } from "../actions/dragTask";
 
 const rows = [
   "All Day",
@@ -161,7 +159,7 @@ export default function Day({
     if (type === "tag") {
       const tag = event.dataTransfer.getData("text/plain").split("|")[1];
 
-      await addTask({ tag, date, startTime, endTime });
+      // TODO: add tag to task
     } else if (type === "task") {
       // Get the id of the task from the dataTransfer object
       const taskId = parseInt(

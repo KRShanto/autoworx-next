@@ -7,13 +7,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/Dialog";
 import FormError from "@/components/FormError";
 import { SlimInput, slimInputClassName } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { cn } from "@/lib/cn";
-import { useFormErrorStore } from "@/stores/form-error";
 import { usePopupStore } from "@/stores/popup";
 import type {
   CalendarSettings,
@@ -24,7 +22,7 @@ import type {
 } from "@prisma/client";
 import moment from "moment";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FaArrowRight,
   FaChevronLeft,
@@ -37,66 +35,76 @@ import NewCustomer from "./NewCustomer";
 import NewOrder from "./NewOrder";
 import NewVehicle from "./NewVehicle";
 import Selector from "./Selector";
-import { addAppointment } from "./addAppointment";
 import { Reminder } from "./Reminder";
-import { EmailTemplate } from "@/types/db";
 import { useEmailTemplateStore } from "@/stores/email-template";
+import { AppointmentFull } from "@/types/db";
+import { editAppointment } from "../../actions/editAppointment";
+import { EmailTemplate } from "@/types/db";
 
 enum Tab {
   Schedule = 0,
   Reminder = 1,
 }
 
-export function NewAppointment({
-  customers,
-  vehicles,
-  orders,
-  settings,
-  employees,
-  templates,
-}: {
-  customers: Customer[];
-  vehicles: Vehicle[];
-  orders: Order[];
-  settings: CalendarSettings;
-  employees: User[];
-  templates: EmailTemplate[];
-}) {
-  const { popup, open, close } = usePopupStore();
-  const { showError } = useFormErrorStore();
-  const setOpen = useCallback(
-    (value: boolean) => {
-      value ? open("ADD_TASK") : close();
-    },
-    [open, close],
-  );
+export function UpdateAppointment() {
+  const { popup, data, close } = usePopupStore();
+  const {
+    appointment,
+    customers,
+    vehicles,
+    orders,
+    settings,
+    employees,
+    templates,
+  } = data as {
+    appointment: AppointmentFull;
+    customers: Customer[];
+    vehicles: Vehicle[];
+    orders: Order[];
+    settings: CalendarSettings;
+    employees: User[];
+    templates: EmailTemplate[];
+  };
+
   const [tab, setTab] = useState(Tab.Schedule);
 
-  const [date, setDate] = useState<string | undefined>();
-  const [startTime, setStartTime] = useState<string | undefined>();
-  const [endTime, setEndTime] = useState<string | undefined>();
+  const [title, setTitle] = useState(appointment.title);
+  const [notes, setNotes] = useState(appointment.notes || "");
+  const [date, setDate] = useState<string | null>(
+    moment(appointment.date).format("YYYY-MM-DD"),
+  );
+  const [startTime, setStartTime] = useState<string | null>(
+    appointment.startTime,
+  );
+  const [endTime, setEndTime] = useState<string | null>(appointment.endTime);
   const [clientList, setClientList] = useState(customers);
   const [vehicleList, setVehicleList] = useState(vehicles);
   const [orderList, setOrderList] = useState(orders);
   const [allDay, setAllDay] = useState(false);
 
-  const [client, setClient] = useState<Customer | null>(null);
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
-  const [order, setOrder] = useState<Order | null>(null);
-  const [assignedUsers, setAssignedUsers] = useState<User[]>([]);
+  const [client, setClient] = useState<Customer | null>(appointment.customer);
+  const [vehicle, setVehicle] = useState<Vehicle | null>(appointment.vehicle);
+  const [order, setOrder] = useState<Order | null>(appointment.order);
+  const [assignedUsers, setAssignedUsers] = useState<User[]>(
+    appointment.assignedUsers,
+  );
 
   const [addSalesPersonOpen, setAddSalesPersonOpen] = useState(false);
   const [employeesToDisplay, setEmployeesToDisplay] =
     useState<User[]>(employees);
 
-  const [times, setTimes] = useState<{ time: string; date: string }[]>([]);
+  const [times, setTimes] = useState<{ time: string; date: string }[]>(
+    appointment.times as any,
+  );
   const [confirmationTemplate, setConfirmationTemplate] =
-    useState<EmailTemplate | null>(null);
+    useState<EmailTemplate | null>(appointment.confirmationEmailTemplate);
   const [reminderTemplate, setReminderTemplate] =
-    useState<EmailTemplate | null>(null);
+    useState<EmailTemplate | null>(appointment.reminderEmailTemplate);
   const [confirmationTemplateStatus, setConfirmationTemplateStatus] =
-    useState(true);
-  const [reminderTemplateStatus, setReminderTemplateStatus] = useState(true);
+    useState<boolean>(appointment.confirmationEmailTemplateStatus);
+  const [reminderTemplateStatus, setReminderTemplateStatus] = useState<boolean>(
+    appointment.reminderEmailTemplateStatus,
+  );
 
   const { setTemplates } = useEmailTemplateStore();
 
@@ -131,55 +139,31 @@ export function NewAppointment({
   }, [templates]);
 
   const handleSubmit = async (data: FormData) => {
-    const title = data.get("title") as string;
-    const notes = data.get("notes") as string;
-
-    const res = await addAppointment({
-      title,
-      date,
-      startTime,
-      endTime,
-      assignedUsers: assignedUsers.map((user) => user.id),
-      customerId: client ? client.id : undefined,
-      vehicleId: vehicle ? vehicle.id : undefined,
-      orderId: order ? order.id : undefined,
-      notes,
-      confirmationEmailTemplateId: confirmationTemplate?.id,
-      reminderEmailTemplateId: reminderTemplate?.id,
-      confirmationEmailTemplateStatus: confirmationTemplateStatus,
-      reminderEmailTemplateStatus: reminderTemplateStatus,
-      times,
+    const res = await editAppointment({
+      id: appointment.id,
+      appointment: {
+        title,
+        date: date as string,
+        startTime: startTime as string,
+        endTime: endTime as string,
+        assignedUsers: assignedUsers.map((user) => user.id),
+        customerId: client ? client.id : undefined,
+        vehicleId: vehicle ? vehicle.id : undefined,
+        orderId: order ? order.id : undefined,
+        notes,
+        confirmationEmailTemplateId: confirmationTemplate?.id,
+        reminderEmailTemplateId: reminderTemplate?.id,
+        confirmationEmailTemplateStatus: confirmationTemplateStatus,
+        reminderEmailTemplateStatus: reminderTemplateStatus,
+        times,
+      },
     });
-
-    // log everything
-    console.log("Title:", title);
-    console.log("Date:", date);
-    console.log("Start Time:", startTime);
-    console.log("End Time:", endTime);
-    console.log("Assigned Users:", assignedUsers);
-    console.log("Client ID:", client ? client.id : undefined);
-    console.log("Vehicle ID:", vehicle ? vehicle.id : undefined);
-    console.log("Order ID:", order ? order.id : undefined);
-    console.log("Notes:", notes);
-    console.log("Times:", times);
-    console.log("Confirmation Template:", confirmationTemplate);
-    console.log("Reminder Template:", reminderTemplate);
-    console.log("Confirmation Template Status:", confirmationTemplateStatus);
-    console.log("Reminder Template Status:", reminderTemplateStatus);
 
     close();
   };
 
   return (
-    <Dialog open={popup === "ADD_TASK"} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <button
-          type="button"
-          className="app-shadow rounded-md bg-[#6571FF] p-2 text-white"
-        >
-          New Appointment
-        </button>
-      </DialogTrigger>
+    <Dialog open={popup === "UPDATE_APPOINTMENT"} onOpenChange={close}>
       <DialogContent
         className="max-h-full max-w-5xl grid-rows-[auto,1fr,auto]"
         form
@@ -220,7 +204,13 @@ export function NewAppointment({
           <div className="space-y-4 bg-background p-6">
             <FormError />
 
-            <SlimInput name="title" label="Appointment Title" required />
+            <SlimInput
+              name="title"
+              label="Appointment Title"
+              required
+              value={title}
+              onChange={(event) => setTitle(event.currentTarget.value)}
+            />
 
             <div className="flex flex-wrap items-end gap-1">
               <SlimInput
@@ -237,8 +227,8 @@ export function NewAppointment({
                   className={cn(slimInputClassName, "flex-auto")}
                   type="time"
                   name="start"
-                  value={startTime}
-                  max={endTime}
+                  value={startTime!}
+                  max={endTime!}
                   onChange={(event) => setStartTime(event.currentTarget.value)}
                 />
                 <FaArrowRight className="shrink-0" />
@@ -246,8 +236,8 @@ export function NewAppointment({
                   className={cn(slimInputClassName, "flex-auto")}
                   type="time"
                   name="end"
-                  value={endTime}
-                  min={startTime}
+                  value={endTime!}
+                  min={startTime!}
                   onChange={(event) => setEndTime(event.currentTarget.value)}
                 />
               </div>
@@ -424,6 +414,8 @@ export function NewAppointment({
               placeholder="Notes"
               className={cn(slimInputClassName, "border-2 border-slate-400")}
               rows={3}
+              value={notes}
+              onChange={(event) => setNotes(event.currentTarget.value)}
             />
           </div>
 
@@ -489,10 +481,8 @@ export function NewAppointment({
         </div>
 
         <DialogFooter className="justify-end">
-          <DialogClose asChild>
-            <button type="button" className="rounded-md border px-4 py-1">
-              Cancel
-            </button>
+          <DialogClose className="rounded-md border px-4 py-1">
+            Cancel
           </DialogClose>
           <Submit
             className="rounded-md border bg-[#6571FF] px-4 py-1 text-white"

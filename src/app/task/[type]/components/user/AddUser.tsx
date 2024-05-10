@@ -3,15 +3,35 @@ import Popup from "@/components/Popup";
 import { usePopupStore } from "@/stores/popup";
 import FormError from "@/components/FormError";
 import Submit from "@/components/Submit";
+import { addUser } from "../../actions/addUser";
+import { useFormErrorStore } from "@/stores/form-error";
 
-// WARNING: This component is not yet complete
 export default function AddUser() {
   const { close } = usePopupStore();
+  const { showError } = useFormErrorStore();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
+
+  async function handleSubmit() {
+    const res = await addUser({
+      name,
+      email,
+      password,
+      confirmPassword: passwordConfirmation,
+    });
+
+    if (res?.message) {
+      showError({
+        field: res.field || "name",
+        message: res.message,
+      });
+    } else {
+      close();
+    }
+  }
 
   return (
     <Popup>
@@ -86,7 +106,10 @@ export default function AddUser() {
         </div>
 
         <div className="mt-5 flex flex-row justify-center gap-5">
-          <Submit className="rounded-md bg-blue-500 px-4 py-2 text-white">
+          <Submit
+            className="rounded-md bg-blue-500 px-4 py-2 text-white"
+            formAction={handleSubmit}
+          >
             Create User
           </Submit>
 

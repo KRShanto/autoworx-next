@@ -23,9 +23,8 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useDrop } from "react-dnd";
 import { FaPen } from "react-icons/fa6";
-import { addTask } from "../../add";
-import { assignAppointmentDate } from "./assignAppointmentDate";
-import { dragTask } from "./dragTask";
+import { assignAppointmentDate } from "../actions/assignAppointmentDate";
+import { dragTask } from "../actions/dragTask";
 
 function useWeek() {
   const searchParams = useSearchParams();
@@ -198,7 +197,7 @@ export default function Week({
     if (type === "tag") {
       const tag = event.dataTransfer.getData("text/plain").split("|")[1];
 
-      await addTask({ tag, date, startTime, endTime });
+      // TODO: add tag to the task
     } else if (type === "task") {
       // Get the id of the task from the dataTransfer object
       const taskId = parseInt(

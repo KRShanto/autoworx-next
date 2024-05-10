@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Dialog,
   DialogClose,
@@ -11,50 +9,34 @@ import {
 } from "@/components/Dialog";
 import { SlimInput, slimInputClassName } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { useEffect, useState } from "react";
-// import { addTemplate } from "./addTemplate";
+import { useState } from "react";
 import FormError from "@/components/FormError";
 import { useFormErrorStore } from "@/stores/form-error";
-import type { EmailTemplate } from "@/types/db";
 import { useEmailTemplateStore } from "@/stores/email-template";
-import { addTemplate } from "./addTemplate";
-import { EmailTemplateType } from "@prisma/client";
+import { updateTemplate } from "../../actions/updateTemplate";
 
-export default function NewTemplate({
-  type,
-  clientName,
-  vehicleModel,
+export default function UpdateTemplate({
+  id,
+  subject,
+  message,
 }: {
-  type: EmailTemplateType;
-  clientName: string;
-  vehicleModel: string;
+  id: number;
+  subject: string;
+  message: string;
 }) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
   const { templates, setTemplates } = useEmailTemplateStore();
-  const [subject, setSubject] = useState(
-    "Appointment Confirmation at TC CUSTOMS ATLANTA",
-  );
-  const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    setMessage(
-      `Hi <CLIENT>,
-    
-This is a friendly reminder that you have an upcoming appointment on Wednesday, May 8 at 12:30 PM EDT.
-  
-Location
-TC CUSTOMS ATLANTA
-6350 MCDONOUGH DRIVE NORTHWEST
-NORCROSS GA 30093
-  
-Vehicle
-<VEHICLE>`,
-    );
-  }, [clientName, vehicleModel]);
+  const [subjectInput, setSubjectInput] = useState(subject);
+  const [messageInput, setMessageInput] = useState(message);
 
-  async function handleSubmit(data: FormData) {
-    const res = (await addTemplate({ subject, message, type })) as any;
+  async function handleSubmit() {
+    const res = (await updateTemplate({
+      id,
+      subject: subjectInput,
+      message: messageInput,
+    })) as any;
 
     if (res.error) {
       showError({
@@ -62,7 +44,18 @@ Vehicle
         message: res.message,
       });
     } else {
-      setTemplates([...templates, { id: res.id, subject, message, type }]);
+      setTemplates(
+        templates.map((template) => {
+          if (template.id === id) {
+            return {
+              ...template,
+              subject: subjectInput,
+              message: messageInput,
+            };
+          }
+          return template;
+        }),
+      );
       setOpen(false);
     }
   }
@@ -71,7 +64,7 @@ Vehicle
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button type="button" className="text-xs text-[#6571FF]">
-          + Add New Template
+          Edit
         </button>
       </DialogTrigger>
 
@@ -80,16 +73,16 @@ Vehicle
         form
       >
         <DialogHeader>
-          <DialogTitle>Custom Template</DialogTitle>
+          <DialogTitle>Custom Template: Edit</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 overflow-y-auto">
           <FormError />
-          <input type="hidden" name="type" value={type} />
+
           <SlimInput
             name="subject"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
+            value={subjectInput}
+            onChange={(e) => setSubjectInput(e.target.value)}
             required
           />
           <label className="block">
@@ -98,8 +91,8 @@ Vehicle
               name="message"
               rows={10}
               className={slimInputClassName}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
             />
           </label>
         </div>

@@ -2,7 +2,6 @@ import { CalendarType } from "@/types/calendar";
 import Body from "./Body";
 import Heading from "./Heading";
 import {
-  Appointment,
   CalendarSettings,
   Customer,
   Order,

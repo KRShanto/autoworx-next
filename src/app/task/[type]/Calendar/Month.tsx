@@ -2,12 +2,10 @@
 
 import { cn } from "@/lib/cn";
 import { TASK_COLOR } from "@/lib/consts";
-// import { usePopupStore } from "@/stores/popup";
 import {
   Tooltip,
   TooltipContent,
   TooltipPortal,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/Tooltip";
 import type {
@@ -27,11 +25,8 @@ import type {
 import moment from "moment";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDrop } from "react-dnd";
-import { addTask } from "../../add";
-import { TaskDetails } from "./TaskDetails";
-import { assignAppointmentDate } from "./assignAppointmentDate";
-import { dragTask } from "./dragTask";
-import UpdateTask from "../CalendarSidebar/UpdateTask";
+import { assignAppointmentDate } from "../actions/assignAppointmentDate";
+import { dragTask } from "../actions/dragTask";
 import { FaPen } from "react-icons/fa6";
 import { usePopupStore } from "@/stores/popup";
 
@@ -160,7 +155,7 @@ export default function Month({
     if (type === "tag") {
       const tag = event.dataTransfer.getData("text/plain").split("|")[1];
 
-      await addTask({ tag, date, startTime, endTime });
+      // TODO: Add tag to the task
     } else if (type === "task") {
       // Get the id of the task from the dataTransfer object
       const taskId = parseInt(

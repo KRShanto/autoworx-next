@@ -4,7 +4,6 @@ import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 import { AuthSession } from "@/types/auth";
-import { Appointment } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 interface AppointmentToAdd {

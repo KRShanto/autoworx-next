@@ -3,7 +3,6 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 
-// BUG: This function is not working as expected
 export async function assignTask({
   userId,
   tasksToAssign,

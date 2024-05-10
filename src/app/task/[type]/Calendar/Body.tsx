@@ -3,7 +3,6 @@ import Week from "./Week";
 import Month from "./Month";
 import { CalendarType } from "@/types/calendar";
 import {
-  Appointment,
   CalendarSettings,
   Customer,
   Order,

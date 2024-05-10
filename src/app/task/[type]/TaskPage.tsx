@@ -5,7 +5,6 @@ import CalendarSidebar from "./CalendarSidebar/CalendarSidebar";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import {
-  Appointment,
   CalendarSettings,
   Customer,
   Order,
@@ -16,7 +15,6 @@ import {
 import { CalendarType } from "@/types/calendar";
 import { AppointmentFull, CalendarAppointment } from "@/types/db";
 import { EmailTemplate } from "@/types/db";
-import { UpdateAppointment } from "./Calendar/UpdateAppointment";
 
 export default function TaskPage({
   type,

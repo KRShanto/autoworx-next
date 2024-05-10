@@ -6,7 +6,6 @@ import { usePopupStore } from "../../../../stores/popup";
 import { Task, User } from "@prisma/client";
 import { MinimizeButton } from "./MinimiseButton";
 import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
-import { FaPlus } from "react-icons/fa";
 import { cn } from "@/lib/cn";
 
 export default function Users({

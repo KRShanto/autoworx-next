@@ -12,7 +12,7 @@ import {
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { useState } from "react";
-import { addVehicle } from "./addVehicle";
+import { addVehicle } from "../../actions/addVehicle";
 import FormError from "@/components/FormError";
 import { useFormErrorStore } from "@/stores/form-error";
 

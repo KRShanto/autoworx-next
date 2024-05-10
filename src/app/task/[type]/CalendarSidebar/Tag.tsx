@@ -1,6 +1,7 @@
 import React, { LegacyRef } from "react";
 import { useDrag } from "react-dnd";
 
+// WARNING: this component is not updated yet
 export default function TagComponent({ tag }: { tag: string }) {
   const [{ isDragging }, drag] = useDrag({
     type: "tag",
