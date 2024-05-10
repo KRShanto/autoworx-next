@@ -15,7 +15,7 @@ import {
 } from "@prisma/client";
 import { CalendarType } from "@/types/calendar";
 import { AppointmentFull, CalendarAppointment } from "@/types/db";
-import { EmailTemplate } from "@/types/email-template";
+import { EmailTemplate } from "@/types/db";
 import { UpdateAppointment } from "./Calendar/UpdateAppointment";
 
 export default function TaskPage({

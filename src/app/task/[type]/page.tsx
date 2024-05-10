@@ -189,23 +189,11 @@ export default async function Page({ params }: { params: { type: string } }) {
         })
       : null;
 
-    // const confirmationEmailTemplate = await db.emailTemplate.findFirst({
-    //   where: {
-    //     id: appointment.confirmationEmailTemplateId || undefined,
-    //   },
-    // });
-
     const confirmationEmailTemplate = appointment.confirmationEmailTemplateId
       ? await db.emailTemplate.findUnique({
           where: { id: appointment.confirmationEmailTemplateId },
         })
       : null;
-
-    // const reminderEmailTemplate = await db.emailTemplate.findFirst({
-    //   where: {
-    //     id: appointment.reminderEmailTemplateId || undefined,
-    //   },
-    // });
 
     const reminderEmailTemplate = appointment.reminderEmailTemplateId
       ? await db.emailTemplate.findUnique({
@@ -236,8 +224,8 @@ export default async function Page({ params }: { params: { type: string } }) {
       customer,
       vehicle,
       order,
-      confirmationEmailTemplate,
-      reminderEmailTemplate,
+      confirmationEmailTemplate: confirmationEmailTemplate as any,
+      reminderEmailTemplate: reminderEmailTemplate as any,
       assignedUsers,
     });
   }

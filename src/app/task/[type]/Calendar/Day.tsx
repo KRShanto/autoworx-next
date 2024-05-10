@@ -8,11 +8,11 @@ import type {
   AppointmentFull,
   CalendarAppointment,
   CalendarTask,
+  EmailTemplate,
 } from "@/types/db";
 import type {
   CalendarSettings,
   Customer,
-  EmailTemplate,
   Order,
   Task,
   User,

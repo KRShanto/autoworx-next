@@ -18,7 +18,6 @@ import { usePopupStore } from "@/stores/popup";
 import type {
   CalendarSettings,
   Customer,
-  EmailTemplate,
   Order,
   User,
   Vehicle,
@@ -43,6 +42,7 @@ import { Reminder } from "./Reminder";
 import { useEmailTemplateStore } from "@/stores/email-template";
 import { AppointmentFull } from "@/types/db";
 import { editAppointment } from "./editAppointment";
+import { EmailTemplate } from "@/types/db";
 
 enum Tab {
   Schedule = 0,

@@ -12,7 +12,7 @@ import {
 } from "@prisma/client";
 import { AppointmentFull, CalendarAppointment, CalendarTask } from "@/types/db";
 import { Suspense } from "react";
-import { EmailTemplate } from "@/types/email-template";
+import { EmailTemplate } from "@/types/db";
 
 export default function Calender({
   type,

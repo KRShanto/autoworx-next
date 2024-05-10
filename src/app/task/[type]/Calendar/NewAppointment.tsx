@@ -39,7 +39,7 @@ import NewVehicle from "./NewVehicle";
 import Selector from "./Selector";
 import { addAppointment } from "./addAppointment";
 import { Reminder } from "./Reminder";
-import { EmailTemplate } from "@/types/email-template";
+import { EmailTemplate } from "@/types/db";
 import { useEmailTemplateStore } from "@/stores/email-template";
 
 enum Tab {

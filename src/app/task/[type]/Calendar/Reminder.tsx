@@ -5,7 +5,7 @@ import { TbUserX } from "react-icons/tb";
 import NewTemplate from "./NewTemplate";
 import Selector from "./Selector";
 import { useEmailTemplateStore } from "@/stores/email-template";
-import { EmailTemplate } from "@prisma/client";
+import { EmailTemplate } from "@/types/db";
 import { FaTimes } from "react-icons/fa";
 import moment from "moment";
 import { deleteTemplate } from "./deleteTemplate";

@@ -12,7 +12,7 @@ import {
   Vehicle,
 } from "@prisma/client";
 import { AppointmentFull, CalendarAppointment, CalendarTask } from "@/types/db";
-import { EmailTemplate } from "@/types/email-template";
+import { EmailTemplate } from "@/types/db";
 
 export default function Body({
   type,
@@ -62,6 +62,11 @@ export default function Body({
         tasksWithoutTime={tasksWithoutTime}
         appointments={appointments as any}
         appointmentsFull={appointmentsFull}
+        customers={customers}
+        vehicles={vehicles}
+        orders={orders}
+        settings={settings}
+        templates={templates}
       />
     );
   if (type === "month")
@@ -72,6 +77,11 @@ export default function Body({
         tasksWithoutTime={tasksWithoutTime}
         appointments={appointments}
         appointmentsFull={appointmentsFull}
+        customers={customers}
+        vehicles={vehicles}
+        orders={orders}
+        settings={settings}
+        templates={templates}
       />
     );
 }

@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 // import { addTemplate } from "./addTemplate";
 import FormError from "@/components/FormError";
 import { useFormErrorStore } from "@/stores/form-error";
-import type { EmailTemplate } from "@/types/email-template";
+import type { EmailTemplate } from "@/types/db";
 import { useEmailTemplateStore } from "@/stores/email-template";
 import { addTemplate } from "./addTemplate";
 import { EmailTemplateType } from "@prisma/client";

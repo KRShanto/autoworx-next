@@ -10,8 +10,20 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/Tooltip";
-import type { CalendarAppointment, CalendarTask } from "@/types/db";
-import type { Task, User } from "@prisma/client";
+import type {
+  AppointmentFull,
+  CalendarAppointment,
+  CalendarTask,
+  EmailTemplate,
+} from "@/types/db";
+import type {
+  CalendarSettings,
+  Customer,
+  Order,
+  Task,
+  User,
+  Vehicle,
+} from "@prisma/client";
 import moment from "moment";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDrop } from "react-dnd";
@@ -34,11 +46,23 @@ export default function Month({
   companyUsers,
   tasksWithoutTime,
   appointments,
+  appointmentsFull,
+  customers,
+  vehicles,
+  orders,
+  settings,
+  templates,
 }: {
   tasks: CalendarTask[];
   companyUsers: User[];
   tasksWithoutTime: Task[];
   appointments: CalendarAppointment[];
+  appointmentsFull: AppointmentFull[];
+  customers: Customer[];
+  vehicles: Vehicle[];
+  orders: Order[];
+  settings: CalendarSettings;
+  templates: EmailTemplate[];
 }) {
   const router = useRouter();
   const [{ canDrop, isOver }, dropRef] = useDrop({
@@ -239,9 +263,32 @@ export default function Month({
                       <TooltipPortal>
                         <TooltipContent>
                           <div className="w-[300px] rounded-lg bg-white p-3">
-                            <h3 className="font-semibold">
-                              {appointment.title}
-                            </h3>
+                            <div className="flex items-center justify-between">
+                              <h3 className="font-semibold">
+                                {appointment.title}
+                              </h3>
+
+                              <button
+                                type="button"
+                                className="text- rounded-full bg-[#6571FF] p-2 text-white"
+                                onClick={() =>
+                                  open("UPDATE_APPOINTMENT", {
+                                    appointment: appointmentsFull.find(
+                                      (appointment) =>
+                                        appointment.id === appointment.id,
+                                    ),
+                                    employees: companyUsers,
+                                    customers,
+                                    vehicles,
+                                    orders,
+                                    templates,
+                                    settings,
+                                  })
+                                }
+                              >
+                                <FaPen className="mx-auto text-[10px]" />
+                              </button>
+                            </div>
 
                             <p>
                               Client: {appointment.customer?.firstName}{" "}
