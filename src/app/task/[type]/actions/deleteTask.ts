@@ -1,9 +1,10 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { ServerAction } from "@/types/action";
 import { revalidatePath } from "next/cache";
 
-export async function deleteTask(id: number) {
+export async function deleteTask(id: number): Promise<ServerAction> {
   // find the task users
   const taskUsers = await db.taskUser.findMany({
     where: {
@@ -25,5 +26,7 @@ export async function deleteTask(id: number) {
 
   revalidatePath("/task");
 
-  return true;
+  return {
+    type: "success",
+  };
 }

@@ -2,6 +2,7 @@
 
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
+import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
 import bcrypt from "bcrypt";
 import { revalidatePath } from "next/cache";
@@ -16,11 +17,12 @@ export async function addUser({
   email: string;
   password: string;
   confirmPassword: string;
-}) {
+}): Promise<ServerAction> {
   if (password !== confirmPassword) {
     return {
       message: "Passwords do not match",
       field: "password",
+      type: "error",
     };
   }
 
@@ -39,4 +41,8 @@ export async function addUser({
   });
 
   revalidatePath("/employee");
+
+  return {
+    type: "success",
+  };
 }

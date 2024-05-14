@@ -52,15 +52,15 @@ Vehicle
   }, [clientName, vehicleModel]);
 
   async function handleSubmit(data: FormData) {
-    const res = (await addTemplate({ subject, message, type })) as any;
+    const res = await addTemplate({ subject, message, type });
 
-    if (res.error) {
+    if (res.type === "error") {
       showError({
         field: res.field || "subject",
-        message: res.message,
+        message: res.message || "",
       });
     } else {
-      setTemplates([...templates, { id: res.id, subject, message, type }]);
+      setTemplates([...templates, { id: res.data.id, subject, message, type }]);
       setOpen(false);
     }
   }

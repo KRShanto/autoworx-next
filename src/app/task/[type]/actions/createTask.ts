@@ -5,6 +5,7 @@ import { Priority } from "@prisma/client";
 import { auth } from "@/app/auth";
 import { AuthSession } from "@/types/auth";
 import { revalidatePath } from "next/cache";
+import { ServerAction } from "@/types/action";
 
 interface TaskType {
   title: string;
@@ -13,7 +14,7 @@ interface TaskType {
   priority: Priority;
 }
 
-export async function createTask(task: TaskType) {
+export async function createTask(task: TaskType): Promise<ServerAction> {
   const session = (await auth()) as AuthSession;
 
   const newTask = await db.task.create({
@@ -48,5 +49,7 @@ export async function createTask(task: TaskType) {
 
   revalidatePath("/task");
 
-  return true;
+  return {
+    type: "success",
+  };
 }

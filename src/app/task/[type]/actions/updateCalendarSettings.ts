@@ -2,6 +2,7 @@
 
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
+import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
 import { revalidatePath } from "next/cache";
 
@@ -11,7 +12,7 @@ export async function updateCalendarSettings(data: {
   dayEnd: string;
   weekend1: string;
   weekend2: string;
-}) {
+}): Promise<ServerAction> {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
 
@@ -39,5 +40,5 @@ export async function updateCalendarSettings(data: {
 
   revalidatePath("/task");
 
-  return { message: "Calendar settings updated" };
+  return { type: "success" };
 }

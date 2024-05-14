@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { ServerAction } from "@/types/action";
 import { Priority } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
@@ -11,7 +12,13 @@ interface TaskType {
   priority: Priority;
 }
 
-export async function editTask({ id, task }: { id: number; task: TaskType }) {
+export async function editTask({
+  id,
+  task,
+}: {
+  id: number;
+  task: TaskType;
+}): Promise<ServerAction> {
   // Find the task users
   const taskUsers = await db.taskUser.findMany({
     where: {
@@ -68,5 +75,7 @@ export async function editTask({ id, task }: { id: number; task: TaskType }) {
 
   revalidatePath("/task");
 
-  return true;
+  return {
+    type: "success",
+  };
 }

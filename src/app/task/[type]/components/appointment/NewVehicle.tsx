@@ -27,19 +27,19 @@ export default function NewVehicle({ setVehicles }: { setVehicles: any }) {
     const submodel = data.get("submodel") as string;
     const type = data.get("type") as string;
 
-    const res = (await addVehicle({
+    const res = await addVehicle({
       make,
       model,
       year,
       submodel,
       type,
-    })) as any;
+    });
 
-    if (res.message) {
+    if (res.type === "error") {
       console.log(res);
       showError({
         field: res.field || "make",
-        message: res.message,
+        message: res.message || "",
       });
     } else {
       setVehicles((prev: any) => [...prev, res]);

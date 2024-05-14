@@ -3,6 +3,7 @@
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
+import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
 import { revalidatePath } from "next/cache";
 import cron from "node-cron";
@@ -24,9 +25,19 @@ interface AppointmentToAdd {
   times?: { date: string; time: string }[];
 }
 
-export async function addAppointment(appointment: AppointmentToAdd) {
+export async function addAppointment(
+  appointment: AppointmentToAdd,
+): Promise<ServerAction> {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
+
+  if (!appointment.title) {
+    return {
+      type: "error",
+      message: "Title is required",
+      field: "title",
+    };
+  }
 
   const newAppointment = await db.appointment.create({
     data: {
@@ -159,7 +170,7 @@ export async function addAppointment(appointment: AppointmentToAdd) {
 
     const times = appointment.times;
 
-    if (!times || times.length === 0) return;
+    if (!times || times.length === 0) return { type: "success" };
 
     for (const time of times) {
       const date = new Date(time.date);
@@ -186,4 +197,6 @@ export async function addAppointment(appointment: AppointmentToAdd) {
       }
     }
   }
+
+  return { type: "success" };
 }

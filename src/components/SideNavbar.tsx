@@ -60,7 +60,7 @@ const navList = [
   {
     title: "Invoices",
     icon: "/icons/navbar/Invoices.svg",
-    link: "/invoice",
+    link: "/estimate",
   },
   {
     title: "Payments",
@@ -95,7 +95,7 @@ export default function SideNavbar() {
         />
 
         {/* Links */}
-        <div className="mt-16 mb-auto flex flex-col items-center gap-4">
+        <div className="mb-auto mt-16 flex flex-col items-center gap-4">
           {navList.map((item, index) =>
             item.subnav ? (
               <Dropdown

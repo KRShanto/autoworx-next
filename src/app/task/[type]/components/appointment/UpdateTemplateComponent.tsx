@@ -32,16 +32,16 @@ export default function UpdateTemplate({
   const [messageInput, setMessageInput] = useState(message);
 
   async function handleSubmit() {
-    const res = (await updateTemplate({
+    const res = await updateTemplate({
       id,
       subject: subjectInput,
       message: messageInput,
-    })) as any;
+    });
 
-    if (res.error) {
+    if (res.type === "error") {
       showError({
         field: res.field || "subject",
-        message: res.message,
+        message: res.message || "",
       });
     } else {
       setTemplates(

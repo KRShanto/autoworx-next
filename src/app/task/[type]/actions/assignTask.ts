@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { ServerAction } from "@/types/action";
 import { revalidatePath } from "next/cache";
 
 export async function assignTask({
@@ -12,7 +13,7 @@ export async function assignTask({
     taskId: number;
     assigned: boolean;
   }[];
-}) {
+}): Promise<ServerAction> {
   const user = await db.user.findUnique({
     where: {
       id: userId,
@@ -71,4 +72,8 @@ export async function assignTask({
   }
 
   revalidatePath("/task");
+
+  return {
+    type: "success",
+  };
 }

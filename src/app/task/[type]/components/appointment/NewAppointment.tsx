@@ -151,21 +151,13 @@ export function NewAppointment({
       times,
     });
 
-    // log everything
-    console.log("Title:", title);
-    console.log("Date:", date);
-    console.log("Start Time:", startTime);
-    console.log("End Time:", endTime);
-    console.log("Assigned Users:", assignedUsers);
-    console.log("Client ID:", client ? client.id : undefined);
-    console.log("Vehicle ID:", vehicle ? vehicle.id : undefined);
-    console.log("Order ID:", order ? order.id : undefined);
-    console.log("Notes:", notes);
-    console.log("Times:", times);
-    console.log("Confirmation Template:", confirmationTemplate);
-    console.log("Reminder Template:", reminderTemplate);
-    console.log("Confirmation Template Status:", confirmationTemplateStatus);
-    console.log("Reminder Template Status:", reminderTemplateStatus);
+    if (res.type === "error") {
+      showError({
+        field: res.field || "all",
+        message: res.message || "",
+      });
+      return;
+    }
 
     close();
   };

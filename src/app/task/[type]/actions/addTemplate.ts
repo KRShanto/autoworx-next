@@ -2,6 +2,7 @@
 
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
+import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
 import { EmailTemplateType } from "@prisma/client";
 
@@ -13,7 +14,7 @@ export async function addTemplate({
   subject: string;
   message: string;
   type: EmailTemplateType;
-}) {
+}): Promise<ServerAction> {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
 
@@ -26,5 +27,8 @@ export async function addTemplate({
     },
   });
 
-  return newTemplate;
+  return {
+    type: "success",
+    data: newTemplate,
+  };
 }

@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { ServerAction } from "@/types/action";
 import { revalidatePath } from "next/cache";
 
 interface AppointmentToAdd {
@@ -26,7 +27,7 @@ export async function editAppointment({
 }: {
   id: number;
   appointment: AppointmentToAdd;
-}) {
+}): Promise<ServerAction> {
   // Update the appointment
   await db.appointment.update({
     where: {
@@ -72,5 +73,7 @@ export async function editAppointment({
 
   revalidatePath("/task");
 
-  return true;
+  return {
+    type: "success",
+  };
 }

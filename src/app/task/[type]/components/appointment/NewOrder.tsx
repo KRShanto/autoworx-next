@@ -23,12 +23,12 @@ export default function NewOrder({ setOrders }: { setOrders: any }) {
     const name = data.get("name") as string;
     const comment = data.get("comment") as string;
 
-    const res = (await addOrder({ name, comment })) as any;
+    const res = await addOrder({ name, comment });
 
-    if (res.message) {
+    if (res.type === "error") {
       showError({
         field: res.field || "name",
-        message: res.message,
+        message: res.message || "",
       });
     } else {
       setOrders((prev: any) => [...prev, res]);

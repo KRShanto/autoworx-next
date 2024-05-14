@@ -23,10 +23,10 @@ export default function AddUser() {
       confirmPassword: passwordConfirmation,
     });
 
-    if (res?.message) {
+    if (res.type === "error") {
       showError({
         field: res.field || "name",
-        message: res.message,
+        message: res.message || "",
       });
     } else {
       close();

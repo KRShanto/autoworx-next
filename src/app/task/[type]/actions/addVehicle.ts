@@ -4,6 +4,7 @@ import { AuthSession } from "@/types/auth";
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { z } from "zod";
+import { ServerAction } from "@/types/action";
 
 export async function addVehicle(data: {
   make: string;
@@ -11,7 +12,7 @@ export async function addVehicle(data: {
   year: number;
   submodel: string;
   type: string;
-}) {
+}): Promise<ServerAction> {
   try {
     const session = (await auth()) as AuthSession;
     const companyId = session.user.companyId;
@@ -24,21 +25,28 @@ export async function addVehicle(data: {
       },
     });
 
-    return vehicle;
+    return {
+      type: "success",
+      data: vehicle,
+    };
   } catch (error: any) {
     if (error instanceof z.ZodError) {
       return {
+        type: "error",
         message: error.errors[0].message,
-        field: error.errors[0].path[0],
+        field: error.errors[0].path[0] as string,
       };
     } else if (error.code === "P2002") {
       return {
+        type: "error",
         message: "Vehicle already exists",
         field: "vin",
       };
     } else {
       return {
+        type: "error",
         message: error.message,
+        field: "all",
       };
     }
   }
