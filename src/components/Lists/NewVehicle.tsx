@@ -9,14 +9,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/Dialog";
+import FormError from "@/components/FormError";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { useState } from "react";
-import { addVehicle } from "../../actions/addVehicle";
-import FormError from "@/components/FormError";
 import { useFormErrorStore } from "@/stores/form-error";
+import { useListsStore } from "@/stores/lists";
+import { useState } from "react";
+import { addVehicle } from "../../app/task/[type]/actions/addVehicle";
 
-export default function NewVehicle({ setVehicles }: { setVehicles: any }) {
+export default function NewVehicle() {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
 
@@ -42,7 +43,9 @@ export default function NewVehicle({ setVehicles }: { setVehicles: any }) {
         message: res.message || "",
       });
     } else {
-      setVehicles((prev: any) => [...prev, res]);
+      useListsStore.setState(({ vehicles }) => ({
+        vehicles: [...vehicles, res.data],
+      }));
       setOpen(false);
     }
   }

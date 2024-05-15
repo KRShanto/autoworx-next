@@ -1,4 +1,5 @@
 import { CalendarType } from "@/types/calendar";
+import type { EmailTemplate } from "@prisma/client";
 import {
   CalendarSettings,
   Customer,
@@ -8,13 +9,12 @@ import {
 } from "@prisma/client";
 import { sentenceCase } from "change-case";
 import moment from "moment";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { NewAppointment } from "../components/appointment/NewAppointment";
 import Settings from "../components/appointment/Settings";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
-import Link from "next/link";
-import { EmailTemplate } from "@/types/db";
 
 function DisplayDate({ type }: { type: CalendarType }) {
   const searchParams = useSearchParams();

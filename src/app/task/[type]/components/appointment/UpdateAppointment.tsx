@@ -9,13 +9,18 @@ import {
   DialogTitle,
 } from "@/components/Dialog";
 import FormError from "@/components/FormError";
+import { SelectClient } from "@/components/Lists/SelectClient";
+import { SelectVehicle } from "@/components/Lists/SelectVehicle";
 import { SlimInput, slimInputClassName } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { cn } from "@/lib/cn";
+import { useListsStore } from "@/stores/lists";
 import { usePopupStore } from "@/stores/popup";
+import { AppointmentFull } from "@/types/db";
 import type {
   CalendarSettings,
   Customer,
+  EmailTemplate,
   Order,
   User,
   Vehicle,
@@ -31,15 +36,10 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { TbBell, TbCalendar } from "react-icons/tb";
-import NewCustomer from "./NewCustomer";
-import NewOrder from "./NewOrder";
-import NewVehicle from "./NewVehicle";
-import Selector from "./Selector";
-import { Reminder } from "./Reminder";
-import { useEmailTemplateStore } from "@/stores/email-template";
-import { AppointmentFull } from "@/types/db";
 import { editAppointment } from "../../actions/editAppointment";
-import { EmailTemplate } from "@/types/db";
+import NewOrder from "./NewOrder";
+import { Reminder } from "./Reminder";
+import Selector from "./Selector";
 
 enum Tab {
   Schedule = 0,
@@ -77,8 +77,6 @@ export function UpdateAppointment() {
     appointment.startTime,
   );
   const [endTime, setEndTime] = useState<string | null>(appointment.endTime);
-  const [clientList, setClientList] = useState(customers);
-  const [vehicleList, setVehicleList] = useState(vehicles);
   const [orderList, setOrderList] = useState(orders);
   const [allDay, setAllDay] = useState(false);
 
@@ -106,8 +104,6 @@ export function UpdateAppointment() {
     appointment.reminderEmailTemplateStatus,
   );
 
-  const { setTemplates } = useEmailTemplateStore();
-
   const handleSearch = (search: string) => {
     setEmployeesToDisplay(
       employees.filter((employee) =>
@@ -134,7 +130,7 @@ export function UpdateAppointment() {
     console.log("Templates; ", templates);
 
     if (templates) {
-      setTemplates(templates);
+      useListsStore.setState({ templates });
     }
   }, [templates]);
 
@@ -330,64 +326,9 @@ export function UpdateAppointment() {
           </div>
 
           <div className="row-start-2 space-y-4 bg-background p-6">
-            <Selector
-              newButton={<NewCustomer setCustomers={setClientList} />}
-              label={
-                client ? `${client.firstName} ${client.lastName}` : "Client"
-              }
-            >
-              <div>
-                {clientList.map((client) => (
-                  <button
-                    type="button"
-                    key={client.id}
-                    className="flex w-full cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100"
-                    onClick={() => setClient(client)}
-                  >
-                    <Image
-                      src={client.photo!}
-                      alt="Client Image"
-                      width={30}
-                      height={30}
-                      className="rounded-full"
-                    />
+            <SelectClient value={client} setValue={setClient} />
 
-                    <div>
-                      <p className="text-start text-sm font-bold">
-                        {client.firstName} {client.lastName}
-                      </p>
-                      <p className="text-xs">{client.email}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </Selector>
-
-            <Selector
-              newButton={<NewVehicle setVehicles={setVehicleList} />}
-              label={
-                vehicle ? vehicle.model || `Vehicle ${vehicle.id}` : "Vehicle"
-              }
-            >
-              <div className="">
-                {vehicleList.map((vehicle) => (
-                  <button
-                    type="button"
-                    key={vehicle.id}
-                    className="flex w-full cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100"
-                    onClick={() => setVehicle(vehicle)}
-                  >
-                    <div>
-                      <p className="text-sm font-bold">
-                        {`${vehicle.model} ${vehicle.id}`}
-                      </p>
-                      <p className="text-xs">Owner</p>{" "}
-                      {/* TODO: Add owner name */}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </Selector>
+            <SelectVehicle value={vehicle} setValue={setVehicle} />
 
             <Selector
               label={order ? order.name : "Order"}
@@ -461,7 +402,6 @@ export function UpdateAppointment() {
             ) : tab === Tab.Reminder ? (
               <Reminder
                 client={client}
-                // @ts-ignore
                 vehicle={vehicle}
                 endTime={endTime!}
                 date={date!}

@@ -14,9 +14,10 @@ import FormError from "@/components/FormError";
 import Input from "@/components/Input";
 import Submit from "@/components/Submit";
 import { useFormErrorStore } from "@/stores/form-error";
+import { useListsStore } from "@/stores/lists";
 import { useState } from "react";
 
-export default function NewCustomer({ setCustomers }: { setCustomers: any }) {
+export default function NewCustomer() {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
 
@@ -51,7 +52,9 @@ export default function NewCustomer({ setCustomers }: { setCustomers: any }) {
         message: res.message,
       });
     } else {
-      setCustomers((prev: any) => [...prev, res]);
+      useListsStore.setState(({ customers }) => ({
+        customers: [...customers, res],
+      }));
       setOpen(false);
     }
   }

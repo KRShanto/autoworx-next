@@ -1,22 +1,23 @@
 "use client";
 
-import { cn } from "@/lib/cn";
-import { TASK_COLOR } from "@/lib/consts";
 import {
   Tooltip,
   TooltipContent,
   TooltipPortal,
   TooltipTrigger,
 } from "@/components/Tooltip";
+import { cn } from "@/lib/cn";
+import { TASK_COLOR } from "@/lib/consts";
+import { usePopupStore } from "@/stores/popup";
 import type {
   AppointmentFull,
   CalendarAppointment,
   CalendarTask,
-  EmailTemplate,
 } from "@/types/db";
 import type {
   CalendarSettings,
   Customer,
+  EmailTemplate,
   Order,
   Task,
   User,
@@ -25,10 +26,9 @@ import type {
 import moment from "moment";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDrop } from "react-dnd";
+import { FaPen } from "react-icons/fa6";
 import { assignAppointmentDate } from "../actions/assignAppointmentDate";
 import { dragTask } from "../actions/dragTask";
-import { FaPen } from "react-icons/fa6";
-import { usePopupStore } from "@/stores/popup";
 
 function useMonth() {
   const searchParams = useSearchParams();

@@ -7,6 +7,7 @@ import { auth } from "@/app/auth";
 import { CalendarType } from "@/types/calendar";
 import TaskPage from "./TaskPage";
 import { AppointmentFull } from "@/types/db";
+import { SyncLists } from "@/components/SyncLists";
 
 export const metadata: Metadata = {
   title: "Task and Activity Management",
@@ -235,6 +236,13 @@ export default async function Page({ params }: { params: { type: string } }) {
       <Title>Task and Activity Management</Title>
 
       <div className="relative flex h-[81vh] gap-4 pt-4">
+        <SyncLists
+          customers={customers}
+          vehicles={vehicles}
+          orders={orders}
+          employees={companyUsers}
+          templates={emailTemplates}
+        />
         <TaskPage
           type={params.type as CalendarType}
           taskWithAssignedUsers={taskWithAssignedUsers}
@@ -247,7 +255,7 @@ export default async function Page({ params }: { params: { type: string } }) {
           orders={orders}
           settings={settings}
           appointments={calendarAppointments!}
-          templates={emailTemplates as any}
+          templates={emailTemplates}
           appointmentsFull={appointmentsFull}
         />
       </div>

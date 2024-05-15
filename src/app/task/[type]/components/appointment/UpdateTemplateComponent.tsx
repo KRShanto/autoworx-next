@@ -12,8 +12,8 @@ import Submit from "@/components/Submit";
 import { useState } from "react";
 import FormError from "@/components/FormError";
 import { useFormErrorStore } from "@/stores/form-error";
-import { useEmailTemplateStore } from "@/stores/email-template";
 import { updateTemplate } from "../../actions/updateTemplate";
+import { useListsStore } from "@/stores/lists";
 
 export default function UpdateTemplate({
   id,
@@ -26,7 +26,6 @@ export default function UpdateTemplate({
 }) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
-  const { templates, setTemplates } = useEmailTemplateStore();
 
   const [subjectInput, setSubjectInput] = useState(subject);
   const [messageInput, setMessageInput] = useState(message);
@@ -44,8 +43,8 @@ export default function UpdateTemplate({
         message: res.message || "",
       });
     } else {
-      setTemplates(
-        templates.map((template) => {
+      useListsStore.setState(({ templates }) => ({
+        templates: templates.map((template) => {
           if (template.id === id) {
             return {
               ...template,
@@ -55,7 +54,7 @@ export default function UpdateTemplate({
           }
           return template;
         }),
-      );
+      }));
       setOpen(false);
     }
   }
