@@ -8,39 +8,44 @@ datasource db {
 }
 
 model Company {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  workOrders WorkOrder[]
-  users      User[]
-  tasks      Task[]
-  customers  Customer[]
-  services   Service[]
-  vehicles   Vehicle[]
-  invoices   Invoice[]
-  settings   Setting[]
-  payments   Payment[]
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+  workOrders         WorkOrder[]
+  users              User[]
+  tasks              Task[]
+  customers          Customer[]
+  services           Service[]
+  vehicles           Vehicle[]
+  invoices           Invoice[]
+  settings           Setting[]
+  payments           Payment[]
   invoiceAdditionals InvoiceAdditional[]
-  calendarSettings CalendarSettings[]
-  orders     Order[]
-  appointments Appointment[]
-  emailTemplates EmailTemplate[]
+  calendarSettings   CalendarSettings[]
+  orders             Order[]
+  appointments       Appointment[]
+  emailTemplates     EmailTemplate[]
+  materials          Material[]
+  vendors            Vendor[]
+  labors             Labor[]
+  tags               Tag[]
+  categories         Category[]
 }
 
 model WorkOrder {
-  id           Int      @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   invoiceId    Int
   activeStatus ActiveStatus
-  deletedAt    DateTime? @map("deleted_at")
-  companyId    Int?     @map("company_id")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-  company      Company? @relation(fields: [companyId], references: [id])
+  deletedAt    DateTime?     @map("deleted_at")
+  companyId    Int?          @map("company_id")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  company      Company?      @relation(fields: [companyId], references: [id])
   users        User[]
   // tasks        Task[]
   appointments Appointment[]
-  
+
   @@index([companyId], name: "fk_work_orders_company")
 }
 
@@ -50,35 +55,34 @@ enum ActiveStatus {
 }
 
 model User {
-  id                 Int      @id @default(autoincrement())
+  id                 Int                @id @default(autoincrement())
   name               String
-  email              String   @unique
-  emailVerifiedAt    DateTime? @map("email_verified_at")
-  image              String   @default("/images/default.png")
+  email              String             @unique
+  emailVerifiedAt    DateTime?          @map("email_verified_at")
+  image              String             @default("/images/default.png")
   password           String
-  provider           Provider @default(email)
-  timezone           String   @default("UTC")
+  provider           Provider           @default(email)
+  timezone           String             @default("UTC")
   phone              Int?
   address            String?
   city               String?
   state              String?
   zip                String?
-  role               Role     @default(admin)
-  employeeType       EmployeeType @default(None)
+  role               Role               @default(admin)
+  employeeType       EmployeeType       @default(None)
   employeeDepartment EmployeeDepartment @default(None)
-  workOrderId        Int?  @map("work_order_id")
-  companyId          Int     @map("company_id")
-  createdAt          DateTime @default(now()) @map("created_at")
-  updatedAt          DateTime @updatedAt @map("updated_at")
-  company            Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  workOrder          WorkOrder? @relation(fields: [workOrderId], references: [id])
+  workOrderId        Int?               @map("work_order_id")
+  companyId          Int                @map("company_id")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+  company            Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  workOrder          WorkOrder?         @relation(fields: [workOrderId], references: [id])
   tasks              Task[]
   oauthTokens        OAuthToken[]
   taskUsers          TaskUser[]
   appointments       Appointment[]
   appointmentUsers   AppointmentUser[]
-  
-  
+
   @@index([companyId], name: "fk_users_company")
   @@index([workOrderId], name: "fk_users_work_order")
 }
@@ -109,84 +113,172 @@ enum EmployeeDepartment {
 }
 
 model OAuthToken {
-  id           Int      @id @default(autoincrement())
-  userId       Int      @map("user_id") @unique
+  id           Int       @id @default(autoincrement())
+  userId       Int       @unique @map("user_id")
   provider     String
-  accessToken  String   @map("access_token")
-  refreshToken String?  @map("refresh_token")
+  accessToken  String    @map("access_token")
+  refreshToken String?   @map("refresh_token")
   expiresIn    DateTime? @map("expires_in")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], name: "fk_oauth_tokens_user")
 }
 
-
 model Order {
-  id        Int      @id @default(autoincrement())
-  name      String
-  comment   String?
-  companyId Int?     @map("company_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id           Int           @id @default(autoincrement())
+  name         String
+  comment      String?
+  companyId    Int?          @map("company_id")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
   // tasks     Task[]
   appointments Appointment[]
-  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company      Company?      @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model Customer {
-  id        Int      @id @default(autoincrement())
-  firstName      String @map("first_name")
-  lastName       String? @map("last_name")
-  mobile    Int?      @unique
-  email     String?
-  address   String?
-  city      String?
-  state     String?
-  zip       String?
-  photo     String? @default("/images/default.png")
-  companyId Int    @map("company_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")  
-  company   Company @relation(fields: [companyId], references: [id] , onDelete: Cascade)
-  customerCompany String? @map("customer_company")
-  tag    String? @default("")
+  id              Int           @id @default(autoincrement())
+  firstName       String        @map("first_name")
+  lastName        String?       @map("last_name")
+  mobile          Int?          @unique
+  email           String?
+  address         String?
+  city            String?
+  state           String?
+  zip             String?
+  photo           String?       @default("/images/default.png")
+  companyId       Int           @map("company_id")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  company         Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customerCompany String?       @map("customer_company")
+  tag             String?       @default("")
   // tasks  Task[]
-  appointments Appointment[]
+  appointments    Appointment[]
 
   @@index([companyId], name: "fk_customers_company")
 }
 
 model Service {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
   name        String
-  description String
-  price       Decimal
-  quantity    Int
-  discount    Decimal
-  total       Decimal
-  companyId   Int     @map("company_id")
-  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  description String?
+  categoryId  Int?      @map("category_id")
+  materialId  Int?      @map("material_id")
+  laborId     Int?      @map("labor_id")
+  tags        Json? // [id, id, id]
+  companyId   Int       @map("company_id")
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category    Category? @relation(fields: [categoryId], references: [id])
+  material    Material? @relation(fields: [materialId], references: [id])
+  labor       Labor?    @relation(fields: [laborId], references: [id])
 
   @@index([companyId], name: "fk_services_company")
 }
 
-model Vehicle {
+model Material {
+  id         Int       @id @default(autoincrement())
+  name       String
+  vendorId   Int?      @map("vendor_id")
+  categoryId Int?      @map("category_id")
+  tags       Json?
+  notes      String?
+  quantity   Int?
+  cost       Decimal?
+  sell       Decimal?
+  discount   Decimal?
+  companyId  Int       @map("company_id")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  company    Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  vendor     Vendor?   @relation(fields: [vendorId], references: [id])
+  category   Category? @relation(fields: [categoryId], references: [id])
+  service    Service[]
+
+  @@index([companyId], name: "fk_materials_company")
+}
+
+model Vendor {
+  id          Int        @id @default(autoincrement())
+  firstName   String?
+  lastName    String?
+  description String?
+  email       String?
+  phone       Int?
+  address     String?
+  city        String?
+  state       String?
+  zip         String?
+  companyName String?
+  companyId   Int        @map("company_id")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  material    Material[]
+}
+
+model Labor {
+  id         Int       @id @default(autoincrement())
+  name       String
+  categoryId Int?      @map("category_id")
+  tags       Json?
+  notes      String?
+  hours      Int?
+  charge     Decimal? // per hour
+  discount   Decimal?
+  companyId  Int       @map("company_id")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  company    Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category   Category? @relation(fields: [categoryId], references: [id])
+  service    Service[]
+}
+
+model Tag {
   id        Int      @id @default(autoincrement())
-  year      Int?
-  make      String?
-  model     String?
-  submodel  String?
-  vin       String?   
-  type      String?
-  license   String?   
-  companyId Int     @map("company_id")
+  name      String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId Int      @map("company_id")
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id        Int          @id @default(autoincrement())
+  name      String
+  type      CategoryType
+  companyId Int          @map("company_id")
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  services  Service[]
+  materials Material[]
+  labors    Labor[]
+  company   Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+enum CategoryType {
+  Service
+  Material
+  Labor
+}
+
+model Vehicle {
+  id           Int           @id @default(autoincrement())
+  year         Int?
+  make         String?
+  model        String?
+  submodel     String?
+  vin          String?
+  type         String?
+  license      String?
+  companyId    Int           @map("company_id")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   // tasks     Task[]
   appointments Appointment[]
 
@@ -194,31 +286,31 @@ model Vehicle {
 }
 
 model Invoice {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  invoiceId   String   @map("invoice_id") @unique
-  customerId  Int      @map("customer_id")
-  vehicleId   Int      @map("vehicle_id")
-  serviceIds  Json     @map("service_ids")
-  photo       String?  
-  subtotal    Decimal  @db.Decimal(8, 2)
-  discount    Decimal  @db.Decimal(8, 2)
-  tax         Decimal  @db.Decimal(8, 2)
-  grandTotal  Decimal  @db.Decimal(8, 2) @map("grand_total")
-  deposit     Decimal  @db.Decimal(8, 2)
-  due         Decimal  @db.Decimal(8, 2)
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  invoiceId   String    @unique @map("invoice_id")
+  customerId  Int       @map("customer_id")
+  vehicleId   Int       @map("vehicle_id")
+  serviceIds  Json      @map("service_ids")
+  photo       String?
+  subtotal    Decimal   @db.Decimal(8, 2)
+  discount    Decimal   @db.Decimal(8, 2)
+  tax         Decimal   @db.Decimal(8, 2)
+  grandTotal  Decimal   @map("grand_total") @db.Decimal(8, 2)
+  deposit     Decimal   @db.Decimal(8, 2)
+  due         Decimal   @db.Decimal(8, 2)
   status      Status
-  sendMail    Boolean  @default(false) @map("send_mail")
-  notes       String?  
-  terms       String?  
-  policy      String?  
-  issueDate   DateTime @default(now()) @map("issue_date")
-  companyId   Int     @map("company_id")
+  sendMail    Boolean   @default(false) @map("send_mail")
+  notes       String?
+  terms       String?
+  policy      String?
+  issueDate   DateTime  @default(now()) @map("issue_date")
+  companyId   Int       @map("company_id")
   salesperson String
-  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   payment     Payment[]
-  tags        String   @default("")
+  tags        String    @default("")
 
   @@index([companyId], name: "fk_invoices_company")
 }
@@ -227,18 +319,18 @@ enum Status {
   Delivered
   Consultations
   Confirmed
-  InProgress @map("In Progress")
-  FollowUp @map("Follow Up")
+  InProgress    @map("In Progress")
+  FollowUp      @map("Follow Up")
   Scheduled
   Pending
-  NoShow @map("No show")
+  NoShow        @map("No show")
   Cancelled
 }
 
 model Setting {
   id        Int      @id @default(autoincrement())
   contact   String
-  companyId Int     @map("company_id")
+  companyId Int      @map("company_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -247,21 +339,21 @@ model Setting {
 }
 
 model Payment {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  invoiceId Int      @map("invoice_id")
+  id               Int      @id @default(autoincrement())
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  invoiceId        Int      @map("invoice_id")
   // TODO: improve this field name
-  invoiceInvoiceId String @map("invoice_invoice_id")
-  type      Type
-  method    Method
-  amount    Decimal  @db.Decimal(8, 2)
-  note      String?  
-  date      DateTime @default(now())
-  tnx       String
-  companyId Int     @map("company_id")
-  invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  invoiceInvoiceId String   @map("invoice_invoice_id")
+  type             Type
+  method           Method
+  amount           Decimal  @db.Decimal(8, 2)
+  note             String?
+  date             DateTime @default(now())
+  tnx              String
+  companyId        Int      @map("company_id")
+  invoice          Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  company          Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([invoiceId], name: "fk_payments_invoice")
   @@index([companyId], name: "fk_payments_company")
@@ -281,7 +373,7 @@ enum Method {
 
 model Message {
   id        Int      @id @default(autoincrement())
-  to        Int     
+  to        Int
   message   String
   from      Int
   createdAt DateTime @default(now()) @map("created_at")
@@ -289,12 +381,11 @@ model Message {
 
   @@index([to], name: "fk_messages_to")
   @@index([from], name: "fk_messages_from")
-  
 }
 
 model InvoiceAdditional {
   id        Int      @id @default(autoincrement())
-  companyId Int      @map("company_id") @unique
+  companyId Int      @unique @map("company_id")
   note      String
   terms     String
   createdAt DateTime @default(now()) @map("created_at")
@@ -306,7 +397,7 @@ model InvoiceAdditional {
 
 model CalendarSettings {
   id        Int      @id @default(autoincrement())
-  companyId Int      @map("company_id") @unique
+  companyId Int      @unique @map("company_id")
   weekStart String
   dayStart  String
   dayEnd    String
@@ -318,21 +409,20 @@ model CalendarSettings {
 }
 
 model Task {
-  id          Int      @id @default(autoincrement())
-  title       String   @db.VarChar(100)
+  id          Int        @id @default(autoincrement())
+  title       String     @db.VarChar(100)
   description String?
   date        DateTime?
-  startTime   String?   @map("start_time")
-  endTime     String?   @map("end_time")  
+  startTime   String?    @map("start_time")
+  endTime     String?    @map("end_time")
   priority    Priority
   taskUser    TaskUser[]
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  userId      Int      @map("user_id")
-  companyId   Int    @map("company_id")
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
- 
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  userId      Int        @map("user_id")
+  companyId   Int        @map("company_id")
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 enum Priority {
@@ -345,7 +435,7 @@ model TaskUser {
   id        Int      @id @default(autoincrement())
   taskId    Int      @map("task_id")
   userId    Int      @map("user_id")
-  eventId   String?   @db.VarChar(100)
+  eventId   String?  @db.VarChar(100)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
@@ -353,33 +443,33 @@ model TaskUser {
 }
 
 model Appointment {
-  id          Int      @id @default(autoincrement())
-  userId      Int      @map("user_id")
-  title       String   @db.VarChar(100)
-  date        DateTime?
-  startTime   String?   @map("start_time")
-  endTime     String?   @map("end_time")  
-  companyId   Int      @map("company_id")
-  workOrderId Int?     @map("work_order_id")
-  customerId  Int?     @map("customer_id")
-  vehicleId   Int?     @map("vehicle_id")
-  orderId     Int?     @map("order_id")
-  notes       String?
-  confirmationEmailTemplateId Int? @map("confirmation_email_template_id")
-  confirmationEmailTemplateStatus Boolean @map("confirmation_email_template_status") @default(false)
-  reminderEmailTemplateId     Int? @map("reminder_email_template_id")
-  reminderEmailTemplateStatus Boolean @map("reminder_email_template_status") @default(false)
-  times       Json? // { time: string; date: string }
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  user        User     @relation(fields: [userId], references: [id])
-  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  workOrder   WorkOrder? @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
-  appointmentUsers AppointmentUser[]
-  invoiceTag  String?  @map("invoice_tag")
-  customer    Customer? @relation(fields: [customerId], references: [id])
-  vehicle     Vehicle? @relation(fields: [vehicleId], references: [id])
-  order      Order? @relation(fields: [orderId], references: [id])
+  id                              Int               @id @default(autoincrement())
+  userId                          Int               @map("user_id")
+  title                           String            @db.VarChar(100)
+  date                            DateTime?
+  startTime                       String?           @map("start_time")
+  endTime                         String?           @map("end_time")
+  companyId                       Int               @map("company_id")
+  workOrderId                     Int?              @map("work_order_id")
+  customerId                      Int?              @map("customer_id")
+  vehicleId                       Int?              @map("vehicle_id")
+  orderId                         Int?              @map("order_id")
+  notes                           String?
+  confirmationEmailTemplateId     Int?              @map("confirmation_email_template_id")
+  confirmationEmailTemplateStatus Boolean           @default(false) @map("confirmation_email_template_status")
+  reminderEmailTemplateId         Int?              @map("reminder_email_template_id")
+  reminderEmailTemplateStatus     Boolean           @default(false) @map("reminder_email_template_status")
+  times                           Json? // { time: string; date: string }
+  createdAt                       DateTime          @default(now()) @map("created_at")
+  updatedAt                       DateTime          @updatedAt @map("updated_at")
+  user                            User              @relation(fields: [userId], references: [id])
+  company                         Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  workOrder                       WorkOrder?        @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  appointmentUsers                AppointmentUser[]
+  invoiceTag                      String?           @map("invoice_tag")
+  customer                        Customer?         @relation(fields: [customerId], references: [id])
+  vehicle                         Vehicle?          @relation(fields: [vehicleId], references: [id])
+  order                           Order?            @relation(fields: [orderId], references: [id])
 
   @@index([userId], name: "fk_tasks_user")
   @@index([companyId], name: "fk_tasks_company")
@@ -387,29 +477,28 @@ model Appointment {
 }
 
 model AppointmentUser {
-  id            Int      @id @default(autoincrement())
-  appointmentId Int      @map("appointment_id")
-  userId        Int      @map("user_id")
-  eventId       String   @db.VarChar(100)
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id            Int         @id @default(autoincrement())
+  appointmentId Int         @map("appointment_id")
+  userId        Int         @map("user_id")
+  eventId       String      @db.VarChar(100)
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
   appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model EmailTemplate {
-  id        Int      @id @default(autoincrement())
+  id        Int               @id @default(autoincrement())
   subject   String
-  message   String?  @db.Text 
-  type      EmailTemplateType  
-  companyId Int     @map("company_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  message   String?           @db.Text
+  type      EmailTemplateType
+  companyId Int               @map("company_id")
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+  company   Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 enum EmailTemplateType {
   Confirmation
   Reminder
 }
-
