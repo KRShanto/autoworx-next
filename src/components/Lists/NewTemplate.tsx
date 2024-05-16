@@ -14,9 +14,9 @@ import Submit from "@/components/Submit";
 import { useEffect, useState } from "react";
 import FormError from "@/components/FormError";
 import { useFormErrorStore } from "@/stores/form-error";
-import { useEmailTemplateStore } from "@/stores/email-template";
-import { addTemplate } from "../../actions/addTemplate";
+import { addTemplate } from "../../app/task/[type]/actions/addTemplate";
 import { EmailTemplateType } from "@prisma/client";
+import { useListsStore } from "@/stores/lists";
 
 export default function NewTemplate({
   type,
@@ -29,7 +29,7 @@ export default function NewTemplate({
 }) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
-  const { templates, setTemplates } = useEmailTemplateStore();
+  const templates = useListsStore((x) => x.templates);
   const [subject, setSubject] = useState(
     "Appointment Confirmation at TC CUSTOMS ATLANTA",
   );
@@ -60,7 +60,9 @@ Vehicle
         message: res.message || "",
       });
     } else {
-      setTemplates([...templates, { id: res.data.id, subject, message, type }]);
+      useListsStore.setState({
+        templates: [...templates, res.data],
+      });
       setOpen(false);
     }
   }

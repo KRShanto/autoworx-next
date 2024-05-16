@@ -1,0 +1,20 @@
+.tab {
+  filter: drop-shadow(1px 1px #fff) drop-shadow(-1px 1px #fff)
+    drop-shadow(-1px -1px #fff) drop-shadow(1px -1px #fff);
+}
+
+.tab[data-state="active"] {
+  z-index: 1;
+}
+
+.tab::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  left: 50%;
+  background-color: inherit;
+  transform: skew(36deg);
+  transform-origin: top right;
+  border-top-right-radius: 0.5rem;
+  z-index: -1;
+}

@@ -1,14 +1,13 @@
 import { Switch } from "@/components/Switch";
-import type { Customer, Vehicle } from "@prisma/client";
-import { useState } from "react";
-import { TbUserX } from "react-icons/tb";
-import NewTemplate from "./NewTemplate";
-import Selector from "./Selector";
-import { useEmailTemplateStore } from "@/stores/email-template";
-import { EmailTemplate } from "@/types/db";
-import { FaTimes } from "react-icons/fa";
+import { useListsStore } from "@/stores/lists";
+import type { Customer, EmailTemplate, Vehicle } from "@prisma/client";
 import moment from "moment";
+import { useState } from "react";
+import { FaTimes } from "react-icons/fa";
+import { TbUserX } from "react-icons/tb";
+import NewTemplate from "../../../../../components/Lists/NewTemplate";
 import { deleteTemplate } from "../../actions/deleteTemplate";
+import Selector from "./Selector";
 import UpdateTemplate from "./UpdateTemplateComponent";
 
 export function Reminder({
@@ -44,8 +43,7 @@ export function Reminder({
 }) {
   const [time, setTime] = useState<string>("");
   const [dateInput, setDateInput] = useState<string>("");
-
-  const { templates, setTemplates } = useEmailTemplateStore();
+  const templates = useListsStore((x) => x.templates);
 
   async function handleDelete({ id, type }: { id: number; type: string }) {
     await deleteTemplate(id);
@@ -59,7 +57,9 @@ export function Reminder({
     }
 
     // remove this template from the array
-    setTemplates(templates.filter((template) => template.id !== id));
+    useListsStore.setState(({ templates }) => ({
+      templates: templates.filter((template) => template.id !== id),
+    }));
   }
 
   return client === null ? (

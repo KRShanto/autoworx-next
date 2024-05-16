@@ -1,7 +1,6 @@
-import Day from "./Day";
-import Week from "./Week";
-import Month from "./Month";
 import { CalendarType } from "@/types/calendar";
+import { AppointmentFull, CalendarAppointment, CalendarTask } from "@/types/db";
+import type { EmailTemplate } from "@prisma/client";
 import {
   CalendarSettings,
   Customer,
@@ -10,8 +9,9 @@ import {
   User,
   Vehicle,
 } from "@prisma/client";
-import { AppointmentFull, CalendarAppointment, CalendarTask } from "@/types/db";
-import { EmailTemplate } from "@/types/db";
+import Day from "./Day";
+import Month from "./Month";
+import Week from "./Week";
 
 export default function Body({
   type,

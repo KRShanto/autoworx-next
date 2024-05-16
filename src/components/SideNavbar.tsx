@@ -114,7 +114,7 @@ export default function SideNavbar() {
                   <DropdownMenuItem
                     key={index}
                     asChild
-                    className="border-solid border-white bg-white shadow-lg hover:border hover:bg-slate-500/80 hover:text-white"
+                    className="border border-solid border-white bg-white shadow-lg hover:bg-slate-500/80 hover:text-white focus:bg-slate-500/80 focus:text-white"
                   >
                     <Link href={subnavItem.link}>{subnavItem.title}</Link>
                   </DropdownMenuItem>
