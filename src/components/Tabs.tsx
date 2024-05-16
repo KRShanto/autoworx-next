@@ -12,7 +12,10 @@ const Tabs = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <TabsPrimitive.Root
     ref={ref}
-    className={cn("drop-shadow-[0_4px_4px_rgb(0_0_0_/_0.25)]", className)}
+    className={cn(
+      "flex flex-col drop-shadow-[0_4px_4px_rgb(0_0_0_/_0.25)]",
+      className,
+    )}
     {...props}
   />
 ));
@@ -25,7 +28,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "items-ends inline-flex h-10 flex-row-reverse justify-center rounded-md px-4 text-muted-foreground",
+      "items-ends inline-flex h-10 flex-row-reverse justify-end rounded-md px-4 text-muted-foreground",
       className,
     )}
     {...props}
@@ -56,7 +59,7 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "rounded-lg bg-background p-4 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "grow rounded-lg bg-background p-4 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       className,
     )}
     {...props}
