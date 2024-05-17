@@ -1,16 +1,17 @@
 import { auth } from "@/app/auth";
 import { SelectClient } from "@/components/Lists/SelectClient";
+import { SelectStatus } from "@/components/Lists/SelectStatus";
 import { SelectVehicle } from "@/components/Lists/SelectVehicle";
 import { SyncLists } from "@/components/SyncLists";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import Title from "@/components/Title";
 import { db } from "@/lib/db";
 import { AuthSession } from "@/types/auth";
-import { CreateEstimateActionsButtons } from "./CreateEstimateActionButtons";
 import { GoFileCode } from "react-icons/go";
 import { BillSummary } from "./BillSummary";
-import { CreateTab } from "./CreateTab";
 import Create from "./Create";
+import { CreateEstimateActionsButtons } from "./CreateEstimateActionButtons";
+import { CreateTab } from "./CreateTab";
 
 export default async function Page() {
   const session = (await auth()) as AuthSession;
@@ -23,6 +24,7 @@ export default async function Page() {
   const labors = await db.labor.findMany({ where: { companyId } });
   const tags = await db.tag.findMany({ where: { companyId } });
   const vendors = await db.vendor.findMany({ where: { companyId } });
+  const statuses = await db.status.findMany({ where: { companyId } });
 
   return (
     <form className="grid gap-3 md:grid-cols-[1fr,24rem] md:grid-rows-[auto,auto,1fr]">
@@ -37,6 +39,7 @@ export default async function Page() {
         labors={labors}
         tags={tags}
         vendors={vendors}
+        statuses={statuses}
       />
 
       <div className="px-3">
@@ -66,6 +69,7 @@ export default async function Page() {
         <div className="flex basis-full flex-wrap items-center gap-3">
           <SelectClient />
           <SelectVehicle />
+          <SelectStatus />
         </div>
       </div>
 

@@ -31,6 +31,7 @@ model Company {
   labors             Labor[]
   tags               Tag[]
   categories         Category[]
+  statuses           Status[]
 }
 
 model WorkOrder {
@@ -175,7 +176,8 @@ model Service {
   category    Category? @relation(fields: [categoryId], references: [id])
   material    Material? @relation(fields: [materialId], references: [id])
   labor       Labor?    @relation(fields: [laborId], references: [id])
-  Tag         Tag[]
+
+  tags ServiceTag[]
 
   @@index([companyId], name: "fk_services_company")
 }
@@ -243,13 +245,22 @@ model Labor {
 model Tag {
   id        Int      @id @default(autoincrement())
   name      String
-  color     String
-  serviceId Int      @map("service_id")
+  hue       Int
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   companyId Int      @map("company_id")
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  service   Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  services ServiceTag[]
+}
+
+model ServiceTag {
+  serviceId Int     @map("service_id")
+  tagId     Int     @map("tag_id")
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([serviceId, tagId])
 }
 
 model Category {
@@ -305,7 +316,8 @@ model Invoice {
   grandTotal  Decimal   @map("grand_total") @db.Decimal(8, 2)
   deposit     Decimal   @db.Decimal(8, 2)
   due         Decimal   @db.Decimal(8, 2)
-  status      Status
+  status      Status    @relation(fields: [statusId], references: [id], onDelete: Restrict)
+  statusId    Int       @map("status_id")
   sendMail    Boolean   @default(false) @map("send_mail")
   notes       String?
   terms       String?
@@ -320,16 +332,15 @@ model Invoice {
   @@index([companyId], name: "fk_invoices_company")
 }
 
-enum Status {
-  Delivered
-  Consultations
-  Confirmed
-  InProgress    @map("In Progress")
-  FollowUp      @map("Follow Up")
-  Scheduled
-  Pending
-  NoShow        @map("No show")
-  Cancelled
+model Status {
+  id        Int       @id @default(autoincrement())
+  name      String
+  hue       Int
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  companyId Int       @map("company_id")
+  company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Invoice   Invoice[]
 }
 
 model Setting {

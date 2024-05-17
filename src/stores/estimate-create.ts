@@ -7,6 +7,6 @@ export const useEstimateCreateStore = create(() => ({
     service: Service | null;
     material: Material | null;
     labor: Labor | null;
-    tags: Tag[] | null;
+    tags: Tag[];
   }[],
 }));
