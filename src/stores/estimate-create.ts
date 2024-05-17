@@ -1,10 +1,12 @@
+import { Labor, Material, Service, Tag } from "@prisma/client";
 import { create } from "zustand";
 
 export const useEstimateCreateStore = create(() => ({
   items: [] as {
-    service: string;
-    material: string;
-    labor: string;
-    tags: string[];
+    id: string; // nanoid
+    service: Service | null;
+    material: Material | null;
+    labor: Labor | null;
+    tags: Tag[] | null;
   }[],
 }));

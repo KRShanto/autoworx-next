@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   HiChatBubbleOvalLeftEllipsis,
@@ -9,12 +9,12 @@ import {
 import { cn } from "@/lib/cn";
 
 const btnCN = cn(
-    "flex items-center gap-2 rounded-md bg-slate-100 px-3 py-1 hover:bg-slate-200",
-  );
-  
+  "flex items-center gap-2 rounded-md bg-slate-100 px-3 py-1 hover:bg-slate-200",
+);
 
 export function CreateEstimateActionsButtons() {
-    return     <div className="flex flex-wrap items-stretch gap-3">
+  return (
+    <div className="flex flex-wrap items-stretch gap-3">
       <button className={btnCN}>
         <HiChatBubbleOvalLeftEllipsis />
         Message
@@ -33,4 +33,5 @@ export function CreateEstimateActionsButtons() {
         <HiTrash />
       </button>
     </div>
+  );
 }

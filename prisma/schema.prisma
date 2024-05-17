@@ -170,34 +170,35 @@ model Service {
   categoryId  Int?      @map("category_id")
   materialId  Int?      @map("material_id")
   laborId     Int?      @map("labor_id")
-  tags        Json? // [id, id, id]
   companyId   Int       @map("company_id")
   company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   category    Category? @relation(fields: [categoryId], references: [id])
   material    Material? @relation(fields: [materialId], references: [id])
   labor       Labor?    @relation(fields: [laborId], references: [id])
+  Tag         Tag[]
 
   @@index([companyId], name: "fk_services_company")
 }
 
 model Material {
-  id         Int       @id @default(autoincrement())
-  name       String
-  vendorId   Int?      @map("vendor_id")
-  categoryId Int?      @map("category_id")
-  tags       Json?
-  notes      String?
-  quantity   Int?
-  cost       Decimal?
-  sell       Decimal?
-  discount   Decimal?
-  companyId  Int       @map("company_id")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
-  company    Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  vendor     Vendor?   @relation(fields: [vendorId], references: [id])
-  category   Category? @relation(fields: [categoryId], references: [id])
-  service    Service[]
+  id             Int       @id @default(autoincrement())
+  name           String
+  vendorId       Int?      @map("vendor_id")
+  categoryId     Int?      @map("category_id")
+  tags           Json?
+  notes          String?
+  quantity       Int?
+  cost           Decimal?
+  sell           Decimal?
+  discount       Decimal?
+  addToInventory Boolean?  @map("add_to_inventory")
+  companyId      Int       @map("company_id")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  company        Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  vendor         Vendor?   @relation(fields: [vendorId], references: [id])
+  category       Category? @relation(fields: [categoryId], references: [id])
+  service        Service[]
 
   @@index([companyId], name: "fk_materials_company")
 }
@@ -222,29 +223,33 @@ model Vendor {
 }
 
 model Labor {
-  id         Int       @id @default(autoincrement())
-  name       String
-  categoryId Int?      @map("category_id")
-  tags       Json?
-  notes      String?
-  hours      Int?
-  charge     Decimal? // per hour
-  discount   Decimal?
-  companyId  Int       @map("company_id")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
-  company    Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  category   Category? @relation(fields: [categoryId], references: [id])
-  service    Service[]
+  id               Int       @id @default(autoincrement())
+  name             String
+  categoryId       Int?      @map("category_id")
+  tags             Json?
+  notes            String?
+  hours            Int?
+  charge           Decimal? // per hour
+  discount         Decimal?
+  addToCannedLabor Boolean?  @map("add_to_canned_labor")
+  companyId        Int       @map("company_id")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  company          Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category         Category? @relation(fields: [categoryId], references: [id])
+  service          Service[]
 }
 
 model Tag {
   id        Int      @id @default(autoincrement())
   name      String
+  color     String
+  serviceId Int      @map("service_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   companyId Int      @map("company_id")
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  service   Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 }
 
 model Category {

@@ -10,17 +10,35 @@ import { CreateEstimateActionsButtons } from "./CreateEstimateActionButtons";
 import { GoFileCode } from "react-icons/go";
 import { BillSummary } from "./BillSummary";
 import { CreateTab } from "./CreateTab";
+import Create from "./Create";
 
 export default async function Page() {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
   const customers = await db.customer.findMany({ where: { companyId } });
   const vehicles = await db.vehicle.findMany({ where: { companyId } });
+  const categories = await db.category.findMany({ where: { companyId } });
+  const services = await db.service.findMany({ where: { companyId } });
+  const materials = await db.material.findMany({ where: { companyId } });
+  const labors = await db.labor.findMany({ where: { companyId } });
+  const tags = await db.tag.findMany({ where: { companyId } });
+  const vendors = await db.vendor.findMany({ where: { companyId } });
 
   return (
     <form className="grid gap-3 md:grid-cols-[1fr,24rem] md:grid-rows-[auto,auto,1fr]">
       <Title>Estimate</Title>
-      <SyncLists customers={customers} vehicles={vehicles} />
+
+      <SyncLists
+        customers={customers}
+        vehicles={vehicles}
+        categories={categories}
+        services={services}
+        materials={materials}
+        labors={labors}
+        tags={tags}
+        vendors={vendors}
+      />
+
       <div className="px-3">
         <button
           type="button"
@@ -30,8 +48,10 @@ export default async function Page() {
           Convert to Estimate
         </button>
       </div>
+
       <div className="app-shadow col-start-1 flex flex-wrap items-center gap-3 rounded-md p-3">
         <div className="mr-auto">
+          {/* TODO: generate randomly */}
           434534674576:{" "}
           <input
             name="title"
@@ -40,12 +60,15 @@ export default async function Page() {
             className="bg-transparent"
           />
         </div>
+
         <CreateEstimateActionsButtons />
+
         <div className="flex basis-full flex-wrap items-center gap-3">
           <SelectClient />
           <SelectVehicle />
         </div>
       </div>
+
       <Tabs defaultValue="create" className="col-start-1">
         <TabsList>
           <TabsTrigger value="payments">Payments</TabsTrigger>
@@ -53,15 +76,18 @@ export default async function Page() {
           <TabsTrigger value="attachment">Attachment</TabsTrigger>
           <TabsTrigger value="create">Create</TabsTrigger>
         </TabsList>
+
         <TabsContent value="create">
           <CreateTab />
         </TabsContent>
+
         <TabsContent value="attachment"></TabsContent>
         <TabsContent value="inspections"></TabsContent>
         <TabsContent value="payments"></TabsContent>
       </Tabs>
+
       <div className="app-shadow col-start-2 row-start-2 row-end-4 grid grid-rows-[1fr,auto,auto] divide-y rounded-md">
-        <div></div>
+        <Create />
         <BillSummary />
       </div>
     </form>
