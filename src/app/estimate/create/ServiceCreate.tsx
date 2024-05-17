@@ -26,7 +26,6 @@ export default function ServiceCreate() {
     });
 
     if (res.type === "success") {
-      // setCategories([...categories, res.data]);
       useListsStore.setState((state) => {
         return { categories: [...state.categories, res.data] };
       });
