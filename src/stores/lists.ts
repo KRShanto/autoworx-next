@@ -10,6 +10,7 @@ import type {
   User,
   Vehicle,
   Vendor,
+  Status,
 } from "@prisma/client";
 import { create } from "zustand";
 
@@ -25,4 +26,5 @@ export const useListsStore = create(() => ({
   labors: [] as Labor[],
   tags: [] as Tag[],
   vendors: [] as Vendor[],
+  statuses: [] as Status[],
 }));
