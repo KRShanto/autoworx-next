@@ -13,9 +13,9 @@ export default function LaborCreate() {
   const [category, setCategory] = useState<Category | null>(null);
   const [tags, setTags] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
-  const [hours, setHours] = useState<number>(1);
-  const [charge, setCharge] = useState<number>(0);
-  const [discount, setDiscount] = useState<number>(0);
+  const [hours, setHours] = useState<number>();
+  const [charge, setCharge] = useState<number>();
+  const [discount, setDiscount] = useState<number>();
   const [addToCannedLabor, setAddToCannedLabor] = useState<boolean>(false);
 
   const categories = useListsStore((x) =>
@@ -51,9 +51,9 @@ export default function LaborCreate() {
       categoryId: category?.id,
       tags,
       notes,
-      hours,
-      charge,
-      discount,
+      hours: hours || 1,
+      charge: charge || 0,
+      discount: discount || 0,
       addToCannedLabor,
     });
 
@@ -171,11 +171,12 @@ export default function LaborCreate() {
 
       <div className="flex items-center gap-5">
         <input
+          id="check"
           type="checkbox"
           checked={addToCannedLabor}
           onChange={(e) => setAddToCannedLabor(e.target.checked)}
         />
-        <label>Add to Canned Labor</label>
+        <label htmlFor="check">Add to Canned Labor</label>
       </div>
 
       <button

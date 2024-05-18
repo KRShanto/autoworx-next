@@ -14,10 +14,10 @@ export default function MaterialCreate() {
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [tags, setTags] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
-  const [quantity, setQuantity] = useState<number>(1);
-  const [cost, setCost] = useState<number>(0);
-  const [sell, setSell] = useState<number>(0);
-  const [discount, setDiscount] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>();
+  const [cost, setCost] = useState<number>();
+  const [sell, setSell] = useState<number>();
+  const [discount, setDiscount] = useState<number>();
   const [addToInventory, setAddToInventory] = useState<boolean>(false);
 
   const [categoryInput, setCategoryInput] = useState("");
@@ -56,10 +56,10 @@ export default function MaterialCreate() {
       vendorId: vendor?.id,
       tags,
       notes,
-      quantity,
-      cost,
-      sell,
-      discount,
+      quantity: quantity || 0,
+      cost: cost || 0,
+      sell: sell || 0,
+      discount: discount || 0,
       addToInventory,
     });
 
