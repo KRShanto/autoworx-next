@@ -7,6 +7,7 @@ import { useEstimateCreateStore } from "@/stores/estimate-create";
 import Selector from "@/components/Selector";
 import { newMaterial } from "./actions/newMaterial";
 import NewVendor from "./NewVendor";
+import Close from "./CloseEstimate";
 
 export default function MaterialCreate() {
   const [name, setName] = useState("");
@@ -214,13 +215,16 @@ export default function MaterialCreate() {
         <span>Add to Inventory</span>
       </label>
 
-      <button
-        className="mx-auto w-fit rounded-md bg-[#6571FF] p-1 px-5 text-white"
-        onClick={handleSubmit}
-        type="button"
-      >
-        Done
-      </button>
+      <div className="flex justify-center gap-5">
+        <Close />
+        <button
+          className="w-fit rounded-md bg-[#6571FF] p-1 px-5 text-white"
+          onClick={handleSubmit}
+          type="button"
+        >
+          Done
+        </button>
+      </div>
     </div>
   );
 }

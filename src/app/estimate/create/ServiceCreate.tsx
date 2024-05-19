@@ -6,6 +6,7 @@ import newCategory from "./actions/newCategory";
 import newService from "./actions/newService";
 import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
+import Close from "./CloseEstimate";
 
 export default function ServiceCreate() {
   const [name, setName] = useState("");
@@ -125,13 +126,16 @@ export default function ServiceCreate() {
         className="h-40 rounded-md border-2 border-slate-400 p-2"
       />
 
-      <button
-        className="mx-auto w-fit rounded-md bg-[#6571FF] p-1 px-5 text-white"
-        onClick={handleSubmit}
-        type="button"
-      >
-        Done
-      </button>
+      <div className="flex justify-center gap-5">
+        <Close />
+        <button
+          className="w-fit rounded-md bg-[#6571FF] p-1 px-5 text-white"
+          onClick={handleSubmit}
+          type="button"
+        >
+          Done
+        </button>
+      </div>
     </div>
   );
 }

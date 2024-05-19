@@ -64,7 +64,7 @@ export function BillSummary() {
 
   return (
     <>
-      <div className="space-y-2 p-3">
+      <div className="space-y-2 p-2">
         {[
           ["subtotal", servicesTotal, setServicesTotal],
           ["discount", discount, setDiscount],
@@ -77,7 +77,9 @@ export function BillSummary() {
             key={index}
             className="relative flex items-center rounded-md border border-solid border-slate-600"
           >
-            <div className="mr-auto px-2 py-1 uppercase">{title as string}</div>
+            <div className="mr-auto px-2 py-1 text-xs uppercase">
+              {title as string}
+            </div>
             <input
               type="text"
               value={data as string}
@@ -85,7 +87,7 @@ export function BillSummary() {
                 // @ts-ignore
                 setData(e.target.value)
               }
-              className="w-[100px] rounded-md bg-slate-500 px-2 py-1 text-white"
+              className="w-[100px] rounded-md bg-slate-500 px-2 py-1 text-xs text-white"
             />
             {title === "deposit" && (
               <DepositCreate
@@ -101,7 +103,7 @@ export function BillSummary() {
         ))}
       </div>
 
-      <div className="space-y-3 rounded-md bg-[#006d77] p-3 text-white">
+      <div className="space-y-1 rounded-md bg-[#006d77] p-2 px-4 text-sm text-white">
         <dl className="flex justify-between">
           <dt>Grand Total</dt> <dd>${grandTotal}</dd>
         </dl>

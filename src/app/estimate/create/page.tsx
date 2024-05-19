@@ -90,7 +90,7 @@ export default async function Page() {
         <TabsContent value="payments"></TabsContent>
       </Tabs>
 
-      <div className="app-shadow col-start-2 row-start-2 row-end-4 grid grid-rows-[1fr,auto,auto] divide-y rounded-md">
+      <div className="app-shadow col-start-2 row-start-2 row-end-4 grid h-[85vh] grid-rows-[1fr,auto,auto] divide-y rounded-md">
         <Create />
         <BillSummary />
       </div>

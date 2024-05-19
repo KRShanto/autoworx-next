@@ -7,6 +7,7 @@ import newService from "./actions/newService";
 import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { newLabor } from "./actions/newLabor";
+import Close from "./CloseEstimate";
 
 export default function LaborCreate() {
   const [name, setName] = useState("");
@@ -179,13 +180,16 @@ export default function LaborCreate() {
         <label htmlFor="check">Add to Canned Labor</label>
       </div>
 
-      <button
-        className="mx-auto w-fit rounded-md bg-[#6571FF] p-1 px-5 text-white"
-        onClick={handleSubmit}
-        type="button"
-      >
-        Done
-      </button>
+      <div className="flex justify-center gap-5">
+        <Close />
+        <button
+          className="w-fit rounded-md bg-[#6571FF] p-1 px-5 text-white"
+          onClick={handleSubmit}
+          type="button"
+        >
+          Done
+        </button>
+      </div>
     </div>
   );
 }
