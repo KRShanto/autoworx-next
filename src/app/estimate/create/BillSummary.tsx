@@ -2,6 +2,8 @@
 
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { useEffect, useState } from "react";
+import { FaPlus } from "react-icons/fa6";
+import DepositCreate from "./DepositCreate";
 
 export function BillSummary() {
   const items = useEstimateCreateStore((state) => state.items);
@@ -9,36 +11,32 @@ export function BillSummary() {
   const [servicesTotal, setServicesTotal] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [grandTotal, setGrandTotal] = useState(0);
-  const [tax, setTax] = useState(2);
-  const [deposit, setDeposit] = useState(500);
+  const [tax, setTax] = useState(0);
+  const [deposit, setDeposit] = useState(0);
   const [due, setDue] = useState(0);
+  const [method, setMethod] = useState("");
+  const [depositNotes, setDepositNotes] = useState("");
 
   useEffect(() => {
     let newServicesTotal = 0;
     let newDiscountTotal = 0;
 
     items.forEach((item) => {
-      const service = item.service;
-      const material = item.material;
-      const labor = item.labor;
+      const { service, material, labor } = item;
 
       if (!service) return;
 
       const materialCost = material?.sell
         ? parseFloat(material.sell.toString()) * material.quantity!
         : 0;
-
       const laborCost = labor?.charge
         ? parseFloat(labor.charge.toString()) * labor.hours!
         : 0;
 
       newServicesTotal += materialCost + laborCost;
-
-      newDiscountTotal += material?.discount
-        ? parseFloat(material.discount.toString())
-        : 0 + parseFloat(labor?.discount?.toString() ?? "0")
-          ? parseFloat(labor?.discount?.toString() ?? "0")
-          : 0;
+      newDiscountTotal +=
+        (material?.discount ? parseFloat(material.discount.toString()) : 0) +
+        (labor?.discount ? parseFloat(labor.discount.toString()) : 0);
     });
 
     setServicesTotal(newServicesTotal);
@@ -77,7 +75,7 @@ export function BillSummary() {
         ].map(([title, data, setData], index) => (
           <div
             key={index}
-            className="flex rounded-md border border-solid border-slate-600"
+            className="relative flex items-center rounded-md border border-solid border-slate-600"
           >
             <div className="mr-auto px-2 py-1 uppercase">{title as string}</div>
             <input
@@ -89,13 +87,23 @@ export function BillSummary() {
               }
               className="w-[100px] rounded-md bg-slate-500 px-2 py-1 text-white"
             />
+            {title === "deposit" && (
+              <DepositCreate
+                deposit={deposit}
+                method={method}
+                setDeposit={setDeposit}
+                setMethod={setMethod}
+                depositNotes={depositNotes}
+                setDepositNotes={setDepositNotes}
+              />
+            )}
           </div>
         ))}
       </div>
 
       <div className="space-y-3 rounded-md bg-[#006d77] p-3 text-white">
         <dl className="flex justify-between">
-          <dt>Grand Total</dt> <dd>$0.00</dd>
+          <dt>Grand Total</dt> <dd>${grandTotal}</dd>
         </dl>
         <button
           type="button"

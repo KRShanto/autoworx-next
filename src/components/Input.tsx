@@ -19,7 +19,7 @@ export default function Input({
   name: string;
   type?: string;
   required?: boolean;
-  defaultValue?: string;
+  defaultValue?: any;
   autoFocus?: boolean;
   className?: string;
   placeholder?: string;
