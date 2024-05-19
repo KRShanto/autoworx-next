@@ -9,4 +9,6 @@ export const useEstimateCreateStore = create(() => ({
     labor: Labor | null;
     tags: Tag[];
   }[],
+  images: [] as string[],
+  tasks: [] as string[],
 }));
