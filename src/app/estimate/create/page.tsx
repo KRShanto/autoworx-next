@@ -49,7 +49,10 @@ export default async function Page() {
       </div>
       <Header />
 
-      <Tabs defaultValue="create" className="col-start-1">
+      <Tabs
+        defaultValue="create"
+        className="col-start-1 flex min-h-0 flex-col overflow-clip"
+      >
         <TabsList>
           <TabsTrigger value="payments">Payments</TabsTrigger>
           <TabsTrigger value="inspections">Inspections</TabsTrigger>

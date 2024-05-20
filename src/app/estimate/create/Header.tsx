@@ -1,27 +1,15 @@
 "use client";
 
-import { CreateEstimateActionsButtons } from "./CreateEstimateActionButtons";
 import { SelectClient } from "@/components/Lists/SelectClient";
-import { SelectVehicle } from "@/components/Lists/SelectVehicle";
 import { SelectStatus } from "@/components/Lists/SelectStatus";
+import { SelectVehicle } from "@/components/Lists/SelectVehicle";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
-import { useEffect, useState } from "react";
 import { customAlphabet } from "nanoid";
-import { Customer, Status, Vehicle } from "@prisma/client";
+import { useEffect } from "react";
+import { CreateEstimateActionsButtons } from "./CreateEstimateActionButtons";
 
 export default function Header() {
-  const {
-    invoiceId,
-    title,
-    client,
-    vehicle,
-    status,
-    setTitle,
-    setClient,
-    setVehicle,
-    setStatus,
-    setInvoiceId,
-  } = useEstimateCreateStore();
+  const { invoiceId, title, setTitle, setInvoiceId } = useEstimateCreateStore();
 
   useEffect(() => setInvoiceId(customAlphabet("1234567890", 10)()), []);
 
@@ -44,13 +32,9 @@ export default function Header() {
       <CreateEstimateActionsButtons />
 
       <div className="flex basis-full flex-wrap items-center gap-3">
-        {/* @NabilSnigdho fix the typescript error */}
-        {/* @ts-ignore */}
-        <SelectClient value={client} setValue={setClient} />
-        {/* @ts-ignore */}
-        <SelectVehicle value={vehicle} setValue={setVehicle} />
-        {/* @ts-ignore */}
-        <SelectStatus value={status} setValue={setStatus} />
+        <SelectClient />
+        <SelectVehicle />
+        <SelectStatus />
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { GoFileCode } from "react-icons/go";
 import { create } from "./actions/create";
 import { InvoiceType } from "@prisma/client";
 import { customAlphabet } from "nanoid";
+import Submit from "@/components/Submit";
 
 export default function ConvertButton({
   text,
@@ -17,9 +18,6 @@ export default function ConvertButton({
   const {
     invoiceId,
     title,
-    client,
-    vehicle,
-    status,
     subtotal,
     discount,
     tax,
@@ -38,8 +36,11 @@ export default function ConvertButton({
     items,
   } = useEstimateCreateStore();
 
-  async function handleSubmit() {
+  async function handleSubmit(formData: FormData) {
     const photoPaths = [];
+    const clientId = formData.get("customerId");
+    const vehicleId = formData.get("vehicleId");
+    const statusId = formData.get("statusId");
 
     // upload photos
     if (photos.length > 0) {
@@ -67,9 +68,9 @@ export default function ConvertButton({
       title,
       invoiceId,
       type,
-      clientId: client?.id,
-      vehicleId: vehicle?.id,
-      statusId: status?.id,
+      clientId: clientId ? +clientId : undefined,
+      vehicleId: vehicleId ? +vehicleId : undefined,
+      statusId: statusId ? +statusId : undefined,
       subtotal,
       discount,
       tax,
@@ -97,14 +98,13 @@ export default function ConvertButton({
 
   return (
     <div className="px-3">
-      <button
-        type="button"
+      <Submit
         className="flex w-full items-center justify-center gap-2 text-nowrap rounded border border-solid border-slate-600 p-2 text-center text-sm"
-        onClick={handleSubmit}
+        formAction={handleSubmit}
       >
         <GoFileCode />
         {text}
-      </button>
+      </Submit>
     </div>
   );
 }
