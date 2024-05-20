@@ -12,6 +12,9 @@ import { BillSummary } from "./BillSummary";
 import Create from "./Create";
 import { CreateEstimateActionsButtons } from "./CreateEstimateActionButtons";
 import { CreateTab } from "./CreateTab";
+import Header from "./Header";
+import ConvertButton from "./ConvertButton";
+import { InvoiceType } from "@prisma/client";
 
 export default async function Page() {
   const session = (await auth()) as AuthSession;
@@ -41,37 +44,11 @@ export default async function Page() {
         vendors={vendors}
         statuses={statuses}
       />
-
-      <div className="px-3">
-        <button
-          type="button"
-          className="flex w-full items-center justify-center gap-2 rounded border border-solid border-slate-600 p-2 text-center"
-        >
-          <GoFileCode />
-          Convert to Estimate
-        </button>
+      <div className="flex">
+        <ConvertButton type={InvoiceType.Estimate} text="Save as Estimate" />
+        <ConvertButton type={InvoiceType.Invoice} text="Convert to Invoice" />
       </div>
-
-      <div className="app-shadow col-start-1 flex flex-wrap items-center gap-3 rounded-md p-3">
-        <div className="mr-auto">
-          {/* TODO: generate randomly */}
-          434534674576:{" "}
-          <input
-            name="title"
-            placeholder="Enter Title..."
-            aria-label="title"
-            className="bg-transparent"
-          />
-        </div>
-
-        <CreateEstimateActionsButtons />
-
-        <div className="flex basis-full flex-wrap items-center gap-3">
-          <SelectClient />
-          <SelectVehicle />
-          <SelectStatus />
-        </div>
-      </div>
+      <Header />
 
       <Tabs defaultValue="create" className="col-start-1">
         <TabsList>

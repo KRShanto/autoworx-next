@@ -136,9 +136,11 @@ export default async function Page({ params }: { params: { type: string } }) {
     },
   });
 
-  const tags = invoices.map((invoice) => invoice.tags).flat();
-  // split tags into array
-  const tagsArray = tags.map((tag) => tag.split(",")).flat();
+  // const tags = invoices.map((invoice) => invoice.tags).flat();
+  // // split tags into array
+  // const tagsArray = tags.map((tag) => tag.split(",")).flat();
+  // TODO: Fix this. need more information
+  const tagsArray = [] as string[];
 
   // Find unique tags
   const uniqueTags = tagsArray.filter(

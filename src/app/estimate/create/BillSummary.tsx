@@ -1,21 +1,31 @@
 "use client";
 
 import { useEstimateCreateStore } from "@/stores/estimate-create";
-import { useEffect, useState } from "react";
-import { FaPlus } from "react-icons/fa6";
+import { useEffect } from "react";
 import DepositCreate from "./DepositCreate";
 
 export function BillSummary() {
-  const items = useEstimateCreateStore((state) => state.items);
-
-  const [servicesTotal, setServicesTotal] = useState(0);
-  const [discount, setDiscount] = useState(0);
-  const [grandTotal, setGrandTotal] = useState(0);
-  const [tax, setTax] = useState(0);
-  const [deposit, setDeposit] = useState(0);
-  const [due, setDue] = useState(0);
-  const [method, setMethod] = useState("");
-  const [depositNotes, setDepositNotes] = useState("");
+  const {
+    items,
+    subtotal,
+    discount,
+    grandTotal,
+    tax,
+    deposit,
+    due,
+    depositMethod,
+    depositNotes,
+  } = useEstimateCreateStore();
+  const {
+    setSubtotal,
+    setDiscount,
+    setGrandTotal,
+    setTax,
+    setDeposit,
+    setDue,
+    setDepositMethod,
+    setDepositNotes,
+  } = useEstimateCreateStore();
 
   useEffect(() => {
     let newServicesTotal = 0;
@@ -39,15 +49,15 @@ export function BillSummary() {
         (labor?.discount ? parseFloat(labor.discount.toString()) : 0);
     });
 
-    setServicesTotal(newServicesTotal);
+    setSubtotal(newServicesTotal);
     setDiscount(newDiscountTotal);
   }, [items]);
 
   useEffect(() => {
-    let newGrandTotal = servicesTotal;
+    let newGrandTotal = subtotal;
 
     if (tax > 0) {
-      newGrandTotal += servicesTotal * (tax / 100);
+      newGrandTotal += subtotal * (tax / 100);
     }
 
     if (discount > 0) {
@@ -55,7 +65,7 @@ export function BillSummary() {
     }
 
     setGrandTotal(newGrandTotal);
-  }, [servicesTotal, discount, tax]);
+  }, [subtotal, discount, tax]);
 
   useEffect(() => {
     const newDue = grandTotal - deposit;
@@ -66,7 +76,7 @@ export function BillSummary() {
     <>
       <div className="space-y-2 p-2">
         {[
-          ["subtotal", servicesTotal, setServicesTotal],
+          ["subtotal", subtotal, setSubtotal],
           ["discount", discount, setDiscount],
           ["tax", tax, setTax],
           ["grand total", grandTotal, setGrandTotal],
@@ -92,9 +102,9 @@ export function BillSummary() {
             {title === "deposit" && (
               <DepositCreate
                 deposit={deposit}
-                method={method}
+                method={depositMethod}
                 setDeposit={setDeposit}
-                setMethod={setMethod}
+                setMethod={setDepositMethod}
                 depositNotes={depositNotes}
                 setDepositNotes={setDepositNotes}
               />
