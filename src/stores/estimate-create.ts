@@ -21,9 +21,6 @@ interface Item {
 interface EstimateCreateStore {
   title: string;
   invoiceId: string;
-  client: Customer | null;
-  vehicle: Vehicle | null;
-  status: Status | null;
   subtotal: number;
   discount: number;
   tax: number;
@@ -43,10 +40,6 @@ interface EstimateCreateStore {
 
   setTitle: (title: string) => void;
   setInvoiceId: (invoiceId: string) => void;
-
-  setClient: (client: Customer) => void;
-  setVehicle: (vehicle: Vehicle) => void;
-  setStatus: (status: Status) => void;
 
   setSubtotal: (subtotal: number) => void;
   setDiscount: (discount: number) => void;
@@ -76,10 +69,6 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
   title: "",
   invoiceId: "",
 
-  client: null,
-  vehicle: null,
-  status: null,
-
   subtotal: 0,
   discount: 0,
   tax: 0,
@@ -102,10 +91,6 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
 
   setTitle: (title: string) => set({ title }),
   setInvoiceId: (invoiceId: string) => set({ invoiceId }),
-
-  setClient: (client: Customer) => set({ client }),
-  setVehicle: (vehicle: Vehicle) => set({ vehicle }),
-  setStatus: (status: Status) => set({ status }),
 
   setSubtotal: (subtotal: number) => set({ subtotal }),
   setDiscount: (discount: number) => set({ discount }),
