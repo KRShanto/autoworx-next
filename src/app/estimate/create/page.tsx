@@ -11,7 +11,8 @@ import { GoFileCode } from "react-icons/go";
 import { BillSummary } from "./BillSummary";
 import Create from "./Create";
 import { CreateEstimateActionsButtons } from "./CreateEstimateActionButtons";
-import { CreateTab } from "./CreateTab";
+import { CreateTab } from "./tabs/CreateTab";
+import { AttachmentTab } from "./tabs/AttachmentTab";
 
 export default async function Page() {
   const session = (await auth()) as AuthSession;
@@ -27,7 +28,7 @@ export default async function Page() {
   const statuses = await db.status.findMany({ where: { companyId } });
 
   return (
-    <form className="grid gap-3 md:grid-cols-[1fr,24rem] md:grid-rows-[auto,auto,1fr]">
+    <form className="-my-2 grid h-[93vh] gap-3 overflow-clip py-2 md:grid-cols-[1fr,24rem] md:grid-rows-[auto,auto,1fr]">
       <Title>Estimate</Title>
 
       <SyncLists
@@ -73,7 +74,10 @@ export default async function Page() {
         </div>
       </div>
 
-      <Tabs defaultValue="create" className="col-start-1">
+      <Tabs
+        defaultValue="create"
+        className="col-start-1 flex min-h-0  flex-col overflow-clip"
+      >
         <TabsList>
           <TabsTrigger value="payments">Payments</TabsTrigger>
           <TabsTrigger value="inspections">Inspections</TabsTrigger>
@@ -85,7 +89,9 @@ export default async function Page() {
           <CreateTab />
         </TabsContent>
 
-        <TabsContent value="attachment"></TabsContent>
+        <TabsContent value="attachment">
+          <AttachmentTab />
+        </TabsContent>
         <TabsContent value="inspections"></TabsContent>
         <TabsContent value="payments"></TabsContent>
       </Tabs>

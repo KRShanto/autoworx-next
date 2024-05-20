@@ -18,7 +18,7 @@ export default function Create() {
   if (type === "LABOR") return <LaborCreate />;
 
   return (
-    <div className="my-5 flex w-full flex-col items-center gap-3">
+    <div className="p-3 w-full space-y-3 overflow-y-auto">
       {items.map((item) => {
         if (!item.service) return null;
 
@@ -35,7 +35,7 @@ export default function Create() {
         return (
           <div
             key={item.id}
-            className="w-[90%] rounded-md border border-[#6571FF] px-5 py-1 "
+            className="rounded-md border border-[#6571FF] px-5 py-1 "
           >
             <div className="flex w-full justify-between text-[#6571FF]">
               <p>{item.service.name}</p>

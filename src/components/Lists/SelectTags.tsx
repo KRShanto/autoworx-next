@@ -50,10 +50,11 @@ export function SelectTags({
           >
             {tag.name}
             <button
+              type="button"
               onClick={() => {
                 setTags((tags) => tags.toSpliced(i, 1));
               }}
-              className="text-[#6470FF] top-0 right-0 absolute translate-x-1/2 -translate-y-1/2"
+              className="absolute right-0 top-0 -translate-y-1/2 translate-x-1/2 text-[#6470FF]"
             >
               <HiXCircle />
             </button>
