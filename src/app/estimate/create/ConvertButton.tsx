@@ -38,6 +38,9 @@ export default function ConvertButton({
   } = useEstimateCreateStore();
 
   async function handleSubmit() {
+    console.log(photos);
+    return;
+
     const res = await create({
       title,
       invoiceId,
@@ -62,8 +65,6 @@ export default function ConvertButton({
       tasks,
       items,
     });
-
-    console.log(res);
   }
 
   return (

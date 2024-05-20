@@ -4,10 +4,10 @@ import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { HiXCircle } from "react-icons/hi2";
 
 export function ImagesInput() {
-  const images = useEstimateCreateStore((x) => x.images);
+  const { photos, setPhotos } = useEstimateCreateStore();
 
   return (
-    <div className="grid grid-cols-2 gap-2 border border-solid border-slate-500 p-2 rounded">
+    <div className="grid grid-cols-2 gap-2 rounded border border-solid border-slate-500 p-2">
       <label className="grid aspect-square content-center justify-items-center gap-2 rounded-md bg-gray-200 text-center">
         <input
           type="file"
@@ -21,9 +21,7 @@ export function ImagesInput() {
             reader.onload = function (e) {
               const base64String = e.target?.result;
               if (typeof base64String !== "string") return;
-              useEstimateCreateStore.setState(({ images }) => ({
-                images: [...images, base64String],
-              }));
+              setPhotos([...photos, base64String]);
             };
 
             reader.readAsDataURL(file);
@@ -47,7 +45,7 @@ export function ImagesInput() {
         <span className="font-medium">Attach Photo/Video</span>
       </label>
       <div className="-m-2 grid aspect-square grid-cols-3 content-start gap-4 overflow-y-auto p-2">
-        {images.map((image, i) => (
+        {photos.map((image, i) => (
           <div
             className="relative flex aspect-square rounded border border-solid border-slate-500 object-contain"
             key={i}
@@ -58,11 +56,7 @@ export function ImagesInput() {
             }
             <button
               type="button"
-              onClick={() => {
-                useEstimateCreateStore.setState(({ images }) => ({
-                  images: images.toSpliced(i, 1),
-                }));
-              }}
+              onClick={() => setPhotos(photos.toSpliced(i, 1))}
               className="absolute right-0 top-0 -translate-y-1/2 translate-x-1/2 text-[#6470FF]"
             >
               <HiXCircle />

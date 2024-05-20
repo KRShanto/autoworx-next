@@ -7,10 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import Title from "@/components/Title";
 import { db } from "@/lib/db";
 import { AuthSession } from "@/types/auth";
-import { GoFileCode } from "react-icons/go";
 import { BillSummary } from "./BillSummary";
 import Create from "./Create";
-import { CreateEstimateActionsButtons } from "./CreateEstimateActionButtons";
 import { CreateTab } from "./tabs/CreateTab";
 import { AttachmentTab } from "./tabs/AttachmentTab";
 import Header from "./Header";
@@ -66,6 +64,7 @@ export default async function Page() {
         <TabsContent value="attachment">
           <AttachmentTab />
         </TabsContent>
+
         <TabsContent value="inspections"></TabsContent>
         <TabsContent value="payments"></TabsContent>
       </Tabs>

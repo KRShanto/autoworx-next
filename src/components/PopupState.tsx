@@ -5,10 +5,8 @@ import AddUser from "../app/task/[type]/components/user/AddUser";
 import AssignTask from "@/app/task/[type]/components/task/AssignTask";
 import AddNewCustomer from "../app/customer/AddCustomer";
 import AddEmployee from "../app/employee/AddEmployee";
-import AddService from "../app/inventory/service/AddService";
 import EditCustomer from "../app/customer/EditCustomer";
 import EditEmployee from "@/app/employee/EditEmployee";
-import EditService from "@/app/inventory/service/EditService";
 import UpdateTask from "@/app/task/[type]/components/task/UpdateTask";
 import { UpdateAppointment } from "@/app/task/[type]/components/appointment/UpdateAppointment";
 
@@ -21,10 +19,8 @@ export default function PopupState() {
   if (popup === "ASSIGN_TASK") return <AssignTask />;
   if (popup === "ADD_EMPLOYEE") return <AddEmployee />;
   if (popup === "ADD_NEW_CUSTOMER") return <AddNewCustomer />;
-  if (popup === "ADD_SERVICE") return <AddService />;
   if (popup === "EDIT_CUSTOMER") return <EditCustomer />;
   if (popup === "EDIT_EMPLOYEE") return <EditEmployee />;
-  if (popup === "EDIT_SERVICE") return <EditService />;
 
   return null;
 }
