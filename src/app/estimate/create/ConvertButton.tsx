@@ -5,6 +5,7 @@ import React from "react";
 import { GoFileCode } from "react-icons/go";
 import { create } from "./actions/create";
 import { InvoiceType } from "@prisma/client";
+import { customAlphabet } from "nanoid";
 
 export default function ConvertButton({
   text,
@@ -38,8 +39,29 @@ export default function ConvertButton({
   } = useEstimateCreateStore();
 
   async function handleSubmit() {
-    console.log(photos);
-    return;
+    const photoPaths = [];
+
+    // upload photos
+    if (photos.length > 0) {
+      const formData = new FormData();
+      photos.forEach((photo) => {
+        formData.append("photos", photo);
+      });
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        console.error("Failed to upload photos");
+        return;
+      }
+
+      const json = await res.json();
+      const data = json.data;
+      photoPaths.push(...data);
+    }
 
     const res = await create({
       title,
@@ -61,9 +83,15 @@ export default function ConvertButton({
       policy,
       customerNotes,
       customerComments,
-      photos,
+      photos: photoPaths,
       tasks,
       items,
+    });
+
+    // change the invoiceId
+    // NOTE: this is not necessary, but it's good for development so that we do not get unique constraint errors
+    useEstimateCreateStore.setState({
+      invoiceId: customAlphabet("1234567890", 10)(),
     });
   }
 

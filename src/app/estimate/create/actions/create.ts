@@ -101,7 +101,17 @@ export async function create({
     },
   });
 
-  // TODO: Add tasks and photos to the estimate
+  // TODO: Add tasks to the estimate
+
+  // Upload photos
+  photos.forEach(async (photo) => {
+    await db.invoicePhoto.create({
+      data: {
+        invoiceId: estimate.id,
+        photo,
+      },
+    });
+  });
 
   items.forEach(async (item) => {
     const service = item.service;

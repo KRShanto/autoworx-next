@@ -37,7 +37,7 @@ interface EstimateCreateStore {
   policy: string;
   customerNotes: string;
   customerComments: string;
-  photos: string[];
+  photos: File[];
   tasks: Task[];
   items: Item[];
 
@@ -63,7 +63,7 @@ interface EstimateCreateStore {
   setCustomerNotes: (customerNotes: string) => void;
   setCustomerComments: (customerComments: string) => void;
 
-  setPhotos: (photos: string[]) => void;
+  setPhotos: (photos: File[]) => void;
   addPhoto: (photo: string) => void;
   removePhoto: (photo: string) => void;
 
@@ -95,7 +95,7 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
   customerNotes: "",
   customerComments: "",
 
-  photos: [] as string[],
+  photos: [] as File[],
   tasks: [] as Task[],
 
   items: [],
@@ -122,7 +122,7 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
   setCustomerNotes: (customerNotes: string) => set({ customerNotes }),
   setCustomerComments: (customerComments: string) => set({ customerComments }),
 
-  setPhotos: (photos: string[]) => set({ photos }),
+  setPhotos: (photos: File[]) => set({ photos }),
   addPhoto: (photo: string) =>
     set((x: any) => ({ photos: [...x.photos, photo] })),
   removePhoto: (photo: string) =>

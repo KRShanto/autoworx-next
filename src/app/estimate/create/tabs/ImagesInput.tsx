@@ -16,15 +16,7 @@ export function ImagesInput() {
           onChange={(event) => {
             const file = event.currentTarget.files?.[0];
             if (!file) return;
-            const reader = new FileReader();
-
-            reader.onload = function (e) {
-              const base64String = e.target?.result;
-              if (typeof base64String !== "string") return;
-              setPhotos([...photos, base64String]);
-            };
-
-            reader.readAsDataURL(file);
+            setPhotos([...photos, file]);
           }}
         />
         <svg
@@ -45,14 +37,18 @@ export function ImagesInput() {
         <span className="font-medium">Attach Photo/Video</span>
       </label>
       <div className="-m-2 grid aspect-square grid-cols-3 content-start gap-4 overflow-y-auto p-2">
-        {photos.map((image, i) => (
+        {photos.map((photo, i) => (
           <div
             className="relative flex aspect-square rounded border border-solid border-slate-500 object-contain"
             key={i}
           >
             {
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={image} className="my-auto" alt={`image-${i}`} />
+              <img
+                src={URL.createObjectURL(photo)}
+                className="my-auto"
+                alt={`image-${i}`}
+              />
             }
             <button
               type="button"
