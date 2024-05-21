@@ -38,7 +38,6 @@ export async function create({
   customerComments,
 
   photos,
-  tasks,
   items,
 }: {
   title: string;
@@ -65,7 +64,6 @@ export async function create({
   customerComments: string;
 
   photos: string[];
-  tasks: Task[];
   items: {
     service: Service | null;
     material: Material | null;
@@ -76,7 +74,7 @@ export async function create({
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
 
-  const estimate = await db.invoice.create({
+  const invoice = await db.invoice.create({
     data: {
       id: invoiceId,
       title,
@@ -101,13 +99,11 @@ export async function create({
     },
   });
 
-  // TODO: Add tasks to the estimate
-
   // Upload photos
   photos.forEach(async (photo) => {
     await db.invoicePhoto.create({
       data: {
-        invoiceId: estimate.id,
+        invoiceId: invoice.id,
         photo,
       },
     });
@@ -121,7 +117,7 @@ export async function create({
 
     const invoiceItem = await db.invoiceItem.create({
       data: {
-        invoiceId: estimate.id,
+        invoiceId: invoice.id,
         serviceId: service?.id,
         materialId: material?.id,
         laborId: labor?.id,
@@ -140,5 +136,6 @@ export async function create({
 
   return {
     type: "success",
+    data: invoice,
   };
 }

@@ -7,6 +7,7 @@ import { create } from "./actions/create";
 import { InvoiceType } from "@prisma/client";
 import { customAlphabet } from "nanoid";
 import Submit from "@/components/Submit";
+import { createTask } from "@/app/task/[type]/actions/createTask";
 
 export default function ConvertButton({
   text,
@@ -85,8 +86,22 @@ export default function ConvertButton({
       customerNotes,
       customerComments,
       photos: photoPaths,
-      tasks,
       items,
+    });
+
+    // Create tasks
+    tasks.forEach(async (task) => {
+      if (!task) return;
+
+      const taskSplit = task.split(":");
+
+      await createTask({
+        title: taskSplit[0],
+        description: taskSplit.length > 1 ? taskSplit[1] : "",
+        priority: "Medium",
+        assignedUsers: [],
+        invoiceId: res.data.id,
+      });
     });
 
     // change the invoiceId
