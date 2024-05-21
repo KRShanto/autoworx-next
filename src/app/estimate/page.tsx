@@ -128,7 +128,7 @@ export default async function Page() {
 function Table({ data }: { data: InvoiceData[] }) {
   return (
     <div className="h-[65vh] rounded-md bg-white">
-      <table className="h-full w-full">
+      <table className="w-full">
         {/* Estimate Header */}
         <thead className=" bg-white">
           <tr className="h-10 border-b">

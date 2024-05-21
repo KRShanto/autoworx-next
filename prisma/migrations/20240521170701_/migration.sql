@@ -108,14 +108,115 @@ CREATE TABLE `Service` (
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
-    `description` VARCHAR(191) NOT NULL,
-    `price` DECIMAL(65, 30) NOT NULL,
-    `quantity` INTEGER NOT NULL,
-    `discount` DECIMAL(65, 30) NOT NULL,
-    `total` DECIMAL(65, 30) NOT NULL,
+    `description` VARCHAR(191) NULL,
+    `category_id` INTEGER NULL,
     `company_id` INTEGER NOT NULL,
 
     INDEX `fk_services_company`(`company_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `InvoiceItem` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `invoice_id` VARCHAR(191) NULL,
+    `service_id` INTEGER NULL,
+    `material_id` INTEGER NULL,
+    `labor_id` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Material` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `vendor_id` INTEGER NULL,
+    `category_id` INTEGER NULL,
+    `tags` JSON NULL,
+    `notes` VARCHAR(191) NULL,
+    `quantity` INTEGER NULL,
+    `cost` DECIMAL(65, 30) NULL,
+    `sell` DECIMAL(65, 30) NULL,
+    `discount` DECIMAL(65, 30) NULL,
+    `add_to_inventory` BOOLEAN NULL,
+    `company_id` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    INDEX `fk_materials_company`(`company_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Vendor` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `firstName` VARCHAR(191) NULL,
+    `lastName` VARCHAR(191) NULL,
+    `description` VARCHAR(191) NULL,
+    `email` VARCHAR(191) NULL,
+    `phone` INTEGER NULL,
+    `address` VARCHAR(191) NULL,
+    `city` VARCHAR(191) NULL,
+    `state` VARCHAR(191) NULL,
+    `zip` VARCHAR(191) NULL,
+    `companyName` VARCHAR(191) NULL,
+    `company_id` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Labor` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `category_id` INTEGER NULL,
+    `tags` JSON NULL,
+    `notes` VARCHAR(191) NULL,
+    `hours` INTEGER NULL,
+    `charge` DECIMAL(65, 30) NULL,
+    `discount` DECIMAL(65, 30) NULL,
+    `add_to_canned_labor` BOOLEAN NULL,
+    `company_id` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Tag` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `hue` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `company_id` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ItemTag` (
+    `service_id` INTEGER NOT NULL,
+    `tag_id` INTEGER NOT NULL,
+
+    PRIMARY KEY (`service_id`, `tag_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Category` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `type` ENUM('Service', 'Material', 'Labor') NOT NULL,
+    `company_id` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -139,32 +240,54 @@ CREATE TABLE `Vehicle` (
 
 -- CreateTable
 CREATE TABLE `Invoice` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id` VARCHAR(191) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
-    `invoice_id` VARCHAR(191) NOT NULL,
-    `customer_id` INTEGER NOT NULL,
-    `vehicle_id` INTEGER NOT NULL,
-    `service_ids` JSON NOT NULL,
-    `photo` VARCHAR(191) NULL,
-    `subtotal` DECIMAL(8, 2) NOT NULL,
-    `discount` DECIMAL(8, 2) NOT NULL,
-    `tax` DECIMAL(8, 2) NOT NULL,
-    `grand_total` DECIMAL(8, 2) NOT NULL,
-    `deposit` DECIMAL(8, 2) NOT NULL,
-    `due` DECIMAL(8, 2) NOT NULL,
-    `status` ENUM('Delivered', 'Consultations', 'Confirmed', 'In Progress', 'Follow Up', 'Scheduled', 'Pending', 'No show', 'Cancelled') NOT NULL,
-    `send_mail` BOOLEAN NOT NULL DEFAULT false,
-    `notes` VARCHAR(191) NULL,
+    `title` VARCHAR(191) NULL,
+    `type` ENUM('Invoice', 'Estimate') NULL DEFAULT 'Invoice',
+    `customer_id` INTEGER NULL,
+    `vehicle_id` INTEGER NULL,
+    `subtotal` DECIMAL(8, 2) NULL DEFAULT 0,
+    `discount` DECIMAL(8, 2) NULL DEFAULT 0,
+    `tax` DECIMAL(8, 2) NULL DEFAULT 0,
+    `grand_total` DECIMAL(8, 2) NULL DEFAULT 0,
+    `deposit` DECIMAL(8, 2) NULL DEFAULT 0,
+    `deposit_notes` VARCHAR(191) NULL DEFAULT '',
+    `deposit_method` VARCHAR(191) NULL DEFAULT '',
+    `due` DECIMAL(8, 2) NULL DEFAULT 0,
+    `status_id` INTEGER NULL,
+    `internalNotes` VARCHAR(191) NULL,
     `terms` VARCHAR(191) NULL,
     `policy` VARCHAR(191) NULL,
-    `issue_date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `customerNotes` VARCHAR(191) NULL,
+    `customerComments` VARCHAR(191) NULL,
     `company_id` INTEGER NOT NULL,
-    `salesperson` VARCHAR(191) NOT NULL,
-    `tags` VARCHAR(191) NOT NULL DEFAULT '',
 
-    UNIQUE INDEX `Invoice_invoice_id_key`(`invoice_id`),
     INDEX `fk_invoices_company`(`company_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `InvoicePhoto` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `invoice_id` VARCHAR(191) NOT NULL,
+    `photo` VARCHAR(191) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    INDEX `fk_invoice_photos_invoice`(`invoice_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Status` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `hue` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `company_id` INTEGER NOT NULL,
+
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -177,26 +300,6 @@ CREATE TABLE `Setting` (
     `updated_at` DATETIME(3) NOT NULL,
 
     INDEX `fk_settings_company`(`company_id`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `Payment` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
-    `invoice_id` INTEGER NOT NULL,
-    `invoice_invoice_id` VARCHAR(191) NOT NULL,
-    `type` ENUM('Payment', 'Deposit', 'Refund') NOT NULL,
-    `method` ENUM('Cash', 'Card', 'Zelle') NOT NULL,
-    `amount` DECIMAL(8, 2) NOT NULL,
-    `note` VARCHAR(191) NULL,
-    `date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `tnx` VARCHAR(191) NOT NULL,
-    `company_id` INTEGER NOT NULL,
-
-    INDEX `fk_payments_invoice`(`invoice_id`),
-    INDEX `fk_payments_company`(`company_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -257,6 +360,7 @@ CREATE TABLE `Task` (
     `updated_at` DATETIME(3) NOT NULL,
     `user_id` INTEGER NOT NULL,
     `company_id` INTEGER NOT NULL,
+    `invoice_id` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -349,19 +453,67 @@ ALTER TABLE `Customer` ADD CONSTRAINT `Customer_company_id_fkey` FOREIGN KEY (`c
 ALTER TABLE `Service` ADD CONSTRAINT `Service_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `Service` ADD CONSTRAINT `Service_category_id_fkey` FOREIGN KEY (`category_id`) REFERENCES `Category`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_service_id_fkey` FOREIGN KEY (`service_id`) REFERENCES `Service`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_material_id_fkey` FOREIGN KEY (`material_id`) REFERENCES `Material`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_labor_id_fkey` FOREIGN KEY (`labor_id`) REFERENCES `Labor`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Material` ADD CONSTRAINT `Material_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Material` ADD CONSTRAINT `Material_vendor_id_fkey` FOREIGN KEY (`vendor_id`) REFERENCES `Vendor`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Material` ADD CONSTRAINT `Material_category_id_fkey` FOREIGN KEY (`category_id`) REFERENCES `Category`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Vendor` ADD CONSTRAINT `Vendor_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Labor` ADD CONSTRAINT `Labor_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Labor` ADD CONSTRAINT `Labor_category_id_fkey` FOREIGN KEY (`category_id`) REFERENCES `Category`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Tag` ADD CONSTRAINT `Tag_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ItemTag` ADD CONSTRAINT `ItemTag_service_id_fkey` FOREIGN KEY (`service_id`) REFERENCES `Service`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ItemTag` ADD CONSTRAINT `ItemTag_tag_id_fkey` FOREIGN KEY (`tag_id`) REFERENCES `Tag`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Category` ADD CONSTRAINT `Category_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `Vehicle` ADD CONSTRAINT `Vehicle_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_status_id_fkey` FOREIGN KEY (`status_id`) REFERENCES `Status`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `InvoicePhoto` ADD CONSTRAINT `InvoicePhoto_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Status` ADD CONSTRAINT `Status_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `Setting` ADD CONSTRAINT `Setting_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Payment` ADD CONSTRAINT `Payment_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Payment` ADD CONSTRAINT `Payment_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `InvoiceAdditional` ADD CONSTRAINT `InvoiceAdditional_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -374,6 +526,9 @@ ALTER TABLE `Task` ADD CONSTRAINT `Task_user_id_fkey` FOREIGN KEY (`user_id`) RE
 
 -- AddForeignKey
 ALTER TABLE `Task` ADD CONSTRAINT `Task_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Task` ADD CONSTRAINT `Task_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `TaskUser` ADD CONSTRAINT `TaskUser_task_id_fkey` FOREIGN KEY (`task_id`) REFERENCES `Task`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
