@@ -8,29 +8,28 @@ datasource db {
 }
 
 model Company {
-  id                 Int                 @id @default(autoincrement())
-  name               String
-  createdAt          DateTime            @default(now()) @map("created_at")
-  updatedAt          DateTime            @updatedAt @map("updated_at")
-  workOrders         WorkOrder[]
-  users              User[]
-  tasks              Task[]
-  customers          Customer[]
-  services           Service[]
-  vehicles           Vehicle[]
-  invoices           Invoice[]
-  settings           Setting[]
-  invoiceAdditionals InvoiceAdditional[]
-  calendarSettings   CalendarSettings[]
-  orders             Order[]
-  appointments       Appointment[]
-  emailTemplates     EmailTemplate[]
-  materials          Material[]
-  vendors            Vendor[]
-  labors             Labor[]
-  tags               Tag[]
-  categories         Category[]
-  statuses           Status[]
+  id               Int                @id @default(autoincrement())
+  name             String
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+  workOrders       WorkOrder[]
+  users            User[]
+  tasks            Task[]
+  customers        Customer[]
+  services         Service[]
+  vehicles         Vehicle[]
+  invoices         Invoice[]
+  settings         Setting[]
+  calendarSettings CalendarSettings[]
+  orders           Order[]
+  appointments     Appointment[]
+  emailTemplates   EmailTemplate[]
+  materials        Material[]
+  vendors          Vendor[]
+  labors           Labor[]
+  tags             Tag[]
+  categories       Category[]
+  statuses         Status[]
 }
 
 model WorkOrder {
@@ -270,22 +269,15 @@ model ItemTag {
 }
 
 model Category {
-  id        Int          @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   name      String
-  type      CategoryType
-  companyId Int          @map("company_id")
-  createdAt DateTime     @default(now()) @map("created_at")
-  updatedAt DateTime     @updatedAt @map("updated_at")
+  companyId Int        @map("company_id")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
   services  Service[]
   materials Material[]
   labors    Labor[]
-  company   Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
-}
-
-enum CategoryType {
-  Service
-  Material
-  Labor
+  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model Vehicle {
@@ -294,9 +286,13 @@ model Vehicle {
   make         String?
   model        String?
   submodel     String?
-  vin          String?
   type         String?
+  color        String?
+  transmission String?
+  engineSize   String?
   license      String?
+  vin          String?
+  notes        String?
   companyId    Int           @map("company_id")
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")
@@ -358,6 +354,8 @@ model Status {
   id        Int       @id @default(autoincrement())
   name      String
   hue       Int
+  // textColor String // hex (with #)
+  // bgColor   String // hex (with #)
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   companyId Int       @map("company_id")
@@ -420,18 +418,6 @@ model Message {
 
   @@index([to], name: "fk_messages_to")
   @@index([from], name: "fk_messages_from")
-}
-
-model InvoiceAdditional {
-  id        Int      @id @default(autoincrement())
-  companyId Int      @unique @map("company_id")
-  note      String
-  terms     String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  @@index([companyId], name: "fk_invoice_additionals_company")
 }
 
 model CalendarSettings {

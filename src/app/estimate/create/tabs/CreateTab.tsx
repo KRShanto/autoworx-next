@@ -11,6 +11,7 @@ import { SelectTags } from "@/components/Lists/SelectTags";
 
 export function CreateTab() {
   const items = useEstimateCreateStore((x) => x.items);
+  const { setCurrentSelectedCategoryId } = useEstimateCreateStore();
   const { open } = useEstimatePopupStore();
   const services = useListsStore((x) => x.services);
   const materials = useListsStore((x) => x.materials);
@@ -59,13 +60,14 @@ export function CreateTab() {
                           type="button"
                           key={service.id}
                           className="mx-auto my-1 block w-[95%] cursor-pointer rounded-md border border-[#6571FF] p-1 text-left text-[#6571FF] hover:bg-gray-100"
-                          onClick={() =>
+                          onClick={() => {
                             useEstimateCreateStore.setState((x) =>
                               create(x, (x) => {
                                 x.items[i].service = service;
                               }),
-                            )
-                          }
+                            );
+                            setCurrentSelectedCategoryId(service.categoryId!);
+                          }}
                         >
                           {service.name}
                         </button>

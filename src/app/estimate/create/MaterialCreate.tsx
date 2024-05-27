@@ -1,6 +1,6 @@
 import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useListsStore } from "@/stores/lists";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import newCategory from "./actions/newCategory";
 import { Category, Vendor } from "@prisma/client";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
@@ -10,6 +10,10 @@ import NewVendor from "./NewVendor";
 import Close from "./CloseEstimate";
 
 export default function MaterialCreate() {
+  const { categories } = useListsStore();
+  const { currentSelectedCategoryId } = useEstimateCreateStore();
+  const vendors = useListsStore((x) => x.vendors);
+
   const [name, setName] = useState("");
   const [category, setCategory] = useState<Category | null>(null);
   const [vendor, setVendor] = useState<Vendor | null>(null);
@@ -23,18 +27,20 @@ export default function MaterialCreate() {
 
   const [categoryInput, setCategoryInput] = useState("");
 
-  const categories = useListsStore((x) =>
-    x.categories.filter((cat) => cat.type === "Material"),
-  );
-  const vendors = useListsStore((x) => x.vendors);
-
   const { close, data } = useEstimatePopupStore();
   const itemId = data?.itemId;
+
+  useEffect(() => {
+    if (currentSelectedCategoryId) {
+      setCategory(
+        categories.find((cat) => cat.id === currentSelectedCategoryId)!,
+      );
+    }
+  }, [currentSelectedCategoryId]);
 
   async function handleNewCategory() {
     const res = await newCategory({
       name: categoryInput,
-      type: "Material",
     });
 
     if (res.type === "success") {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { FaSearch } from "react-icons/fa";
 
@@ -13,16 +13,15 @@ export default function Selector({
 }) {
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    setOpen(false);
-  }, [label]);
-
   return (
     <div className="relative h-10 basis-full md:basis-96">
       {!open ? (
         <div className="flex h-full items-center justify-between rounded-md border-2 border-slate-400 px-4">
-          <p className="text-sm font-medium text-slate-400">{label}</p>
-          <button onClick={() => setOpen(true)}>
+          <button
+            onClick={() => setOpen(true)}
+            className="flex w-full items-center justify-between"
+          >
+            <p className="text-sm font-medium text-slate-400">{label}</p>
             <FaChevronDown className="text-[#797979]" />
           </button>
         </div>
@@ -41,8 +40,9 @@ export default function Selector({
             </button>
           </div>
 
-          {/* BUG: The dropdown is not at the top of the screen. The parent element hides the dropdown. So for now I'm using height instead. */}
-          <div className="h-[140px] overflow-scroll">{children}</div>
+          <div className="mb-5" onClick={() => setOpen(false)}>
+            {children}
+          </div>
 
           {/* New button */}
           <div className="border-t-2 border-slate-400 p-2">{newButton}</div>

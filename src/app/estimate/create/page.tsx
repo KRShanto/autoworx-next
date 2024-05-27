@@ -14,6 +14,8 @@ import { AttachmentTab } from "./tabs/AttachmentTab";
 import Header from "./Header";
 import ConvertButton from "./ConvertButton";
 import { InvoiceType } from "@prisma/client";
+import { GoFile, GoFileCode } from "react-icons/go";
+import EstimateLogo from "@/components/EstimateLogo";
 
 export default async function Page() {
   const session = (await auth()) as AuthSession;
@@ -44,8 +46,17 @@ export default async function Page() {
         statuses={statuses}
       />
       <div className="flex">
-        <ConvertButton type={InvoiceType.Estimate} text="Save as Estimate" />
-        <ConvertButton type={InvoiceType.Invoice} text="Convert to Invoice" />
+        <ConvertButton
+          type={InvoiceType.Invoice}
+          text="Convert to Invoice"
+          icon={<GoFileCode />}
+        />
+        <ConvertButton
+          type={InvoiceType.Estimate}
+          text="Sell as Estimate"
+          className="border-none bg-[#6470FF] text-white"
+          icon={<EstimateLogo />}
+        />
       </div>
       <Header />
 

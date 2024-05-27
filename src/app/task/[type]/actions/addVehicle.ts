@@ -7,11 +7,17 @@ import { z } from "zod";
 import { ServerAction } from "@/types/action";
 
 export async function addVehicle(data: {
+  year: number;
   make: string;
   model: string;
-  year: number;
   submodel: string;
   type: string;
+  color: string;
+  transmission: string;
+  engineSize: string;
+  license: string;
+  vin: string;
+  notes: string;
 }): Promise<ServerAction> {
   try {
     const session = (await auth()) as AuthSession;

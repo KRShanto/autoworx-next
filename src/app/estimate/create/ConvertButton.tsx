@@ -8,13 +8,18 @@ import { InvoiceType } from "@prisma/client";
 import { customAlphabet } from "nanoid";
 import Submit from "@/components/Submit";
 import { createTask } from "@/app/task/[type]/actions/createTask";
+import { cn } from "@/lib/cn";
 
 export default function ConvertButton({
   text,
+  icon,
   type,
+  className,
 }: {
   text: string;
+  icon: React.ReactNode;
   type: InvoiceType;
+  className?: string;
 }) {
   const {
     invoiceId,
@@ -114,10 +119,13 @@ export default function ConvertButton({
   return (
     <div className="px-3">
       <Submit
-        className="flex w-full items-center justify-center gap-2 text-nowrap rounded border border-solid border-slate-600 p-2 text-center text-sm"
+        className={cn(
+          "flex w-full items-center justify-center gap-2 text-nowrap rounded border border-solid border-slate-600 p-2 text-center text-sm",
+          className,
+        )}
         formAction={handleSubmit}
       >
-        <GoFileCode />
+        {icon}
         {text}
       </Submit>
     </div>

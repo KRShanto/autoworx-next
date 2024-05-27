@@ -22,18 +22,36 @@ export default function NewVehicle() {
   const { showError } = useFormErrorStore();
 
   async function handleSubmit(data: FormData) {
+    // const make = data.get("make") as string;
+    // const model = data.get("model") as string;
+    // const year = +(data.get("year") ?? 0) as number;
+    // const submodel = data.get("submodel") as string;
+    // const type = data.get("type") as string;
+
+    const year = +(data.get("year") ?? 0) as number;
     const make = data.get("make") as string;
     const model = data.get("model") as string;
-    const year = +(data.get("year") ?? 0) as number;
     const submodel = data.get("submodel") as string;
     const type = data.get("type") as string;
+    const color = data.get("color") as string;
+    const transmission = data.get("transmission") as string;
+    const engineSize = data.get("engineSize") as string;
+    const license = data.get("license") as string;
+    const vin = data.get("vin") as string;
+    const notes = data.get("notes") as string;
 
     const res = await addVehicle({
+      year,
       make,
       model,
-      year,
       submodel,
       type,
+      color,
+      transmission,
+      engineSize,
+      license,
+      vin,
+      notes,
     });
 
     if (res.type === "error") {
@@ -68,14 +86,21 @@ export default function NewVehicle() {
 
         <div className="grid gap-2 overflow-y-auto sm:grid-cols-2">
           <FormError />
+
           <SlimInput name="year" type="number" />
           <SlimInput name="make" />
           <SlimInput name="model" />
           <SlimInput name="submodel" required={false} label="Sub Model" />
+          <SlimInput name="type" required={false} />
+          <SlimInput name="color" required={false} />
+          <SlimInput name="transmission" required={false} />
+          <SlimInput name="engineSize" required={false} />
+          <SlimInput name="license" required={false} label="License Plate" />
+          <SlimInput name="vin" required={false} />
           <SlimInput
-            name="type"
-            rootClassName="col-span-full"
+            name="notes"
             required={false}
+            rootClassName="col-span-full"
           />
         </div>
 

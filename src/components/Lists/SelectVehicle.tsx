@@ -32,9 +32,7 @@ export function SelectVehicle({
               onClick={() => setVehicle(vehicle)}
             >
               <div>
-                <p className="text-sm font-bold">
-                  {`${vehicle.model} ${vehicle.id}`}
-                </p>
+                <p className="text-sm font-bold">{vehicle.model}</p>
                 <p className="text-xs">Owner</p> {/* TODO: Add owner name */}
               </div>
             </button>

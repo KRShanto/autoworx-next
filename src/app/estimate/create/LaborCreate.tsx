@@ -1,15 +1,17 @@
 import Selector from "@/components/Selector";
 import { useListsStore } from "@/stores/lists";
 import { Category } from "@prisma/client";
-import { use, useState } from "react";
+import { useEffect, useState } from "react";
 import newCategory from "./actions/newCategory";
-import newService from "./actions/newService";
 import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { newLabor } from "./actions/newLabor";
 import Close from "./CloseEstimate";
 
 export default function LaborCreate() {
+  const { categories } = useListsStore();
+  const { currentSelectedCategoryId } = useEstimateCreateStore();
+
   const [name, setName] = useState("");
   const [category, setCategory] = useState<Category | null>(null);
   const [tags, setTags] = useState<string>("");
@@ -19,18 +21,22 @@ export default function LaborCreate() {
   const [discount, setDiscount] = useState<number>();
   const [addToCannedLabor, setAddToCannedLabor] = useState<boolean>(false);
 
-  const categories = useListsStore((x) =>
-    x.categories.filter((cat) => cat.type === "Labor"),
-  );
   const [categoryInput, setCategoryInput] = useState("");
 
   const { close, data } = useEstimatePopupStore();
   const itemId = data?.itemId;
 
+  useEffect(() => {
+    if (currentSelectedCategoryId) {
+      setCategory(
+        categories.find((cat) => cat.id === currentSelectedCategoryId)!,
+      );
+    }
+  }, [currentSelectedCategoryId]);
+
   async function handleNewCategory() {
     const res = await newCategory({
       name: categoryInput,
-      type: "Labor",
     });
 
     if (res.type === "success") {
@@ -117,16 +123,23 @@ export default function LaborCreate() {
           }
         >
           <div>
-            {categories.map((cat) => (
-              <button
-                type="button"
-                key={cat.id}
-                onClick={() => setCategory(cat)}
-                className="mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200"
-              >
-                {cat.name}
-              </button>
-            ))}
+            {categories
+              // sort by currentSelectedCategoryId
+              .sort((a, b) => {
+                if (a.id === currentSelectedCategoryId) return -1;
+                if (b.id === currentSelectedCategoryId) return 1;
+                return 0;
+              })
+              .map((cat) => (
+                <button
+                  type="button"
+                  key={cat.id}
+                  onClick={() => setCategory(cat)}
+                  className="mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200"
+                >
+                  {cat.name}
+                </button>
+              ))}
           </div>
         </Selector>
       </div>

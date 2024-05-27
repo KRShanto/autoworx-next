@@ -18,6 +18,7 @@ interface Item {
   labor: Labor | null;
   tags: Tag[];
 }
+
 interface EstimateCreateStore {
   title: string;
   invoiceId: string;
@@ -37,6 +38,7 @@ interface EstimateCreateStore {
   photos: File[];
   tasks: string[];
   items: Item[];
+  currentSelectedCategoryId: number | null;
 
   setTitle: (title: string) => void;
   setInvoiceId: (invoiceId: string) => void;
@@ -63,6 +65,8 @@ interface EstimateCreateStore {
   setTasks: (tasks: string[]) => void;
   addTask: (task: Task) => void;
   removeTask: (taskId: number) => void;
+
+  setCurrentSelectedCategoryId: (categoryId: number) => void;
 }
 
 export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
@@ -88,6 +92,8 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
   tasks: [],
 
   items: [],
+
+  currentSelectedCategoryId: null,
 
   setTitle: (title: string) => set({ title }),
   setInvoiceId: (invoiceId: string) => set({ invoiceId }),
@@ -117,4 +123,7 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
   addTask: (task: Task) => set((x: any) => ({ tasks: [...x.tasks, task] })),
   removeTask: (taskId: number) =>
     set((x: any) => ({ tasks: x.tasks.filter((t: Task) => t.id !== taskId) })),
+
+  setCurrentSelectedCategoryId: (categoryId: number) =>
+    set({ currentSelectedCategoryId: categoryId }),
 }));

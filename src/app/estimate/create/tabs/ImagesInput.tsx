@@ -8,7 +8,7 @@ export function ImagesInput() {
 
   return (
     <div className="grid grid-cols-2 gap-2 rounded border border-solid border-slate-500 p-2">
-      <label className="grid aspect-square content-center justify-items-center gap-2 rounded-md bg-gray-200 text-center">
+      <label className="grid aspect-square cursor-pointer content-center justify-items-center gap-2 rounded-md bg-gray-200 text-center">
         <input
           type="file"
           hidden

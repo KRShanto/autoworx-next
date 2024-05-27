@@ -12,18 +12,16 @@ export default function ServiceCreate() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState<Category | null>(null);
   const [description, setDescription] = useState("");
-  const categories = useListsStore((x) =>
-    x.categories.filter((cat) => cat.type === "Service"),
-  );
+  const { categories } = useListsStore();
   const [categoryInput, setCategoryInput] = useState("");
 
   const { close, data } = useEstimatePopupStore();
+  const { setCurrentSelectedCategoryId } = useEstimateCreateStore();
   const itemId = data?.itemId;
 
   async function handleNewCategory() {
     const res = await newCategory({
       name: categoryInput,
-      type: "Service",
     });
 
     if (res.type === "success") {
