@@ -216,7 +216,7 @@ function Dropdown({
         side="right"
         align="start"
         sideOffset={8}
-        className="space-y-1 border-none bg-transparent p-0 shadow-none"
+        className="-m-4 space-y-1 border-none bg-transparent p-4 shadow-none"
       >
         {children}
       </DropdownMenuContent>
