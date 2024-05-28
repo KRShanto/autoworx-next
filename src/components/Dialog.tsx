@@ -30,8 +30,9 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> &
-    {form?: boolean}
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+    form?: boolean;
+  }
 >(({ className, form, children, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
@@ -133,3 +134,20 @@ export {
   DialogTitle,
   DialogDescription,
 };
+
+import { useRouter } from "next/navigation";
+import type { ReactNode } from "react";
+
+export function InterceptedDialog({ children }: { children: ReactNode }) {
+  const router = useRouter();
+
+  function close() {
+    router.back();
+  }
+
+  return (
+    <Dialog open={true} onOpenChange={close}>
+      {children}
+    </Dialog>
+  );
+}

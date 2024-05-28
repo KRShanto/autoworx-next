@@ -153,7 +153,11 @@ function Table({ data }: { data: InvoiceData[] }) {
               key={data.id}
               className={cn("py-3", index % 2 === 0 ? evenColor : oddColor)}
             >
-              <td className="h-12 px-10 text-left">{data.id}</td>
+              <td className="h-12 px-10 text-left">
+                <Link href={`/estimate/view/${data.id}`} passHref>
+                  {data.id}
+                </Link>
+              </td>
               <td className="px-10 text-left">{data.clientName}</td>
               <td className="px-10 text-left">{data.vehicle}</td>
               <td className="px-10 text-left">{data.email}</td>
