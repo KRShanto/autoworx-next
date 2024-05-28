@@ -140,13 +140,18 @@ import type { ReactNode } from "react";
 
 export function InterceptedDialog({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const [open, setOpen] = React.useState(false)
 
   function close() {
     router.back();
   }
 
+  React.useEffect(()=> {
+    setOpen(true)
+  }, [])
+
   return (
-    <Dialog open={true} onOpenChange={close}>
+    <Dialog open={open} onOpenChange={close}>
       {children}
     </Dialog>
   );
