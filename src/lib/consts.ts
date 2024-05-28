@@ -28,3 +28,14 @@ export const INVOICE_TAGS = [
     name: "schedule",
   },
 ];
+
+export const INVOICE_COLORS: { textColor: string; bgColor: string }[] = [
+  { textColor: "#EB9D0B", bgColor: "#FFE7BA" },
+  { textColor: "#38D3CF", bgColor: "#CBFFFD" },
+  { textColor: "#C13232", bgColor: "#FFACAC" },
+  { textColor: "#5860BA", bgColor: "#DADDFF" },
+  { textColor: "#59B24A", bgColor: "#CAEBC5" },
+  { textColor: "#C77B35", bgColor: "#FFD1A6" },
+  { textColor: "#B156C0", bgColor: "#FAD9FF" },
+  { textColor: "#9B446E", bgColor: "#FFDAEC" },
+];

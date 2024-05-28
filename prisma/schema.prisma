@@ -250,7 +250,8 @@ model Labor {
 model Tag {
   id        Int      @id @default(autoincrement())
   name      String
-  hue       Int
+  textColor String // hex (with #)
+  bgColor   String // hex (with #)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   companyId Int      @map("company_id")
@@ -353,7 +354,6 @@ model InvoicePhoto {
 model Status {
   id        Int       @id @default(autoincrement())
   name      String
-  // hue       Int
   textColor String // hex (with #)
   bgColor   String // hex (with #)
   createdAt DateTime  @default(now()) @map("created_at")

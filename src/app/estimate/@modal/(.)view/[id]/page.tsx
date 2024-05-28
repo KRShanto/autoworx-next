@@ -92,10 +92,10 @@ export default async function ViewEstimate({
                 key={key}
                 className="flex rounded border border-solid border-[#6571FF]"
               >
-                <span className="grow shrink-0 px-2 font-bold uppercase text-[#6571FF]">
+                <span className="shrink-0 grow px-2 font-bold uppercase text-[#6571FF]">
                   {key}
                 </span>
-                <div className="rounded bg-[#6571FF] px-2 text-white basis-20 shrink-0">
+                <div className="shrink-0 basis-20 rounded bg-[#6571FF] px-2 text-white">
                   ${value?.toFixed(2)}
                 </div>
               </div>

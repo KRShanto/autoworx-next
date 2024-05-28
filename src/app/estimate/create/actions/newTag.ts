@@ -7,10 +7,12 @@ import { AuthSession } from "@/types/auth";
 
 export default async function newTag({
   name,
-  hue,
+  textColor,
+  bgColor,
 }: {
   name: string;
-  hue: number;
+  textColor?: string;
+  bgColor?: string;
 }): Promise<ServerAction> {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
@@ -19,7 +21,8 @@ export default async function newTag({
     data: {
       companyId,
       name,
-      hue,
+      textColor: textColor || "black",
+      bgColor: bgColor || "white",
     },
   });
 

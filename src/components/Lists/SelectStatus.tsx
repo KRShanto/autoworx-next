@@ -4,7 +4,6 @@ import newStatus from "@/app/estimate/create/actions/newStatus";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
 import { Status } from "@prisma/client";
-import Hue from "@uiw/react-color-hue";
 import { useRef, useState } from "react";
 import { FaChevronUp, FaSearch } from "react-icons/fa";
 import { PiPaletteBold, PiPulse } from "react-icons/pi";
@@ -17,19 +16,9 @@ import {
 import FormError from "../FormError";
 import Submit from "../Submit";
 import { SelectProps } from "./select-props";
+import { INVOICE_COLORS } from "@/lib/consts";
 
 type SelectedColor = { textColor: string; bgColor: string } | null;
-
-const colors: { textColor: string; bgColor: string }[] = [
-  { textColor: "#EB9D0B", bgColor: "#FFE7BA" },
-  { textColor: "#38D3CF", bgColor: "#CBFFFD" },
-  { textColor: "#C13232", bgColor: "#FFACAC" },
-  { textColor: "#5860BA", bgColor: "#DADDFF" },
-  { textColor: "#59B24A", bgColor: "#CAEBC5" },
-  { textColor: "#C77B35", bgColor: "#FFD1A6" },
-  { textColor: "#B156C0", bgColor: "#FAD9FF" },
-  { textColor: "#9B446E", bgColor: "#FFDAEC" },
-];
 
 export function SelectStatus({
   name = "statusId",
@@ -107,7 +96,7 @@ export function SelectStatus({
           />
           {pickerOpen && (
             <div className="grid grid-cols-4 gap-2 p-2">
-              {colors.map((color, index) => (
+              {INVOICE_COLORS.map((color, index) => (
                 <button
                   key={index}
                   onClick={() => {
@@ -153,8 +142,7 @@ function QuickAddForm({
 
     const res = await newStatus({
       name,
-      textColor: selectedColor?.textColor,
-      bgColor: selectedColor?.bgColor,
+      ...selectedColor,
     });
 
     if (res.type === "error") {
