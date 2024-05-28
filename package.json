@@ -25,6 +25,7 @@
     "email-validator": "^2.0.4",
     "googleapis": "^134.0.0",
     "html-pdf": "^3.0.1",
+    "match-sorter": "^6.3.4",
     "moment": "^2.30.1",
     "mutative": "^1.0.5",
     "nanoid": "^5.0.6",

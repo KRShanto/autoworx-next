@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { FaSearch } from "react-icons/fa";
+import { DropdownMenu, DropdownMenuTrigger } from "./DropdownMenu";
+import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
+import { cn } from "@/lib/cn";
 
 export default function Selector({
   label,
@@ -14,19 +17,24 @@ export default function Selector({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="relative h-10 basis-full md:basis-96">
-      {!open ? (
-        <div className="flex h-full items-center justify-between rounded-md border-2 border-slate-400 px-4">
-          <button
-            onClick={() => setOpen(true)}
-            className="flex w-full items-center justify-between"
-          >
-            <p className="text-sm font-medium text-slate-400">{label}</p>
-            <FaChevronDown className="text-[#797979]" />
-          </button>
-        </div>
-      ) : (
-        <div className="absolute z-50 w-full rounded-lg border-2 border-slate-400 bg-white">
+    <DropdownMenu open={open} onOpenChange={setOpen}>
+      <div className="basis-full md:basis-96">
+        <DropdownMenuTrigger
+          onClick={() => setOpen(true)}
+          className={cn(
+            "flex h-10 w-full items-center justify-between rounded-md border-2 border-slate-400 px-4",
+            open && "invisible",
+          )}
+        >
+          <p className="text-sm font-medium text-slate-400">{label}</p>
+          <FaChevronDown className="text-[#797979]" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="start"
+          sideOffset={-40}
+          className="z-50 w-full rounded-lg border-2 border-slate-400 bg-white"
+          style={{ minWidth: "var(--radix-popper-anchor-width)" }}
+        >
           {/* Search */}
           <div className="relative m-2">
             <FaSearch className="absolute left-2 top-1/2 -translate-y-1/2 transform text-[#797979]" />
@@ -39,15 +47,13 @@ export default function Selector({
               <FaChevronUp className="absolute right-2 top-1/2 -translate-y-1/2 transform text-[#797979]" />
             </button>
           </div>
-
           <div className="mb-5" onClick={() => setOpen(false)}>
             {children}
           </div>
-
           {/* New button */}
           <div className="border-t-2 border-slate-400 p-2">{newButton}</div>
-        </div>
-      )}
-    </div>
+        </DropdownMenuContent>
+      </div>
+    </DropdownMenu>
   );
 }
