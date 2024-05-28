@@ -71,7 +71,10 @@ const oddColor = "bg-[#F8FAFF]";
 export default async function Page() {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
-  const estimates = await fetchAndTransformData(InvoiceType.Estimate, companyId);
+  const estimates = await fetchAndTransformData(
+    InvoiceType.Estimate,
+    companyId,
+  );
   const invoices = await fetchAndTransformData(InvoiceType.Invoice, companyId);
   const statuses = await db.status.findMany({ where: { companyId } });
 
@@ -93,10 +96,7 @@ export default async function Page() {
           </div>
 
           {/* Filter */}
-          <SyncLists
-        statuses={statuses}
-          
-          />
+          <SyncLists statuses={statuses} />
           <Filter />
         </div>
 
@@ -181,9 +181,12 @@ function Table({ data }: { data: InvoiceData[] }) {
                 </p>
               </td>
               <td className="px-10 text-left">
-                <button className="text-2xl text-blue-600">
+                <Link
+                  href={`/estimate/edit/${data.id}`}
+                  className="text-2xl text-blue-600"
+                >
                   <CiEdit />
-                </button>
+                </Link>
               </td>
             </tr>
           ))}
