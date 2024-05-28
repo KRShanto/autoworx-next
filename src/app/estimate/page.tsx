@@ -3,13 +3,15 @@ import { cn } from "@/lib/cn";
 import React from "react";
 import { CiEdit } from "react-icons/ci";
 import { FaSearch } from "react-icons/fa";
-import FilterImage from "@/../public/icons/Filter.svg";
-import Image from "next/image";
 import Link from "next/link";
 import moment from "moment";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import { db } from "@/lib/db";
 import { InvoiceType } from "@prisma/client";
+import { Filter } from "./Filter";
+import { AuthSession } from "@/types/auth";
+import { auth } from "../auth";
+import { SyncLists } from "@/components/SyncLists";
 
 interface InvoiceData {
   id: string;
@@ -24,9 +26,9 @@ interface InvoiceData {
   bgColor?: string;
 }
 
-async function fetchAndTransformData(type: InvoiceType) {
+async function fetchAndTransformData(type: InvoiceType, companyId: number) {
   const data = await db.invoice.findMany({
-    where: { type },
+    where: { type, companyId },
   });
 
   return await Promise.all(
@@ -67,8 +69,11 @@ const evenColor = "bg-white";
 const oddColor = "bg-[#F8FAFF]";
 
 export default async function Page() {
-  const estimates = await fetchAndTransformData(InvoiceType.Estimate);
-  const invoices = await fetchAndTransformData(InvoiceType.Invoice);
+  const session = (await auth()) as AuthSession;
+  const companyId = session.user.companyId;
+  const estimates = await fetchAndTransformData(InvoiceType.Estimate, companyId);
+  const invoices = await fetchAndTransformData(InvoiceType.Invoice, companyId);
+  const statuses = await db.status.findMany({ where: { companyId } });
 
   return (
     <div>
@@ -88,16 +93,11 @@ export default async function Page() {
           </div>
 
           {/* Filter */}
-          <button className="flex h-10 items-center gap-2 rounded-md border-2 border-slate-400 p-1">
-            <Image
-              src={FilterImage}
-              alt="Filter"
-              width={20}
-              height={20}
-              className="cursor-pointer"
-            />
-            Customize
-          </button>
+          <SyncLists
+        statuses={statuses}
+          
+          />
+          <Filter />
         </div>
 
         {/* Create Estimate */}
