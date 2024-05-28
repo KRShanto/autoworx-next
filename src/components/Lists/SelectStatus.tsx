@@ -5,7 +5,7 @@ import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
 import { Status } from "@prisma/client";
 import { useRef, useState } from "react";
-import { FaChevronUp, FaSearch } from "react-icons/fa";
+import { FaChevronUp, FaSearch, FaTimes } from "react-icons/fa";
 import { PiPaletteBold, PiPulse } from "react-icons/pi";
 import {
   DropdownMenu,
@@ -17,6 +17,8 @@ import FormError from "../FormError";
 import Submit from "../Submit";
 import { SelectProps } from "./select-props";
 import { INVOICE_COLORS } from "@/lib/consts";
+import { IoMdClose } from "react-icons/io";
+import { deleteStatus } from "@/app/estimate/create/actions/deleteStatus";
 
 type SelectedColor = { textColor: string; bgColor: string } | null;
 
@@ -31,6 +33,19 @@ export function SelectStatus({
   const [open, setOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
+
+  async function handleDelete(id: number) {
+    const res = await deleteStatus(id);
+
+    if (res.type === "success") {
+      useListsStore.setState(({ statuses }) => ({
+        statuses: statuses.filter((status) => status.id !== id),
+      }));
+      if (status?.id === id) {
+        setStatus(null);
+      }
+    }
+  }
 
   return (
     <>
@@ -71,7 +86,7 @@ export function SelectStatus({
               <DropdownMenuItem
                 key={statusItem.id}
                 onClick={() => setStatus(statusItem)}
-                className="mx-4"
+                className="mx-4 flex cursor-pointer items-center justify-between"
                 style={{
                   backgroundColor: statusItem?.bgColor,
                   color: statusItem?.textColor,
@@ -82,6 +97,12 @@ export function SelectStatus({
                 }}
               >
                 {statusItem.name}
+                <button
+                  className="text-lg text-[#66738C]"
+                  onClick={() => handleDelete(statusItem.id)}
+                >
+                  <IoMdClose />
+                </button>
               </DropdownMenuItem>
             ))}
           </div>

@@ -16,7 +16,6 @@ export default function Header() {
   return (
     <div className="app-shadow col-start-1 flex flex-wrap items-center gap-3 rounded-md p-3">
       <div className="mr-auto flex gap-1">
-        {/* TODO: generate randomly */}
         <p>{invoiceId}</p>
         <p>:</p>
         <input

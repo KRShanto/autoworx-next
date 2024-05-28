@@ -94,11 +94,10 @@ export function SelectTags({
                 <DropdownMenuItem
                   key={tag.id}
                   onClick={() => setTags((tags) => [...tags, tag])}
-                  className="mx-4"
+                  className="mx-4 cursor-pointer"
                   style={{
                     backgroundColor: tag.bgColor,
                     color: tag.textColor,
-                    border: `1px solid ${tag.textColor}`,
                   }}
                 >
                   {tag.name}
