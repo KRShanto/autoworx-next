@@ -51,7 +51,7 @@ export default function DeleteEstimateButton() {
             Cancel
           </DialogClose>
           <Submit
-            className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
+            className="rounded-lg border bg-red-500 px-5 py-2 text-white hover:bg-red-600"
             formAction={async () => router.push("/estimate")}
           >
             Delete

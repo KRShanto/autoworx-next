@@ -18,6 +18,19 @@ import FormError from "../FormError";
 import Submit from "../Submit";
 import { SelectProps } from "./select-props";
 
+type SelectedColor = { textColor: string; bgColor: string } | null;
+
+const colors: { textColor: string; bgColor: string }[] = [
+  { textColor: "#EB9D0B", bgColor: "#FFE7BA" },
+  { textColor: "#38D3CF", bgColor: "#CBFFFD" },
+  { textColor: "#C13232", bgColor: "#FFACAC" },
+  { textColor: "#5860BA", bgColor: "#DADDFF" },
+  { textColor: "#59B24A", bgColor: "#CAEBC5" },
+  { textColor: "#C77B35", bgColor: "#FFD1A6" },
+  { textColor: "#B156C0", bgColor: "#FAD9FF" },
+  { textColor: "#9B446E", bgColor: "#FFDAEC" },
+];
+
 export function SelectStatus({
   name = "statusId",
   value = null,
@@ -27,6 +40,8 @@ export function SelectStatus({
   const [status, setStatus] = setValue ? [value, setValue] : state;
   const statusList = useListsStore((x) => x.statuses);
   const [open, setOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
 
   return (
     <>
@@ -35,8 +50,8 @@ export function SelectStatus({
         <DropdownMenuTrigger
           className="flex h-10 items-center gap-2 rounded-md bg-slate-100 px-2 py-1"
           style={{
-            backgroundColor: `hsl(${status?.hue}, 50%, 40%)`,
-            color: status?.hue !== undefined ? "#FFFFFF" : undefined,
+            backgroundColor: status?.bgColor,
+            color: status?.textColor,
           }}
         >
           <PiPulse />
@@ -61,18 +76,23 @@ export function SelectStatus({
               <FaChevronUp className="absolute right-2 top-1/2 -translate-y-1/2 transform text-[#797979]" />
             </button>
           </div>
-          <div className="h-[140px] space-y-1 overflow-y-auto">
-            {statusList.map((status) => (
+
+          <div className="space-y-1">
+            {statusList.map((statusItem) => (
               <DropdownMenuItem
-                key={status.id}
-                onClick={() => setStatus(status)}
+                key={statusItem.id}
+                onClick={() => setStatus(statusItem)}
                 className="mx-4"
                 style={{
-                  backgroundColor: `hsl(${status?.hue}, 100%, 80%)`,
-                  color: `hsl(${status?.hue}, 100%, 20%)`,
+                  backgroundColor: statusItem?.bgColor,
+                  color: statusItem?.textColor,
+                  border:
+                    statusItem?.id === status?.id
+                      ? `1px solid ${status.textColor}`
+                      : "",
                 }}
               >
-                {status.name}
+                {statusItem.name}
               </DropdownMenuItem>
             ))}
           </div>
@@ -82,22 +102,60 @@ export function SelectStatus({
               setStatus(status);
               setOpen(false);
             }}
+            setPickerOpen={setPickerOpen}
+            selectedColor={selectedColor}
           />
+          {pickerOpen && (
+            <div className="grid grid-cols-4 gap-2 p-2">
+              {colors.map((color, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    setSelectedColor({
+                      textColor: color.textColor,
+                      bgColor: color.bgColor,
+                    });
+                  }}
+                  style={{
+                    backgroundColor: color.bgColor,
+                    color: color.textColor,
+                    border:
+                      selectedColor?.textColor === color.textColor
+                        ? `1px solid ${color.textColor}`
+                        : "none",
+                  }}
+                  className="rounded-md p-2"
+                >
+                  Aa
+                </button>
+              ))}
+            </div>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </>
   );
 }
 
-function QuickAddForm({ onSuccess }: { onSuccess?: (value: Status) => void }) {
-  const n = useListsStore((x) => x.statuses.length);
-  const [hue, setHue] = useState((n % 12) * 30);
+function QuickAddForm({
+  onSuccess,
+  setPickerOpen,
+  selectedColor,
+}: {
+  onSuccess?: (value: Status) => void;
+  setPickerOpen: any;
+  selectedColor: SelectedColor;
+}) {
   const { showError } = useFormErrorStore();
   const formRef = useRef<HTMLFormElement | null>(null);
   async function handleSubmit(data: FormData) {
     const name = data.get("name") as string;
 
-    const res = await newStatus({ name, hue });
+    const res = await newStatus({
+      name,
+      textColor: selectedColor?.textColor,
+      bgColor: selectedColor?.bgColor,
+    });
 
     if (res.type === "error") {
       console.log(res);
@@ -122,14 +180,15 @@ function QuickAddForm({ onSuccess }: { onSuccess?: (value: Status) => void }) {
         required
         className="flex-1 rounded-sm border border-solid border-black p-1"
       />
-      <DropdownMenu>
-        <DropdownMenuTrigger className="rounded bg-[#6470FF] p-2 text-white">
-          <PiPaletteBold />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <Hue hue={hue} onChange={({ h }) => setHue(h)} />
-        </DropdownMenuContent>
-      </DropdownMenu>
+
+      <button
+        className="rounded bg-[#6470FF] p-2 text-white"
+        onClick={() => setPickerOpen((prev: boolean) => !prev)}
+        type="button"
+      >
+        <PiPaletteBold />
+      </button>
+
       <Submit
         className="rounded bg-slate-500 p-1 text-xs leading-3 text-white"
         formAction={handleSubmit}

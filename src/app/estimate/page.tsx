@@ -20,7 +20,8 @@ interface InvoiceData {
   grandTotal: number;
   createdAt: Date;
   status?: string;
-  color?: number;
+  textColor?: string;
+  bgColor?: string;
 }
 
 async function fetchAndTransformData(type: InvoiceType) {
@@ -55,7 +56,8 @@ async function fetchAndTransformData(type: InvoiceType) {
         grandTotal: item.grandTotal as any,
         createdAt: item.createdAt,
         status: status?.name || "",
-        color: status?.hue,
+        textColor: status?.textColor || "",
+        bgColor: status?.bgColor || "",
       };
     }),
   );
@@ -167,7 +169,8 @@ function Table({ data }: { data: InvoiceData[] }) {
                 <p
                   className="rounded-md text-center text-white"
                   style={{
-                    backgroundColor: `hsl(${data.color}, 50%, 40%)`,
+                    backgroundColor: data.bgColor,
+                    color: data.textColor,
                   }}
                 >
                   {data.status}

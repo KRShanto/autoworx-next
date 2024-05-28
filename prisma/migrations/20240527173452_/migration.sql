@@ -212,7 +212,6 @@ CREATE TABLE `ItemTag` (
 CREATE TABLE `Category` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `type` ENUM('Service', 'Material', 'Labor') NOT NULL,
     `company_id` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
@@ -227,9 +226,13 @@ CREATE TABLE `Vehicle` (
     `make` VARCHAR(191) NULL,
     `model` VARCHAR(191) NULL,
     `submodel` VARCHAR(191) NULL,
-    `vin` VARCHAR(191) NULL,
     `type` VARCHAR(191) NULL,
+    `color` VARCHAR(191) NULL,
+    `transmission` VARCHAR(191) NULL,
+    `engineSize` VARCHAR(191) NULL,
     `license` VARCHAR(191) NULL,
+    `vin` VARCHAR(191) NULL,
+    `notes` VARCHAR(191) NULL,
     `company_id` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
@@ -314,20 +317,6 @@ CREATE TABLE `Message` (
 
     INDEX `fk_messages_to`(`to`),
     INDEX `fk_messages_from`(`from`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `InvoiceAdditional` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `company_id` INTEGER NOT NULL,
-    `note` VARCHAR(191) NOT NULL,
-    `terms` VARCHAR(191) NOT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
-
-    UNIQUE INDEX `InvoiceAdditional_company_id_key`(`company_id`),
-    INDEX `fk_invoice_additionals_company`(`company_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -514,9 +503,6 @@ ALTER TABLE `Status` ADD CONSTRAINT `Status_company_id_fkey` FOREIGN KEY (`compa
 
 -- AddForeignKey
 ALTER TABLE `Setting` ADD CONSTRAINT `Setting_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `InvoiceAdditional` ADD CONSTRAINT `InvoiceAdditional_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `CalendarSettings` ADD CONSTRAINT `CalendarSettings_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
