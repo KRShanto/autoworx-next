@@ -12,7 +12,6 @@ model Company {
   name             String
   createdAt        DateTime           @default(now()) @map("created_at")
   updatedAt        DateTime           @updatedAt @map("updated_at")
-  workOrders       WorkOrder[]
   users            User[]
   tasks            Task[]
   customers        Customer[]
@@ -32,26 +31,6 @@ model Company {
   statuses         Status[]
 }
 
-model WorkOrder {
-  id           Int           @id @default(autoincrement())
-  invoiceId    Int
-  activeStatus ActiveStatus
-  deletedAt    DateTime?     @map("deleted_at")
-  companyId    Int?          @map("company_id")
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  company      Company?      @relation(fields: [companyId], references: [id])
-  users        User[]
-  appointments Appointment[]
-
-  @@index([companyId], name: "fk_work_orders_company")
-}
-
-enum ActiveStatus {
-  Active
-  Archived
-}
-
 model User {
   id                 Int                @id @default(autoincrement())
   name               String
@@ -69,12 +48,10 @@ model User {
   role               Role               @default(admin)
   employeeType       EmployeeType       @default(None)
   employeeDepartment EmployeeDepartment @default(None)
-  workOrderId        Int?               @map("work_order_id")
   companyId          Int                @map("company_id")
   createdAt          DateTime           @default(now()) @map("created_at")
   updatedAt          DateTime           @updatedAt @map("updated_at")
   company            Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  workOrder          WorkOrder?         @relation(fields: [workOrderId], references: [id])
   tasks              Task[]
   oauthTokens        OAuthToken[]
   taskUsers          TaskUser[]
@@ -82,7 +59,6 @@ model User {
   appointmentUsers   AppointmentUser[]
 
   @@index([companyId], name: "fk_users_company")
-  @@index([workOrderId], name: "fk_users_work_order")
 }
 
 enum Provider {
@@ -174,17 +150,18 @@ model Service {
 }
 
 model InvoiceItem {
-  id         Int       @id @default(autoincrement())
-  invoiceId  String?   @map("invoice_id")
-  serviceId  Int?      @map("service_id")
-  materialId Int?      @map("material_id")
-  laborId    Int?      @map("labor_id")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
-  invoice    Invoice?  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  service    Service?  @relation(fields: [serviceId], references: [id])
-  material   Material? @relation(fields: [materialId], references: [id])
-  labor      Labor?    @relation(fields: [laborId], references: [id])
+  id         Int          @id @default(autoincrement())
+  invoiceId  String?      @map("invoice_id")
+  serviceId  Int?         @map("service_id")
+  materialId Int?         @map("material_id")
+  laborId    Int?         @map("labor_id")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+  invoice    Invoice?     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  service    Service?     @relation(fields: [serviceId], references: [id])
+  material   Material?    @relation(fields: [materialId], references: [id])
+  labor      Labor?       @relation(fields: [laborId], references: [id])
+  technician Technician[]
 }
 
 model Material {
@@ -281,6 +258,24 @@ model Category {
   company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
+model Technician {
+  id            Int       @id @default(autoincrement())
+  assignedBy    String?   @map("assigned_by")
+  assignedDate  DateTime? @map("assigned_date")
+  due           DateTime? @default(now())
+  amount        Decimal?  @default(0)
+  priority      Priority? @default(Low)
+  statusId      Int?      @map("status_id")
+  newNote       String?   @map("new_note")
+  workNote      String?   @map("work_note")
+  invoiceItemId Int       @map("invoice_item_id")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  status      Status?      @relation(fields: [statusId], references: [id])
+  invoiceItem InvoiceItem? @relation(fields: [invoiceItemId], references: [id])
+}
+
 model Vehicle {
   id           Int           @id @default(autoincrement())
   year         Int?
@@ -352,15 +347,16 @@ model InvoicePhoto {
 }
 
 model Status {
-  id        Int       @id @default(autoincrement())
-  name      String
-  textColor String // hex (with #)
-  bgColor   String // hex (with #)
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  companyId Int       @map("company_id")
-  company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  Invoice   Invoice[]
+  id         Int          @id @default(autoincrement())
+  name       String
+  textColor  String // hex (with #)
+  bgColor    String // hex (with #)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+  companyId  Int          @map("company_id")
+  company    Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Invoice    Invoice[]
+  Technician Technician[]
 }
 
 model Setting {
@@ -477,7 +473,6 @@ model Appointment {
   startTime                       String?           @map("start_time")
   endTime                         String?           @map("end_time")
   companyId                       Int               @map("company_id")
-  workOrderId                     Int?              @map("work_order_id")
   customerId                      Int?              @map("customer_id")
   vehicleId                       Int?              @map("vehicle_id")
   orderId                         Int?              @map("order_id")
@@ -491,16 +486,13 @@ model Appointment {
   updatedAt                       DateTime          @updatedAt @map("updated_at")
   user                            User              @relation(fields: [userId], references: [id])
   company                         Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  workOrder                       WorkOrder?        @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
   appointmentUsers                AppointmentUser[]
-  invoiceTag                      String?           @map("invoice_tag")
   customer                        Customer?         @relation(fields: [customerId], references: [id])
   vehicle                         Vehicle?          @relation(fields: [vehicleId], references: [id])
   order                           Order?            @relation(fields: [orderId], references: [id])
 
   @@index([userId], name: "fk_tasks_user")
   @@index([companyId], name: "fk_tasks_company")
-  @@index([workOrderId], name: "fk_tasks_work_order")
 }
 
 model AppointmentUser {

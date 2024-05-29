@@ -192,7 +192,8 @@ CREATE TABLE `Labor` (
 CREATE TABLE `Tag` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `hue` INTEGER NOT NULL,
+    `textColor` VARCHAR(191) NOT NULL,
+    `bgColor` VARCHAR(191) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
     `company_id` INTEGER NOT NULL,
@@ -286,7 +287,8 @@ CREATE TABLE `InvoicePhoto` (
 CREATE TABLE `Status` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `hue` INTEGER NOT NULL,
+    `textColor` VARCHAR(191) NOT NULL,
+    `bgColor` VARCHAR(191) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
     `company_id` INTEGER NOT NULL,
