@@ -13,7 +13,7 @@ export function TasksInput() {
         {tasks.map((task, i) => (
           <label key={i} className="relative block">
             <input
-              value={task}
+              value={typeof task === "string" ? task : task.title}
               onChange={(event) =>
                 useEstimateCreateStore.setState((x) =>
                   create(x, (x) => {

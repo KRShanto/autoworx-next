@@ -16,9 +16,9 @@ export default function Header({
   status,
 }: {
   id?: string;
-  vehicle: Vehicle | null;
-  customer: Customer | null;
-  status: Status | null;
+  vehicle?: Vehicle;
+  customer?: Customer;
+  status?: Status;
 }) {
   const { invoiceId, title, setTitle, setInvoiceId } = useEstimateCreateStore();
 

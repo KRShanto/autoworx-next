@@ -9,20 +9,6 @@ CREATE TABLE `Company` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `WorkOrder` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `invoiceId` INTEGER NOT NULL,
-    `activeStatus` ENUM('Active', 'Archived') NOT NULL,
-    `deleted_at` DATETIME(3) NULL,
-    `company_id` INTEGER NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
-
-    INDEX `fk_work_orders_company`(`company_id`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `User` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
@@ -40,14 +26,12 @@ CREATE TABLE `User` (
     `role` ENUM('admin', 'employee') NOT NULL DEFAULT 'admin',
     `employeeType` ENUM('Salary', 'Hourly', 'Contract Based', 'None') NOT NULL DEFAULT 'None',
     `employeeDepartment` ENUM('Sales', 'Management', 'Workshop', 'None') NOT NULL DEFAULT 'None',
-    `work_order_id` INTEGER NULL,
     `company_id` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `User_email_key`(`email`),
     INDEX `fk_users_company`(`company_id`),
-    INDEX `fk_users_work_order`(`work_order_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -221,6 +205,24 @@ CREATE TABLE `Category` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `Technician` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `assigned_by` VARCHAR(191) NULL,
+    `assigned_date` DATETIME(3) NULL,
+    `due` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `amount` DECIMAL(65, 30) NULL DEFAULT 0,
+    `priority` ENUM('Low', 'Medium', 'High') NULL DEFAULT 'Low',
+    `status_id` INTEGER NULL,
+    `new_note` VARCHAR(191) NULL,
+    `work_note` VARCHAR(191) NULL,
+    `invoice_item_id` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `Vehicle` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `year` INTEGER NULL,
@@ -248,7 +250,7 @@ CREATE TABLE `Invoice` (
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
     `title` VARCHAR(191) NULL,
-    `type` ENUM('Invoice', 'Estimate') NULL DEFAULT 'Invoice',
+    `type` ENUM('Invoice', 'Estimate') NOT NULL DEFAULT 'Invoice',
     `customer_id` INTEGER NULL,
     `vehicle_id` INTEGER NULL,
     `subtotal` DECIMAL(8, 2) NULL DEFAULT 0,
@@ -377,7 +379,6 @@ CREATE TABLE `Appointment` (
     `start_time` VARCHAR(191) NULL,
     `end_time` VARCHAR(191) NULL,
     `company_id` INTEGER NOT NULL,
-    `work_order_id` INTEGER NULL,
     `customer_id` INTEGER NULL,
     `vehicle_id` INTEGER NULL,
     `order_id` INTEGER NULL,
@@ -389,11 +390,9 @@ CREATE TABLE `Appointment` (
     `times` JSON NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
-    `invoice_tag` VARCHAR(191) NULL,
 
     INDEX `fk_tasks_user`(`user_id`),
     INDEX `fk_tasks_company`(`company_id`),
-    INDEX `fk_tasks_work_order`(`work_order_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -423,13 +422,7 @@ CREATE TABLE `EmailTemplate` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `WorkOrder` ADD CONSTRAINT `WorkOrder_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `User` ADD CONSTRAINT `User_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `User` ADD CONSTRAINT `User_work_order_id_fkey` FOREIGN KEY (`work_order_id`) REFERENCES `WorkOrder`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `OAuthToken` ADD CONSTRAINT `OAuthToken_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -489,6 +482,12 @@ ALTER TABLE `ItemTag` ADD CONSTRAINT `ItemTag_tag_id_fkey` FOREIGN KEY (`tag_id`
 ALTER TABLE `Category` ADD CONSTRAINT `Category_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `Technician` ADD CONSTRAINT `Technician_status_id_fkey` FOREIGN KEY (`status_id`) REFERENCES `Status`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Technician` ADD CONSTRAINT `Technician_invoice_item_id_fkey` FOREIGN KEY (`invoice_item_id`) REFERENCES `InvoiceItem`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `Vehicle` ADD CONSTRAINT `Vehicle_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -529,9 +528,6 @@ ALTER TABLE `Appointment` ADD CONSTRAINT `Appointment_user_id_fkey` FOREIGN KEY 
 
 -- AddForeignKey
 ALTER TABLE `Appointment` ADD CONSTRAINT `Appointment_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Appointment` ADD CONSTRAINT `Appointment_work_order_id_fkey` FOREIGN KEY (`work_order_id`) REFERENCES `WorkOrder`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Appointment` ADD CONSTRAINT `Appointment_customer_id_fkey` FOREIGN KEY (`customer_id`) REFERENCES `Customer`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;

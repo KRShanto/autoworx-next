@@ -18,7 +18,7 @@ export default function Create() {
   if (type === "LABOR") return <LaborCreate />;
 
   return (
-    <div className="p-3 w-full space-y-3 overflow-y-auto">
+    <div className="w-full space-y-3 overflow-y-auto p-3">
       {items.map((item) => {
         if (!item.service) return null;
 
@@ -42,7 +42,9 @@ export default function Create() {
               <button
                 type="button"
                 onClick={() =>
-                  setOpenService(openService === item.id ? null : item.id)
+                  setOpenService(
+                    openService === item.id ? null : (item.id as string),
+                  )
                 }
                 className="flex items-center gap-1"
               >

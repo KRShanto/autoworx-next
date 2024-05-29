@@ -95,9 +95,9 @@ export default async function Page({ params }: { params: { id: string } }) {
 
       <Header
         id={invoice.id}
-        customer={customer}
-        vehicle={vehicle}
-        status={status}
+        customer={customer!}
+        vehicle={vehicle!}
+        status={status!}
       />
 
       <Tabs
