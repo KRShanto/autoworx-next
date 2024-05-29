@@ -100,17 +100,25 @@ export default function MaterialCreate() {
         Materials/Parts Information
       </h3>
 
-      <input
-        type="text"
-        placeholder="Material/Parts Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="rounded-md border-2 border-slate-400 p-1 text-xs"
-      />
+      <div className="flex items-center gap-2">
+        <label htmlFor="name" className="w-28 text-end text-sm">
+          Material/
+          <br /> Parts Name
+        </label>
+        <input
+          type="text"
+          // placeholder="Material/Parts Name"
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+        />
+      </div>
 
-      <div className="w-full">
+      <div className="flex items-center gap-2">
+        <label className="w-28 text-end text-sm">Category</label>
         <Selector
-          label={category ? category.name : "Category"}
+          label={category ? category.name : ""}
           newButton={
             <div className="flex gap-2">
               <input
@@ -145,9 +153,10 @@ export default function MaterialCreate() {
         </Selector>
       </div>
 
-      <div className="w-full">
+      <div className="flex items-center gap-2">
+        <label className="w-28 text-end text-sm">Vendor</label>
         <Selector
-          label={vendor ? vendor.firstName || "Vendor" : "Vendor"}
+          label={vendor ? vendor.firstName || "Vendor" : ""}
           newButton={<NewVendor itemId={itemId} />}
         >
           <div>
@@ -165,54 +174,84 @@ export default function MaterialCreate() {
         </Selector>
       </div>
 
-      <input
-        type="text"
-        placeholder="Tags"
-        value={tags}
-        onChange={(e) => setTags(e.target.value)}
-        className="rounded-md border-2 border-slate-400 p-1 text-xs"
-      />
+      <div className="flex items-center gap-2">
+        <label htmlFor="tags" className="w-28 text-end text-sm">
+          Tags
+        </label>
+        <input
+          type="text"
+          id="tags"
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
+          className="w-full rounded-md  border-2 border-slate-400 p-1 text-xs"
+        />
+      </div>
 
-      <textarea
-        placeholder="Notes"
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-        className="rounded-md border-2 border-slate-400 p-1 text-xs"
-      />
+      <div className="flex items-center gap-2">
+        <label htmlFor="notes" className="w-28 text-end text-sm">
+          Notes
+        </label>
+        <textarea
+          id="notes"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          className="w-full rounded-md  border-2 border-slate-400 p-1 text-xs"
+        />
+      </div>
 
-      <input
-        type="number"
-        placeholder="Quantity"
-        value={quantity}
-        onChange={(e) => setQuantity(+e.target.value)}
-        className="rounded-md border-2 border-slate-400 p-1 text-xs"
-      />
+      <div className="flex items-center gap-2">
+        <label htmlFor="qt" className="w-28 text-end text-sm">
+          Quantity
+        </label>
+        <input
+          type="number"
+          id="qt"
+          value={quantity}
+          onChange={(e) => setQuantity(+e.target.value)}
+          className="w-full rounded-md  border-2 border-slate-400 p-1 text-xs"
+        />
+      </div>
 
-      <input
-        type="number"
-        placeholder="Cost"
-        value={cost}
-        onChange={(e) => setCost(+e.target.value)}
-        className="rounded-md border-2 border-slate-400 p-1 text-xs"
-      />
+      <div className="flex items-center gap-2">
+        <label htmlFor="price" className="w-28 text-end text-sm">
+          Cost Price
+        </label>
+        <input
+          type="number"
+          id="price"
+          value={cost}
+          onChange={(e) => setCost(+e.target.value)}
+          className="w-full rounded-md  border-2 border-slate-400 p-1 text-xs"
+        />
+      </div>
 
-      <input
-        type="number"
-        placeholder="Sell"
-        value={sell}
-        onChange={(e) => setSell(+e.target.value)}
-        className="rounded-md border-2 border-slate-400 p-1 text-xs"
-      />
+      <div className="flex items-center gap-2">
+        <label htmlFor="sell" className="w-28 text-end text-sm">
+          Sell Price
+        </label>
+        <input
+          type="number"
+          id="sell"
+          value={sell}
+          onChange={(e) => setSell(+e.target.value)}
+          className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+        />
+      </div>
 
-      <input
-        type="number"
-        placeholder="Discount"
-        value={discount}
-        onChange={(e) => setDiscount(+e.target.value)}
-        className="rounded-md border-2 border-slate-400 p-1 text-xs"
-      />
+      <div className="flex items-center gap-2">
+        <label htmlFor="discount" className="w-28 text-end text-sm">
+          Discount
+        </label>
+        <input
+          type="number"
+          id="discount"
+          value={discount}
+          onChange={(e) => setDiscount(+e.target.value)}
+          className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+        />
+      </div>
 
-      <label className="flex items-center gap-2">
+      <label className="ml-5 flex items-center gap-2">
         <input
           type="checkbox"
           checked={addToInventory}

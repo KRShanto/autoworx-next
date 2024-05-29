@@ -92,17 +92,23 @@ export default function LaborCreate() {
     <div className="flex flex-col gap-2 p-5">
       <h3 className="w-full text-xl font-semibold">Labor Information</h3>
 
-      <input
-        type="text"
-        placeholder="Labor Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="rounded-md border-2 border-slate-400 p-1 text-xs"
-      />
+      <div className="flex items-center gap-2">
+        <label htmlFor="name" className="w-28 text-end text-sm">
+          Labor Name
+        </label>
+        <input
+          type="text"
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+        />
+      </div>
 
-      <div className="w-full">
+      <div className="flex items-center gap-2">
+        <label className="w-28 text-end text-sm">Category</label>
         <Selector
-          label={category ? category.name : "Category"}
+          label={category ? category.name : ""}
           newButton={
             <div className="flex gap-2">
               <input
@@ -144,46 +150,71 @@ export default function LaborCreate() {
         </Selector>
       </div>
 
-      <input
-        type="text"
-        placeholder="Tags"
-        value={tags}
-        onChange={(e) => setTags(e.target.value)}
-        className="rounded-md border-2 border-slate-400 p-1 text-xs"
-      />
+      <div className="flex items-center gap-2">
+        <label htmlFor="tags" className="w-28 text-end text-sm">
+          Tags
+        </label>
+        <input
+          type="text"
+          id="tags"
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
+          className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+        />
+      </div>
 
-      <textarea
-        placeholder="Notes"
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-        className="h-30 rounded-md border-2 border-slate-400 p-1 text-xs"
-      />
+      <div className="flex items-center gap-2">
+        <label htmlFor="notes" className="w-28 text-end text-sm">
+          Notes
+        </label>
+        <textarea
+          id="notes"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          className="h-30 w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+        />
+      </div>
 
-      <input
-        type="number"
-        placeholder="No. of Hours"
-        value={hours}
-        onChange={(e) => setHours(parseInt(e.target.value))}
-        className="rounded-md border-2 border-slate-400 p-1 text-xs"
-      />
+      <div className="flex items-center gap-2">
+        <label htmlFor="hours" className="w-28 text-end text-sm">
+          No. of Hours
+        </label>
+        <input
+          type="number"
+          id="hours"
+          value={hours}
+          onChange={(e) => setHours(parseInt(e.target.value))}
+          className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+        />
+      </div>
 
-      <input
-        type="number"
-        placeholder="$/hr"
-        value={charge}
-        onChange={(e) => setCharge(parseFloat(e.target.value))}
-        className="rounded-md border-2 border-slate-400 p-1 text-xs"
-      />
+      <div className="flex items-center gap-2">
+        <label htmlFor="perhour" className="w-28 text-end text-sm">
+          $/hr
+        </label>
+        <input
+          type="number"
+          id="perhour"
+          value={charge}
+          onChange={(e) => setCharge(parseFloat(e.target.value))}
+          className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+        />
+      </div>
 
-      <input
-        type="number"
-        placeholder="Discount"
-        value={discount}
-        onChange={(e) => setDiscount(parseFloat(e.target.value))}
-        className="rounded-md border-2 border-slate-400 p-1 text-xs"
-      />
+      <div className="flex items-center gap-2">
+        <label htmlFor="discount" className="w-28 text-end text-sm">
+          Discount
+        </label>
+        <input
+          type="number"
+          id="discount"
+          value={discount}
+          onChange={(e) => setDiscount(parseFloat(e.target.value))}
+          className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+        />
+      </div>
 
-      <div className="flex items-center gap-5">
+      <div className="ml-5 flex items-center gap-5">
         <input
           id="check"
           type="checkbox"
