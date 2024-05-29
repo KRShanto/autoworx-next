@@ -144,8 +144,9 @@ export default function ConvertButton({
       }
     });
 
+    // Reset the cache
+    useEstimateCreateStore.getState().reset();
     // Redirect to the index
-    router.refresh(); // TODO: its still caching the old data. Need to fix this
     router.push("/estimate");
   }
 

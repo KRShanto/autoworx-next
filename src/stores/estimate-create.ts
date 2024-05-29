@@ -67,6 +67,8 @@ interface EstimateCreateStore {
   removeTask: (taskId: number) => void;
 
   setCurrentSelectedCategoryId: (categoryId: number) => void;
+
+  reset: () => void;
 }
 
 export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
@@ -126,4 +128,27 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
 
   setCurrentSelectedCategoryId: (categoryId: number) =>
     set({ currentSelectedCategoryId: categoryId }),
+
+  reset: () =>
+    set({
+      title: "",
+      invoiceId: "",
+      subtotal: 0,
+      discount: 0,
+      tax: 0,
+      deposit: 0,
+      depositNotes: "",
+      depositMethod: "",
+      grandTotal: 0,
+      due: 0,
+      internalNotes: "",
+      terms: "",
+      policy: "",
+      customerNotes: "",
+      customerComments: "",
+      photos: [],
+      tasks: [],
+      items: [],
+      currentSelectedCategoryId: null,
+    }),
 }));

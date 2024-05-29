@@ -19,11 +19,24 @@ import { useState } from "react";
 import { newVendor } from "./actions/newVendor";
 import { FaPlus } from "react-icons/fa6";
 import { HiTrash } from "react-icons/hi2";
-import { useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { deleteEstimate } from "./actions/delete";
 
 export default function DeleteEstimateButton() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const params = useParams();
+
+  async function handleDelete() {
+    if (pathname.includes("/estimate/edit/")) {
+      const { id } = params as { id: string };
+      const res = await deleteEstimate(id);
+    }
+
+    useEstimateCreateStore.getState().reset();
+    router.push("/estimate");
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -52,7 +65,7 @@ export default function DeleteEstimateButton() {
           </DialogClose>
           <Submit
             className="rounded-lg border bg-red-500 px-5 py-2 text-white hover:bg-red-600"
-            formAction={async () => router.push("/estimate")}
+            formAction={handleDelete}
           >
             Delete
           </Submit>
