@@ -4,11 +4,13 @@ import { useEstimateCreateStore } from "@/stores/estimate-create";
 import React from "react";
 import { GoFileCode } from "react-icons/go";
 import { create } from "./actions/create";
+import { update } from "../edit/[id]/update";
 import { InvoiceType } from "@prisma/client";
 import { customAlphabet } from "nanoid";
 import Submit from "@/components/Submit";
 import { createTask } from "@/app/task/[type]/actions/createTask";
 import { cn } from "@/lib/cn";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function ConvertButton({
   text,
@@ -21,6 +23,9 @@ export default function ConvertButton({
   type: InvoiceType;
   className?: string;
 }) {
+  const pathaname = usePathname();
+  const router = useRouter();
+
   const {
     invoiceId,
     title,
@@ -47,6 +52,7 @@ export default function ConvertButton({
     const clientId = formData.get("customerId");
     const vehicleId = formData.get("vehicleId");
     const statusId = formData.get("statusId");
+    const isEditPage = pathaname.includes("/estimate/edit/");
 
     // upload photos
     if (photos.length > 0) {
@@ -70,50 +76,77 @@ export default function ConvertButton({
       photoPaths.push(...data);
     }
 
-    const res = await create({
-      title,
-      invoiceId,
-      type,
-      clientId: clientId ? +clientId : undefined,
-      vehicleId: vehicleId ? +vehicleId : undefined,
-      statusId: statusId ? +statusId : undefined,
-      subtotal,
-      discount,
-      tax,
-      deposit,
-      depositNotes,
-      depositMethod,
-      grandTotal,
-      due,
-      internalNotes,
-      terms,
-      policy,
-      customerNotes,
-      customerComments,
-      photos: photoPaths,
-      items,
-    });
+    let res;
+    if (isEditPage) {
+      res = await update({
+        id: invoiceId,
+        title,
+        customerId: clientId ? +clientId : undefined,
+        vehicleId: vehicleId ? +vehicleId : undefined,
+        statusId: statusId ? +statusId : undefined,
+        subtotal,
+        discount,
+        tax,
+        deposit,
+        depositNotes,
+        depositMethod,
+        grandTotal,
+        due,
+        internalNotes,
+        terms,
+        policy,
+        customerNotes,
+        customerComments,
+        // photos: photoPaths,
+        items,
+      });
+    } else {
+      res = await create({
+        title,
+        invoiceId,
+        type,
+        clientId: clientId ? +clientId : undefined,
+        vehicleId: vehicleId ? +vehicleId : undefined,
+        statusId: statusId ? +statusId : undefined,
+        subtotal,
+        discount,
+        tax,
+        deposit,
+        depositNotes,
+        depositMethod,
+        grandTotal,
+        due,
+        internalNotes,
+        terms,
+        policy,
+        customerNotes,
+        customerComments,
+        photos: photoPaths,
+        items,
+      });
+    }
 
     // Create tasks
+    // TODO: create tasks for `Task` tasks
     tasks.forEach(async (task) => {
       if (!task) return;
 
-      const taskSplit = task.split(":");
+      if (typeof task === "string") {
+        const taskSplit = task.split(":");
 
-      await createTask({
-        title: taskSplit[0],
-        description: taskSplit.length > 1 ? taskSplit[1] : "",
-        priority: "Medium",
-        assignedUsers: [],
-        invoiceId: res.data.id,
-      });
+        await createTask({
+          title: taskSplit[0],
+          description: taskSplit.length > 1 ? taskSplit[1] : "",
+          priority: "Medium",
+          assignedUsers: [],
+          invoiceId: res.data.id,
+        });
+      }
     });
 
-    // change the invoiceId
-    // NOTE: this is not necessary, but it's good for development so that we do not get unique constraint errors
-    useEstimateCreateStore.setState({
-      invoiceId: customAlphabet("1234567890", 10)(),
-    });
+    // Redirect to the index
+    router.refresh(); // TODO: its still caching the old data. Need to fix this
+    router.push("/estimate");
   }
 
   return (

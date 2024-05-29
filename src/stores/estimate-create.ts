@@ -12,7 +12,7 @@ import { customAlphabet } from "nanoid";
 import { create } from "zustand";
 
 interface Item {
-  id: string; // nanoid
+  id: string | number; // nanoid
   service: Service | null;
   material: Material | null;
   labor: Labor | null;
@@ -36,7 +36,7 @@ interface EstimateCreateStore {
   customerNotes: string;
   customerComments: string;
   photos: File[];
-  tasks: string[];
+  tasks: (Task | string)[];
   items: Item[];
   currentSelectedCategoryId: number | null;
 

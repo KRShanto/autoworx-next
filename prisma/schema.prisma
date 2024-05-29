@@ -273,7 +273,7 @@ model Technician {
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
   status      Status?      @relation(fields: [statusId], references: [id])
-  invoiceItem InvoiceItem? @relation(fields: [invoiceItemId], references: [id])
+  invoiceItem InvoiceItem? @relation(fields: [invoiceItemId], references: [id], onDelete: Cascade)
 }
 
 model Vehicle {
@@ -303,7 +303,7 @@ model Invoice {
   createdAt        DateTime       @default(now()) @map("created_at")
   updatedAt        DateTime       @updatedAt @map("updated_at")
   title            String?
-  type             InvoiceType?   @default(Invoice)
+  type             InvoiceType    @default(Invoice)
   customerId       Int?           @map("customer_id")
   vehicleId        Int?           @map("vehicle_id")
   subtotal         Decimal?       @default(0) @db.Decimal(8, 2)

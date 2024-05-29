@@ -10,11 +10,48 @@ import { CreateTab } from "../../create/tabs/CreateTab";
 import { AttachmentTab } from "../../create/tabs/AttachmentTab";
 import Header from "../../create/Header";
 import ConvertButton from "../../create/ConvertButton";
-import { InvoiceType } from "@prisma/client";
+import { InvoiceItem, InvoiceType, ItemTag } from "@prisma/client";
 import { GoFileCode } from "react-icons/go";
 import EstimateLogo from "@/components/EstimateLogo";
+import { notFound } from "next/navigation";
+import SyncEstimate from "../../create/SyncEstimate";
+import { FaSave } from "react-icons/fa";
 
-export default async function Page() {
+export default async function Page({ params }: { params: { id: string } }) {
+  const { id } = params;
+  const invoice = await db.invoice.findUnique({ where: { id } });
+
+  if (!invoice) return notFound();
+
+  const vehicle = invoice.vehicleId
+    ? await db.vehicle.findUnique({ where: { id: invoice.vehicleId } })
+    : null;
+  const customer = invoice.customerId
+    ? await db.customer.findUnique({ where: { id: invoice.customerId } })
+    : null;
+  const status = invoice.statusId
+    ? await db.status.findUnique({ where: { id: invoice.statusId } })
+    : null;
+  const items = await db.invoiceItem.findMany({
+    where: { invoiceId: id },
+    select: { service: true, material: true, labor: true, id: true },
+  });
+  const itemTags = await db.itemTag.findMany({
+    where: { itemId: { in: items.map((item) => item.id) } },
+  });
+  const itemTagsTags = await db.tag.findMany({
+    where: { id: { in: itemTags.map((itemTag) => itemTag.tagId) } },
+  });
+  const itemWithTags = items.map((item) => {
+    const tags = itemTagsTags.filter((tag) =>
+      itemTags.find((itemTag) => itemTag.tagId === tag.id),
+    );
+    return { ...item, tags };
+  });
+
+  const photos = await db.invoicePhoto.findMany({ where: { invoiceId: id } });
+  const tasks = await db.task.findMany({ where: { invoiceId: id } });
+
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
   const customers = await db.customer.findMany({ where: { companyId } });
@@ -42,20 +79,26 @@ export default async function Page() {
         vendors={vendors}
         statuses={statuses}
       />
-      <div className="flex">
-        <ConvertButton
-          type={InvoiceType.Invoice}
-          text="Convert to Invoice"
-          icon={<GoFileCode />}
-        />
-        <ConvertButton
-          type={InvoiceType.Estimate}
-          text="Sell as Estimate"
-          className="border-none bg-[#6470FF] text-white"
-          icon={<EstimateLogo />}
-        />
-      </div>
-      <Header />
+      <SyncEstimate
+        invoice={invoice}
+        items={itemWithTags}
+        photos={photos}
+        tasks={tasks}
+      />
+
+      <ConvertButton
+        type={invoice.type}
+        text={`Update ${invoice.type}`}
+        icon={<FaSave />}
+        className="border-none bg-[#6571FF] text-white"
+      />
+
+      <Header
+        id={invoice.id}
+        customer={customer}
+        vehicle={vehicle}
+        status={status}
+      />
 
       <Tabs
         defaultValue="create"
