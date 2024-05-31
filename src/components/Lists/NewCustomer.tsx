@@ -25,7 +25,7 @@ export default function NewCustomer() {
     const firstName = data.get("first-name") as string;
     const lastName = data.get("last-name") as string;
     const email = data.get("email") as string;
-    const mobile = Number.parseInt(data.get("mobile") as string);
+    const mobile = data.get("mobile") as string;
     const company = data.get("company") as string;
     const address = data.get("address") as string;
     const city = data.get("city") as string;
@@ -118,7 +118,7 @@ export default function NewCustomer() {
                 Mobile Number
               </label>
               <Input
-                type="text"
+                type="number"
                 name="mobile"
                 className="rounded-md border-2 border-slate-400 p-1"
               />

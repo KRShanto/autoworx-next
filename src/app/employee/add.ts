@@ -24,7 +24,7 @@ export async function addEmployee(data: {
   name: string;
   email: string;
   password: string;
-  phone: number;
+  phone: string;
   address: string;
   city: string;
   state: string;

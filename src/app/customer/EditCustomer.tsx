@@ -18,7 +18,7 @@ export default function EditCustomer() {
   async function handleSubmit(data: FormData) {
     const name = data.get("name") as string;
     const email = data.get("email") as string;
-    const mobile = parseInt(data.get("mobile") as string);
+    const mobile = data.get("mobile") as string;
     const address = data.get("address") as string;
     const city = data.get("city") as string;
     const state = data.get("state") as string;

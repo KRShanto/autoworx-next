@@ -29,7 +29,7 @@ export default function EditEmployee() {
   async function handleSubmit(formData: FormData) {
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
-    const phone = parseInt(formData.get("phone") as string);
+    const phone = formData.get("phone") as string;
     const address = formData.get("address") as string;
     const city = formData.get("city") as string;
     const state = formData.get("state") as string;
@@ -99,7 +99,7 @@ export default function EditEmployee() {
           </div>
           <div className="mt-2">
             <Input
-              type="text"
+              type="number"
               className="w-full rounded-md border p-2"
               name="phone"
               required

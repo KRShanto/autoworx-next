@@ -21,7 +21,7 @@ export async function editEmployee(data: {
   id: number;
   name: string;
   email: string;
-  phone: number;
+  phone: string;
   address: string;
   city: string;
   state: string;

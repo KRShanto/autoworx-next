@@ -19,7 +19,7 @@ export async function editCustomer(data: {
   id: number;
   name: string;
   email: string;
-  mobile: number;
+  mobile: string;
   address: string;
   city: string;
   state: string;

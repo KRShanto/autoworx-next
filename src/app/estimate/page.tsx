@@ -18,7 +18,7 @@ interface InvoiceData {
   clientName: string;
   vehicle: string;
   email: string;
-  phone: number;
+  phone: string;
   grandTotal: number;
   createdAt: Date;
   status?: string;
@@ -54,7 +54,7 @@ async function fetchAndTransformData(type: InvoiceType, companyId: number) {
         clientName: customer?.firstName + " " + customer?.lastName || "",
         vehicle: vehicle?.model || "",
         email: customer?.email || "",
-        phone: customer?.mobile || 0o0,
+        phone: customer?.mobile || "",
         grandTotal: item.grandTotal as any,
         createdAt: item.createdAt,
         status: status?.name || "",

@@ -15,7 +15,7 @@ export async function addCustomer(data: {
   firstName: string;
   lastName?: string;
   email?: string;
-  mobile?: number;
+  mobile?: string;
   address?: string;
   city?: string;
   state?: string;

@@ -12,7 +12,7 @@
 - [ ] Try to optimize the code
 - [ ] Add loaders for every page that requires data from the server
 - [ ] Error handling on every form
-- [ ] Make all mobile type `Int` to `String`
+- [x] Make all mobile type `Int` to `String`
 
 ## Task And Activity Management
 

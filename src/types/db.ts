@@ -36,7 +36,7 @@ export interface CustomerType {
   id?: number;
   name: string;
   email: string;
-  mobile: number;
+  mobile: string;
   address: string;
   city: string;
   state: string;
@@ -82,7 +82,7 @@ export interface Payment {
   date?: Date;
   name?: string;
   email?: string;
-  mobile?: number;
+  mobile?: string;
   type?: "Payment" | "Deposit" | "Refund"; // ??
   address?: string;
   note?: string;

@@ -26,7 +26,7 @@ export default function NewVendor({ itemId }: { itemId: string }) {
     const firstName = data.get("first-name") as string;
     const lastName = data.get("last-name") as string;
     const email = data.get("email") as string;
-    const phone = Number.parseInt(data.get("phone") as string);
+    const phone = data.get("phone") as string;
     const company = data.get("company") as string;
     const address = data.get("address") as string;
     const city = data.get("city") as string;
@@ -133,7 +133,7 @@ export default function NewVendor({ itemId }: { itemId: string }) {
                 Mobile Number
               </label>
               <Input
-                type="text"
+                type="number"
                 name="phone"
                 className="rounded-md border-2 border-slate-400 p-1"
               />
