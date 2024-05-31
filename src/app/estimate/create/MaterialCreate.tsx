@@ -9,6 +9,7 @@ import { newMaterial } from "./actions/newMaterial";
 import NewVendor from "./NewVendor";
 import Close from "./CloseEstimate";
 import { updateMeterial } from "./actions/updateMeterial";
+import { SelectTags } from "@/components/Lists/SelectTags";
 
 export default function MaterialCreate() {
   const { categories } = useListsStore();
@@ -260,17 +261,14 @@ export default function MaterialCreate() {
         </Selector>
       </div>
 
+      {/* TODO: add to backend */}
       <div className="flex items-center gap-2">
         <label htmlFor="tags" className="w-28 text-end text-sm">
           Tags
         </label>
-        <input
-          type="text"
-          id="tags"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          className="w-full rounded-md  border-2 border-slate-400 p-1 text-xs"
-        />
+        <div className="w-full">
+          <SelectTags />
+        </div>
       </div>
 
       <div className="flex items-center gap-2">

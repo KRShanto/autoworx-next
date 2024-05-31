@@ -27,9 +27,24 @@ interface InvoiceData {
   bgColor?: string;
 }
 
-async function fetchAndTransformData(type: InvoiceType, companyId: number) {
+async function fetchAndTransformData(
+  type: InvoiceType,
+  companyId: number,
+  searchParams: { startDate?: string; endDate?: string; status?: string },
+) {
+  const { startDate, endDate, status } = searchParams;
+
   const data = await db.invoice.findMany({
-    where: { type, companyId },
+    where: {
+      type,
+      companyId,
+      createdAt: {
+        // BUG: its not working
+        gte: startDate ? new Date(startDate) : undefined,
+        lte: endDate ? new Date(endDate) : undefined,
+      },
+      statusId: status ? parseInt(status) : undefined,
+    },
   });
 
   return await Promise.all(
@@ -69,14 +84,23 @@ async function fetchAndTransformData(type: InvoiceType, companyId: number) {
 const evenColor = "bg-white";
 const oddColor = "bg-[#F8FAFF]";
 
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: { startDate?: string; endDate?: string; status?: string };
+}) {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
   const estimates = await fetchAndTransformData(
     InvoiceType.Estimate,
     companyId,
+    searchParams,
   );
-  const invoices = await fetchAndTransformData(InvoiceType.Invoice, companyId);
+  const invoices = await fetchAndTransformData(
+    InvoiceType.Invoice,
+    companyId,
+    searchParams,
+  );
   const statuses = await db.status.findMany({ where: { companyId } });
 
   return (

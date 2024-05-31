@@ -66,6 +66,7 @@ export function Filter() {
             type="date"
             value={start}
             onChange={(event) => setStart(event.currentTarget.value)}
+            required={false}
           />
           <SlimInput
             name="endDate"
@@ -74,6 +75,7 @@ export function Filter() {
             defaultValue={searchParams.get("endDate") ?? ""}
             min={start}
             max={today}
+            required={false}
           />
           <div className="col-span-full">
             <label className="mb-1 px-2 font-medium">Status</label>
