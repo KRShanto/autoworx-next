@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/app/auth";
+import { createTask } from "@/app/task/[type]/actions/createTask";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
@@ -12,6 +13,7 @@ import {
   Labor,
   Tag,
 } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 export async function create({
   title,
@@ -39,6 +41,7 @@ export async function create({
 
   photos,
   items,
+  tasks,
 }: {
   title: string;
   invoiceId: string;
@@ -70,6 +73,8 @@ export async function create({
     labor: Labor | null;
     tags: Tag[];
   }[];
+
+  tasks: { id: undefined | number; task: string }[];
 }): Promise<ServerAction> {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
@@ -133,6 +138,22 @@ export async function create({
       });
     });
   });
+
+  tasks.forEach(async (task) => {
+    if (!task) return;
+
+    const taskSplit = task.task.split(":");
+
+    await createTask({
+      title: taskSplit[0].trim(),
+      description: taskSplit.length > 1 ? taskSplit[1].trim() : "",
+      priority: "Medium",
+      assignedUsers: [],
+      invoiceId: invoice.id,
+    });
+  });
+
+  revalidatePath("/estimate");
 
   return {
     type: "success",

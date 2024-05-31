@@ -36,7 +36,7 @@ interface EstimateCreateStore {
   customerNotes: string;
   customerComments: string;
   photos: File[];
-  tasks: (Task | string)[];
+  tasks: { id: undefined | number; task: string }[];
   items: Item[];
   currentSelectedCategoryId: number | null;
 
@@ -62,7 +62,7 @@ interface EstimateCreateStore {
   addPhoto: (photo: string) => void;
   removePhoto: (photo: string) => void;
 
-  setTasks: (tasks: string[]) => void;
+  setTasks: (tasks: { id: undefined | number; task: string }[]) => void;
   addTask: (task: Task) => void;
   removeTask: (taskId: number) => void;
 
@@ -121,7 +121,8 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
   removePhoto: (photo: string) =>
     set((x: any) => ({ photos: x.photos.filter((p: string) => p !== photo) })),
 
-  setTasks: (tasks: string[]) => set({ tasks }),
+  setTasks: (tasks: { id: undefined | number; task: string }[]) =>
+    set({ tasks }),
   addTask: (task: Task) => set((x: any) => ({ tasks: [...x.tasks, task] })),
   removeTask: (taskId: number) =>
     set((x: any) => ({ tasks: x.tasks.filter((t: Task) => t.id !== taskId) })),

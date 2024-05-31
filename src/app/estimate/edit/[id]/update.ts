@@ -1,5 +1,6 @@
 "use server";
 
+import { createTask } from "@/app/task/[type]/actions/createTask";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { Labor, Material, Service, Tag } from "@prisma/client";
@@ -34,6 +35,7 @@ interface UpdateEstimateInput {
     labor: Labor | null;
     tags: Tag[];
   }[];
+  tasks: { id: undefined | number; task: string }[];
 }
 
 export async function update(data: UpdateEstimateInput): Promise<ServerAction> {
@@ -94,6 +96,30 @@ export async function update(data: UpdateEstimateInput): Promise<ServerAction> {
         },
       });
     });
+  });
+
+  data.tasks.forEach(async (task) => {
+    // if task.id is undefined, create a new task
+    if (task.id === undefined) {
+      await createTask({
+        title: task.task.split(":")[0],
+        description: task.task.length > 1 ? task.task.split(":")[1] : "",
+        assignedUsers: [],
+        priority: "Medium",
+        invoiceId: data.id,
+      });
+    } else {
+      // if task.id is not undefined, update the task
+      await db.task.update({
+        where: {
+          id: task.id,
+        },
+        data: {
+          title: task.task.split(":")[0],
+          description: task.task.length > 1 ? task.task.split(":")[1] : "",
+        },
+      });
+    }
   });
 
   return {

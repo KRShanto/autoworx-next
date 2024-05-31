@@ -99,6 +99,7 @@ export default function ConvertButton({
         customerComments,
         // photos: photoPaths,
         items,
+        tasks,
       });
     } else {
       res = await create({
@@ -123,31 +124,14 @@ export default function ConvertButton({
         customerComments,
         photos: photoPaths,
         items,
+        tasks,
       });
     }
 
-    // Create tasks
-    // TODO: create tasks for `Task` tasks
-    tasks.forEach(async (task) => {
-      if (!task) return;
-
-      if (typeof task === "string") {
-        const taskSplit = task.split(":");
-
-        await createTask({
-          title: taskSplit[0],
-          description: taskSplit.length > 1 ? taskSplit[1] : "",
-          priority: "Medium",
-          assignedUsers: [],
-          invoiceId: res.data.id,
-        });
-      }
-    });
-
-    // Reset the cache
-    useEstimateCreateStore.getState().reset();
     // Redirect to the index
     router.push("/estimate");
+    // Reset the states
+    useEstimateCreateStore.getState().reset();
   }
 
   return (

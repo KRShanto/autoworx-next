@@ -51,7 +51,10 @@ export default function SyncEstimate(
       customerNotes: invoice.customerNotes || "",
       customerComments: invoice.customerComments || "",
       // photos, // TODO
-      tasks,
+      tasks: tasks.map((task) => ({
+        id: task.id,
+        task: `${task.title}: ${task.description || ""}`,
+      })),
       items,
       currentSelectedCategoryId: null,
     });
