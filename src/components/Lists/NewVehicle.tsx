@@ -16,10 +16,18 @@ import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
 import { useState } from "react";
 import { addVehicle } from "../../app/task/[type]/actions/addVehicle";
+import { INVOICE_COLORS } from "@/lib/consts";
+import { ColorType } from "@/types/color";
+
+type SelectedColor = ColorType | null;
 
 export default function NewVehicle() {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
+  const [pickerOpen, setPickerOpen] = useState(true);
+  const [selectedColor, setSelectedColor] = useState<SelectedColor>(
+    INVOICE_COLORS[1],
+  );
 
   async function handleSubmit(data: FormData) {
     const year = +(data.get("year") ?? 0) as number;
@@ -27,7 +35,6 @@ export default function NewVehicle() {
     const model = data.get("model") as string;
     const submodel = data.get("submodel") as string;
     const type = data.get("type") as string;
-    const color = data.get("color") as string;
     const transmission = data.get("transmission") as string;
     const engineSize = data.get("engineSize") as string;
     const license = data.get("license") as string;
@@ -40,7 +47,8 @@ export default function NewVehicle() {
       model,
       submodel,
       type,
-      color,
+      textColor: selectedColor?.textColor || "black",
+      bgColor: selectedColor?.bgColor || "white",
       transmission,
       engineSize,
       license,
@@ -57,6 +65,7 @@ export default function NewVehicle() {
     } else {
       useListsStore.setState(({ vehicles }) => ({
         vehicles: [...vehicles, res.data],
+        newAddedVehicle: res.data,
       }));
       setOpen(false);
     }
@@ -86,7 +95,52 @@ export default function NewVehicle() {
           <SlimInput name="model" />
           <SlimInput name="submodel" required={false} label="Sub Model" />
           <SlimInput name="type" required={false} />
-          <SlimInput name="color" required={false} />
+          <div>
+            <label className="mb-1 px-2 font-medium">Color</label>
+            <div
+              style={{
+                backgroundColor: selectedColor?.bgColor,
+                color: selectedColor?.textColor,
+                border: "1px solid #6571FF",
+              }}
+              onClick={() => setPickerOpen(!pickerOpen)}
+              className="cursor-pointer rounded-md px-2 py-0.5"
+            >
+              Aa
+            </div>
+          </div>
+
+          {pickerOpen && (
+            <>
+              <div></div>
+
+              <div className="grid grid-cols-4 gap-2 p-2">
+                {INVOICE_COLORS.map((color, index) => (
+                  <button
+                    type="button"
+                    key={index}
+                    onClick={() => {
+                      setSelectedColor({
+                        textColor: color.textColor,
+                        bgColor: color.bgColor,
+                      });
+                    }}
+                    style={{
+                      backgroundColor: color.bgColor,
+                      color: color.textColor,
+                      border:
+                        selectedColor?.textColor === color.textColor
+                          ? `1px solid ${color.textColor}`
+                          : "none",
+                    }}
+                    className="rounded-md p-2"
+                  >
+                    Aa
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
           <SlimInput name="transmission" required={false} />
           <SlimInput name="engineSize" required={false} />
           <SlimInput name="license" required={false} label="License Plate" />

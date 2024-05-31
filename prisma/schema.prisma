@@ -283,7 +283,8 @@ model Vehicle {
   model        String?
   submodel     String?
   type         String?
-  color        String?
+  textColor    String? // hex (with #)
+  bgColor      String? // hex (with #)
   transmission String?
   engineSize   String?
   license      String?
@@ -368,28 +369,6 @@ model Setting {
 
   @@index([companyId], name: "fk_settings_company")
 }
-
-// TODO: Need more information about the payment model
-// model Payment {
-//   id               Int      @id @default(autoincrement())
-//   createdAt        DateTime @default(now()) @map("created_at")
-//   updatedAt        DateTime @updatedAt @map("updated_at")
-//   invoiceId        Int      @map("invoice_id")
-//   // TODO: improve this field name
-//   invoiceInvoiceId String   @map("invoice_invoice_id")
-//   type             Type
-//   method           Method
-//   amount           Decimal  @db.Decimal(8, 2)
-//   note             String?
-//   date             DateTime @default(now())
-//   tnx              String
-//   companyId        Int      @map("company_id")
-//   invoice          Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-//   company          Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-//   @@index([invoiceId], name: "fk_payments_invoice")
-//   @@index([companyId], name: "fk_payments_company")
-// }
 
 enum Type {
   Payment

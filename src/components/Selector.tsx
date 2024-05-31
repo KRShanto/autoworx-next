@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { FaSearch } from "react-icons/fa";
 import { DropdownMenu, DropdownMenuTrigger } from "./DropdownMenu";
@@ -9,12 +9,16 @@ export default function Selector({
   label,
   newButton,
   children,
+  openState,
 }: {
   label: string;
   newButton: React.ReactNode;
   children: React.ReactNode;
+  openState?: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
 }) {
-  const [open, setOpen] = useState(false);
+  // TODO: here is an error! try to find better solution
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [open, setOpen] = openState || useState(false);
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -47,6 +51,7 @@ export default function Selector({
               <FaChevronUp className="absolute right-2 top-1/2 -translate-y-1/2 transform text-[#797979]" />
             </button>
           </div>
+
           <div className="mb-5" onClick={() => setOpen(false)}>
             {children}
           </div>

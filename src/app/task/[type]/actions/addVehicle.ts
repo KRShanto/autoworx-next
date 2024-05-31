@@ -12,7 +12,8 @@ export async function addVehicle(data: {
   model: string;
   submodel: string;
   type: string;
-  color: string;
+  textColor: string;
+  bgColor: string;
   transmission: string;
   engineSize: string;
   license: string;

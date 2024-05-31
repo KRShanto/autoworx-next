@@ -4,7 +4,7 @@ import Selector from "@/components/Selector";
 import { useListsStore } from "@/stores/lists";
 import { Customer } from "@prisma/client";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NewCustomer from "./NewCustomer";
 import { SelectProps } from "./select-props";
 
@@ -16,6 +16,15 @@ export function SelectClient({
   const state = useState(value);
   const [client, setClient] = setValue ? [value, setValue] : state;
   const clientList = useListsStore((x) => x.customers);
+  const { newAddedCustomer } = useListsStore();
+  const [openDropdown, setOpenDropdown] = useState(false);
+
+  useEffect(() => {
+    if (newAddedCustomer) {
+      setClient(newAddedCustomer);
+      setOpenDropdown(false);
+    }
+  }, [newAddedCustomer]);
 
   return (
     <>
@@ -23,6 +32,7 @@ export function SelectClient({
       <Selector
         newButton={<NewCustomer />}
         label={client ? `${client.firstName} ${client.lastName}` : "Client"}
+        openState={[openDropdown, setOpenDropdown]}
       >
         <div>
           {clientList.map((client) => (

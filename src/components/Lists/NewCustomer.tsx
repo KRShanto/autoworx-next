@@ -54,6 +54,7 @@ export default function NewCustomer() {
     } else {
       useListsStore.setState(({ customers }) => ({
         customers: [...customers, res],
+        newAddedCustomer: res,
       }));
       setOpen(false);
     }

@@ -27,4 +27,6 @@ export const useListsStore = create(() => ({
   tags: [] as Tag[],
   vendors: [] as Vendor[],
   statuses: [] as Status[],
+  newAddedCustomer: null as Customer | null,
+  newAddedVehicle: null as Vehicle | null,
 }));
