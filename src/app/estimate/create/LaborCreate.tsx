@@ -7,6 +7,7 @@ import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { newLabor } from "./actions/newLabor";
 import Close from "./CloseEstimate";
+import { updateLabor } from "./actions/updateLabor";
 
 export default function LaborCreate() {
   const { categories } = useListsStore();
@@ -33,6 +34,28 @@ export default function LaborCreate() {
       );
     }
   }, [currentSelectedCategoryId]);
+
+  useEffect(() => {
+    if (data?.labor && data.edit) {
+      setName(data.labor.name);
+      setCategory(data.labor.category);
+      setTags(data.labor.tags);
+      setNotes(data.labor.notes);
+      setHours(data.labor.hours);
+      setCharge(data.labor.charge);
+      setDiscount(data.labor.discount);
+      setAddToCannedLabor(data.labor.addToCannedLabor);
+    } else {
+      setName("");
+      setCategory(null);
+      setTags("");
+      setNotes("");
+      setHours(1);
+      setCharge(0);
+      setDiscount(0);
+      setAddToCannedLabor(false);
+    }
+  }, [data]);
 
   async function handleNewCategory() {
     const res = await newCategory({
@@ -88,9 +111,61 @@ export default function LaborCreate() {
     }
   }
 
+  async function handleEdit() {
+    if (!name) {
+      alert("Labor name is required");
+      return;
+    }
+
+    const res = await updateLabor({
+      id: data.labor.id,
+      name,
+      categoryId: category?.id,
+      tags,
+      notes,
+      hours: hours || 1,
+      charge: charge || 0,
+      discount: discount || 0,
+      addToCannedLabor,
+    });
+
+    if (res.type === "success") {
+      // Change the service where itemId is the same
+      useEstimateCreateStore.setState((state) => {
+        const items = state.items.map((item) => {
+          if (item.id === itemId) {
+            return {
+              ...item,
+              labor: res.data,
+            };
+          }
+          return item;
+        });
+        return { items };
+      });
+
+      // Update the labor in listsStore
+      useListsStore.setState((state) => {
+        return {
+          labors: state.labors.map((labor) => {
+            if (labor.id === data.labor.id) {
+              return res.data;
+            }
+            return labor;
+          }),
+        };
+      });
+
+      close();
+    }
+  }
+
   return (
     <div className="flex flex-col gap-2 p-5">
-      <h3 className="w-full text-xl font-semibold">Labor Information</h3>
+      <h3 className="w-full text-xl font-semibold">
+        {/* Labor Information */}
+        {data?.edit ? "Edit Labor Information" : "Labor Information"}
+      </h3>
 
       <div className="flex items-center gap-2">
         <label htmlFor="name" className="w-28 text-end text-sm">
@@ -228,7 +303,7 @@ export default function LaborCreate() {
         <Close />
         <button
           className="w-fit rounded-md bg-[#6571FF] p-1 px-5 text-white"
-          onClick={handleSubmit}
+          onClick={data?.edit ? handleEdit : handleSubmit}
           type="button"
         >
           Done

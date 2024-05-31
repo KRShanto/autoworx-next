@@ -8,6 +8,7 @@ import Selector from "@/components/Selector";
 import { newMaterial } from "./actions/newMaterial";
 import NewVendor from "./NewVendor";
 import Close from "./CloseEstimate";
+import { updateMeterial } from "./actions/updateMeterial";
 
 export default function MaterialCreate() {
   const { categories } = useListsStore();
@@ -29,6 +30,40 @@ export default function MaterialCreate() {
 
   const { close, data } = useEstimatePopupStore();
   const itemId = data?.itemId;
+
+  useEffect(() => {
+    if (data.material && data.edit) {
+      setName(data.material.name);
+      setCategory(
+        data.material.categoryId
+          ? categories.find((cat) => cat.id === data.material.categoryId)!
+          : null,
+      );
+      setVendor(
+        data.material.vendorId
+          ? vendors.find((ven) => ven.id === data.material.vendorId)!
+          : null,
+      );
+      setTags(data.material.tags || "");
+      setNotes(data.material.notes || "");
+      setQuantity(data.material.quantity || 0);
+      setCost(data.material.cost || 0);
+      setSell(data.material.sell || 0);
+      setDiscount(data.material.discount || 0);
+      setAddToInventory(data.material.addToInventory || false);
+    } else {
+      setName("");
+      setCategory(null);
+      setVendor(null);
+      setTags("");
+      setNotes("");
+      setQuantity(0);
+      setCost(0);
+      setSell(0);
+      setDiscount(0);
+      setAddToInventory(false);
+    }
+  }, [data]);
 
   useEffect(() => {
     if (currentSelectedCategoryId) {
@@ -94,10 +129,61 @@ export default function MaterialCreate() {
     }
   }
 
+  async function handleEdit() {
+    if (!name) {
+      alert("Material name is required");
+      return;
+    }
+
+    const res = await updateMeterial({
+      id: data.material.id,
+      name,
+      categoryId: category?.id,
+      vendorId: vendor?.id,
+      tags,
+      notes,
+      quantity: quantity || 0,
+      cost: cost || 0,
+      sell: sell || 0,
+      discount: discount || 0,
+      addToInventory,
+    });
+
+    if (res.type === "success") {
+      // Update the material in the items
+      useEstimateCreateStore.setState((state) => {
+        const items = state.items.map((item) => {
+          if (item.id === itemId) {
+            return {
+              ...item,
+              material: res.data,
+            };
+          }
+          return item;
+        });
+        return { items };
+      });
+
+      // Update the material in the listsStore
+      useListsStore.setState((state) => {
+        const materials = state.materials.map((material) => {
+          if (material.id === res.data.id) {
+            return res.data;
+          }
+          return material;
+        });
+        return { materials };
+      });
+
+      close();
+    }
+  }
+
   return (
     <div className="flex flex-col gap-2 p-5">
       <h3 className="w-full text-xl font-semibold">
-        Materials/Parts Information
+        {/* Materials/Parts Information */}
+        {data.edit ? "Edit Materials/Parts" : "Materials/Parts Information"}
       </h3>
 
       <div className="flex items-center gap-2">
@@ -264,7 +350,7 @@ export default function MaterialCreate() {
         <Close />
         <button
           className="w-fit rounded-md bg-[#6571FF] p-1 px-5 text-white"
-          onClick={handleSubmit}
+          onClick={data.edit ? handleEdit : handleSubmit}
           type="button"
         >
           Done

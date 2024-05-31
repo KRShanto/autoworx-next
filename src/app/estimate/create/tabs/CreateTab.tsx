@@ -8,15 +8,94 @@ import { nanoid } from "nanoid";
 import { HiOutlinePlusCircle, HiOutlineXCircle } from "react-icons/hi2";
 import { create } from "mutative";
 import { SelectTags } from "@/components/Lists/SelectTags";
+import { FaEdit } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa6";
+import { deleteService } from "../actions/deleteService";
+import { deleteMaterial } from "../actions/deleteMaterial";
+import { deleteLabor } from "../actions/deleteLabor";
 
 export function CreateTab() {
   const items = useEstimateCreateStore((x) => x.items);
   const { setCurrentSelectedCategoryId } = useEstimateCreateStore();
-  const { open } = useEstimatePopupStore();
+  const { open, close, type } = useEstimatePopupStore();
   const services = useListsStore((x) => x.services);
   const materials = useListsStore((x) => x.materials);
   const labors = useListsStore((x) => x.labors);
-  const tags = useListsStore((x) => x.tags);
+
+  async function handleServiceDelete(id: number) {
+    await deleteService(id);
+
+    useEstimateCreateStore.setState((x) => {
+      return create(x, (x) => {
+        x.items = x.items.map((item) => {
+          if (item.service?.id === id) {
+            item.service = null;
+          }
+          return item;
+        });
+      });
+    });
+
+    useListsStore.setState((x) => {
+      return create(x, (x) => {
+        x.services = x.services.filter((service) => service.id !== id);
+      });
+    });
+
+    if (type === "SERVICE") {
+      close();
+    }
+  }
+
+  async function handleMaterialDelete(id: number) {
+    await deleteMaterial(id);
+
+    useEstimateCreateStore.setState((x) => {
+      return create(x, (x) => {
+        x.items = x.items.map((item) => {
+          if (item.material?.id === id) {
+            item.material = null;
+          }
+          return item;
+        });
+      });
+    });
+
+    useListsStore.setState((x) => {
+      return create(x, (x) => {
+        x.materials = x.materials.filter((material) => material.id !== id);
+      });
+    });
+
+    if (type === "MATERIAL") {
+      close();
+    }
+  }
+
+  async function handleLaborDelete(id: number) {
+    await deleteLabor(id);
+
+    useEstimateCreateStore.setState((x) => {
+      return create(x, (x) => {
+        x.items = x.items.map((item) => {
+          if (item.labor?.id === id) {
+            item.labor = null;
+          }
+          return item;
+        });
+      });
+    });
+
+    useListsStore.setState((x) => {
+      return create(x, (x) => {
+        x.labors = x.labors.filter((labor) => labor.id !== id);
+      });
+    });
+
+    if (type === "LABOR") {
+      close();
+    }
+  }
 
   return (
     <>
@@ -56,21 +135,45 @@ export function CreateTab() {
                   >
                     <div className="">
                       {services.map((service) => (
-                        <button
-                          type="button"
+                        <div
+                          className="mx-auto my-1 flex w-[95%] cursor-pointer items-center justify-between gap-1 rounded-md border border-[#6571FF] p-1 text-[#6571FF] hover:bg-gray-100"
                           key={service.id}
-                          className="mx-auto my-1 block w-[95%] cursor-pointer rounded-md border border-[#6571FF] p-1 text-left text-[#6571FF] hover:bg-gray-100"
-                          onClick={() => {
-                            useEstimateCreateStore.setState((x) =>
-                              create(x, (x) => {
-                                x.items[i].service = service;
-                              }),
-                            );
-                            setCurrentSelectedCategoryId(service.categoryId!);
-                          }}
                         >
-                          {service.name}
-                        </button>
+                          <button
+                            type="button"
+                            className="w-full text-left"
+                            onClick={() => {
+                              useEstimateCreateStore.setState((x) =>
+                                create(x, (x) => {
+                                  x.items[i].service = service;
+                                }),
+                              );
+                              setCurrentSelectedCategoryId(service.categoryId!);
+                            }}
+                          >
+                            {service.name}
+                          </button>
+                          <div className="flex">
+                            <button
+                              onClick={() =>
+                                open("SERVICE", {
+                                  itemId: item.id,
+                                  edit: true,
+                                  service,
+                                })
+                              }
+                              className="rounded-full p-2 transition-colors hover:bg-gray-200"
+                            >
+                              <FaEdit />
+                            </button>
+                            <button
+                              onClick={() => handleServiceDelete(service.id)}
+                              className="rounded-full p-2 transition-colors hover:bg-gray-200"
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </Selector>
@@ -91,20 +194,44 @@ export function CreateTab() {
                   >
                     <div>
                       {materials.map((material) => (
-                        <button
-                          type="button"
+                        <div
+                          className="mx-auto my-1 flex w-[95%] cursor-pointer items-center justify-between gap-1 rounded-md border border-[#6571FF] p-1 text-[#6571FF] hover:bg-gray-100"
                           key={material.id}
-                          className="mx-auto my-1 block w-[95%] cursor-pointer rounded-md border border-[#6571FF] p-1 text-left text-[#6571FF] hover:bg-gray-100"
-                          onClick={() =>
-                            useEstimateCreateStore.setState((x) =>
-                              create(x, (x) => {
-                                x.items[i].material = material;
-                              }),
-                            )
-                          }
                         >
-                          {material.name}
-                        </button>
+                          <button
+                            type="button"
+                            className="w-full text-left"
+                            onClick={() =>
+                              useEstimateCreateStore.setState((x) =>
+                                create(x, (x) => {
+                                  x.items[i].material = material;
+                                }),
+                              )
+                            }
+                          >
+                            {material.name}
+                          </button>
+                          <div className="flex">
+                            <button
+                              onClick={() =>
+                                open("MATERIAL", {
+                                  itemId: item.id,
+                                  edit: true,
+                                  material,
+                                })
+                              }
+                              className="rounded-full p-2 transition-colors hover:bg-gray-200"
+                            >
+                              <FaEdit />
+                            </button>
+                            <button
+                              onClick={() => handleMaterialDelete(material.id)}
+                              className="rounded-full p-2 transition-colors hover:bg-gray-200"
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </Selector>
@@ -123,20 +250,44 @@ export function CreateTab() {
                   >
                     <div className="">
                       {labors.map((labor) => (
-                        <button
-                          type="button"
+                        <div
+                          className="mx-auto my-1 flex w-[95%] cursor-pointer items-center justify-between gap-1 rounded-md border border-[#6571FF] p-1 text-[#6571FF] hover:bg-gray-100"
                           key={labor.id}
-                          className="mx-auto my-1 block w-[95%] cursor-pointer rounded-md border border-[#6571FF] p-1 text-left text-[#6571FF] hover:bg-gray-100"
-                          onClick={() =>
-                            useEstimateCreateStore.setState((x) =>
-                              create(x, (x) => {
-                                x.items[i].labor = labor;
-                              }),
-                            )
-                          }
                         >
-                          {labor.name}
-                        </button>
+                          <button
+                            type="button"
+                            className="w-full text-left"
+                            onClick={() =>
+                              useEstimateCreateStore.setState((x) =>
+                                create(x, (x) => {
+                                  x.items[i].labor = labor;
+                                }),
+                              )
+                            }
+                          >
+                            {labor.name}
+                          </button>
+                          <div className="flex">
+                            <button
+                              onClick={() =>
+                                open("LABOR", {
+                                  itemId: item.id,
+                                  edit: true,
+                                  labor,
+                                })
+                              }
+                              className="rounded-full p-2 transition-colors hover:bg-gray-200"
+                            >
+                              <FaEdit />
+                            </button>
+                            <button
+                              onClick={() => handleLaborDelete(labor.id)}
+                              className="rounded-full p-2 transition-colors hover:bg-gray-200"
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </Selector>
