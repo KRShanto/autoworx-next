@@ -28,7 +28,6 @@ export default function ConvertButton({
 
   const {
     invoiceId,
-    title,
     subtotal,
     discount,
     tax,
@@ -80,7 +79,6 @@ export default function ConvertButton({
     if (isEditPage) {
       res = await update({
         id: invoiceId,
-        title,
         customerId: clientId ? +clientId : undefined,
         vehicleId: vehicleId ? +vehicleId : undefined,
         statusId: statusId ? +statusId : undefined,
@@ -103,7 +101,6 @@ export default function ConvertButton({
       });
     } else {
       res = await create({
-        title,
         invoiceId,
         type,
         clientId: clientId ? +clientId : undefined,

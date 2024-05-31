@@ -5,18 +5,10 @@ import { createTask } from "@/app/task/[type]/actions/createTask";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
-import {
-  Task,
-  InvoiceType,
-  Service,
-  Material,
-  Labor,
-  Tag,
-} from "@prisma/client";
+import { InvoiceType, Service, Material, Labor, Tag } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export async function create({
-  title,
   invoiceId,
   type,
 
@@ -43,7 +35,6 @@ export async function create({
   items,
   tasks,
 }: {
-  title: string;
   invoiceId: string;
   type: InvoiceType;
 
@@ -82,7 +73,6 @@ export async function create({
   const invoice = await db.invoice.create({
     data: {
       id: invoiceId,
-      title,
       type,
       customerId: clientId,
       vehicleId,

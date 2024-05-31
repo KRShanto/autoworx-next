@@ -20,7 +20,7 @@ export default function Header({
   customer?: Customer;
   status?: Status;
 }) {
-  const { invoiceId, title, setTitle, setInvoiceId } = useEstimateCreateStore();
+  const { invoiceId, setInvoiceId } = useEstimateCreateStore();
 
   useEffect(() => {
     if (!id) setInvoiceId(customAlphabet("1234567890", 10)());
@@ -30,15 +30,6 @@ export default function Header({
     <div className="app-shadow col-start-1 flex flex-wrap items-center gap-3 rounded-md p-3">
       <div className="mr-auto flex gap-1">
         <p>{invoiceId}</p>
-        <p>:</p>
-        <input
-          name="title"
-          placeholder="Enter Title..."
-          aria-label="title"
-          className="bg-transparent"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
       </div>
 
       <CreateEstimateActionsButtons />

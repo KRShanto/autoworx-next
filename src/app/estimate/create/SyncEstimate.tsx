@@ -20,22 +20,19 @@ interface Item {
   tags: Tag[];
 }
 
-export default function SyncEstimate(
-  {
-    invoice,
-    items,
-    photos,
-    tasks,
-  }: {
-    invoice: Invoice;
-    items: Item[];
-    photos: InvoicePhoto[];
-    tasks: Task[];
-  }, // TODO: Type this
-) {
+export default function SyncEstimate({
+  invoice,
+  items,
+  photos,
+  tasks,
+}: {
+  invoice: Invoice;
+  items: Item[];
+  photos: InvoicePhoto[];
+  tasks: Task[];
+}) {
   useEffect(() => {
     useEstimateCreateStore.setState({
-      title: invoice.title || "",
       invoiceId: invoice.id,
       subtotal: parseFloat(invoice.subtotal?.toString() || "0"),
       discount: parseFloat(invoice.discount?.toString() || "0"),

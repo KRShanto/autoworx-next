@@ -22,12 +22,6 @@ export default function NewVehicle() {
   const { showError } = useFormErrorStore();
 
   async function handleSubmit(data: FormData) {
-    // const make = data.get("make") as string;
-    // const model = data.get("model") as string;
-    // const year = +(data.get("year") ?? 0) as number;
-    // const submodel = data.get("submodel") as string;
-    // const type = data.get("type") as string;
-
     const year = +(data.get("year") ?? 0) as number;
     const make = data.get("make") as string;
     const model = data.get("model") as string;

@@ -33,7 +33,6 @@ export function SelectVehicle({
             >
               <div>
                 <p className="text-sm font-bold">{vehicle.model}</p>
-                <p className="text-xs">Owner</p> {/* TODO: Add owner name */}
               </div>
             </button>
           ))}

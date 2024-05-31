@@ -302,7 +302,6 @@ model Invoice {
   id               String         @id @default(cuid())
   createdAt        DateTime       @default(now()) @map("created_at")
   updatedAt        DateTime       @updatedAt @map("updated_at")
-  title            String?
   type             InvoiceType    @default(Invoice)
   customerId       Int?           @map("customer_id")
   vehicleId        Int?           @map("vehicle_id")

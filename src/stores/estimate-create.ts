@@ -20,7 +20,6 @@ interface Item {
 }
 
 interface EstimateCreateStore {
-  title: string;
   invoiceId: string;
   subtotal: number;
   discount: number;
@@ -40,7 +39,6 @@ interface EstimateCreateStore {
   items: Item[];
   currentSelectedCategoryId: number | null;
 
-  setTitle: (title: string) => void;
   setInvoiceId: (invoiceId: string) => void;
 
   setSubtotal: (subtotal: number) => void;
@@ -72,7 +70,6 @@ interface EstimateCreateStore {
 }
 
 export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
-  title: "",
   invoiceId: "",
 
   subtotal: 0,
@@ -97,7 +94,6 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
 
   currentSelectedCategoryId: null,
 
-  setTitle: (title: string) => set({ title }),
   setInvoiceId: (invoiceId: string) => set({ invoiceId }),
 
   setSubtotal: (subtotal: number) => set({ subtotal }),
@@ -132,7 +128,6 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
 
   reset: () =>
     set({
-      title: "",
       invoiceId: "",
       subtotal: 0,
       discount: 0,
