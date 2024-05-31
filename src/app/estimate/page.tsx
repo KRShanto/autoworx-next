@@ -12,6 +12,7 @@ import { Filter } from "./Filter";
 import { AuthSession } from "@/types/auth";
 import { auth } from "../auth";
 import { SyncLists } from "@/components/SyncLists";
+import ConvertTo from "./ConvertTo";
 
 interface InvoiceData {
   id: string;
@@ -184,7 +185,8 @@ function Table({ data }: { data: InvoiceData[] }) {
                   {data.status}
                 </p>
               </td>
-              <td className="px-10 text-left">
+              <td className="flex items-center gap-3 px-10">
+                <ConvertTo id={data.id} />
                 <Link
                   href={`/estimate/edit/${data.id}`}
                   className="text-2xl text-blue-600"

@@ -10,12 +10,11 @@ import { CreateTab } from "../../create/tabs/CreateTab";
 import { AttachmentTab } from "../../create/tabs/AttachmentTab";
 import Header from "../../create/Header";
 import ConvertButton from "../../create/ConvertButton";
-import { InvoiceItem, InvoiceType, ItemTag } from "@prisma/client";
-import { GoFileCode } from "react-icons/go";
-import EstimateLogo from "@/components/EstimateLogo";
 import { notFound } from "next/navigation";
 import SyncEstimate from "../../create/SyncEstimate";
 import { FaSave } from "react-icons/fa";
+import { SiConvertio } from "react-icons/si";
+import ConvertTo from "./ConvertTo";
 
 export default async function Page({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -86,12 +85,15 @@ export default async function Page({ params }: { params: { id: string } }) {
         tasks={tasks}
       />
 
-      <ConvertButton
-        type={invoice.type}
-        text={`Update ${invoice.type}`}
-        icon={<FaSave />}
-        className="border-none bg-[#6571FF] text-white"
-      />
+      <div className="flex items-center">
+        <ConvertButton
+          type={invoice.type}
+          text={`Update ${invoice.type}`}
+          icon={<FaSave />}
+          className="border-none bg-[#6571FF] px-8 text-white"
+        />
+        <ConvertTo invoice={invoice} />
+      </div>
 
       <Header
         id={invoice.id}

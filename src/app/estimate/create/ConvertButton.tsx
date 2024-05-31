@@ -4,7 +4,7 @@ import { useEstimateCreateStore } from "@/stores/estimate-create";
 import React from "react";
 import { GoFileCode } from "react-icons/go";
 import { create } from "./actions/create";
-import { update } from "../edit/[id]/update";
+import { update } from "../edit/[id]/actions/update";
 import { InvoiceType } from "@prisma/client";
 import { customAlphabet } from "nanoid";
 import Submit from "@/components/Submit";
