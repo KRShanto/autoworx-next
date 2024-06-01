@@ -11,7 +11,7 @@ export async function dragTask(task: any): Promise<ServerAction> {
       id: task.id,
     },
     data: {
-      date: task.date,
+      date: new Date(task.date),
       startTime: task.startTime,
       endTime: task.endTime,
     },

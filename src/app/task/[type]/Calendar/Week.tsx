@@ -64,6 +64,10 @@ export default function Week({
 }) {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [draggedOverRow, setDraggedOverRow] = useState<{
+    r: number;
+    c: number;
+  } | null>(null);
 
   const { open } = usePopupStore();
 
@@ -243,9 +247,9 @@ export default function Week({
     <>
       <div
         className="relative mt-3 h-[90%] overflow-auto border border-b border-l border-t border-neutral-200"
-        style={{
-          backgroundColor: isOver ? "rgba(0, 0, 0, 0.1)" : "transparent",
-        }}
+        // style={{
+        //   backgroundColor: isOver ? "rgba(0, 0, 0, 0.1)" : "transparent",
+        // }}
         ref={dropRef}
       >
         {rows.map((row: any, rowIndex: number) => (
@@ -291,8 +295,22 @@ export default function Week({
                   className={cellClasses}
                   disabled={isHeaderCell}
                   onClick={isHeaderCell ? undefined : handleClick}
-                  onDrop={(event) => handleDrop(event, rowIndex, columnIndex)}
-                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={(event) => {
+                    handleDrop(event, rowIndex, columnIndex);
+                    setDraggedOverRow(null);
+                  }}
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                    setDraggedOverRow({ r: rowIndex, c: columnIndex });
+                  }}
+                  onDragLeave={() => setDraggedOverRow(null)}
+                  style={{
+                    backgroundColor:
+                      draggedOverRow?.r === rowIndex &&
+                      draggedOverRow?.c === columnIndex
+                        ? "rgba(0, 0, 0, 0.1)"
+                        : "transparent",
+                  }}
                 >
                   {column}
                 </button>

@@ -72,6 +72,7 @@ export default function Day({
 
   const { open } = usePopupStore();
   const is1300 = useMediaQuery({ query: "(max-width: 1300px)" });
+  const [draggedOverRow, setDraggedOverRow] = useState<number | null>(null);
 
   const [{ canDrop, isOver }, dropRef] = useDrop({
     accept: ["tag", "task", "appointment"],
@@ -204,15 +205,22 @@ export default function Day({
   return (
     <div
       ref={dropRef}
-      style={{ backgroundColor: isOver ? "lightgreen" : "white" }}
+      // style={{ backgroundColor: isOver ? "lightgreen" : "white" }}
       className="relative mt-3 h-[90%] overflow-auto border border-neutral-200"
     >
       {rows.map((row, i) => (
         <button
           type="button"
           key={row}
-          onDrop={(event) => handleDrop(event, i)}
-          onDragOver={(event) => event.preventDefault()}
+          onDrop={(event) => {
+            handleDrop(event, i);
+            setDraggedOverRow(null);
+          }}
+          onDragOver={(event) => {
+            event.preventDefault();
+            setDraggedOverRow(i);
+          }}
+          onDragLeave={() => setDraggedOverRow(null)}
           className={cn(
             "block h-[45px] w-full border-neutral-200",
             i !== rows.length - 1 && "border-b",
@@ -224,6 +232,9 @@ export default function Day({
             open("ADD_TASK", { date, startTime, companyUsers });
           }}
           disabled={i === 0}
+          style={{
+            backgroundColor: draggedOverRow === i ? "#c4c4c4" : "white",
+          }}
         >
           {/* Row heading */}
           <div
