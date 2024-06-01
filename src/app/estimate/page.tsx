@@ -39,9 +39,8 @@ async function fetchAndTransformData(
       type,
       companyId,
       createdAt: {
-        // BUG: its not working
-        gte: startDate ? new Date(startDate) : undefined,
-        lte: endDate ? new Date(endDate) : undefined,
+        gte: startDate ? new Date(`${startDate}T00:00:00`) : undefined,
+        lte: endDate ? new Date(`${endDate}T23:59:59.999`) : undefined,
       },
       statusId: status ? parseInt(status) : undefined,
     },
