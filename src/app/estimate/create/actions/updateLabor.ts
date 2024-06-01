@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
+import { Tag } from "@prisma/client";
 
 export async function updateLabor({
   id,
@@ -17,7 +18,7 @@ export async function updateLabor({
   id: number;
   name: string;
   categoryId?: number;
-  tags?: string;
+  tags?: Tag[];
   notes?: string;
   hours?: number;
   charge?: number;
@@ -29,7 +30,6 @@ export async function updateLabor({
     data: {
       name,
       categoryId,
-      tags,
       notes,
       hours,
       charge,
@@ -38,8 +38,41 @@ export async function updateLabor({
     },
   });
 
+  // delete all labor tags
+  await db.laborTag.deleteMany({
+    where: {
+      laborId: id,
+    },
+  });
+
+  // create labor tags
+  if (tags) {
+    await Promise.all(
+      tags.map((tag) =>
+        db.laborTag.create({
+          data: {
+            laborId: id,
+            tagId: tag.id,
+          },
+        }),
+      ),
+    );
+  }
+
+  const updatedLaborTags = await db.laborTag.findMany({
+    where: {
+      laborId: id,
+    },
+    include: {
+      tag: true,
+    },
+  });
+
   return {
     type: "success",
-    data: updatedLabor,
+    data: {
+      ...updatedLabor,
+      tags: updatedLaborTags.map((tag) => tag.tag),
+    },
   };
 }

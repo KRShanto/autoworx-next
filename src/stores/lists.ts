@@ -22,7 +22,7 @@ export const useListsStore = create(() => ({
   templates: [] as EmailTemplate[],
   categories: [] as Category[],
   services: [] as Service[],
-  materials: [] as Material[],
+  materials: [] as (Material & { tags: Tag[] })[],
   labors: [] as Labor[],
   tags: [] as Tag[],
   vendors: [] as Vendor[],

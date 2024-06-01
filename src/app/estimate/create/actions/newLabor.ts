@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/app/auth";
 import { AuthSession } from "@/types/auth";
 import { ServerAction } from "@/types/action";
+import { Tag } from "@prisma/client";
 
 export async function newLabor({
   name,
@@ -17,7 +18,7 @@ export async function newLabor({
 }: {
   name: string;
   categoryId?: number;
-  tags?: string;
+  tags?: Tag[];
   notes?: string;
   hours?: number;
   charge?: number;
@@ -31,7 +32,6 @@ export async function newLabor({
     data: {
       name,
       categoryId,
-      tags,
       notes,
       hours,
       charge,
@@ -41,8 +41,34 @@ export async function newLabor({
     },
   });
 
+  // create labor tags
+  if (tags) {
+    await Promise.all(
+      tags.map((tag) =>
+        db.laborTag.create({
+          data: {
+            laborId: newLabor.id,
+            tagId: tag.id,
+          },
+        }),
+      ),
+    );
+  }
+
+  const newLaborTags = await db.laborTag.findMany({
+    where: {
+      laborId: newLabor.id,
+    },
+    include: {
+      tag: true,
+    },
+  });
+
   return {
     type: "success",
-    data: newLabor,
+    data: {
+      ...newLabor,
+      tags: newLaborTags.map((tag) => tag.tag),
+    },
   };
 }

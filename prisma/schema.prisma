@@ -169,7 +169,6 @@ model Material {
   name           String
   vendorId       Int?          @map("vendor_id")
   categoryId     Int?          @map("category_id")
-  tags           Json?
   notes          String?
   quantity       Int?
   cost           Decimal?
@@ -183,6 +182,7 @@ model Material {
   vendor         Vendor?       @relation(fields: [vendorId], references: [id])
   category       Category?     @relation(fields: [categoryId], references: [id])
   invoiceItems   InvoiceItem[]
+  tags           MaterialTag[]
 
   @@index([companyId], name: "fk_materials_company")
 }
@@ -210,7 +210,6 @@ model Labor {
   id               Int           @id @default(autoincrement())
   name             String
   categoryId       Int?          @map("category_id")
-  tags             Json?
   notes            String?
   hours            Int?
   charge           Decimal? // per hour
@@ -222,6 +221,7 @@ model Labor {
   company          Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   category         Category?     @relation(fields: [categoryId], references: [id])
   invoiceItems     InvoiceItem[]
+  tags             LaborTag[]
 }
 
 model Tag {
@@ -234,7 +234,9 @@ model Tag {
   companyId Int      @map("company_id")
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  items ItemTag[]
+  items     ItemTag[]
+  materials MaterialTag[]
+  labors    LaborTag[]
 }
 
 model ItemTag {
@@ -244,6 +246,24 @@ model ItemTag {
   tag    Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([itemId, tagId])
+}
+
+model MaterialTag {
+  materialId Int      @map("material_id")
+  tagId      Int      @map("tag_id")
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([materialId, tagId])
+}
+
+model LaborTag {
+  laborId Int   @map("labor_id")
+  tagId   Int   @map("tag_id")
+  labor   Labor @relation(fields: [laborId], references: [id], onDelete: Cascade)
+  tag     Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([laborId, tagId])
 }
 
 model Category {

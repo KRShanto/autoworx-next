@@ -2,7 +2,7 @@ import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useListsStore } from "@/stores/lists";
 import React, { useEffect, useState } from "react";
 import newCategory from "./actions/newCategory";
-import { Category, Vendor } from "@prisma/client";
+import { Category, Tag, Vendor } from "@prisma/client";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import Selector from "@/components/Selector";
 import { newMaterial } from "./actions/newMaterial";
@@ -20,7 +20,7 @@ export default function MaterialCreate() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState<Category | null>(null);
   const [vendor, setVendor] = useState<Vendor | null>(null);
-  const [tags, setTags] = useState<string>("");
+  const [tags, setTags] = useState<Tag[]>([]);
   const [notes, setNotes] = useState<string>("");
   const [quantity, setQuantity] = useState<number>();
   const [cost, setCost] = useState<number>();
@@ -46,7 +46,7 @@ export default function MaterialCreate() {
           ? vendors.find((ven) => ven.id === data.material.vendorId)!
           : null,
       );
-      setTags(data.material.tags || "");
+      setTags(data.material.tags || []);
       setNotes(data.material.notes || "");
       setQuantity(data.material.quantity || 0);
       setCost(data.material.cost || 0);
@@ -57,7 +57,7 @@ export default function MaterialCreate() {
       setName("");
       setCategory(null);
       setVendor(null);
-      setTags("");
+      setTags([]);
       setNotes("");
       setQuantity(0);
       setCost(0);
@@ -272,7 +272,7 @@ export default function MaterialCreate() {
           Tags
         </label>
         <div className="w-full">
-          <SelectTags />
+          <SelectTags value={tags} setValue={setTags} />
         </div>
       </div>
 

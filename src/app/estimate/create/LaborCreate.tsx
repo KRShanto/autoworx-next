@@ -1,6 +1,6 @@
 import Selector from "@/components/Selector";
 import { useListsStore } from "@/stores/lists";
-import { Category } from "@prisma/client";
+import { Category, Tag } from "@prisma/client";
 import { useEffect, useState } from "react";
 import newCategory from "./actions/newCategory";
 import { useEstimatePopupStore } from "@/stores/estimate-popup";
@@ -9,6 +9,7 @@ import { newLabor } from "./actions/newLabor";
 import Close from "./CloseEstimate";
 import { updateLabor } from "./actions/updateLabor";
 import { cn } from "@/lib/cn";
+import { SelectTags } from "@/components/Lists/SelectTags";
 
 export default function LaborCreate() {
   const { categories } = useListsStore();
@@ -16,7 +17,7 @@ export default function LaborCreate() {
 
   const [name, setName] = useState("");
   const [category, setCategory] = useState<Category | null>(null);
-  const [tags, setTags] = useState<string>("");
+  const [tags, setTags] = useState<Tag[]>([]);
   const [notes, setNotes] = useState<string>("");
   const [hours, setHours] = useState<number>();
   const [charge, setCharge] = useState<number>();
@@ -49,7 +50,7 @@ export default function LaborCreate() {
     } else {
       setName("");
       setCategory(null);
-      setTags("");
+      setTags([]);
       setNotes("");
       setHours(1);
       setCharge(0);
@@ -234,13 +235,9 @@ export default function LaborCreate() {
         <label htmlFor="tags" className="w-28 text-end text-sm">
           Tags
         </label>
-        <input
-          type="text"
-          id="tags"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
-        />
+        <div className="w-full">
+          <SelectTags value={tags} setValue={setTags} />
+        </div>
       </div>
 
       <div className="flex items-center gap-2">
