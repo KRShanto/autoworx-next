@@ -1,7 +1,4 @@
 import { auth } from "@/app/auth";
-import { SelectClient } from "@/components/Lists/SelectClient";
-import { SelectStatus } from "@/components/Lists/SelectStatus";
-import { SelectVehicle } from "@/components/Lists/SelectVehicle";
 import { SyncLists } from "@/components/SyncLists";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import Title from "@/components/Title";
@@ -14,7 +11,7 @@ import { AttachmentTab } from "./tabs/AttachmentTab";
 import Header from "./Header";
 import ConvertButton from "./ConvertButton";
 import { InvoiceType, Labor, Material, Tag } from "@prisma/client";
-import { GoFile, GoFileCode } from "react-icons/go";
+import { GoFileCode } from "react-icons/go";
 import EstimateLogo from "@/components/EstimateLogo";
 
 export default async function Page() {

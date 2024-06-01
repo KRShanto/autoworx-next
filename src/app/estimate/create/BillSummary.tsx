@@ -3,6 +3,7 @@
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { useEffect } from "react";
 import DepositCreate from "./DepositCreate";
+import MakePayment from "./MakePayment";
 
 export function BillSummary() {
   const {
@@ -117,12 +118,7 @@ export function BillSummary() {
         <dl className="flex justify-between">
           <dt>Grand Total</dt> <dd>${grandTotal}</dd>
         </dl>
-        <button
-          type="button"
-          className="w-full rounded-md bg-white p-2 text-[#006d77]"
-        >
-          Make Payment
-        </button>
+        <MakePayment />
       </div>
     </>
   );

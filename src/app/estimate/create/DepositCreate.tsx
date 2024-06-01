@@ -9,14 +9,9 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/Dialog";
-import FormError from "@/components/FormError";
 import Input from "@/components/Input";
 import Submit from "@/components/Submit";
-import { useEstimateCreateStore } from "@/stores/estimate-create";
-import { useFormErrorStore } from "@/stores/form-error";
-import { useListsStore } from "@/stores/lists";
 import { useState } from "react";
-import { newVendor } from "./actions/newVendor";
 import { FaPlus } from "react-icons/fa6";
 
 export default function DepositCreate({
