@@ -15,6 +15,7 @@ import SyncEstimate from "../../create/SyncEstimate";
 import { FaSave } from "react-icons/fa";
 import { SiConvertio } from "react-icons/si";
 import ConvertTo from "./ConvertTo";
+import { Labor, Material, Tag } from "@prisma/client";
 
 export default async function Page({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -57,11 +58,45 @@ export default async function Page({ params }: { params: { id: string } }) {
   const vehicles = await db.vehicle.findMany({ where: { companyId } });
   const categories = await db.category.findMany({ where: { companyId } });
   const services = await db.service.findMany({ where: { companyId } });
-  const materials = await db.material.findMany({ where: { companyId } });
-  const labors = await db.labor.findMany({ where: { companyId } });
+  // const materials = await db.material.findMany({ where: { companyId } });
+  // const labors = await db.labor.findMany({ where: { companyId } });
   const tags = await db.tag.findMany({ where: { companyId } });
   const vendors = await db.vendor.findMany({ where: { companyId } });
   const statuses = await db.status.findMany({ where: { companyId } });
+
+  const materials = (await db.material.findMany({
+    where: { companyId },
+  })) as (Material & { tags: Tag[] })[];
+
+  const labors = (await db.labor.findMany({
+    where: { companyId },
+  })) as (Labor & { tags: Tag[] })[];
+
+  const materialTags = await db.materialTag.findMany({
+    where: {
+      materialId: { in: materials.map((material) => material.id) },
+    },
+    include: { tag: true },
+  });
+
+  const laborTags = await db.laborTag.findMany({
+    where: {
+      laborId: { in: labors.map((labor) => labor.id) },
+    },
+    include: { tag: true },
+  });
+
+  materials.forEach((material) => {
+    material.tags = materialTags
+      .filter((materialTag) => materialTag.materialId === material.id)
+      .map((materialTag) => materialTag.tag);
+  });
+
+  labors.forEach((labor) => {
+    labor.tags = laborTags
+      .filter((laborTag) => laborTag.laborId === labor.id)
+      .map((laborTag) => laborTag.tag);
+  });
 
   return (
     <form className="-my-2 grid h-[93vh] gap-3 overflow-clip py-2 md:grid-cols-[1fr,24rem] md:grid-rows-[auto,auto,1fr]">

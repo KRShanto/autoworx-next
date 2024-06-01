@@ -38,7 +38,7 @@ export function SyncLists({
   templates?: EmailTemplate[];
   categories?: Category[];
   services?: Service[];
-  materials?: Material[];
+  materials?: (Material & { tags: Tag[] })[];
   labors?: Labor[];
   tags?: Tag[];
   vendors?: Vendor[];

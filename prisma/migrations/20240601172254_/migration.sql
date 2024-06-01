@@ -18,7 +18,7 @@ CREATE TABLE `User` (
     `password` VARCHAR(191) NOT NULL,
     `provider` ENUM('google', 'apple', 'email') NOT NULL DEFAULT 'email',
     `timezone` VARCHAR(191) NOT NULL DEFAULT 'UTC',
-    `phone` INTEGER NULL,
+    `phone` VARCHAR(191) NULL,
     `address` VARCHAR(191) NULL,
     `city` VARCHAR(191) NULL,
     `state` VARCHAR(191) NULL,
@@ -68,7 +68,7 @@ CREATE TABLE `Customer` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `first_name` VARCHAR(191) NOT NULL,
     `last_name` VARCHAR(191) NULL,
-    `mobile` INTEGER NULL,
+    `mobile` VARCHAR(191) NULL,
     `email` VARCHAR(191) NULL,
     `address` VARCHAR(191) NULL,
     `city` VARCHAR(191) NULL,
@@ -81,7 +81,6 @@ CREATE TABLE `Customer` (
     `customer_company` VARCHAR(191) NULL,
     `tag` VARCHAR(191) NULL DEFAULT '',
 
-    UNIQUE INDEX `Customer_mobile_key`(`mobile`),
     INDEX `fk_customers_company`(`company_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -119,7 +118,6 @@ CREATE TABLE `Material` (
     `name` VARCHAR(191) NOT NULL,
     `vendor_id` INTEGER NULL,
     `category_id` INTEGER NULL,
-    `tags` JSON NULL,
     `notes` VARCHAR(191) NULL,
     `quantity` INTEGER NULL,
     `cost` DECIMAL(65, 30) NULL,
@@ -141,7 +139,7 @@ CREATE TABLE `Vendor` (
     `lastName` VARCHAR(191) NULL,
     `description` VARCHAR(191) NULL,
     `email` VARCHAR(191) NULL,
-    `phone` INTEGER NULL,
+    `phone` VARCHAR(191) NULL,
     `address` VARCHAR(191) NULL,
     `city` VARCHAR(191) NULL,
     `state` VARCHAR(191) NULL,
@@ -159,7 +157,6 @@ CREATE TABLE `Labor` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
     `category_id` INTEGER NULL,
-    `tags` JSON NULL,
     `notes` VARCHAR(191) NULL,
     `hours` INTEGER NULL,
     `charge` DECIMAL(65, 30) NULL,
@@ -191,6 +188,22 @@ CREATE TABLE `ItemTag` (
     `tag_id` INTEGER NOT NULL,
 
     PRIMARY KEY (`service_id`, `tag_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `MaterialTag` (
+    `material_id` INTEGER NOT NULL,
+    `tag_id` INTEGER NOT NULL,
+
+    PRIMARY KEY (`material_id`, `tag_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `LaborTag` (
+    `labor_id` INTEGER NOT NULL,
+    `tag_id` INTEGER NOT NULL,
+
+    PRIMARY KEY (`labor_id`, `tag_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -230,7 +243,8 @@ CREATE TABLE `Vehicle` (
     `model` VARCHAR(191) NULL,
     `submodel` VARCHAR(191) NULL,
     `type` VARCHAR(191) NULL,
-    `color` VARCHAR(191) NULL,
+    `textColor` VARCHAR(191) NULL,
+    `bgColor` VARCHAR(191) NULL,
     `transmission` VARCHAR(191) NULL,
     `engineSize` VARCHAR(191) NULL,
     `license` VARCHAR(191) NULL,
@@ -249,7 +263,6 @@ CREATE TABLE `Invoice` (
     `id` VARCHAR(191) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
-    `title` VARCHAR(191) NULL,
     `type` ENUM('Invoice', 'Estimate') NOT NULL DEFAULT 'Invoice',
     `customer_id` INTEGER NULL,
     `vehicle_id` INTEGER NULL,
@@ -477,6 +490,18 @@ ALTER TABLE `ItemTag` ADD CONSTRAINT `ItemTag_service_id_fkey` FOREIGN KEY (`ser
 
 -- AddForeignKey
 ALTER TABLE `ItemTag` ADD CONSTRAINT `ItemTag_tag_id_fkey` FOREIGN KEY (`tag_id`) REFERENCES `Tag`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `MaterialTag` ADD CONSTRAINT `MaterialTag_material_id_fkey` FOREIGN KEY (`material_id`) REFERENCES `Material`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `MaterialTag` ADD CONSTRAINT `MaterialTag_tag_id_fkey` FOREIGN KEY (`tag_id`) REFERENCES `Tag`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `LaborTag` ADD CONSTRAINT `LaborTag_labor_id_fkey` FOREIGN KEY (`labor_id`) REFERENCES `Labor`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `LaborTag` ADD CONSTRAINT `LaborTag_tag_id_fkey` FOREIGN KEY (`tag_id`) REFERENCES `Tag`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Category` ADD CONSTRAINT `Category_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
