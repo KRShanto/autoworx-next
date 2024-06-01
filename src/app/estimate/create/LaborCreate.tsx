@@ -8,6 +8,7 @@ import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { newLabor } from "./actions/newLabor";
 import Close from "./CloseEstimate";
 import { updateLabor } from "./actions/updateLabor";
+import { cn } from "@/lib/cn";
 
 export default function LaborCreate() {
   const { categories } = useListsStore();
@@ -195,8 +196,12 @@ export default function LaborCreate() {
               />
               <button
                 onClick={handleNewCategory}
-                className="text-nowrap rounded-md bg-slate-700 px-2 text-white"
+                className={cn(
+                  "text-nowrap rounded-md px-2 text-white",
+                  categoryInput ? "bg-slate-700 " : "bg-slate-400",
+                )}
                 type="button"
+                disabled={!categoryInput}
               >
                 Quick Add
               </button>

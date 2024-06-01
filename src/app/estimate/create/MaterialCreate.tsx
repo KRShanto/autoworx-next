@@ -10,6 +10,7 @@ import NewVendor from "./NewVendor";
 import Close from "./CloseEstimate";
 import { updateMeterial } from "./actions/updateMeterial";
 import { SelectTags } from "@/components/Lists/SelectTags";
+import { cn } from "@/lib/cn";
 
 export default function MaterialCreate() {
   const { categories } = useListsStore();
@@ -217,8 +218,12 @@ export default function MaterialCreate() {
               />
               <button
                 onClick={handleNewCategory}
-                className="text-nowrap rounded-md bg-slate-700 px-2 text-white"
+                className={cn(
+                  "text-nowrap rounded-md px-2 text-white",
+                  categoryInput ? "bg-slate-700" : "bg-slate-400",
+                )}
                 type="button"
+                disabled={!categoryInput}
               >
                 Quick Add
               </button>
