@@ -19,6 +19,7 @@ import moment from "moment";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
+import { FaTimes } from "react-icons/fa";
 import { HiMagnifyingGlass, HiOutlineFunnel } from "react-icons/hi2";
 
 export function Filter() {
@@ -60,23 +61,61 @@ export function Filter() {
           <DialogTitle>Customize</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-8">
-          <SlimInput
-            name="startDate"
-            label="Start Date"
-            type="date"
-            value={start}
-            onChange={(event) => setStart(event.currentTarget.value)}
-            required={false}
-          />
-          <SlimInput
-            name="endDate"
-            label="End Date"
-            type="date"
-            defaultValue={searchParams.get("endDate") ?? ""}
-            min={start}
-            max={today}
-            required={false}
-          />
+          <div>
+            {/* <SlimInput
+              name="startDate"
+              label="Start Date"
+              type="date"
+              value={start}
+              onChange={(event) => setStart(event.currentTarget.value)}
+              required={false}
+            /> */}
+            <label className="mb-1 px-2 font-medium">Start Date</label>
+            <div className="flex">
+              <input
+                name="startDate"
+                id="startDate"
+                type="date"
+                value={start}
+                onChange={(event) => setStart(event.currentTarget.value)}
+                className={slimInputClassName}
+              />
+              <button
+                type="button"
+                onClick={() => setStart("")}
+                className="rounded-full p-2 transition-colors hover:bg-red-200 hover:text-red-500"
+              >
+                <FaTimes />
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1 px-2 font-medium">End Date</label>
+            <div className="flex">
+              <input
+                name="endDate"
+                id="endDate"
+                type="date"
+                defaultValue={searchParams.get("endDate") ?? ""}
+                min={start}
+                max={today}
+                className={slimInputClassName}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const input = document.getElementById(
+                    "endDate",
+                  ) as HTMLInputElement;
+                  input.value = "";
+                }}
+                className="rounded-full p-2 transition-colors hover:bg-red-200 hover:text-red-500"
+              >
+                <FaTimes />
+              </button>
+            </div>
+          </div>
           <div className="col-span-full">
             <label className="mb-1 px-2 font-medium">Status</label>
             <div className="relative rounded border border-solid border-slate-500 p-2">
