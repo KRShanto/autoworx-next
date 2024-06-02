@@ -98,6 +98,20 @@ export default async function Page({ params }: { params: { id: string } }) {
       .map((laborTag) => laborTag.tag);
   });
 
+  const payment = await db.payment.findFirst({
+    where: { invoiceId: id },
+    include: {
+      card: true,
+      check: true,
+      cash: true,
+      other: {
+        include: {
+          paymentMethod: true,
+        },
+      },
+    },
+  });
+
   return (
     <form className="-my-2 grid h-[93vh] gap-3 overflow-clip py-2 md:grid-cols-[1fr,24rem] md:grid-rows-[auto,auto,1fr]">
       <Title>Estimate</Title>
@@ -118,6 +132,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         items={itemWithTags}
         photos={photos}
         tasks={tasks}
+        payment={payment}
       />
 
       <div className="flex items-center">

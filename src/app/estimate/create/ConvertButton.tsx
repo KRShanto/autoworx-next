@@ -2,15 +2,11 @@
 
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import React from "react";
-import { GoFileCode } from "react-icons/go";
-import { create } from "./actions/create";
-import { update } from "../edit/[id]/actions/update";
 import { InvoiceType } from "@prisma/client";
-import { customAlphabet } from "nanoid";
 import Submit from "@/components/Submit";
-import { createTask } from "@/app/task/[type]/actions/createTask";
 import { cn } from "@/lib/cn";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useInvoiceCreate } from "@/hooks/useInvoiceCreate";
 
 export default function ConvertButton({
   text,
@@ -23,107 +19,11 @@ export default function ConvertButton({
   type: InvoiceType;
   className?: string;
 }) {
-  const pathaname = usePathname();
   const router = useRouter();
-
-  const {
-    invoiceId,
-    subtotal,
-    discount,
-    tax,
-    deposit,
-    depositNotes,
-    depositMethod,
-    grandTotal,
-    due,
-    internalNotes,
-    terms,
-    policy,
-    customerNotes,
-    customerComments,
-    photos,
-    tasks,
-    items,
-  } = useEstimateCreateStore();
+  const createInvoice = useInvoiceCreate(type);
 
   async function handleSubmit(formData: FormData) {
-    const photoPaths = [];
-    const clientId = formData.get("customerId");
-    const vehicleId = formData.get("vehicleId");
-    const statusId = formData.get("statusId");
-    const isEditPage = pathaname.includes("/estimate/edit/");
-
-    // upload photos
-    if (photos.length > 0) {
-      const formData = new FormData();
-      photos.forEach((photo) => {
-        formData.append("photos", photo);
-      });
-
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        console.error("Failed to upload photos");
-        return;
-      }
-
-      const json = await res.json();
-      const data = json.data;
-      photoPaths.push(...data);
-    }
-
-    let res;
-    if (isEditPage) {
-      res = await update({
-        id: invoiceId,
-        customerId: clientId ? +clientId : undefined,
-        vehicleId: vehicleId ? +vehicleId : undefined,
-        statusId: statusId ? +statusId : undefined,
-        subtotal,
-        discount,
-        tax,
-        deposit,
-        depositNotes,
-        depositMethod,
-        grandTotal,
-        due,
-        internalNotes,
-        terms,
-        policy,
-        customerNotes,
-        customerComments,
-        // photos: photoPaths,
-        items,
-        tasks,
-      });
-    } else {
-      res = await create({
-        invoiceId,
-        type,
-        clientId: clientId ? +clientId : undefined,
-        vehicleId: vehicleId ? +vehicleId : undefined,
-        statusId: statusId ? +statusId : undefined,
-        subtotal,
-        discount,
-        tax,
-        deposit,
-        depositNotes,
-        depositMethod,
-        grandTotal,
-        due,
-        internalNotes,
-        terms,
-        policy,
-        customerNotes,
-        customerComments,
-        photos: photoPaths,
-        items,
-        tasks,
-      });
-    }
+    const res = await createInvoice(formData);
 
     // Redirect to the index
     router.push("/estimate");

@@ -394,7 +394,7 @@ model Setting {
 
 model Payment {
   id        Int           @id @default(autoincrement())
-  date      DateTime
+  date      DateTime?
   notes     String?
   type      PaymentType
   card      CardPayment?

@@ -1,11 +1,17 @@
 "use client";
 
 import { useEstimateCreateStore } from "@/stores/estimate-create";
+import { FullPayment } from "@/types/db";
 import {
+  CardPayment,
+  CashPayment,
+  CheckPayment,
   Invoice,
   InvoicePhoto,
   Labor,
   Material,
+  OtherPayment,
+  Payment,
   Service,
   Tag,
   Task,
@@ -25,11 +31,13 @@ export default function SyncEstimate({
   items,
   photos,
   tasks,
+  payment,
 }: {
   invoice: Invoice;
   items: Item[];
   photos: InvoicePhoto[];
   tasks: Task[];
+  payment: FullPayment;
 }) {
   useEffect(() => {
     useEstimateCreateStore.setState({
@@ -54,8 +62,9 @@ export default function SyncEstimate({
       })),
       items,
       currentSelectedCategoryId: null,
+      payment,
     });
-  }, [invoice, items, photos, tasks]);
+  }, [invoice, items, photos, tasks, payment]);
 
   return null;
 }

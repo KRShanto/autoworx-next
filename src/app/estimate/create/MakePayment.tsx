@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,11 @@ import { cn } from "@/lib/cn";
 import { newPaymentMethod } from "./actions/newPaymentMethod";
 import { CardType, PaymentMethod, PaymentType } from "@prisma/client";
 import { newPayment } from "./actions/newPayment";
+import { useEstimateCreateStore } from "@/stores/estimate-create";
+import { useInvoiceCreate } from "@/hooks/useInvoiceCreate";
+import { usePathname, useRouter } from "next/navigation";
+import moment from "moment";
+import { updatePayment } from "./actions/updatePayment";
 
 function TabTrigger({
   value,
@@ -44,50 +49,96 @@ function TabTrigger({
 }
 
 export default function MakePayment() {
+  const { paymentMethods } = useListsStore();
+  const { payment } = useEstimateCreateStore();
+  const createInvoice = useInvoiceCreate("Invoice");
+  const router = useRouter();
+  const pathaname = usePathname();
+  const isEditPage = pathaname.includes("/estimate/edit/");
+
   const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState("card");
+  const [tab, setTab] = useState("CARD");
+  const [paymentMethodInput, setPaymentMethodInput] = useState("");
+
+  const [date, setDate] = useState<Date>(new Date());
+  const [notes, setNotes] = useState("");
+  const [card, setCard] = useState("");
+  const [cardType, setCardType] = useState("MASTERCARD");
+  const [check, setCheck] = useState("");
+  const [cash, setCash] = useState<number | string>("");
+  const [amount, setAmount] = useState<number | string>("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(
     null,
   );
-  const [paymentMethodInput, setpaymentMethodInput] = useState("");
-  const { paymentMethods } = useListsStore();
+
+  useEffect(() => {
+    if (payment) {
+      setTab(payment.type);
+      setDate(payment.date || new Date());
+      setNotes(payment.notes || "");
+
+      switch (payment.type) {
+        case "CARD":
+          setCard(payment.card?.creditCard || "");
+          setCardType(payment.card?.cardType || "MASTERCARD");
+          break;
+        case "CHECK":
+          setCheck(payment.check?.checkNumber || "");
+          break;
+        case "CASH":
+          setCash(payment.cash?.receivedCash || "");
+          break;
+        case "OTHER":
+          setAmount(payment.other?.amount || "");
+          setPaymentMethod(payment.other?.paymentMethod || null);
+          break;
+      }
+    }
+  }, [payment]);
 
   async function handleSubmit(formData: FormData) {
-    // common
-    const date = formData.get("date") as string;
-    const notes = formData.get("notes") as string;
+    const res1 = await createInvoice(formData);
 
-    // card
-    const card = formData.get("card") as string;
-    const cardType = formData.get("cardType") as string;
+    let res2;
 
-    // check
-    const check = formData.get("check") as string;
+    if (isEditPage && payment) {
+      res2 = await updatePayment({
+        id: payment.id,
+        type: tab as PaymentType,
+        date,
+        notes,
+        additionalData: {
+          creditCard: card,
+          cardType: cardType ? (cardType as CardType) : "MASTERCARD",
+          checkNumber: check,
+          receivedCash: Number(cash),
+          paymentMethodId: paymentMethod?.id,
+          amount: Number(amount),
+        },
+      });
+    } else {
+      res2 = await newPayment({
+        invoiceId: res1.data.id,
+        type: tab as PaymentType,
+        date,
+        notes,
+        additionalData: {
+          creditCard: card,
+          cardType: cardType ? (cardType as CardType) : "MASTERCARD",
+          checkNumber: check,
+          receivedCash: Number(cash),
+          paymentMethodId: paymentMethod?.id,
+          amount: Number(amount),
+        },
+      });
+    }
 
-    // cash
-    const cash = formData.get("cash") as string;
-
-    // other
-    const amount = formData.get("amount") as string;
-
-    const res = await newPayment({
-      type: tab.toUpperCase() as PaymentType,
-      date,
-      notes,
-      additionalData: {
-        creditCard: card,
-        cardType: cardType
-          ? (cardType.toUpperCase() as CardType)
-          : "MASTERCARD",
-        checkNumber: check,
-        receivedCash: Number(cash),
-        paymentMethodId: paymentMethod?.id,
-        amount: Number(amount),
-      },
-    });
-
-    if (res.type === "success") {
+    if (res2.type === "success") {
       setOpen(false);
+      // Redirect to the index
+      router.push("/estimate");
+      // Reset the states
+      useEstimateCreateStore.getState().reset();
     }
   }
 
@@ -95,7 +146,7 @@ export default function MakePayment() {
     const res = await newPaymentMethod(paymentMethodInput);
 
     if (res.type === "success") {
-      setpaymentMethodInput("");
+      setPaymentMethodInput("");
 
       useListsStore.setState({
         paymentMethods: [...paymentMethods, res.data],
@@ -121,17 +172,17 @@ export default function MakePayment() {
             <DialogClose />
           </DialogHeader>
 
-          <Tabs.Root className="mt-5" value={tab} onValueChange={setTab}>
+          <Tabs.Root className="mt-5" value={tab} onValueChange={setTab as any}>
             <Tabs.List className="flex justify-between">
-              <TabTrigger value="card" tab={tab}>
+              <TabTrigger value="CARD" tab={tab}>
                 <FaRegCreditCard />
                 Card
               </TabTrigger>
 
-              <TabTrigger value="check" tab={tab}>
+              <TabTrigger value="CHECK" tab={tab}>
                 <Image
                   src={
-                    tab === "check"
+                    tab === "CHECK"
                       ? "/icons/CheckWhite.svg"
                       : "/icons/Check.svg"
                   }
@@ -142,10 +193,10 @@ export default function MakePayment() {
                 Check
               </TabTrigger>
 
-              <TabTrigger value="cash" tab={tab}>
+              <TabTrigger value="CASH" tab={tab}>
                 <Image
                   src={
-                    tab === "cash" ? "/icons/CashWhite.svg" : "/icons/Cash.svg"
+                    tab === "CASH" ? "/icons/CashWhite.svg" : "/icons/Cash.svg"
                   }
                   alt="Cash icon"
                   width={20}
@@ -154,15 +205,20 @@ export default function MakePayment() {
                 Cash
               </TabTrigger>
 
-              <TabTrigger value="other" tab={tab}>
+              <TabTrigger value="OTHER" tab={tab}>
                 Other
               </TabTrigger>
             </Tabs.List>
 
-            <Tabs.Content value="card">
+            <Tabs.Content value="CARD">
               <div className="mt-5 flex justify-between gap-3">
                 <div>
-                  <SlimInput name="date" type="date" />
+                  <SlimInput
+                    name="date"
+                    type="date"
+                    value={moment(date).format("YYYY-MM-DD")}
+                    onChange={(e) => setDate(new Date(e.target.value))}
+                  />
                 </div>
 
                 <div className="w-full">
@@ -170,28 +226,54 @@ export default function MakePayment() {
                     name="card"
                     type="text"
                     label="Credit Card (Last 4 digits)"
+                    value={card}
+                    onChange={(e) => setCard(e.target.value)}
                   />
                 </div>
               </div>
 
               <div className="mt-5 flex items-center gap-5">
                 <div className="flex items-center gap-1">
-                  <input type="radio" id="mastercard" name="cardType" />
+                  <input
+                    type="radio"
+                    id="mastercard"
+                    name="cardType"
+                    checked={cardType === "MASTERCARD"}
+                    onChange={() => setCardType("MASTERCARD")}
+                  />
                   <label htmlFor="mastercard">Mastercard</label>
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <input type="radio" id="visa" name="cardType" />
+                  <input
+                    type="radio"
+                    id="visa"
+                    name="cardType"
+                    checked={cardType === "VISA"}
+                    onChange={() => setCardType("VISA")}
+                  />
                   <label htmlFor="visa">Visa</label>
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <input type="radio" id="amex" name="cardType" />
+                  <input
+                    type="radio"
+                    id="amex"
+                    name="cardType"
+                    checked={cardType === "AMEX"}
+                    onChange={() => setCardType("AMEX")}
+                  />
                   <label htmlFor="amex">Amex</label>
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <input type="radio" id="other" name="cardType" />
+                  <input
+                    type="radio"
+                    id="other"
+                    name="cardType"
+                    checked={cardType === "OTHER"}
+                    onChange={() => setCardType("OTHER")}
+                  />
                   <label htmlFor="other">Other</label>
                 </div>
               </div>
@@ -202,18 +284,31 @@ export default function MakePayment() {
                   name="notes"
                   id="notes"
                   className="h-20 w-full rounded-md border-2 border-slate-400 p-2 outline-none"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
                 />
               </div>
             </Tabs.Content>
 
-            <Tabs.Content value="check">
+            <Tabs.Content value="CHECK">
               <div className="mt-5 flex justify-between gap-3">
                 <div>
-                  <SlimInput name="date" type="date" />
+                  <SlimInput
+                    name="date"
+                    type="date"
+                    value={moment(date).format("YYYY-MM-DD")}
+                    onChange={(e) => setDate(new Date(e.target.value))}
+                  />
                 </div>
 
                 <div className="w-full">
-                  <SlimInput name="check" type="text" label="Check #" />
+                  <SlimInput
+                    name="check"
+                    type="text"
+                    label="Check #"
+                    value={check}
+                    onChange={(e) => setCheck(e.target.value)}
+                  />
                 </div>
               </div>
 
@@ -223,18 +318,31 @@ export default function MakePayment() {
                   name="notes"
                   id="notes"
                   className="h-20 w-full rounded-md border-2 border-slate-400 p-2 outline-none"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
                 />
               </div>
             </Tabs.Content>
 
-            <Tabs.Content value="cash">
+            <Tabs.Content value="CASH">
               <div className="mt-5 flex justify-between gap-3">
                 <div>
-                  <SlimInput name="date" type="date" />
+                  <SlimInput
+                    name="date"
+                    type="date"
+                    value={moment(date).format("YYYY-MM-DD")}
+                    onChange={(e) => setDate(new Date(e.target.value))}
+                  />
                 </div>
 
                 <div className="w-full">
-                  <SlimInput name="cash" type="text" label="Recieve Cash" />
+                  <SlimInput
+                    name="cash"
+                    type="text"
+                    label="Recieve Cash"
+                    value={cash}
+                    onChange={(e) => setCash(e.target.value)}
+                  />
                 </div>
               </div>
 
@@ -244,11 +352,13 @@ export default function MakePayment() {
                   name="notes"
                   id="notes"
                   className="h-20 w-full rounded-md border-2 border-slate-400 p-2 outline-none"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
                 />
               </div>
             </Tabs.Content>
 
-            <Tabs.Content value="other">
+            <Tabs.Content value="OTHER">
               <div className="mt-5">
                 <label>Payment Method</label>
                 <Selector
@@ -258,7 +368,7 @@ export default function MakePayment() {
                       <input
                         type="text"
                         value={paymentMethodInput}
-                        onChange={(e) => setpaymentMethodInput(e.target.value)}
+                        onChange={(e) => setPaymentMethodInput(e.target.value)}
                         className="w-full rounded-md border-2 border-slate-400 p-1"
                       />
                       <button
@@ -276,25 +386,6 @@ export default function MakePayment() {
                   }
                 >
                   <div className="flex flex-col gap-2">
-                    {/* <button
-                      className="mx-auto w-[95%] rounded-md border-2 border-slate-400 p-1 px-2 text-left"
-                      onClick={() => setPaymentMethod("Cash")}
-                    >
-                      Cash
-                    </button>
-
-                    <button
-                      className="mx-auto w-[95%] rounded-md border-2 border-slate-400 p-1 px-2 text-left"
-                      onClick={() => setPaymentMethod("Check")}
-                    >
-                      Check
-                    </button>
-                    <button
-                      className="mx-auto w-[95%] rounded-md border-2 border-slate-400 p-1 px-2 text-left"
-                      onClick={() => setPaymentMethod("Credit Card")}
-                    >
-                      Card
-                    </button> */}
                     {paymentMethods.map((method) => (
                       <button
                         key={method.id}
@@ -310,11 +401,21 @@ export default function MakePayment() {
 
               <div className="mt-5 flex justify-between gap-3">
                 <div>
-                  <SlimInput name="date" type="date" />
+                  <SlimInput
+                    name="date"
+                    type="date"
+                    value={moment(date).format("YYYY-MM-DD")}
+                    onChange={(e) => setDate(new Date(e.target.value))}
+                  />
                 </div>
 
                 <div className="w-full">
-                  <SlimInput name="amount" type="text" />
+                  <SlimInput
+                    name="amount"
+                    type="text"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                  />
                 </div>
               </div>
 
@@ -324,6 +425,8 @@ export default function MakePayment() {
                   name="notes"
                   id="notes"
                   className="h-20 w-full rounded-md border-2 border-slate-400 p-2 outline-none"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
                 />
               </div>
             </Tabs.Content>

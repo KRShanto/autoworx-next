@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { CardType, PaymentType } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 interface CardPaymentData {
   creditCard?: string;
@@ -23,7 +24,7 @@ interface OtherPaymentData {
 }
 
 interface PaymentData {
-  invoiceId: string;
+  id: number;
   type: PaymentType;
   date: Date;
   notes: string;
@@ -34,105 +35,84 @@ interface PaymentData {
     | OtherPaymentData;
 }
 
-export async function newPayment({
-  invoiceId,
+export async function updatePayment({
+  id,
   type,
   date,
   notes,
   additionalData,
 }: PaymentData): Promise<ServerAction> {
-  let newPayment;
+  let updatedPayment;
 
   switch (type) {
     case "CARD":
-      newPayment = await db.payment.create({
+      updatedPayment = await db.payment.update({
+        where: { id },
         data: {
-          invoiceId,
           date: new Date(date),
           notes: notes,
-          type: "CARD",
           card: {
-            create: {
+            update: {
               cardType: (additionalData as CardPaymentData).cardType,
               creditCard: (additionalData as CardPaymentData).creditCard,
             },
           },
         },
-        include: {
-          card: true,
-        },
       });
       break;
 
     case "CHECK":
-      newPayment = await db.payment.create({
+      updatedPayment = await db.payment.update({
+        where: { id },
         data: {
-          invoiceId,
           date: new Date(date),
           notes: notes,
-          type: "CHECK",
           check: {
-            create: {
+            update: {
               checkNumber: (additionalData as CheckPaymentData).checkNumber,
             },
           },
-        },
-        include: {
-          check: true,
         },
       });
       break;
 
     case "CASH":
-      newPayment = await db.payment.create({
+      updatedPayment = await db.payment.update({
+        where: { id },
         data: {
-          invoiceId,
           date: new Date(date),
           notes: notes,
-          type: "CASH",
           cash: {
-            create: {
+            update: {
               receivedCash: (additionalData as CashPaymentData).receivedCash,
             },
           },
-        },
-        include: {
-          cash: true,
         },
       });
       break;
 
     case "OTHER":
-      newPayment = await db.payment.create({
+      updatedPayment = await db.payment.update({
+        where: { id },
         data: {
-          invoiceId,
           date: new Date(date),
           notes: notes,
-          type: "OTHER",
           other: {
-            create: {
+            update: {
               paymentMethodId: (additionalData as OtherPaymentData)
                 .paymentMethodId,
               amount: (additionalData as OtherPaymentData).amount,
             },
           },
         },
-        include: {
-          other: true,
-        },
       });
       break;
 
     default:
-      return {
-        type: "error",
-        message: "Invalid payment type",
-      };
+      throw new Error("Invalid payment type");
   }
 
-  return {
-    type: "success",
-    message: "Payment created",
-    data: newPayment,
-  };
+  revalidatePath("/estimate");
+
+  return { type: "success", data: updatedPayment };
 }

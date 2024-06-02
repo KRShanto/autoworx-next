@@ -1,9 +1,15 @@
 // NOTE: these properties are optional for prisma's select statement. But they aren't optional in the db.
 
 import {
+  CardPayment,
+  CashPayment,
+  CheckPayment,
   Customer,
   EmailTemplate,
   Order,
+  OtherPayment,
+  Payment,
+  PaymentMethod,
   Priority,
   User,
   Vehicle,
@@ -76,20 +82,6 @@ export interface AdditionalInfo {
   terms: string;
 }
 
-export interface Payment {
-  tnx?: string;
-  method: "Cash" | "Card" | "Zelle";
-  date?: Date;
-  name?: string;
-  email?: string;
-  mobile?: string;
-  type?: "Payment" | "Deposit" | "Refund"; // ??
-  address?: string;
-  note?: string;
-  amount: number;
-  status?: "Success"; // ??
-}
-
 export interface TaskType {
   id?: number;
   title: string;
@@ -142,3 +134,12 @@ export interface AppointmentFull {
   assignedUsers: User[];
   times: string[];
 }
+
+export type FullPayment =
+  | (Payment & {
+      card: CardPayment | null;
+      check: CheckPayment | null;
+      cash: CashPayment | null;
+      other: (OtherPayment & { paymentMethod: PaymentMethod | null }) | null;
+    })
+  | null;

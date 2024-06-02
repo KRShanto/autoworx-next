@@ -1,7 +1,9 @@
+import { FullPayment } from "@/types/db";
 import {
   Customer,
   Labor,
   Material,
+  Payment,
   Service,
   Status,
   Tag,
@@ -37,6 +39,7 @@ interface EstimateCreateStore {
   photos: File[];
   tasks: { id: undefined | number; task: string }[];
   items: Item[];
+  payment: FullPayment;
   currentSelectedCategoryId: number | null;
 
   setInvoiceId: (invoiceId: string) => void;
@@ -92,6 +95,7 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
 
   items: [],
 
+  payment: null,
   currentSelectedCategoryId: null,
 
   setInvoiceId: (invoiceId: string) => set({ invoiceId }),
