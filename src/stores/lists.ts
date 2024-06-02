@@ -11,6 +11,7 @@ import type {
   Vehicle,
   Vendor,
   Status,
+  PaymentMethod,
 } from "@prisma/client";
 import { create } from "zustand";
 
@@ -29,4 +30,5 @@ export const useListsStore = create(() => ({
   statuses: [] as Status[],
   newAddedCustomer: null as Customer | null,
   newAddedVehicle: null as Vehicle | null,
+  paymentMethods: [] as PaymentMethod[],
 }));

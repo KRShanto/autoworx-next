@@ -24,6 +24,9 @@ export default async function Page() {
   const tags = await db.tag.findMany({ where: { companyId } });
   const vendors = await db.vendor.findMany({ where: { companyId } });
   const statuses = await db.status.findMany({ where: { companyId } });
+  const paymentMethods = await db.paymentMethod.findMany({
+    where: { companyId },
+  });
 
   const materials = (await db.material.findMany({
     where: { companyId },
@@ -73,6 +76,7 @@ export default async function Page() {
         tags={tags}
         vendors={vendors}
         statuses={statuses}
+        paymentMethods={paymentMethods}
       />
       <div className="flex">
         <ConvertButton

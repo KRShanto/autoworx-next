@@ -14,6 +14,7 @@ import type {
   Vehicle,
   Vendor,
   Status,
+  PaymentMethod,
 } from "@prisma/client";
 import { useEffect } from "react";
 
@@ -30,6 +31,7 @@ export function SyncLists({
   tags = [],
   vendors = [],
   statuses = [],
+  paymentMethods = [],
 }: {
   customers?: Customer[];
   vehicles?: Vehicle[];
@@ -43,6 +45,7 @@ export function SyncLists({
   tags?: Tag[];
   vendors?: Vendor[];
   statuses?: Status[];
+  paymentMethods?: PaymentMethod[];
 }) {
   useEffect(() => {
     useListsStore.setState({
@@ -58,6 +61,7 @@ export function SyncLists({
       tags,
       vendors,
       statuses,
+      paymentMethods,
     });
   }, [
     customers,
@@ -72,6 +76,7 @@ export function SyncLists({
     tags,
     vendors,
     statuses,
+    paymentMethods,
   ]);
   return null;
 }
