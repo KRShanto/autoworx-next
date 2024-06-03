@@ -13,6 +13,7 @@ import ConvertButton from "./ConvertButton";
 import { InvoiceType, Labor, Material, Tag } from "@prisma/client";
 import { GoFileCode } from "react-icons/go";
 import EstimateLogo from "@/components/EstimateLogo";
+import PaymentTab from "./tabs/PaymentTab";
 
 export default async function Page() {
   const session = (await auth()) as AuthSession;
@@ -86,7 +87,7 @@ export default async function Page() {
         />
         <ConvertButton
           type={InvoiceType.Estimate}
-          text="Sell as Estimate"
+          text="Save as Estimate"
           className="border-none bg-[#6470FF] text-white"
           icon={<EstimateLogo />}
         />
@@ -113,7 +114,9 @@ export default async function Page() {
         </TabsContent>
 
         <TabsContent value="inspections"></TabsContent>
-        <TabsContent value="payments"></TabsContent>
+        <TabsContent value="payments">
+          <PaymentTab />
+        </TabsContent>
       </Tabs>
 
       <div className="app-shadow col-start-2 row-start-2 row-end-4 grid h-[85vh] grid-rows-[1fr,auto,auto] divide-y rounded-md">
