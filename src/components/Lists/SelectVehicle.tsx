@@ -15,8 +15,10 @@ export function SelectVehicle({
   const state = useState(value);
   const [vehicle, setVehicle] = setValue ? [value, setValue] : state;
   const vehicleList = useListsStore((x) => x.vehicles);
+  const [vehicleToDisplay, setVehicleToDisplay] = useState<Vehicle[]>([]);
   const { newAddedVehicle } = useListsStore();
   const [openDropdown, setOpenDropdown] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (newAddedVehicle) {
@@ -31,6 +33,18 @@ export function SelectVehicle({
     }
   }, [vehicle]);
 
+  useEffect(() => {
+    if (search) {
+      setVehicleToDisplay(
+        vehicleList.filter((vehicle) =>
+          vehicle.model?.toLowerCase().includes(search.toLowerCase()),
+        ),
+      );
+    } else {
+      setVehicleToDisplay(vehicleList.slice(0, 4));
+    }
+  }, [search, vehicleList]);
+
   return (
     <>
       <input type="hidden" name={name} value={vehicle?.id ?? ""} />
@@ -38,6 +52,7 @@ export function SelectVehicle({
         newButton={<NewVehicle />}
         label={vehicle ? vehicle.model || `Vehicle ${vehicle.id}` : "Vehicle"}
         openState={[openDropdown, setOpenDropdown]}
+        setSearch={setSearch}
       >
         <div className="">
           {vehicleList.map((vehicle) => (

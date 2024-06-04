@@ -17,11 +17,13 @@ export function SelectClient({
   const state = useState(value);
   const [client, setClient] = setValue ? [value, setValue] : state;
   const clientList = useListsStore((x) => x.customers);
+  const [clientsToDisplay, setClientsToDisplay] = useState<Customer[]>([]);
   const { newAddedCustomer } = useListsStore();
   const [openDropdown, setOpenDropdown] = useState(false);
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (newAddedCustomer) {
@@ -40,6 +42,20 @@ export function SelectClient({
     }
   }, [client]);
 
+  useEffect(() => {
+    if (search) {
+      setClientsToDisplay(
+        clientList.filter((client) =>
+          `${client.firstName} ${client.lastName}`
+            .toLowerCase()
+            .includes(search.toLowerCase()),
+        ),
+      );
+    } else {
+      setClientsToDisplay(clientList.slice(0, 4));
+    }
+  }, [search, clientList]);
+
   return (
     <>
       <input type="hidden" name={name} value={client?.id ?? ""} />
@@ -47,9 +63,10 @@ export function SelectClient({
         newButton={<NewCustomer />}
         label={client ? `${client.firstName} ${client.lastName}` : "Client"}
         openState={[openDropdown, setOpenDropdown]}
+        setSearch={setSearch}
       >
         <div>
-          {clientList.map((client) => (
+          {clientsToDisplay.map((client) => (
             <button
               type="button"
               key={client.id}

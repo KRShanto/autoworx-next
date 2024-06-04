@@ -281,6 +281,7 @@ CREATE TABLE `Invoice` (
     `customerNotes` VARCHAR(191) NULL,
     `customerComments` VARCHAR(191) NULL,
     `company_id` INTEGER NOT NULL,
+    `user_id` INTEGER NOT NULL,
 
     INDEX `fk_invoices_company`(`company_id`),
     PRIMARY KEY (`id`)
@@ -586,6 +587,9 @@ ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_company_id_fkey` FOREIGN KEY (`com
 
 -- AddForeignKey
 ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_status_id_fkey` FOREIGN KEY (`status_id`) REFERENCES `Status`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `InvoicePhoto` ADD CONSTRAINT `InvoicePhoto_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

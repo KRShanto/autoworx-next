@@ -14,9 +14,7 @@ import { SelectTags } from "@/components/Lists/SelectTags";
 export default function LaborCreate() {
   const { categories } = useListsStore();
   const { currentSelectedCategoryId } = useEstimateCreateStore();
-
-  const [categoriesToShow, setCategoriesToShow] =
-    useState<Category[]>(categories);
+  const [categoriesToShow, setCategoriesToShow] = useState<Category[]>([]);
   const [name, setName] = useState("");
   const [category, setCategory] = useState<Category | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -32,6 +30,7 @@ export default function LaborCreate() {
   const itemId = data?.itemId;
 
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (currentSelectedCategoryId) {
@@ -62,6 +61,18 @@ export default function LaborCreate() {
       setAddToCannedLabor(false);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (search) {
+      setCategoriesToShow(
+        categories.filter((cat) =>
+          cat.name.toLowerCase().includes(search.toLowerCase()),
+        ),
+      );
+    } else {
+      setCategoriesToShow(categories.slice(0, 4));
+    }
+  }, [search, categories]);
 
   async function handleNewCategory() {
     const res = await newCategory({
@@ -193,6 +204,7 @@ export default function LaborCreate() {
         <Selector
           label={category ? category.name : ""}
           openState={[categoryOpen, setCategoryOpen]}
+          setSearch={setSearch}
           newButton={
             <div className="flex gap-2">
               <input

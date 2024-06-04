@@ -14,15 +14,16 @@ export default function ServiceCreate() {
   const { close, data } = useEstimatePopupStore();
   const itemId = data?.itemId;
   const edit = data?.edit as boolean | undefined;
-  console.log(edit);
 
   const [name, setName] = useState("");
   const [category, setCategory] = useState<Category | undefined>();
-  // service?.categoryId
-  //   ? categories.find((cat) => cat.id === service.categoryId)
-  //   : null,
   const [description, setDescription] = useState("");
   const [categoryInput, setCategoryInput] = useState("");
+  const [categoriesToDisplay, setCategoriesToDisplay] = useState<Category[]>(
+    [],
+  );
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (data.service && edit) {
@@ -36,6 +37,18 @@ export default function ServiceCreate() {
     }
   }, [data]);
 
+  useEffect(() => {
+    if (search) {
+      setCategoriesToDisplay(
+        categories.filter((cat) =>
+          cat.name.toLowerCase().includes(search.toLowerCase()),
+        ),
+      );
+    } else {
+      setCategoriesToDisplay(categories.slice(0, 4));
+    }
+  }, [search, categories]);
+
   async function handleNewCategory() {
     const res = await newCategory({
       name: categoryInput,
@@ -46,6 +59,8 @@ export default function ServiceCreate() {
         return { categories: [...state.categories, res.data] };
       });
       setCategory(res.data);
+      setCategoryInput("");
+      setCategoryOpen(false);
     }
   }
 
@@ -145,6 +160,8 @@ export default function ServiceCreate() {
       <div className="w-full">
         <Selector
           label={category ? category.name : "Category"}
+          openState={[categoryOpen, setCategoryOpen]}
+          setSearch={setSearch}
           newButton={
             <div className="flex gap-2">
               <input
@@ -165,7 +182,7 @@ export default function ServiceCreate() {
           }
         >
           <div>
-            {categories.map((cat) => (
+            {categoriesToDisplay.map((cat) => (
               <button
                 type="button"
                 key={cat.id}

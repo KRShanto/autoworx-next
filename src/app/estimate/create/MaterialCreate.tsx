@@ -14,8 +14,14 @@ import { cn } from "@/lib/cn";
 
 export default function MaterialCreate() {
   const { categories } = useListsStore();
+  const { vendors } = useListsStore();
+
+  const [categoriesToDisplay, setCategoriesToDisplay] = useState<Category[]>(
+    [],
+  );
+  const [vendorsToDisplay, setVendorsToDisplay] = useState<Vendor[]>([]);
+
   const { currentSelectedCategoryId } = useEstimateCreateStore();
-  const vendors = useListsStore((x) => x.vendors);
 
   const [name, setName] = useState("");
   const [category, setCategory] = useState<Category | null>(null);
@@ -35,6 +41,9 @@ export default function MaterialCreate() {
 
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [vendorOpen, setVendorOpen] = useState(false);
+
+  const [categorySearch, setCategorySearch] = useState("");
+  const [vendorSearch, setVendorSearch] = useState("");
 
   useEffect(() => {
     if (data.material && data.edit) {
@@ -77,6 +86,32 @@ export default function MaterialCreate() {
       );
     }
   }, [currentSelectedCategoryId]);
+
+  useEffect(() => {
+    if (categorySearch) {
+      setCategoriesToDisplay(
+        categories.filter((cat) =>
+          cat.name.toLowerCase().includes(categorySearch.toLowerCase()),
+        ),
+      );
+    } else {
+      setCategoriesToDisplay(categories.slice(0, 4));
+    }
+  }, [categorySearch, categories]);
+
+  useEffect(() => {
+    if (vendorSearch) {
+      setVendorsToDisplay(
+        vendors.filter((ven) =>
+          `${ven.firstName} ${ven.lastName}`
+            .toLowerCase()
+            .includes(vendorSearch.toLowerCase()),
+        ),
+      );
+    } else {
+      setVendorsToDisplay(vendors.slice(0, 4));
+    }
+  }, [vendorSearch, vendors]);
 
   async function handleNewCategory() {
     const res = await newCategory({
@@ -213,6 +248,7 @@ export default function MaterialCreate() {
         <Selector
           label={category ? category.name : ""}
           openState={[categoryOpen, setCategoryOpen]}
+          setSearch={setCategorySearch}
           newButton={
             <div className="flex gap-2">
               <input
@@ -237,7 +273,7 @@ export default function MaterialCreate() {
           }
         >
           <div>
-            {categories.map((cat) => (
+            {categoriesToDisplay.map((cat) => (
               <button
                 type="button"
                 key={cat.id}
@@ -255,6 +291,8 @@ export default function MaterialCreate() {
         <label className="w-28 text-end text-sm">Vendor</label>
         <Selector
           label={vendor ? vendor.firstName || "Vendor" : ""}
+          openState={[vendorOpen, setVendorOpen]}
+          setSearch={setVendorSearch}
           newButton={
             <NewVendor
               itemId={itemId}
@@ -262,10 +300,9 @@ export default function MaterialCreate() {
               setVendor={setVendor}
             />
           }
-          openState={[vendorOpen, setVendorOpen]}
         >
           <div>
-            {vendors.map((ven) => (
+            {vendorsToDisplay.map((ven) => (
               <button
                 type="button"
                 key={ven.id}

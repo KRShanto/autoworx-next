@@ -13,6 +13,8 @@ import { FaTrash } from "react-icons/fa6";
 import { deleteService } from "../actions/deleteService";
 import { deleteMaterial } from "../actions/deleteMaterial";
 import { deleteLabor } from "../actions/deleteLabor";
+import { useEffect, useState } from "react";
+import { Labor, Material, Service } from "@prisma/client";
 
 export function CreateTab() {
   const items = useEstimateCreateStore((x) => x.items);
@@ -21,6 +23,50 @@ export function CreateTab() {
   const services = useListsStore((x) => x.services);
   const materials = useListsStore((x) => x.materials);
   const labors = useListsStore((x) => x.labors);
+
+  const [servicesToDisplay, setServicesToDisplay] = useState<Service[]>([]);
+  const [materialsToDisplay, setMaterialsToDisplay] = useState<Material[]>([]);
+  const [laborsToDisplay, setLaborsToDisplay] = useState<Labor[]>([]);
+
+  const [serviceSearch, setServiceSearch] = useState("");
+  const [materialSearch, setMaterialSearch] = useState("");
+  const [laborSearch, setLaborSearch] = useState("");
+
+  useEffect(() => {
+    if (serviceSearch) {
+      setServicesToDisplay(
+        services.filter((service) =>
+          service.name.toLowerCase().includes(serviceSearch.toLowerCase()),
+        ),
+      );
+    } else {
+      setServicesToDisplay(services.slice(0, 4));
+    }
+  }, [serviceSearch, services]);
+
+  useEffect(() => {
+    if (materialSearch) {
+      setMaterialsToDisplay(
+        materials.filter((material) =>
+          material.name.toLowerCase().includes(materialSearch.toLowerCase()),
+        ),
+      );
+    } else {
+      setMaterialsToDisplay(materials.slice(0, 4));
+    }
+  }, [materialSearch, materials]);
+
+  useEffect(() => {
+    if (laborSearch) {
+      setLaborsToDisplay(
+        labors.filter((labor) =>
+          labor.name.toLowerCase().includes(laborSearch.toLowerCase()),
+        ),
+      );
+    } else {
+      setLaborsToDisplay(labors.slice(0, 4));
+    }
+  }, [laborSearch, labors]);
 
   async function handleServiceDelete(id: number) {
     await deleteService(id);
@@ -102,10 +148,10 @@ export function CreateTab() {
       <div className="-mx-8">
         <table className="w-full border-separate border-spacing-x-8 border-spacing-y-4">
           <colgroup>
-            <col className=" w-1/4" />
-            <col className=" w-1/4" />
-            <col className=" w-1/4" />
-            <col className=" w-1/5" />
+            <col className="w-1/4" />
+            <col className="w-1/4" />
+            <col className="w-1/4" />
+            <col className="w-1/5" />
             <col />
           </colgroup>
           <thead>
@@ -132,9 +178,10 @@ export function CreateTab() {
                       </button>
                     }
                     label={item.service ? item.service.name : "Service"}
+                    setSearch={setServiceSearch}
                   >
                     <div className="">
-                      {services.map((service) => (
+                      {servicesToDisplay.map((service) => (
                         <div
                           className="mx-auto my-1 flex w-[95%] cursor-pointer items-center justify-between gap-1 rounded-md border border-[#6571FF] p-1 text-[#6571FF] hover:bg-gray-100"
                           key={service.id}
@@ -191,9 +238,10 @@ export function CreateTab() {
                     label={
                       item.material ? item.material.name : "Materials/Parts"
                     }
+                    setSearch={setMaterialSearch}
                   >
                     <div>
-                      {materials.map((material) => (
+                      {materialsToDisplay.map((material) => (
                         <div
                           className="mx-auto my-1 flex w-[95%] cursor-pointer items-center justify-between gap-1 rounded-md border border-[#6571FF] p-1 text-[#6571FF] hover:bg-gray-100"
                           key={material.id}
@@ -247,9 +295,10 @@ export function CreateTab() {
                       </button>
                     }
                     label={item.labor ? item.labor.name : "Labor"}
+                    setSearch={setLaborSearch}
                   >
                     <div className="">
-                      {labors.map((labor) => (
+                      {laborsToDisplay.map((labor) => (
                         <div
                           className="mx-auto my-1 flex w-[95%] cursor-pointer items-center justify-between gap-1 rounded-md border border-[#6571FF] p-1 text-[#6571FF] hover:bg-gray-100"
                           key={labor.id}
@@ -325,7 +374,7 @@ export function CreateTab() {
       <div className="bg-slate-50">
         <button
           type="button"
-          className="flex items-center gap-2  p-2 text-[#6571FF]"
+          className="flex items-center gap-2 p-2 text-[#6571FF]"
           onClick={() => {
             useEstimateCreateStore.setState((x) => ({
               items: [
