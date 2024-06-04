@@ -25,6 +25,12 @@ export function SelectVehicle({
     }
   }, [newAddedVehicle]);
 
+  useEffect(() => {
+    if (vehicle) {
+      useListsStore.setState({ vehicle });
+    }
+  }, [vehicle]);
+
   return (
     <>
       <input type="hidden" name={name} value={vehicle?.id ?? ""} />

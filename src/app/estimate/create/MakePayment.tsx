@@ -96,8 +96,8 @@ export default function MakePayment() {
     }
   }, [payment]);
 
-  async function handleSubmit(formData: FormData) {
-    const res1 = await createInvoice(formData);
+  async function handleSubmit() {
+    const res1 = await createInvoice();
 
     let res2;
 
@@ -441,6 +441,7 @@ export default function MakePayment() {
               <button
                 className="rounded-md bg-[#6571FF] p-2 px-5 text-white"
                 formAction={handleSubmit}
+                type="submit"
               >
                 Record
               </button>

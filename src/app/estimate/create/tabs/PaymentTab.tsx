@@ -1,98 +1,144 @@
 import { cn } from "@/lib/cn";
+import { useEstimateCreateStore } from "@/stores/estimate-create";
 import moment from "moment";
 import Link from "next/link";
 import React from "react";
+import CurrentInvoicePayment from "./CurrentInvoicePayment";
+import { db } from "@/lib/db";
+import { Service } from "@prisma/client";
 
-export default function PaymentTab() {
-  const data = [
-    {
-      id: 3532532,
-      vehicle: "Toyota",
-      service: "Service Number 1",
-      amount: 69,
-      date: new Date(),
-      paymentMethod: "Cash",
-      notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ",
-    },
-    {
-      id: 53252352,
-      vehicle: "Mercedes",
-      service: "Service Number 2",
-      amount: 55,
-      date: new Date(),
-      paymentMethod: "Visa/Mastercard",
-      notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ",
-    },
-    {
-      id: 102202022,
-      vehicle: "BMW",
-      service: "Service Number 3",
-      amount: 42,
-      date: new Date(),
-      paymentMethod: "Cash",
-      notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ",
-    },
-    {
-      id: 311112525,
-      vehicle: "Lamborghini",
-      service: "Service Number 4",
-      amount: 433,
-      date: new Date(),
-      paymentMethod: "Bkash",
-      notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ",
-    },
-  ];
+const evenColor = "bg-white";
+const oddColor = "bg-[#F8FAFF]";
 
-  const evenColor = "bg-white";
-  const oddColor = "bg-[#F8FAFF]";
+export default async function PaymentTab({
+  clientId,
+}: {
+  clientId: number | undefined;
+}) {
+  if (!clientId) return null;
+
+  const client = await db.customer.findUnique({
+    where: { id: clientId },
+  });
+
+  if (!client) return null;
+
+  const invoices = await db.invoice.findMany({
+    where: { customerId: clientId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      invoiceItems: { select: { service: true, serviceId: true, id: true } },
+      grandTotal: true,
+      vehicleId: true,
+      createdAt: true,
+      customerNotes: true,
+      id: true,
+    },
+  });
+
+  const totalPaid = invoices.reduce(
+    (acc, invoice) =>
+      acc +
+      (invoice.grandTotal ? parseFloat(invoice.grandTotal.toString()) : 0),
+    0,
+  );
+
+  const invoicesWithFull = await Promise.all(
+    invoices.map(async (invoice) => {
+      const vehicle = invoice.vehicleId
+        ? await db.vehicle.findUnique({
+            where: { id: invoice.vehicleId },
+          })
+        : null;
+
+      let paymentMethodText = "";
+
+      const payment = await db.payment.findFirst({
+        where: { invoiceId: invoice.id },
+        select: {
+          other: true,
+          type: true,
+          card: true,
+        },
+      });
+
+      if (payment && payment.type === "OTHER") {
+        const paymentMethodId = payment.other?.paymentMethodId;
+        const paymentMethod = paymentMethodId
+          ? await db.paymentMethod.findUnique({
+              where: { id: paymentMethodId },
+            })
+          : null;
+        paymentMethodText = paymentMethod?.name ?? "";
+      } else if (payment && payment.type === "CARD") {
+        paymentMethodText = payment?.card?.cardType ?? "";
+      } else {
+        paymentMethodText = payment?.type ?? "";
+      }
+
+      return {
+        ...invoice,
+        vehicle: vehicle?.model ?? "",
+        paymentMethod: paymentMethodText,
+      };
+    }),
+  );
+
+  const totalServices = [] as (Service & { count: number })[];
+
+  invoicesWithFull.forEach((invoice) => {
+    invoice.invoiceItems.forEach((item) => {
+      if (item.serviceId) {
+        const service = totalServices.find(
+          (service) => service.id === item.serviceId,
+        );
+
+        if (service) {
+          service.count += 1;
+        } else {
+          totalServices.push({ ...item.service!, count: 1 });
+        }
+      }
+    });
+  });
 
   return (
     <div className="h-full">
       {/* Section 1 */}
       <div className="flex h-[25%] items-center justify-evenly">
-        <div className="flex border border-slate-400">
-          <div className="bg-[#F8FAFF] p-5 px-10 font-semibold">
-            <h3>Invoice Payment</h3>
-            <p className="text-center">$69</p>
-          </div>
-
-          <div className="p-5 px-10 font-semibold">
-            <h3>Total Outstanding</h3>
-            <p className="text-center">$345</p>
-          </div>
-        </div>
+        <CurrentInvoicePayment />
 
         <div className="border border-slate-400 text-sm">
-          <h3 className="p-3 py-1">Most Frequent Services</h3>
+          <h3 className="p-3 py-1 font-semibold">Most Frequent Services</h3>
           <div>
-            <div className="flex gap-44 bg-[#F8FAFF] p-3 py-1">
-              <p>Service Number 1</p>
-              <p>Ordred 69 times</p>
-            </div>
-            <div className="flex gap-44 p-3 py-1">
-              <p>Service Number 2</p>
-              <p>Ordred 55 times</p>
-            </div>
-            <div className="flex gap-44 bg-[#F8FAFF] p-3 py-1">
-              <p>Service Number 3</p>
-              <p>Ordred 42 times</p>
-            </div>
-            <div className="flex gap-44 p-3 py-1">
-              <p>Service Number 4</p>
-              <p>Ordred 433 times</p>
-            </div>
+            {/* top 4 services */}
+            {totalServices
+              .sort((a, b) => b.count - a.count)
+              .slice(0, 4)
+              .map((service, index) => (
+                <div
+                  key={service.id}
+                  className={cn(
+                    "flex gap-44 p-3 py-1",
+                    index % 2 === 0 ? evenColor : oddColor,
+                  )}
+                >
+                  <p>{service.name}</p>
+                  <p>Ordered {service.count} times</p>
+                </div>
+              ))}
           </div>
         </div>
 
         <div className="flex border border-slate-400">
           <div className="bg-[#F8FAFF] p-5 px-10 font-semibold">
             <h3>Total Paid</h3>
-            <p className="text-center">$469</p>
+            <p className="text-center">${totalPaid}</p>
           </div>
 
           <div className="p-5 px-10 font-semibold">
             <h3>Total Transactions</h3>
-            <p className="text-center">345</p>
+            <p className="text-center">{invoices.length}</p>
           </div>
         </div>
       </div>
@@ -113,30 +159,35 @@ export default function PaymentTab() {
           </thead>
 
           <tbody>
-            {data.map((data, index) => (
-              <tr
-                key={data.id}
-                className={cn("py-3", index % 2 === 0 ? evenColor : oddColor)}
-              >
-                <td className="h-12 px-10 text-left">
-                  <Link
-                    href={`/estimate/view/${data.id}`}
-                    passHref
-                    className="text-blue-600"
-                  >
-                    #{data.id}
-                  </Link>
-                </td>
-                <td className="px-10 text-left">{data.vehicle}</td>
-                <td className="px-10 text-left">${data.amount}</td>
+            {
+              // only show the latest 4 invoices
+              invoicesWithFull.slice(0, 4).map((data, index) => (
+                <tr
+                  key={data.id}
+                  className={cn("py-3", index % 2 === 0 ? evenColor : oddColor)}
+                >
+                  <td className="h-8 px-10 text-left">
+                    <Link
+                      href={`/estimate/view/${data.id}`}
+                      passHref
+                      className="text-blue-600"
+                    >
+                      #{data.id}
+                    </Link>
+                  </td>
+                  <td className="px-10 text-left">{data.vehicle}</td>
+                  <td className="px-10 text-left">
+                    ${data.grandTotal?.toString()}
+                  </td>
 
-                <td className="px-10 text-left">
-                  {moment(data.date).format("DD.MM.YYYY")}
-                </td>
-                <td className="px-10 text-left">{data.paymentMethod}</td>
-                <td className="px-10 text-left">{data.notes}</td>
-              </tr>
-            ))}
+                  <td className="px-10 text-left">
+                    {moment(data.createdAt).format("DD.MM.YYYY")}
+                  </td>
+                  <td className="px-10 text-left">{data.paymentMethod}</td>
+                  <td className="px-10 text-left">{data.customerNotes}</td>
+                </tr>
+              ))
+            }
           </tbody>
         </table>
       </div>
@@ -157,7 +208,7 @@ export default function PaymentTab() {
           </thead>
 
           <tbody>
-            {data.map((data, index) => (
+            {invoicesWithFull.map((data, index) => (
               <tr
                 key={data.id}
                 className={cn("py-3", index % 2 === 0 ? evenColor : oddColor)}
@@ -172,13 +223,15 @@ export default function PaymentTab() {
                   </Link>
                 </td>
                 <td className="px-10 text-left">{data.vehicle}</td>
-                <td className="px-10 text-left">${data.amount}</td>
+                <td className="px-10 text-left">
+                  ${data.grandTotal?.toString()}
+                </td>
 
                 <td className="px-10 text-left">
-                  {moment(data.date).format("DD.MM.YYYY")}
+                  {moment(data.createdAt).format("DD.MM.YYYY")}
                 </td>
                 <td className="px-10 text-left">{data.paymentMethod}</td>
-                <td className="px-10 text-left">{data.notes}</td>
+                <td className="px-10 text-left">{data.customerNotes}</td>
               </tr>
             ))}
           </tbody>

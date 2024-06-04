@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import NewCustomer from "./NewCustomer";
 import { SelectProps } from "./select-props";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export function SelectClient({
   name = "customerId",
@@ -18,6 +19,9 @@ export function SelectClient({
   const clientList = useListsStore((x) => x.customers);
   const { newAddedCustomer } = useListsStore();
   const [openDropdown, setOpenDropdown] = useState(false);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
 
   useEffect(() => {
     if (newAddedCustomer) {
@@ -25,6 +29,16 @@ export function SelectClient({
       setOpenDropdown(false);
     }
   }, [newAddedCustomer]);
+
+  useEffect(() => {
+    if (client) {
+      const params = new URLSearchParams(searchParams);
+      params.set("clientId", client.id.toString());
+      replace(`${pathname}?${params.toString()}`);
+
+      useListsStore.setState({ customer: client });
+    }
+  }, [client]);
 
   return (
     <>

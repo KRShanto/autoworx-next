@@ -22,8 +22,8 @@ export default function ConvertButton({
   const router = useRouter();
   const createInvoice = useInvoiceCreate(type);
 
-  async function handleSubmit(formData: FormData) {
-    const res = await createInvoice(formData);
+  async function handleSubmit() {
+    const res = await createInvoice();
 
     // Redirect to the index
     router.push("/estimate");

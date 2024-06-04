@@ -5,6 +5,7 @@ import { InvoiceType } from "@prisma/client";
 import { create } from "@/app/estimate/create/actions/create";
 import { update } from "@/app/estimate/edit/[id]/actions/update";
 import { ServerAction } from "@/types/action";
+import { useListsStore } from "@/stores/lists";
 
 export function useInvoiceCreate(type: InvoiceType) {
   const {
@@ -26,14 +27,15 @@ export function useInvoiceCreate(type: InvoiceType) {
     tasks,
     items,
   } = useEstimateCreateStore();
+  const { customer, vehicle, status } = useListsStore();
 
   const pathaname = usePathname();
 
-  async function handleSubmit(formData: FormData): Promise<ServerAction> {
+  async function handleSubmit(): Promise<ServerAction> {
     const photoPaths = [];
-    const clientId = formData.get("customerId");
-    const vehicleId = formData.get("vehicleId");
-    const statusId = formData.get("statusId");
+    const clientId = customer?.id;
+    const vehicleId = vehicle?.id;
+    const statusId = status?.id;
     const isEditPage = pathaname.includes("/estimate/edit/");
 
     // upload photos

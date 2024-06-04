@@ -31,4 +31,8 @@ export const useListsStore = create(() => ({
   newAddedCustomer: null as Customer | null,
   newAddedVehicle: null as Vehicle | null,
   paymentMethods: [] as PaymentMethod[],
+
+  customer: null as Customer | null,
+  vehicle: null as Vehicle | null,
+  status: null as Status | null,
 }));

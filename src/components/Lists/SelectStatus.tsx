@@ -4,7 +4,7 @@ import newStatus from "@/app/estimate/create/actions/newStatus";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
 import { Status } from "@prisma/client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaChevronUp, FaSearch, FaTimes } from "react-icons/fa";
 import { PiPaletteBold, PiPulse } from "react-icons/pi";
 import {
@@ -33,6 +33,12 @@ export function SelectStatus({
   const [open, setOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
+
+  useEffect(() => {
+    if (status) {
+      useListsStore.setState({ status });
+    }
+  }, [statusList]);
 
   async function handleDelete(id: number) {
     const res = await deleteStatus(id);

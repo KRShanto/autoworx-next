@@ -16,8 +16,15 @@ import { FaSave } from "react-icons/fa";
 import { SiConvertio } from "react-icons/si";
 import ConvertTo from "./ConvertTo";
 import { Labor, Material, Tag } from "@prisma/client";
+import PaymentTab from "../../create/tabs/PaymentTab";
 
-export default async function Page({ params }: { params: { id: string } }) {
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams: { clientId?: string };
+}) {
   const { id } = params;
   const invoice = await db.invoice.findUnique({ where: { id } });
 
@@ -58,8 +65,6 @@ export default async function Page({ params }: { params: { id: string } }) {
   const vehicles = await db.vehicle.findMany({ where: { companyId } });
   const categories = await db.category.findMany({ where: { companyId } });
   const services = await db.service.findMany({ where: { companyId } });
-  // const materials = await db.material.findMany({ where: { companyId } });
-  // const labors = await db.labor.findMany({ where: { companyId } });
   const tags = await db.tag.findMany({ where: { companyId } });
   const vendors = await db.vendor.findMany({ where: { companyId } });
   const statuses = await db.status.findMany({ where: { companyId } });
@@ -172,7 +177,15 @@ export default async function Page({ params }: { params: { id: string } }) {
         </TabsContent>
 
         <TabsContent value="inspections"></TabsContent>
-        <TabsContent value="payments"></TabsContent>
+        <TabsContent value="payments">
+          <PaymentTab
+            clientId={
+              searchParams.clientId
+                ? parseInt(searchParams.clientId)
+                : undefined
+            }
+          />
+        </TabsContent>
       </Tabs>
 
       <div className="app-shadow col-start-2 row-start-2 row-end-4 grid h-[85vh] grid-rows-[1fr,auto,auto] divide-y rounded-md">

@@ -15,7 +15,11 @@ import { GoFileCode } from "react-icons/go";
 import EstimateLogo from "@/components/EstimateLogo";
 import PaymentTab from "./tabs/PaymentTab";
 
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: { clientId?: string };
+}) {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
   const customers = await db.customer.findMany({ where: { companyId } });
@@ -115,7 +119,13 @@ export default async function Page() {
 
         <TabsContent value="inspections"></TabsContent>
         <TabsContent value="payments">
-          <PaymentTab />
+          <PaymentTab
+            clientId={
+              searchParams.clientId
+                ? parseInt(searchParams.clientId)
+                : undefined
+            }
+          />
         </TabsContent>
       </Tabs>
 
