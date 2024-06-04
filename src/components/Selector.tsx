@@ -10,11 +10,13 @@ export default function Selector({
   newButton,
   children,
   openState,
+  setSearch,
 }: {
   label: string;
   newButton: React.ReactNode;
   children: React.ReactNode;
   openState?: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+  setSearch?: React.Dispatch<React.SetStateAction<string>>;
 }) {
   // TODO: here is an error! try to find better solution
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -46,6 +48,7 @@ export default function Selector({
               type="text"
               placeholder="Search"
               className="w-full rounded-md border-2 border-slate-400 p-1 pl-6 pr-10 focus:outline-none"
+              onChange={(e) => setSearch?.(e.target.value)}
             />
             <button onClick={() => setOpen(false)}>
               <FaChevronUp className="absolute right-2 top-1/2 -translate-y-1/2 transform text-[#797979]" />

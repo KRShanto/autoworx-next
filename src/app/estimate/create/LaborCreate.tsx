@@ -15,6 +15,8 @@ export default function LaborCreate() {
   const { categories } = useListsStore();
   const { currentSelectedCategoryId } = useEstimateCreateStore();
 
+  const [categoriesToShow, setCategoriesToShow] =
+    useState<Category[]>(categories);
   const [name, setName] = useState("");
   const [category, setCategory] = useState<Category | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -215,7 +217,7 @@ export default function LaborCreate() {
           }
         >
           <div>
-            {categories
+            {categoriesToShow
               // sort by currentSelectedCategoryId
               .sort((a, b) => {
                 if (a.id === currentSelectedCategoryId) return -1;

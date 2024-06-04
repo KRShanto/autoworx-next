@@ -58,6 +58,7 @@ model User {
   taskUsers          TaskUser[]
   appointments       Appointment[]
   appointmentUsers   AppointmentUser[]
+  invoices           Invoice[]
 
   @@index([companyId], name: "fk_users_company")
 }
@@ -342,12 +343,14 @@ model Invoice {
   customerNotes    String?
   customerComments String?
   companyId        Int            @map("company_id")
+  userId           Int            @map("user_id")
   company          Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
   invoiceItems     InvoiceItem[]
   photos           InvoicePhoto[]
   tasks            Task[]
   status           Status?        @relation(fields: [statusId], references: [id])
   payments         Payment[]
+  user             User           @relation(fields: [userId], references: [id])
 
   @@index([companyId], name: "fk_invoices_company")
 }

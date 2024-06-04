@@ -2,6 +2,7 @@ import { DialogContent, InterceptedDialog } from "@/components/Dialog";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { InvoiceItems } from "./InvoiceItems";
+import moment from "moment";
 
 export default async function CreateWorkOrder({
   params: { id1 },
@@ -22,10 +23,22 @@ export default async function CreateWorkOrder({
       photos: true,
       tasks: true,
       status: true,
+      user: true,
     },
   });
 
   if (!invoice) notFound();
+
+  const customer = invoice.customerId
+    ? await db.customer.findUnique({
+        where: { id: invoice.customerId },
+      })
+    : null;
+  const vehicle = invoice.vehicleId
+    ? await db.vehicle.findUnique({
+        where: { id: invoice.vehicleId },
+      })
+    : null;
 
   return (
     <InterceptedDialog>
@@ -57,24 +70,34 @@ export default async function CreateWorkOrder({
             </h1>
             <div>
               <h2 className="font-bold text-slate-500">Estimate To:</h2>
-              <p>Client Name</p>
-              <p>Mobile Number</p>
-              <p>Email</p>
+              <p>
+                {customer?.firstName} {customer?.lastName}
+              </p>
+              <p>{customer?.mobile}</p>
+              <p>{customer?.email}</p>
             </div>
             <div>
               <h2 className="font-bold text-slate-500">Vehicle Details:</h2>
-              <p>Year</p>
-              <p>Make</p>
-              <p>Model</p>
-              <p>Sub Model</p>
-              <p>Type</p>
+              <p>{vehicle?.year}</p>
+              <p>{vehicle?.make}</p>
+              <p>{vehicle?.model}</p>
+              <p>{vehicle?.submodel}</p>
+              <p>{vehicle?.type}</p>
             </div>
             <div>
               <h2 className="font-bold text-slate-500">Estimate Details:</h2>
-              <p>Estimate Number</p>
-              <p>Date</p>
+              <p>{invoice.id}</p>
+              <p>{moment(invoice.createdAt).format("MMM DD, YYYY")}</p>
               <p>Bill Status</p>
-              <p>Order Status</p>
+              <p
+                className="max-w-32 rounded-md px-2 py-[1px] text-xs font-semibold"
+                style={{
+                  color: invoice.status?.textColor,
+                  backgroundColor: invoice.status?.bgColor,
+                }}
+              >
+                {invoice.status?.name}
+              </p>
             </div>
           </div>
         </div>
@@ -95,7 +118,7 @@ export default async function CreateWorkOrder({
         </div>
         <div>
           <p className="font-bold text-slate-500">{invoice.company.name}</p>
-          <p>Employee Name</p>
+          <p>{invoice.user.name}</p>
         </div>
       </DialogContent>
     </InterceptedDialog>

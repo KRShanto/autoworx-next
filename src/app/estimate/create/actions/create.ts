@@ -91,6 +91,7 @@ export async function create({
       customerNotes,
       customerComments,
       companyId,
+      userId: session.user.id as any,
     },
   });
 
