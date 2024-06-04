@@ -18,7 +18,15 @@ import { useListsStore } from "@/stores/lists";
 import { useState } from "react";
 import { newVendor } from "./actions/newVendor";
 
-export default function NewVendor({ itemId }: { itemId: string }) {
+export default function NewVendor({
+  itemId,
+  setVendorOpenState,
+  setVendor,
+}: {
+  itemId: string;
+  setVendorOpenState: any;
+  setVendor: any;
+}) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
 
@@ -70,7 +78,9 @@ export default function NewVendor({ itemId }: { itemId: string }) {
         return { items };
       });
 
+      setVendor(res.data);
       setOpen(false);
+      setVendorOpenState(false);
     }
   }
 

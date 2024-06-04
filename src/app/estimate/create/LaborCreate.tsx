@@ -29,6 +29,8 @@ export default function LaborCreate() {
   const { close, data } = useEstimatePopupStore();
   const itemId = data?.itemId;
 
+  const [categoryOpen, setCategoryOpen] = useState(false);
+
   useEffect(() => {
     if (currentSelectedCategoryId) {
       setCategory(
@@ -69,6 +71,8 @@ export default function LaborCreate() {
         return { categories: [...state.categories, res.data] };
       });
       setCategory(res.data);
+      setCategoryInput("");
+      setCategoryOpen(false);
     }
   }
 
@@ -186,6 +190,7 @@ export default function LaborCreate() {
         <label className="w-28 text-end text-sm">Category</label>
         <Selector
           label={category ? category.name : ""}
+          openState={[categoryOpen, setCategoryOpen]}
           newButton={
             <div className="flex gap-2">
               <input
@@ -199,7 +204,7 @@ export default function LaborCreate() {
                 onClick={handleNewCategory}
                 className={cn(
                   "text-nowrap rounded-md px-2 text-white",
-                  categoryInput ? "bg-slate-700 " : "bg-slate-400",
+                  categoryInput ? "bg-slate-700" : "bg-slate-400",
                 )}
                 type="button"
                 disabled={!categoryInput}

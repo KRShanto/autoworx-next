@@ -33,6 +33,9 @@ export default function MaterialCreate() {
   const { close, data } = useEstimatePopupStore();
   const itemId = data?.itemId;
 
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [vendorOpen, setVendorOpen] = useState(false);
+
   useEffect(() => {
     if (data.material && data.edit) {
       setName(data.material.name);
@@ -85,6 +88,8 @@ export default function MaterialCreate() {
         return { categories: [...state.categories, res.data] };
       });
       setCategory(res.data);
+      setCategoryInput("");
+      setCategoryOpen(false);
     }
   }
 
@@ -207,6 +212,7 @@ export default function MaterialCreate() {
         <label className="w-28 text-end text-sm">Category</label>
         <Selector
           label={category ? category.name : ""}
+          openState={[categoryOpen, setCategoryOpen]}
           newButton={
             <div className="flex gap-2">
               <input
@@ -249,7 +255,14 @@ export default function MaterialCreate() {
         <label className="w-28 text-end text-sm">Vendor</label>
         <Selector
           label={vendor ? vendor.firstName || "Vendor" : ""}
-          newButton={<NewVendor itemId={itemId} />}
+          newButton={
+            <NewVendor
+              itemId={itemId}
+              setVendorOpenState={setVendorOpen}
+              setVendor={setVendor}
+            />
+          }
+          openState={[vendorOpen, setVendorOpen]}
         >
           <div>
             {vendors.map((ven) => (
@@ -284,7 +297,7 @@ export default function MaterialCreate() {
           id="notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          className="w-full rounded-md  border-2 border-slate-400 p-1 text-xs"
+          className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
         />
       </div>
 
@@ -297,7 +310,7 @@ export default function MaterialCreate() {
           id="qt"
           value={quantity}
           onChange={(e) => setQuantity(+e.target.value)}
-          className="w-full rounded-md  border-2 border-slate-400 p-1 text-xs"
+          className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
         />
       </div>
 
@@ -310,7 +323,7 @@ export default function MaterialCreate() {
           id="price"
           value={cost}
           onChange={(e) => setCost(+e.target.value)}
-          className="w-full rounded-md  border-2 border-slate-400 p-1 text-xs"
+          className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
         />
       </div>
 
