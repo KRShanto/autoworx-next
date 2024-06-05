@@ -18,7 +18,6 @@ export default function Selector({
   openState?: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
   setSearch?: React.Dispatch<React.SetStateAction<string>>;
 }) {
-  // TODO: here is an error! try to find better solution
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [open, setOpen] = openState || useState(false);
 

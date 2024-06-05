@@ -1,36 +1,210 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Autoworx
 
-## Getting Started
+A web based software for managing car repair shops.
 
-First, run the development server:
+## Technologies
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Next.js (frontend + backend)
+- NextAuth (authentication)
+- Tailwind CSS
+- Prisma (ORM)
+- MySQL (database)
+- Zustand (state management)
+- Pusher (real-time chat)
+- Radix-UI (design system)
+- react-icons (icons)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Pages
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Not started
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- `/` - Dashboard
+- `/analytics` - Analytics
+- `/sales` - Creating and managing sales
+- `/settings` - Settings
 
-## Learn More
+### Not updated
 
-To learn more about Next.js, take a look at the following resources:
+- `/customer` - Creating and managing customers
+- `/employee` - Creating and managing employees
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Work in progress
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- `/estimate` - Creating and managing estimates and invoices
+- `/inventory` - Creating and managing inventory
 
-## Deploy on Vercel
+### Done for now
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `/(auth)` - Authentication
+- `/communication` - Communication page
+- `/task` - Creating and managing tasks
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Database
+
+You can find more details about the database in the `prisma/schema.prisma` file.
+
+Here is a brief overview of some of the main tables:
+
+### User
+
+- **Purpose**: Represents an individual who can be an employee or admin of a company.
+- **Key Fields**:
+  - `name`: Name of the user.
+  - `email`: Unique email address of the user.
+  - `password`: User's password.
+  - `role`: Role of the user (admin or employee).
+  - `companyId`: ID of the company the user belongs to.
+- **Relations**:
+  - Belongs to a `Company`.
+  - Can have multiple `tasks`, `appointments`, and `invoices`.
+
+### Company
+
+- **Purpose**: Represents a business entity.
+- **Key Fields**:
+  - `name`: Name of the company.
+  - `createdAt`: Creation timestamp.
+  - `updatedAt`: Last update timestamp.
+- **Relations**:
+  - Has many `users`, `tasks`, `customers`, `services`, `vehicles`, `invoices`, and more.
+
+### Customer
+
+- **Purpose**: Represents a customer of the company.
+- **Key Fields**:
+  - `firstName`: First name of the customer.
+  - `lastName`: Last name of the customer.
+  - `email`: Email address of the customer.
+  - `phone`: Phone number of the customer.
+  - `address`, `city`, `state`, `zip`: Address details.
+  - `companyId`: ID of the company the customer is associated with.
+- **Relations**:
+  - Belongs to a `Company`.
+  - Can have multiple `appointments`.
+
+### Vehicle
+
+- **Purpose**: Represents a vehicle associated with the company.
+- **Key Fields**:
+  - `year`: Year of the vehicle.
+  - `make`: Make of the vehicle.
+  - `model`: Model of the vehicle.
+  - `transmission`, `engineSize`, `license`, `vin`: Vehicle specifications.
+  - `companyId`: ID of the company the vehicle belongs to.
+- **Relations**:
+  - Belongs to a `Company`.
+  - Can have multiple `appointments`.
+
+### Invoice
+
+- **Purpose**: Represents a financial document for billing purposes, either as an invoice or an estimate.
+- **Key Fields**:
+  - `type`: Type of the invoice (Invoice or Estimate).
+  - `customerId`: ID of the customer.
+  - `vehicleId`: ID of the vehicle.
+  - `subtotal`, `discount`, `tax`, `grandTotal`: Financial details.
+  - `statusId`: ID of the status.
+  - `companyId`: ID of the company.
+  - `userId`: ID of the user.
+- **Relations**:
+  - Belongs to a `Company`.
+  - Belongs to a `User`.
+  - Can have multiple `invoiceItems`, `payments`, `tasks`, and `photos`.
+
+### Service
+
+- **Purpose**: Represents a service provided by the company, which can be part of an invoice.
+- **Key Fields**:
+  - `name`: Name of the service.
+  - `description`: Description of the service.
+  - `categoryId`: ID of the category.
+  - `companyId`: ID of the company.
+- **Relations**:
+  - Belongs to a `Company`.
+  - Can belong to a `Category`.
+  - Can have multiple `invoiceItems`.
+
+### Material
+
+- **Purpose**: Represents materials used in services or invoices.
+- **Key Fields**:
+  - `name`: Name of the material.
+  - `vendorId`: ID of the vendor.
+  - `categoryId`: ID of the category.
+  - `quantity`, `cost`, `sell`, `discount`: Financial and inventory details.
+  - `companyId`: ID of the company.
+- **Relations**:
+  - Belongs to a `Company`.
+  - Can belong to a `Category` and a `Vendor`.
+  - Can have multiple `invoiceItems`.
+
+### Labor
+
+- **Purpose**: Represents labor associated with an invoice.
+- **Key Fields**:
+  - `name`: Name of the labor.
+  - `categoryId`: ID of the category.
+  - `hours`, `charge`, `discount`: Labor details.
+  - `companyId`: ID of the company.
+- **Relations**:
+  - Belongs to a `Company`.
+  - Can belong to a `Category`.
+  - Can have multiple `invoiceItems`.
+
+### Payment
+
+- **Purpose**: Represents a payment made for an invoice.
+- **Key Fields**:
+  - `date`: Date of the payment.
+  - `notes`: Notes regarding the payment.
+  - `type`: Type of the payment (CARD, CHECK, CASH, OTHER).
+  - `invoiceId`: ID of the invoice.
+- **Relations**:
+  - Belongs to an `Invoice`.
+
+### Task
+
+- **Purpose**: Represents a task assigned within the company.
+- **Key Fields**:
+  - `title`: Title of the task.
+  - `description`: Description of the task.
+  - `date`: Date of the task.
+  - `startTime`, `endTime`: Timing of the task.
+  - `priority`: Priority of the task (Low, Medium, High).
+  - `companyId`: ID of the company.
+  - `userId`: ID of the user.
+  - `invoiceId`: ID of the invoice.
+- **Relations**:
+  - Belongs to a `Company`.
+  - Belongs to a `User`.
+  - Can be linked to an `Invoice`.
+
+### Appointment
+
+- **Purpose**: Represents a scheduled appointment within the company.
+- **Key Fields**:
+  - `title`: Title of the appointment.
+  - `date`: Date of the appointment.
+  - `startTime`, `endTime`: Timing of the appointment.
+  - `notes`: Notes regarding the appointment.
+  - `companyId`: ID of the company.
+  - `userId`: ID of the user.
+  - `customerId`: ID of the customer.
+  - `vehicleId`: ID of the vehicle.
+  - `orderId`: ID of the order.
+- **Relations**:
+  - Belongs to a `Company`.
+  - Belongs to a `User`.
+  - Can have multiple `appointmentUsers`.
+
+### Message
+
+- **Purpose**: Represents a chat message.
+- **Key Fields**:
+  - `to`: ID of the recipient.
+  - `from`: ID of the sender.
+  - `message`: The message content.
+  - `createdAt`: Timestamp of message creation.
+  - `updatedAt`: Timestamp of message update.
+- **Relations**:
+  - None explicitly defined, but indexed for recipient and sender.

@@ -7,6 +7,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Company model.
+// Every user belongs to a company.
+// For now, every user has to create their own company when registering.
+// In the future, we can add a feature to join a company.
 model Company {
   id               Int                @id @default(autoincrement())
   name             String
@@ -18,7 +22,6 @@ model Company {
   services         Service[]
   vehicles         Vehicle[]
   invoices         Invoice[]
-  settings         Setting[]
   calendarSettings CalendarSettings[]
   orders           Order[]
   appointments     Appointment[]
@@ -32,6 +35,10 @@ model Company {
   paymentMethods   PaymentMethod[]
 }
 
+// User model.
+// User can be employee or admin.
+// When user registers, they have to create a company. So, every new user is an admin.
+// After that, they can add employees to the company.
 model User {
   id                 Int                @id @default(autoincrement())
   name               String
@@ -88,6 +95,8 @@ enum EmployeeDepartment {
   None
 }
 
+// OAuth token for user.
+// This is mainly used for google calendar integration.
 model OAuthToken {
   id           Int       @id @default(autoincrement())
   userId       Int       @unique @map("user_id")
@@ -102,17 +111,8 @@ model OAuthToken {
   @@index([userId], name: "fk_oauth_tokens_user")
 }
 
-model Order {
-  id           Int           @id @default(autoincrement())
-  name         String
-  comment      String?
-  companyId    Int?          @map("company_id")
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  appointments Appointment[]
-  company      Company?      @relation(fields: [companyId], references: [id], onDelete: Cascade)
-}
-
+// Customer of a company.
+// Customer is just data, they can't login.
 model Customer {
   id              Int           @id @default(autoincrement())
   firstName       String        @map("first_name")
@@ -135,169 +135,7 @@ model Customer {
   @@index([companyId], name: "fk_customers_company")
 }
 
-model Service {
-  id           Int           @id @default(autoincrement())
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  name         String
-  description  String?
-  categoryId   Int?          @map("category_id")
-  companyId    Int           @map("company_id")
-  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  category     Category?     @relation(fields: [categoryId], references: [id])
-  tags         ItemTag[]
-  invoiceItems InvoiceItem[]
-
-  @@index([companyId], name: "fk_services_company")
-}
-
-model InvoiceItem {
-  id         Int          @id @default(autoincrement())
-  invoiceId  String?      @map("invoice_id")
-  serviceId  Int?         @map("service_id")
-  materialId Int?         @map("material_id")
-  laborId    Int?         @map("labor_id")
-  createdAt  DateTime     @default(now()) @map("created_at")
-  updatedAt  DateTime     @updatedAt @map("updated_at")
-  invoice    Invoice?     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  service    Service?     @relation(fields: [serviceId], references: [id])
-  material   Material?    @relation(fields: [materialId], references: [id])
-  labor      Labor?       @relation(fields: [laborId], references: [id])
-  technician Technician[]
-}
-
-model Material {
-  id             Int           @id @default(autoincrement())
-  name           String
-  vendorId       Int?          @map("vendor_id")
-  categoryId     Int?          @map("category_id")
-  notes          String?
-  quantity       Int?
-  cost           Decimal?
-  sell           Decimal?
-  discount       Decimal?
-  addToInventory Boolean?      @map("add_to_inventory")
-  companyId      Int           @map("company_id")
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime      @updatedAt @map("updated_at")
-  company        Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  vendor         Vendor?       @relation(fields: [vendorId], references: [id])
-  category       Category?     @relation(fields: [categoryId], references: [id])
-  invoiceItems   InvoiceItem[]
-  tags           MaterialTag[]
-
-  @@index([companyId], name: "fk_materials_company")
-}
-
-model Vendor {
-  id          Int        @id @default(autoincrement())
-  firstName   String?
-  lastName    String?
-  description String?
-  email       String?
-  phone       String?
-  address     String?
-  city        String?
-  state       String?
-  zip         String?
-  companyName String?
-  companyId   Int        @map("company_id")
-  createdAt   DateTime   @default(now()) @map("created_at")
-  updatedAt   DateTime   @updatedAt @map("updated_at")
-  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  material    Material[]
-}
-
-model Labor {
-  id               Int           @id @default(autoincrement())
-  name             String
-  categoryId       Int?          @map("category_id")
-  notes            String?
-  hours            Int?
-  charge           Decimal? // per hour
-  discount         Decimal?
-  addToCannedLabor Boolean?      @map("add_to_canned_labor")
-  companyId        Int           @map("company_id")
-  createdAt        DateTime      @default(now()) @map("created_at")
-  updatedAt        DateTime      @updatedAt @map("updated_at")
-  company          Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  category         Category?     @relation(fields: [categoryId], references: [id])
-  invoiceItems     InvoiceItem[]
-  tags             LaborTag[]
-}
-
-model Tag {
-  id        Int      @id @default(autoincrement())
-  name      String
-  textColor String // hex (with #)
-  bgColor   String // hex (with #)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  companyId Int      @map("company_id")
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  items     ItemTag[]
-  materials MaterialTag[]
-  labors    LaborTag[]
-}
-
-model ItemTag {
-  itemId Int     @map("service_id")
-  tagId  Int     @map("tag_id")
-  item   Service @relation(fields: [itemId], references: [id])
-  tag    Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@id([itemId, tagId])
-}
-
-model MaterialTag {
-  materialId Int      @map("material_id")
-  tagId      Int      @map("tag_id")
-  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
-  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@id([materialId, tagId])
-}
-
-model LaborTag {
-  laborId Int   @map("labor_id")
-  tagId   Int   @map("tag_id")
-  labor   Labor @relation(fields: [laborId], references: [id], onDelete: Cascade)
-  tag     Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@id([laborId, tagId])
-}
-
-model Category {
-  id        Int        @id @default(autoincrement())
-  name      String
-  companyId Int        @map("company_id")
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
-  services  Service[]
-  materials Material[]
-  labors    Labor[]
-  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-}
-
-model Technician {
-  id            Int       @id @default(autoincrement())
-  assignedBy    String?   @map("assigned_by")
-  assignedDate  DateTime? @map("assigned_date")
-  due           DateTime? @default(now())
-  amount        Decimal?  @default(0)
-  priority      Priority? @default(Low)
-  statusId      Int?      @map("status_id")
-  newNote       String?   @map("new_note")
-  workNote      String?   @map("work_note")
-  invoiceItemId Int       @map("invoice_item_id")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-
-  status      Status?      @relation(fields: [statusId], references: [id])
-  invoiceItem InvoiceItem? @relation(fields: [invoiceItemId], references: [id], onDelete: Cascade)
-}
-
+// Vehicle of a company.
 model Vehicle {
   id           Int           @id @default(autoincrement())
   year         Int?
@@ -321,6 +159,9 @@ model Vehicle {
   @@index([companyId], name: "fk_vehicles_company")
 }
 
+// Invoice of a company.
+// Note that `Invoice` is same as `Estimate`. So don't get confused.
+// We can differentiate them by `type` field.
 model Invoice {
   id               String         @id @default(cuid())
   createdAt        DateTime       @default(now()) @map("created_at")
@@ -360,6 +201,8 @@ enum InvoiceType {
   Estimate
 }
 
+// Photo of a invoice.
+// One invoice can have multiple photos.
 model InvoicePhoto {
   id        Int      @id @default(autoincrement())
   invoiceId String   @map("invoice_id")
@@ -371,6 +214,211 @@ model InvoicePhoto {
   @@index([invoiceId], name: "fk_invoice_photos_invoice")
 }
 
+// InvoiceItem of a invoice.
+// Its a holder for service, material and labor.
+// One invoice can have multiple InvoiceItems.
+// And one InvoiceItem can have one service, material and labor.
+// Its dependant on invoice. So, invoiceItem can't be in multiple invoices.
+model InvoiceItem {
+  id         Int          @id @default(autoincrement())
+  invoiceId  String?      @map("invoice_id")
+  serviceId  Int?         @map("service_id")
+  materialId Int?         @map("material_id")
+  laborId    Int?         @map("labor_id")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+  invoice    Invoice?     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  service    Service?     @relation(fields: [serviceId], references: [id])
+  material   Material?    @relation(fields: [materialId], references: [id])
+  labor      Labor?       @relation(fields: [laborId], references: [id])
+  technician Technician[]
+}
+
+// Service of a invoice.
+// Service is a part of InvoiceItem.
+// One invoice can have multiple InvoiceItems.
+// And one InvoiceItem can have one service.
+// Service itself is an independant model, So one service can be in multiple invoices.
+// And if you want to fetch services for a customer, you need to fetch all invoices and then all invoice items and then you'll get services.
+model Service {
+  id           Int           @id @default(autoincrement())
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  name         String
+  description  String?
+  categoryId   Int?          @map("category_id")
+  companyId    Int           @map("company_id")
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category     Category?     @relation(fields: [categoryId], references: [id])
+  tags         ItemTag[]
+  invoiceItems InvoiceItem[]
+
+  @@index([companyId], name: "fk_services_company")
+}
+
+// Material of a invoice.
+// Material is a part of InvoiceItem.
+// One invoice can have multiple InvoiceItems.
+// And one InvoiceItem can have one material.
+// Material itself is an independant model, So one material can be in multiple invoices.
+// And if you want to fetch materials for a customer, you need to fetch all invoices and then all invoice items and then you'll get materials.
+model Material {
+  id             Int           @id @default(autoincrement())
+  name           String
+  vendorId       Int?          @map("vendor_id")
+  categoryId     Int?          @map("category_id")
+  notes          String?
+  quantity       Int?
+  cost           Decimal?
+  sell           Decimal?
+  discount       Decimal?
+  addToInventory Boolean?      @map("add_to_inventory")
+  companyId      Int           @map("company_id")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  company        Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  vendor         Vendor?       @relation(fields: [vendorId], references: [id])
+  category       Category?     @relation(fields: [categoryId], references: [id])
+  invoiceItems   InvoiceItem[]
+  tags           MaterialTag[]
+
+  @@index([companyId], name: "fk_materials_company")
+}
+
+// Vendor of a company.
+// Vendor is just data, they can't login.
+// Vendor is a part of Material.
+model Vendor {
+  id          Int        @id @default(autoincrement())
+  firstName   String?
+  lastName    String?
+  description String?
+  email       String?
+  phone       String?
+  address     String?
+  city        String?
+  state       String?
+  zip         String?
+  // company name for vendor. Its not related to company model.
+  companyName String?
+  companyId   Int        @map("company_id")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  material    Material[]
+}
+
+// Labor of a invoice.
+// Labor is a part of InvoiceItem.
+// One invoice can have multiple InvoiceItems.
+// And one InvoiceItem can have one labor.
+// Labor itself is an independant model, So one labor can be in multiple invoices.
+// And if you want to fetch labors for a customer, you need to fetch all invoices and then all invoice items and then you'll get labors.
+model Labor {
+  id               Int           @id @default(autoincrement())
+  name             String
+  categoryId       Int?          @map("category_id")
+  notes            String?
+  hours            Int?
+  charge           Decimal? // per hour
+  discount         Decimal?
+  addToCannedLabor Boolean?      @map("add_to_canned_labor")
+  companyId        Int           @map("company_id")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+  company          Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category         Category?     @relation(fields: [categoryId], references: [id])
+  invoiceItems     InvoiceItem[]
+  tags             LaborTag[]
+}
+
+// Tag for a invoice.
+// Tag is a part of InvoiceItem, Material and Labor.
+// One invoice can have multiple InvoiceItems.
+// And one InvoiceItem, Material and Labor can have multiple tags.
+// Tag itself is an independant model, So one tag can be in multiple invoices.
+model Tag {
+  id        Int      @id @default(autoincrement())
+  name      String
+  textColor String // hex (with #)
+  bgColor   String // hex (with #)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  companyId Int      @map("company_id")
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  items     ItemTag[]
+  materials MaterialTag[]
+  labors    LaborTag[]
+}
+
+// Many to many relation between Item and Tag.
+model ItemTag {
+  itemId Int     @map("service_id")
+  tagId  Int     @map("tag_id")
+  item   Service @relation(fields: [itemId], references: [id])
+  tag    Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([itemId, tagId])
+}
+
+// Many to many relation between Material and Tag.
+model MaterialTag {
+  materialId Int      @map("material_id")
+  tagId      Int      @map("tag_id")
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([materialId, tagId])
+}
+
+// Many to many relation between Labor and Tag.
+model LaborTag {
+  laborId Int   @map("labor_id")
+  tagId   Int   @map("tag_id")
+  labor   Labor @relation(fields: [laborId], references: [id], onDelete: Cascade)
+  tag     Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([laborId, tagId])
+}
+
+// Category of a invoice.
+// Category is a part of Service, Material and Labor.
+// It's an independant model. So, one category can be in multiple services, materials and labors.
+model Category {
+  id        Int        @id @default(autoincrement())
+  name      String
+  companyId Int        @map("company_id")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  services  Service[]
+  materials Material[]
+  labors    Labor[]
+  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+// Technician of a InvoiceItem.
+// One InvoiceItem can have multiple technicians.
+model Technician {
+  id            Int       @id @default(autoincrement())
+  assignedBy    String?   @map("assigned_by")
+  assignedDate  DateTime? @map("assigned_date")
+  due           DateTime? @default(now())
+  amount        Decimal?  @default(0)
+  priority      Priority? @default(Low)
+  statusId      Int?      @map("status_id")
+  newNote       String?   @map("new_note")
+  workNote      String?   @map("work_note")
+  invoiceItemId Int       @map("invoice_item_id")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  status      Status?      @relation(fields: [statusId], references: [id])
+  invoiceItem InvoiceItem? @relation(fields: [invoiceItemId], references: [id], onDelete: Cascade)
+}
+
+// Status of a invoice.
+// Status is an independant model. So, one status can be in multiple invoices.
 model Status {
   id         Int          @id @default(autoincrement())
   name       String
@@ -384,17 +432,11 @@ model Status {
   Technician Technician[]
 }
 
-model Setting {
-  id        Int      @id @default(autoincrement())
-  contact   String
-  companyId Int      @map("company_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  @@index([companyId], name: "fk_settings_company")
-}
-
+// Payment of a invoice.
+// One invoice can have one payment. And one payment can't be in multiple invoices.
+// Payment can be of type card, check, cash or other.
+// If payment type is other, then it can have a payment method.
+// If payment type is card, then it can have a card type.
 model Payment {
   id        Int           @id @default(autoincrement())
   date      DateTime?
@@ -465,18 +507,7 @@ enum CardType {
   OTHER
 }
 
-model Message {
-  id        Int      @id @default(autoincrement())
-  to        Int
-  message   String
-  from      Int
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@index([to], name: "fk_messages_to")
-  @@index([from], name: "fk_messages_from")
-}
-
+// Calendar settings for a company.
 model CalendarSettings {
   id        Int      @id @default(autoincrement())
   companyId Int      @unique @map("company_id")
@@ -490,6 +521,7 @@ model CalendarSettings {
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
+// Task for a company.
 model Task {
   id          Int        @id @default(autoincrement())
   title       String     @db.VarChar(100)
@@ -515,6 +547,8 @@ enum Priority {
   High
 }
 
+// Assigned user for a task.
+// One task can have multiple users.
 model TaskUser {
   id        Int      @id @default(autoincrement())
   taskId    Int      @map("task_id")
@@ -526,6 +560,7 @@ model TaskUser {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// Appointment for a company.
 model Appointment {
   id                              Int               @id @default(autoincrement())
   userId                          Int               @map("user_id")
@@ -556,6 +591,7 @@ model Appointment {
   @@index([companyId], name: "fk_tasks_company")
 }
 
+// Assigned user for an appointment.
 model AppointmentUser {
   id            Int         @id @default(autoincrement())
   appointmentId Int         @map("appointment_id")
@@ -567,6 +603,20 @@ model AppointmentUser {
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// Order for appointment.
+// There's order option in appointment to show the orders of the appointment.
+model Order {
+  id           Int           @id @default(autoincrement())
+  name         String
+  comment      String?
+  companyId    Int?          @map("company_id")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  appointments Appointment[]
+  company      Company?      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+// Email template for a company.
 model EmailTemplate {
   id        Int               @id @default(autoincrement())
   subject   String
@@ -581,4 +631,17 @@ model EmailTemplate {
 enum EmailTemplateType {
   Confirmation
   Reminder
+}
+
+// Message for chat.
+model Message {
+  id        Int      @id @default(autoincrement())
+  to        Int
+  message   String
+  from      Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([to], name: "fk_messages_to")
+  @@index([from], name: "fk_messages_from")
 }
