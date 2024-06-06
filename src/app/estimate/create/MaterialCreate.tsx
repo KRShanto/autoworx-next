@@ -1,7 +1,6 @@
 import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useListsStore } from "@/stores/lists";
 import React, { useEffect, useState } from "react";
-import newCategory from "./actions/newCategory";
 import { Category, Tag, Vendor } from "@prisma/client";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import Selector from "@/components/Selector";
@@ -10,15 +9,12 @@ import NewVendor from "./NewVendor";
 import Close from "./CloseEstimate";
 import { updateMeterial } from "./actions/updateMeterial";
 import { SelectTags } from "@/components/Lists/SelectTags";
-import { cn } from "@/lib/cn";
+import SelectCategory from "@/components/Lists/SelectCategory";
 
 export default function MaterialCreate() {
   const { categories } = useListsStore();
   const { vendors } = useListsStore();
 
-  const [categoriesToDisplay, setCategoriesToDisplay] = useState<Category[]>(
-    [],
-  );
   const [vendorsToDisplay, setVendorsToDisplay] = useState<Vendor[]>([]);
 
   const { currentSelectedCategoryId } = useEstimateCreateStore();
@@ -34,15 +30,10 @@ export default function MaterialCreate() {
   const [discount, setDiscount] = useState<number>();
   const [addToInventory, setAddToInventory] = useState<boolean>(false);
 
-  const [categoryInput, setCategoryInput] = useState("");
-
   const { close, data } = useEstimatePopupStore();
   const itemId = data?.itemId;
 
-  const [categoryOpen, setCategoryOpen] = useState(false);
   const [vendorOpen, setVendorOpen] = useState(false);
-
-  const [categorySearch, setCategorySearch] = useState("");
   const [vendorSearch, setVendorSearch] = useState("");
 
   useEffect(() => {
@@ -88,18 +79,6 @@ export default function MaterialCreate() {
   }, [currentSelectedCategoryId]);
 
   useEffect(() => {
-    if (categorySearch) {
-      setCategoriesToDisplay(
-        categories.filter((cat) =>
-          cat.name.toLowerCase().includes(categorySearch.toLowerCase()),
-        ),
-      );
-    } else {
-      setCategoriesToDisplay(categories.slice(0, 4));
-    }
-  }, [categorySearch, categories]);
-
-  useEffect(() => {
     if (vendorSearch) {
       setVendorsToDisplay(
         vendors.filter((ven) =>
@@ -112,21 +91,6 @@ export default function MaterialCreate() {
       setVendorsToDisplay(vendors.slice(0, 4));
     }
   }, [vendorSearch, vendors]);
-
-  async function handleNewCategory() {
-    const res = await newCategory({
-      name: categoryInput,
-    });
-
-    if (res.type === "success") {
-      useListsStore.setState((state) => {
-        return { categories: [...state.categories, res.data] };
-      });
-      setCategory(res.data);
-      setCategoryInput("");
-      setCategoryOpen(false);
-    }
-  }
 
   async function handleSubmit() {
     if (!name) {
@@ -235,7 +199,6 @@ export default function MaterialCreate() {
         </label>
         <input
           type="text"
-          // placeholder="Material/Parts Name"
           id="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -243,49 +206,11 @@ export default function MaterialCreate() {
         />
       </div>
 
-      <div className="flex items-center gap-2">
-        <label className="w-28 text-end text-sm">Category</label>
-        <Selector
-          label={category ? category.name : ""}
-          openState={[categoryOpen, setCategoryOpen]}
-          setSearch={setCategorySearch}
-          newButton={
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Category Name"
-                value={categoryInput}
-                onChange={(e) => setCategoryInput(e.target.value)}
-                className="w-full rounded-md border-2 border-slate-400 p-1"
-              />
-              <button
-                onClick={handleNewCategory}
-                className={cn(
-                  "text-nowrap rounded-md px-2 text-white",
-                  categoryInput ? "bg-slate-700" : "bg-slate-400",
-                )}
-                type="button"
-                disabled={!categoryInput}
-              >
-                Quick Add
-              </button>
-            </div>
-          }
-        >
-          <div>
-            {categoriesToDisplay.map((cat) => (
-              <button
-                type="button"
-                key={cat.id}
-                onClick={() => setCategory(cat)}
-                className="mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200"
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
-        </Selector>
-      </div>
+      <SelectCategory
+        onCategoryChange={setCategory}
+        showLabelAsValue={false}
+        labelPosition="left"
+      />
 
       <div className="flex items-center gap-2">
         <label className="w-28 text-end text-sm">Vendor</label>

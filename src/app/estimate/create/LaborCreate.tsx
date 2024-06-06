@@ -1,20 +1,17 @@
-import Selector from "@/components/Selector";
 import { useListsStore } from "@/stores/lists";
 import { Category, Tag } from "@prisma/client";
 import { useEffect, useState } from "react";
-import newCategory from "./actions/newCategory";
 import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { newLabor } from "./actions/newLabor";
 import Close from "./CloseEstimate";
 import { updateLabor } from "./actions/updateLabor";
-import { cn } from "@/lib/cn";
 import { SelectTags } from "@/components/Lists/SelectTags";
+import SelectCategory from "@/components/Lists/SelectCategory";
 
 export default function LaborCreate() {
   const { categories } = useListsStore();
   const { currentSelectedCategoryId } = useEstimateCreateStore();
-  const [categoriesToShow, setCategoriesToShow] = useState<Category[]>([]);
   const [name, setName] = useState("");
   const [category, setCategory] = useState<Category | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -24,13 +21,8 @@ export default function LaborCreate() {
   const [discount, setDiscount] = useState<number>();
   const [addToCannedLabor, setAddToCannedLabor] = useState<boolean>(false);
 
-  const [categoryInput, setCategoryInput] = useState("");
-
   const { close, data } = useEstimatePopupStore();
   const itemId = data?.itemId;
-
-  const [categoryOpen, setCategoryOpen] = useState(false);
-  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (currentSelectedCategoryId) {
@@ -61,33 +53,6 @@ export default function LaborCreate() {
       setAddToCannedLabor(false);
     }
   }, [data]);
-
-  useEffect(() => {
-    if (search) {
-      setCategoriesToShow(
-        categories.filter((cat) =>
-          cat.name.toLowerCase().includes(search.toLowerCase()),
-        ),
-      );
-    } else {
-      setCategoriesToShow(categories.slice(0, 4));
-    }
-  }, [search, categories]);
-
-  async function handleNewCategory() {
-    const res = await newCategory({
-      name: categoryInput,
-    });
-
-    if (res.type === "success") {
-      useListsStore.setState((state) => {
-        return { categories: [...state.categories, res.data] };
-      });
-      setCategory(res.data);
-      setCategoryInput("");
-      setCategoryOpen(false);
-    }
-  }
 
   async function handleSubmit() {
     if (!name) {
@@ -199,56 +164,11 @@ export default function LaborCreate() {
         />
       </div>
 
-      <div className="flex items-center gap-2">
-        <label className="w-28 text-end text-sm">Category</label>
-        <Selector
-          label={category ? category.name : ""}
-          openState={[categoryOpen, setCategoryOpen]}
-          setSearch={setSearch}
-          newButton={
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Category Name"
-                value={categoryInput}
-                onChange={(e) => setCategoryInput(e.target.value)}
-                className="w-full rounded-md border-2 border-slate-400 p-1"
-              />
-              <button
-                onClick={handleNewCategory}
-                className={cn(
-                  "text-nowrap rounded-md px-2 text-white",
-                  categoryInput ? "bg-slate-700" : "bg-slate-400",
-                )}
-                type="button"
-                disabled={!categoryInput}
-              >
-                Quick Add
-              </button>
-            </div>
-          }
-        >
-          <div>
-            {categoriesToShow
-              // sort by currentSelectedCategoryId
-              .sort((a, b) => {
-                if (a.id === currentSelectedCategoryId) return -1;
-                if (b.id === currentSelectedCategoryId) return 1;
-                return 0;
-              })
-              .map((cat) => (
-                <button
-                  type="button"
-                  key={cat.id}
-                  onClick={() => setCategory(cat)}
-                  className="mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200"
-                >
-                  {cat.name}
-                </button>
-              ))}
-          </div>
-        </Selector>
-      </div>
+      <SelectCategory
+        onCategoryChange={setCategory}
+        showLabelAsValue={false}
+        labelPosition="left"
+      />
 
       <div className="flex items-center gap-2">
         <label htmlFor="tags" className="w-28 text-end text-sm">
