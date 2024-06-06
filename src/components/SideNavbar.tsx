@@ -72,8 +72,12 @@ const navList = [
     icon: "/icons/navbar/Inventory.svg",
     subnav: [
       {
-        title: "Service",
-        link: "/inventory/service",
+        title: "Inventory List",
+        link: "/inventory",
+      },
+      {
+        title: "Vendor List",
+        link: "/inventory/vendor",
       },
     ],
   },

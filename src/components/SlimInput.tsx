@@ -9,8 +9,7 @@ export type SlimInputProps = {
 };
 
 export const slimInputClassName =
-  "border-primary-foreground bg-white w-full rounded-sm border px-2 py-0.5 leading-6";
-
+  "border-primary-foreground bg-white w-full rounded-sm border px-2 py-0.5 leading-6 outline-none";
 export function SlimInput({
   label,
   className,
@@ -19,7 +18,9 @@ export function SlimInput({
 }: SlimInputProps & ComponentProps<"input">) {
   return (
     <label className={cn("block", rootClassName)}>
-      <div className="mb-1 px-2 font-medium">{label ?? sentenceCase(props.name)}</div>
+      <div className="mb-1 px-2 font-medium">
+        {label ?? sentenceCase(props.name)}
+      </div>
       <input
         type="text"
         required

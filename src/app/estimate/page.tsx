@@ -108,7 +108,7 @@ export default async function Page({
 
       {/* Header */}
       <div className="mt-5 flex justify-between">
-        <div className="app-shadow flex gap-3 rounded-md p-3 ">
+        <div className="app-shadow flex gap-3 rounded-md p-3">
           {/* Search */}
           <div className="relative flex items-center">
             <FaSearch className="absolute left-3 text-gray-400" />
@@ -156,7 +156,7 @@ function Table({ data }: { data: InvoiceData[] }) {
     <div className="h-[65vh] rounded-md bg-white">
       <table className="w-full">
         {/* Estimate Header */}
-        <thead className=" bg-white">
+        <thead className="bg-white">
           <tr className="h-10 border-b">
             <th className="px-10 text-left">Invoice ID</th>
             <th className="px-10 text-left">Client</th>
