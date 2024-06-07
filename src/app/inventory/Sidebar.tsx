@@ -2,6 +2,8 @@ import { db } from "@/lib/db";
 import React from "react";
 import { FaPrint } from "react-icons/fa6";
 import UseProductForm from "./UseProductForm";
+import SalesPurchaseHistory from "./SalesPurchaseHistory";
+import ReplenishProductForm from "./ReplenishProductForm";
 
 export default async function Sidebar({ productId }: { productId: number }) {
   const product = productId
@@ -20,12 +22,8 @@ export default async function Sidebar({ productId }: { productId: number }) {
                 </h3>
                 <p className="mt-2 text-center text-4xl font-bold">
                   $
-                  {/* {parseFloat(product?.price ? product.price.toString() : "0") *
-                parseFloat(
-                    product?.quantity ? product.quantity.toString() : "0",
-                )} */}
-                  {parseFloat(product?.price!.toString()) *
-                    parseFloat(product?.quantity!.toString())}
+                  {parseFloat(product?.price?.toString() || "0") *
+                    parseFloat(product?.quantity?.toString() || "0")}
                 </p>
               </div>
             ) : (
@@ -77,10 +75,8 @@ export default async function Sidebar({ productId }: { productId: number }) {
                 </div>
               </div>
               <div className="mt-3 flex justify-end gap-3">
-                <UseProductForm />
-                <button className="w-28 rounded-md bg-[#69DBD0] p-1 text-white">
-                  Replenish
-                </button>
+                <UseProductForm productId={productId} />
+                <ReplenishProductForm productId={productId} />
               </div>
             </>
           ) : (
@@ -88,6 +84,8 @@ export default async function Sidebar({ productId }: { productId: number }) {
           )}
         </div>
       </div>
+
+      <SalesPurchaseHistory productId={productId} />
     </div>
   );
 }

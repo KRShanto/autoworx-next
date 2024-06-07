@@ -14,8 +14,9 @@ import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { useEffect, useState } from "react";
+import { useProduct as productUse } from "./actions/useProduct";
 
-export default function UseProductForm() {
+export default function UseProductForm({ productId }: { productId: number }) {
   const [open, setOpen] = useState(false);
 
   async function handleSubmit(formData: FormData) {
@@ -23,7 +24,16 @@ export default function UseProductForm() {
     const quantity = formData.get("quantity") as string;
     const notes = formData.get("notes") as string;
 
-    // TODO
+    const res = await productUse({
+      productId,
+      date: new Date(date),
+      quantity: parseInt(quantity),
+      notes,
+    });
+
+    if (res.type === "success") {
+      setOpen(false);
+    }
   }
 
   return (

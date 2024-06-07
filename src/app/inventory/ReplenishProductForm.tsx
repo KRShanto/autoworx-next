@@ -1,0 +1,155 @@
+"use client";
+
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/Dialog";
+import FormError from "@/components/FormError";
+import Selector from "@/components/Selector";
+import { SlimInput } from "@/components/SlimInput";
+import Submit from "@/components/Submit";
+import { useEffect, useState } from "react";
+import { useProduct as productUse } from "./actions/useProduct";
+import { Vendor } from "@prisma/client";
+import { replenish } from "./actions/replenish";
+import { useListsStore } from "@/stores/lists";
+import NewVendor from "@/components/Lists/NewVendor";
+
+export default function ReplenishProductForm({
+  productId,
+}: {
+  productId: number;
+}) {
+  const { vendors } = useListsStore();
+  const [open, setOpen] = useState(false);
+  const [vendor, setVendor] = useState<Vendor | null>(null);
+  const [vendorOpen, setVendorOpen] = useState(false);
+  const [vendorSearch, setVendorSearch] = useState("");
+  const [vendorsToDisplay, setVendorsToDisplay] = useState<Vendor[]>([]);
+
+  useEffect(() => {
+    if (vendorSearch) {
+      setVendorsToDisplay(
+        vendors.filter((ven) =>
+          ven.name.toLowerCase().includes(vendorSearch.toLowerCase()),
+        ),
+      );
+    } else {
+      setVendorsToDisplay(vendors.slice(0, 4));
+    }
+  }, [vendorSearch, vendors]);
+
+  async function handleSubmit(formData: FormData) {
+    const date = formData.get("date") as string;
+    const quantity = formData.get("quantity") as string;
+    const price = formData.get("price") as string;
+    const unit = formData.get("unit") as string;
+    const lot = formData.get("lot") as string;
+    const notes = formData.get("notes") as string;
+
+    const res = await replenish({
+      productId,
+      date: new Date(date),
+      quantity: parseInt(quantity),
+      notes,
+      vendorId: vendor?.id,
+      price: parseFloat(price),
+      unit,
+      lot,
+    });
+
+    if (res.type === "success") {
+      setOpen(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <button className="w-28 rounded-md bg-[#69DBD0] p-1 text-white">
+          Replenish
+        </button>
+      </DialogTrigger>
+
+      <DialogContent className="max-h-full w-[30rem] max-w-xl" form>
+        <DialogHeader>
+          <DialogTitle>Replenish Product</DialogTitle>
+        </DialogHeader>
+
+        <FormError />
+
+        <div className="flex flex-col gap-3 p-2">
+          <SlimInput name="date" type="date" className="col-span-1" />
+          {/* TODO: make reusable component */}
+          <div>
+            <label>Vendor</label>
+            <Selector
+              label={vendor ? vendor.name || "Vendor" : ""}
+              openState={[vendorOpen, setVendorOpen]}
+              setSearch={setVendorSearch}
+              newButton={
+                <NewVendor
+                  afterSubmit={(ven) => {
+                    setVendor(ven);
+                    setVendorOpen(false);
+                  }}
+                  button={
+                    <button type="button" className="text-xs text-[#6571FF]">
+                      + New Vendor
+                    </button>
+                  }
+                />
+              }
+            >
+              <div>
+                {vendorsToDisplay.map((ven) => (
+                  <button
+                    type="button"
+                    key={ven.id}
+                    onClick={() => setVendor(ven)}
+                    className="mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200"
+                  >
+                    {ven.name}
+                  </button>
+                ))}
+              </div>
+            </Selector>
+          </div>
+
+          <div className="flex gap-3">
+            <SlimInput name="quantity" required={false} />
+            <SlimInput name="price" required={false} />
+            <SlimInput name="unit" required={false} />
+            <SlimInput name="lot" required={false} />
+          </div>
+
+          <div className="col-span-2">
+            <label htmlFor="notes"> Notes</label>
+            <textarea
+              id="notes"
+              name="notes"
+              className="h-28 w-full rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6 outline-none"
+            />
+          </div>
+        </div>
+
+        <DialogFooter>
+          <DialogClose className="rounded-lg border-2 border-slate-400 p-2">
+            Cancel
+          </DialogClose>
+          <Submit
+            className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
+            formAction={handleSubmit}
+          >
+            Submit
+          </Submit>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

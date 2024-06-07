@@ -636,22 +636,40 @@ enum EmailTemplateType {
 }
 
 model InventoryProduct {
-  id          Int                  @id @default(autoincrement())
-  name        String
-  description String?
-  categoryId  Int?                 @map("category_id")
-  quantity    Int?                 @default(1)
-  price       Decimal?             @default(0)
-  unit        String?              @default("pc")
-  lot         String?
-  vendorId    Int?                 @map("vendor_id")
-  type        InventoryProductType
-  companyId   Int                  @map("company_id")
-  createdAt   DateTime             @default(now()) @map("created_at")
-  updatedAt   DateTime             @updatedAt @map("updated_at")
-  company     Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  category    Category?            @relation(fields: [categoryId], references: [id])
-  vendor      Vendor?              @relation(fields: [vendorId], references: [id])
+  id                      Int                       @id @default(autoincrement())
+  name                    String
+  description             String?
+  categoryId              Int?                      @map("category_id")
+  quantity                Int?                      @default(1)
+  price                   Decimal?                  @default(0)
+  unit                    String?                   @default("pc")
+  lot                     String?
+  vendorId                Int?                      @map("vendor_id")
+  type                    InventoryProductType
+  companyId               Int                       @map("company_id")
+  createdAt               DateTime                  @default(now()) @map("created_at")
+  updatedAt               DateTime                  @updatedAt @map("updated_at")
+  company                 Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category                Category?                 @relation(fields: [categoryId], references: [id])
+  vendor                  Vendor?                   @relation(fields: [vendorId], references: [id])
+  InventoryProductHistory InventoryProductHistory[]
+}
+
+model InventoryProductHistory {
+  id        Int                         @id @default(autoincrement())
+  productId Int                         @map("inventory_id")
+  quantity  Int
+  date      DateTime?                   @default(now())
+  notes     String?
+  type      InventoryProductHistoryType
+  createdAt DateTime                    @default(now()) @map("created_at")
+  updatedAt DateTime                    @updatedAt @map("updated_at")
+  product   InventoryProduct            @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+enum InventoryProductHistoryType {
+  Purchase
+  Sale
 }
 
 enum InventoryProductType {

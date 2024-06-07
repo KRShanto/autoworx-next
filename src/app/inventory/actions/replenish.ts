@@ -4,16 +4,24 @@ import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { revalidatePath } from "next/cache";
 
-export async function useProduct({
+export async function replenish({
   productId,
   date,
+  vendorId,
   quantity,
+  price,
+  unit,
+  lot,
   notes,
 }: {
   productId: number;
   date: Date;
+  vendorId?: number;
   quantity: number;
-  notes: string;
+  price?: number;
+  unit?: string;
+  lot?: string;
+  notes?: string;
 }): Promise<ServerAction> {
   const newHistory = await db.inventoryProductHistory.create({
     data: {
@@ -21,7 +29,7 @@ export async function useProduct({
       date,
       quantity,
       notes,
-      type: "Sale",
+      type: "Purchase",
     },
   });
 
@@ -30,11 +38,16 @@ export async function useProduct({
     where: { id: productId },
   });
 
-  const newQuantity = product!.quantity! - quantity;
+  const newQuantity = product!.quantity! + quantity;
 
   await db.inventoryProduct.update({
     where: { id: productId },
-    data: { quantity: newQuantity },
+    data: {
+      quantity: newQuantity,
+      price: price || product?.price,
+      unit: unit || product?.unit,
+      lot: lot || product?.lot,
+    },
   });
 
   revalidatePath("/inventory");
