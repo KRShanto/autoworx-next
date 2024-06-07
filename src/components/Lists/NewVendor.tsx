@@ -21,7 +21,7 @@ export default function NewVendor({
   afterSubmit,
 }: {
   button: JSX.Element;
-  afterSubmit: (vendor: Vendor) => void;
+  afterSubmit?: (vendor: Vendor) => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -53,7 +53,7 @@ export default function NewVendor({
         vendors: [...useListsStore.getState().vendors, res.data],
       });
 
-      afterSubmit(res.data);
+      afterSubmit && afterSubmit(res.data);
     }
 
     setOpen(false);

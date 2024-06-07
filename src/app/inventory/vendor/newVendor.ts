@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/app/auth";
 import { AuthSession } from "@/types/auth";
 import { ServerAction } from "@/types/action";
+import { revalidatePath } from "next/cache";
 
 export async function newVendor({
   name,
@@ -43,6 +44,8 @@ export async function newVendor({
       companyId,
     },
   });
+
+  revalidatePath("/inventory/vendor");
 
   return {
     type: "success",
