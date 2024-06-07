@@ -82,9 +82,7 @@ export default function MaterialCreate() {
     if (vendorSearch) {
       setVendorsToDisplay(
         vendors.filter((ven) =>
-          `${ven.firstName} ${ven.lastName}`
-            .toLowerCase()
-            .includes(vendorSearch.toLowerCase()),
+          ven.name.toLowerCase().includes(vendorSearch.toLowerCase()),
         ),
       );
     } else {
@@ -215,7 +213,7 @@ export default function MaterialCreate() {
       <div className="flex items-center gap-2">
         <label className="w-28 text-end text-sm">Vendor</label>
         <Selector
-          label={vendor ? vendor.firstName || "Vendor" : ""}
+          label={vendor ? vendor.name || "Vendor" : ""}
           openState={[vendorOpen, setVendorOpen]}
           setSearch={setVendorSearch}
           newButton={
@@ -234,7 +232,7 @@ export default function MaterialCreate() {
                 onClick={() => setVendor(ven)}
                 className="mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200"
               >
-                {ven.firstName} {ven.lastName}
+                {ven.name}
               </button>
             ))}
           </div>

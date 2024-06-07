@@ -6,8 +6,7 @@ import { AuthSession } from "@/types/auth";
 import { ServerAction } from "@/types/action";
 
 export async function newVendor({
-  firstName,
-  lastName,
+  name,
   email,
   phone,
   address,
@@ -15,10 +14,9 @@ export async function newVendor({
   state,
   zip,
   company,
-  description,
+  website,
 }: {
-  firstName: string;
-  lastName?: string;
+  name: string;
   email?: string;
   phone?: string;
   address?: string;
@@ -26,15 +24,14 @@ export async function newVendor({
   state?: string;
   zip?: string;
   company?: string;
-  description?: string;
+  website?: string;
 }): Promise<ServerAction> {
   const session = (await auth()) as AuthSession;
   const companyId = session?.user?.companyId;
 
   const newVendor = await db.vendor.create({
     data: {
-      firstName,
-      lastName,
+      name,
       email,
       phone,
       address,
@@ -42,7 +39,7 @@ export async function newVendor({
       state,
       zip,
       companyName: company,
-      description,
+      website,
       companyId,
     },
   });

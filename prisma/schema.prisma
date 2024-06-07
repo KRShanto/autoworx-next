@@ -290,23 +290,23 @@ model Material {
 // Vendor is just data, they can't login.
 // Vendor is a part of Material.
 model Vendor {
-  id          Int        @id @default(autoincrement())
-  firstName   String?
-  lastName    String?
-  description String?
-  email       String?
-  phone       String?
-  address     String?
-  city        String?
-  state       String?
-  zip         String?
+  id                Int                @id @default(autoincrement())
+  name              String
+  website           String?
+  email             String?
+  phone             String?
+  address           String?
+  city              String?
+  state             String?
+  zip               String?
   // company name for vendor. Its not related to company model.
-  companyName String?
-  companyId   Int        @map("company_id")
-  createdAt   DateTime   @default(now()) @map("created_at")
-  updatedAt   DateTime   @updatedAt @map("updated_at")
-  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  material    Material[]
+  companyName       String?
+  companyId         Int                @map("company_id")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  company           Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  material          Material[]
+  inventoryProducts InventoryProduct[]
 }
 
 // Labor of a invoice.
@@ -644,13 +644,14 @@ model InventoryProduct {
   price       Decimal?             @default(0)
   unit        String?              @default("pc")
   lot         String?
-  vendorName  String?
+  vendorId    Int?                 @map("vendor_id")
   type        InventoryProductType
   companyId   Int                  @map("company_id")
   createdAt   DateTime             @default(now()) @map("created_at")
   updatedAt   DateTime             @updatedAt @map("updated_at")
   company     Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
   category    Category?            @relation(fields: [categoryId], references: [id])
+  vendor      Vendor?              @relation(fields: [vendorId], references: [id])
 }
 
 enum InventoryProductType {

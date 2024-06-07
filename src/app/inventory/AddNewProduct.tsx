@@ -12,21 +12,40 @@ import {
 import FormError from "@/components/FormError";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { Category, InventoryProductType } from "@prisma/client";
-import { useState } from "react";
+import { Category, InventoryProductType, Vendor } from "@prisma/client";
+import { useEffect, useState } from "react";
 import { createProduct } from "./actions/create";
 import SelectCategory from "@/components/Lists/SelectCategory";
+import Selector from "@/components/Selector";
+import { useListsStore } from "@/stores/lists";
+import NewVendor from "@/components/Lists/NewVendor";
 
 export default function AddNewProduct() {
   const [open, setOpen] = useState(false);
+  const { vendors } = useListsStore();
+  const [vendor, setVendor] = useState<Vendor | null>(null);
   const [category, setCategory] = useState<Category | null>();
+  const [vendorOpen, setVendorOpen] = useState(false);
+  const [vendorSearch, setVendorSearch] = useState("");
+  const [vendorsToDisplay, setVendorsToDisplay] = useState<Vendor[]>([]);
+
+  useEffect(() => {
+    if (vendorSearch) {
+      setVendorsToDisplay(
+        vendors.filter((ven) =>
+          ven.name.toLowerCase().includes(vendorSearch.toLowerCase()),
+        ),
+      );
+    } else {
+      setVendorsToDisplay(vendors.slice(0, 4));
+    }
+  }, [vendorSearch, vendors]);
 
   async function handleSubmit(data: FormData) {
     const name = data.get("productName") as string;
     const description = data.get("description") as string;
     const price = Number(data.get("price"));
     const categoryId = category?.id;
-    const vendorName = data.get("vendorName") as string;
     const quantity = Number(data.get("quantity"));
     const unit = data.get("unit") as string;
     const lot = data.get("lot") as string;
@@ -39,7 +58,7 @@ export default function AddNewProduct() {
       description,
       price,
       categoryId,
-      vendorName,
+      vendorId: vendor?.id,
       quantity,
       unit,
       lot,
@@ -73,7 +92,40 @@ export default function AddNewProduct() {
           <div>
             <SelectCategory onCategoryChange={setCategory} />
             <SlimInput name="productName" />
-            <SlimInput name="vendorName" required={false} />
+            <div>
+              <label>Vendor</label>
+              <Selector
+                label={vendor ? vendor.name || "Vendor" : ""}
+                openState={[vendorOpen, setVendorOpen]}
+                setSearch={setVendorSearch}
+                newButton={
+                  <NewVendor
+                    afterSubmit={(ven) => {
+                      setVendor(ven);
+                      setVendorOpen(false);
+                    }}
+                    button={
+                      <button type="button" className="text-xs text-[#6571FF]">
+                        + New Vendor
+                      </button>
+                    }
+                  />
+                }
+              >
+                <div>
+                  {vendorsToDisplay.map((ven) => (
+                    <button
+                      type="button"
+                      key={ven.id}
+                      onClick={() => setVendor(ven)}
+                      className="mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200"
+                    >
+                      {ven.name}
+                    </button>
+                  ))}
+                </div>
+              </Selector>
+            </div>
           </div>
           <div>
             <label>Description</label>

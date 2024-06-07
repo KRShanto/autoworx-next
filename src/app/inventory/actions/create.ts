@@ -12,7 +12,7 @@ interface CreateProductInput {
   description?: string;
   price?: number;
   categoryId?: number;
-  vendorName?: string;
+  vendorId?: number;
   quantity?: number;
   unit?: string;
   lot?: string;

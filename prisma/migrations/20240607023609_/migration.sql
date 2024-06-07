@@ -52,18 +52,6 @@ CREATE TABLE `OAuthToken` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Order` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(191) NOT NULL,
-    `comment` VARCHAR(191) NULL,
-    `company_id` INTEGER NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `Customer` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `first_name` VARCHAR(191) NOT NULL,
@@ -86,16 +74,66 @@ CREATE TABLE `Customer` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Service` (
+CREATE TABLE `Vehicle` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `year` INTEGER NULL,
+    `make` VARCHAR(191) NULL,
+    `model` VARCHAR(191) NULL,
+    `submodel` VARCHAR(191) NULL,
+    `type` VARCHAR(191) NULL,
+    `textColor` VARCHAR(191) NULL,
+    `bgColor` VARCHAR(191) NULL,
+    `transmission` VARCHAR(191) NULL,
+    `engineSize` VARCHAR(191) NULL,
+    `license` VARCHAR(191) NULL,
+    `vin` VARCHAR(191) NULL,
+    `notes` VARCHAR(191) NULL,
+    `company_id` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
-    `name` VARCHAR(191) NOT NULL,
-    `description` VARCHAR(191) NULL,
-    `category_id` INTEGER NULL,
-    `company_id` INTEGER NOT NULL,
 
-    INDEX `fk_services_company`(`company_id`),
+    INDEX `fk_vehicles_company`(`company_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Invoice` (
+    `id` VARCHAR(191) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `type` ENUM('Invoice', 'Estimate') NOT NULL DEFAULT 'Invoice',
+    `customer_id` INTEGER NULL,
+    `vehicle_id` INTEGER NULL,
+    `subtotal` DECIMAL(8, 2) NULL DEFAULT 0,
+    `discount` DECIMAL(8, 2) NULL DEFAULT 0,
+    `tax` DECIMAL(8, 2) NULL DEFAULT 0,
+    `grand_total` DECIMAL(8, 2) NULL DEFAULT 0,
+    `deposit` DECIMAL(8, 2) NULL DEFAULT 0,
+    `deposit_notes` VARCHAR(191) NULL DEFAULT '',
+    `deposit_method` VARCHAR(191) NULL DEFAULT '',
+    `due` DECIMAL(8, 2) NULL DEFAULT 0,
+    `status_id` INTEGER NULL,
+    `internalNotes` VARCHAR(191) NULL,
+    `terms` VARCHAR(191) NULL,
+    `policy` VARCHAR(191) NULL,
+    `customerNotes` VARCHAR(191) NULL,
+    `customerComments` VARCHAR(191) NULL,
+    `company_id` INTEGER NOT NULL,
+    `user_id` INTEGER NOT NULL,
+
+    INDEX `fk_invoices_company`(`company_id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `InvoicePhoto` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `invoice_id` VARCHAR(191) NOT NULL,
+    `photo` VARCHAR(191) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    INDEX `fk_invoice_photos_invoice`(`invoice_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -109,6 +147,20 @@ CREATE TABLE `InvoiceItem` (
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Service` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NULL,
+    `category_id` INTEGER NULL,
+    `company_id` INTEGER NOT NULL,
+
+    INDEX `fk_services_company`(`company_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -236,70 +288,6 @@ CREATE TABLE `Technician` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Vehicle` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `year` INTEGER NULL,
-    `make` VARCHAR(191) NULL,
-    `model` VARCHAR(191) NULL,
-    `submodel` VARCHAR(191) NULL,
-    `type` VARCHAR(191) NULL,
-    `textColor` VARCHAR(191) NULL,
-    `bgColor` VARCHAR(191) NULL,
-    `transmission` VARCHAR(191) NULL,
-    `engineSize` VARCHAR(191) NULL,
-    `license` VARCHAR(191) NULL,
-    `vin` VARCHAR(191) NULL,
-    `notes` VARCHAR(191) NULL,
-    `company_id` INTEGER NOT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
-
-    INDEX `fk_vehicles_company`(`company_id`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `Invoice` (
-    `id` VARCHAR(191) NOT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
-    `type` ENUM('Invoice', 'Estimate') NOT NULL DEFAULT 'Invoice',
-    `customer_id` INTEGER NULL,
-    `vehicle_id` INTEGER NULL,
-    `subtotal` DECIMAL(8, 2) NULL DEFAULT 0,
-    `discount` DECIMAL(8, 2) NULL DEFAULT 0,
-    `tax` DECIMAL(8, 2) NULL DEFAULT 0,
-    `grand_total` DECIMAL(8, 2) NULL DEFAULT 0,
-    `deposit` DECIMAL(8, 2) NULL DEFAULT 0,
-    `deposit_notes` VARCHAR(191) NULL DEFAULT '',
-    `deposit_method` VARCHAR(191) NULL DEFAULT '',
-    `due` DECIMAL(8, 2) NULL DEFAULT 0,
-    `status_id` INTEGER NULL,
-    `internalNotes` VARCHAR(191) NULL,
-    `terms` VARCHAR(191) NULL,
-    `policy` VARCHAR(191) NULL,
-    `customerNotes` VARCHAR(191) NULL,
-    `customerComments` VARCHAR(191) NULL,
-    `company_id` INTEGER NOT NULL,
-    `user_id` INTEGER NOT NULL,
-
-    INDEX `fk_invoices_company`(`company_id`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `InvoicePhoto` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `invoice_id` VARCHAR(191) NOT NULL,
-    `photo` VARCHAR(191) NOT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
-
-    INDEX `fk_invoice_photos_invoice`(`invoice_id`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `Status` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
@@ -309,18 +297,6 @@ CREATE TABLE `Status` (
     `updated_at` DATETIME(3) NOT NULL,
     `company_id` INTEGER NOT NULL,
 
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `Setting` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `contact` VARCHAR(191) NOT NULL,
-    `company_id` INTEGER NOT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
-
-    INDEX `fk_settings_company`(`company_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -387,20 +363,6 @@ CREATE TABLE `PaymentMethod` (
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `Message` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `to` INTEGER NOT NULL,
-    `message` VARCHAR(191) NOT NULL,
-    `from` INTEGER NOT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
-
-    INDEX `fk_messages_to`(`to`),
-    INDEX `fk_messages_from`(`from`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -489,6 +451,18 @@ CREATE TABLE `AppointmentUser` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `Order` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `comment` VARCHAR(191) NULL,
+    `company_id` INTEGER NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `EmailTemplate` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `subject` VARCHAR(191) NOT NULL,
@@ -501,6 +475,39 @@ CREATE TABLE `EmailTemplate` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `InventoryProduct` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NULL,
+    `category_id` INTEGER NULL,
+    `quantity` INTEGER NULL DEFAULT 1,
+    `price` DECIMAL(65, 30) NULL DEFAULT 0,
+    `unit` VARCHAR(191) NULL DEFAULT 'pc',
+    `lot` VARCHAR(191) NULL,
+    `vendor_id` INTEGER NULL,
+    `type` ENUM('Supply', 'Product') NOT NULL,
+    `company_id` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Message` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `to` INTEGER NOT NULL,
+    `message` VARCHAR(191) NOT NULL,
+    `from` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    INDEX `fk_messages_to`(`to`),
+    INDEX `fk_messages_from`(`from`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `User` ADD CONSTRAINT `User_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -508,16 +515,22 @@ ALTER TABLE `User` ADD CONSTRAINT `User_company_id_fkey` FOREIGN KEY (`company_i
 ALTER TABLE `OAuthToken` ADD CONSTRAINT `OAuthToken_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Order` ADD CONSTRAINT `Order_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `Customer` ADD CONSTRAINT `Customer_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Service` ADD CONSTRAINT `Service_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `Vehicle` ADD CONSTRAINT `Vehicle_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Service` ADD CONSTRAINT `Service_category_id_fkey` FOREIGN KEY (`category_id`) REFERENCES `Category`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_status_id_fkey` FOREIGN KEY (`status_id`) REFERENCES `Status`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `InvoicePhoto` ADD CONSTRAINT `InvoicePhoto_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -530,6 +543,12 @@ ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_material_id_fkey` FOREIGN 
 
 -- AddForeignKey
 ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_labor_id_fkey` FOREIGN KEY (`labor_id`) REFERENCES `Labor`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Service` ADD CONSTRAINT `Service_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Service` ADD CONSTRAINT `Service_category_id_fkey` FOREIGN KEY (`category_id`) REFERENCES `Category`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Material` ADD CONSTRAINT `Material_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -580,25 +599,7 @@ ALTER TABLE `Technician` ADD CONSTRAINT `Technician_status_id_fkey` FOREIGN KEY 
 ALTER TABLE `Technician` ADD CONSTRAINT `Technician_invoice_item_id_fkey` FOREIGN KEY (`invoice_item_id`) REFERENCES `InvoiceItem`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Vehicle` ADD CONSTRAINT `Vehicle_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_status_id_fkey` FOREIGN KEY (`status_id`) REFERENCES `Status`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `InvoicePhoto` ADD CONSTRAINT `InvoicePhoto_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `Status` ADD CONSTRAINT `Status_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Setting` ADD CONSTRAINT `Setting_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Payment` ADD CONSTRAINT `Payment_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -661,4 +662,16 @@ ALTER TABLE `AppointmentUser` ADD CONSTRAINT `AppointmentUser_appointment_id_fke
 ALTER TABLE `AppointmentUser` ADD CONSTRAINT `AppointmentUser_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `Order` ADD CONSTRAINT `Order_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `EmailTemplate` ADD CONSTRAINT `EmailTemplate_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `InventoryProduct` ADD CONSTRAINT `InventoryProduct_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `InventoryProduct` ADD CONSTRAINT `InventoryProduct_category_id_fkey` FOREIGN KEY (`category_id`) REFERENCES `Category`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `InventoryProduct` ADD CONSTRAINT `InventoryProduct_vendor_id_fkey` FOREIGN KEY (`vendor_id`) REFERENCES `Vendor`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;

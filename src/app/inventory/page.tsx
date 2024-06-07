@@ -37,10 +37,13 @@ export default async function Page({
   const categories = await db.category.findMany({
     where: { companyId },
   });
+  const vendors = await db.vendor.findMany({
+    where: { companyId },
+  });
 
   return (
     <div className="h-full">
-      <SyncLists categories={categories} />
+      <SyncLists categories={categories} vendors={vendors} />
 
       <header className="flex justify-between">
         <Title>Inventory</Title>
