@@ -1,5 +1,16 @@
+import { cn } from "@/lib/cn";
 import React from "react";
 
-export default function Title({ children }: { children: React.ReactNode }) {
-  return <h1 className="font-bold text-[#797979] text-[26px]">{children}</h1>;
+export default function Title({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <h1 className={cn("text-[26px] font-bold text-[#797979]", className)}>
+      {children}
+    </h1>
+  );
 }

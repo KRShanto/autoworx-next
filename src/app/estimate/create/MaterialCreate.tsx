@@ -5,7 +5,8 @@ import { Category, Tag, Vendor } from "@prisma/client";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import Selector from "@/components/Selector";
 import { newMaterial } from "./actions/newMaterial";
-import NewVendor from "./NewVendor";
+// import NewVendor from "./NewVendor";
+import NewVendor from "@/components/Lists/NewVendor";
 import Close from "./CloseEstimate";
 import { updateMeterial } from "./actions/updateMeterial";
 import { SelectTags } from "@/components/Lists/SelectTags";
@@ -14,6 +15,8 @@ import SelectCategory from "@/components/Lists/SelectCategory";
 export default function MaterialCreate() {
   const { categories } = useListsStore();
   const { vendors } = useListsStore();
+
+  console.log("vendos: ", vendors);
 
   const [vendorsToDisplay, setVendorsToDisplay] = useState<Vendor[]>([]);
 
@@ -218,9 +221,32 @@ export default function MaterialCreate() {
           setSearch={setVendorSearch}
           newButton={
             <NewVendor
-              itemId={itemId}
-              setVendorOpenState={setVendorOpen}
-              setVendor={setVendor}
+              button={
+                <button type="button" className="text-xs text-[#6571FF]">
+                  + New Vendor
+                </button>
+              }
+              afterSubmit={(vendor) => {
+                useListsStore.setState(({ vendors }) => ({
+                  vendors: [...vendors, vendor],
+                }));
+
+                useEstimateCreateStore.setState((state) => {
+                  const items = state.items.map((item) => {
+                    if (item.id === itemId) {
+                      return {
+                        ...item,
+                        vendor,
+                      };
+                    }
+                    return item;
+                  });
+                  return { items };
+                });
+
+                setVendor(vendor);
+                setVendorOpen(false);
+              }}
             />
           }
         >

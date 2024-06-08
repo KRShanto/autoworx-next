@@ -5,6 +5,7 @@ import Table from "./Table";
 import Details from "./Details";
 import Title from "@/components/Title";
 import NewVendor from "@/components/Lists/NewVendor";
+import TopVendors from "./TopVendors";
 
 export default async function Page({
   searchParams: { vendorId },
@@ -34,7 +35,10 @@ export default async function Page({
 
       <div className="mt-5 flex h-full gap-3">
         <Table vendors={vendors} vendorId={parseInt(vendorId)} />
-        <Details vendor={vendors.find((v) => v.id === parseInt(vendorId))} />
+        <div className="flex w-[30%] flex-col gap-3">
+          <Details vendor={vendors.find((v) => v.id === parseInt(vendorId))} />
+          <TopVendors />
+        </div>
       </div>
     </div>
   );

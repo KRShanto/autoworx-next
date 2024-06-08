@@ -23,7 +23,7 @@ export default function SalesPurchaseHistoryClient({
   vendorName,
   price,
 }: {
-  productId: number;
+  productId: number | undefined;
   histories: InventoryProductHistory[];
   vendorName: string;
   price: number;
@@ -88,7 +88,7 @@ function Table({
   vendorName,
   price,
 }: {
-  productId: number;
+  productId?: number;
   histories: InventoryProductHistory[];
   vendorName: string;
   price: number;
