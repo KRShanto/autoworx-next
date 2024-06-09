@@ -79,6 +79,10 @@ const navList = [
         title: "Vendor List",
         link: "/inventory/vendor",
       },
+      {
+        title: "Camera",
+        link: "/inventory/camera",
+      },
     ],
   },
 ];

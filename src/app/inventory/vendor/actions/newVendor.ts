@@ -16,6 +16,7 @@ export async function newVendor({
   zip,
   company,
   website,
+  notes,
 }: {
   name: string;
   email?: string;
@@ -26,6 +27,7 @@ export async function newVendor({
   zip?: string;
   company?: string;
   website?: string;
+  notes?: string;
 }): Promise<ServerAction> {
   const session = (await auth()) as AuthSession;
   const companyId = session?.user?.companyId;
@@ -41,6 +43,7 @@ export async function newVendor({
       zip,
       companyName: company,
       website,
+      notes,
       companyId,
     },
   });

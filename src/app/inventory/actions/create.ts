@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/app/auth";
+import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
@@ -22,10 +23,7 @@ interface CreateProductInput {
 export async function createProduct(
   data: CreateProductInput,
 ): Promise<ServerAction> {
-  // TODO: reuse
-  const session = (await auth()) as AuthSession;
-  const companyId = session.user.companyId;
-
+  const companyId = await getCompanyId();
   const newProduct = await db.inventoryProduct.create({
     data: {
       ...data,
