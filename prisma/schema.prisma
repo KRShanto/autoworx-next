@@ -301,6 +301,7 @@ model Vendor {
   zip               String?
   // company name for vendor. Its not related to company model.
   companyName       String?
+  notes             String?
   companyId         Int                @map("company_id")
   createdAt         DateTime           @default(now()) @map("created_at")
   updatedAt         DateTime           @updatedAt @map("updated_at")
