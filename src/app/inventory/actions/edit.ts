@@ -24,6 +24,7 @@ export async function editProduct({
   quantity?: number;
   unit?: string;
   lot?: string;
+  type?: string;
 }): Promise<ServerAction> {
   const updatedProduct = await db.inventoryProduct.update({
     where: { id },

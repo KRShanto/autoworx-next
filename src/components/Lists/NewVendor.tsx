@@ -1,6 +1,6 @@
 "use client";
 
-import { newVendor } from "@/app/inventory/vendor/newVendor";
+import { newVendor } from "@/app/inventory/vendor/actions/newVendor";
 import { Vendor } from "@prisma/client";
 import { useState } from "react";
 import {

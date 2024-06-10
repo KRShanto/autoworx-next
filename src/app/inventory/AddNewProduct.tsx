@@ -71,112 +71,116 @@ export default function AddNewProduct() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <button className="rounded-md bg-[#6571FF] p-2 px-5 text-white">
-          Add New Product
-        </button>
-      </DialogTrigger>
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <button className="rounded-md bg-[#6571FF] p-2 px-5 text-white">
+            Add New Product
+          </button>
+        </DialogTrigger>
+        <DialogContent
+          className="max-h-full max-w-xl grid-rows-[auto,1fr,auto]"
+          form
+        >
+          <DialogHeader>
+            <DialogTitle>Add New Product</DialogTitle>
+          </DialogHeader>
 
-      <DialogContent
-        className="max-h-full max-w-xl grid-rows-[auto,1fr,auto]"
-        form
-      >
-        <DialogHeader>
-          <DialogTitle>Add New Product</DialogTitle>
-        </DialogHeader>
+          <FormError />
 
-        <FormError />
-
-        <div className="grid grid-cols-2 gap-5 overflow-y-auto">
-          <div>
-            <SelectCategory onCategoryChange={setCategory} />
-            <SlimInput name="productName" />
+          <div className="grid grid-cols-2 gap-5 overflow-y-auto">
             <div>
-              <label>Vendor</label>
-              <Selector
-                label={vendor ? vendor.name || "Vendor" : ""}
-                openState={[vendorOpen, setVendorOpen]}
-                setSearch={setVendorSearch}
-                newButton={
-                  <NewVendor
-                    afterSubmit={(ven) => {
-                      setVendor(ven);
-                      setVendorOpen(false);
-                    }}
-                    button={
-                      <button type="button" className="text-xs text-[#6571FF]">
-                        + New Vendor
+              <SelectCategory onCategoryChange={setCategory} />
+              <SlimInput name="productName" />
+              <div>
+                <label>Vendor</label>
+                <Selector
+                  label={vendor ? vendor.name || "Vendor" : ""}
+                  openState={[vendorOpen, setVendorOpen]}
+                  setSearch={setVendorSearch}
+                  newButton={
+                    <NewVendor
+                      afterSubmit={(ven) => {
+                        setVendor(ven);
+                        setVendorOpen(false);
+                      }}
+                      button={
+                        <button
+                          type="button"
+                          className="text-xs text-[#6571FF]"
+                        >
+                          + New Vendor
+                        </button>
+                      }
+                    />
+                  }
+                >
+                  <div>
+                    {vendorsToDisplay.map((ven) => (
+                      <button
+                        type="button"
+                        key={ven.id}
+                        onClick={() => setVendor(ven)}
+                        className="mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200"
+                      >
+                        {ven.name}
                       </button>
-                    }
-                  />
-                }
-              >
-                <div>
-                  {vendorsToDisplay.map((ven) => (
-                    <button
-                      type="button"
-                      key={ven.id}
-                      onClick={() => setVendor(ven)}
-                      className="mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200"
-                    >
-                      {ven.name}
-                    </button>
-                  ))}
-                </div>
-              </Selector>
+                    ))}
+                  </div>
+                </Selector>
+              </div>
             </div>
-          </div>
-          <div>
-            <label>Description</label>
-            <textarea
-              name="description"
-              required={false}
-              className="h-28 w-[95%] rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6"
-            />
             <div>
+              <label>Description</label>
+              <textarea
+                name="description"
+                required={false}
+                className="h-28 w-[95%] rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6"
+              />
               <div>
-                <input
-                  id="product"
-                  type="radio"
-                  name="type"
-                  value={InventoryProductType.Product}
-                  className="mr-1"
-                />
-                <label htmlFor="product">Products</label>
-              </div>
-              <div>
-                <input
-                  id="supply"
-                  type="radio"
-                  name="type"
-                  value={InventoryProductType.Supply}
-                  className="mr-1"
-                />
-                <label htmlFor="supply">Supplies</label>
+                <div>
+                  <input
+                    id="product"
+                    type="radio"
+                    name="type"
+                    value={InventoryProductType.Product}
+                    className="mr-1"
+                  />
+                  <label htmlFor="product">Products</label>
+                </div>
+                <div>
+                  <input
+                    id="supply"
+                    type="radio"
+                    name="type"
+                    value={InventoryProductType.Supply}
+                    className="mr-1"
+                  />
+                  <label htmlFor="supply">Supplies</label>
+                </div>
               </div>
             </div>
+            <div className="col-span-3 mt-5 flex w-[90%] gap-5">
+              <SlimInput name="quantity" type="number" required={false} />
+              <SlimInput name="price" type="number" required={false} />
+              <SlimInput name="unit" required={false} />
+              <SlimInput name="lot" label="Lot#" required={false} />
+            </div>
           </div>
-          <div className="col-span-3 mt-5 flex w-[90%] gap-5">
-            <SlimInput name="quantity" type="number" required={false} />
-            <SlimInput name="price" type="number" required={false} />
-            <SlimInput name="unit" required={false} />
-            <SlimInput name="lot" label="Lot#" required={false} />
-          </div>
-        </div>
 
-        <DialogFooter>
-          <DialogClose className="rounded-lg border-2 border-slate-400 p-2">
-            Cancel
-          </DialogClose>
-          <Submit
-            className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
-            formAction={handleSubmit}
-          >
-            Add
-          </Submit>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter>
+            <DialogClose className="rounded-lg border-2 border-slate-400 p-2">
+              Cancel
+            </DialogClose>
+            <Submit
+              className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
+              formAction={handleSubmit}
+            >
+              Add
+            </Submit>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

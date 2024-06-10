@@ -40,7 +40,6 @@ export default async function Page({
   const vendors = await db.vendor.findMany({
     where: { companyId },
   });
-
   return (
     <div className="h-full">
       <SyncLists categories={categories} vendors={vendors} />
@@ -65,7 +64,7 @@ export default async function Page({
             <p>Procurement</p>
           </TabsContent>
 
-          <TabsContent value="products">
+          <TabsContent value="products" className="overflow-x-scroll">
             <ProductTable
               products={products as any}
               currentProductId={parseInt(productId)}

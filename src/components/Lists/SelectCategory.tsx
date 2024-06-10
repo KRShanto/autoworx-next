@@ -7,17 +7,21 @@ import { cn } from "@/lib/cn";
 import newCategory from "@/app/estimate/create/actions/newCategory";
 
 export default function SelectCategory({
+  categoryData,
   onCategoryChange,
   showLabelAsValue,
   labelPosition = "top",
 }: {
+  categoryData?: Category | null;
   showLabelAsValue?: boolean;
   onCategoryChange: (category: Category) => void;
   labelPosition?: "top" | "left" | "none";
 }) {
   const { categories } = useListsStore();
 
-  const [category, setCategory] = useState<Category | null>();
+  const [category, setCategory] = useState<Category | null>(
+    categoryData || null,
+  );
   const [categoriesToDisplay, setCategoriesToDisplay] = useState<Category[]>(
     [],
   );
@@ -106,7 +110,12 @@ export default function SelectCategory({
               type="button"
               key={cat.id}
               onClick={() => setCategory(cat)}
-              className="mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200"
+              className={cn(
+                "mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200",
+                {
+                  "bg-slate-300": category && category.id === cat.id,
+                },
+              )}
             >
               {cat.name}
             </button>
