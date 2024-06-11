@@ -10,25 +10,23 @@ import {
   DialogTrigger,
 } from "@/components/Dialog";
 import FormError from "@/components/FormError";
+import NewVendor from "@/components/Lists/NewVendor";
+import SelectCategory from "@/components/Lists/SelectCategory";
+import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
+import { cn } from "@/lib/cn";
+import { useListsStore } from "@/stores/lists";
 import {
   Category,
-  InventoryProductType,
   InventoryProduct,
+  InventoryProductType,
   Vendor,
 } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { createProduct } from "./actions/create";
-import SelectCategory from "@/components/Lists/SelectCategory";
-import Selector from "@/components/Selector";
-import { useListsStore } from "@/stores/lists";
-import NewVendor from "@/components/Lists/NewVendor";
 import { CiEdit } from "react-icons/ci";
-import { getInventoryProductById } from "./actions/query";
-import {} from "@prisma/client";
-import { cn } from "@/lib/cn";
 import { editProduct } from "./actions/edit";
+import { getInventoryProductById } from "./actions/query";
 
 type TProps = {
   currentProductId: number | undefined;
@@ -50,11 +48,6 @@ const radioData = [
     label: "Products",
     value: InventoryProductType.Product,
   },
-  {
-    id: "supply",
-    label: "Supplies",
-    value: InventoryProductType.Supply,
-  },
 ];
 
 export default function EditProduct({ currentProductId }: TProps) {
@@ -65,6 +58,7 @@ export default function EditProduct({ currentProductId }: TProps) {
   const [vendorOpen, setVendorOpen] = useState(false); // useful
   const [vendorSearch, setVendorSearch] = useState(""); // useful
   const [vendorsToDisplay, setVendorsToDisplay] = useState<Vendor[]>([]); // useful
+  const [error, setError] = useState<string | null>("");
   const [product, setProduct] = useState<TInputType>({
     productName: "",
     description: "",
@@ -74,30 +68,43 @@ export default function EditProduct({ currentProductId }: TProps) {
     lot: "",
     type: InventoryProductType.Product,
   });
+  console.log({ currentProductId });
   useEffect(() => {
+    let ignore = false;
     const fetchInventoryProduct = async () => {
       try {
-        const product = await getInventoryProductById<
-          InventoryProduct & { category: Category; vendor: Vendor }
-        >(currentProductId);
-        setProduct({
-          productName: product.name,
-          description: product.description,
-          price: Number(product.price) as number,
-          quantity: product.quantity,
-          unit: product.unit,
-          lot: product.lot,
-          type: product.type,
-        });
-        setCategory(product.category as Category);
-        setVendor(product.vendor as Vendor);
-      } catch (err) {
-        console.log(err);
+        if (currentProductId) {
+          const product = await getInventoryProductById<
+            InventoryProduct & { category: Category; vendor: Vendor }
+          >(currentProductId);
+          if (!ignore) {
+            setProduct({
+              productName: product.name,
+              description: product.description,
+              price: Number(product.price) as number,
+              quantity: product.quantity,
+              unit: product.unit,
+              lot: product.lot,
+              type: InventoryProductType.Product,
+            });
+            setCategory(product?.category as Category);
+            setVendor(product?.vendor as Vendor);
+            setError(null);
+          }
+        } else {
+          throw new Error("product id missing");
+        }
+      } catch (err: any) {
+        if (!ignore) {
+          setError(err.message as string);
+        }
       }
     };
     fetchInventoryProduct();
-  }, []);
-  // TODO: Vendor searching feature valid for edit product
+    return () => {
+      ignore = true;
+    };
+  }, [currentProductId]);
   useEffect(() => {
     if (vendorSearch) {
       setVendorsToDisplay(
@@ -116,7 +123,6 @@ export default function EditProduct({ currentProductId }: TProps) {
         ) &&
         alreadySelectedVendor
       ) {
-        console.log("condition true");
         defaultVendors = [alreadySelectedVendor, ...defaultVendors];
       }
       setVendorsToDisplay(defaultVendors);
@@ -127,7 +133,6 @@ export default function EditProduct({ currentProductId }: TProps) {
   ) => {
     const name = e.target.name as string;
     const value = e.target.value as string;
-    console.log(name);
     setProduct({ ...product, [name]: value });
   };
 
@@ -139,27 +144,33 @@ export default function EditProduct({ currentProductId }: TProps) {
     const quantity = Number(product.quantity) as number;
     const unit = product.unit as string;
     const lot = product.lot as string;
-    const type =
-      (product.type as InventoryProductType) || InventoryProductType.Product;
+    // const type =
+    //   (product.type as InventoryProductType) || InventoryProductType.Product;
+    try {
+      if (!(price > 0 && quantity > 0)) {
+        throw new Error("Price and quantity must be greater than 0");
+      }
+      const res = await editProduct({
+        id: currentProductId as number,
+        name,
+        description,
+        price,
+        categoryId,
+        vendorId: vendor?.id,
+        quantity,
+        unit,
+        lot,
+      });
 
-    const res = await editProduct({
-      id: currentProductId as number,
-      name,
-      description,
-      price,
-      categoryId,
-      vendorId: vendor?.id,
-      quantity,
-      unit,
-      lot,
-      type,
-    });
-
-    if (res.type === "success") {
-      setOpen(false);
+      if (res.type === "success") {
+        setOpen(false);
+        setError(null);
+      }
+    } catch (err: any) {
+      setError(err.message as string);
     }
   }
-  console.log({ vendorsToDisplay });
+  console.log({ category });
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -171,6 +182,11 @@ export default function EditProduct({ currentProductId }: TProps) {
           form
         >
           <DialogHeader>
+            {error && (
+              <p className="bg-red-500 py-2 text-center text-sm text-white">
+                {error}
+              </p>
+            )}
             <DialogTitle>Edit product</DialogTitle>
           </DialogHeader>
 
@@ -252,7 +268,7 @@ export default function EditProduct({ currentProductId }: TProps) {
                       className="mr-1"
                       checked={radio.value === product.type}
                     />
-                    <label htmlFor="product">{radio.label}</label>
+                    <label htmlFor={radio.id}>{radio.label}</label>
                   </div>
                 ))}
               </div>

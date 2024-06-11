@@ -19,16 +19,20 @@ export default function SelectCategory({
 }) {
   const { categories } = useListsStore();
 
-  const [category, setCategory] = useState<Category | null>(
-    categoryData || null,
-  );
+  const [category, setCategory] = useState<Category | null>(null);
   const [categoriesToDisplay, setCategoriesToDisplay] = useState<Category[]>(
     [],
   );
   const [categoryInput, setCategoryInput] = useState("");
   const [categorySearch, setCategorySearch] = useState("");
   const [categoryOpen, setCategoryOpen] = useState(false);
-
+  useEffect(() => {
+    if (categoryData) {
+      setCategory(categoryData as Category);
+    } else {
+      setCategory(null);
+    }
+  }, [categoryData]);
   useEffect(() => {
     if (categorySearch) {
       setCategoriesToDisplay(
