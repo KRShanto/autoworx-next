@@ -15,6 +15,7 @@ import Submit from "../Submit";
 import { SlimInput } from "../SlimInput";
 import { useListsStore } from "@/stores/lists";
 import { editVendor } from "@/app/inventory/vendor/actions/editVendor";
+import { SlimTextarea } from "../SlimTextarea";
 
 export default function EditVendor({
   button,
@@ -89,8 +90,11 @@ export default function EditVendor({
             <SlimInput name="state" defaultValue={vendor.state ?? ""} required={false} />
             <SlimInput name="zip" defaultValue={vendor.zip ?? ""} required={false} />
           </div>
+
+          <div className="sm:col-span-2">
           <SlimInput name="website" defaultValue={vendor.website ?? ""} required={false} />
-          <SlimInput name="notes" defaultValue={vendor.notes ?? ""} placeholder="Add notes" required={false} />
+          <SlimTextarea name="notes" defaultValue={vendor.notes ?? ""} placeholder="Add notes" required={false} />
+          </div>
         </div>
 
         <DialogFooter>
