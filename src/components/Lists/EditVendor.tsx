@@ -14,13 +14,15 @@ import {
 import Submit from "../Submit";
 import { SlimInput } from "../SlimInput";
 import { useListsStore } from "@/stores/lists";
-import { newVendor } from "@/app/inventory/vendor/actions/newVendor";
+import { editVendor } from "@/app/inventory/vendor/actions/editVendor";
 
-export default function NewVendor({
+export default function EditVendor({
   button,
+  vendor,
   afterSubmit,
 }: {
   button: JSX.Element;
+  vendor: Vendor;
   afterSubmit?: (vendor: Vendor) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -37,7 +39,8 @@ export default function NewVendor({
     const website = data.get("website") as string;
     const notes = data.get("notes") as string;
 
-    const res = await newVendor({
+    const res = await editVendor({
+      id: vendor.id,
       name,
       company,
       phone,
@@ -52,7 +55,9 @@ export default function NewVendor({
 
     if (res.type === "success") {
       useListsStore.setState({
-        vendors: [...useListsStore.getState().vendors, res.data],
+        vendors: useListsStore
+          .getState()
+          .vendors.map((v) => (v.id === vendor.id ? res.data : v)),
       });
 
       afterSubmit && afterSubmit(res.data);
@@ -70,26 +75,22 @@ export default function NewVendor({
         form
       >
         <DialogHeader>
-          <DialogTitle>Add New Vendor</DialogTitle>
+          <DialogTitle>Edit Vendor</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-2 overflow-y-auto sm:grid-cols-2">
-          <SlimInput name="contactName" />
-          <SlimInput name="companyName" required={false} />
-          <SlimInput name="phone" required={false} />
-          <SlimInput name="email" required={false} />
-          <SlimInput name="address" required={false} />
+          <SlimInput name="contactName" defaultValue={vendor.name} />
+          <SlimInput name="companyName" defaultValue={vendor.companyName ?? ""} required={false} />
+          <SlimInput name="phone" defaultValue={vendor.phone ?? ""} required={false} />
+          <SlimInput name="email" defaultValue={vendor.email ?? ""}  required={false} />
+          <SlimInput name="address" defaultValue={vendor.address ?? ""} required={false} />
           <div className="flex gap-3">
-            <SlimInput name="city" required={false} />
-            <SlimInput name="state" required={false} />
-            <SlimInput name="zip" required={false} />
+            <SlimInput name="city" defaultValue={vendor.city ?? ""} required={false} />
+            <SlimInput name="state" defaultValue={vendor.state ?? ""} required={false} />
+            <SlimInput name="zip" defaultValue={vendor.zip ?? ""} required={false} />
           </div>
-          <SlimInput name="website" required={false} />
-          <SlimInput
-            name="notes"
-            placeholder="Add notes here ..."
-            required={false}
-          />
+          <SlimInput name="website" defaultValue={vendor.website ?? ""} required={false} />
+          <SlimInput name="notes" defaultValue={vendor.notes ?? ""} placeholder="Add notes" required={false} />
         </div>
 
         <DialogFooter>
