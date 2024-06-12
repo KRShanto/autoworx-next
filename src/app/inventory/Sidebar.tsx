@@ -1,10 +1,10 @@
 import { db } from "@/lib/db";
+import QRCode from "qrcode";
 import React from "react";
 import { FaPrint } from "react-icons/fa6";
-import UseProductForm from "./UseProductForm";
-import SalesPurchaseHistory from "./SalesPurchaseHistory";
 import ReplenishProductForm from "./ReplenishProductForm";
-import QRCode from "qrcode";
+import SalesPurchaseHistory from "./SalesPurchaseHistory";
+import UseProductForm from "./UseProductForm";
 
 export default async function Sidebar({ productId }: { productId: number }) {
   const product = productId
@@ -13,7 +13,7 @@ export default async function Sidebar({ productId }: { productId: number }) {
 
   const imgUrl = product
     ? await QRCode.toDataURL(
-        `${process.env.NEXT_PUBLIC_APP_URL}/inventory/use/${product.id}`,
+        `${process.env.NEXT_PUBLIC_APP_URL}inventory/use/${product.id}`,
       )
     : null;
 
