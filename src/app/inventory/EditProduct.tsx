@@ -17,19 +17,13 @@ import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { cn } from "@/lib/cn";
 import { useListsStore } from "@/stores/lists";
-import {
-  Category,
-  InventoryProduct,
-  InventoryProductType,
-  Vendor,
-} from "@prisma/client";
+import { Category, InventoryProduct, Vendor } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { CiEdit } from "react-icons/ci";
 import { editProduct } from "./actions/edit";
-import { getInventoryProductById } from "./actions/query";
 
 type TProps = {
-  currentProductId: number | undefined;
+  productData: InventoryProduct & { category: Category; vendor: Vendor };
 };
 
 type TInputType = {
@@ -39,72 +33,28 @@ type TInputType = {
   quantity: number | null;
   unit: string | null;
   lot: string | null;
-  type: InventoryProductType;
 };
 
-const radioData = [
-  {
-    id: "product",
-    label: "Products",
-    value: InventoryProductType.Product,
-  },
-];
-
-export default function EditProduct({ currentProductId }: TProps) {
+export default function EditProduct({ productData }: TProps) {
   const [open, setOpen] = useState(false);
   const { vendors } = useListsStore(); // useful
-  const [vendor, setVendor] = useState<Vendor | null>(null);
-  const [category, setCategory] = useState<Category | null>();
+  const [vendor, setVendor] = useState<Vendor | null>(productData.vendor);
+  const [category, setCategory] = useState<Category | null>(
+    productData.category,
+  );
   const [vendorOpen, setVendorOpen] = useState(false); // useful
   const [vendorSearch, setVendorSearch] = useState(""); // useful
   const [vendorsToDisplay, setVendorsToDisplay] = useState<Vendor[]>([]); // useful
   const [error, setError] = useState<string | null>("");
   const [product, setProduct] = useState<TInputType>({
-    productName: "",
-    description: "",
-    price: 0,
-    quantity: 0,
-    unit: "",
-    lot: "",
-    type: InventoryProductType.Product,
+    productName: productData.name,
+    description: productData.description,
+    price: Number(productData.price) as number,
+    quantity: productData.quantity,
+    unit: productData.unit,
+    lot: productData.lot,
   });
-  console.log({ currentProductId });
-  useEffect(() => {
-    let ignore = false;
-    const fetchInventoryProduct = async () => {
-      try {
-        if (currentProductId) {
-          const product = await getInventoryProductById<
-            InventoryProduct & { category: Category; vendor: Vendor }
-          >(currentProductId);
-          if (!ignore) {
-            setProduct({
-              productName: product.name,
-              description: product.description,
-              price: Number(product.price) as number,
-              quantity: product.quantity,
-              unit: product.unit,
-              lot: product.lot,
-              type: InventoryProductType.Product,
-            });
-            setCategory(product?.category as Category);
-            setVendor(product?.vendor as Vendor);
-            setError(null);
-          }
-        } else {
-          throw new Error("product id missing");
-        }
-      } catch (err: any) {
-        if (!ignore) {
-          setError(err.message as string);
-        }
-      }
-    };
-    fetchInventoryProduct();
-    return () => {
-      ignore = true;
-    };
-  }, [currentProductId]);
+
   useEffect(() => {
     if (vendorSearch) {
       setVendorsToDisplay(
@@ -128,6 +78,7 @@ export default function EditProduct({ currentProductId }: TProps) {
       setVendorsToDisplay(defaultVendors);
     }
   }, [vendorSearch, vendors]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -144,14 +95,12 @@ export default function EditProduct({ currentProductId }: TProps) {
     const quantity = Number(product.quantity) as number;
     const unit = product.unit as string;
     const lot = product.lot as string;
-    // const type =
-    //   (product.type as InventoryProductType) || InventoryProductType.Product;
     try {
       if (!(price > 0 && quantity > 0)) {
         throw new Error("Price and quantity must be greater than 0");
       }
       const res = await editProduct({
-        id: currentProductId as number,
+        id: productData.id,
         name,
         description,
         price,
@@ -255,23 +204,6 @@ export default function EditProduct({ currentProductId }: TProps) {
                 className="h-28 w-[95%] rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6"
                 value={product.description as string}
               />
-              {/* radio section */}
-              <div>
-                {radioData.map((radio) => (
-                  <div key={radio.id}>
-                    <input
-                      onChange={handleChange}
-                      id={radio.id}
-                      type="radio"
-                      name="type"
-                      value={radio.value as InventoryProductType}
-                      className="mr-1"
-                      checked={radio.value === product.type}
-                    />
-                    <label htmlFor={radio.id}>{radio.label}</label>
-                  </div>
-                ))}
-              </div>
             </div>
             <div className="col-span-3 mt-5 flex w-[90%] gap-5">
               <SlimInput
