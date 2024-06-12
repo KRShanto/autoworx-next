@@ -15,7 +15,7 @@ export const getInventoryProductById = async <T>(
         vendor: true,
       },
     });
-    return inventoryProduct as T;
+    return JSON.parse(JSON.stringify(inventoryProduct)) as T;
   } catch (err) {
     throw err;
   }

@@ -10,7 +10,7 @@ export default function Page() {
   const [result, setResult] = useState<any>(null);
   const router = useRouter();
 
-  function handleScan(data: any) {
+  async function handleScan(data: any) {
     if (data) {
       setResult(data);
       router.push(data.text);
@@ -24,7 +24,7 @@ export default function Page() {
       {result ? (
         <h2>Redirecting to {result.text}</h2>
       ) : (
-        <QrReader
+          <QrReader
           delay={300}
           style={{ width: 320, height: 240 }}
           onError={(err: any) => console.error(err)}

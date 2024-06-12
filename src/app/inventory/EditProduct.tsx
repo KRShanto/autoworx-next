@@ -68,7 +68,6 @@ export default function EditProduct({ currentProductId }: TProps) {
     lot: "",
     type: InventoryProductType.Product,
   });
-  console.log({ currentProductId });
   useEffect(() => {
     let ignore = false;
     const fetchInventoryProduct = async () => {
@@ -170,7 +169,6 @@ export default function EditProduct({ currentProductId }: TProps) {
       setError(err.message as string);
     }
   }
-  console.log({ category });
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
