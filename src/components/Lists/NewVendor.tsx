@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Vendor } from "@prisma/client";
 import { useState } from "react";
 import {
@@ -36,7 +35,7 @@ export default function NewVendor({
     const state = data.get("state") as string;
     const zip = data.get("zip") as string;
     const website = data.get("website") as string;
-    const notes =data.get("notes") as string;
+    const notes = data.get("notes") as string;
 
     const res = await newVendor({
       name,
@@ -86,7 +85,11 @@ export default function NewVendor({
             <SlimInput name="zip" required={false} />
           </div>
           <SlimInput name="website" required={false} />
-          <SlimInput name="notes" placeholder="Add notes here ..." required={false} />
+          <SlimInput
+            name="notes"
+            placeholder="Add notes here ..."
+            required={false}
+          />
         </div>
 
         <DialogFooter>
