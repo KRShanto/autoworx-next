@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import { CiEdit } from "react-icons/ci";
 import { FaTimes } from "react-icons/fa";
+import EditProduct from "./EditProduct";
 
 const evenColor = "bg-white";
 const oddColor = "bg-[#F8FAFF]";
@@ -19,7 +20,6 @@ export default function ProductTable({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-
   return (
     <div>
       <table className="w-full">
@@ -54,9 +54,9 @@ export default function ProductTable({
               </td>
               <td className="px-10 text-left">{product.quantity}</td>
               <td className="px-10 text-left">{product.unit}</td>
-              <td className="mt-2 flex gap-3 px-10">
+              <td className="item-center mt-2 flex gap-3 px-10">
                 <button className="text-2xl text-blue-600">
-                  <CiEdit />
+                  <EditProduct currentProductId={currentProductId} />
                 </button>
                 <button className="text-xl text-red-400">
                   <FaTimes />
