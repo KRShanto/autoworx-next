@@ -22,6 +22,7 @@ export default function Details({ vendor }: { vendor: Vendor | undefined }) {
           <p>State: {vendor.state}</p>
           <p>Zip: {vendor.zip}</p>
           <p>Website: {vendor.website}</p>
+          <p>Notes: {vendor.notes}</p>
           <div className="flex justify-end">
             <Link
               href={`/inventory/vendor/${vendor.id}/history`}

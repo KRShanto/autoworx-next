@@ -42,6 +42,7 @@ export default async function Page({
   });
   return (
     <div className="h-full">
+      
       <SyncLists categories={categories} vendors={vendors} />
 
       <header className="flex justify-between">

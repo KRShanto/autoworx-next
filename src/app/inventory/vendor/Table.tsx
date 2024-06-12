@@ -1,5 +1,6 @@
 "use client";
 
+import EditVendor from "@/components/Lists/EditVendor";
 import { cn } from "@/lib/cn";
 import { Vendor } from "@prisma/client";
 import moment from "moment";
@@ -57,9 +58,14 @@ export default function Table({
                 {moment(vendor.createdAt).format("DD MMM YYYY, hh:mm A")}
               </td>
               <td className="mt-2 flex gap-3 px-10">
+                
+                <EditVendor button={
                 <button className="text-2xl text-blue-600">
                   <CiEdit />
                 </button>
+                }
+                vendor={vendor}
+                />
                 <button className="text-xl text-red-400">
                   <FaTimes />
                 </button>
