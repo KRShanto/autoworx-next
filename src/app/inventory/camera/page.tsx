@@ -4,7 +4,6 @@ import adapter from "webrtc-adapter";
 
 import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
-// @ts-ignore
 import { QrReader } from "react-qr-reader";
 
 // qr code scannar page
@@ -12,7 +11,6 @@ export default function Page() {
   const [result, setResult] = useState<any>(null);
   const router = useRouter();
   const qrRef = useRef(null);
-
 
   const handleScan = (result, error) => {
     if (!!result) {
@@ -33,7 +31,6 @@ export default function Page() {
       {result ? (
         <h2>Redirecting to {result.text}</h2>
       ) : (
-
         <>
           <QrReader
             className="h-[300px] w-[300px] lg:h-[400px] lg:w-[400px]"
