@@ -12,7 +12,7 @@ export function InvoiceItems({
       typeof db.invoiceItem.findMany<{
         include: {
           service: true;
-          material: true;
+          materials: true;
           labor: true;
         };
       }>
@@ -24,10 +24,15 @@ export function InvoiceItems({
   return items.map((item) => {
     if (!item.service) return null;
 
-    const materialCost = item.material?.sell
-      ? parseFloat(item.material.sell.toString()) * item.material.quantity! -
-        parseFloat(item.material.discount?.toString()!)
-      : 0;
+    const materialCost = item.materials.reduce((acc, material) => {
+      return (
+        acc +
+        (material && material.sell
+          ? parseFloat(material.sell.toString()) * material.quantity! -
+            parseFloat(material.discount?.toString()!)
+          : 0)
+      );
+    }, 0);
 
     const laborCost = item.labor?.charge
       ? parseFloat(item.labor?.charge.toString()) * item.labor?.hours!
@@ -36,7 +41,7 @@ export function InvoiceItems({
     return (
       <div
         key={item.id}
-        className="rounded-md border border-[#6571FF] px-5 py-1 "
+        className="rounded-md border border-[#6571FF] px-5 py-1"
       >
         <div className="flex w-full justify-between text-[#6571FF]">
           <p>{item.service.name}</p>
@@ -55,16 +60,24 @@ export function InvoiceItems({
         {openService === item.id && (
           <>
             <div className="mt-2 text-[#6571FF]">
-              <div className="flex justify-between">
-                <p>{item.material ? item.material.name : "Material"}</p>
-                <p>
-                  $
-                  {item.material?.sell
-                    ? parseFloat(item.material.sell.toString()) *
-                        item.material.quantity! -
-                      parseFloat(item.material.discount?.toString()!)
-                    : 0}
-                </p>
+              <div>
+                {item.materials.map((material, index) => {
+                  if (!material) return null;
+
+                  return (
+                    <div key={index} className="flex justify-between">
+                      <p>{material.name}</p>
+                      <p>
+                        ${" "}
+                        {material.sell
+                          ? parseFloat(material.sell.toString()) *
+                              material.quantity! -
+                            parseFloat(material.discount?.toString()!)
+                          : 0}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

@@ -5,18 +5,14 @@ import { Category, Tag, Vendor } from "@prisma/client";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import Selector from "@/components/Selector";
 import { newMaterial } from "./actions/newMaterial";
-// import NewVendor from "./NewVendor";
 import NewVendor from "@/components/Lists/NewVendor";
 import Close from "./CloseEstimate";
-import { updateMeterial } from "./actions/updateMeterial";
 import { SelectTags } from "@/components/Lists/SelectTags";
 import SelectCategory from "@/components/Lists/SelectCategory";
 
 export default function MaterialCreate() {
   const { categories } = useListsStore();
   const { vendors } = useListsStore();
-
-  console.log("vendos: ", vendors);
 
   const [vendorsToDisplay, setVendorsToDisplay] = useState<Vendor[]>([]);
 
@@ -35,6 +31,7 @@ export default function MaterialCreate() {
 
   const { close, data } = useEstimatePopupStore();
   const itemId = data?.itemId;
+  const materialIndex = data?.materialIndex;
 
   const [vendorOpen, setVendorOpen] = useState(false);
   const [vendorSearch, setVendorSearch] = useState("");
@@ -142,48 +139,41 @@ export default function MaterialCreate() {
       return;
     }
 
-    const res = await updateMeterial({
-      id: data.material.id,
-      name,
-      categoryId: category?.id,
-      vendorId: vendor?.id,
-      tags,
-      notes,
-      quantity: quantity || 0,
-      cost: cost || 0,
-      sell: sell || 0,
-      discount: discount || 0,
-      addToInventory,
+    // Update the material in the items
+    // @ts-ignore
+    useEstimateCreateStore.setState((state) => {
+      const items = state.items.map((item) => {
+        if (item.id === itemId) {
+          const materials = item.materials.map((material, i) => {
+            if (i === materialIndex) {
+              return {
+                ...material,
+                name,
+                categoryId: category?.id,
+                vendorId: vendor?.id,
+                tags,
+                notes,
+                quantity: quantity || 0,
+                cost: cost || 0,
+                sell: sell || 0,
+                discount: discount || 0,
+                addToInventory,
+              };
+            }
+            return material;
+          });
+
+          return {
+            ...item,
+            materials,
+          };
+        }
+        return item;
+      });
+      return { items };
     });
 
-    if (res.type === "success") {
-      // Update the material in the items
-      useEstimateCreateStore.setState((state) => {
-        const items = state.items.map((item) => {
-          if (item.id === itemId) {
-            return {
-              ...item,
-              material: res.data,
-            };
-          }
-          return item;
-        });
-        return { items };
-      });
-
-      // Update the material in the listsStore
-      useListsStore.setState((state) => {
-        const materials = state.materials.map((material) => {
-          if (material.id === res.data.id) {
-            return res.data;
-          }
-          return material;
-        });
-        return { materials };
-      });
-
-      close();
-    }
+    close();
   }
 
   return (
@@ -211,6 +201,7 @@ export default function MaterialCreate() {
         onCategoryChange={setCategory}
         showLabelAsValue={false}
         labelPosition="left"
+        categoryData={category}
       />
 
       <div className="flex items-center gap-2">

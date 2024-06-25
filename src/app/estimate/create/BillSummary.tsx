@@ -33,20 +33,36 @@ export function BillSummary() {
     let newDiscountTotal = 0;
 
     items.forEach((item) => {
-      const { service, material, labor } = item;
+      const { service, materials, labor } = item;
 
       if (!service) return;
 
-      const materialCost = material?.sell
-        ? parseFloat(material.sell.toString()) * material.quantity!
-        : 0;
+      // total material cost
+      const materialCost = materials.reduce((acc, material) => {
+        return (
+          acc +
+          (material && material.sell
+            ? parseFloat(material.sell.toString()) * material.quantity! -
+              parseFloat(material.discount?.toString()!)
+            : 0)
+        );
+      }, 0);
+      // total material discount
+      const materialDiscount = materials.reduce((acc, material) => {
+        return (
+          acc +
+          (material && material.discount
+            ? parseFloat(material.discount.toString())
+            : 0)
+        );
+      }, 0);
       const laborCost = labor?.charge
         ? parseFloat(labor.charge.toString()) * labor.hours!
         : 0;
 
       newServicesTotal += materialCost + laborCost;
       newDiscountTotal +=
-        (material?.discount ? parseFloat(material.discount.toString()) : 0) +
+        materialDiscount +
         (labor?.discount ? parseFloat(labor.discount.toString()) : 0);
     });
 

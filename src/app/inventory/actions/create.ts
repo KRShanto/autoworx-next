@@ -1,10 +1,8 @@
 "use server";
 
-import { auth } from "@/app/auth";
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
-import { AuthSession } from "@/types/auth";
 import { InventoryProductType } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 

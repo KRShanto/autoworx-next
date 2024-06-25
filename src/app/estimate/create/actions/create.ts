@@ -60,7 +60,7 @@ export async function create({
   photos: string[];
   items: {
     service: Service | null;
-    material: Material | null;
+    materials: (Material | null)[];
     labor: Labor | null;
     tags: Tag[];
   }[];
@@ -107,7 +107,7 @@ export async function create({
 
   items.forEach(async (item) => {
     const service = item.service;
-    const material = item.material;
+    const materials = item.materials;
     const labor = item.labor;
     const tags = item.tags;
 
@@ -115,9 +115,30 @@ export async function create({
       data: {
         invoiceId: invoice.id,
         serviceId: service?.id,
-        materialId: material?.id,
         laborId: labor?.id,
       },
+    });
+
+    // Create materials
+    materials.forEach(async (material) => {
+      if (!material) return;
+
+      await db.material.create({
+        data: {
+          name: material.name,
+          vendorId: material.vendorId,
+          categoryId: material.categoryId,
+          notes: material.notes,
+          quantity: material.quantity,
+          cost: material.cost,
+          sell: material.sell,
+          discount: material.discount,
+          invoiceId: invoice.id,
+          companyId,
+          invoiceItemId: invoiceItem.id,
+          productId: material.productId,
+        },
+      });
     });
 
     tags.forEach(async (tag) => {

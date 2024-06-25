@@ -193,6 +193,7 @@ model Invoice {
   status           Status?        @relation(fields: [statusId], references: [id])
   payments         Payment[]
   user             User           @relation(fields: [userId], references: [id])
+  Material         Material[]
 
   @@index([companyId], name: "fk_invoices_company")
 }
@@ -224,15 +225,19 @@ model InvoiceItem {
   id         Int          @id @default(autoincrement())
   invoiceId  String?      @map("invoice_id")
   serviceId  Int?         @map("service_id")
-  materialId Int?         @map("material_id")
   laborId    Int?         @map("labor_id")
   createdAt  DateTime     @default(now()) @map("created_at")
   updatedAt  DateTime     @updatedAt @map("updated_at")
   invoice    Invoice?     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   service    Service?     @relation(fields: [serviceId], references: [id])
-  material   Material?    @relation(fields: [materialId], references: [id])
   labor      Labor?       @relation(fields: [laborId], references: [id])
   technician Technician[]
+  materials  Material[]
+}
+
+enum InvoiceItemMaterialType {
+  Material
+  Product
 }
 
 // Service of a invoice.
@@ -264,24 +269,29 @@ model Service {
 // Material itself is an independant model, So one material can be in multiple invoices.
 // And if you want to fetch materials for a customer, you need to fetch all invoices and then all invoice items and then you'll get materials.
 model Material {
-  id             Int           @id @default(autoincrement())
-  name           String
-  vendorId       Int?          @map("vendor_id")
-  categoryId     Int?          @map("category_id")
-  notes          String?
-  quantity       Int?
-  cost           Decimal?
-  sell           Decimal?
-  discount       Decimal?
-  addToInventory Boolean?      @map("add_to_inventory")
-  companyId      Int           @map("company_id")
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime      @updatedAt @map("updated_at")
-  company        Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  vendor         Vendor?       @relation(fields: [vendorId], references: [id])
-  category       Category?     @relation(fields: [categoryId], references: [id])
-  invoiceItems   InvoiceItem[]
-  tags           MaterialTag[]
+  id            Int      @id @default(autoincrement())
+  name          String
+  vendorId      Int?     @map("vendor_id")
+  categoryId    Int?     @map("category_id")
+  notes         String?
+  quantity      Int?
+  cost          Decimal?
+  sell          Decimal?
+  discount      Decimal?
+  companyId     Int      @map("company_id")
+  invoiceId     String?  @map("invoice_id")
+  invoiceItemId Int?     @map("invoice_item_id")
+  productId     Int?     @map("product_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  company     Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  vendor      Vendor?           @relation(fields: [vendorId], references: [id])
+  category    Category?         @relation(fields: [categoryId], references: [id])
+  tags        MaterialTag[]
+  invoiceItem InvoiceItem?      @relation(fields: [invoiceItemId], references: [id])
+  product     InventoryProduct? @relation(fields: [productId], references: [id])
+  invoice     Invoice?          @relation(fields: [invoiceId], references: [id])
 
   @@index([companyId], name: "fk_materials_company")
 }
@@ -654,6 +664,8 @@ model InventoryProduct {
   category                Category?                 @relation(fields: [categoryId], references: [id])
   vendor                  Vendor?                   @relation(fields: [vendorId], references: [id])
   InventoryProductHistory InventoryProductHistory[]
+  // InvoiceItemMaterial     InvoiceItemMaterial[]
+  Material                Material[]
 }
 
 model InventoryProductHistory {

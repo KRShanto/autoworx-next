@@ -1,21 +1,33 @@
 import { useListsStore } from "@/stores/lists";
 import { Category } from "@prisma/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import newService from "./actions/newService";
 import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import Close from "./CloseEstimate";
-import { updateService } from "./actions/updateService";
 import SelectCategory from "@/components/Lists/SelectCategory";
 
 export default function ServiceCreate() {
   const { close, data } = useEstimatePopupStore();
   const itemId = data?.itemId;
   const edit = data?.edit as boolean | undefined;
+  const { categories } = useListsStore();
 
   const [name, setName] = useState("");
   const [category, setCategory] = useState<Category | undefined>();
   const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    if (data?.service && data.edit) {
+      setName(data.service.name);
+      setCategory(categories.find((cat) => cat.id === data.service.categoryId));
+      setDescription(data.service.description);
+    } else {
+      setName("");
+      setCategory(undefined);
+      setDescription("");
+    }
+  }, [data]);
 
   async function handleSubmit() {
     if (!name) {
@@ -59,41 +71,27 @@ export default function ServiceCreate() {
       return;
     }
 
-    const res = await updateService({
-      id: data.service.id,
-      name,
-      categoryId: category?.id,
-      description,
+    // Change the service in the items
+    // @ts-ignore
+    useEstimateCreateStore.setState((state) => {
+      const items = state.items.map((item) => {
+        if (item.id === itemId) {
+          return {
+            ...item,
+            service: {
+              ...item.service,
+              name,
+              categoryId: category?.id,
+              description,
+            },
+          };
+        }
+        return item;
+      });
+      return { items };
     });
 
-    if (res.type === "success") {
-      // Change the service in the items
-      useEstimateCreateStore.setState((state) => {
-        const items = state.items.map((item) => {
-          if (item.id === itemId) {
-            return {
-              ...item,
-              service: res.data,
-            };
-          }
-          return item;
-        });
-        return { items };
-      });
-
-      // Update the service in the listsStore
-      useListsStore.setState((state) => {
-        const services = state.services.map((service) => {
-          if (service.id === data.service.id) {
-            return res.data;
-          }
-          return service;
-        });
-        return { services };
-      });
-
-      close();
-    }
+    close();
   }
 
   return (
@@ -114,6 +112,7 @@ export default function ServiceCreate() {
         onCategoryChange={setCategory}
         showLabelAsValue
         labelPosition="none"
+        categoryData={category}
       />
 
       <textarea

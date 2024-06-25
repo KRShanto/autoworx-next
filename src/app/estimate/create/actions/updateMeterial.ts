@@ -15,7 +15,6 @@ export async function updateMeterial({
   cost,
   sell,
   discount,
-  addToInventory,
 }: {
   id: number;
   name: string;
@@ -27,7 +26,6 @@ export async function updateMeterial({
   cost?: number;
   sell?: number;
   discount?: number;
-  addToInventory?: boolean;
 }): Promise<ServerAction> {
   const updatedMaterial = await db.material.update({
     where: { id },
@@ -40,7 +38,6 @@ export async function updateMeterial({
       cost,
       sell,
       discount,
-      addToInventory,
     },
   });
 

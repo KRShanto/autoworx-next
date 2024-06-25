@@ -1,6 +1,7 @@
 "use server";
 
 import { createTask } from "@/app/task/[type]/actions/createTask";
+import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { Labor, Material, Service, Tag } from "@prisma/client";
@@ -30,7 +31,7 @@ interface UpdateEstimateInput {
   //   photos: string[]; // TODO
   items: {
     service: Service | null;
-    material: Material | null;
+    materials: (Material | null)[];
     labor: Labor | null;
     tags: Tag[];
   }[];
@@ -38,6 +39,8 @@ interface UpdateEstimateInput {
 }
 
 export async function update(data: UpdateEstimateInput): Promise<ServerAction> {
+  const companyId = await getCompanyId();
+
   // update invoice itself
   await db.invoice.update({
     where: {
@@ -73,7 +76,7 @@ export async function update(data: UpdateEstimateInput): Promise<ServerAction> {
   // create new items
   data.items.forEach(async (item) => {
     const service = item.service;
-    const material = item.material;
+    const materials = item.materials;
     const labor = item.labor;
     const tags = item.tags;
 
@@ -81,9 +84,37 @@ export async function update(data: UpdateEstimateInput): Promise<ServerAction> {
       data: {
         invoiceId: data.id,
         serviceId: service?.id,
-        materialId: material?.id,
         laborId: labor?.id,
       },
+    });
+
+    // Delete existing materials
+    await db.material.deleteMany({
+      where: {
+        invoiceItemId: invoiceItem.id,
+      },
+    });
+
+    // Create materials
+    materials.forEach(async (material) => {
+      if (!material) return;
+
+      await db.material.create({
+        data: {
+          name: material.name,
+          vendorId: material.vendorId,
+          categoryId: material.categoryId,
+          notes: material.notes,
+          quantity: material.quantity,
+          cost: material.cost,
+          sell: material.sell,
+          discount: material.discount,
+          invoiceId: data.id,
+          companyId,
+          invoiceItemId: invoiceItem.id,
+          productId: material.productId,
+        },
+      });
     });
 
     tags.forEach(async (tag) => {

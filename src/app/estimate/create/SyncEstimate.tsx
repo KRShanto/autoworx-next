@@ -1,30 +1,9 @@
 "use client";
 
-import { useEstimateCreateStore } from "@/stores/estimate-create";
+import { Item, useEstimateCreateStore } from "@/stores/estimate-create";
 import { FullPayment } from "@/types/db";
-import {
-  CardPayment,
-  CashPayment,
-  CheckPayment,
-  Invoice,
-  InvoicePhoto,
-  Labor,
-  Material,
-  OtherPayment,
-  Payment,
-  Service,
-  Tag,
-  Task,
-} from "@prisma/client";
+import { Invoice, InvoicePhoto, Task } from "@prisma/client";
 import { useEffect } from "react";
-
-interface Item {
-  id: number;
-  service: Service | null;
-  material: Material | null;
-  labor: Labor | null;
-  tags: Tag[];
-}
 
 export default function SyncEstimate({
   invoice,

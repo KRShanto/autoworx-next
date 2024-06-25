@@ -32,9 +32,13 @@ export default async function Page({
   const paymentMethods = await db.paymentMethod.findMany({
     where: { companyId },
   });
+  const products = await db.inventoryProduct.findMany({
+    where: { companyId, type: "Product" },
+  });
 
+  // TODO: try to improve this query
   const materials = (await db.material.findMany({
-    where: { companyId },
+    where: { companyId, invoiceId: null },
   })) as (Material & { tags: Tag[] })[];
 
   const labors = (await db.labor.findMany({
@@ -60,6 +64,15 @@ export default async function Page({
       .filter((materialTag) => materialTag.materialId === material.id)
       .map((materialTag) => materialTag.tag);
   });
+  materials.push(
+    // @ts-ignore
+    ...products.map((product) => ({
+      ...product,
+      cost: product.price,
+      tags: [],
+      productId: product.id,
+    })),
+  );
 
   labors.forEach((labor) => {
     labor.tags = laborTags
@@ -96,6 +109,7 @@ export default async function Page({
           icon={<EstimateLogo />}
         />
       </div>
+
       <Header />
 
       <Tabs

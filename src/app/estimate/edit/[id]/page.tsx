@@ -41,7 +41,7 @@ export default async function Page({
     : null;
   const items = await db.invoiceItem.findMany({
     where: { invoiceId: id },
-    select: { service: true, material: true, labor: true, id: true },
+    select: { service: true, materials: true, labor: true, id: true },
   });
   const itemTags = await db.itemTag.findMany({
     where: { itemId: { in: items.map((item) => item.id) } },
@@ -70,7 +70,7 @@ export default async function Page({
   const statuses = await db.status.findMany({ where: { companyId } });
 
   const materials = (await db.material.findMany({
-    where: { companyId },
+    where: { companyId, invoiceId: null },
   })) as (Material & { tags: Tag[] })[];
 
   const labors = (await db.labor.findMany({

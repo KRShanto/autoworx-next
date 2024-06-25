@@ -1,6 +1,7 @@
 import { FullPayment } from "@/types/db";
 import {
   Customer,
+  InventoryProduct,
   Labor,
   Material,
   Payment,
@@ -13,10 +14,10 @@ import {
 import { customAlphabet } from "nanoid";
 import { create } from "zustand";
 
-interface Item {
+export interface Item {
   id: string | number; // nanoid
   service: Service | null;
-  material: Material | null;
+  materials: (Material | null)[];
   labor: Labor | null;
   tags: Tag[];
 }
@@ -70,6 +71,13 @@ interface EstimateCreateStore {
   setCurrentSelectedCategoryId: (categoryId: number) => void;
 
   reset: () => void;
+  removeMaterial: ({
+    itemIndex,
+    materialIndex,
+  }: {
+    itemIndex: number;
+    materialIndex: number;
+  }) => void;
 }
 
 export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
@@ -151,4 +159,21 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
       items: [],
       currentSelectedCategoryId: null,
     }),
+  removeMaterial({ itemIndex, materialIndex }) {
+    console.log("removeMaterial", itemIndex, materialIndex);
+
+    set((state) => {
+      const items = state.items.map((item, index) => {
+        if (index === itemIndex && item.materials.length > 1) {
+          const materials = item.materials.filter(
+            (_, i) => i !== materialIndex,
+          );
+
+          return { ...item, materials };
+        }
+        return item;
+      });
+      return { items };
+    });
+  },
 }));

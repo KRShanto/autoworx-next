@@ -2,8 +2,9 @@
 
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
+import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
-import { Tag } from "@prisma/client";
+import { InventoryProduct, Material, Tag } from "@prisma/client";
 
 export async function newMaterial({
   name,
@@ -27,27 +28,42 @@ export async function newMaterial({
   sell?: number;
   discount?: number;
   addToInventory?: boolean;
-}) {
+}): Promise<ServerAction> {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
+  let newMaterial: Material | InventoryProduct | null = null;
 
-  const newMaterial = await db.material.create({
-    data: {
-      name,
-      categoryId,
-      vendorId,
-      notes,
-      quantity,
-      cost,
-      sell,
-      discount,
-      addToInventory,
-      companyId,
-    },
-  });
+  if (addToInventory) {
+    newMaterial = await db.inventoryProduct.create({
+      data: {
+        name,
+        categoryId,
+        vendorId,
+        description: notes,
+        quantity,
+        price: sell,
+        companyId,
+        type: "Product",
+      },
+    });
+  } else {
+    newMaterial = await db.material.create({
+      data: {
+        name,
+        categoryId,
+        vendorId,
+        notes,
+        quantity,
+        cost,
+        sell,
+        discount,
+        companyId,
+      },
+    });
+  }
 
   // create material tags
-  if (tags) {
+  if (tags && newMaterial) {
     await Promise.all(
       tags.map((tag) =>
         db.materialTag.create({
@@ -62,7 +78,7 @@ export async function newMaterial({
 
   const newMaterialTags = await db.materialTag.findMany({
     where: {
-      materialId: newMaterial.id,
+      materialId: newMaterial?.id,
     },
     include: { tag: true },
   });
