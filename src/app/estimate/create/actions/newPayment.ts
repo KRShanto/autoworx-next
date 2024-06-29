@@ -71,9 +71,21 @@ export async function newPayment({
     [],
   );
 
-  // update the inventoryProduct quantity
   await Promise.all(
     productsWithQuantity.map(async (product) => {
+      // create a new history entry
+      await db.inventoryProductHistory.create({
+        data: {
+          productId: product.id,
+          date: new Date(date),
+          quantity: product.quantity,
+          notes,
+          type: "Sale",
+          invoiceId,
+        },
+      });
+
+      // update the inventoryProduct quantity
       await db.inventoryProduct.update({
         where: {
           id: product.id,
