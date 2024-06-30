@@ -127,9 +127,14 @@ function Table({
               )}
             </td>
             <td className="mt-2 flex gap-3 px-5">
-              <Link href="#" className="mx-auto">
-                <HiExternalLink />
-              </Link>
+              {history.invoiceId && (
+                <Link
+                  href={`/estimate/view/${history.invoiceId}`}
+                  className="mx-auto"
+                >
+                  <HiExternalLink />
+                </Link>
+              )}
             </td>
           </tr>
         ))}

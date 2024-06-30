@@ -12,7 +12,7 @@ export function InvoiceItems({
       typeof db.invoiceItem.findMany<{
         include: {
           service: true;
-          material: true;
+          materials: true;
           labor: true;
         };
       }>
@@ -27,7 +27,7 @@ export function InvoiceItems({
     return (
       <div
         key={item.id}
-        className="rounded-md border border-[#6571FF] px-5 py-1 "
+        className="rounded-md border border-[#6571FF] px-5 py-1"
       >
         <div className="flex w-full justify-between text-[#6571FF]">
           <p>{item.service.name}</p>
@@ -44,9 +44,19 @@ export function InvoiceItems({
 
         {openService === item.id && (
           <div className="my-2 grid grid-cols-2 gap-3 text-[#6571FF]">
-            <p className="rounded-md border border-solid border-[#6571FF] p-2">
-              {item.material ? item.material.name : "Material"}
-            </p>
+            {/* TODO */}
+            {item.materials.map((material, index) => {
+              if (!material) return null;
+
+              return (
+                <div
+                  key={index}
+                  className="rounded-md border border-solid border-[#6571FF] p-2"
+                >
+                  <p>{material.name}</p>
+                </div>
+              );
+            })}
             <p></p>
           </div>
         )}

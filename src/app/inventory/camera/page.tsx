@@ -1,19 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-// @ts-ignore
-import QrReader from "react-qr-scanner";
+import React, { useRef, useState } from "react";
+import { QrReader } from "react-qr-reader";
 
 // qr code scannar page
 export default function Page() {
   const [result, setResult] = useState<any>(null);
   const router = useRouter();
+  const qrRef: any = useRef(null);
 
-  async function handleScan(data: any) {
-    if (data) {
-      setResult(data);
-      router.push(data.text);
+  const handleScan = (result: any, error: any) => {
+    if (!!result) {
+      setResult(result?.text);
+      router.push(result?.text);
+      qrRef?.current?.stop();
     }
   }
 
@@ -24,12 +25,16 @@ export default function Page() {
       {result ? (
         <h2>Redirecting to {result.text}</h2>
       ) : (
-        <QrReader
-          delay={300}
-          style={{ width: 320, height: 240 }}
-          onError={(err: any) => console.error(err)}
-          onScan={handleScan}
-        />
+        <>
+          <QrReader
+            className="h-[300px] w-[300px] lg:h-[400px] lg:w-[400px]"
+            onResult={handleScan}
+            constraints={{ facingMode: "environment" }}
+            // @ts-ignore
+            style={{ width: "40%", height: "40%" }}
+            ref={qrRef}
+          />
+        </>
       )}
     </div>
   );

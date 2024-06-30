@@ -26,7 +26,7 @@ export default async function ViewEstimate({
       invoiceItems: {
         include: {
           service: true,
-          material: true,
+          materials: true,
           labor: true,
         },
       },

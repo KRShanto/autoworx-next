@@ -16,7 +16,7 @@ export default async function CreateWorkOrder({
       invoiceItems: {
         include: {
           service: true,
-          material: true,
+          materials: true,
           labor: true,
         },
       },

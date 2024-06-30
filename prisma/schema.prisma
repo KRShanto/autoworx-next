@@ -164,35 +164,37 @@ model Vehicle {
 // Note that `Invoice` is same as `Estimate`. So don't get confused.
 // We can differentiate them by `type` field.
 model Invoice {
-  id               String         @id @default(cuid())
-  createdAt        DateTime       @default(now()) @map("created_at")
-  updatedAt        DateTime       @updatedAt @map("updated_at")
-  type             InvoiceType    @default(Invoice)
-  customerId       Int?           @map("customer_id")
-  vehicleId        Int?           @map("vehicle_id")
-  subtotal         Decimal?       @default(0) @db.Decimal(8, 2)
-  discount         Decimal?       @default(0) @db.Decimal(8, 2)
-  tax              Decimal?       @default(0) @db.Decimal(8, 2)
-  grandTotal       Decimal?       @default(0) @map("grand_total") @db.Decimal(8, 2)
-  deposit          Decimal?       @default(0) @db.Decimal(8, 2)
-  depositNotes     String?        @default("") @map("deposit_notes")
-  depositMethod    String?        @default("") @map("deposit_method")
-  due              Decimal?       @default(0) @db.Decimal(8, 2)
-  statusId         Int?           @map("status_id")
-  internalNotes    String?
-  terms            String?
-  policy           String?
-  customerNotes    String?
-  customerComments String?
-  companyId        Int            @map("company_id")
-  userId           Int            @map("user_id")
-  company          Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  invoiceItems     InvoiceItem[]
-  photos           InvoicePhoto[]
-  tasks            Task[]
-  status           Status?        @relation(fields: [statusId], references: [id])
-  payments         Payment[]
-  user             User           @relation(fields: [userId], references: [id])
+  id                      String                    @id @default(cuid())
+  createdAt               DateTime                  @default(now()) @map("created_at")
+  updatedAt               DateTime                  @updatedAt @map("updated_at")
+  type                    InvoiceType               @default(Invoice)
+  customerId              Int?                      @map("customer_id")
+  vehicleId               Int?                      @map("vehicle_id")
+  subtotal                Decimal?                  @default(0) @db.Decimal(8, 2)
+  discount                Decimal?                  @default(0) @db.Decimal(8, 2)
+  tax                     Decimal?                  @default(0) @db.Decimal(8, 2)
+  grandTotal              Decimal?                  @default(0) @map("grand_total") @db.Decimal(8, 2)
+  deposit                 Decimal?                  @default(0) @db.Decimal(8, 2)
+  depositNotes            String?                   @default("") @map("deposit_notes")
+  depositMethod           String?                   @default("") @map("deposit_method")
+  due                     Decimal?                  @default(0) @db.Decimal(8, 2)
+  statusId                Int?                      @map("status_id")
+  internalNotes           String?
+  terms                   String?
+  policy                  String?
+  customerNotes           String?
+  customerComments        String?
+  companyId               Int                       @map("company_id")
+  userId                  Int                       @map("user_id")
+  company                 Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  invoiceItems            InvoiceItem[]
+  photos                  InvoicePhoto[]
+  tasks                   Task[]
+  status                  Status?                   @relation(fields: [statusId], references: [id])
+  payments                Payment[]
+  user                    User                      @relation(fields: [userId], references: [id])
+  Material                Material[]
+  InventoryProductHistory InventoryProductHistory[]
 
   @@index([companyId], name: "fk_invoices_company")
 }
@@ -224,15 +226,20 @@ model InvoiceItem {
   id         Int          @id @default(autoincrement())
   invoiceId  String?      @map("invoice_id")
   serviceId  Int?         @map("service_id")
-  materialId Int?         @map("material_id")
   laborId    Int?         @map("labor_id")
   createdAt  DateTime     @default(now()) @map("created_at")
   updatedAt  DateTime     @updatedAt @map("updated_at")
   invoice    Invoice?     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   service    Service?     @relation(fields: [serviceId], references: [id])
-  material   Material?    @relation(fields: [materialId], references: [id])
   labor      Labor?       @relation(fields: [laborId], references: [id])
   technician Technician[]
+  materials  Material[]
+  ItemTag    ItemTag[]
+}
+
+enum InvoiceItemMaterialType {
+  Material
+  Product
 }
 
 // Service of a invoice.
@@ -251,7 +258,6 @@ model Service {
   companyId    Int           @map("company_id")
   company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   category     Category?     @relation(fields: [categoryId], references: [id])
-  tags         ItemTag[]
   invoiceItems InvoiceItem[]
 
   @@index([companyId], name: "fk_services_company")
@@ -264,24 +270,29 @@ model Service {
 // Material itself is an independant model, So one material can be in multiple invoices.
 // And if you want to fetch materials for a customer, you need to fetch all invoices and then all invoice items and then you'll get materials.
 model Material {
-  id             Int           @id @default(autoincrement())
-  name           String
-  vendorId       Int?          @map("vendor_id")
-  categoryId     Int?          @map("category_id")
-  notes          String?
-  quantity       Int?
-  cost           Decimal?
-  sell           Decimal?
-  discount       Decimal?
-  addToInventory Boolean?      @map("add_to_inventory")
-  companyId      Int           @map("company_id")
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime      @updatedAt @map("updated_at")
-  company        Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  vendor         Vendor?       @relation(fields: [vendorId], references: [id])
-  category       Category?     @relation(fields: [categoryId], references: [id])
-  invoiceItems   InvoiceItem[]
-  tags           MaterialTag[]
+  id            Int      @id @default(autoincrement())
+  name          String
+  vendorId      Int?     @map("vendor_id")
+  categoryId    Int?     @map("category_id")
+  notes         String?
+  quantity      Int?
+  cost          Decimal?
+  sell          Decimal?
+  discount      Decimal?
+  companyId     Int      @map("company_id")
+  invoiceId     String?  @map("invoice_id")
+  invoiceItemId Int?     @map("invoice_item_id")
+  productId     Int?     @map("product_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  company     Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  vendor      Vendor?           @relation(fields: [vendorId], references: [id])
+  category    Category?         @relation(fields: [categoryId], references: [id])
+  tags        MaterialTag[]
+  invoiceItem InvoiceItem?      @relation(fields: [invoiceItemId], references: [id])
+  product     InventoryProduct? @relation(fields: [productId], references: [id])
+  invoice     Invoice?          @relation(fields: [invoiceId], references: [id])
 
   @@index([companyId], name: "fk_materials_company")
 }
@@ -356,10 +367,10 @@ model Tag {
 
 // Many to many relation between Item and Tag.
 model ItemTag {
-  itemId Int     @map("service_id")
-  tagId  Int     @map("tag_id")
-  item   Service @relation(fields: [itemId], references: [id])
-  tag    Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  itemId Int
+  tagId  Int
+  item   InvoiceItem @relation(fields: [itemId], references: [id])
+  tag    Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([itemId, tagId])
 }
@@ -654,6 +665,8 @@ model InventoryProduct {
   category                Category?                 @relation(fields: [categoryId], references: [id])
   vendor                  Vendor?                   @relation(fields: [vendorId], references: [id])
   InventoryProductHistory InventoryProductHistory[]
+  // InvoiceItemMaterial     InvoiceItemMaterial[]
+  Material                Material[]
 }
 
 model InventoryProductHistory {
@@ -663,9 +676,11 @@ model InventoryProductHistory {
   date      DateTime?                   @default(now())
   notes     String?
   type      InventoryProductHistoryType
+  invoiceId String?                     @map("invoice_id")
   createdAt DateTime                    @default(now()) @map("created_at")
   updatedAt DateTime                    @updatedAt @map("updated_at")
   product   InventoryProduct            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  invoice   Invoice?                    @relation(fields: [invoiceId], references: [id])
 }
 
 enum InventoryProductHistoryType {

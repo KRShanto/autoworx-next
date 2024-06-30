@@ -13,24 +13,20 @@ export default async function Page({
   searchParams: { productId: string };
 }) {
   const companyId = await getCompanyId();
+
   const supplies = await db.inventoryProduct.findMany({
     where: { companyId, type: "Supply" },
-    select: {
+    include: {
       category: true,
-      name: true,
-      quantity: true,
-      unit: true,
-      id: true,
+      vendor: true,
     },
   });
+
   const products = await db.inventoryProduct.findMany({
     where: { companyId, type: "Product" },
-    select: {
+    include: {
       category: true,
-      name: true,
-      quantity: true,
-      unit: true,
-      id: true,
+      vendor: true,
     },
   });
 

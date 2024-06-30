@@ -1,6 +1,5 @@
 "use client";
 
-import Selector from "@/components/Selector";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useListsStore } from "@/stores/lists";
@@ -8,140 +7,16 @@ import { nanoid } from "nanoid";
 import { HiOutlinePlusCircle, HiOutlineXCircle } from "react-icons/hi2";
 import { create } from "mutative";
 import { SelectTags } from "@/components/Lists/SelectTags";
-import { FaEdit } from "react-icons/fa";
-import { FaTrash } from "react-icons/fa6";
-import { deleteService } from "../actions/deleteService";
-import { deleteMaterial } from "../actions/deleteMaterial";
-import { deleteLabor } from "../actions/deleteLabor";
-import { useEffect, useState } from "react";
-import { Labor, Material, Service } from "@prisma/client";
+import ItemSelector from "@/components/ItemSelector";
+import React from "react";
 
 export function CreateTab() {
-  const items = useEstimateCreateStore((x) => x.items);
-  const { setCurrentSelectedCategoryId } = useEstimateCreateStore();
-  const { open, close, type } = useEstimatePopupStore();
+  const { items, removeMaterial } = useEstimateCreateStore();
+  const { open } = useEstimatePopupStore();
+
   const services = useListsStore((x) => x.services);
   const materials = useListsStore((x) => x.materials);
   const labors = useListsStore((x) => x.labors);
-
-  const [servicesToDisplay, setServicesToDisplay] = useState<Service[]>([]);
-  const [materialsToDisplay, setMaterialsToDisplay] = useState<Material[]>([]);
-  const [laborsToDisplay, setLaborsToDisplay] = useState<Labor[]>([]);
-
-  const [serviceSearch, setServiceSearch] = useState("");
-  const [materialSearch, setMaterialSearch] = useState("");
-  const [laborSearch, setLaborSearch] = useState("");
-
-  useEffect(() => {
-    if (serviceSearch) {
-      setServicesToDisplay(
-        services.filter((service) =>
-          service.name.toLowerCase().includes(serviceSearch.toLowerCase()),
-        ),
-      );
-    } else {
-      setServicesToDisplay(services.slice(0, 4));
-    }
-  }, [serviceSearch, services]);
-
-  useEffect(() => {
-    if (materialSearch) {
-      setMaterialsToDisplay(
-        materials.filter((material) =>
-          material.name.toLowerCase().includes(materialSearch.toLowerCase()),
-        ),
-      );
-    } else {
-      setMaterialsToDisplay(materials.slice(0, 4));
-    }
-  }, [materialSearch, materials]);
-
-  useEffect(() => {
-    if (laborSearch) {
-      setLaborsToDisplay(
-        labors.filter((labor) =>
-          labor.name.toLowerCase().includes(laborSearch.toLowerCase()),
-        ),
-      );
-    } else {
-      setLaborsToDisplay(labors.slice(0, 4));
-    }
-  }, [laborSearch, labors]);
-
-  async function handleServiceDelete(id: number) {
-    await deleteService(id);
-
-    useEstimateCreateStore.setState((x) => {
-      return create(x, (x) => {
-        x.items = x.items.map((item) => {
-          if (item.service?.id === id) {
-            item.service = null;
-          }
-          return item;
-        });
-      });
-    });
-
-    useListsStore.setState((x) => {
-      return create(x, (x) => {
-        x.services = x.services.filter((service) => service.id !== id);
-      });
-    });
-
-    if (type === "SERVICE") {
-      close();
-    }
-  }
-
-  async function handleMaterialDelete(id: number) {
-    await deleteMaterial(id);
-
-    useEstimateCreateStore.setState((x) => {
-      return create(x, (x) => {
-        x.items = x.items.map((item) => {
-          if (item.material?.id === id) {
-            item.material = null;
-          }
-          return item;
-        });
-      });
-    });
-
-    useListsStore.setState((x) => {
-      return create(x, (x) => {
-        x.materials = x.materials.filter((material) => material.id !== id);
-      });
-    });
-
-    if (type === "MATERIAL") {
-      close();
-    }
-  }
-
-  async function handleLaborDelete(id: number) {
-    await deleteLabor(id);
-
-    useEstimateCreateStore.setState((x) => {
-      return create(x, (x) => {
-        x.items = x.items.map((item) => {
-          if (item.labor?.id === id) {
-            item.labor = null;
-          }
-          return item;
-        });
-      });
-    });
-
-    useListsStore.setState((x) => {
-      return create(x, (x) => {
-        x.labors = x.labors.filter((labor) => labor.id !== id);
-      });
-    });
-
-    if (type === "LABOR") {
-      close();
-    }
-  }
 
   return (
     <>
@@ -166,212 +41,200 @@ export function CreateTab() {
           </thead>
           <tbody>
             {items.map((item, i) => (
-              <tr key={i}>
-                <td>
-                  <Selector
-                    newButton={
-                      <button
-                        type="button"
-                        onClick={() => open("SERVICE", { itemId: item.id })}
-                      >
-                        + Create new Service
-                      </button>
-                    }
-                    label={item.service ? item.service.name : "Service"}
-                    setSearch={setServiceSearch}
-                  >
-                    <div className="">
-                      {servicesToDisplay.map((service) => (
-                        <div
-                          className="mx-auto my-1 flex w-[95%] cursor-pointer items-center justify-between gap-1 rounded-md border border-[#6571FF] p-1 text-[#6571FF] hover:bg-gray-100"
-                          key={service.id}
+              <React.Fragment key={`item-${i}`}>
+                {item.materials.map((material, j) => (
+                  <tr key={`item-${i}-material-${j}`}>
+                    <td>
+                      {j > 0 ? null : (
+                        <ItemSelector
+                          type="SERVICE"
+                          label="Service"
+                          item={item}
+                          list={services}
+                          display="name"
+                          onEdit={() =>
+                            open("SERVICE", {
+                              itemId: item.id,
+                              edit: true,
+                              service: item.service,
+                            })
+                          }
+                          onSelect={(service) =>
+                            useEstimateCreateStore.setState((x) =>
+                              create(x, (x) => {
+                                x.items[i].service = service;
+                              }),
+                            )
+                          }
+                          onSearch={(search) => {
+                            const filteredServices = services.filter(
+                              (service) =>
+                                service.name
+                                  .toLowerCase()
+                                  .includes(search.toLowerCase()),
+                            );
+
+                            return filteredServices;
+                          }}
+                          onDelete={() =>
+                            useEstimateCreateStore.setState((x) => {
+                              // set the service to null
+                              const items = x.items.map((item, index) => {
+                                if (index === i) {
+                                  return { ...item, service: null };
+                                }
+                                return item;
+                              });
+                              return { items };
+                            })
+                          }
+                        />
+                      )}
+                    </td>
+                    <td>
+                      <ItemSelector
+                        type="MATERIAL"
+                        label="Materials/Parts"
+                        item={item}
+                        list={materials}
+                        display="name"
+                        alwaysShowDeleteButton={
+                          item.materials.length > 1 && j > 0
+                        }
+                        materialIndex={j}
+                        onDelete={() =>
+                          removeMaterial({ itemIndex: i, materialIndex: j })
+                        }
+                        onEdit={() =>
+                          open("MATERIAL", {
+                            itemId: item.id,
+                            edit: true,
+                            material,
+                            materialIndex: j,
+                          })
+                        }
+                        onSelect={(material) =>
+                          useEstimateCreateStore.setState((x) =>
+                            create(x, (x) => {
+                              x.items[i].materials[j] = material;
+                            }),
+                          )
+                        }
+                        onSearch={(search) => {
+                          const filteredMaterials = materials.filter(
+                            (material) =>
+                              material.name
+                                .toLowerCase()
+                                .includes(search.toLowerCase()),
+                          );
+
+                          return filteredMaterials;
+                        }}
+                      />
+
+                      {/* Check if this is the last material */}
+                      {/* Add new material button */}
+                      {j === item.materials.length - 1 ? (
+                        <button
+                          type="button"
+                          className="flex items-center gap-1 text-[#6571FF]"
+                          onClick={() => {
+                            useEstimateCreateStore.setState((x) =>
+                              create(x, (x) => {
+                                x.items[i].materials.push(null);
+                              }),
+                            );
+                          }}
                         >
-                          <button
-                            type="button"
-                            className="w-full text-left"
-                            onClick={() => {
-                              useEstimateCreateStore.setState((x) =>
-                                create(x, (x) => {
-                                  x.items[i].service = service;
-                                }),
-                              );
-                              setCurrentSelectedCategoryId(service.categoryId!);
-                            }}
-                          >
-                            {service.name}
-                          </button>
-                          <div className="flex">
-                            <button
-                              onClick={() =>
-                                open("SERVICE", {
-                                  itemId: item.id,
-                                  edit: true,
-                                  service,
-                                })
-                              }
-                              className="rounded-full p-2 transition-colors hover:bg-gray-200"
-                            >
-                              <FaEdit />
-                            </button>
-                            <button
-                              onClick={() => handleServiceDelete(service.id)}
-                              className="rounded-full p-2 transition-colors hover:bg-gray-200"
-                            >
-                              <FaTrash />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </Selector>
-                </td>
-                <td>
-                  <Selector
-                    newButton={
-                      <button
-                        type="button"
-                        onClick={() => open("MATERIAL", { itemId: item.id })}
-                      >
-                        + New Material
-                      </button>
-                    }
-                    label={
-                      item.material ? item.material.name : "Materials/Parts"
-                    }
-                    setSearch={setMaterialSearch}
-                  >
-                    <div>
-                      {materialsToDisplay.map((material) => (
-                        <div
-                          className="mx-auto my-1 flex w-[95%] cursor-pointer items-center justify-between gap-1 rounded-md border border-[#6571FF] p-1 text-[#6571FF] hover:bg-gray-100"
-                          key={material.id}
+                          <HiOutlinePlusCircle size="1.2em" /> Add More
+                        </button>
+                      ) : null}
+                    </td>
+                    <td>
+                      {j > 0 ? null : (
+                        <ItemSelector
+                          type="LABOR"
+                          label="Labor"
+                          item={item}
+                          list={labors}
+                          display="name"
+                          onEdit={() =>
+                            open("LABOR", {
+                              itemId: item.id,
+                              edit: true,
+                              labor: item.labor,
+                            })
+                          }
+                          onSelect={(labor) =>
+                            useEstimateCreateStore.setState((x) =>
+                              create(x, (x) => {
+                                x.items[i].labor = labor;
+                              }),
+                            )
+                          }
+                          onSearch={(search) => {
+                            const filteredLabors = labors.filter((labor) =>
+                              labor.name
+                                .toLowerCase()
+                                .includes(search.toLowerCase()),
+                            );
+
+                            return filteredLabors;
+                          }}
+                          onDelete={() =>
+                            useEstimateCreateStore.setState((x) => {
+                              // set the labor to null
+                              const items = x.items.map((item, index) => {
+                                if (index === i) {
+                                  return { ...item, labor: null };
+                                }
+                                return item;
+                              });
+                              return { items };
+                            })
+                          }
+                        />
+                      )}
+                    </td>
+                    <td>
+                      {j > 0 ? null : (
+                        <SelectTags
+                          value={item.tags}
+                          setValue={(tags) => {
+                            useEstimateCreateStore.setState((x) =>
+                              create(x, (x) => {
+                                x.items[i].tags =
+                                  tags instanceof Function
+                                    ? tags(item.tags)
+                                    : tags;
+                              }),
+                            );
+                          }}
+                        />
+                      )}
+                    </td>
+                    <td>
+                      {j > 0 ? null : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            useEstimateCreateStore.setState((x) => ({
+                              items: items.toSpliced(i, 1),
+                            }));
+                          }}
                         >
-                          <button
-                            type="button"
-                            className="w-full text-left"
-                            onClick={() =>
-                              useEstimateCreateStore.setState((x) =>
-                                create(x, (x) => {
-                                  x.items[i].material = material;
-                                }),
-                              )
-                            }
-                          >
-                            {material.name}
-                          </button>
-                          <div className="flex">
-                            <button
-                              onClick={() =>
-                                open("MATERIAL", {
-                                  itemId: item.id,
-                                  edit: true,
-                                  material,
-                                })
-                              }
-                              className="rounded-full p-2 transition-colors hover:bg-gray-200"
-                            >
-                              <FaEdit />
-                            </button>
-                            <button
-                              onClick={() => handleMaterialDelete(material.id)}
-                              className="rounded-full p-2 transition-colors hover:bg-gray-200"
-                            >
-                              <FaTrash />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </Selector>
-                </td>
-                <td>
-                  <Selector
-                    newButton={
-                      <button
-                        type="button"
-                        onClick={() => open("LABOR", { itemId: item.id })}
-                      >
-                        + New Labor
-                      </button>
-                    }
-                    label={item.labor ? item.labor.name : "Labor"}
-                    setSearch={setLaborSearch}
-                  >
-                    <div className="">
-                      {laborsToDisplay.map((labor) => (
-                        <div
-                          className="mx-auto my-1 flex w-[95%] cursor-pointer items-center justify-between gap-1 rounded-md border border-[#6571FF] p-1 text-[#6571FF] hover:bg-gray-100"
-                          key={labor.id}
-                        >
-                          <button
-                            type="button"
-                            className="w-full text-left"
-                            onClick={() =>
-                              useEstimateCreateStore.setState((x) =>
-                                create(x, (x) => {
-                                  x.items[i].labor = labor;
-                                }),
-                              )
-                            }
-                          >
-                            {labor.name}
-                          </button>
-                          <div className="flex">
-                            <button
-                              onClick={() =>
-                                open("LABOR", {
-                                  itemId: item.id,
-                                  edit: true,
-                                  labor,
-                                })
-                              }
-                              className="rounded-full p-2 transition-colors hover:bg-gray-200"
-                            >
-                              <FaEdit />
-                            </button>
-                            <button
-                              onClick={() => handleLaborDelete(labor.id)}
-                              className="rounded-full p-2 transition-colors hover:bg-gray-200"
-                            >
-                              <FaTrash />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </Selector>
-                </td>
-                <td>
-                  <SelectTags
-                    value={item.tags}
-                    setValue={(tags) => {
-                      useEstimateCreateStore.setState((x) =>
-                        create(x, (x) => {
-                          x.items[i].tags =
-                            tags instanceof Function ? tags(item.tags) : tags;
-                        }),
-                      );
-                    }}
-                  />
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      useEstimateCreateStore.setState((x) => ({
-                        items: items.toSpliced(i, 1),
-                      }));
-                    }}
-                  >
-                    <HiOutlineXCircle size="1.2em" />
-                  </button>
-                </td>
-              </tr>
+                          <HiOutlineXCircle size="1.2em" />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </React.Fragment>
             ))}
           </tbody>
         </table>
       </div>
-      <div className="bg-slate-50">
+      <div className="flex gap-52 bg-slate-50">
         <button
           type="button"
           className="flex items-center gap-2 p-2 text-[#6571FF]"
@@ -382,7 +245,7 @@ export function CreateTab() {
                 {
                   id: nanoid(),
                   service: null,
-                  material: null,
+                  materials: [null],
                   labor: null,
                   tags: [],
                 },

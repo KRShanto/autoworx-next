@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/cn";
-import { Category, InventoryProduct } from "@prisma/client";
+import { Category, InventoryProduct, Vendor } from "@prisma/client";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import { CiEdit } from "react-icons/ci";
@@ -16,10 +16,10 @@ export default function ProductTable({
   products,
 }: {
   currentProductId: number | undefined;
-  products: (InventoryProduct & { category: Category })[];
+  products: (InventoryProduct & { category: Category; vendor: Vendor })[];
 }) {
   const router = useRouter();
-  const pathname = usePathname();
+
   return (
     <div>
       <table className="w-full">
@@ -56,7 +56,7 @@ export default function ProductTable({
               <td className="px-10 text-left">{product.unit}</td>
               <td className="item-center mt-2 flex gap-3 px-10">
                 <button className="text-2xl text-blue-600">
-                  <EditProduct currentProductId={product?.id as number} />
+                  <EditProduct productData={product} />
                 </button>
                 <button className="text-xl text-red-400">
                   <FaTimes />

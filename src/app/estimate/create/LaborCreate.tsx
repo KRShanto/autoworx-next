@@ -5,7 +5,6 @@ import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { newLabor } from "./actions/newLabor";
 import Close from "./CloseEstimate";
-import { updateLabor } from "./actions/updateLabor";
 import { SelectTags } from "@/components/Lists/SelectTags";
 import SelectCategory from "@/components/Lists/SelectCategory";
 
@@ -35,7 +34,7 @@ export default function LaborCreate() {
   useEffect(() => {
     if (data?.labor && data.edit) {
       setName(data.labor.name);
-      setCategory(data.labor.category);
+      setCategory(categories.find((cat) => cat.id === data.labor.categoryId)!);
       setTags(data.labor.tags);
       setNotes(data.labor.notes);
       setHours(data.labor.hours);
@@ -101,53 +100,36 @@ export default function LaborCreate() {
       return;
     }
 
-    const res = await updateLabor({
-      id: data.labor.id,
-      name,
-      categoryId: category?.id,
-      tags,
-      notes,
-      hours: hours || 1,
-      charge: charge || 0,
-      discount: discount || 0,
-      addToCannedLabor,
+    // Change the service where itemId is the same
+    // @ts-ignore
+    useEstimateCreateStore.setState((state) => {
+      const items = state.items.map((item) => {
+        if (item.id === itemId) {
+          return {
+            ...item,
+            labor: {
+              ...item.labor,
+              name,
+              categoryId: category?.id,
+              tags,
+              notes,
+              hours,
+              charge,
+              discount,
+              addToCannedLabor,
+            },
+          };
+        }
+        return item;
+      });
+      return { items };
     });
-
-    if (res.type === "success") {
-      // Change the service where itemId is the same
-      useEstimateCreateStore.setState((state) => {
-        const items = state.items.map((item) => {
-          if (item.id === itemId) {
-            return {
-              ...item,
-              labor: res.data,
-            };
-          }
-          return item;
-        });
-        return { items };
-      });
-
-      // Update the labor in listsStore
-      useListsStore.setState((state) => {
-        return {
-          labors: state.labors.map((labor) => {
-            if (labor.id === data.labor.id) {
-              return res.data;
-            }
-            return labor;
-          }),
-        };
-      });
-
-      close();
-    }
+    close();
   }
 
   return (
     <div className="flex flex-col gap-2 p-5">
       <h3 className="w-full text-xl font-semibold">
-        {/* Labor Information */}
         {data?.edit ? "Edit Labor Information" : "Labor Information"}
       </h3>
 
@@ -168,6 +150,7 @@ export default function LaborCreate() {
         onCategoryChange={setCategory}
         showLabelAsValue={false}
         labelPosition="left"
+        categoryData={category}
       />
 
       <div className="flex items-center gap-2">
