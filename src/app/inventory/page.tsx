@@ -1,11 +1,11 @@
+import { SyncLists } from "@/components/SyncLists";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import Title from "@/components/Title";
-import AddNewProduct from "./AddNewProduct";
-import { db } from "@/lib/db";
-import { SyncLists } from "@/components/SyncLists";
-import Sidebar from "./Sidebar";
 import { getCompanyId } from "@/lib/companyId";
+import { db } from "@/lib/db";
+import AddNewProduct from "./AddNewProduct";
 import ProductTable from "./ProductTable";
+import Sidebar from "./Sidebar";
 
 export default async function Page({
   searchParams: { productId },
@@ -37,8 +37,7 @@ export default async function Page({
     where: { companyId },
   });
   return (
-    <div className="h-full">
-      
+    <div className="h-full w-full">
       <SyncLists categories={categories} vendors={vendors} />
 
       <header className="flex justify-between">
@@ -49,7 +48,7 @@ export default async function Page({
       <div className="flex h-full w-full justify-between gap-3">
         <Tabs
           defaultValue="supplies"
-          className="col-start-1 mt-3 flex h-[93%] min-h-0 flex-col overflow-clip"
+          className="col-start-1 mt-3 flex h-[93%] min-h-0 w-1/2 flex-col overflow-clip text-xs 2xl:text-base"
         >
           <TabsList>
             <TabsTrigger value="procurement">Procurement</TabsTrigger>
@@ -61,7 +60,7 @@ export default async function Page({
             <p>Procurement</p>
           </TabsContent>
 
-          <TabsContent value="products" className="overflow-x-scroll">
+          <TabsContent value="products" className="#overflow-x-scroll">
             <ProductTable
               products={products as any}
               currentProductId={parseInt(productId)}

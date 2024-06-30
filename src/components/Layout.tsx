@@ -1,11 +1,10 @@
 "use client";
 
+import { Session } from "next-auth";
+import { redirect, usePathname } from "next/navigation";
+import PopupState from "./PopupState";
 import SideNavbar from "./SideNavbar";
 import TopNavbar from "./TopNavbar";
-import PopupState from "./PopupState";
-import { usePathname } from "next/navigation";
-import { Session } from "next-auth";
-import { redirect } from "next/navigation";
 
 export default function Layout({
   children,
@@ -29,7 +28,7 @@ export default function Layout({
     );
 
   return (
-    <div>
+    <div className="#overflow-y-hidden w-full">
       <SideNavbar />
       <div className="ml-[5%]">
         <TopNavbar />

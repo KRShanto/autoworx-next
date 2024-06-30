@@ -18,16 +18,16 @@ export default async function Sidebar({ productId }: { productId: number }) {
     : null;
 
   return (
-    <div className="mt-12 h-[88.5%] w-full">
-      <div className="flex h-[35%] gap-4">
+    <div className="mt-12 h-[88.5%] w-1/2 flex flex-col">
+      <div className="#h-[35%] flex gap-4">
         <div className="flex flex-col justify-between">
-          <div className="app-shadow rounded-lg bg-white p-6 px-6">
+          <div className="app-shadow rounded-lg bg-white py-2 2xl:py-6 px-6">
             {product ? (
-              <div className="h-16 w-32">
-                <h3 className="text-nowrap text-center font-semibold">
+              <div className="#h-16 #w-32 px-2 py-0 2xl:p-4">
+                <h3 className="text-md text-nowrap text-center font-semibold 2xl:text-2xl">
                   Total Value
                 </h3>
-                <p className="mt-2 text-center text-4xl font-bold">
+                <p className="mt-2 text-center text-2xl font-bold 2xl:text-4xl">
                   $
                   {parseFloat(product?.price?.toString() || "0") *
                     parseFloat(product?.quantity?.toString() || "0")}
@@ -37,11 +37,13 @@ export default async function Sidebar({ productId }: { productId: number }) {
               <div className="h-16 w-32"></div>
             )}
           </div>
-          <div className="app-shadow rounded-lg bg-white p-6 px-6">
+          <div className="app-shadow mt-4 rounded-lg bg-white p-6 px-6">
             {product ? (
-              <div className="h-16 w-32">
-                <h3 className="text-center font-semibold">Price</h3>
-                <p className="mt-2 text-nowrap text-center text-3xl font-bold">
+              <div className="#h-16 #w-32 px-2 py-0 2xl:p-4">
+                <h3 className="text-md text-center font-semibold 2xl:text-2xl">
+                  Price
+                </h3>
+                <p className="mt-2 text-nowrap text-center text-2xl font-bold 2xl:text-3xl">
                   ${parseFloat(product?.price?.toString()!)}
                   <span className="text-base">/{product.unit}</span>
                 </p>
@@ -51,7 +53,7 @@ export default async function Sidebar({ productId }: { productId: number }) {
             )}
           </div>
         </div>
-        <div className="app-shadow w-full rounded-lg bg-white p-4">
+        <div className="app-shadow w-full rounded-lg bg-white p-4 text-xs 2xl:text-base">
           {product ? (
             <>
               <div className="flex gap-4">
