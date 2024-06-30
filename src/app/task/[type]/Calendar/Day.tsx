@@ -75,6 +75,7 @@ export default function Day({
   const is1300 = useMediaQuery({ query: "(max-width: 1300px)" });
   const [draggedOverRow, setDraggedOverRow] = useState<number | null>(null);
   const parentRef = useRef<HTMLDivElement>(null);
+  const [isRefAvailable, setIsRefAvailable] = useState<boolean>(false);
 
   const [{ canDrop, isOver }, dropRef] = useDrop({
     accept: ["tag", "task", "appointment"],
@@ -86,6 +87,18 @@ export default function Day({
       canDrop: monitor.canDrop(),
     }),
   }) as [{ canDrop: boolean; isOver: boolean }, any];
+
+  useEffect(() => {
+    // This effect checks if the ref is available and updates isRefAvailable accordingly.
+    const checkRefAvailability = () => {
+      setIsRefAvailable(!!parentRef.current);
+    };
+
+    checkRefAvailability();
+    // Optionally, listen to resize events or other events that might affect the ref's availability
+    window.addEventListener("resize", checkRefAvailability);
+    return () => window.removeEventListener("resize", checkRefAvailability);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -219,6 +232,7 @@ export default function Day({
   function calculateLeftPosition(taskIndex: number, tasksInRowLength: number) {
     if (parentRef.current) {
       const parentWidth = parentRef.current.offsetWidth;
+      console.log("parentWidth", parentWidth);
       const distributionPercentage = (90 / tasksInRowLength) * taskIndex;
       const shiftPercentage = (110 / parentWidth) * 100;
       return `calc(${distributionPercentage}% + ${shiftPercentage}%)`;
@@ -314,6 +328,8 @@ export default function Day({
         // Define the maximum title length based on the height
         const maxTitleLength =
           height === "45px" ? 60 : height === "90px" ? 120 : event.title.length;
+
+        if (!isRefAvailable) return null;
 
         return (
           <Tooltip key={event.id}>

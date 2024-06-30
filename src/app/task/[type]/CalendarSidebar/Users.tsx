@@ -19,6 +19,15 @@ export default function Users({
   const { open } = usePopupStore();
   const minimized = useCalendarSidebarStore((x) => x.minimized);
   const setMinimized = useCalendarSidebarStore((x) => x.setMinimized);
+  const [usersToDisplay, setUsersToDisplay] = useState(users);
+
+  function searchUser(formData: FormData) {
+    const searchValue = formData.get("search") as string;
+    const filteredUsers = users.filter((user) =>
+      user.name.toLowerCase().includes(searchValue.toLowerCase()),
+    );
+    setUsersToDisplay(filteredUsers);
+  }
 
   return (
     <div
@@ -36,14 +45,18 @@ export default function Users({
         </h2>
 
         {!minimized && (
-          <form className="mt-3 flex items-center justify-center gap-2">
+          <form
+            className="mt-3 flex items-center justify-center gap-2"
+            action={searchUser}
+          >
             <input
               type="search"
-              className="w-[70%] border-none"
+              className="w-[70%] rounded-[5px] border-none bg-[#F5F5F5] p-2 text-[13px] outline-none"
               placeholder="Search here..."
+              name="search"
             />
             <button className="w-[30%] rounded-[5px] bg-[#797979] p-2 text-[13px] text-white">
-              Filter
+              Search
             </button>
           </form>
         )}
@@ -51,7 +64,7 @@ export default function Users({
 
       <div className="flex-grow overflow-scroll py-2">
         {!minimized &&
-          users.map((user, index) => {
+          usersToDisplay.map((user, index) => {
             const isSelected = selectedUser === index;
 
             function handleClick() {
