@@ -29,7 +29,7 @@ export default function UserComponent({
     <>
       <button
         className={cn(
-          "mt-2 flex w-full items-center rounded-lg py-2",
+          "mt-2 flex w-full items-center rounded-lg py-2  sm:h-[12%] ",
           isSelected ? "bg-[#006D77]" : "bg-[#F8F9FA]",
         )}
         onClick={handleClick}
@@ -40,11 +40,11 @@ export default function UserComponent({
           alt="User Image"
           width={50}
           height={50}
-          className="rounded-full"
+          className="rounded-full sm:max-h-12 sm:max-w-12"
         />
         <p
           className={cn(
-            "ml-2 text-[14px] font-bold",
+            "ml-2 text-[14px] font-bold sm:text-xs",
             isSelected ? "text-white" : "text-[#797979]",
             minimized && "sr-only",
           )}
@@ -66,7 +66,7 @@ export default function UserComponent({
           ))}
 
           <button
-            className="mt-3 rounded-2xl bg-slate-500 px-5 py-1 text-[15px] text-white"
+            className="mt-3 rounded-2xl bg-slate-500 px-5 py-1 text-[15px] text-white sm:text-xs"
             onClick={() =>
               open("ASSIGN_TASK", {
                 user,

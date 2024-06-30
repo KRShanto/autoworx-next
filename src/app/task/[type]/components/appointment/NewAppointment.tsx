@@ -163,13 +163,13 @@ export function NewAppointment({
       <DialogTrigger asChild>
         <button
           type="button"
-          className="app-shadow rounded-md bg-[#6571FF] p-2 text-white"
+          className="app-shadow rounded-md bg-[#6571FF] p-2 text-white text-xs sm:text-sm"
         >
           New Appointment
         </button>
       </DialogTrigger>
       <DialogContent
-        className="max-h-full max-w-5xl grid-rows-[auto,1fr,auto]"
+        className="max-h-full max-w-5xl grid grid-rows-[auto,1fr,auto] sm:max-h-[80vh] sm:max-w-[60vw]"
         form
       >
         {/* Heading */}
