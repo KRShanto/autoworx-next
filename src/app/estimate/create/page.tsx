@@ -38,7 +38,7 @@ export default async function Page({
 
   // TODO: try to improve this query
   const materials = (await db.material.findMany({
-    where: { companyId, invoiceId: null },
+    where: { companyId }, //     where: { companyId, invoiceId: null },
   })) as (Material & { tags: Tag[] })[];
 
   const labors = (await db.labor.findMany({
@@ -143,7 +143,7 @@ export default async function Page({
         </TabsContent>
       </Tabs>
 
-      <div className="app-shadow col-start-2 row-start-2 row-end-4 grid h-[85vh] grid-rows-[1fr,auto,auto] divide-y rounded-md">
+      <div className="app-shadow col-start-2 row-start-2 row-end-4 grid h-[85vh] grid-rows-[1fr,auto,auto] divide-y overflow-y-scroll rounded-md">
         <Create />
         <BillSummary />
       </div>
