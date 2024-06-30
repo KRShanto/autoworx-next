@@ -29,7 +29,7 @@ import { editProduct } from "./actions/edit";
 import { getInventoryProductById } from "./actions/query";
 
 type TProps = {
-  currentProductId: number | undefined;
+  currentProductId: number | string | null;
 };
 
 type TInputType = {

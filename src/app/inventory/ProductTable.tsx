@@ -56,7 +56,7 @@ export default function ProductTable({
               <td className="px-10 text-left">{product.unit}</td>
               <td className="item-center mt-2 flex gap-3 px-10">
                 <button className="text-2xl text-blue-600">
-                  <EditProduct currentProductId={currentProductId} />
+                  <EditProduct currentProductId={product?.id as number} />
                 </button>
                 <button className="text-xl text-red-400">
                   <FaTimes />

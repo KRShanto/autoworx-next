@@ -42,7 +42,6 @@ export default async function Page({
   });
   return (
     <div className="h-full">
-      
       <SyncLists categories={categories} vendors={vendors} />
 
       <header className="flex justify-between">
@@ -50,7 +49,7 @@ export default async function Page({
         <AddNewProduct />
       </header>
 
-      <div className="flex h-full w-full justify-between gap-3">
+      <div className="grid h-full w-full grid-cols-2 justify-between gap-3">
         <Tabs
           defaultValue="supplies"
           className="col-start-1 mt-3 flex h-[93%] min-h-0 flex-col overflow-clip"
