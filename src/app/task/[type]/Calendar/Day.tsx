@@ -20,12 +20,13 @@ import type {
 } from "@prisma/client";
 import moment from "moment";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDrop } from "react-dnd";
 import { FaPen } from "react-icons/fa6";
 import { useMediaQuery } from "react-responsive";
 import { assignAppointmentDate } from "../actions/assignAppointmentDate";
 import { dragTask } from "../actions/dragTask";
+import mergeRefs from "merge-refs";
 
 const rows = [
   "All Day",
@@ -73,6 +74,7 @@ export default function Day({
   const { open } = usePopupStore();
   const is1300 = useMediaQuery({ query: "(max-width: 1300px)" });
   const [draggedOverRow, setDraggedOverRow] = useState<number | null>(null);
+  const parentRef = useRef<HTMLDivElement>(null);
 
   const [{ canDrop, isOver }, dropRef] = useDrop({
     accept: ["tag", "task", "appointment"],
@@ -202,10 +204,31 @@ export default function Day({
     }
   }
 
+  /**
+   * Calculates the left CSS position for a task in a row.
+   *
+   * This function dynamically calculates and returns the CSS `calc()` value for the `left` property
+   * of a task based on its index within a row and the total number of tasks in that row. It ensures
+   * tasks are evenly distributed across the parent container, with an additional shift to the right.
+   * If the parent container's width cannot be determined, it returns "0%" as a fallback.
+   *
+   * @param taskIndex - Index of the task in the row.
+   * @param tasksInRowLength - Total number of tasks in the row.
+   * @returns CSS `calc()` string for the left position or "0%" if parent width is unknown.
+   */
+  function calculateLeftPosition(taskIndex: number, tasksInRowLength: number) {
+    if (parentRef.current) {
+      const parentWidth = parentRef.current.offsetWidth;
+      const distributionPercentage = (90 / tasksInRowLength) * taskIndex;
+      const shiftPercentage = (110 / parentWidth) * 100;
+      return `calc(${distributionPercentage}% + ${shiftPercentage}%)`;
+    }
+    return "0%"; // Default fallback
+  }
+
   return (
     <div
-      ref={dropRef}
-      // style={{ backgroundColor: isOver ? "lightgreen" : "white" }}
+      ref={mergeRefs(dropRef, parentRef)}
       className="relative mt-3 h-[90%] overflow-auto border border-neutral-200"
     >
       {rows.map((row, i) => (
@@ -250,27 +273,37 @@ export default function Day({
 
       {/* Tasks */}
       {events.map((event, index) => {
-        // TODO: fix overlapping tasks
         const top = `${event.rowStartIndex * 45}px`;
-        let left = "130px";
         const height = `${
           (event.rowEndIndex - event.rowStartIndex + 1) * 45
         }px`;
         const widthNumber = is1300 ? 300 : 500;
-        const width = `${widthNumber}px`;
+        let width = `${widthNumber}px`;
         // @ts-ignore
         const backgroundColor = event.priority
           ? // @ts-ignore
             TASK_COLOR[event.priority]
           : "rgb(100, 116, 139)";
-        // if the previous task ends at the same time as this task
-        // then move this task right
-        if (
-          index > 0 &&
-          event.rowStartIndex === events[index - 1].rowStartIndex
-        ) {
-          left = `${widthNumber + 130}px`;
+
+        // Calculate how many tasks are in the same row
+        const tasksInRow = events.filter(
+          (task) => task.rowStartIndex === event.rowStartIndex,
+        );
+
+        // If there are more than one task in the same row
+        // then move the task right
+        // If there are more than two tasks in the same row
+        // then reduce the width of the task
+        // Now figure out which task is this
+        const taskIndex = tasksInRow.findIndex((task) => task.id === event.id);
+
+        // If there's more than two tasks in the same row
+        // then reduce the width of the task
+        // calculate the width based on the number of tasks in the row (devide from 90%)
+        if (tasksInRow.length > 2) {
+          width = `${90 / tasksInRow.length}%`;
         }
+
         // Define a function to truncate the task title based on the height
         const truncateTitle = (title: string, maxLength: number) => {
           return title.length > maxLength
@@ -287,7 +320,7 @@ export default function Day({
             <TooltipTrigger
               className="absolute top-0 z-10 rounded-lg border px-2 py-1 text-[17px] text-white"
               style={{
-                left,
+                left: calculateLeftPosition(taskIndex, tasksInRow.length),
                 top,
                 height,
                 backgroundColor,
