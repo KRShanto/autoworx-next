@@ -13,6 +13,8 @@ interface TaskType {
   assignedUsers: number[];
   priority: Priority;
   invoiceId?: string;
+  startTime?: string;
+  endTime?: string;
 }
 
 export async function createTask(task: TaskType): Promise<ServerAction> {
@@ -26,6 +28,8 @@ export async function createTask(task: TaskType): Promise<ServerAction> {
       userId: parseInt(session.user.id),
       companyId: session.user.companyId,
       invoiceId: task.invoiceId,
+      startTime: task.startTime,
+      endTime: task.endTime,
     },
   });
 

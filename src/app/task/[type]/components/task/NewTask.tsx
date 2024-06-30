@@ -16,6 +16,7 @@ import { FaCheck, FaPlus } from "react-icons/fa6";
 import Image from "next/image";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { createTask } from "../../actions/createTask";
+import { TimePicker } from "antd";
 
 export default function NewTask({
   companyUsers,
@@ -30,6 +31,7 @@ export default function NewTask({
   const [description, setDescription] = useState("");
   const [assignedUsers, setAssignedUsers] = useState<number[]>([]);
   const [priority, setPriority] = useState<Priority>("Low");
+  const [time, setTime] = useState<{ startTime: string; endTime: string }>();
 
   async function handleSubmit() {
     const res = await createTask({
@@ -37,9 +39,19 @@ export default function NewTask({
       description,
       assignedUsers,
       priority,
+      startTime: time?.startTime,
+      endTime: time?.endTime,
     });
 
     setOpen(false);
+  }
+
+  function onChange(e: any) {
+    const [start, end] = e;
+    setTime({
+      startTime: start?.format("HH:mm"),
+      endTime: end?.format("HH:mm"),
+    });
   }
 
   return (
@@ -77,6 +89,17 @@ export default function NewTask({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               autoFocus
+            />
+          </div>
+
+          <div id="timer-parent" className="mb-4 flex flex-col">
+            <label htmlFor="time">Time</label>
+            <TimePicker.RangePicker
+              onChange={onChange}
+              getPopupContainer={() => document.getElementById("timer-parent")!}
+              use12Hours
+              format="h:mm a"
+              className="mt-2 rounded-md border-2 border-gray-500 p-1 placeholder-slate-800"
             />
           </div>
 

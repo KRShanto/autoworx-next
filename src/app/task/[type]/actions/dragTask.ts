@@ -6,14 +6,20 @@ import { revalidatePath } from "next/cache";
 
 // TODO: later, use updateTask instead of dragTask
 export async function dragTask(task: any): Promise<ServerAction> {
+  const oldTask = await db.task.findUnique({
+    where: {
+      id: task.id,
+    },
+  });
+
   await db.task.update({
     where: {
       id: task.id,
     },
     data: {
       date: new Date(task.date),
-      startTime: task.startTime,
-      endTime: task.endTime,
+      startTime: oldTask?.startTime || task.startTime,
+      endTime: oldTask?.endTime || task.endTime,
     },
   });
 

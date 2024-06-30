@@ -67,8 +67,6 @@ export default function Day({
   settings: CalendarSettings;
   templates: EmailTemplate[];
 }) {
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const [loading, setLoading] = useState(false);
   const date = useDate();
 
   const { open } = usePopupStore();
@@ -99,18 +97,6 @@ export default function Day({
     window.addEventListener("resize", checkRefAvailability);
     return () => window.removeEventListener("resize", checkRefAvailability);
   }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollPosition(dropRef.current.scrollTop);
-    };
-
-    dropRef.current?.addEventListener("scroll", handleScroll);
-
-    return () => {
-      dropRef.current?.removeEventListener("scroll", handleScroll);
-    };
-  }, [dropRef]);
 
   const events = useMemo<
     ((

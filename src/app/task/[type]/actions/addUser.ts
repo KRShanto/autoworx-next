@@ -40,6 +40,7 @@ export async function addUser({
     },
   });
 
+  revalidatePath("/task");
   revalidatePath("/employee");
 
   return {

@@ -17,6 +17,8 @@ import { useState } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa6";
 import { editTask } from "../../actions/editTask";
+import { TimePicker } from "antd";
+import dayjs from "dayjs";
 
 export default function UpdateTask() {
   const { popup, data, close } = usePopupStore();
@@ -31,6 +33,10 @@ export default function UpdateTask() {
     task.assignedUsers.map((user) => user.id),
   );
   const [priority, setPriority] = useState<Priority>(task.priority);
+  const [time, setTime] = useState<{ startTime: string; endTime: string }>({
+    startTime: task.startTime,
+    endTime: task.endTime,
+  });
 
   async function handleSubmit() {
     const res = await editTask({
@@ -40,10 +46,20 @@ export default function UpdateTask() {
         description,
         assignedUsers,
         priority,
+        startTime: time?.startTime,
+        endTime: time?.endTime,
       },
     });
 
     close();
+  }
+
+  function onChange(e: any) {
+    const [start, end] = e;
+    setTime({
+      startTime: start?.format("HH:mm"),
+      endTime: end?.format("HH:mm"),
+    });
   }
 
   return (
@@ -76,6 +92,21 @@ export default function UpdateTask() {
               value={description || ""}
               onChange={(e) => setDescription(e.target.value)}
               autoFocus
+            />
+          </div>
+
+          <div id="timer-parent" className="mb-4 flex flex-col">
+            <label htmlFor="time">Time</label>
+            <TimePicker.RangePicker
+              onChange={onChange}
+              getPopupContainer={() => document.getElementById("timer-parent")!}
+              use12Hours
+              format="h:mm a"
+              className="mt-2 rounded-md border-2 border-gray-500 p-1 placeholder-slate-800"
+              value={[
+                dayjs(time.startTime, "HH:mm"),
+                dayjs(time.endTime, "HH:mm"),
+              ]}
             />
           </div>
 

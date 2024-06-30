@@ -50,9 +50,7 @@ export default function TaskPage({
     (task) => task.startTime && task.endTime && task.date,
   );
   // Filter the tasks without startTime, endTime, and date
-  const tasksWithoutTime = taskWithAssignedUsers.filter(
-    (task) => !task.startTime && !task.endTime && !task.date,
-  );
+  const tasksWithoutTime = taskWithAssignedUsers.filter((task) => !task.date);
 
   return (
     <DndProvider backend={HTML5Backend}>

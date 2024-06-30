@@ -10,6 +10,8 @@ interface TaskType {
   description: string;
   assignedUsers: number[];
   priority: Priority;
+  startTime?: string;
+  endTime?: string;
 }
 
 export async function editTask({
@@ -70,6 +72,8 @@ export async function editTask({
       title: task.title,
       description: task.description,
       priority: task.priority,
+      startTime: task.startTime,
+      endTime: task.endTime,
     },
   });
 
