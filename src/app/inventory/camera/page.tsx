@@ -16,11 +16,7 @@ export default function Page() {
       router.push(result?.text);
       qrRef?.current?.stop();
     }
-
-    if (!!error) {
-      console.info(error);
-    }
-  };
+  }
 
   return (
     <div className="flex h-screen flex-col items-center justify-center">

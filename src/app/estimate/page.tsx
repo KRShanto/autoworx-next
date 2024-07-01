@@ -153,7 +153,7 @@ export default async function Page({
 
 function Table({ data }: { data: InvoiceData[] }) {
   return (
-    <div className="h-[65vh] rounded-md bg-white">
+    <div className="min-h-[65vh] overflow-x-scroll rounded-md bg-white xl:overflow-hidden">
       <table className="w-full">
         {/* Estimate Header */}
         <thead className="bg-white">
