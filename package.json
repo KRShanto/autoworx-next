@@ -55,6 +55,7 @@
     "react-to-pdf": "^1.0.1",
     "sass": "^1.72.0",
     "server-only": "^0.0.1",
+    "sharp": "^0.33.4",
     "slugify": "^1.6.6",
     "tailwind-merge": "^2.2.2",
     "webrtc-adapter": "^9.0.1",
