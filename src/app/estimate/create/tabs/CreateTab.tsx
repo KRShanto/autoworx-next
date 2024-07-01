@@ -127,7 +127,6 @@ export function CreateTab() {
                                 .toLowerCase()
                                 .includes(search.toLowerCase()),
                           );
-
                           return filteredMaterials;
                         }}
                       />
