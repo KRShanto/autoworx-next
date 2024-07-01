@@ -15,5 +15,5 @@ export default function TopLoader() {
     NProgress.done();
   }, [pathname, router]);
 
-  return <NextTopLoader color="cyan" height={4} showSpinner={false} />;
+  return <NextTopLoader color="cyan" height={10} showSpinner={false} />;
 }

@@ -54,7 +54,6 @@ export default function EditProduct({ productData }: TProps) {
     unit: productData.unit,
     lot: productData.lot,
   });
-
   useEffect(() => {
     if (vendorSearch) {
       setVendorsToDisplay(
@@ -119,7 +118,6 @@ export default function EditProduct({ productData }: TProps) {
       setError(err.message as string);
     }
   }
-  console.log({ category });
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>

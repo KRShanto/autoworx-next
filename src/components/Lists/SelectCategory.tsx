@@ -18,7 +18,6 @@ export default function SelectCategory({
   labelPosition?: "top" | "left" | "none";
 }) {
   const { categories } = useListsStore();
-
   const [category, setCategory] = useState<Category | null>(null);
   const [categoriesToDisplay, setCategoriesToDisplay] = useState<Category[]>(
     [],
@@ -26,6 +25,7 @@ export default function SelectCategory({
   const [categoryInput, setCategoryInput] = useState("");
   const [categorySearch, setCategorySearch] = useState("");
   const [categoryOpen, setCategoryOpen] = useState(false);
+
   useEffect(() => {
     if (categoryData) {
       setCategory(categoryData as Category);
@@ -33,6 +33,7 @@ export default function SelectCategory({
       setCategory(null);
     }
   }, [categoryData]);
+
   useEffect(() => {
     if (categorySearch) {
       setCategoriesToDisplay(

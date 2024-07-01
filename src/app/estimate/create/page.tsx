@@ -38,7 +38,7 @@ export default async function Page({
 
   // TODO: try to improve this query
   const materials = (await db.material.findMany({
-    where: { companyId, invoiceId: null },
+    where: { companyId, invoiceId: null }, // prev:   where: { companyId, invoiceId: null },
   })) as (Material & { tags: Tag[] })[];
 
   const labors = (await db.labor.findMany({
@@ -81,7 +81,7 @@ export default async function Page({
   });
 
   return (
-    <form className="-my-2 grid h-[93vh] gap-3 overflow-clip py-2 md:grid-cols-[1fr,24rem] md:grid-rows-[auto,auto,1fr]">
+    <form className="-my-2 min-h-[93vh] gap-3 space-y-4 overflow-clip py-2 lg:grid lg:grid-cols-[1fr,24rem] lg:grid-rows-[auto,auto,1fr] lg:space-y-0">
       <Title>Estimate</Title>
 
       <SyncLists
@@ -123,7 +123,7 @@ export default async function Page({
           <TabsTrigger value="create">Create</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="create">
+        <TabsContent value="create" className="h-auto w-full">
           <CreateTab />
         </TabsContent>
 
@@ -143,7 +143,7 @@ export default async function Page({
         </TabsContent>
       </Tabs>
 
-      <div className="app-shadow col-start-2 row-start-2 row-end-4 grid h-[85vh] grid-rows-[1fr,auto,auto] divide-y rounded-md">
+      <div className="app-shadow col-start-2 row-start-2 row-end-4 grid min-h-[85vh] grid-rows-[1fr,auto,auto] divide-y rounded-md">
         <Create />
         <BillSummary />
       </div>
