@@ -25,12 +25,12 @@ export default function ProductTable({
       <table className="w-full">
         <thead className="bg-white">
           <tr className="h-10 border-b">
-            <th className="px-10 text-left">#</th>
-            <th className="px-10 text-left">Name</th>
-            <th className="px-10 text-left">Category</th>
-            <th className="px-10 text-left">Quantity</th>
-            <th className="px-10 text-left">Unit</th>
-            <th className="px-10 text-left">Action</th>
+            <th className="px-4 text-left 2xl:px-10">#</th>
+            <th className="px-4 text-left 2xl:px-10">Name</th>
+            <th className="px-4 text-left 2xl:px-10">Category</th>
+            <th className="px-4 text-left 2xl:px-10">Quantity</th>
+            <th className="px-4 text-left 2xl:px-10">Unit</th>
+            <th className="px-4 text-left 2xl:px-10">Action</th>
           </tr>
         </thead>
 
@@ -45,16 +45,18 @@ export default function ProductTable({
               )}
               onClick={() => router.push(`/inventory?productId=${product.id}`)}
             >
-              <td className="h-12 px-10 text-left">
+              <td className="h-12 px-4 text-left 2xl:px-10">
                 <p>{product.id}</p>
               </td>
-              <td className="text-nowrap px-10 text-left">{product.name}</td>
-              <td className="text-nowrap px-10 text-left">
+              <td className="text-nowrap px-4 text-left 2xl:px-10">
+                {product.name}
+              </td>
+              <td className="text-nowrap px-4 text-left 2xl:px-10">
                 {product.category?.name}
               </td>
-              <td className="px-10 text-left">{product.quantity}</td>
-              <td className="px-10 text-left">{product.unit}</td>
-              <td className="item-center mt-2 flex gap-3 px-10">
+              <td className="px-4 text-left 2xl:px-10">{product.quantity}</td>
+              <td className="px-4 text-left 2xl:px-10">{product.unit}</td>
+              <td className="item-center mt-2 flex gap-3 px-4 2xl:px-10">
                 <button className="text-2xl text-blue-600">
                   <EditProduct productData={product} />
                 </button>

@@ -31,13 +31,13 @@ export default function SalesPurchaseHistoryClient({
   const [tab, setTab] = useState<Tab>(Tab.Sales);
 
   return (
-    <div className="app-shadow mt-4 h-[63%] w-full rounded-lg bg-white p-4">
+    <div className="app-shadow #h-[63%] mt-4 w-full grow rounded-lg bg-white p-4">
       <Tabs.Root value={tab} onValueChange={(value) => setTab(value as Tab)}>
         <Tabs.List className="flex gap-5">
           <Tabs.Trigger
             value={Tab.Sales}
             className={cn(
-              "rounded-md p-2 px-5 text-lg",
+              "rounded-md p-2 px-5 text-sm 2xl:text-lg",
               tab === Tab.Sales
                 ? "bg-[#6571FF] text-white"
                 : "border border-[#6571FF] text-[#6571FF]",
@@ -48,7 +48,7 @@ export default function SalesPurchaseHistoryClient({
           <Tabs.Trigger
             value={Tab.Purchase}
             className={cn(
-              "rounded-md p-2 px-5 text-lg",
+              "rounded-md p-2 px-5 text-sm 2xl:text-lg",
               tab === Tab.Purchase
                 ? "bg-[#6571FF] text-white"
                 : "border border-[#6571FF] text-[#6571FF]",
@@ -94,15 +94,15 @@ function Table({
   price: number;
 }) {
   return (
-    <table className="w-full">
+    <table className="w-full text-sm 2xl:text-base">
       <thead className="bg-white">
         <tr className="h-10 border-b">
-          <th className="px-10 text-left">#</th>
-          <th className="px-10 text-left">Name</th>
-          <th className="px-10 text-left">Price</th>
-          <th className="px-10 text-left">Quantity</th>
-          <th className="px-10 text-left">Total</th>
-          <th className="px-10 text-left">Date</th>
+          <th className="px-4 text-left 2xl:px-10">#</th>
+          <th className="px-4 text-left 2xl:px-10">Name</th>
+          <th className="px-4 text-left 2xl:px-10">Price</th>
+          <th className="px-4 text-left 2xl:px-10">Quantity</th>
+          <th className="px-4 text-left 2xl:px-10">Total</th>
+          <th className="px-4 text-left 2xl:px-10">Date</th>
           <th className="px-5 text-left">Invoice</th>
         </tr>
       </thead>
@@ -113,14 +113,18 @@ function Table({
             key={history.id}
             className={cn("py-3", index % 2 === 0 ? evenColor : oddColor)}
           >
-            <td className="h-12 px-10 text-left">
+            <td className="h-12 px-4 text-left 2xl:px-10">
               <p>{history.id}</p>
             </td>
-            <td className="text-nowrap px-10 text-left">{vendorName}</td>
-            <td className="text-nowrap px-10 text-left">{price}</td>
-            <td className="px-10 text-left">{history.quantity}</td>
-            <td className="px-10 text-left">{price * history.quantity}</td>
-            <td className="px-10 text-left">
+            <td className="text-nowrap px-4 text-left 2xl:px-10">
+              {vendorName}
+            </td>
+            <td className="text-nowrap px-4 text-left 2xl:px-10">{price}</td>
+            <td className="px-4 text-left 2xl:px-10">{history.quantity}</td>
+            <td className="px-4 text-left 2xl:px-10">
+              {price * history.quantity}
+            </td>
+            <td className="px-4 text-left 2xl:px-10">
               {moment(history.date).format(
                 // date.month.year
                 "DD.MM.YYYY",
