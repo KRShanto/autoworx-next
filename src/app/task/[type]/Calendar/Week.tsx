@@ -374,7 +374,7 @@ export default function Week({
                   {truncateTitle(event.title, maxTitleLength)}
                 </p>
               </TooltipTrigger>
-              <TooltipContent className="h-48 w-72 rounded-md border border-slate-400 bg-white p-3">
+              <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
                 {event.type === "appointment" ? (
                   <div>
                     <div className="flex items-center justify-between">

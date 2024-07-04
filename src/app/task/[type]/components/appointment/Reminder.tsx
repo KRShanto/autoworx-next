@@ -3,7 +3,7 @@ import { useListsStore } from "@/stores/lists";
 import type { Customer, EmailTemplate, Vehicle } from "@prisma/client";
 import moment from "moment";
 import { useState } from "react";
-import { FaTimes } from "react-icons/fa";
+import { FaTimes, FaTrash } from "react-icons/fa";
 import { TbUserX } from "react-icons/tb";
 import NewTemplate from "../../../../../components/Lists/NewTemplate";
 import { deleteTemplate } from "../../actions/deleteTemplate";
@@ -182,7 +182,7 @@ export function Reminder({
           {/* input time */}
           <input
             type="time"
-            className="rounded-lg border-2 border-slate-400 p-1 text-lg "
+            className="rounded-lg border-2 border-slate-400 p-1 text-lg"
             value={time}
             onChange={(e) => setTime(e.target.value)}
           />
@@ -219,13 +219,21 @@ export function Reminder({
             const hours = diff.hours();
 
             return (
-              <p key={index}>
-                <span className="text-[#6571FF]">
-                  {days} days {hours}
-                  hours
-                </span>{" "}
-                before appointment
-              </p>
+              <div key={index} className="flex justify-between px-5">
+                <p>
+                  <span className="text-[#6571FF]">
+                    {days} days {hours}
+                    hours
+                  </span>{" "}
+                  before appointment
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setTimes(times.filter((_, i) => i !== index))}
+                >
+                  <FaTrash />
+                </button>
+              </div>
             );
           })}
         </div>

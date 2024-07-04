@@ -119,8 +119,6 @@ export function NewAppointment({
   }, [allDay, settings]);
 
   useEffect(() => {
-    console.log("Templates; ", templates);
-
     if (templates) {
       useListsStore.setState({ templates });
     }
@@ -155,6 +153,20 @@ export function NewAppointment({
       return;
     }
 
+    // reset all the fields
+    setDate(undefined);
+    setStartTime(undefined);
+    setEndTime(undefined);
+    setClient(null);
+    setVehicle(null);
+    setOrder(null);
+    setAssignedUsers([]);
+    setConfirmationTemplate(null);
+    setReminderTemplate(null);
+    setConfirmationTemplateStatus(true);
+    setReminderTemplateStatus(true);
+    setTimes([]);
+
     close();
   };
 
@@ -163,13 +175,13 @@ export function NewAppointment({
       <DialogTrigger asChild>
         <button
           type="button"
-          className="app-shadow rounded-md bg-[#6571FF] p-2 text-white text-xs sm:text-sm"
+          className="app-shadow rounded-md bg-[#6571FF] p-2 text-xs text-white sm:text-sm"
         >
           New Appointment
         </button>
       </DialogTrigger>
       <DialogContent
-        className="max-h-full max-w-5xl grid grid-rows-[auto,1fr,auto] sm:max-h-[80vh] sm:max-w-[60vw]"
+        className="grid max-h-full max-w-5xl grid-rows-[auto,1fr,auto] sm:max-h-[80vh] sm:max-w-[60vw]"
         form
       >
         {/* Heading */}
@@ -363,7 +375,7 @@ export function NewAppointment({
           <div className="relative row-span-2 min-h-36 divide-y bg-background">
             {tab === Tab.Schedule ? (
               <div className="absolute inset-0 divide-y overflow-y-auto">
-                <div className="sticky top-0 z-10 flex items-center gap-4  bg-background px-8 py-2">
+                <div className="sticky top-0 z-10 flex items-center gap-4 bg-background px-8 py-2">
                   <button type="button" onClick={() => handleDate("-")}>
                     <FaChevronLeft />
                   </button>

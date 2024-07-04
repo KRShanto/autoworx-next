@@ -166,7 +166,7 @@ export function UpdateAppointment() {
       >
         {/* Heading */}
         <DialogHeader className="grid items-center gap-4 sm:grid-cols-2">
-          <DialogTitle>New Appointment</DialogTitle>
+          <DialogTitle>Edit Appointment</DialogTitle>
 
           {/* Options */}
           <div className="flex items-center justify-self-center rounded-full bg-primary p-1">
