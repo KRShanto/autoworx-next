@@ -28,15 +28,6 @@ import { assignAppointmentDate } from "../actions/assignAppointmentDate";
 import { dragTask } from "../actions/dragTask";
 import mergeRefs from "merge-refs";
 
-const rows = [
-  "All Day",
-  // 1am to 12pm
-  ...Array.from(
-    { length: 24 },
-    (_, i) => `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
-  ),
-];
-
 function useDate() {
   const searchParams = useSearchParams();
   const date = moment(searchParams.get("date"), moment.HTML5_FMT.DATE);
@@ -67,6 +58,36 @@ export default function Day({
   settings: CalendarSettings;
   templates: EmailTemplate[];
 }) {
+  const rows = ["All Day"];
+
+  // If the settings are available, use the dayStart and dayEnd to generate the rows
+  if (settings && settings.dayStart && settings.dayEnd) {
+    const startTime = moment(settings.dayStart, "HH:mm");
+    const endTime = moment(settings.dayEnd, "HH:mm");
+
+    // Loop from start time to end time, incrementing by 1 hour
+    for (
+      let time = moment(startTime);
+      time.isBefore(endTime);
+      time.add(1, "hours")
+    ) {
+      // Format each time and add to rows
+      rows.push(time.format("h A"));
+    }
+
+    // Add the end time as well
+    rows.push(endTime.format("h A"));
+  } else {
+    // 1am to 12pm
+    rows.push(
+      ...Array.from(
+        { length: 24 },
+        (_, i) =>
+          `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
+      ),
+    );
+  }
+
   const date = useDate();
 
   const { open } = usePopupStore();
@@ -115,7 +136,6 @@ export default function Day({
           type: "appointment" as const,
         })),
       ]
-        // include type before mapping
         .filter((event: CalendarTask | CalendarAppointment) => {
           // return today's tasks
           // also filter by month and year
@@ -332,7 +352,7 @@ export default function Day({
             >
               {truncateTitle(event.title, maxTitleLength)}
             </TooltipTrigger>
-            <TooltipContent className="h-48 w-72 rounded-md border border-slate-400 bg-white p-3">
+            <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
               {event.type === "appointment" ? (
                 <div>
                   <div className="flex items-center justify-between">
