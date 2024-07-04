@@ -1,16 +1,5 @@
-import EmployeeList from "./EmployeeList";
-import Header from "./Header";
-import { Metadata } from "next";
+import React from "react";
 
-export const metadata: Metadata = {
-  title: "Employees",
-};
-
-export default function EmployeePage() {
-  return (
-    <div>
-      <Header />
-      <EmployeeList />
-    </div>
-  );
+export default function Page() {
+  return <h1>Employee Page</h1>;
 }
