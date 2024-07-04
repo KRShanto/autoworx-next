@@ -85,6 +85,11 @@ const navList = [
       },
     ],
   },
+  {
+    title: "Employee",
+    icon: "/icons/navbar/Employee.png",
+    link: "/employee",
+  },
 ];
 
 export default function SideNavbar() {
