@@ -13,8 +13,7 @@ import FormError from "@/components/FormError";
 import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { useEffect, useState } from "react";
-import { useProduct as productUse } from "./actions/useProduct";
+import { useState } from "react";
 import { Vendor } from "@prisma/client";
 import { replenish } from "./actions/replenish";
 import { useListsStore } from "@/stores/lists";
@@ -29,20 +28,6 @@ export default function ReplenishProductForm({
   const [open, setOpen] = useState(false);
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [vendorOpen, setVendorOpen] = useState(false);
-  const [vendorSearch, setVendorSearch] = useState("");
-  const [vendorsToDisplay, setVendorsToDisplay] = useState<Vendor[]>([]);
-
-  useEffect(() => {
-    if (vendorSearch) {
-      setVendorsToDisplay(
-        vendors.filter((ven) =>
-          ven.name.toLowerCase().includes(vendorSearch.toLowerCase()),
-        ),
-      );
-    } else {
-      setVendorsToDisplay(vendors.slice(0, 4));
-    }
-  }, [vendorSearch, vendors]);
 
   async function handleSubmit(formData: FormData) {
     const date = formData.get("date") as string;
@@ -88,10 +73,11 @@ export default function ReplenishProductForm({
           {/* TODO: make reusable component */}
           <div>
             <label>Vendor</label>
+
             <Selector
-              label={vendor ? vendor.name || "Vendor" : ""}
-              openState={[vendorOpen, setVendorOpen]}
-              setSearch={setVendorSearch}
+              label={(vendor: Vendor | null) =>
+                vendor ? vendor.name || `Vendor ${vendor.id}` : "Vendor"
+              }
               newButton={
                 <NewVendor
                   afterSubmit={(ven) => {
@@ -105,20 +91,17 @@ export default function ReplenishProductForm({
                   }
                 />
               }
-            >
-              <div>
-                {vendorsToDisplay.map((ven) => (
-                  <button
-                    type="button"
-                    key={ven.id}
-                    onClick={() => setVendor(ven)}
-                    className="mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200"
-                  >
-                    {ven.name}
-                  </button>
-                ))}
-              </div>
-            </Selector>
+              displayList={(vendor: Vendor) => <p>{vendor.name}</p>}
+              items={vendors}
+              onSearch={(search: string) =>
+                vendors.filter((vendor) =>
+                  vendor.name.toLowerCase().includes(search.toLowerCase()),
+                )
+              }
+              openState={[vendorOpen, setVendorOpen]}
+              selectedItem={vendor}
+              setSelectedItem={setVendor}
+            />
           </div>
 
           <div className="flex gap-3">

@@ -39,15 +39,6 @@ export default function Tasks({
           {tasks.map((task) => (
             <TaskComponent key={task.id} task={task} />
           ))}
-          {tags.map((tag, index) => (
-            <TagComponent key={index} tag={tag} />
-          ))}
-          {appointments.map((appointment) => (
-            <AppointmentComponent
-              key={appointment.id}
-              appointment={appointment}
-            />
-          ))}
 
           <NewTask companyUsers={users} />
         </div>

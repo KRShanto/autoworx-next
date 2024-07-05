@@ -39,7 +39,7 @@ import { TbBell, TbCalendar } from "react-icons/tb";
 import { editAppointment } from "../../actions/editAppointment";
 import NewOrder from "./NewOrder";
 import { Reminder } from "./Reminder";
-import Selector from "./Selector";
+import Selector from "@/components/Selector";
 
 enum Tab {
   Schedule = 0,
@@ -104,6 +104,8 @@ export function UpdateAppointment() {
     appointment.reminderEmailTemplateStatus,
   );
 
+  const [orderOpen, setOrderOpen] = useState(false);
+
   const handleSearch = (search: string) => {
     setEmployeesToDisplay(
       employees.filter((employee) =>
@@ -127,8 +129,6 @@ export function UpdateAppointment() {
   }, [allDay, settings]);
 
   useEffect(() => {
-    console.log("Templates; ", templates);
-
     if (templates) {
       useListsStore.setState({ templates });
     }
@@ -331,24 +331,25 @@ export function UpdateAppointment() {
             <SelectVehicle value={vehicle} setValue={setVehicle} />
 
             <Selector
-              label={order ? order.name : "Order"}
-              newButton={<NewOrder setOrders={setOrderList} />}
-            >
-              <div className="">
-                {orderList.map((order) => (
-                  <button
-                    type="button"
-                    key={order.id}
-                    className="flex w-full cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100"
-                    onClick={() => setOrder(order)}
-                  >
-                    <div>
-                      <p className="text-sm font-bold">{order.name}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </Selector>
+              label={(order: Order | null) => (order ? order.name : "Order")}
+              openState={[orderOpen, setOrderOpen]}
+              newButton={
+                <NewOrder
+                  setOrder={setOrder}
+                  setOrders={setOrderList}
+                  setOrderOpen={setOrderOpen}
+                />
+              }
+              items={orderList}
+              selectedItem={order}
+              setSelectedItem={setOrder}
+              displayList={(item) => <p>{item.name}</p>}
+              onSearch={(search) => {
+                return orderList.filter((order) =>
+                  order.name.toLowerCase().includes(search.toLowerCase()),
+                );
+              }}
+            />
 
             <textarea
               name="notes"
@@ -363,7 +364,7 @@ export function UpdateAppointment() {
           <div className="relative row-span-2 min-h-36 divide-y bg-background">
             {tab === Tab.Schedule ? (
               <div className="absolute inset-0 divide-y overflow-y-auto">
-                <div className="sticky top-0 z-10 flex items-center gap-4  bg-background px-8 py-2">
+                <div className="sticky top-0 z-10 flex items-center gap-4 bg-background px-8 py-2">
                   <button type="button" onClick={() => handleDate("-")}>
                     <FaChevronLeft />
                   </button>

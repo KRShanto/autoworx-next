@@ -38,7 +38,7 @@ export default async function Page({
 
   // TODO: try to improve this query
   const materials = (await db.material.findMany({
-    where: { companyId, invoiceId: null }, // prev:   where: { companyId, invoiceId: null },
+    where: { companyId, invoiceId: null },
   })) as (Material & { tags: Tag[] })[];
 
   const labors = (await db.labor.findMany({

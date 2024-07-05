@@ -15,10 +15,9 @@ import SelectCategory from "@/components/Lists/SelectCategory";
 import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { cn } from "@/lib/cn";
 import { useListsStore } from "@/stores/lists";
 import { Category, InventoryProduct, Vendor } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CiEdit } from "react-icons/ci";
 import { editProduct } from "./actions/edit";
 
@@ -43,8 +42,6 @@ export default function EditProduct({ productData }: TProps) {
     productData.category,
   );
   const [vendorOpen, setVendorOpen] = useState(false); // useful
-  const [vendorSearch, setVendorSearch] = useState(""); // useful
-  const [vendorsToDisplay, setVendorsToDisplay] = useState<Vendor[]>([]); // useful
   const [error, setError] = useState<string | null>("");
   const [product, setProduct] = useState<TInputType>({
     productName: productData.name,
@@ -54,29 +51,6 @@ export default function EditProduct({ productData }: TProps) {
     unit: productData.unit,
     lot: productData.lot,
   });
-  useEffect(() => {
-    if (vendorSearch) {
-      setVendorsToDisplay(
-        vendors.filter((ven) =>
-          ven.name.toLowerCase().includes(vendorSearch.toLowerCase()),
-        ),
-      );
-    } else {
-      const alreadySelectedVendor = vendors.find(
-        (ven) => ven.id === vendor?.id,
-      ) as Vendor;
-      let defaultVendors = vendors.slice(0, 4);
-      if (
-        !defaultVendors.find(
-          (vendor) => vendor.id === alreadySelectedVendor?.id,
-        ) &&
-        alreadySelectedVendor
-      ) {
-        defaultVendors = [alreadySelectedVendor, ...defaultVendors];
-      }
-      setVendorsToDisplay(defaultVendors);
-    }
-  }, [vendorSearch, vendors]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -152,10 +126,11 @@ export default function EditProduct({ productData }: TProps) {
               />
               <div>
                 <label>Vendor</label>
+
                 <Selector
-                  label={vendor ? vendor.name || "Vendor" : ""}
-                  openState={[vendorOpen, setVendorOpen]}
-                  setSearch={setVendorSearch}
+                  label={(vendor: Vendor | null) =>
+                    vendor ? vendor.name || `Vendor ${vendor.id}` : "Vendor"
+                  }
                   newButton={
                     <NewVendor
                       afterSubmit={(ven) => {
@@ -172,25 +147,17 @@ export default function EditProduct({ productData }: TProps) {
                       }
                     />
                   }
-                >
-                  <div>
-                    {vendorsToDisplay.map((ven) => (
-                      <button
-                        type="button"
-                        key={ven?.id}
-                        onClick={() => setVendor(ven)}
-                        className={cn(
-                          "mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200",
-                          {
-                            "bg-slate-300": vendor && vendor?.id === ven?.id,
-                          },
-                        )}
-                      >
-                        {ven?.name}
-                      </button>
-                    ))}
-                  </div>
-                </Selector>
+                  items={vendors}
+                  onSearch={(search: string) =>
+                    vendors.filter((vendor) =>
+                      vendor.name.toLowerCase().includes(search.toLowerCase()),
+                    )
+                  }
+                  displayList={(vendor: Vendor) => <p>{vendor.name}</p>}
+                  openState={[vendorOpen, setVendorOpen]}
+                  selectedItem={vendor}
+                  setSelectedItem={setVendor}
+                />
               </div>
             </div>
             <div>

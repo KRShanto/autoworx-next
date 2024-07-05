@@ -6,7 +6,6 @@ import * as Tabs from "@radix-ui/react-tabs";
 import moment from "moment";
 import Link from "next/link";
 import { useState } from "react";
-import { FaLink } from "react-icons/fa6";
 import { HiExternalLink } from "react-icons/hi";
 
 enum Tab {

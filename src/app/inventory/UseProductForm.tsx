@@ -10,10 +10,9 @@ import {
   DialogTrigger,
 } from "@/components/Dialog";
 import FormError from "@/components/FormError";
-import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useProduct as productUse } from "./actions/useProduct";
 
 export default function UseProductForm({ productId }: { productId: number }) {

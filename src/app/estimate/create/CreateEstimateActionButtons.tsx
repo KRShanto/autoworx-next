@@ -4,7 +4,6 @@ import {
   HiChatBubbleOvalLeftEllipsis,
   HiMiniArrowUpTray,
   HiPrinter,
-  HiTrash,
 } from "react-icons/hi2";
 import { cn } from "@/lib/cn";
 import DeleteEstimateButton from "./DeleteEstimateButton";

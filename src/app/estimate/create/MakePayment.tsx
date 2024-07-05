@@ -71,6 +71,8 @@ export default function MakePayment() {
     null,
   );
 
+  const [openPaymentMethod, setOpenPaymentMethod] = useState(false);
+
   useEffect(() => {
     if (payment) {
       setTab(payment.type);
@@ -147,6 +149,8 @@ export default function MakePayment() {
 
     if (res.type === "success") {
       setPaymentMethodInput("");
+      setPaymentMethod(res.data);
+      setOpenPaymentMethod(false);
 
       useListsStore.setState({
         paymentMethods: [...paymentMethods, res.data],
@@ -361,12 +365,19 @@ export default function MakePayment() {
             <Tabs.Content value="OTHER">
               <div className="mt-5">
                 <label>Payment Method</label>
+
                 <Selector
-                  label={paymentMethod?.name || ""}
+                  label={(paymentMethod: PaymentMethod | null) =>
+                    paymentMethod
+                      ? paymentMethod.name ||
+                        `Payment Method ${paymentMethod.id}`
+                      : "Payment Method"
+                  }
                   newButton={
                     <div className="flex gap-2">
                       <input
                         type="text"
+                        placeholder="Payment Method Name"
                         value={paymentMethodInput}
                         onChange={(e) => setPaymentMethodInput(e.target.value)}
                         className="w-full rounded-md border-2 border-slate-400 p-1"
@@ -384,19 +395,19 @@ export default function MakePayment() {
                       </button>
                     </div>
                   }
-                >
-                  <div className="flex flex-col gap-2">
-                    {paymentMethods.map((method) => (
-                      <button
-                        key={method.id}
-                        className="mx-auto w-[95%] rounded-md border-2 border-slate-400 p-1 px-2 text-left"
-                        onClick={() => setPaymentMethod(method)}
-                      >
-                        {method.name}
-                      </button>
-                    ))}
-                  </div>
-                </Selector>
+                  items={paymentMethods}
+                  onSearch={(search: string) =>
+                    paymentMethods.filter((method) =>
+                      method.name.toLowerCase().includes(search.toLowerCase()),
+                    )
+                  }
+                  displayList={(paymentMethod: PaymentMethod) => (
+                    <p>{paymentMethod.name}</p>
+                  )}
+                  openState={[openPaymentMethod, setOpenPaymentMethod]}
+                  selectedItem={paymentMethod}
+                  setSelectedItem={setPaymentMethod}
+                />
               </div>
 
               <div className="mt-5 flex justify-between gap-3">

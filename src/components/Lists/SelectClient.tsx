@@ -17,13 +17,11 @@ export function SelectClient({
   const state = useState(value);
   const [client, setClient] = setValue ? [value, setValue] : state;
   const clientList = useListsStore((x) => x.customers);
-  const [clientsToDisplay, setClientsToDisplay] = useState<Customer[]>([]);
   const { newAddedCustomer } = useListsStore();
   const [openDropdown, setOpenDropdown] = useState(false);
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
-  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (newAddedCustomer) {
@@ -42,55 +40,44 @@ export function SelectClient({
     }
   }, [client]);
 
-  useEffect(() => {
-    if (search) {
-      setClientsToDisplay(
-        clientList.filter((client) =>
-          `${client.firstName} ${client.lastName}`
-            .toLowerCase()
-            .includes(search.toLowerCase()),
-        ),
-      );
-    } else {
-      setClientsToDisplay(clientList.slice(0, 4));
-    }
-  }, [search, clientList]);
-
   return (
     <>
       <input type="hidden" name={name} value={client?.id ?? ""} />
-      <Selector
-        newButton={<NewCustomer />}
-        label={client ? `${client.firstName} ${client.lastName}` : "Client"}
-        openState={[openDropdown, setOpenDropdown]}
-        setSearch={setSearch}
-      >
-        <div>
-          {clientsToDisplay.map((client) => (
-            <button
-              type="button"
-              key={client.id}
-              className="flex w-full cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100"
-              onClick={() => setClient(client)}
-            >
-              <Image
-                src={client.photo!}
-                alt="Client Image"
-                width={30}
-                height={30}
-                className="rounded-full"
-              />
 
-              <div>
-                <p className="text-start text-sm font-bold">
-                  {client.firstName} {client.lastName}
-                </p>
-                <p className="text-xs">{client.email}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </Selector>
+      <Selector
+        label={(client: Customer | null) =>
+          client ? `${client.firstName} ${client.lastName}` : "Client"
+        }
+        newButton={<NewCustomer />}
+        displayList={(client: Customer) => (
+          <div className="flex gap-3">
+            <Image
+              src={client.photo || "/images/default.png"}
+              alt="Client Image"
+              width={50}
+              height={50}
+              className="rounded-full"
+            />
+            <div>
+              <h3 className="font-bold">{`${client.firstName} ${client.lastName}`}</h3>
+              <p>
+                {client.mobile} {client.email}
+              </p>
+            </div>
+          </div>
+        )}
+        items={clientList}
+        onSearch={(search: string) =>
+          clientList.filter((client) =>
+            `${client.firstName} ${client.lastName}`
+              .toLowerCase()
+              .includes(search.toLowerCase()),
+          )
+        }
+        openState={[openDropdown, setOpenDropdown]}
+        selectedItem={client}
+        setSelectedItem={setClient}
+      />
     </>
   );
 }

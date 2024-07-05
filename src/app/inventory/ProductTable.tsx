@@ -2,9 +2,8 @@
 
 import { cn } from "@/lib/cn";
 import { Category, InventoryProduct, Vendor } from "@prisma/client";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React from "react";
-import { CiEdit } from "react-icons/ci";
 import { FaTimes } from "react-icons/fa";
 import EditProduct from "./EditProduct";
 

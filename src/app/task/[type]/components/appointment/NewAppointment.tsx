@@ -40,7 +40,7 @@ import { TbBell, TbCalendar } from "react-icons/tb";
 import { addAppointment } from "../../actions/addAppointment";
 import NewOrder from "./NewOrder";
 import { Reminder } from "./Reminder";
-import Selector from "./Selector";
+import Selector from "@/components/Selector";
 
 enum Tab {
   Schedule = 0,
@@ -75,7 +75,7 @@ export function NewAppointment({
   const [date, setDate] = useState<string | undefined>();
   const [startTime, setStartTime] = useState<string | undefined>();
   const [endTime, setEndTime] = useState<string | undefined>();
-  const [orderList, setOrderList] = useState(orders);
+  const [orderList, setOrderList] = useState<Order[]>(orders);
   const [allDay, setAllDay] = useState(false);
 
   const [client, setClient] = useState<Customer | null>(null);
@@ -95,6 +95,8 @@ export function NewAppointment({
   const [confirmationTemplateStatus, setConfirmationTemplateStatus] =
     useState(true);
   const [reminderTemplateStatus, setReminderTemplateStatus] = useState(true);
+
+  const [orderOpen, setOrderOpen] = useState(false);
 
   const handleSearch = (search: string) => {
     setEmployeesToDisplay(
@@ -345,24 +347,25 @@ export function NewAppointment({
             <SelectVehicle value={vehicle} setValue={setVehicle} />
 
             <Selector
-              label={order ? order.name : "Order"}
-              newButton={<NewOrder setOrders={setOrderList} />}
-            >
-              <div className="">
-                {orderList.map((order) => (
-                  <button
-                    type="button"
-                    key={order.id}
-                    className="flex w-full cursor-pointer items-center gap-4 rounded-md p-2 hover:bg-gray-100"
-                    onClick={() => setOrder(order)}
-                  >
-                    <div>
-                      <p className="text-sm font-bold">{order.name}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </Selector>
+              label={(order: Order | null) => (order ? order.name : "Order")}
+              openState={[orderOpen, setOrderOpen]}
+              newButton={
+                <NewOrder
+                  setOrder={setOrder}
+                  setOrders={setOrderList}
+                  setOrderOpen={setOrderOpen}
+                />
+              }
+              items={orderList}
+              selectedItem={order}
+              setSelectedItem={setOrder}
+              displayList={(item) => <p>{item.name}</p>}
+              onSearch={(search) => {
+                return orderList.filter((order) =>
+                  order.name.toLowerCase().includes(search.toLowerCase()),
+                );
+              }}
+            />
 
             <textarea
               name="notes"
