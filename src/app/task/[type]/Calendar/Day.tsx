@@ -1,6 +1,6 @@
 "use client";
 
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/Tooltip";
+import { Tooltip, TooltipContent } from "@/components/Tooltip";
 import { cn } from "@/lib/cn";
 import { TASK_COLOR } from "@/lib/consts";
 import { usePopupStore } from "@/stores/popup";
@@ -27,6 +27,8 @@ import { useMediaQuery } from "react-responsive";
 import { assignAppointmentDate } from "../actions/assignAppointmentDate";
 import { dragTask } from "../actions/dragTask";
 import mergeRefs from "merge-refs";
+import DraggableDayTooltip from "./draggable/DraggableDayTooltip";
+import DropRowButton from "./dropable/DropRowButton";
 
 function useDate() {
   const searchParams = useSearchParams();
@@ -59,7 +61,6 @@ export default function Day({
   templates: EmailTemplate[];
 }) {
   const rows = ["All Day"];
-
   // If the settings are available, use the dayStart and dayEnd to generate the rows
   if (settings && settings.dayStart && settings.dayEnd) {
     const startTime = moment(settings.dayStart, "HH:mm");
@@ -100,6 +101,7 @@ export default function Day({
     accept: ["tag", "task", "appointment"],
     drop: (item, monitor) => {
       // Update your state here
+      console.log({item, monitor});
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
@@ -164,12 +166,11 @@ export default function Day({
     return moment(date).format("YYYY-MM-DD");
   }
 
-  function formatTime(row: string) {
-    const [hour, period] = row.split(" ");
+  function formatTime(row: string = '') {
+    const [hour, period] = row?.split(" ");
     const time = `${hour.padStart(2, "0")}:00 ${period}`;
     return moment(time, "hh:mm A").format("HH:mm");
   }
-
   async function handleDrop(event: React.DragEvent, rowIndex: number) {
     const startTime = formatTime(rows[rowIndex]);
     const endTime = formatTime(rows[rowIndex + 1]);
@@ -245,21 +246,21 @@ export default function Day({
     }
     return "0%"; // Default fallback
   }
-
   return (
     <div
       ref={mergeRefs(dropRef, parentRef)}
       className="relative mt-3 h-[90%] overflow-auto border border-neutral-200"
     >
       {rows.map((row, i) => (
-        <button
+        <DropRowButton
           type="button"
-          key={row}
-          onDrop={(event) => {
+          row={row}
+          key={i}
+          onDrop={(event: React.DragEvent) => {
             handleDrop(event, i);
             setDraggedOverRow(null);
           }}
-          onDragOver={(event) => {
+          onDragOver={(event: React.DragEvent) => {
             event.preventDefault();
             setDraggedOverRow(i);
           }}
@@ -288,7 +289,7 @@ export default function Day({
           >
             {row}
           </div>
-        </button>
+        </DropRowButton>
       ))}
 
       {/* Tasks */}
@@ -306,8 +307,17 @@ export default function Day({
           : "rgb(100, 116, 139)";
 
         // Calculate how many tasks are in the same row
+        //TODO:
+        const eventStartTime = moment(event.startTime, "HH:mm");
+        const eventEndTime = moment(event.endTime, "HH:mm");
         const tasksInRow = events.filter(
-          (task) => task.rowStartIndex === event.rowStartIndex,
+          (task) => {
+            const taskStartTime = moment(task.startTime, "HH:mm");
+            const taskEndTime = moment(task.endTime, "HH:mm");
+            if (task.rowStartIndex === event.rowStartIndex || taskStartTime.isBetween(eventStartTime, eventEndTime) || taskEndTime.isBetween(eventStartTime, eventEndTime)) {
+              return true;
+            } 
+          }
         );
 
         // If there are more than one task in the same row
@@ -316,7 +326,6 @@ export default function Day({
         // then reduce the width of the task
         // Now figure out which task is this
         const taskIndex = tasksInRow.findIndex((task) => task.id === event.id);
-
         // If there's more than two tasks in the same row
         // then reduce the width of the task
         // calculate the width based on the number of tasks in the row (devide from 90%)
@@ -334,13 +343,10 @@ export default function Day({
         // Define the maximum title length based on the height
         const maxTitleLength =
           height === "45px" ? 60 : height === "90px" ? 120 : event.title.length;
-
         if (!isRefAvailable) return null;
-
         return (
           <Tooltip key={event.id}>
-            <TooltipTrigger
-              className="absolute top-0 z-10 rounded-lg border px-2 py-1 text-[17px] text-white"
+            <DraggableDayTooltip
               style={{
                 left: calculateLeftPosition(taskIndex, tasksInRow.length),
                 top,
@@ -349,9 +355,10 @@ export default function Day({
                 maxWidth: width,
                 minWidth: width,
               }}
+              task={event}
             >
               {truncateTitle(event.title, maxTitleLength)}
-            </TooltipTrigger>
+            </DraggableDayTooltip>
             <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
               {event.type === "appointment" ? (
                 <div>
