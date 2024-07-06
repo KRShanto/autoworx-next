@@ -29,3 +29,21 @@ export async function dragTask(task: any): Promise<ServerAction> {
     type: "success",
   };
 }
+
+export async function updateTask(task: any): Promise<ServerAction> {
+  await db.task.update({
+    where: {
+      id: task.id,
+    },
+    data: {
+      startTime: task?.startTime,
+      endTime: task?.endTime,
+    },
+  });
+
+  revalidatePath("/task");
+
+  return {
+    type: "success",
+  };
+}
