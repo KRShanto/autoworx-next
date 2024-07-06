@@ -41,6 +41,7 @@ import { addAppointment } from "../../actions/addAppointment";
 import NewOrder from "./NewOrder";
 import { Reminder } from "./Reminder";
 import Selector from "@/components/Selector";
+import { TimePicker } from "antd";
 
 enum Tab {
   Schedule = 0,
@@ -125,6 +126,12 @@ export function NewAppointment({
       useListsStore.setState({ templates });
     }
   }, [templates]);
+
+  function onTimeChange(e: any) {
+    const [start, end] = e;
+    setStartTime(start?.format("HH:mm"));
+    setEndTime(end?.format("HH:mm"));
+  }
 
   const handleSubmit = async (data: FormData) => {
     const title = data.get("title") as string;
@@ -234,23 +241,17 @@ export function NewAppointment({
                 required={false}
                 onChange={(event) => setDate(event.currentTarget.value)}
               />
-              <div className="flex grow items-center gap-1">
-                <input
-                  className={cn(slimInputClassName, "flex-auto")}
-                  type="time"
-                  name="start"
-                  value={startTime}
-                  max={endTime}
-                  onChange={(event) => setStartTime(event.currentTarget.value)}
-                />
-                <FaArrowRight className="shrink-0" />
-                <input
-                  className={cn(slimInputClassName, "flex-auto")}
-                  type="time"
-                  name="end"
-                  value={endTime}
-                  min={startTime}
-                  onChange={(event) => setEndTime(event.currentTarget.value)}
+
+              <div id="timer-parent">
+                <TimePicker.RangePicker
+                  id="time"
+                  onChange={onTimeChange}
+                  getPopupContainer={() =>
+                    document.getElementById("timer-parent")!
+                  }
+                  use12Hours
+                  format="h:mm a"
+                  className="rounded-md border border-gray-500 p-1 placeholder-slate-800"
                 />
               </div>
             </div>

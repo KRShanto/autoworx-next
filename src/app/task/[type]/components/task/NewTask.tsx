@@ -101,6 +101,7 @@ export default function NewTask({
           <div id="timer-parent" className="mb-4 flex flex-col">
             <label htmlFor="time">Time</label>
             <TimePicker.RangePicker
+              id="time"
               onChange={onChange}
               getPopupContainer={() => document.getElementById("timer-parent")!}
               use12Hours
