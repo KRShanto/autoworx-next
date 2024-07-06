@@ -146,7 +146,22 @@ export default function AddNewProduct() {
             </div>
             <div className="col-span-3 mt-5 flex w-[90%] gap-5">
               <SlimInput name="quantity" type="number" required={false} />
-              <SlimInput name="price" type="number" required={false} />
+
+              <div>
+                <label htmlFor="price" className="px-2 font-medium">
+                  Price
+                </label>
+                <div className="mt-1 flex gap-1 rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6">
+                  <span className="text-lg">$</span>
+                  <input
+                    type="text"
+                    name="price"
+                    className="w-full outline-none"
+                    id="price"
+                  />
+                </div>
+              </div>
+
               <SlimInput name="unit" required={false} />
               <SlimInput name="lot" label="Lot#" required={false} />
             </div>

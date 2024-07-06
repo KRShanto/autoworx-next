@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
+import { InventoryProductType } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export async function editProduct({
@@ -14,6 +15,7 @@ export async function editProduct({
   quantity,
   unit,
   lot,
+  type,
 }: {
   id: number;
   name: string;
@@ -24,6 +26,7 @@ export async function editProduct({
   quantity?: number;
   unit?: string;
   lot?: string;
+  type?: InventoryProductType;
 }): Promise<ServerAction> {
   const updatedProduct = await db.inventoryProduct.update({
     where: { id },
@@ -36,6 +39,7 @@ export async function editProduct({
       quantity,
       unit,
       lot,
+      type,
     },
   });
 

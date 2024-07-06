@@ -16,7 +16,12 @@ import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { useListsStore } from "@/stores/lists";
-import { Category, InventoryProduct, Vendor } from "@prisma/client";
+import {
+  Category,
+  InventoryProduct,
+  InventoryProductType,
+  Vendor,
+} from "@prisma/client";
 import { useState } from "react";
 import { CiEdit } from "react-icons/ci";
 import { editProduct } from "./actions/edit";
@@ -32,6 +37,7 @@ type TInputType = {
   quantity: number | null;
   unit: string | null;
   lot: string | null;
+  type: InventoryProductType;
 };
 
 export default function EditProduct({ productData }: TProps) {
@@ -50,6 +56,7 @@ export default function EditProduct({ productData }: TProps) {
     quantity: productData.quantity,
     unit: productData.unit,
     lot: productData.lot,
+    type: productData.type,
   });
 
   const handleChange = (
@@ -68,6 +75,8 @@ export default function EditProduct({ productData }: TProps) {
     const quantity = Number(product.quantity) as number;
     const unit = product.unit as string;
     const lot = product.lot as string;
+    const type = product.type as InventoryProductType;
+
     try {
       if (!(price > 0 && quantity > 0)) {
         throw new Error("Price and quantity must be greater than 0");
@@ -82,6 +91,7 @@ export default function EditProduct({ productData }: TProps) {
         quantity,
         unit,
         lot,
+        type,
       });
 
       if (res.type === "success") {
@@ -169,7 +179,35 @@ export default function EditProduct({ productData }: TProps) {
                 className="h-28 w-[95%] rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6"
                 value={product.description as string}
               />
+
+              <div>
+                <div>
+                  <input
+                    id="product"
+                    type="radio"
+                    name="type"
+                    value={InventoryProductType.Product}
+                    onChange={handleChange}
+                    className="mr-1"
+                    checked={product.type === InventoryProductType.Product}
+                  />
+                  <label htmlFor="product">Products</label>
+                </div>
+                <div>
+                  <input
+                    id="supply"
+                    type="radio"
+                    name="type"
+                    value={InventoryProductType.Supply}
+                    onChange={handleChange}
+                    className="mr-1"
+                    checked={product.type === InventoryProductType.Supply}
+                  />
+                  <label htmlFor="supply">Supplies</label>
+                </div>
+              </div>
             </div>
+
             <div className="col-span-3 mt-5 flex w-[90%] gap-5">
               <SlimInput
                 onChange={handleChange}
