@@ -87,6 +87,7 @@ export default function AddNewProduct() {
                   }
                   newButton={
                     <NewVendor
+                      bgShadow={false}
                       afterSubmit={(ven) => {
                         setVendor(ven);
                         setVendorOpen(false);

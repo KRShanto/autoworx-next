@@ -18,6 +18,7 @@ interface SelectorProps<T> {
   openState?: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
   selectedItem?: T | null | undefined;
   setSelectedItem?: React.Dispatch<React.SetStateAction<T | null>>;
+  clickabled?: boolean;
 }
 
 /**
@@ -36,6 +37,7 @@ interface SelectorProps<T> {
  * @param {[boolean, React.Dispatch<React.SetStateAction<boolean>>]} [props.openState] - Optional state for controlling the open state from outside.
  * @param {T | null | undefined} [props.selectedItem] - The currently selected item.
  * @param {React.Dispatch<React.SetStateAction<T | null>>} [props.setSelectedItem] - Function to set the selected item.
+ * @param {boolean} [props.clickabled] - Optional prop to enable/disable item selection.
  * @returns {JSX.Element} The rendered Selector component.
  */
 export default function Selector<T>({
@@ -49,6 +51,7 @@ export default function Selector<T>({
   openState,
   selectedItem,
   setSelectedItem,
+  clickabled = true,
 }: SelectorProps<T>): JSX.Element {
   // Using provided open state or setting local state
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -142,20 +145,37 @@ export default function Selector<T>({
 
           {/* Display list of items */}
           <div className="mb-5 max-h-40 overflow-y-auto">
-            {filteredItems.map((item, index) => (
-              <button
-                onClick={() => handleSelectItem(item)}
-                type="button"
-                key={index}
-                className={cn(
-                  "w-full p-1 px-2 text-left hover:bg-gray-100",
-                  border &&
-                    "relative left-1/2 my-1 w-[95%] -translate-x-1/2 rounded-md border-2 border-slate-400 py-[0.3rem]",
-                )}
-              >
-                {displayList(item)}
-              </button>
-            ))}
+            {filteredItems.map((item, index) => {
+              if (clickabled) {
+                return (
+                  <button
+                    onClick={() => handleSelectItem(item)}
+                    type="button"
+                    key={index}
+                    className={cn(
+                      "w-full p-1 px-2 text-left hover:bg-gray-100",
+                      border &&
+                        "relative left-1/2 my-1 w-[95%] -translate-x-1/2 rounded-md border-2 border-slate-400 py-[0.3rem]",
+                    )}
+                  >
+                    {displayList(item)}
+                  </button>
+                );
+              } else {
+                return (
+                  <div
+                    key={index}
+                    className={cn(
+                      "w-full p-1 px-2 text-left hover:bg-gray-100",
+                      border &&
+                        "relative left-1/2 my-1 w-[95%] -translate-x-1/2 rounded-md border-2 border-slate-400 py-[0.3rem]",
+                    )}
+                  >
+                    {displayList(item)}
+                  </div>
+                );
+              }
+            })}
           </div>
 
           {/* New button */}

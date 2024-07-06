@@ -31,12 +31,12 @@ export default async function TopVendors() {
     <div className="app-shadow h-[45%] w-full rounded-lg bg-white p-5">
       <h3 className="text-xl font-bold">Top Vendors</h3>
 
-      <div className="flex flex-col gap-3 p-3">
+      <div className="flex h-[90%] flex-col gap-3 overflow-y-auto p-3">
         {topVendors
           .sort((a, b) => b.total - a.total)
           .map((vendor, i) => (
-            <div key={i} className="flex justify-between">
-              <p>
+            <div key={i} className="flex items-center justify-between">
+              <p className="text-sm">
                 {vendor.name}, {vendor.companyName}
               </p>
               {/* progress bar */}

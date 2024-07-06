@@ -30,7 +30,7 @@ export default function SalesPurchaseHistoryClient({
   const [tab, setTab] = useState<Tab>(Tab.Sales);
 
   return (
-    <div className="app-shadow #h-[63%] mt-4 w-full grow rounded-lg bg-white p-4">
+    <div className="app-shadow mt-4 h-[63%] w-full overflow-y-auto rounded-lg bg-white p-4">
       <Tabs.Root value={tab} onValueChange={(value) => setTab(value as Tab)}>
         <Tabs.List className="flex gap-5">
           <Tabs.Trigger
@@ -59,7 +59,6 @@ export default function SalesPurchaseHistoryClient({
         <div className="mt-3">
           <Tabs.Content value={Tab.Sales}>
             <Table
-              productId={productId}
               histories={histories.filter((history) => history.type === "Sale")}
               vendorName={vendorName}
               price={price}
@@ -67,7 +66,6 @@ export default function SalesPurchaseHistoryClient({
           </Tabs.Content>
           <Tabs.Content value={Tab.Purchase}>
             <Table
-              productId={productId}
               histories={histories.filter(
                 (history) => history.type === "Purchase",
               )}
@@ -82,12 +80,10 @@ export default function SalesPurchaseHistoryClient({
 }
 
 function Table({
-  productId,
   histories,
   vendorName,
   price,
 }: {
-  productId?: number;
   histories: InventoryProductHistory[];
   vendorName: string;
   price: number;

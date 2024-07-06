@@ -18,9 +18,11 @@ import { newVendor } from "@/app/inventory/vendor/actions/newVendor";
 import { SlimTextarea } from "../SlimTextarea";
 
 export default function NewVendor({
+  bgShadow,
   button,
   afterSubmit,
 }: {
+  bgShadow?: boolean;
   button: JSX.Element;
   afterSubmit?: (vendor: Vendor) => void;
 }) {
@@ -69,6 +71,7 @@ export default function NewVendor({
       <DialogContent
         className="max-h-full max-w-xl grid-rows-[auto,1fr,auto]"
         form
+        bgShadow={bgShadow}
       >
         <DialogHeader>
           <DialogTitle>Add New Vendor</DialogTitle>

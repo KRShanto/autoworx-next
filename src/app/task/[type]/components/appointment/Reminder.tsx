@@ -49,6 +49,9 @@ export function Reminder({
   const [dateInput, setDateInput] = useState<string>("");
   const templates = useListsStore((x) => x.templates);
 
+  const [openConfirmation, setOpenConfirmation] = useState(false);
+  const [openReminder, setOpenReminder] = useState(false);
+
   async function handleDelete({ id, type }: { id: number; type: string }) {
     await deleteTemplate(id);
 
@@ -86,6 +89,7 @@ export function Reminder({
 
         <Selector
           border
+          clickabled={false}
           label={(template: EmailTemplate | null) =>
             template ? template.subject : "Template"
           }
@@ -100,8 +104,17 @@ export function Reminder({
             (template: EmailTemplate) => template.type === "Confirmation",
           )}
           displayList={(template: EmailTemplate) => (
-            <div className="flex justify-between">
-              <p className="text-sm font-bold">{template.subject}</p>
+            <div className="flex">
+              <button
+                className="w-full text-left text-sm font-bold"
+                onClick={() => {
+                  setConfirmationTemplate(template);
+                  setOpenConfirmation(false);
+                }}
+                type="button"
+              >
+                {template.subject}
+              </button>
               <div className="flex items-center gap-2">
                 <UpdateTemplate
                   id={template.id}
@@ -126,6 +139,7 @@ export function Reminder({
               template.subject.toLowerCase().includes(search.toLowerCase()),
             )
           }
+          openState={[openConfirmation, setOpenConfirmation]}
         />
       </div>
       <div className="space-y-4 p-2">
@@ -141,6 +155,7 @@ export function Reminder({
 
         <Selector
           border
+          clickabled={false}
           label={(template: EmailTemplate | null) =>
             template ? template.subject : "Template"
           }
@@ -155,8 +170,17 @@ export function Reminder({
             (template: EmailTemplate) => template.type === "Reminder",
           )}
           displayList={(template: EmailTemplate) => (
-            <div className="flex justify-between">
-              <p className="text-sm font-bold">{template.subject}</p>
+            <div className="flex">
+              <button
+                className="w-full text-left text-sm font-bold"
+                onClick={() => {
+                  setReminderTemplate(template);
+                  setOpenReminder(false);
+                }}
+                type="button"
+              >
+                {template.subject}
+              </button>
               <div className="flex items-center gap-2">
                 <UpdateTemplate
                   id={template.id}
@@ -181,6 +205,7 @@ export function Reminder({
               template.subject.toLowerCase().includes(search.toLowerCase()),
             )
           }
+          openState={[openReminder, setOpenReminder]}
         />
       </div>
 

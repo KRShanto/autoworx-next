@@ -149,6 +149,7 @@ export default function UpdateTask() {
                           );
                         }
                       }}
+                      checked={assignedUsers.includes(user.id)}
                     />
                     <Image
                       src={user.image}
