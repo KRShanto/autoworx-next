@@ -92,7 +92,6 @@ export default function UpdateTask() {
               className="mt-2 rounded-md border-2 border-gray-500 p-1"
               value={description || ""}
               onChange={(e) => setDescription(e.target.value)}
-              autoFocus
             />
           </div>
 

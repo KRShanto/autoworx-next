@@ -1,6 +1,5 @@
 import { TooltipTrigger } from "@/components/Tooltip";
 import { usePopupStore } from "@/stores/popup";
-import { AppointmentFull } from "@/types/db";
 import React, { ReactElement } from "react";
 import { useDrag } from "react-dnd";
 
@@ -9,6 +8,7 @@ export default function DraggableDayTooltip({
   style,
   task,
   updateTaskData,
+  updateAppointmentData,
   ...props
 }: {
   children: ReactElement;
@@ -18,11 +18,20 @@ export default function DraggableDayTooltip({
     event: any;
     companyUsers: any;
   };
+  updateAppointmentData: {
+    appointment: any;
+    employees: any;
+    customers: any;
+    vehicles: any;
+    orders: any;
+    templates: any;
+    settings: any;
+  };
 }) {
   const { open } = usePopupStore();
 
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: task.type,
+    type: "task",
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
@@ -33,6 +42,15 @@ export default function DraggableDayTooltip({
   };
 
   const { event, companyUsers } = updateTaskData;
+  const {
+    appointment,
+    customers,
+    employees,
+    vehicles,
+    orders,
+    templates,
+    settings,
+  } = updateAppointmentData;
 
   return (
     <TooltipTrigger
@@ -46,12 +64,24 @@ export default function DraggableDayTooltip({
         opacity: isDragging ? 0.5 : 1,
         cursor: isDragging ? "grabbing" : "pointer",
       }}
-      onClick={() =>
-        open("UPDATE_TASK", {
-          task: event,
-          companyUsers,
-        })
-      }
+      onClick={() => {
+        if (event.type === "task") {
+          open("UPDATE_TASK", {
+            task: event,
+            companyUsers,
+          });
+        } else {
+          open("UPDATE_APPOINTMENT", {
+            appointment,
+            employees,
+            customers,
+            vehicles,
+            orders,
+            templates,
+            settings,
+          });
+        }
+      }}
       {...props}
     >
       {children}

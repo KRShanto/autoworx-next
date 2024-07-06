@@ -175,11 +175,7 @@ export default function Day({
     // Get the task type
     const type = event.dataTransfer.getData("text/plain").split("|")[0];
 
-    if (type === "tag") {
-      const tag = event.dataTransfer.getData("text/plain").split("|")[1];
-
-      // TODO: add tag to task
-    } else if (type === "task") {
+    if (type === "task") {
       // Get the id of the task from the dataTransfer object
       const taskId = parseInt(
         event.dataTransfer.getData("text/plain").split("|")[1],
@@ -355,6 +351,17 @@ export default function Day({
               }}
               task={event}
               updateTaskData={{ event, companyUsers }}
+              updateAppointmentData={{
+                appointment: appointmentsFull.find(
+                  (appointment) => appointment.id === event.id,
+                ),
+                employees: companyUsers,
+                customers,
+                vehicles,
+                orders,
+                templates,
+                settings,
+              }}
             >
               {<>{truncateTitle(event.title, maxTitleLength)}</>}
             </DraggableDayTooltip>

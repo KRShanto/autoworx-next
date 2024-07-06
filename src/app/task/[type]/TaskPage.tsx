@@ -22,7 +22,6 @@ export default function TaskPage({
   companyUsers,
   usersWithTasks,
   tasks,
-  tags,
   customers,
   vehicles,
   orders,
@@ -36,7 +35,6 @@ export default function TaskPage({
   companyUsers: User[];
   usersWithTasks: any; // TODO: Fix this type
   tasks: Task[];
-  tags: string[];
   customers: Customer[];
   vehicles: Vehicle[];
   orders: Order[];
@@ -54,12 +52,7 @@ export default function TaskPage({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <CalendarSidebar
-        usersWithTasks={usersWithTasks}
-        tasks={tasks}
-        tags={tags}
-        appointments={appointments as any}
-      />
+      <CalendarSidebar usersWithTasks={usersWithTasks} tasks={tasks} />
       <Calendar
         type={type}
         tasks={calendarTasks as any}

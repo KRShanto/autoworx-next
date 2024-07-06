@@ -129,24 +129,6 @@ export default async function Page({ params }: { params: { type: string } }) {
     });
   }
 
-  // Get all invoices
-  const invoices = await db.invoice.findMany({
-    where: {
-      companyId,
-    },
-  });
-
-  // const tags = invoices.map((invoice) => invoice.tags).flat();
-  // // split tags into array
-  // const tagsArray = tags.map((tag) => tag.split(",")).flat();
-  // TODO: Fix this. need more information
-  const tagsArray = [] as string[];
-
-  // Find unique tags
-  const uniqueTags = tagsArray.filter(
-    (tag, index) => tagsArray.indexOf(tag) === index,
-  );
-
   const customers = await db.customer.findMany({
     where: { companyId },
   });
@@ -251,7 +233,6 @@ export default async function Page({ params }: { params: { type: string } }) {
           companyUsers={companyUsers}
           usersWithTasks={usersWithTasks}
           tasks={tasks}
-          tags={uniqueTags}
           customers={customers}
           vehicles={vehicles}
           orders={orders}

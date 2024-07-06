@@ -34,12 +34,14 @@ import {
   FaChevronRight,
   FaSearch,
   FaTimes,
+  FaTrash,
 } from "react-icons/fa";
 import { TbBell, TbCalendar } from "react-icons/tb";
 import { editAppointment } from "../../actions/editAppointment";
 import NewOrder from "./NewOrder";
 import { Reminder } from "./Reminder";
 import Selector from "@/components/Selector";
+import { deleteAppointment } from "../../actions/deleteAppointment";
 
 enum Tab {
   Schedule = 0,
@@ -421,17 +423,30 @@ export function UpdateAppointment() {
           </div>
         </div>
 
-        <DialogFooter className="justify-end">
-          <DialogClose className="rounded-md border px-4 py-1">
-            Cancel
-          </DialogClose>
-          <Submit
-            className="rounded-md border bg-[#6571FF] px-4 py-1 text-white"
-            formAction={handleSubmit}
+        <div className="flex">
+          <button
+            className="text-xl text-red-500 hover:text-red-700"
+            type="button"
+            onClick={async () => {
+              await deleteAppointment(appointment.id);
+              close();
+            }}
           >
-            Save
-          </Submit>
-        </DialogFooter>
+            <FaTrash />
+          </button>
+
+          <DialogFooter className="w-full">
+            <DialogClose className="rounded-md border px-4 py-1">
+              Cancel
+            </DialogClose>
+            <Submit
+              className="rounded-md border bg-[#6571FF] px-4 py-1 text-white"
+              formAction={handleSubmit}
+            >
+              Save
+            </Submit>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
