@@ -99,10 +99,6 @@ export default function Day({
 
   const [{ canDrop, isOver }, dropRef] = useDrop({
     accept: ["tag", "task", "appointment"],
-    drop: (item, monitor) => {
-      // Update your state here
-      console.log({item, monitor});
-    },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
@@ -166,7 +162,7 @@ export default function Day({
     return moment(date).format("YYYY-MM-DD");
   }
 
-  function formatTime(row: string = '') {
+  function formatTime(row: string = "") {
     const [hour, period] = row?.split(" ");
     const time = `${hour.padStart(2, "0")}:00 ${period}`;
     return moment(time, "hh:mm A").format("HH:mm");
@@ -310,15 +306,17 @@ export default function Day({
         //TODO:
         const eventStartTime = moment(event.startTime, "HH:mm");
         const eventEndTime = moment(event.endTime, "HH:mm");
-        const tasksInRow = events.filter(
-          (task) => {
-            const taskStartTime = moment(task.startTime, "HH:mm");
-            const taskEndTime = moment(task.endTime, "HH:mm");
-            if (task.rowStartIndex === event.rowStartIndex || taskStartTime.isBetween(eventStartTime, eventEndTime) || taskEndTime.isBetween(eventStartTime, eventEndTime)) {
-              return true;
-            } 
+        const tasksInRow = events.filter((task) => {
+          const taskStartTime = moment(task.startTime, "HH:mm");
+          const taskEndTime = moment(task.endTime, "HH:mm");
+          if (
+            task.rowStartIndex === event.rowStartIndex ||
+            taskStartTime.isBetween(eventStartTime, eventEndTime) ||
+            taskEndTime.isBetween(eventStartTime, eventEndTime)
+          ) {
+            return true;
           }
-        );
+        });
 
         // If there are more than one task in the same row
         // then move the task right
@@ -356,8 +354,9 @@ export default function Day({
                 minWidth: width,
               }}
               task={event}
+              updateTaskData={{ event, companyUsers }}
             >
-              {truncateTitle(event.title, maxTitleLength)}
+              {<>{truncateTitle(event.title, maxTitleLength)}</>}
             </DraggableDayTooltip>
             <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
               {event.type === "appointment" ? (
