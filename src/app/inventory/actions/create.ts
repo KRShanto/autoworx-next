@@ -22,10 +22,21 @@ export async function createProduct(
   data: CreateProductInput,
 ): Promise<ServerAction> {
   const companyId = await getCompanyId();
+
   const newProduct = await db.inventoryProduct.create({
     data: {
       ...data,
       companyId,
+    },
+  });
+
+  // create a history record
+  await db.inventoryProductHistory.create({
+    data: {
+      productId: newProduct.id,
+      date: new Date(),
+      quantity: newProduct.quantity || 1,
+      type: "Purchase",
     },
   });
 
