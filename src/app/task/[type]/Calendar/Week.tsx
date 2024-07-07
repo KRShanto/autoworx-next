@@ -25,6 +25,9 @@ import { useDrop } from "react-dnd";
 import { FaPen } from "react-icons/fa6";
 import { assignAppointmentDate } from "../actions/assignAppointmentDate";
 import { dragTask } from "../actions/dragTask";
+import DraggableDayTooltip from "./draggable/DraggableDayTooltip";
+import DropRowButton from "./dropable/DropRowButton";
+import DropWeekButton from "./dropable/DropWeekButton";
 
 function useWeek() {
   const searchParams = useSearchParams();
@@ -98,16 +101,24 @@ export default function Week({
   const week = useWeek();
   const today = week.toDate();
 
-  // Define the days of the week
-  const days = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
+  const weekStart = settings.weekStart || "Sunday";
+
+  // Get the days of the week based on the weekStart
+  const days = useMemo(() => {
+    const days = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+
+    const start = days.indexOf(weekStart);
+
+    return [...days.slice(start), ...days.slice(0, start)] as typeof days;
+  }, [weekStart]);
 
   // Generate the all-day row
   const allDayRow = [
@@ -194,7 +205,6 @@ export default function Week({
         today.setDate(today.getDate() - today.getDay() + columnIndex - 1),
       ),
     );
-
     // Get the task type
     const type = event.dataTransfer.getData("text/plain").split("|")[0];
 
@@ -242,7 +252,7 @@ export default function Week({
       }
     }
   }
-
+  console.log(rows);
   return (
     <>
       <div
@@ -288,18 +298,20 @@ export default function Week({
                 const startTime = formatTime(row[0]);
                 open("ADD_TASK", { date, startTime, companyUsers });
               }
-
               return (
-                <button
+                <DropWeekButton
                   key={columnIndex}
+                  rowTime={row[0]}
+                  today={today}
+                  columnIndex={columnIndex}
                   className={cellClasses}
                   disabled={isHeaderCell}
                   onClick={isHeaderCell ? undefined : handleClick}
-                  onDrop={(event) => {
+                  onDrop={(event: React.DragEvent) => {
                     handleDrop(event, rowIndex, columnIndex);
                     setDraggedOverRow(null);
                   }}
-                  onDragOver={(event) => {
+                  onDragOver={(event: React.DragEvent) => {
                     event.preventDefault();
                     setDraggedOverRow({ r: rowIndex, c: columnIndex });
                   }}
@@ -313,7 +325,7 @@ export default function Week({
                   }}
                 >
                   {column}
-                </button>
+                </DropWeekButton>
               );
             })}
           </div>
@@ -335,7 +347,7 @@ export default function Week({
             45 * (event.rowEndIndex - event.rowStartIndex + 1)
           }px`;
           // width according to the cell width
-          const width = "12.9%";
+          const width = "11.9%"; // prev = 12.9%
           // @ts-ignore
           const backgroundColor = event.priority
             ? // @ts-ignore
@@ -349,7 +361,6 @@ export default function Week({
               : title;
           };
 
-          // TODO
           // Define the maximum title length based on the height
           const maxTitleLength =
             height === "45px"
@@ -360,7 +371,8 @@ export default function Week({
 
           return (
             <Tooltip key={event.id}>
-              <TooltipTrigger
+              <DraggableDayTooltip
+                //@ts-ignore
                 className="absolute top-0 rounded-lg border"
                 style={{
                   left,
@@ -369,11 +381,24 @@ export default function Week({
                   backgroundColor,
                   width,
                 }}
+                task={event}
+                updateTaskData={{ event, companyUsers }}
+                updateAppointmentData={{
+                  appointment: appointmentsFull.find(
+                    (appointment) => appointment.id === event.id,
+                  ),
+                  employees: companyUsers,
+                  customers,
+                  vehicles,
+                  orders,
+                  templates,
+                  settings,
+                }}
               >
                 <p className="z-30 p-1 text-[17px] text-white max-[1600px]:text-[12px]">
                   {truncateTitle(event.title, maxTitleLength)}
                 </p>
-              </TooltipTrigger>
+              </DraggableDayTooltip>
               <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
                 {event.type === "appointment" ? (
                   <div>

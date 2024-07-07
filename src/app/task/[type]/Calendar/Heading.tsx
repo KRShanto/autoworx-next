@@ -8,7 +8,7 @@ import {
   Vehicle,
 } from "@prisma/client";
 import { sentenceCase } from "change-case";
-import moment from "moment";
+import moment, { Moment } from "moment";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -24,6 +24,22 @@ function DisplayDate({ type }: { type: CalendarType }) {
     /* else: Month year */
     type === "day" ? "dddd, D MMMM YYYY" : "MMMM YYYY",
   );
+}
+
+function getNextValidDate(
+  date: Moment,
+  direction: number,
+  weekend1: string,
+  weekend2: string,
+): Moment {
+  let nextDate = moment(date);
+  while (
+    nextDate.format("dddd") === weekend1 ||
+    nextDate.format("dddd") === weekend2
+  ) {
+    nextDate.add(direction, "days");
+  }
+  return nextDate;
 }
 
 export default function Heading({
@@ -45,6 +61,8 @@ export default function Heading({
 }) {
   const router = useRouter();
   const q = type === "day" ? "date" : type;
+  const weekend1 = settings.weekend1;
+  const weekend2 = settings.weekend2;
 
   return (
     <div className="flex items-center justify-between">
@@ -55,8 +73,8 @@ export default function Heading({
         </Suspense>
       </h2>
 
-      {/* Calender options */}
-      <div className="flex items-center gap-3 ">
+      {/* Calendar options */}
+      <div className="flex items-center gap-3">
         {/* Highlight day's date in Month section */}
         <Link
           className="app-shadow rounded-md p-2 text-[#797979]"
@@ -72,8 +90,14 @@ export default function Heading({
           onClick={() => {
             const searchParams = new URLSearchParams(window.location.search);
             const date = moment(searchParams.get(q));
+            const validDate = getNextValidDate(
+              date.subtract(1, `${type}s`),
+              -1,
+              weekend1,
+              weekend2,
+            );
             router.push(
-              `/task/${type}?${q}=${(date.isValid() ? date : moment()).subtract(1, `${type}s`).format(moment.HTML5_FMT[q.toUpperCase() as Uppercase<typeof q>])}`,
+              `/task/${type}?${q}=${(date.isValid() ? validDate : moment()).format(moment.HTML5_FMT[q.toUpperCase() as Uppercase<typeof q>])}`,
             );
           }}
         >
@@ -87,8 +111,14 @@ export default function Heading({
           onClick={() => {
             const searchParams = new URLSearchParams(window.location.search);
             const date = moment(searchParams.get(q));
+            const validDate = getNextValidDate(
+              date.add(1, `${type}s`),
+              1,
+              weekend1,
+              weekend2,
+            );
             router.push(
-              `/task/${type}?${q}=${(date.isValid() ? date : moment()).add(1, `${type}s`).format(moment.HTML5_FMT[q.toUpperCase() as Uppercase<typeof q>])}`,
+              `/task/${type}?${q}=${(date.isValid() ? validDate : moment()).format(moment.HTML5_FMT[q.toUpperCase() as Uppercase<typeof q>])}`,
             );
           }}
         >
