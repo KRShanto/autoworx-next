@@ -130,7 +130,7 @@ export default function Settings({
                   </select>
                 </div>
 
-                <div className="w-full ">
+                <div className="w-full">
                   <select
                     id="weekend-2"
                     name="weekend-2"

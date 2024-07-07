@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { CiEdit } from "react-icons/ci";
 import { FaTimes } from "react-icons/fa";
+import { deleteVendor } from "./actions/deleteVendor";
 
 const evenColor = "bg-white";
 const oddColor = "bg-[#F8FAFF]";
@@ -58,15 +59,20 @@ export default function Table({
                 {moment(vendor.createdAt).format("DD MMM YYYY, hh:mm A")}
               </td>
               <td className="mt-2 flex gap-3 px-10">
-                
-                <EditVendor button={
-                <button className="text-2xl text-blue-600">
-                  <CiEdit />
-                </button>
-                }
-                vendor={vendor}
+                <EditVendor
+                  button={
+                    <button className="text-2xl text-blue-600">
+                      <CiEdit />
+                    </button>
+                  }
+                  vendor={vendor}
                 />
-                <button className="text-xl text-red-400">
+                <button
+                  className="text-xl text-red-400"
+                  onClick={() => {
+                    deleteVendor(vendor.id);
+                  }}
+                >
                   <FaTimes />
                 </button>
               </td>
