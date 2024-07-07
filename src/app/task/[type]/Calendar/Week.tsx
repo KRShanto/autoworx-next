@@ -101,16 +101,24 @@ export default function Week({
   const week = useWeek();
   const today = week.toDate();
 
-  // Define the days of the week
-  const days = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
+  const weekStart = settings.weekStart || "Sunday";
+
+  // Get the days of the week based on the weekStart
+  const days = useMemo(() => {
+    const days = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+
+    const start = days.indexOf(weekStart);
+
+    return [...days.slice(start), ...days.slice(0, start)] as typeof days;
+  }, [weekStart]);
 
   // Generate the all-day row
   const allDayRow = [
@@ -244,7 +252,7 @@ export default function Week({
       }
     }
   }
-  console.log(rows)
+  console.log(rows);
   return (
     <>
       <div
@@ -373,19 +381,19 @@ export default function Week({
                   backgroundColor,
                   width,
                 }}
-              task={event}
-              updateTaskData={{ event, companyUsers }}
-              updateAppointmentData={{
-                appointment: appointmentsFull.find(
-                  (appointment) => appointment.id === event.id,
-                ),
-                employees: companyUsers,
-                customers,
-                vehicles,
-                orders,
-                templates,
-                settings,
-              }}
+                task={event}
+                updateTaskData={{ event, companyUsers }}
+                updateAppointmentData={{
+                  appointment: appointmentsFull.find(
+                    (appointment) => appointment.id === event.id,
+                  ),
+                  employees: companyUsers,
+                  customers,
+                  vehicles,
+                  orders,
+                  templates,
+                  settings,
+                }}
               >
                 <p className="z-30 p-1 text-[17px] text-white max-[1600px]:text-[12px]">
                   {truncateTitle(event.title, maxTitleLength)}
