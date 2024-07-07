@@ -27,6 +27,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/invoice/removeEmployee"
-  ],
+, "src/app/task/[type]/Calendar/dropable/DropRowButton.jsx", "src/app/task/[type]/Calendar/dropable/DropWeekButton.jsx"  ],
   "exclude": ["node_modules"]
 }
