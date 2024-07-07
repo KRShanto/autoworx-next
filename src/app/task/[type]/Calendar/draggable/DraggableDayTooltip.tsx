@@ -31,12 +31,11 @@ export default function DraggableDayTooltip({
   const { open } = usePopupStore();
 
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: "task",
+    type: 'task',
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
   }));
-
   const handleDragStart = (event: any) => {
     event.dataTransfer.setData("text/plain", `${task.type}|${task.id}`);
   };
@@ -58,7 +57,6 @@ export default function DraggableDayTooltip({
       // @ts-ignore
       ref={drag}
       onDragStart={handleDragStart}
-      className="absolute top-0 z-10 rounded-lg border bg-red-400 px-2 py-1 text-[17px] text-white hover:z-20"
       style={{
         ...style,
         opacity: isDragging ? 0.5 : 1,

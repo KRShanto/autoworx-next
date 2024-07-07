@@ -36,6 +36,7 @@ export async function updateTask(task: any): Promise<ServerAction> {
       id: task.id,
     },
     data: {
+      date: task?.date,
       startTime: task?.startTime,
       endTime: task?.endTime,
     },

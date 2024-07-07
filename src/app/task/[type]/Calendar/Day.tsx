@@ -341,6 +341,8 @@ export default function Day({
         return (
           <Tooltip key={event.id}>
             <DraggableDayTooltip
+              //@ts-ignore
+              className="absolute top-0 z-10 rounded-lg border px-2 py-1 text-[17px] text-white hover:z-20"
               style={{
                 left: calculateLeftPosition(taskIndex, tasksInRow.length),
                 top,
