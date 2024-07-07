@@ -302,13 +302,20 @@ export default function Day({
         //TODO:
         const eventStartTime = moment(event.startTime, "HH:mm");
         const eventEndTime = moment(event.endTime, "HH:mm");
-        const tasksInRow = events.filter((task) => {
+        const tasksInRow = events.slice().sort((a, b) => {
+        const aRowStartIndex = a.rowStartIndex
+        const aRowEndIndex = a.rowEndIndex
+        const aBigIndex = aRowEndIndex - aRowStartIndex
+        const bRowStartIndex = b.rowStartIndex
+        const bRowEndIndex = b.rowEndIndex
+        const bBigIndex = bRowEndIndex - bRowStartIndex
+        return bBigIndex - aBigIndex  
+      }).filter((task) => {
           const taskStartTime = moment(task.startTime, "HH:mm");
           const taskEndTime = moment(task.endTime, "HH:mm");
           if (
-            task.rowStartIndex === event.rowStartIndex ||
-            taskStartTime.isBetween(eventStartTime, eventEndTime) ||
-            taskEndTime.isBetween(eventStartTime, eventEndTime)
+            event.rowStartIndex === task.rowStartIndex || (eventStartTime.isBefore(taskEndTime) &&
+            eventEndTime.isAfter(taskStartTime)) || event.rowEndIndex === task.rowStartIndex || event.rowStartIndex === task.rowEndIndex
           ) {
             return true;
           }

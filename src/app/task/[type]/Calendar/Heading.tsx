@@ -61,8 +61,8 @@ export default function Heading({
 }) {
   const router = useRouter();
   const q = type === "day" ? "date" : type;
-  const weekend1 = settings.weekend1;
-  const weekend2 = settings.weekend2;
+  const weekend1 = settings?.weekend1;
+  const weekend2 = settings?.weekend2;
 
   return (
     <div className="flex items-center justify-between">
