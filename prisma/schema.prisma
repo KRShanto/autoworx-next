@@ -287,7 +287,7 @@ model Material {
   updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
 
   company     Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  vendor      Vendor?           @relation(fields: [vendorId], references: [id])
+  vendor      Vendor?           @relation(fields: [vendorId], references: [id], onDelete: SetNull)
   category    Category?         @relation(fields: [categoryId], references: [id])
   tags        MaterialTag[]
   invoiceItem InvoiceItem?      @relation(fields: [invoiceItemId], references: [id])
@@ -663,7 +663,7 @@ model InventoryProduct {
   updatedAt               DateTime                  @default(now()) @updatedAt @map("updated_at")
   company                 Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   category                Category?                 @relation(fields: [categoryId], references: [id])
-  vendor                  Vendor?                   @relation(fields: [vendorId], references: [id])
+  vendor                  Vendor?                   @relation(fields: [vendorId], references: [id], onDelete: SetNull)
   InventoryProductHistory InventoryProductHistory[]
   // InvoiceItemMaterial     InvoiceItemMaterial[]
   Material                Material[]

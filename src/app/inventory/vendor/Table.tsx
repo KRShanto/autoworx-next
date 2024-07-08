@@ -4,7 +4,7 @@ import EditVendor from "@/components/Lists/EditVendor";
 import { cn } from "@/lib/cn";
 import { Vendor } from "@prisma/client";
 import moment from "moment";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import React from "react";
 import { CiEdit } from "react-icons/ci";
 import { FaTimes } from "react-icons/fa";
@@ -69,8 +69,9 @@ export default function Table({
                 />
                 <button
                   className="text-xl text-red-400"
-                  onClick={() => {
-                    deleteVendor(vendor.id);
+                  onClick={async () => {
+                    await deleteVendor(vendor.id);
+                    router.push("/inventory/vendor");
                   }}
                 >
                   <FaTimes />

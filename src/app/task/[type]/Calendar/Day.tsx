@@ -302,24 +302,30 @@ export default function Day({
         //TODO:
         const eventStartTime = moment(event.startTime, "HH:mm");
         const eventEndTime = moment(event.endTime, "HH:mm");
-        const tasksInRow = events.slice().sort((a, b) => {
-        const aRowStartIndex = a.rowStartIndex
-        const aRowEndIndex = a.rowEndIndex
-        const aBigIndex = aRowEndIndex - aRowStartIndex
-        const bRowStartIndex = b.rowStartIndex
-        const bRowEndIndex = b.rowEndIndex
-        const bBigIndex = bRowEndIndex - bRowStartIndex
-        return bBigIndex - aBigIndex  
-      }).filter((task) => {
-          const taskStartTime = moment(task.startTime, "HH:mm");
-          const taskEndTime = moment(task.endTime, "HH:mm");
-          if (
-            event.rowStartIndex === task.rowStartIndex || (eventStartTime.isBefore(taskEndTime) &&
-            eventEndTime.isAfter(taskStartTime)) || event.rowEndIndex === task.rowStartIndex || event.rowStartIndex === task.rowEndIndex
-          ) {
-            return true;
-          }
-        });
+        const tasksInRow = events
+          .slice()
+          .sort((a, b) => {
+            const aRowStartIndex = a.rowStartIndex;
+            const aRowEndIndex = a.rowEndIndex;
+            const aBigIndex = aRowEndIndex - aRowStartIndex;
+            const bRowStartIndex = b.rowStartIndex;
+            const bRowEndIndex = b.rowEndIndex;
+            const bBigIndex = bRowEndIndex - bRowStartIndex;
+            return bBigIndex - aBigIndex;
+          })
+          .filter((task) => {
+            const taskStartTime = moment(task.startTime, "HH:mm");
+            const taskEndTime = moment(task.endTime, "HH:mm");
+            if (
+              event.rowStartIndex === task.rowStartIndex ||
+              (eventStartTime.isBefore(taskEndTime) &&
+                eventEndTime.isAfter(taskStartTime)) ||
+              event.rowEndIndex === task.rowStartIndex ||
+              event.rowStartIndex === task.rowEndIndex
+            ) {
+              return true;
+            }
+          });
 
         // If there are more than one task in the same row
         // then move the task right
