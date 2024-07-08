@@ -405,29 +405,8 @@ export default function Day({
                       <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 rounded-lg border bg-[#6571FF]"></div>
                     </div>
                   ) : (
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-semibold">{event.title}</h3>
-
-                        <button
-                          type="button"
-                          className="text- rounded-full bg-[#6571FF] p-2 text-white"
-                          onClick={() =>
-                            open("UPDATE_TASK", {
-                              task: event,
-                              companyUsers,
-                            })
-                          }
-                        >
-                          <FaPen className="mx-auto text-[10px]" />
-                        </button>
-                      </div>
-
-                      {/* @ts-ignore */}
-                      <p className="mt-3 text-left">{event.description}</p>
-
-                      {/* @ts-ignore */}
-                      <p className="mt-3">Task Priority: {event.priority}</p>
+                    <div className="flex h-full justify-start">
+                      <h3 className="font-semibold">{event.title}</h3>
                     </div>
                   )}
                 </>
