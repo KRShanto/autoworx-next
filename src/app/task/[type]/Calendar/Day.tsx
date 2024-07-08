@@ -25,10 +25,10 @@ import { useDrop } from "react-dnd";
 import { FaPen } from "react-icons/fa6";
 import { useMediaQuery } from "react-responsive";
 import { assignAppointmentDate } from "../actions/assignAppointmentDate";
-import { dragTask } from "../actions/dragTask";
+import { updateTask } from "../actions/dragTask";
 import mergeRefs from "merge-refs";
-import DraggableDayTooltip from "./draggable/DraggableDayTooltip";
-import DropRowButton from "./dropable/DropRowButton";
+import DraggableTaskTooltip from "./draggable/DraggableTaskTooltip";
+import { formatDate, formatTime, updateTimeSpace } from "@/utils/taskAndActivity";
 
 function useDate() {
   const searchParams = useSearchParams();
@@ -157,60 +157,57 @@ export default function Day({
         }),
     [tasks, appointments, date],
   );
-
-  function formatDate(date: Date) {
-    return moment(date).format("YYYY-MM-DD");
-  }
-
-  function formatTime(row: string = "") {
-    const [hour, period] = row?.split(" ");
-    const time = `${hour.padStart(2, "0")}:00 ${period}`;
-    return moment(time, "hh:mm A").format("HH:mm");
-  }
   async function handleDrop(event: React.DragEvent, rowIndex: number) {
     const startTime = formatTime(rows[rowIndex]);
     const endTime = formatTime(rows[rowIndex + 1]);
     const date = new Date().toISOString();
 
     // Get the task type
-    const type = event.dataTransfer.getData("text/plain").split("|")[0];
+    const attributeData = event.dataTransfer.getData("text/plain").split("|");
+    const type = attributeData[0];
+    if(rows[rowIndex] === 'All Day') return;
 
     if (type === "task") {
       // Get the id of the task from the dataTransfer object
       const taskId = parseInt(
-        event.dataTransfer.getData("text/plain").split("|")[1],
+        attributeData[1]
       );
-
       // Find the task in your state
-      const task = tasksWithoutTime.find((task) => task.id == taskId);
-
-      if (task) {
+      const taskFoundWithoutTime = tasksWithoutTime.find((task) => task.id == taskId);
+      const oldTask = tasks.find((task) => task.id === taskId);
+      if (taskFoundWithoutTime) {
         // Add task to database
-        await dragTask({
-          id: task.id,
-          date,
-          startTime,
-          endTime,
+        await updateTask({
+          id: taskFoundWithoutTime.id,
+          date: taskFoundWithoutTime?.date || date,
+          startTime: oldTask?.startTime || startTime,
+          endTime: oldTask?.endTime || endTime,
         });
+      } else {
+        const { newStartTime, newEndTime} = updateTimeSpace(oldTask?.startTime as string, oldTask?.endTime as string, rows[rowIndex]);
+        if (oldTask) {
+          await updateTask({
+            id: oldTask.id,
+            date: new Date(oldTask.date),
+            startTime: newStartTime,
+            endTime: newEndTime
+          })
+        }
       }
-    } else {
+    } else if(type === "appointment") {
       // Get the id of the appointment from the dataTransfer object
-      const appointmentId = Number.parseInt(
-        event.dataTransfer.getData("text/plain").split("|")[1],
-      );
-
+      const appointmentId = parseInt(attributeData[1])
       // Find the appointment in your state
-      const appointment = appointments.find(
+      const oldAppointment = appointments.find(
         (appointment) => appointment.id === appointmentId,
       );
-
-      if (appointment) {
-        // Add appointment to database
+      const { newStartTime, newEndTime} = updateTimeSpace(oldAppointment?.startTime as string, oldAppointment?.endTime as string , rows[rowIndex]);
+      if (oldAppointment) {
         await assignAppointmentDate({
-          id: appointment.id,
-          date,
-          startTime,
-          endTime,
+            id: oldAppointment.id,
+            date: oldAppointment.date as Date | string,
+            startTime: newStartTime,
+            endTime: newEndTime,
         });
       }
     }
@@ -244,9 +241,8 @@ export default function Day({
       className="relative mt-3 h-[90%] overflow-auto border border-neutral-200"
     >
       {rows.map((row, i) => (
-        <DropRowButton
+        <button
           type="button"
-          row={row}
           key={i}
           onDrop={(event: React.DragEvent) => {
             handleDrop(event, i);
@@ -281,7 +277,7 @@ export default function Day({
           >
             {row}
           </div>
-        </DropRowButton>
+        </button>
       ))}
 
       {/* Tasks */}
@@ -358,7 +354,7 @@ export default function Day({
         if (!isRefAvailable) return null;
         return (
           <Tooltip key={event.id}>
-            <DraggableDayTooltip
+            <DraggableTaskTooltip
               //@ts-ignore
               className="absolute top-0 z-10 rounded-lg border px-2 py-1 text-[17px] text-white hover:z-20"
               style={{
@@ -384,7 +380,7 @@ export default function Day({
               }}
             >
               {<>{truncateTitle(event.title, maxTitleLength)}</>}
-            </DraggableDayTooltip>
+            </DraggableTaskTooltip>
             <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
               {event.type === "appointment" ? (
                 <div>
