@@ -101,7 +101,7 @@ export default function Week({
   const week = useWeek();
   const today = week.toDate();
 
-  const weekStart = settings.weekStart || "Sunday";
+  const weekStart = settings?.weekStart || "Sunday";
 
   // Get the days of the week based on the weekStart
   const days = useMemo(() => {
@@ -252,7 +252,6 @@ export default function Week({
       }
     }
   }
-  console.log(rows);
   return (
     <>
       <div
