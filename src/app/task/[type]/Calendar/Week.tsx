@@ -24,10 +24,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useDrop } from "react-dnd";
 import { FaPen } from "react-icons/fa6";
 import { assignAppointmentDate } from "../actions/assignAppointmentDate";
-import { dragTask } from "../actions/dragTask";
-import DraggableDayTooltip from "./draggable/DraggableDayTooltip";
-import DropRowButton from "./dropable/DropRowButton";
-import DropWeekButton from "./dropable/DropWeekButton";
+import { updateTask } from "../actions/dragTask";
+import DraggableTaskTooltip from "./draggable/DraggableTaskTooltip";
+import { formatDate, formatTime, updateTimeSpace } from "@/utils/taskAndActivity";
 
 function useWeek() {
   const searchParams = useSearchParams();
@@ -131,18 +130,6 @@ export default function Week({
     }),
   ];
 
-  // Format the date
-  function formatDate(date: Date) {
-    return moment(date).format("YYYY-MM-DD");
-  }
-
-  // Format the time
-  function formatTime(row: string) {
-    const [hour, period] = row.split(" ");
-    const time = `${hour.padStart(2, "0")}:00 ${period}`;
-    return moment(time, "hh:mm A").format("HH:mm");
-  }
-
   // Combine the all-day row and the hourly rows into a single array
   const rows = [allDayRow, ...hourlyRows];
 
@@ -197,8 +184,10 @@ export default function Week({
     event: React.DragEvent,
     rowIndex: number,
     columnIndex: number,
+    rowTime: string
   ) {
-    const startTime = formatTime(hourlyRows[rowIndex - 1][0]);
+    if (rowTime === "All Day" || columnIndex === 0) return;
+    const startTime = formatTime(hourlyRows[rowIndex - 1]?.[0]);
     const endTime = formatTime(hourlyRows[rowIndex][0]);
     const date = formatDate(
       new Date(
@@ -206,7 +195,8 @@ export default function Week({
       ),
     );
     // Get the task type
-    const type = event.dataTransfer.getData("text/plain").split("|")[0];
+    const attributeData = event.dataTransfer.getData("text/plain").split("|");
+    const type = attributeData[0];
 
     if (type === "tag") {
       const tag = event.dataTransfer.getData("text/plain").split("|")[1];
@@ -215,39 +205,44 @@ export default function Week({
     } else if (type === "task") {
       // Get the id of the task from the dataTransfer object
       const taskId = parseInt(
-        event.dataTransfer.getData("text/plain").split("|")[1],
+        attributeData[1],
       );
-
       // Find the task in your state
-      const task = tasksWithoutTime.find((task) => task.id === taskId);
-
-      if (task) {
+      const taskFoundWithoutTime = tasksWithoutTime.find((task) => task.id == taskId);
+      const oldTask = tasks.find((task) => task.id === taskId);
+      if (taskFoundWithoutTime) {
         // Add task to database
-        await dragTask({
-          id: task.id,
-          date,
-          startTime,
-          endTime,
+        await updateTask({
+          id: taskFoundWithoutTime.id,
+          date: taskFoundWithoutTime.date || date,
+          startTime: oldTask?.startTime || startTime,
+          endTime: oldTask?.endTime || endTime,
         });
+      } else {
+          const { newStartTime, newEndTime} = updateTimeSpace(oldTask?.startTime as string, oldTask?.endTime as string, rowTime);
+          await updateTask({
+            id: oldTask?.id,
+            date: new Date(date),
+            startTime: newStartTime,
+            endTime: newEndTime
+          })
       }
-    } else {
+    } else if(type === 'appointment') {
       // Get the id of the appointment from the dataTransfer object
       const appointmentId = parseInt(
-        event.dataTransfer.getData("text/plain").split("|")[1],
+        attributeData[1],
       );
-
       // Find the appointment in your state
-      const appointment = appointments.find(
-        (appointment) => appointment.id == appointmentId,
+      const oldAppointment = appointments.find(
+        (appointment) => appointment.id === appointmentId,
       );
-
-      if (appointment) {
-        // Add appointment to database
+      const { newStartTime, newEndTime} = updateTimeSpace(oldAppointment?.startTime as string, oldAppointment?.endTime as string , rowTime);
+      if (oldAppointment) {
         await assignAppointmentDate({
-          id: appointment.id,
-          date,
-          startTime,
-          endTime,
+            id: oldAppointment.id,
+            date,
+            startTime: newStartTime,
+            endTime: newEndTime,
         });
       }
     }
@@ -298,16 +293,13 @@ export default function Week({
                 open("ADD_TASK", { date, startTime, companyUsers });
               }
               return (
-                <DropWeekButton
+                <button
                   key={columnIndex}
-                  rowTime={row[0]}
-                  today={today}
-                  columnIndex={columnIndex}
                   className={cellClasses}
                   disabled={isHeaderCell}
                   onClick={isHeaderCell ? undefined : handleClick}
                   onDrop={(event: React.DragEvent) => {
-                    handleDrop(event, rowIndex, columnIndex);
+                    handleDrop(event, rowIndex, columnIndex, row[0]);
                     setDraggedOverRow(null);
                   }}
                   onDragOver={(event: React.DragEvent) => {
@@ -324,7 +316,7 @@ export default function Week({
                   }}
                 >
                   {column}
-                </DropWeekButton>
+                </button>
               );
             })}
           </div>
@@ -370,7 +362,7 @@ export default function Week({
 
           return (
             <Tooltip key={event.id}>
-              <DraggableDayTooltip
+              <DraggableTaskTooltip
                 //@ts-ignore
                 className="absolute top-0 rounded-lg border"
                 style={{
@@ -397,7 +389,7 @@ export default function Week({
                 <p className="z-30 p-1 text-[17px] text-white max-[1600px]:text-[12px]">
                   {truncateTitle(event.title, maxTitleLength)}
                 </p>
-              </DraggableDayTooltip>
+              </DraggableTaskTooltip>
               <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
                 {event.type === "appointment" ? (
                   <div>
