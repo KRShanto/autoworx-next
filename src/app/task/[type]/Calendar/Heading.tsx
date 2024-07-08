@@ -61,8 +61,8 @@ export default function Heading({
 }) {
   const router = useRouter();
   const q = type === "day" ? "date" : type;
-  const weekend1 = settings?.weekend1;
-  const weekend2 = settings?.weekend2;
+  const weekend1 = settings ? settings.weekend1 : null;
+  const weekend2 = settings ? settings.weekend2 : null;
 
   return (
     <div className="flex items-center justify-between">
@@ -93,8 +93,8 @@ export default function Heading({
             const validDate = getNextValidDate(
               date.subtract(1, `${type}s`),
               -1,
-              weekend1,
-              weekend2,
+              weekend1 ? weekend1 : "", 
+              weekend2 ? weekend2 : "", 
             );
             router.push(
               `/task/${type}?${q}=${(date.isValid() ? validDate : moment()).format(moment.HTML5_FMT[q.toUpperCase() as Uppercase<typeof q>])}`,
@@ -114,8 +114,8 @@ export default function Heading({
             const validDate = getNextValidDate(
               date.add(1, `${type}s`),
               1,
-              weekend1,
-              weekend2,
+              weekend1 ? weekend1 : "", 
+              weekend2 ? weekend2 : "", 
             );
             router.push(
               `/task/${type}?${q}=${(date.isValid() ? validDate : moment()).format(moment.HTML5_FMT[q.toUpperCase() as Uppercase<typeof q>])}`,
