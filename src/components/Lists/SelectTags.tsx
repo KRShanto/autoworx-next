@@ -1,12 +1,14 @@
 "use client";
 
 import newTag from "@/app/estimate/create/actions/newTag";
+import { INVOICE_COLORS } from "@/lib/consts";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
 import { Tag } from "@prisma/client";
 import { useMemo, useRef, useState } from "react";
 import { FaChevronUp, FaSearch } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa6";
+import { HiXCircle } from "react-icons/hi2";
 import { PiPaletteBold } from "react-icons/pi";
 import {
   DropdownMenu,
@@ -17,8 +19,6 @@ import {
 import FormError from "../FormError";
 import Submit from "../Submit";
 import { SelectProps } from "./select-props";
-import { HiXCircle } from "react-icons/hi2";
-import { INVOICE_COLORS } from "@/lib/consts";
 
 type SelectedColor = { textColor: string; bgColor: string } | null;
 
@@ -26,12 +26,14 @@ export function SelectTags({
   name = "tagIds",
   value = [],
   setValue,
+  open,
+  setOpen,
 }: SelectProps<Tag[]>) {
   const state = useState(value);
   const [tags, setTags] = setValue ? [value, setValue] : state;
   const tagIds = useMemo(() => new Set(tags.map((x) => x.id)), [tags]);
   const tagList = useListsStore((x) => x.tags);
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
 
@@ -42,7 +44,11 @@ export function SelectTags({
         name={name}
         value={tags.map((x) => x.id).join(",")}
       />
-      <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenu
+        open={open}
+        onOpenChange={(isOpen) => {
+        }}
+      >
         {tags.map((tag, i) => (
           <div
             key={tag.id}
@@ -64,7 +70,12 @@ export function SelectTags({
             </button>
           </div>
         ))}
-        <DropdownMenuTrigger className="flex min-h-10 w-full items-center justify-between rounded-md border-2 border-slate-400 px-4">
+        <DropdownMenuTrigger
+          onClick={() => {
+            setOpen && setOpen(!open);
+          }}
+          className="flex min-h-10 w-full items-center justify-between rounded-md border-2 border-slate-400 px-4"
+        >
           <p className="text-sm font-medium text-slate-400">Tags</p>
           <FaChevronDown className="text-[#797979]" />
         </DropdownMenuTrigger>
@@ -83,7 +94,7 @@ export function SelectTags({
               placeholder="Search"
               className="w-full rounded-md border-2 border-slate-400 p-1 pl-6 pr-10 focus:outline-none"
             />
-            <button onClick={() => setOpen(false)}>
+            <button onClick={() => setOpen && setOpen(false)}>
               <FaChevronUp className="absolute right-2 top-1/2 -translate-y-1/2 transform text-[#797979]" />
             </button>
           </div>

@@ -1,24 +1,28 @@
 // CategorySelector.tsx
-import { Category } from "@prisma/client";
-import { useState, useEffect } from "react";
-import Selector from "@/components/Selector";
-import { useListsStore } from "@/stores/lists";
-import { cn } from "@/lib/cn";
 import newCategory from "@/app/estimate/create/actions/newCategory";
+import Selector from "@/components/Selector";
+import { cn } from "@/lib/cn";
+import { useListsStore } from "@/stores/lists";
+import { Category } from "@prisma/client";
+import { useEffect, useState } from "react";
 
 export default function SelectCategory({
   categoryData,
   onCategoryChange,
   labelPosition = "top",
+  categoryOpen,
+  setCategoryOpen,
 }: {
   categoryData?: Category | null;
   onCategoryChange: (category: Category) => void;
   labelPosition?: "top" | "left" | "none";
+  categoryOpen?: boolean;
+  setCategoryOpen?: any;
 }) {
   const { categories } = useListsStore();
   const [category, setCategory] = useState<Category | null>(null);
   const [categoryInput, setCategoryInput] = useState("");
-  const [categoryOpen, setCategoryOpen] = useState(false);
+  // const [categoryOpen, setCategoryOpen] = useState(false);
 
   useEffect(() => {
     if (categoryData) {

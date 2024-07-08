@@ -58,12 +58,15 @@ export function SelectStatus({
   return (
     <>
       <input type="hidden" name={name} value={status?.id ?? ""} />
-      <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenu open={open} onOpenChange={()=>{}}>
         <DropdownMenuTrigger
           className="flex h-10 items-center gap-2 rounded-md bg-slate-100 px-2 py-1"
           style={{
             backgroundColor: status?.bgColor,
             color: status?.textColor,
+          }}
+          onClick={() => {
+            setOpen && setOpen(!open);
           }}
         >
           <PiPulse />
