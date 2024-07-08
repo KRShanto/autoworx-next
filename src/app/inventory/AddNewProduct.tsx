@@ -13,7 +13,7 @@ import FormError from "@/components/FormError";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { Category, InventoryProductType, Vendor } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { createProduct } from "./actions/create";
 import SelectCategory from "@/components/Lists/SelectCategory";
 import Selector from "@/components/Selector";
@@ -26,20 +26,6 @@ export default function AddNewProduct() {
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [category, setCategory] = useState<Category | null>();
   const [vendorOpen, setVendorOpen] = useState(false);
-  const [vendorSearch, setVendorSearch] = useState("");
-  const [vendorsToDisplay, setVendorsToDisplay] = useState<Vendor[]>([]);
-
-  useEffect(() => {
-    if (vendorSearch) {
-      setVendorsToDisplay(
-        vendors.filter((ven) =>
-          ven.name.toLowerCase().includes(vendorSearch.toLowerCase()),
-        ),
-      );
-    } else {
-      setVendorsToDisplay(vendors.slice(0, 4));
-    }
-  }, [vendorSearch, vendors]);
 
   async function handleSubmit(data: FormData) {
     const name = data.get("productName") as string;
@@ -94,12 +80,14 @@ export default function AddNewProduct() {
               <SlimInput name="productName" />
               <div>
                 <label>Vendor</label>
+
                 <Selector
-                  label={vendor ? vendor.name || "Vendor" : ""}
-                  openState={[vendorOpen, setVendorOpen]}
-                  setSearch={setVendorSearch}
+                  label={(vendor: Vendor | null) =>
+                    vendor ? vendor.name || `Vendor ${vendor.id}` : "Vendor"
+                  }
                   newButton={
                     <NewVendor
+                      bgShadow={false}
                       afterSubmit={(ven) => {
                         setVendor(ven);
                         setVendorOpen(false);
@@ -114,20 +102,17 @@ export default function AddNewProduct() {
                       }
                     />
                   }
-                >
-                  <div>
-                    {vendorsToDisplay.map((ven) => (
-                      <button
-                        type="button"
-                        key={ven.id}
-                        onClick={() => setVendor(ven)}
-                        className="mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200"
-                      >
-                        {ven.name}
-                      </button>
-                    ))}
-                  </div>
-                </Selector>
+                  items={vendors}
+                  displayList={(vendor: Vendor) => <p>{vendor.name}</p>}
+                  onSearch={(search: string) =>
+                    vendors.filter((vendor) =>
+                      vendor.name.toLowerCase().includes(search.toLowerCase()),
+                    )
+                  }
+                  openState={[vendorOpen, setVendorOpen]}
+                  selectedItem={vendor}
+                  setSelectedItem={setVendor}
+                />
               </div>
             </div>
             <div>
@@ -162,7 +147,22 @@ export default function AddNewProduct() {
             </div>
             <div className="col-span-3 mt-5 flex w-[90%] gap-5">
               <SlimInput name="quantity" type="number" required={false} />
-              <SlimInput name="price" type="number" required={false} />
+
+              <div>
+                <label htmlFor="price" className="px-2 font-medium">
+                  Price
+                </label>
+                <div className="mt-1 flex gap-1 rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6">
+                  <span className="text-lg">$</span>
+                  <input
+                    type="text"
+                    name="price"
+                    className="w-full outline-none"
+                    id="price"
+                  />
+                </div>
+              </div>
+
               <SlimInput name="unit" required={false} />
               <SlimInput name="lot" label="Lot#" required={false} />
             </div>

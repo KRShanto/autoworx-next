@@ -15,10 +15,14 @@ import SelectCategory from "@/components/Lists/SelectCategory";
 import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { cn } from "@/lib/cn";
 import { useListsStore } from "@/stores/lists";
-import { Category, InventoryProduct, Vendor } from "@prisma/client";
-import { useEffect, useState } from "react";
+import {
+  Category,
+  InventoryProduct,
+  InventoryProductType,
+  Vendor,
+} from "@prisma/client";
+import { useState } from "react";
 import { CiEdit } from "react-icons/ci";
 import { editProduct } from "./actions/edit";
 
@@ -33,6 +37,7 @@ type TInputType = {
   quantity: number | null;
   unit: string | null;
   lot: string | null;
+  type: InventoryProductType;
 };
 
 export default function EditProduct({ productData }: TProps) {
@@ -43,8 +48,6 @@ export default function EditProduct({ productData }: TProps) {
     productData.category,
   );
   const [vendorOpen, setVendorOpen] = useState(false); // useful
-  const [vendorSearch, setVendorSearch] = useState(""); // useful
-  const [vendorsToDisplay, setVendorsToDisplay] = useState<Vendor[]>([]); // useful
   const [error, setError] = useState<string | null>("");
   const [product, setProduct] = useState<TInputType>({
     productName: productData.name,
@@ -53,30 +56,8 @@ export default function EditProduct({ productData }: TProps) {
     quantity: productData.quantity,
     unit: productData.unit,
     lot: productData.lot,
+    type: productData.type,
   });
-  useEffect(() => {
-    if (vendorSearch) {
-      setVendorsToDisplay(
-        vendors.filter((ven) =>
-          ven.name.toLowerCase().includes(vendorSearch.toLowerCase()),
-        ),
-      );
-    } else {
-      const alreadySelectedVendor = vendors.find(
-        (ven) => ven.id === vendor?.id,
-      ) as Vendor;
-      let defaultVendors = vendors.slice(0, 4);
-      if (
-        !defaultVendors.find(
-          (vendor) => vendor.id === alreadySelectedVendor?.id,
-        ) &&
-        alreadySelectedVendor
-      ) {
-        defaultVendors = [alreadySelectedVendor, ...defaultVendors];
-      }
-      setVendorsToDisplay(defaultVendors);
-    }
-  }, [vendorSearch, vendors]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -94,6 +75,8 @@ export default function EditProduct({ productData }: TProps) {
     const quantity = Number(product.quantity) as number;
     const unit = product.unit as string;
     const lot = product.lot as string;
+    const type = product.type as InventoryProductType;
+
     try {
       if (!(price > 0 && quantity > 0)) {
         throw new Error("Price and quantity must be greater than 0");
@@ -108,6 +91,7 @@ export default function EditProduct({ productData }: TProps) {
         quantity,
         unit,
         lot,
+        type,
       });
 
       if (res.type === "success") {
@@ -152,10 +136,11 @@ export default function EditProduct({ productData }: TProps) {
               />
               <div>
                 <label>Vendor</label>
+
                 <Selector
-                  label={vendor ? vendor.name || "Vendor" : ""}
-                  openState={[vendorOpen, setVendorOpen]}
-                  setSearch={setVendorSearch}
+                  label={(vendor: Vendor | null) =>
+                    vendor ? vendor.name || `Vendor ${vendor.id}` : "Vendor"
+                  }
                   newButton={
                     <NewVendor
                       afterSubmit={(ven) => {
@@ -172,25 +157,17 @@ export default function EditProduct({ productData }: TProps) {
                       }
                     />
                   }
-                >
-                  <div>
-                    {vendorsToDisplay.map((ven) => (
-                      <button
-                        type="button"
-                        key={ven?.id}
-                        onClick={() => setVendor(ven)}
-                        className={cn(
-                          "mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200",
-                          {
-                            "bg-slate-300": vendor && vendor?.id === ven?.id,
-                          },
-                        )}
-                      >
-                        {ven?.name}
-                      </button>
-                    ))}
-                  </div>
-                </Selector>
+                  items={vendors}
+                  onSearch={(search: string) =>
+                    vendors.filter((vendor) =>
+                      vendor.name.toLowerCase().includes(search.toLowerCase()),
+                    )
+                  }
+                  displayList={(vendor: Vendor) => <p>{vendor.name}</p>}
+                  openState={[vendorOpen, setVendorOpen]}
+                  selectedItem={vendor}
+                  setSelectedItem={setVendor}
+                />
               </div>
             </div>
             <div>
@@ -202,7 +179,35 @@ export default function EditProduct({ productData }: TProps) {
                 className="h-28 w-[95%] rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6"
                 value={product.description as string}
               />
+
+              <div>
+                <div>
+                  <input
+                    id="product"
+                    type="radio"
+                    name="type"
+                    value={InventoryProductType.Product}
+                    onChange={handleChange}
+                    className="mr-1"
+                    checked={product.type === InventoryProductType.Product}
+                  />
+                  <label htmlFor="product">Products</label>
+                </div>
+                <div>
+                  <input
+                    id="supply"
+                    type="radio"
+                    name="type"
+                    value={InventoryProductType.Supply}
+                    onChange={handleChange}
+                    className="mr-1"
+                    checked={product.type === InventoryProductType.Supply}
+                  />
+                  <label htmlFor="supply">Supplies</label>
+                </div>
+              </div>
             </div>
+
             <div className="col-span-3 mt-5 flex w-[90%] gap-5">
               <SlimInput
                 onChange={handleChange}

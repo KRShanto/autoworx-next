@@ -21,9 +21,7 @@ export default async function Page({
     <div className="h-full">
       <div className="flex items-center justify-between">
         <Title>Vendor List</Title>
-        {/* <button className="rounded-md bg-[#6571FF] p-2 px-8 text-white">
-          Add New Vendor
-        </button> */}
+
         <NewVendor
           button={
             <button className="rounded-md bg-[#6571FF] p-2 px-8 text-white">

@@ -9,13 +9,9 @@ import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
 export default function CalendarSidebar({
   usersWithTasks,
   tasks,
-  tags,
-  appointments,
 }: {
   usersWithTasks: any;
   tasks: Task[];
-  tags: string[];
-  appointments: Appointment[];
 }) {
   const minimized = useCalendarSidebarStore((x) => x.minimized);
 
@@ -27,12 +23,7 @@ export default function CalendarSidebar({
       )}
     >
       <Heading />
-      <Body
-        usersWithTasks={usersWithTasks}
-        tasks={tasks}
-        tags={tags}
-        appointments={appointments}
-      />
+      <Body usersWithTasks={usersWithTasks} tasks={tasks} />
     </div>
   );
 }

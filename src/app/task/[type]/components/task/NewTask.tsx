@@ -43,6 +43,13 @@ export default function NewTask({
       endTime: time?.endTime,
     });
 
+    // reset form
+    setTitle("");
+    setDescription("");
+    setAssignedUsers([]);
+    setPriority("Low");
+    setTime(undefined);
+
     setOpen(false);
   }
 
@@ -88,13 +95,13 @@ export default function NewTask({
               className="mt-2 rounded-md border-2 border-gray-500 p-1"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              autoFocus
             />
           </div>
 
           <div id="timer-parent" className="mb-4 flex flex-col">
             <label htmlFor="time">Time</label>
             <TimePicker.RangePicker
+              id="time"
               onChange={onChange}
               getPopupContainer={() => document.getElementById("timer-parent")!}
               use12Hours
@@ -108,15 +115,17 @@ export default function NewTask({
           <div className="mb-4 flex flex-col">
             <label htmlFor="assigned_users">Assign</label>
 
-            <div className="flex w-full items-center justify-end rounded-md border p-1">
-              <button onClick={() => setShowUsers(!showUsers)} type="button">
-                {showUsers ? (
-                  <FaChevronUp className="text-[#797979]" />
-                ) : (
-                  <FaChevronDown className="text-[#797979]" />
-                )}
-              </button>
-            </div>
+            <button
+              onClick={() => setShowUsers(!showUsers)}
+              type="button"
+              className="flex w-full items-center justify-end rounded-md border-2 border-gray-500 p-2"
+            >
+              {showUsers ? (
+                <FaChevronUp className="text-[#797979]" />
+              ) : (
+                <FaChevronDown className="text-[#797979]" />
+              )}
+            </button>
 
             {!onlyOneUser && showUsers && (
               <div className="mt-2 flex h-40 flex-col gap-2 overflow-y-auto p-2 font-bold">

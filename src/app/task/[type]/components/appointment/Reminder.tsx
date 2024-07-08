@@ -7,7 +7,7 @@ import { FaTimes, FaTrash } from "react-icons/fa";
 import { TbUserX } from "react-icons/tb";
 import NewTemplate from "../../../../../components/Lists/NewTemplate";
 import { deleteTemplate } from "../../actions/deleteTemplate";
-import Selector from "./Selector";
+import Selector from "@/components/Selector";
 import UpdateTemplate from "./UpdateTemplateComponent";
 
 export function Reminder({
@@ -33,9 +33,13 @@ export function Reminder({
   times: { time: string; date: string }[];
   setTimes: (times: { time: string; date: string }[]) => void;
   confirmationTemplate: EmailTemplate | null;
-  setConfirmationTemplate: (template: EmailTemplate | null) => void;
+  setConfirmationTemplate: React.Dispatch<
+    React.SetStateAction<EmailTemplate | null>
+  >;
   reminderTemplate: EmailTemplate | null;
-  setReminderTemplate: (template: EmailTemplate | null) => void;
+  setReminderTemplate: React.Dispatch<
+    React.SetStateAction<EmailTemplate | null>
+  >;
   confirmationTemplateStatus: boolean;
   setConfirmationTemplateStatus: (status: boolean) => void;
   reminderTemplateStatus: boolean;
@@ -44,6 +48,9 @@ export function Reminder({
   const [time, setTime] = useState<string>("");
   const [dateInput, setDateInput] = useState<string>("");
   const templates = useListsStore((x) => x.templates);
+
+  const [openConfirmation, setOpenConfirmation] = useState(false);
+  const [openReminder, setOpenReminder] = useState(false);
 
   async function handleDelete({ id, type }: { id: number; type: string }) {
     await deleteTemplate(id);
@@ -79,9 +86,12 @@ export function Reminder({
             setChecked={setConfirmationTemplateStatus}
           />
         </label>
+
         <Selector
-          label={
-            confirmationTemplate ? confirmationTemplate.subject : "Template"
+          border
+          clickabled={false}
+          label={(template: EmailTemplate | null) =>
+            template ? template.subject : "Template"
           }
           newButton={
             <NewTemplate
@@ -90,39 +100,47 @@ export function Reminder({
               vehicleModel={vehicle?.model!}
             />
           }
-        >
-          <div>
-            {templates
-              .filter(
-                (template: EmailTemplate) => template.type === "Confirmation",
-              )
-              .map((template: EmailTemplate, index: number) => (
+          items={templates.filter(
+            (template: EmailTemplate) => template.type === "Confirmation",
+          )}
+          displayList={(template: EmailTemplate) => (
+            <div className="flex">
+              <button
+                className="w-full text-left text-sm font-bold"
+                onClick={() => {
+                  setConfirmationTemplate(template);
+                  setOpenConfirmation(false);
+                }}
+                type="button"
+              >
+                {template.subject}
+              </button>
+              <div className="flex items-center gap-2">
+                <UpdateTemplate
+                  id={template.id}
+                  subject={template.subject}
+                  message={template.message || ""}
+                />
                 <button
                   type="button"
-                  key={index}
-                  className="mx-auto mt-2 flex w-[95%] cursor-pointer items-center justify-between rounded-md border-2 p-1 px-3 hover:bg-gray-100"
-                  onClick={() => setConfirmationTemplate(template)}
+                  onClick={() =>
+                    handleDelete({ id: template.id, type: "Confirmation" })
+                  }
                 >
-                  <p className="text-sm font-bold">{template.subject}</p>
-                  <div className="flex items-center gap-2">
-                    <UpdateTemplate
-                      id={template.id}
-                      subject={template.subject}
-                      message={template.message || ""}
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleDelete({ id: template.id, type: "Confirmation" })
-                      }
-                    >
-                      <FaTimes />
-                    </button>
-                  </div>
+                  <FaTimes />
                 </button>
-              ))}
-          </div>
-        </Selector>
+              </div>
+            </div>
+          )}
+          selectedItem={confirmationTemplate}
+          setSelectedItem={setConfirmationTemplate}
+          onSearch={(search: string) =>
+            templates.filter((template) =>
+              template.subject.toLowerCase().includes(search.toLowerCase()),
+            )
+          }
+          openState={[openConfirmation, setOpenConfirmation]}
+        />
       </div>
       <div className="space-y-4 p-2">
         <label className="flex items-center">
@@ -134,8 +152,13 @@ export function Reminder({
             setChecked={setReminderTemplateStatus}
           />
         </label>
+
         <Selector
-          label={reminderTemplate ? reminderTemplate.subject : "Template"}
+          border
+          clickabled={false}
+          label={(template: EmailTemplate | null) =>
+            template ? template.subject : "Template"
+          }
           newButton={
             <NewTemplate
               type="Reminder"
@@ -143,38 +166,47 @@ export function Reminder({
               vehicleModel={vehicle?.model!}
             />
           }
-        >
-          <div className="">
-            {templates
-              .filter((template: EmailTemplate) => template.type === "Reminder")
-              .map((template: EmailTemplate, index: number) => (
+          items={templates.filter(
+            (template: EmailTemplate) => template.type === "Reminder",
+          )}
+          displayList={(template: EmailTemplate) => (
+            <div className="flex">
+              <button
+                className="w-full text-left text-sm font-bold"
+                onClick={() => {
+                  setReminderTemplate(template);
+                  setOpenReminder(false);
+                }}
+                type="button"
+              >
+                {template.subject}
+              </button>
+              <div className="flex items-center gap-2">
+                <UpdateTemplate
+                  id={template.id}
+                  subject={template.subject}
+                  message={template.message || ""}
+                />
                 <button
                   type="button"
-                  key={index}
-                  className="mx-auto flex w-[95%] cursor-pointer items-center justify-between gap-4 rounded-md border-2 p-2 hover:bg-gray-100"
-                  onClick={() => setReminderTemplate(template)}
+                  onClick={() =>
+                    handleDelete({ id: template.id, type: "Reminder" })
+                  }
                 >
-                  <p className="text-sm font-bold">{template.subject}</p>
-
-                  <div className="flex items-center gap-2">
-                    <UpdateTemplate
-                      id={template.id}
-                      subject={template.subject}
-                      message={template.message || ""}
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleDelete({ id: template.id, type: "Reminder" })
-                      }
-                    >
-                      <FaTimes />
-                    </button>
-                  </div>
+                  <FaTimes />
                 </button>
-              ))}
-          </div>
-        </Selector>
+              </div>
+            </div>
+          )}
+          selectedItem={reminderTemplate}
+          setSelectedItem={setReminderTemplate}
+          onSearch={(search: string) =>
+            templates.filter((template) =>
+              template.subject.toLowerCase().includes(search.toLowerCase()),
+            )
+          }
+          openState={[openReminder, setOpenReminder]}
+        />
       </div>
 
       <div className="mx-auto my-2 h-[300px] w-[95%] rounded-md border-2 border-slate-400">

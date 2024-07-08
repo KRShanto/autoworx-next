@@ -14,8 +14,6 @@ export default function MaterialCreate() {
   const { categories } = useListsStore();
   const { vendors } = useListsStore();
 
-  const [vendorsToDisplay, setVendorsToDisplay] = useState<Vendor[]>([]);
-
   const { currentSelectedCategoryId } = useEstimateCreateStore();
 
   const [name, setName] = useState("");
@@ -77,18 +75,6 @@ export default function MaterialCreate() {
       );
     }
   }, [currentSelectedCategoryId]);
-
-  useEffect(() => {
-    if (vendorSearch) {
-      setVendorsToDisplay(
-        vendors.filter((ven) =>
-          ven.name.toLowerCase().includes(vendorSearch.toLowerCase()),
-        ),
-      );
-    } else {
-      setVendorsToDisplay(vendors.slice(0, 4));
-    }
-  }, [vendorSearch, vendors]);
 
   async function handleSubmit() {
     if (!name) {
@@ -199,17 +185,15 @@ export default function MaterialCreate() {
 
       <SelectCategory
         onCategoryChange={setCategory}
-        showLabelAsValue={false}
         labelPosition="left"
         categoryData={category}
       />
 
       <div className="flex items-center gap-2">
         <label className="w-28 text-end text-sm">Vendor</label>
+
         <Selector
-          label={vendor ? vendor.name || "Vendor" : ""}
-          openState={[vendorOpen, setVendorOpen]}
-          setSearch={setVendorSearch}
+          label={(vendor: Vendor | null) => (vendor ? vendor.name : "Vendor")}
           newButton={
             <NewVendor
               button={
@@ -240,20 +224,17 @@ export default function MaterialCreate() {
               }}
             />
           }
-        >
-          <div>
-            {vendorsToDisplay.map((ven) => (
-              <button
-                type="button"
-                key={ven.id}
-                onClick={() => setVendor(ven)}
-                className="mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200"
-              >
-                {ven.name}
-              </button>
-            ))}
-          </div>
-        </Selector>
+          items={vendors}
+          onSearch={(search: string) =>
+            vendors.filter((vendor) =>
+              vendor.name.toLowerCase().includes(search.toLowerCase()),
+            )
+          }
+          displayList={(vendor: Vendor) => <p>{vendor.name}</p>}
+          openState={[vendorOpen, setVendorOpen]}
+          selectedItem={vendor}
+          setSelectedItem={setVendor}
+        />
       </div>
 
       {/* TODO: add to backend */}

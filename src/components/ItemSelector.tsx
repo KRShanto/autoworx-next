@@ -62,6 +62,7 @@ export default function ItemSelector<T>({
       setSelected(item.materials[materialIndex!]);
     }
   }, [item.materials]);
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <div className="relative basis-full md:basis-96">

@@ -110,7 +110,6 @@ export default function ServiceCreate() {
 
       <SelectCategory
         onCategoryChange={setCategory}
-        showLabelAsValue
         labelPosition="none"
         categoryData={category}
       />

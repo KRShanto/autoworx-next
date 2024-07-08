@@ -9,21 +9,15 @@ import newCategory from "@/app/estimate/create/actions/newCategory";
 export default function SelectCategory({
   categoryData,
   onCategoryChange,
-  showLabelAsValue,
   labelPosition = "top",
 }: {
   categoryData?: Category | null;
-  showLabelAsValue?: boolean;
   onCategoryChange: (category: Category) => void;
   labelPosition?: "top" | "left" | "none";
 }) {
   const { categories } = useListsStore();
   const [category, setCategory] = useState<Category | null>(null);
-  const [categoriesToDisplay, setCategoriesToDisplay] = useState<Category[]>(
-    [],
-  );
   const [categoryInput, setCategoryInput] = useState("");
-  const [categorySearch, setCategorySearch] = useState("");
   const [categoryOpen, setCategoryOpen] = useState(false);
 
   useEffect(() => {
@@ -33,18 +27,6 @@ export default function SelectCategory({
       setCategory(null);
     }
   }, [categoryData]);
-
-  useEffect(() => {
-    if (categorySearch) {
-      setCategoriesToDisplay(
-        categories.filter((cat) =>
-          cat.name.toLowerCase().includes(categorySearch.toLowerCase()),
-        ),
-      );
-    } else {
-      setCategoriesToDisplay(categories.slice(0, 4));
-    }
-  }, [categorySearch, categories]);
 
   async function handleNewCategory() {
     const res = await newCategory({
@@ -82,10 +64,11 @@ export default function SelectCategory({
           Category
         </label>
       )}
+
       <Selector
-        label={category ? category.name : showLabelAsValue ? "Category" : ""}
-        openState={[categoryOpen, setCategoryOpen]}
-        setSearch={setCategorySearch}
+        label={(category: Category | null) =>
+          category ? category.name || `Category ${category.id}` : "Category"
+        }
         newButton={
           <div className="flex gap-2">
             <input
@@ -108,25 +91,17 @@ export default function SelectCategory({
             </button>
           </div>
         }
-      >
-        <div>
-          {categoriesToDisplay.map((cat) => (
-            <button
-              type="button"
-              key={cat.id}
-              onClick={() => setCategory(cat)}
-              className={cn(
-                "mx-auto my-1 block w-[90%] rounded-md border-2 border-slate-400 p-1 text-center hover:bg-slate-200",
-                {
-                  "bg-slate-300": category && category.id === cat.id,
-                },
-              )}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
-      </Selector>
+        items={categories}
+        displayList={(category: Category) => <p>{category.name}</p>}
+        onSearch={(search: string) =>
+          categories.filter((cat) =>
+            cat.name.toLowerCase().includes(search.toLowerCase()),
+          )
+        }
+        openState={[categoryOpen, setCategoryOpen]}
+        selectedItem={category}
+        setSelectedItem={setCategory}
+      />
     </div>
   );
 }

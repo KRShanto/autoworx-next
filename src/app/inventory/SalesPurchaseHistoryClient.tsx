@@ -6,7 +6,6 @@ import * as Tabs from "@radix-ui/react-tabs";
 import moment from "moment";
 import Link from "next/link";
 import { useState } from "react";
-import { FaLink } from "react-icons/fa6";
 import { HiExternalLink } from "react-icons/hi";
 
 enum Tab {
@@ -31,7 +30,7 @@ export default function SalesPurchaseHistoryClient({
   const [tab, setTab] = useState<Tab>(Tab.Sales);
 
   return (
-    <div className="app-shadow #h-[63%] mt-4 w-full grow rounded-lg bg-white p-4">
+    <div className="app-shadow mt-4 h-[63%] w-full overflow-y-auto rounded-lg bg-white p-4">
       <Tabs.Root value={tab} onValueChange={(value) => setTab(value as Tab)}>
         <Tabs.List className="flex gap-5">
           <Tabs.Trigger
@@ -60,7 +59,6 @@ export default function SalesPurchaseHistoryClient({
         <div className="mt-3">
           <Tabs.Content value={Tab.Sales}>
             <Table
-              productId={productId}
               histories={histories.filter((history) => history.type === "Sale")}
               vendorName={vendorName}
               price={price}
@@ -68,7 +66,6 @@ export default function SalesPurchaseHistoryClient({
           </Tabs.Content>
           <Tabs.Content value={Tab.Purchase}>
             <Table
-              productId={productId}
               histories={histories.filter(
                 (history) => history.type === "Purchase",
               )}
@@ -83,12 +80,10 @@ export default function SalesPurchaseHistoryClient({
 }
 
 function Table({
-  productId,
   histories,
   vendorName,
   price,
 }: {
-  productId?: number;
   histories: InventoryProductHistory[];
   vendorName: string;
   price: number;
@@ -97,13 +92,13 @@ function Table({
     <table className="w-full text-sm 2xl:text-base">
       <thead className="bg-white">
         <tr className="h-10 border-b">
-          <th className="px-4 text-left 2xl:px-10">#</th>
-          <th className="px-4 text-left 2xl:px-10">Name</th>
-          <th className="px-4 text-left 2xl:px-10">Price</th>
-          <th className="px-4 text-left 2xl:px-10">Quantity</th>
-          <th className="px-4 text-left 2xl:px-10">Total</th>
-          <th className="px-4 text-left 2xl:px-10">Date</th>
-          <th className="px-5 text-left">Invoice</th>
+          <th className="text-center">#</th>
+          <th className="text-center">Name</th>
+          <th className="text-center">Price</th>
+          <th className="text-center">Quantity</th>
+          <th className="text-center">Total</th>
+          <th className="text-center">Date</th>
+          <th className="text-center">Invoice</th>
         </tr>
       </thead>
 
@@ -113,28 +108,24 @@ function Table({
             key={history.id}
             className={cn("py-3", index % 2 === 0 ? evenColor : oddColor)}
           >
-            <td className="h-12 px-4 text-left 2xl:px-10">
+            <td className="h-12 text-center">
               <p>{history.id}</p>
             </td>
-            <td className="text-nowrap px-4 text-left 2xl:px-10">
-              {vendorName}
-            </td>
-            <td className="text-nowrap px-4 text-left 2xl:px-10">{price}</td>
-            <td className="px-4 text-left 2xl:px-10">{history.quantity}</td>
-            <td className="px-4 text-left 2xl:px-10">
-              {price * history.quantity}
-            </td>
-            <td className="px-4 text-left 2xl:px-10">
+            <td className="text-nowrap text-center">{vendorName}</td>
+            <td className="text-nowrap text-center">${price}</td>
+            <td className="text-center">{history.quantity}</td>
+            <td className="text-center">${price * history.quantity}</td>
+            <td className="text-center">
               {moment(history.date).format(
                 // date.month.year
                 "DD.MM.YYYY",
               )}
             </td>
-            <td className="mt-2 flex gap-3 px-5">
+            <td className="">
               {history.invoiceId && (
                 <Link
                   href={`/estimate/view/${history.invoiceId}`}
-                  className="mx-auto"
+                  className="relative left-1/2 -translate-x-1/2 transform"
                 >
                   <HiExternalLink />
                 </Link>

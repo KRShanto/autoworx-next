@@ -14,11 +14,12 @@ import type { CalendarTask } from "@/types/db";
 import type { Priority, User } from "@prisma/client";
 import Image from "next/image";
 import { useState } from "react";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaTractor, FaTrash } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa6";
 import { editTask } from "../../actions/editTask";
 import { TimePicker } from "antd";
 import dayjs from "dayjs";
+import { deleteTask } from "../../actions/deleteTask";
 
 export default function UpdateTask() {
   const { popup, data, close } = usePopupStore();
@@ -91,7 +92,6 @@ export default function UpdateTask() {
               className="mt-2 rounded-md border-2 border-gray-500 p-1"
               value={description || ""}
               onChange={(e) => setDescription(e.target.value)}
-              autoFocus
             />
           </div>
 
@@ -115,15 +115,17 @@ export default function UpdateTask() {
           <div className="mb-4 flex flex-col">
             <label htmlFor="assigned_users">Assign</label>
 
-            <div className="flex w-full items-center justify-end rounded-md border p-1">
-              <button onClick={() => setShowUsers(!showUsers)} type="button">
-                {showUsers ? (
-                  <FaChevronUp className="text-[#797979]" />
-                ) : (
-                  <FaChevronDown className="text-[#797979]" />
-                )}
-              </button>
-            </div>
+            <button
+              onClick={() => setShowUsers(!showUsers)}
+              type="button"
+              className="flex w-full items-center justify-end rounded-md border-2 border-gray-500 p-2"
+            >
+              {showUsers ? (
+                <FaChevronUp className="text-[#797979]" />
+              ) : (
+                <FaChevronDown className="text-[#797979]" />
+              )}
+            </button>
 
             {showUsers && (
               <div className="mt-2 flex h-40 flex-col gap-2 overflow-y-auto p-2 font-bold">
@@ -147,6 +149,7 @@ export default function UpdateTask() {
                           );
                         }
                       }}
+                      checked={assignedUsers.includes(user.id)}
                     />
                     <Image
                       src={user.image}
@@ -199,17 +202,30 @@ export default function UpdateTask() {
             </div>
           </div>
 
-          <DialogFooter>
-            <DialogClose className="rounded-md border px-4 py-1">
-              Cancel
-            </DialogClose>
-            <Submit
-              className="rounded-md border bg-[#6571FF] px-4 py-1 text-white"
-              formAction={handleSubmit}
+          <div className="flex">
+            <button
+              className="text-xl text-red-500 hover:text-red-700"
+              type="button"
+              onClick={async () => {
+                await deleteTask(task.id);
+                close();
+              }}
             >
-              Save
-            </Submit>
-          </DialogFooter>
+              <FaTrash />
+            </button>
+
+            <DialogFooter className="w-full">
+              <DialogClose className="rounded-md border px-4 py-1">
+                Cancel
+              </DialogClose>
+              <Submit
+                className="rounded-md border bg-[#6571FF] px-4 py-1 text-white"
+                formAction={handleSubmit}
+              >
+                Save
+              </Submit>
+            </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

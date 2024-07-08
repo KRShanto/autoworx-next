@@ -148,7 +148,6 @@ export default function LaborCreate() {
 
       <SelectCategory
         onCategoryChange={setCategory}
-        showLabelAsValue={false}
         labelPosition="left"
         categoryData={category}
       />

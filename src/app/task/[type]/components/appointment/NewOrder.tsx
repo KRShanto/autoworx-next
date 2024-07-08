@@ -16,7 +16,15 @@ import { addOrder } from "../../actions/addOrder";
 import FormError from "@/components/FormError";
 import { useFormErrorStore } from "@/stores/form-error";
 
-export default function NewOrder({ setOrders }: { setOrders: any }) {
+export default function NewOrder({
+  setOrder,
+  setOrders,
+  setOrderOpen,
+}: {
+  setOrder: any;
+  setOrders: any;
+  setOrderOpen: any;
+}) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
   async function handleSubmit(data: FormData) {
@@ -31,8 +39,10 @@ export default function NewOrder({ setOrders }: { setOrders: any }) {
         message: res.message || "",
       });
     } else {
-      setOrders((prev: any) => [...prev, res]);
+      setOrder(res.data);
+      setOrders((prev: any) => [...prev, res.data]);
       setOpen(false);
+      setOrderOpen(false);
     }
   }
 
