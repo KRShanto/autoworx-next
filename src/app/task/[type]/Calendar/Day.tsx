@@ -61,33 +61,14 @@ export default function Day({
   templates: EmailTemplate[];
 }) {
   const rows = ["All Day"];
-  // If the settings are available, use the dayStart and dayEnd to generate the rows
-  if (settings && settings.dayStart && settings.dayEnd) {
-    const startTime = moment(settings.dayStart, "HH:mm");
-    const endTime = moment(settings.dayEnd, "HH:mm");
 
-    // Loop from start time to end time, incrementing by 1 hour
-    for (
-      let time = moment(startTime);
-      time.isBefore(endTime);
-      time.add(1, "hours")
-    ) {
-      // Format each time and add to rows
-      rows.push(time.format("h A"));
-    }
-
-    // Add the end time as well
-    rows.push(endTime.format("h A"));
-  } else {
-    // 1am to 12pm
-    rows.push(
-      ...Array.from(
-        { length: 24 },
-        (_, i) =>
-          `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
-      ),
-    );
-  }
+  rows.push(
+    ...Array.from(
+      { length: 24 },
+      (_, i) =>
+        `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
+    ),
+  );
 
   const date = useDate();
 
