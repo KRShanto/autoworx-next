@@ -63,11 +63,17 @@ export default function Day({
   const rows = ["All Day"];
 
   rows.push(
-    ...Array.from(
-      { length: 24 },
-      (_, i) =>
-        `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
-    ),
+    ...Array.from({ length: 24 }, (_, i) => {
+      if (i < 11) {
+        return `${i + 1} AM`; // 1 AM to 11 AM
+      } else if (i === 11) {
+        return "12 PM"; // Noon
+      } else if (i < 23) {
+        return `${i - 11} PM`; // 1 PM to 11 PM
+      } else {
+        return "12 AM"; // Midnight of the next day
+      }
+    }),
   );
 
   const date = useDate();
@@ -77,6 +83,7 @@ export default function Day({
   const [draggedOverRow, setDraggedOverRow] = useState<number | null>(null);
   const parentRef = useRef<HTMLDivElement>(null);
   const [isRefAvailable, setIsRefAvailable] = useState<boolean>(false);
+  
 
   const [{ canDrop, isOver }, dropRef] = useDrop({
     accept: ["tag", "task", "appointment"],
@@ -97,6 +104,20 @@ export default function Day({
     window.addEventListener("resize", checkRefAvailability);
     return () => window.removeEventListener("resize", checkRefAvailability);
   }, []);
+
+  const rowRefs = useRef<Array<HTMLDivElement | null>>([]); // Define rowRefs to store references to each row
+
+  // useEffect(() => {
+  //   // Scroll to the row corresponding to settings.dayStart after loading
+  //   if (settings && rowRefs.current) {
+  //     const startRowIndex = rows.findIndex(row => formatTime(row) === settings.dayStart);
+  //     if (startRowIndex > 0 && rowRefs.current[startRowIndex]) {
+  //       setTimeout(() => {
+  //         rowRefs.current[startRowIndex]?.scrollIntoView({ behavior: "smooth" });
+  //       }, 10);
+  //     }
+  //   }
+  // }, [settings]);
 
   const events = useMemo<
     ((
@@ -148,6 +169,7 @@ export default function Day({
     const time = `${hour.padStart(2, "0")}:00 ${period}`;
     return moment(time, "hh:mm A").format("HH:mm");
   }
+  
   async function handleDrop(event: React.DragEvent, rowIndex: number) {
     const startTime = formatTime(rows[rowIndex]);
     const endTime = formatTime(rows[rowIndex + 1]);
@@ -219,51 +241,61 @@ export default function Day({
     }
     return "0%"; // Default fallback
   }
+  
   return (
     <div
       ref={mergeRefs(dropRef, parentRef)}
       className="relative mt-3 h-[90%] overflow-auto border border-neutral-200"
     >
-      {rows.map((row, i) => (
-        <DropRowButton
-          type="button"
-          row={row}
-          key={i}
-          onDrop={(event: React.DragEvent) => {
-            handleDrop(event, i);
-            setDraggedOverRow(null);
-          }}
-          onDragOver={(event: React.DragEvent) => {
-            event.preventDefault();
-            setDraggedOverRow(i);
-          }}
-          onDragLeave={() => setDraggedOverRow(null)}
-          className={cn(
-            "block h-[45px] w-full border-neutral-200",
-            i !== rows.length - 1 && "border-b",
-            i !== 0 && "cursor-pointer",
-          )}
-          onClick={() => {
-            const date = formatDate(new Date());
-            const startTime = formatTime(row);
-            open("ADD_TASK", { date, startTime, companyUsers });
-          }}
-          disabled={i === 0}
-          style={{
-            backgroundColor: draggedOverRow === i ? "#c4c4c4" : "white",
-          }}
-        >
-          {/* Row heading */}
-          <div
+      {rows.map((row, i) => {
+        const rowTime = formatTime(row);
+
+        return (
+          <DropRowButton
+          // ref={(el : any) => (rowRefs.current[i] = el)} // Assign ref to each row
+            type="button"
+            row={row}
+            key={i}
+            onDrop={(event: React.DragEvent) => {
+              handleDrop(event, i);
+              setDraggedOverRow(null);
+            }}
+            onDragOver={(event: React.DragEvent) => {
+              event.preventDefault();
+              setDraggedOverRow(i);
+            }}
+            onDragLeave={() => setDraggedOverRow(null)}
             className={cn(
-              "flex h-full w-[100px] items-center justify-center border-r border-neutral-200 text-[19px] text-[#797979]",
-              i === 0 && "font-bold",
+              "block h-[45px] w-full border-neutral-200",
+              i !== rows.length - 1 && "border-b",
+              i !== 0 && "cursor-pointer",
             )}
+            onClick={() => {
+              const date = formatDate(new Date());
+              const startTime = formatTime(row);
+              open("ADD_TASK", { date, startTime, companyUsers });
+            }}
+            disabled={i === 0}
+            style={{
+              backgroundColor: draggedOverRow === i ? "#c4c4c4" : "white",
+              color:
+                rowTime >= settings.dayStart && rowTime <= settings.dayEnd
+                  ? "#7575a3"
+                  : "#d1d1e0",
+            }}
           >
-            {row}
-          </div>
-        </DropRowButton>
-      ))}
+            {/* Row heading */}
+            <div
+              className={cn(
+                "flex h-full w-[100px] items-center justify-center border-r border-neutral-200 text-[19px]",
+                i === 0 && "font-bold text-[#7575a3]",
+              )}
+            >
+              {row}
+            </div>
+          </DropRowButton>
+        );
+      })}
 
       {/* Tasks */}
       {events.map((event, index) => {
