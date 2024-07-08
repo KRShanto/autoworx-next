@@ -61,33 +61,14 @@ export default function Day({
   templates: EmailTemplate[];
 }) {
   const rows = ["All Day"];
-  // If the settings are available, use the dayStart and dayEnd to generate the rows
-  if (settings && settings.dayStart && settings.dayEnd) {
-    const startTime = moment(settings.dayStart, "HH:mm");
-    const endTime = moment(settings.dayEnd, "HH:mm");
 
-    // Loop from start time to end time, incrementing by 1 hour
-    for (
-      let time = moment(startTime);
-      time.isBefore(endTime);
-      time.add(1, "hours")
-    ) {
-      // Format each time and add to rows
-      rows.push(time.format("h A"));
-    }
-
-    // Add the end time as well
-    rows.push(endTime.format("h A"));
-  } else {
-    // 1am to 12pm
-    rows.push(
-      ...Array.from(
-        { length: 24 },
-        (_, i) =>
-          `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
-      ),
-    );
-  }
+  rows.push(
+    ...Array.from(
+      { length: 24 },
+      (_, i) =>
+        `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
+    ),
+  );
 
   const date = useDate();
 
@@ -284,15 +265,15 @@ export default function Day({
       {events.map((event, index) => {
         const top = `${event.rowStartIndex * 45}px`;
         const height = `${
-          (event.rowEndIndex - event.rowStartIndex + 1) * 45
+          (event.rowEndIndex - event.rowStartIndex + 1) * 55
         }px`;
-        const widthNumber = is1300 ? 300 : 500;
+        const widthNumber = is1300 ? 300 : 300;
         let width = `${widthNumber}px`;
         // @ts-ignore
         const backgroundColor = event.priority
           ? // @ts-ignore
             TASK_COLOR[event.priority]
-          : "rgb(100, 116, 139)";
+          : "rgb(255, 255, 255)";
 
         // Calculate how many tasks are in the same row
         //TODO:
@@ -356,7 +337,7 @@ export default function Day({
           <Tooltip key={event.id}>
             <DraggableTaskTooltip
               //@ts-ignore
-              className="absolute top-0 z-10 rounded-lg border px-2 py-1 text-[17px] text-white hover:z-20"
+              className={`absolute top-0 z-10 rounded-lg border-2 px-2 py-1 text-[17px] ${event.type === "appointment" ? "text-gray-600" : "text-white"} hover:z-20`}
               style={{
                 left: calculateLeftPosition(taskIndex, tasksInRow.length),
                 top,
@@ -379,7 +360,39 @@ export default function Day({
                 settings,
               }}
             >
-              {<>{truncateTitle(event.title, maxTitleLength)}</>}
+              {
+                <>
+                  {event.type === "appointment" ? (
+                    <div className="flex flex-col items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-semibold">{event.title}</h3>
+                        </div>
+                        <p className="text-left">
+                          Client:{" "}
+                          {event.customer &&
+                            `${event.customer.firstName} ${event.customer.lastName}`}
+                        </p>
+                        <p className="text-left">
+                          Assigned To:{" "}
+                          {event.assignedUsers
+                            .slice(0, 1)
+                            .map((user: User) => user.name)}
+                        </p>
+                        <p className="text-left">
+                          {moment(event.startTime, "HH:mm").format("hh:mm A")}{" "}
+                          To {moment(event.endTime, "HH:mm").format("hh:mm A")}
+                        </p>
+                      </div>
+                      <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 rounded-lg border bg-[#6571FF]"></div>
+                    </div>
+                  ) : (
+                    <div className="flex h-full justify-start">
+                      <h3 className="font-semibold">{event.title}</h3>
+                    </div>
+                  )}
+                </>
+              }
             </DraggableTaskTooltip>
             <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
               {event.type === "appointment" ? (
