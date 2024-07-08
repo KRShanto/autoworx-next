@@ -1,14 +1,11 @@
 "use client";
 
-import { deleteStatus } from "@/app/estimate/create/actions/deleteStatus";
 import newStatus from "@/app/estimate/create/actions/newStatus";
-import { INVOICE_COLORS } from "@/lib/consts";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
 import { Status } from "@prisma/client";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronUp, FaSearch, FaTimes } from "react-icons/fa";
-import { IoMdClose } from "react-icons/io";
 import { PiPaletteBold, PiPulse } from "react-icons/pi";
 import {
   DropdownMenu,
@@ -19,6 +16,9 @@ import {
 import FormError from "../FormError";
 import Submit from "../Submit";
 import { SelectProps } from "./select-props";
+import { INVOICE_COLORS } from "@/lib/consts";
+import { IoMdClose } from "react-icons/io";
+import { deleteStatus } from "@/app/estimate/create/actions/deleteStatus";
 
 type SelectedColor = { textColor: string; bgColor: string } | null;
 
@@ -26,13 +26,11 @@ export function SelectStatus({
   name = "statusId",
   value = null,
   setValue,
-  open,
-  setOpen,
 }: SelectProps<Status | null>) {
   const state = useState(value);
   const [status, setStatus] = setValue ? [value, setValue] : state;
   const statusList = useListsStore((x) => x.statuses);
-  // const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
 
@@ -58,15 +56,12 @@ export function SelectStatus({
   return (
     <>
       <input type="hidden" name={name} value={status?.id ?? ""} />
-      <DropdownMenu open={open} onOpenChange={()=>{}}>
+      <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger
           className="flex h-10 items-center gap-2 rounded-md bg-slate-100 px-2 py-1"
           style={{
             backgroundColor: status?.bgColor,
             color: status?.textColor,
-          }}
-          onClick={() => {
-            setOpen && setOpen(!open);
           }}
         >
           <PiPulse />

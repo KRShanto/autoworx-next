@@ -1,14 +1,14 @@
-import NewVendor from "@/components/Lists/NewVendor";
-import SelectCategory from "@/components/Lists/SelectCategory";
-import { SelectTags } from "@/components/Lists/SelectTags";
-import Selector from "@/components/Selector";
-import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useListsStore } from "@/stores/lists";
-import { Category, Tag, Vendor } from "@prisma/client";
 import React, { useEffect, useState } from "react";
+import { Category, Tag, Vendor } from "@prisma/client";
+import { useEstimateCreateStore } from "@/stores/estimate-create";
+import Selector from "@/components/Selector";
 import { newMaterial } from "./actions/newMaterial";
+import NewVendor from "@/components/Lists/NewVendor";
 import Close from "./CloseEstimate";
+import { SelectTags } from "@/components/Lists/SelectTags";
+import SelectCategory from "@/components/Lists/SelectCategory";
 
 export default function MaterialCreate() {
   const { categories } = useListsStore();
@@ -31,10 +31,8 @@ export default function MaterialCreate() {
   const itemId = data?.itemId;
   const materialIndex = data?.materialIndex;
 
-  const [vendorSearch, setVendorSearch] = useState("");
   const [vendorOpen, setVendorOpen] = useState(false);
-  const [tagsOpen, setTagsOpen] = useState(false);
-  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [vendorSearch, setVendorSearch] = useState("");
 
   useEffect(() => {
     if (data.material && data.edit) {
@@ -163,18 +161,7 @@ export default function MaterialCreate() {
 
     close();
   }
-  useEffect(() => {
-    if (categoryOpen && (vendorOpen || tagsOpen)) {
-      setVendorOpen(false);
-      setTagsOpen(false);
-    } else if (vendorOpen && (categoryOpen || tagsOpen)) {
-      setCategoryOpen(false);
-      setTagsOpen(false);
-    } else if (tagsOpen && (categoryOpen || vendorOpen)) {
-      setCategoryOpen(false);
-      setVendorOpen(false);
-    }
-  }, [categoryOpen, vendorOpen, tagsOpen]);
+
   return (
     <div className="flex flex-col gap-2 p-5">
       <h3 className="w-full text-xl font-semibold">
@@ -200,8 +187,6 @@ export default function MaterialCreate() {
         onCategoryChange={setCategory}
         labelPosition="left"
         categoryData={category}
-        categoryOpen={categoryOpen}
-        setCategoryOpen={setCategoryOpen}
       />
 
       <div className="flex items-center gap-2">
@@ -258,12 +243,7 @@ export default function MaterialCreate() {
           Tags
         </label>
         <div className="w-full">
-          <SelectTags
-            value={tags}
-            setValue={setTags}
-            open={tagsOpen}
-            setOpen={setTagsOpen}
-          />
+          <SelectTags value={tags} setValue={setTags} />
         </div>
       </div>
 

@@ -11,17 +11,15 @@ export function SelectVehicle({
   name = "vehicleId",
   value = null,
   setValue,
-  openDropdown,
-  setOpenDropdown,
 }: SelectProps<Vehicle | null>) {
   const state = useState(value);
   const [vehicle, setVehicle] = setValue ? [value, setValue] : state;
   const vehicleList = useListsStore((x) => x.vehicles);
   const { newAddedVehicle } = useListsStore();
-  // const [openDropdown, setOpenDropdown] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(false);
 
   useEffect(() => {
-    if (newAddedVehicle && setOpenDropdown) {
+    if (newAddedVehicle) {
       setVehicle(newAddedVehicle);
       setOpenDropdown(false);
     }

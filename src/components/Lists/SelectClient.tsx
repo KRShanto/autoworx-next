@@ -4,29 +4,27 @@ import Selector from "@/components/Selector";
 import { useListsStore } from "@/stores/lists";
 import { Customer } from "@prisma/client";
 import Image from "next/image";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import NewCustomer from "./NewCustomer";
 import { SelectProps } from "./select-props";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export function SelectClient({
   name = "customerId",
   value = null,
   setValue,
-  openDropdown,
-  setOpenDropdown,
 }: SelectProps<Customer | null>) {
   const state = useState(value);
   const [client, setClient] = setValue ? [value, setValue] : state;
   const clientList = useListsStore((x) => x.customers);
   const { newAddedCustomer } = useListsStore();
-  // const [openDropdown, setOpenDropdown] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(false);
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
 
   useEffect(() => {
-    if (newAddedCustomer && setOpenDropdown) {
+    if (newAddedCustomer) {
       setClient(newAddedCustomer);
       setOpenDropdown(false);
     }

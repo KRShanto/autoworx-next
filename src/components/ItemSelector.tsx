@@ -1,17 +1,12 @@
-import { cn } from "@/lib/cn";
-import { Item } from "@/stores/estimate-create";
-import { useEstimatePopupStore } from "@/stores/estimate-popup";
-import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
 import React, { useEffect, useState } from "react";
-import {
-  FaChevronDown,
-  FaChevronUp,
-  FaEdit,
-  FaSearch,
-  FaTimes,
-} from "react-icons/fa";
-import { FaPen } from "react-icons/fa6";
+import { FaChevronUp, FaChevronDown, FaTimes, FaEdit } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import { DropdownMenu, DropdownMenuTrigger } from "./DropdownMenu";
+import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
+import { cn } from "@/lib/cn";
+import { FaPen } from "react-icons/fa6";
+import { useEstimatePopupStore } from "@/stores/estimate-popup";
+import { Item } from "@/stores/estimate-create";
 
 export default function ItemSelector<T>({
   label,
@@ -25,8 +20,6 @@ export default function ItemSelector<T>({
   alwaysShowDeleteButton,
   materialIndex,
   onSearch,
-  open,
-  setOpen,
 }: {
   label: string;
   type: "SERVICE" | "MATERIAL" | "LABOR";
@@ -39,10 +32,8 @@ export default function ItemSelector<T>({
   alwaysShowDeleteButton?: boolean;
   materialIndex?: number;
   onSearch?: (search: string) => T[];
-  open: boolean;
-  setOpen: any;
 }) {
-  // const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [itemIist, setItemIist] = useState<T[]>(list);
   const [selected, setSelected] = useState<T | null>(null);
   const { open: openPopup } = useEstimatePopupStore();
