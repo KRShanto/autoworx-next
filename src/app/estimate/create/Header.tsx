@@ -4,10 +4,10 @@ import { SelectClient } from "@/components/Lists/SelectClient";
 import { SelectStatus } from "@/components/Lists/SelectStatus";
 import { SelectVehicle } from "@/components/Lists/SelectVehicle";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
-import { customAlphabet } from "nanoid";
-import { useEffect } from "react";
-import { CreateEstimateActionsButtons } from "./CreateEstimateActionButtons";
 import { Customer, Status, Vehicle } from "@prisma/client";
+import { customAlphabet } from "nanoid";
+import { useEffect, useState } from "react";
+import { CreateEstimateActionsButtons } from "./CreateEstimateActionButtons";
 
 export default function Header({
   id,
@@ -21,11 +21,31 @@ export default function Header({
   status?: Status;
 }) {
   const { invoiceId, setInvoiceId } = useEstimateCreateStore();
-
+  //dropdown states
+  const [clientOpenDropdown, setClientOpenDropdown] = useState(false);
+  const [vehicleOpenDropdown, setVehicleOpenDropdown] = useState(false);
+  const [statusOpenDropdown, setStatusOpenDropdown] = useState(false);
   useEffect(() => {
     if (!id) setInvoiceId(customAlphabet("1234567890", 10)());
   }, [id]);
-
+  useEffect(() => {
+    if (clientOpenDropdown && (vehicleOpenDropdown || statusOpenDropdown)) {
+      setVehicleOpenDropdown(false);
+      setStatusOpenDropdown(false);
+    } else if (
+      vehicleOpenDropdown &&
+      (clientOpenDropdown || statusOpenDropdown)
+    ) {
+      setClientOpenDropdown(false);
+      setStatusOpenDropdown(false);
+    } else if (
+      statusOpenDropdown &&
+      (clientOpenDropdown || vehicleOpenDropdown)
+    ) {
+      setClientOpenDropdown(false);
+      setVehicleOpenDropdown(false);
+    }
+  }, [statusOpenDropdown, clientOpenDropdown, vehicleOpenDropdown]);
   return (
     <div className="app-shadow col-start-1 flex flex-wrap items-center gap-3 rounded-md p-3">
       <div className="mr-auto flex gap-1">
@@ -35,9 +55,21 @@ export default function Header({
       <CreateEstimateActionsButtons />
 
       <div className="flex basis-full flex-wrap items-center gap-3">
-        <SelectClient value={customer} />
-        <SelectVehicle value={vehicle} />
-        <SelectStatus value={status} />
+        <SelectClient
+          value={customer}
+          openDropdown={clientOpenDropdown}
+          setOpenDropdown={setClientOpenDropdown}
+        />
+        <SelectVehicle
+          value={vehicle}
+          openDropdown={vehicleOpenDropdown}
+          setOpenDropdown={setVehicleOpenDropdown}
+        />
+        <SelectStatus
+          value={status}
+          open={statusOpenDropdown}
+          setOpen={setStatusOpenDropdown}
+        />
       </div>
     </div>
   );

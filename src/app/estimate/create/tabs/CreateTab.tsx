@@ -1,14 +1,14 @@
 "use client";
 
+import ItemSelector from "@/components/ItemSelector";
+import { SelectTags } from "@/components/Lists/SelectTags";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useListsStore } from "@/stores/lists";
-import { nanoid } from "nanoid";
-import { HiOutlinePlusCircle, HiOutlineXCircle } from "react-icons/hi2";
 import { create } from "mutative";
-import { SelectTags } from "@/components/Lists/SelectTags";
-import ItemSelector from "@/components/ItemSelector";
-import React from "react";
+import { nanoid } from "nanoid";
+import React, { useEffect, useState } from "react";
+import { HiOutlinePlusCircle, HiOutlineXCircle } from "react-icons/hi2";
 
 export function CreateTab() {
   const { items, removeMaterial } = useEstimateCreateStore();
@@ -17,6 +17,31 @@ export function CreateTab() {
   const services = useListsStore((x) => x.services);
   const materials = useListsStore((x) => x.materials);
   const labors = useListsStore((x) => x.labors);
+  // dropdown states
+  const [servicesOpen, setServicesOpen] = useState(false);
+  const [materialsOpen, setMaterialsOpen] = useState(false);
+  const [laborsOpen, setLaborsOpen] = useState(false);
+  const [tagsOpen, setTagsOpen] = useState(false);
+
+  useEffect(() => {
+    if (servicesOpen && (materialsOpen || laborsOpen || tagsOpen)) {
+      setMaterialsOpen(false);
+      setLaborsOpen(false);
+      setTagsOpen(false);
+    } else if (materialsOpen && (servicesOpen || laborsOpen || tagsOpen)) {
+      setServicesOpen(false);
+      setLaborsOpen(false);
+      setTagsOpen(false);
+    } else if (laborsOpen && (servicesOpen || materialsOpen || tagsOpen)) {
+      setServicesOpen(false);
+      setMaterialsOpen(false);
+      setTagsOpen(false);
+    } else if (tagsOpen && (servicesOpen || materialsOpen || laborsOpen)) {
+      setServicesOpen(false);
+      setMaterialsOpen(false);
+      setLaborsOpen(false);
+    }
+  }, [servicesOpen, materialsOpen, laborsOpen, tagsOpen]);
 
   return (
     <>
@@ -88,6 +113,8 @@ export function CreateTab() {
                               return { items };
                             })
                           }
+                          open={servicesOpen}
+                          setOpen={setServicesOpen}
                         />
                       )}
                     </td>
@@ -129,6 +156,8 @@ export function CreateTab() {
                           );
                           return filteredMaterials;
                         }}
+                        open={materialsOpen}
+                        setOpen={setMaterialsOpen}
                       />
 
                       {/* Check if this is the last material */}
@@ -192,6 +221,8 @@ export function CreateTab() {
                               return { items };
                             })
                           }
+                          open={laborsOpen}
+                          setOpen={setLaborsOpen}
                         />
                       )}
                     </td>
@@ -209,6 +240,8 @@ export function CreateTab() {
                               }),
                             );
                           }}
+                          open={tagsOpen}
+                          setOpen={setTagsOpen}
                         />
                       )}
                     </td>
