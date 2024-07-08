@@ -302,16 +302,27 @@ export default function Day({
         //TODO:
         const eventStartTime = moment(event.startTime, "HH:mm");
         const eventEndTime = moment(event.endTime, "HH:mm");
+        // sort by big indexes
         const tasksInRow = events.slice().sort((a, b) => {
         const aRowStartIndex = a.rowStartIndex
         const aRowEndIndex = a.rowEndIndex
         const aBigIndex = aRowEndIndex - aRowStartIndex
         const bRowStartIndex = b.rowStartIndex
         const bRowEndIndex = b.rowEndIndex
-        const bBigIndex = bRowEndIndex - bRowStartIndex
-        return bBigIndex - aBigIndex  
-      }).filter((task) => {
-          const taskStartTime = moment(task.startTime, "HH:mm");
+          const bBigIndex = bRowEndIndex - bRowStartIndex
+          if (a.type === 'appointment' && b.type !== 'appointment') {
+            return -1
+          }
+          if (a.type !== 'appointment' && b.type === 'appointment') {
+            return 1
+          }
+          if (a.type === 'appointment' && b.type === 'appointment') {
+        return bBigIndex - aBigIndex;
+    }
+          
+          return aBigIndex - bBigIndex
+        }).filter((task) => {
+            const taskStartTime = moment(task.startTime, "HH:mm");
           const taskEndTime = moment(task.endTime, "HH:mm");
           if (
             event.rowStartIndex === task.rowStartIndex || (eventStartTime.isBefore(taskEndTime) &&
@@ -319,8 +330,8 @@ export default function Day({
           ) {
             return true;
           }
-        });
-
+        })
+        
         // If there are more than one task in the same row
         // then move the task right
         // If there are more than two tasks in the same row
