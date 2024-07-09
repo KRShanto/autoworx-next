@@ -64,14 +64,21 @@ export default function Day({
   settings: CalendarSettings;
   templates: EmailTemplate[];
 }) {
-  const rows = ["All Day"];
+
+  const rows: string[] = [];
 
   rows.push(
-    ...Array.from(
-      { length: 24 },
-      (_, i) =>
-        `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
-    ),
+    ...Array.from({ length: 24 }, (_, i) => {
+      if (i < 11) {
+        return `${i + 1} AM`; // 1 AM to 11 AM
+      } else if (i === 11) {
+        return "12 PM"; // Noon
+      } else if (i < 23) {
+        return `${i - 11} PM`; // 1 PM to 11 PM
+      } else {
+        return "12 AM"; // Midnight of the next day
+      }
+    }),
   );
 
   const date = useDate();
@@ -247,18 +254,30 @@ export default function Day({
 
     return aBigIndex - bBigIndex;
   });
+
+
   return (
     <div
       ref={mergeRefs(dropRef, parentRef)}
       className="relative mt-3 h-[90%] overflow-auto"
     >
-      {rows.map((row, i) => (
+      {rows.map((row, i) => {
+          const rowTime = formatTime(row);
+          const dateRangeforBgChanger = rowTime >= settings.dayStart && rowTime <= settings.dayEnd;
+
+        return (
         <div key={i} className="relative">
+        
           <div
             className={cn(
-              "absolute -top-[37.5px] flex h-full w-[100px] items-center justify-center text-[19px] text-[#797979]",
-              i === 0 && "-top-5 font-bold",
+              "absolute -top-[37.5px] flex h-full w-[100px] items-center justify-center text-[19px]",
+              i === 0 && "-top-5 "
             )}
+            style={{
+              color: rowTime >= settings.dayStart && rowTime <= settings.dayEnd
+                ? "#7575a3"
+                : "#d1d1e0",
+            }}
           >
             {row}
           </div>
@@ -285,14 +304,17 @@ export default function Day({
             }}
             disabled={i === 0}
             style={{
-              backgroundColor: draggedOverRow === i ? "#c4c4c4" : "white",
+              backgroundColor: draggedOverRow === i ? "#c4c4c4" : dateRangeforBgChanger ? "white	": "#f2f2f2",
               width: "calc(100% - 85px)",
+             
             }}
           >
             {/* Row heading */}
           </button>
         </div>
-      ))}
+       );
+       
+       })}
 
       {/* Tasks */}
       {events.map((event, index) => {
