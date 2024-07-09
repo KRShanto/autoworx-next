@@ -17,31 +17,14 @@ export function CreateTab() {
   const services = useListsStore((x) => x.services);
   const materials = useListsStore((x) => x.materials);
   const labors = useListsStore((x) => x.labors);
-  // dropdown states
-  const [servicesOpen, setServicesOpen] = useState(false);
-  const [materialsOpen, setMaterialsOpen] = useState(false);
-  const [laborsOpen, setLaborsOpen] = useState(false);
-  const [tagsOpen, setTagsOpen] = useState(false);
 
-  useEffect(() => {
-    if (servicesOpen && (materialsOpen || laborsOpen || tagsOpen)) {
-      setMaterialsOpen(false);
-      setLaborsOpen(false);
-      setTagsOpen(false);
-    } else if (materialsOpen && (servicesOpen || laborsOpen || tagsOpen)) {
-      setServicesOpen(false);
-      setLaborsOpen(false);
-      setTagsOpen(false);
-    } else if (laborsOpen && (servicesOpen || materialsOpen || tagsOpen)) {
-      setServicesOpen(false);
-      setMaterialsOpen(false);
-      setTagsOpen(false);
-    } else if (tagsOpen && (servicesOpen || materialsOpen || laborsOpen)) {
-      setServicesOpen(false);
-      setMaterialsOpen(false);
-      setLaborsOpen(false);
-    }
-  }, [servicesOpen, materialsOpen, laborsOpen, tagsOpen]);
+  // dropdown state
+  const [dropdownsOpen, setDropdownsOpen] = useState({
+    SERVICE: [-1, -1],
+    MATERIAL: [-1, -1],
+    LABOR: [-1, -1],
+    TAG: [-1, -1],
+  });
 
   return (
     <>
@@ -113,8 +96,9 @@ export function CreateTab() {
                               return { items };
                             })
                           }
-                          open={servicesOpen}
-                          setOpen={setServicesOpen}
+                          index={[i, j]}
+                          dropdownsOpen={dropdownsOpen}
+                          setDropdownsOpen={setDropdownsOpen}
                         />
                       )}
                     </td>
@@ -156,8 +140,9 @@ export function CreateTab() {
                           );
                           return filteredMaterials;
                         }}
-                        // open={materialsOpen}
-                        // setOpen={setMaterialsOpen}
+                        index={[i, j]}
+                        dropdownsOpen={dropdownsOpen}
+                        setDropdownsOpen={setDropdownsOpen}
                       />
 
                       {/* Check if this is the last material */}
@@ -221,14 +206,16 @@ export function CreateTab() {
                               return { items };
                             })
                           }
-                          open={laborsOpen}
-                          setOpen={setLaborsOpen}
+                          index={[i, j]}
+                          dropdownsOpen={dropdownsOpen}
+                          setDropdownsOpen={setDropdownsOpen}
                         />
                       )}
                     </td>
                     <td>
                       {j > 0 ? null : (
                         <SelectTags
+                          type="TAG"
                           value={item.tags}
                           setValue={(tags) => {
                             useEstimateCreateStore.setState((x) =>
@@ -240,8 +227,9 @@ export function CreateTab() {
                               }),
                             );
                           }}
-                          open={tagsOpen}
-                          setOpen={setTagsOpen}
+                          index={[i, j]}
+                          dropdownsOpen={dropdownsOpen}
+                          setDropdownsOpen={setDropdownsOpen}
                         />
                       )}
                     </td>
