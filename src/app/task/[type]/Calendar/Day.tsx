@@ -28,7 +28,11 @@ import { assignAppointmentDate } from "../actions/assignAppointmentDate";
 import { updateTask } from "../actions/dragTask";
 import mergeRefs from "merge-refs";
 import DraggableTaskTooltip from "./draggable/DraggableTaskTooltip";
-import { formatDate, formatTime, updateTimeSpace } from "@/utils/taskAndActivity";
+import {
+  formatDate,
+  formatTime,
+  updateTimeSpace,
+} from "@/utils/taskAndActivity";
 
 function useDate() {
   const searchParams = useSearchParams();
@@ -146,15 +150,15 @@ export default function Day({
     // Get the task type
     const attributeData = event.dataTransfer.getData("text/plain").split("|");
     const type = attributeData[0];
-    if(rows[rowIndex] === 'All Day') return;
+    if (rows[rowIndex] === "All Day") return;
 
     if (type === "task") {
       // Get the id of the task from the dataTransfer object
-      const taskId = parseInt(
-        attributeData[1]
-      );
+      const taskId = parseInt(attributeData[1]);
       // Find the task in your state
-      const taskFoundWithoutTime = tasksWithoutTime.find((task) => task.id == taskId);
+      const taskFoundWithoutTime = tasksWithoutTime.find(
+        (task) => task.id == taskId,
+      );
       const oldTask = tasks.find((task) => task.id === taskId);
       if (taskFoundWithoutTime) {
         // Add task to database
@@ -165,30 +169,38 @@ export default function Day({
           endTime: oldTask?.endTime || endTime,
         });
       } else {
-        const { newStartTime, newEndTime} = updateTimeSpace(oldTask?.startTime as string, oldTask?.endTime as string, rows[rowIndex]);
+        const { newStartTime, newEndTime } = updateTimeSpace(
+          oldTask?.startTime as string,
+          oldTask?.endTime as string,
+          rows[rowIndex],
+        );
         if (oldTask) {
           await updateTask({
             id: oldTask.id,
             date: new Date(oldTask.date),
             startTime: newStartTime,
-            endTime: newEndTime
-          })
+            endTime: newEndTime,
+          });
         }
       }
-    } else if(type === "appointment") {
+    } else if (type === "appointment") {
       // Get the id of the appointment from the dataTransfer object
-      const appointmentId = parseInt(attributeData[1])
+      const appointmentId = parseInt(attributeData[1]);
       // Find the appointment in your state
       const oldAppointment = appointments.find(
         (appointment) => appointment.id === appointmentId,
       );
-      const { newStartTime, newEndTime} = updateTimeSpace(oldAppointment?.startTime as string, oldAppointment?.endTime as string , rows[rowIndex]);
+      const { newStartTime, newEndTime } = updateTimeSpace(
+        oldAppointment?.startTime as string,
+        oldAppointment?.endTime as string,
+        rows[rowIndex],
+      );
       if (oldAppointment) {
         await assignAppointmentDate({
-            id: oldAppointment.id,
-            date: oldAppointment.date as Date | string,
-            startTime: newStartTime,
-            endTime: newEndTime,
+          id: oldAppointment.id,
+          date: oldAppointment.date as Date | string,
+          startTime: newStartTime,
+          endTime: newEndTime,
         });
       }
     }
@@ -217,24 +229,24 @@ export default function Day({
   }
 
   const sortedEvents = events.slice().sort((a, b) => {
-          const aRowStartIndex = a.rowStartIndex
-          const aRowEndIndex = a.rowEndIndex
-          const aBigIndex = aRowEndIndex - aRowStartIndex
-          const bRowStartIndex = b.rowStartIndex
-          const bRowEndIndex = b.rowEndIndex
-          const bBigIndex = bRowEndIndex - bRowStartIndex
-          if (a.type === 'appointment' && b.type !== 'appointment') {
-            return -1
-          }
-          if (a.type !== 'appointment' && b.type === 'appointment') {
-            return 1
-          }
-          if (a.type === 'appointment' && b.type === 'appointment') {
-            return bBigIndex - aBigIndex;
-          }
-          
-          return aBigIndex - bBigIndex
-   })
+    const aRowStartIndex = a.rowStartIndex;
+    const aRowEndIndex = a.rowEndIndex;
+    const aBigIndex = aRowEndIndex - aRowStartIndex;
+    const bRowStartIndex = b.rowStartIndex;
+    const bRowEndIndex = b.rowEndIndex;
+    const bBigIndex = bRowEndIndex - bRowStartIndex;
+    if (a.type === "appointment" && b.type !== "appointment") {
+      return -1;
+    }
+    if (a.type !== "appointment" && b.type === "appointment") {
+      return 1;
+    }
+    if (a.type === "appointment" && b.type === "appointment") {
+      return bBigIndex - aBigIndex;
+    }
+
+    return aBigIndex - bBigIndex;
+  });
   return (
     <div
       ref={mergeRefs(dropRef, parentRef)}
@@ -244,8 +256,8 @@ export default function Day({
         <div key={i} className="relative">
           <div
             className={cn(
-              "flex h-full w-[100px] items-center justify-center text-[19px] text-[#797979] absolute -top-[37.5px]",
-              i === 0 && "font-bold -top-5",
+              "absolute -top-[37.5px] flex h-full w-[100px] items-center justify-center text-[19px] text-[#797979]",
+              i === 0 && "-top-5 font-bold",
             )}
           >
             {row}
@@ -262,7 +274,7 @@ export default function Day({
             }}
             onDragLeave={() => setDraggedOverRow(null)}
             className={cn(
-              "block h-[75px] border-neutral-200 ml-[85px]",
+              "ml-[85px] block h-[75px] border-neutral-200",
               i !== rows.length && "border-b border-l",
               i !== 0 ? "cursor-pointer" : "border-t",
             )}
@@ -274,11 +286,10 @@ export default function Day({
             disabled={i === 0}
             style={{
               backgroundColor: draggedOverRow === i ? "#c4c4c4" : "white",
-              width: 'calc(100% - 85px)'
+              width: "calc(100% - 85px)",
             }}
           >
             {/* Row heading */}
-            
           </button>
         </div>
       ))}
@@ -293,7 +304,7 @@ export default function Day({
         // @ts-ignore
         const backgroundColor = event.priority
           ? // @ts-ignore
-          TASK_COLOR[event.priority]
+            TASK_COLOR[event.priority]
           : "rgb(255, 255, 255)";
 
         // Calculate how many tasks are in the same row
@@ -305,14 +316,15 @@ export default function Day({
           const taskStartTime = moment(task.startTime, "HH:mm");
           const taskEndTime = moment(task.endTime, "HH:mm");
           if (
-            event.rowStartIndex === task.rowStartIndex || (eventStartTime.isBefore(taskEndTime) &&
+            event.rowStartIndex === task.rowStartIndex ||
+            (eventStartTime.isBefore(taskEndTime) &&
               eventEndTime.isAfter(taskStartTime))
           ) {
             return true;
           }
-        })
+        });
         const diffByMinutes = eventEndTime.diff(eventStartTime, "minutes");
-        const height = `${diffByMinutes / 60 * 75}px`;
+        const height = `${(diffByMinutes / 60) * 75}px`;
         // If there are more than one task in the same row
         // then move the task right
         // If there are more than two tasks in the same row
@@ -341,7 +353,7 @@ export default function Day({
           <Tooltip key={event.id}>
             <DraggableTaskTooltip
               //@ts-ignore
-              className={`absolute top-0 z-10 rounded-lg border-2 px-2 py-1 text-[17px] ${event.type === "appointment" ? "text-gray-600 overflow-y-auto" : "text-white"} hover:z-20`}
+              className={`absolute top-0 z-10 rounded-lg border-2 px-2 py-1 text-[17px] ${event.type === "appointment" ? "overflow-y-auto text-gray-600" : "text-white"} hover:z-20`}
               style={{
                 left: calculateLeftPosition(taskIndex, tasksInRow.length),
                 top,
@@ -367,7 +379,7 @@ export default function Day({
               {
                 <>
                   {event.type === "appointment" ? (
-                    <div className="flex flex-col items-start">
+                    <div className="flex h-full flex-col items-start">
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
                           <h3 className="font-semibold">{event.title}</h3>
