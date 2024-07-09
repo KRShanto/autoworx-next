@@ -5,7 +5,7 @@ import { useListsStore } from "@/stores/lists";
 import { Customer } from "@prisma/client";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NewCustomer from "./NewCustomer";
 import { SelectProps } from "./select-props";
 
@@ -76,7 +76,7 @@ export function SelectClient({
               .includes(search.toLowerCase()),
           )
         }
-        openState={[openDropdown, setOpenDropdown]}
+        openState={[openDropdown as boolean, setOpenDropdown as Dispatch<SetStateAction<boolean>>]}
         selectedItem={client}
         setSelectedItem={setClient}
       />
