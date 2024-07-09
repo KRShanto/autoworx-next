@@ -156,8 +156,8 @@ export function CreateTab() {
                           );
                           return filteredMaterials;
                         }}
-                        open={materialsOpen}
-                        setOpen={setMaterialsOpen}
+                        // open={materialsOpen}
+                        // setOpen={setMaterialsOpen}
                       />
 
                       {/* Check if this is the last material */}

@@ -21,7 +21,6 @@ export default function Create() {
     <div className="w-full space-y-3 overflow-y-auto p-3">
       {items.map((item) => {
         if (!item.service) return null;
-
         const materialCost = item.materials.reduce((acc, material) => {
           return (
             acc +

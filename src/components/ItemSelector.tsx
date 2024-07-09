@@ -25,8 +25,8 @@ export default function ItemSelector<T>({
   alwaysShowDeleteButton,
   materialIndex,
   onSearch,
-  open,
-  setOpen,
+  // open,
+  // setOpen,
 }: {
   label: string;
   type: "SERVICE" | "MATERIAL" | "LABOR";
@@ -39,10 +39,10 @@ export default function ItemSelector<T>({
   alwaysShowDeleteButton?: boolean;
   materialIndex?: number;
   onSearch?: (search: string) => T[];
-  open: boolean;
-  setOpen: any;
+  // open: boolean;
+  // setOpen: any;
 }) {
-  // const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [itemIist, setItemIist] = useState<T[]>(list);
   const [selected, setSelected] = useState<T | null>(null);
   const { open: openPopup } = useEstimatePopupStore();
