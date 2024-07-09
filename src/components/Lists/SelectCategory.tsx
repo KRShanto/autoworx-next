@@ -102,7 +102,7 @@ export default function SelectCategory({
             cat.name.toLowerCase().includes(search.toLowerCase()),
           )
         }
-        openState={[categoryOpen, setCategoryOpen]}
+        openState={[categoryOpen as boolean, setCategoryOpen]}
         selectedItem={category}
         setSelectedItem={setCategory}
       />
