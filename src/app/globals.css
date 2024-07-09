@@ -251,3 +251,7 @@ html {
     height: 40%;
   }
 }
+
+form {
+  pointer-events: auto !important;
+}

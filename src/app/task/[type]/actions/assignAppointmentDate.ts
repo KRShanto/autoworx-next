@@ -11,7 +11,7 @@ export async function assignAppointmentDate({
   endTime,
 }: {
   id: number;
-  date: string;
+  date: Date | string;
   startTime: string;
   endTime: string;
 }): Promise<ServerAction> {
