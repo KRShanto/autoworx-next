@@ -33,6 +33,7 @@ import {
   formatTime,
   updateTimeSpace,
 } from "@/utils/taskAndActivity";
+import { any } from "zod";
 
 function useDate() {
   const searchParams = useSearchParams();
@@ -213,6 +214,30 @@ export default function Day({
     }
   }
 
+  //scrolling till settings.dAyStart hour
+  const containerRef = useRef<any>(null);
+
+  useEffect(() => {
+    const scrollToStartTime = () => {
+      if (containerRef.current) {
+        const startTimeIndex = rows.findIndex(row => {
+          const rowTime = formatTime(row);
+          return rowTime === settings.dayStart;
+        });
+
+        if (startTimeIndex !== -1) {
+          const scrollPosition = startTimeIndex * 75; 
+          containerRef.current.scrollTo({
+            top: scrollPosition,
+            behavior: 'smooth',
+          });
+        }
+      }
+    };
+
+    scrollToStartTime();
+  }, [rows, settings.dayStart]);
+
   /**
    * Calculates the left CSS position for a task in a row.
    *
@@ -258,8 +283,8 @@ export default function Day({
 
   return (
     <div
-      ref={mergeRefs(dropRef, parentRef)}
-      className="relative mt-3 h-[90%] overflow-auto"
+      ref={mergeRefs(dropRef, parentRef,containerRef)}
+      className="relative mt-3 h-[90%] overflow-auto "
     >
       {rows.map((row, i) => {
           const rowTime = formatTime(row);
@@ -275,8 +300,8 @@ export default function Day({
             )}
             style={{
               color: rowTime >= settings.dayStart && rowTime <= settings.dayEnd
-                ? "#7575a3"
-                : "#d1d1e0",
+                ? "#d1d1e0"
+                : "#7575a3",
             }}
           >
             {row}
@@ -304,7 +329,7 @@ export default function Day({
             }}
             disabled={i === 0}
             style={{
-              backgroundColor: draggedOverRow === i ? "#c4c4c4" : dateRangeforBgChanger ? "white	": "#f2f2f2",
+              backgroundColor: draggedOverRow === i ? "#c4c4c4" : dateRangeforBgChanger ? " #f2f2f2	": "white",
               width: "calc(100% - 85px)",
              
             }}
