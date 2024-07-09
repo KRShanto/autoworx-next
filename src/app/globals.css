@@ -255,3 +255,6 @@ html {
 form {
   pointer-events: auto !important;
 }
+body {
+  pointer-events: auto !important;
+}

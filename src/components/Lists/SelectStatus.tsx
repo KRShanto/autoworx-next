@@ -58,7 +58,12 @@ export function SelectStatus({
   return (
     <>
       <input type="hidden" name={name} value={status?.id ?? ""} />
-      <DropdownMenu open={open} onOpenChange={()=>{}}>
+      <DropdownMenu
+        open={open}
+        onOpenChange={(open) => {
+          !open && setOpen && setOpen(open);
+        }}
+      >
         <DropdownMenuTrigger
           className="flex h-10 items-center gap-2 rounded-md bg-slate-100 px-2 py-1"
           style={{

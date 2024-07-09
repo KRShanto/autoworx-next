@@ -10,15 +10,15 @@ import {
   DialogTrigger,
 } from "@/components/Dialog";
 import FormError from "@/components/FormError";
-import { SlimInput } from "@/components/SlimInput";
-import Submit from "@/components/Submit";
-import { Category, InventoryProductType, Vendor } from "@prisma/client";
-import { useState } from "react";
-import { createProduct } from "./actions/create";
+import NewVendor from "@/components/Lists/NewVendor";
 import SelectCategory from "@/components/Lists/SelectCategory";
 import Selector from "@/components/Selector";
+import { SlimInput } from "@/components/SlimInput";
+import Submit from "@/components/Submit";
 import { useListsStore } from "@/stores/lists";
-import NewVendor from "@/components/Lists/NewVendor";
+import { Category, InventoryProductType, Vendor } from "@prisma/client";
+import { useEffect, useState } from "react";
+import { createProduct } from "./actions/create";
 
 export default function AddNewProduct() {
   const [open, setOpen] = useState(false);
@@ -26,6 +26,7 @@ export default function AddNewProduct() {
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [category, setCategory] = useState<Category | null>();
   const [vendorOpen, setVendorOpen] = useState(false);
+  const [categoryOpen, setCategoryOpen] = useState(false);
 
   async function handleSubmit(data: FormData) {
     const name = data.get("productName") as string;
@@ -55,7 +56,12 @@ export default function AddNewProduct() {
       setOpen(false);
     }
   }
-
+  useEffect(() => {
+    setVendorOpen(false);
+  }, [categoryOpen]);
+  useEffect(() => {
+    setCategoryOpen(false);
+  }, [vendorOpen]);
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -76,7 +82,11 @@ export default function AddNewProduct() {
 
           <div className="grid grid-cols-2 gap-5 overflow-y-auto">
             <div>
-              <SelectCategory onCategoryChange={setCategory} />
+              <SelectCategory
+                onCategoryChange={setCategory}
+                categoryOpen={categoryOpen}
+                setCategoryOpen={setCategoryOpen}
+              />
               <SlimInput name="productName" />
               <div>
                 <label>Vendor</label>
