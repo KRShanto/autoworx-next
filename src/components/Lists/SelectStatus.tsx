@@ -27,7 +27,7 @@ export function SelectStatus({
   value = null,
   setValue,
   open,
-  setOpen,
+  setOpen
 }: SelectProps<Status | null>) {
   const state = useState(value);
   const [status, setStatus] = setValue ? [value, setValue] : state;
@@ -92,7 +92,9 @@ export function SelectStatus({
               placeholder="Search"
               className="w-full rounded-md border-2 border-slate-400 p-1 pl-6 pr-10 focus:outline-none"
             />
-            <button onClick={() => setOpen(false)}>
+            <button onClick={() => {
+              setOpen && setOpen(!open);
+            }}>
               <FaChevronUp className="absolute right-2 top-1/2 -translate-y-1/2 transform text-[#797979]" />
             </button>
           </div>
@@ -126,7 +128,8 @@ export function SelectStatus({
           <QuickAddForm
             onSuccess={(status) => {
               setStatus(status);
-              setOpen(false);
+              if(setOpen) setOpen(false);
+              // setOpen(false);
             }}
             setPickerOpen={setPickerOpen}
             selectedColor={selectedColor}
