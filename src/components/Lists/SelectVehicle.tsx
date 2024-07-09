@@ -3,7 +3,7 @@
 import Selector from "@/components/Selector";
 import { useListsStore } from "@/stores/lists";
 import { Vehicle } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NewVehicle from "./NewVehicle";
 import { SelectProps } from "./select-props";
 
@@ -48,7 +48,7 @@ export function SelectVehicle({
             vehicle.model?.toLowerCase().includes(search.toLowerCase()),
           )
         }
-        openState={[openDropdown, setOpenDropdown]}
+        openState={[openDropdown as boolean, setOpenDropdown as Dispatch<SetStateAction<boolean>>]}
         selectedItem={vehicle}
         setSelectedItem={setVehicle}
         displayList={(item) => <p>{item.model}</p>}

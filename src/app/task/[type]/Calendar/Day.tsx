@@ -142,17 +142,6 @@ export default function Day({
         }),
     [tasks, appointments, date],
   );
-
-    function formatDate(date: Date) {
-    return moment(date).format("YYYY-MM-DD");
-  }
-
-  function formatTime(row: string = "") {
-    const [hour, period] = row?.split(" ");
-    const time = `${hour.padStart(2, "0")}:00 ${period}`;
-    return moment(time, "hh:mm A").format("HH:mm");
-  }
-
   async function handleDrop(event: React.DragEvent, rowIndex: number) {
     const startTime = formatTime(rows[rowIndex]);
     const endTime = formatTime(rows[rowIndex + 1]);
@@ -216,7 +205,7 @@ export default function Day({
       }
     }
   }
- 
+
   /**
    * Calculates the left CSS position for a task in a row.
    *
@@ -232,75 +221,84 @@ export default function Day({
   function calculateLeftPosition(taskIndex: number, tasksInRowLength: number) {
     if (parentRef.current) {
       const parentWidth = parentRef.current.offsetWidth;
-      console.log("parentWidth", parentWidth);
       const distributionPercentage = (90 / tasksInRowLength) * taskIndex;
       const shiftPercentage = (110 / parentWidth) * 100;
       return `calc(${distributionPercentage}% + ${shiftPercentage}%)`;
     }
     return "0%"; // Default fallback
   }
+
+  const sortedEvents = events.slice().sort((a, b) => {
+    const aRowStartIndex = a.rowStartIndex;
+    const aRowEndIndex = a.rowEndIndex;
+    const aBigIndex = aRowEndIndex - aRowStartIndex;
+    const bRowStartIndex = b.rowStartIndex;
+    const bRowEndIndex = b.rowEndIndex;
+    const bBigIndex = bRowEndIndex - bRowStartIndex;
+    if (a.type === "appointment" && b.type !== "appointment") {
+      return -1;
+    }
+    if (a.type !== "appointment" && b.type === "appointment") {
+      return 1;
+    }
+    if (a.type === "appointment" && b.type === "appointment") {
+      return bBigIndex - aBigIndex;
+    }
+
+    return aBigIndex - bBigIndex;
+  });
   return (
     <div
       ref={mergeRefs(dropRef, parentRef)}
-      className="relative mt-3 h-[90%] overflow-auto border border-neutral-200"
+      className="relative mt-3 h-[90%] overflow-auto"
     >
-      {rows.map((row, i) => {
-  const rowTime = formatTime(row);
- 
-  
-
-  return (
-    <button
-      type="button"
-      key={i}
-      onDrop={(event: React.DragEvent) => {
-        handleDrop(event, i);
-        setDraggedOverRow(null);
-      }}
-      onDragOver={(event: React.DragEvent) => {
-        event.preventDefault();
-        setDraggedOverRow(i);
-      }}
-      onDragLeave={() => setDraggedOverRow(null)}
-      className={cn(
-        "block h-[45px] w-full border-neutral-200",
-        i !== rows.length - 1 && "border-b",
-        i !== 0 && "cursor-pointer"
-      )}
-      onClick={() => {
-        const date = formatDate(new Date());
-        const startTime = formatTime(row);
-        open("ADD_TASK", { date, startTime, companyUsers });
-      }}
-      disabled={i === 0}
-      style={{
-        backgroundColor: draggedOverRow === i ? "#c4c4c4" : "white",
-        color:
-          rowTime >= settings.dayStart && rowTime <= settings.dayEnd
-            ? "red"
-            : "#d1d1e0",
-      }}
-    >
-      {/* Row heading */}
-      <div
-        className={cn(
-          "flex h-full w-[100px] items-center justify-center border-r border-neutral-200 text-[19px] text-[#797979]",
-          i === 0 && "font-bold text-[#7575a3]"
-        )}
-      >
-        {row}
-      </div>
-    </button>
-  );
-})}
-
+      {rows.map((row, i) => (
+        <div key={i} className="relative">
+          <div
+            className={cn(
+              "absolute -top-[37.5px] flex h-full w-[100px] items-center justify-center text-[19px] text-[#797979]",
+              i === 0 && "-top-5 font-bold",
+            )}
+          >
+            {row}
+          </div>
+          <button
+            type="button"
+            onDrop={(event: React.DragEvent) => {
+              handleDrop(event, i);
+              setDraggedOverRow(null);
+            }}
+            onDragOver={(event: React.DragEvent) => {
+              event.preventDefault();
+              setDraggedOverRow(i);
+            }}
+            onDragLeave={() => setDraggedOverRow(null)}
+            className={cn(
+              "ml-[85px] block h-[75px] border-neutral-200",
+              i !== rows.length && "border-b border-l",
+              i !== 0 ? "cursor-pointer" : "border-t",
+            )}
+            onClick={() => {
+              const date = formatDate(new Date());
+              const startTime = formatTime(row);
+              open("ADD_TASK", { date, startTime, companyUsers });
+            }}
+            disabled={i === 0}
+            style={{
+              backgroundColor: draggedOverRow === i ? "#c4c4c4" : "white",
+              width: "calc(100% - 85px)",
+            }}
+          >
+            {/* Row heading */}
+          </button>
+        </div>
+      ))}
 
       {/* Tasks */}
       {events.map((event, index) => {
-        const top = `${event.rowStartIndex * 45}px`;
-        const height = `${
-          (event.rowEndIndex - event.rowStartIndex + 1) * 55
-        }px`;
+        const top = `${event.rowStartIndex * 75}px`;
+        // const height = `${(event.rowEndIndex - event.rowStartIndex + 1) * 55
+        //   }px`;
         const widthNumber = is1300 ? 300 : 300;
         let width = `${widthNumber}px`;
         // @ts-ignore
@@ -314,41 +312,19 @@ export default function Day({
         const eventStartTime = moment(event.startTime, "HH:mm");
         const eventEndTime = moment(event.endTime, "HH:mm");
         // sort by big indexes
-        const tasksInRow = events
-          .slice()
-          .sort((a, b) => {
-            const aRowStartIndex = a.rowStartIndex;
-            const aRowEndIndex = a.rowEndIndex;
-            const aBigIndex = aRowEndIndex - aRowStartIndex;
-            const bRowStartIndex = b.rowStartIndex;
-            const bRowEndIndex = b.rowEndIndex;
-            const bBigIndex = bRowEndIndex - bRowStartIndex;
-            if (a.type === "appointment" && b.type !== "appointment") {
-              return -1;
-            }
-            if (a.type !== "appointment" && b.type === "appointment") {
-              return 1;
-            }
-            if (a.type === "appointment" && b.type === "appointment") {
-              return bBigIndex - aBigIndex;
-            }
-
-            return aBigIndex - bBigIndex;
-          })
-          .filter((task) => {
-            const taskStartTime = moment(task.startTime, "HH:mm");
-            const taskEndTime = moment(task.endTime, "HH:mm");
-            if (
-              event.rowStartIndex === task.rowStartIndex ||
-              (eventStartTime.isBefore(taskEndTime) &&
-                eventEndTime.isAfter(taskStartTime)) ||
-              event.rowEndIndex === task.rowStartIndex ||
-              event.rowStartIndex === task.rowEndIndex
-            ) {
-              return true;
-            }
-          });
-
+        const tasksInRow = sortedEvents.filter((task) => {
+          const taskStartTime = moment(task.startTime, "HH:mm");
+          const taskEndTime = moment(task.endTime, "HH:mm");
+          if (
+            event.rowStartIndex === task.rowStartIndex ||
+            (eventStartTime.isBefore(taskEndTime) &&
+              eventEndTime.isAfter(taskStartTime))
+          ) {
+            return true;
+          }
+        });
+        const diffByMinutes = eventEndTime.diff(eventStartTime, "minutes");
+        const height = `${(diffByMinutes / 60) * 75}px`;
         // If there are more than one task in the same row
         // then move the task right
         // If there are more than two tasks in the same row
@@ -377,7 +353,7 @@ export default function Day({
           <Tooltip key={event.id}>
             <DraggableTaskTooltip
               //@ts-ignore
-              className={`absolute top-0 z-10 rounded-lg border-2 px-2 py-1 text-[17px] ${event.type === "appointment" ? "text-gray-600" : "text-white"} hover:z-20`}
+              className={`absolute top-0 z-10 rounded-lg border-2 px-2 py-1 text-[17px] ${event.type === "appointment" ? "overflow-y-auto text-gray-600" : "text-white"} hover:z-20`}
               style={{
                 left: calculateLeftPosition(taskIndex, tasksInRow.length),
                 top,
@@ -403,7 +379,7 @@ export default function Day({
               {
                 <>
                   {event.type === "appointment" ? (
-                    <div className="flex flex-col items-start">
+                    <div className="flex h-full flex-col items-start">
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
                           <h3 className="font-semibold">{event.title}</h3>

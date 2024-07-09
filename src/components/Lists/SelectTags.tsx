@@ -46,7 +46,8 @@ export function SelectTags({
       />
       <DropdownMenu
         open={open}
-        onOpenChange={(isOpen) => {
+        onOpenChange={(open) => {
+          !open && setOpen && setOpen(open);
         }}
       >
         {tags.map((tag, i) => (
