@@ -20,13 +20,14 @@ import type {
 } from "@prisma/client";
 import moment from "moment";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDrop } from "react-dnd";
 import { FaPen } from "react-icons/fa6";
 import { assignAppointmentDate } from "../actions/assignAppointmentDate";
 import { updateTask } from "../actions/dragTask";
 import DraggableTaskTooltip from "./draggable/DraggableTaskTooltip";
 import { formatDate, formatTime, updateTimeSpace } from "@/utils/taskAndActivity";
+import mergeRefs from "merge-refs";
 
 function useWeek() {
   const searchParams = useSearchParams();
@@ -101,6 +102,7 @@ export default function Week({
   const today = week.toDate();
 
   const weekStart = settings?.weekStart || "Sunday";
+  const parentRef = useRef<HTMLDivElement>(null)
 
   // Get the days of the week based on the weekStart
   const days = useMemo(() => {
@@ -266,16 +268,6 @@ export default function Week({
 
     return aBigIndex - bBigIndex;
   });
-
-  // function calculateLeftPosition(taskIndex: number, tasksInRowLength: number) {
-  //   if (parentRef.current) {
-  //     const parentWidth = parentRef.current.offsetWidth;
-  //     const distributionPercentage = (90 / tasksInRowLength) * taskIndex;
-  //     const shiftPercentage = (110 / parentWidth) * 100;
-  //     return `calc(${distributionPercentage}% + ${shiftPercentage}%)`;
-  //   }
-  //   return "0%"; // Default fallback
-  // }
   return (
     <>
       <div
@@ -283,7 +275,7 @@ export default function Week({
         // style={{
         //   backgroundColor: isOver ? "rgba(0, 0, 0, 0.1)" : "transparent",
         // }}
-        ref={dropRef}
+        ref={mergeRefs(dropRef, parentRef)}
       >
         {rows.map((row: any, rowIndex: number) => (
           <div
@@ -356,19 +348,19 @@ export default function Week({
 
         {events.map((event, index) => {
           // left according to the cell width
-          const left = `calc(10% + 12.9% * ${event.columnIndex})`;
+          let left = `calc(10% + 12.9% * ${event.columnIndex})`;
           let top = `${71 * event.rowStartIndex + 71}px`;
           // if the previous task starts at the same time as this task
           // then move this task down
-          if (
-            index > 0 &&
-            event.rowStartIndex === events[index - 1].rowStartIndex
-          ) {
-            top = `${71 * event.rowStartIndex + 71 + 20}px`;
-          }
-          const height = `${
-            71 * (event.rowEndIndex - event.rowStartIndex + 1)
-          }px`;
+          // if (
+          //   index > 0 &&
+          //   event.rowStartIndex === events[index - 1].rowStartIndex
+          // ) {
+          //   top = `${71 * event.rowStartIndex + 71}px`;
+          // }
+          // const height = `${
+          //   71 * (event.rowEndIndex - event.rowStartIndex + 1)
+          // }px`;
           // width according to the cell width
           let width = "22px"; // prev = 12.9%
           // @ts-ignore
@@ -376,24 +368,31 @@ export default function Week({
             ? // @ts-ignore
               TASK_COLOR[event.priority]
             : "#FAF9F6";
-          // Calculate how many tasks are in the same row
-        //TODO:
+            // Calculate how many tasks are in the same row
+            //TODO:
         const eventStartTime = moment(event.startTime, "HH:mm");
         const eventEndTime = moment(event.endTime, "HH:mm");
         // sort by big indexes
-        const tasksInRow = sortedEvents.filter((task) => {
-          const taskStartTime = moment(task.startTime, "HH:mm");
-          const taskEndTime = moment(task.endTime, "HH:mm");
-          if (
-            event.rowStartIndex === task.rowStartIndex ||
-            (eventStartTime.isBefore(taskEndTime) &&
-              eventEndTime.isAfter(taskStartTime))
-          ) {
-            return true;
+          const tasksInRow = sortedEvents.filter((task) => {
+            if (event.columnIndex === task.columnIndex) {
+              const taskStartTime = moment(task.startTime, "HH:mm");
+              const taskEndTime = moment(task.endTime, "HH:mm");
+              if (
+                event.rowStartIndex === task.rowStartIndex ||
+                (eventStartTime.isBefore(taskEndTime) &&
+                  eventEndTime.isAfter(taskStartTime))
+              ) {
+                return true;
+              }
           }
-        });
+          });
+          const limitOfTasks = 5
           const taskIndex = tasksInRow.findIndex((task) => task.id === event.id);
-          console.log({taskIndex});
+          const diffByMinutes = eventEndTime.diff(eventStartTime, "minutes");
+          const height = `${(diffByMinutes / 60) * 71}px`;  
+          if (taskIndex) {
+            left = `calc(10% + 12.9% * ${event.columnIndex} + ${taskIndex * 2}%)`;
+          }
           // if (tasksInRow.length > 2) {
           //   width = `${12.9 / tasksInRow.length}%`;
           // }
@@ -403,7 +402,6 @@ export default function Week({
               ? `${title.slice(0, maxLength)}...`
               : title;
           };
-
           // Define the maximum title length based on the height
           const maxTitleLength =
             height === "45px"
@@ -411,18 +409,18 @@ export default function Week({
               : height === "90px"
                 ? 30
                 : event.title.length;
-
           return (
-            <Tooltip key={event.id}>
+            <Tooltip key={event.id} >
               <DraggableTaskTooltip
                 //@ts-ignore
-                className="absolute top-0 rounded-lg border"
+                className={`absolute top-0 rounded-lg border ${taskIndex === limitOfTasks && 'bg-opacity-25'}`}
                 style={{
                   left,
                   top,
                   height,
-                  backgroundColor,
+                  backgroundColor: taskIndex === limitOfTasks ? '#6571FF' : backgroundColor,
                   width,
+                  display: taskIndex > limitOfTasks && 'none'
                 }}
                 task={event}
                 updateTaskData={{ event, companyUsers }}
@@ -438,16 +436,16 @@ export default function Week({
                   settings,
                 }}
               >
-                {/* <p className="z-30 p-1 text-[17px] text-white max-[1600px]:text-[12px]">
-                  {truncateTitle(event.title, maxTitleLength)}
-                </p> */}
                 {
-                <>
+                  <>
                     {event.type === "appointment" && (
-                      <div className="flex h-full flex-col items-start">
+                      <div  className="flex h-full flex-col items-start">
                         <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 rounded-lg border bg-[#6571FF]"></div>
                       </div>
                     )}
+                    <p className="z-30 text-sm text-white">
+                      {taskIndex === limitOfTasks && `${(tasksInRow?.length - limitOfTasks)}+`}
+                    </p>
                 </>
               }
               </DraggableTaskTooltip>
