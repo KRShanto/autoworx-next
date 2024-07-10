@@ -222,7 +222,7 @@ export default function Day({
       if (containerRef.current) {
         const startTimeIndex = rows.findIndex(row => {
           const rowTime = formatTime(row);
-          return rowTime === settings.dayStart;
+          return rowTime === settings?.dayStart;
         });
 
         if (startTimeIndex !== -1) {
@@ -236,7 +236,7 @@ export default function Day({
     };
 
     scrollToStartTime();
-  }, [rows, settings.dayStart]);
+  }, [rows, settings?.dayStart]);
 
   /**
    * Calculates the left CSS position for a task in a row.
@@ -288,7 +288,7 @@ export default function Day({
     >
       {rows.map((row, i) => {
           const rowTime = formatTime(row);
-          const dateRangeforBgChanger = rowTime >= settings.dayStart && rowTime <= settings.dayEnd;
+          const dateRangeforBgChanger = rowTime >= settings?.dayStart && rowTime <= settings?.dayEnd;
 
         return (
         <div key={i} className="relative">
@@ -299,7 +299,7 @@ export default function Day({
               i === 0 && "-top-5 "
             )}
             style={{
-              color: rowTime >= settings.dayStart && rowTime <= settings.dayEnd
+              color: rowTime >= settings?.dayStart && rowTime <= settings?.dayEnd
                 ? "#d1d1e0"
                 : "#7575a3",
             }}
@@ -355,7 +355,6 @@ export default function Day({
           : "rgb(255, 255, 255)";
 
         // Calculate how many tasks are in the same row
-        //TODO:
         const eventStartTime = moment(event.startTime, "HH:mm");
         const eventEndTime = moment(event.endTime, "HH:mm");
         // sort by big indexes
@@ -371,7 +370,7 @@ export default function Day({
           }
         });
         const diffByMinutes = eventEndTime.diff(eventStartTime, "minutes");
-        const height = `${(diffByMinutes / 60) * 75}px`;
+        const height = `${(diffByMinutes / 60) * 75}px`; // 75 is the height of one task
         // If there are more than one task in the same row
         // then move the task right
         // If there are more than two tasks in the same row
