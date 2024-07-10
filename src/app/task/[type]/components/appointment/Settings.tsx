@@ -13,6 +13,7 @@ import { CalendarSettings } from "@prisma/client";
 import { GoGear } from "react-icons/go";
 import Submit from "@/components/Submit";
 
+
 const week = [
   "Saturday",
   "Sunday",
@@ -25,10 +26,15 @@ const week = [
 
 export default function Settings({
   settings,
+  
 }: {
   settings?: CalendarSettings;
 }) {
   const [open, setOpen] = useState(false);
+  
+  //setDayStart and  setDayEnd
+  const [dayStart, setDayStart] = useState(settings?.dayStart ??"");
+  const [dayEnd, setDayEnd] = useState(settings?.dayEnd ??"");
 
   async function handleSave(data: FormData) {
     const weekStart = data.get("week-start") as string;
@@ -49,6 +55,7 @@ export default function Settings({
   }
 
   return (
+    <div>
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button className="app-shadow rounded-md p-2 text-xl text-[#797979]">
@@ -94,6 +101,7 @@ export default function Settings({
                 name="day-start"
                 defaultValue={settings ? settings.dayStart : "10:00"}
                 className="rounded-md border-2 border-slate-400 p-1"
+                onChange={(e) => setDayStart(e.target.value)}
               />
             </div>
 
@@ -107,6 +115,7 @@ export default function Settings({
                 name="day-end"
                 defaultValue={settings ? settings.dayEnd : "18:00"}
                 className="rounded-md border-2 border-slate-400 p-1"
+                onChange={(e)=> setDayEnd(e.target.value)}
               />
             </div>
           </div>
@@ -181,5 +190,8 @@ export default function Settings({
         </form>
       </DialogContent>
     </Dialog>
+    {/* Pass start and end times to Day component */}
+    {/* <Day  dayStart={dayStart} dayEnd={dayEnd} /> */}
+    </div>
   );
 }

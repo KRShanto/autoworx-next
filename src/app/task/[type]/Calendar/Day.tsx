@@ -33,6 +33,7 @@ import {
   formatTime,
   updateTimeSpace,
 } from "@/utils/taskAndActivity";
+import { any } from "zod";
 
 function useDate() {
   const searchParams = useSearchParams();
@@ -64,14 +65,21 @@ export default function Day({
   settings: CalendarSettings;
   templates: EmailTemplate[];
 }) {
-  const rows = ["All Day"];
+
+  const rows: string[] = [];
 
   rows.push(
-    ...Array.from(
-      { length: 24 },
-      (_, i) =>
-        `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
-    ),
+    ...Array.from({ length: 24 }, (_, i) => {
+      if (i < 11) {
+        return `${i + 1} AM`; // 1 AM to 11 AM
+      } else if (i === 11) {
+        return "12 PM"; // Noon
+      } else if (i < 23) {
+        return `${i - 11} PM`; // 1 PM to 11 PM
+      } else {
+        return "12 AM"; // Midnight of the next day
+      }
+    }),
   );
 
   const date = useDate();
@@ -206,6 +214,30 @@ export default function Day({
     }
   }
 
+  //scrolling till settings.dayStart
+  const containerRef = useRef<any>(null);
+
+  useEffect(() => {
+    const scrollToStartTime = () => {
+      if (containerRef.current) {
+        const startTimeIndex = rows.findIndex(row => {
+          const rowTime = formatTime(row);
+          return rowTime === settings.dayStart;
+        });
+
+        if (startTimeIndex !== -1) {
+          const scrollPosition = startTimeIndex * 75; 
+          containerRef.current.scrollTo({
+            top: scrollPosition,
+            behavior: 'smooth',
+          });
+        }
+      }
+    };
+
+    scrollToStartTime();
+  }, [rows, settings.dayStart]);
+
   /**
    * Calculates the left CSS position for a task in a row.
    *
@@ -247,18 +279,30 @@ export default function Day({
 
     return aBigIndex - bBigIndex;
   });
+
+
   return (
     <div
-      ref={mergeRefs(dropRef, parentRef)}
-      className="relative mt-3 h-[90%] overflow-auto"
+      ref={mergeRefs(dropRef, parentRef,containerRef)}
+      className="relative mt-3 h-[90%] overflow-auto "
     >
-      {rows.map((row, i) => (
+      {rows.map((row, i) => {
+          const rowTime = formatTime(row);
+          const dateRangeforBgChanger = rowTime >= settings.dayStart && rowTime <= settings.dayEnd;
+
+        return (
         <div key={i} className="relative">
+        
           <div
             className={cn(
-              "absolute -top-[37.5px] flex h-full w-[100px] items-center justify-center text-[19px] text-[#797979]",
-              i === 0 && "-top-5 font-bold",
+              "absolute -top-[37.5px] flex h-full w-[100px] items-center justify-center text-[19px]",
+              i === 0 && "-top-5 "
             )}
+            style={{
+              color: rowTime >= settings.dayStart && rowTime <= settings.dayEnd
+                ? "#d1d1e0"
+                : "#7575a3",
+            }}
           >
             {row}
           </div>
@@ -285,14 +329,17 @@ export default function Day({
             }}
             disabled={i === 0}
             style={{
-              backgroundColor: draggedOverRow === i ? "#c4c4c4" : "white",
+              backgroundColor: draggedOverRow === i ? "#c4c4c4" : dateRangeforBgChanger ? " #f2f2f2	": "white",
               width: "calc(100% - 85px)",
+             
             }}
           >
             {/* Row heading */}
           </button>
         </div>
-      ))}
+       );
+       
+       })}
 
       {/* Tasks */}
       {events.map((event, index) => {
