@@ -1,12 +1,12 @@
+import SelectCategory from "@/components/Lists/SelectCategory";
+import { SelectTags } from "@/components/Lists/SelectTags";
+import { useEstimateCreateStore } from "@/stores/estimate-create";
+import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useListsStore } from "@/stores/lists";
 import { Category, Tag } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { useEstimatePopupStore } from "@/stores/estimate-popup";
-import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { newLabor } from "./actions/newLabor";
 import Close from "./CloseEstimate";
-import { SelectTags } from "@/components/Lists/SelectTags";
-import SelectCategory from "@/components/Lists/SelectCategory";
 
 export default function LaborCreate() {
   const { categories } = useListsStore();
@@ -23,6 +23,9 @@ export default function LaborCreate() {
   const { close, data } = useEstimatePopupStore();
   const itemId = data?.itemId;
 
+  const [tagsOpen, setTagsOpen] = useState(false);
+  const [categoryOpen, setCategoryOpen] = useState(false);
+
   useEffect(() => {
     if (currentSelectedCategoryId) {
       setCategory(
@@ -30,6 +33,13 @@ export default function LaborCreate() {
       );
     }
   }, [currentSelectedCategoryId]);
+
+  useEffect(() => {
+    setTagsOpen(false);
+  }, [categoryOpen]);
+  useEffect(() => {
+    setCategoryOpen(false);
+  }, [tagsOpen]);
 
   useEffect(() => {
     if (data?.labor && data.edit) {
@@ -150,6 +160,8 @@ export default function LaborCreate() {
         onCategoryChange={setCategory}
         labelPosition="left"
         categoryData={category}
+        categoryOpen={categoryOpen}
+        setCategoryOpen={setCategoryOpen}
       />
 
       <div className="flex items-center gap-2">
@@ -157,7 +169,11 @@ export default function LaborCreate() {
           Tags
         </label>
         <div className="w-full">
-          <SelectTags value={tags} setValue={setTags} />
+          <SelectTags
+            value={tags}
+            setValue={setTags}
+            openStates={[tagsOpen, setTagsOpen]}
+          />
         </div>
       </div>
 

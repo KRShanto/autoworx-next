@@ -261,8 +261,7 @@ export default function MaterialCreate() {
           <SelectTags
             value={tags}
             setValue={setTags}
-            open={tagsOpen}
-            setOpen={setTagsOpen}
+            openStates={[tagsOpen, setTagsOpen]}
           />
         </div>
       </div>

@@ -5,7 +5,7 @@ import { INVOICE_COLORS } from "@/lib/consts";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
 import { Tag } from "@prisma/client";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FaChevronUp, FaSearch } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa6";
 import { HiXCircle } from "react-icons/hi2";
@@ -26,19 +26,58 @@ export function SelectTags({
   name = "tagIds",
   value = [],
   setValue,
-  open,
-  setOpen,
+  dropdownsOpen = {},
+  setDropdownsOpen,
+  index = [-1, -1],
+  type,
+  openStates,
 }: SelectProps<Tag[]>) {
   const state = useState(value);
   const [tags, setTags] = setValue ? [value, setValue] : state;
   const tagIds = useMemo(() => new Set(tags.map((x) => x.id)), [tags]);
   const tagList = useListsStore((x) => x.tags);
-  // const [open, setOpen] = useState(false);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [open, setOpen] = openStates || useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
-
+  useEffect(() => {
+    if (type) {
+      if (
+        dropdownsOpen[type][0] === index[0] &&
+        dropdownsOpen[type][1] === index[1]
+      ) {
+        setOpen(true);
+      } else {
+        setOpen(false);
+      }
+    }
+  }, [dropdownsOpen]);
   return (
-    <>
+    <div
+      onClick={() => {
+        if (setDropdownsOpen) {
+          if (
+            type &&
+            dropdownsOpen[type][0] === index[0] &&
+            dropdownsOpen[type][1] === index[1]
+          ) {
+            setDropdownsOpen({
+              SERVICE: [-1, -1],
+              MATERIAL: [-1, -1],
+              LABOR: [-1, -1],
+              TAG: [-1, -1],
+            });
+          } else {
+            setDropdownsOpen({
+              SERVICE: type === "SERVICE" ? [...index] : -1,
+              MATERIAL: type === "MATERIAL" ? [...index] : -1,
+              LABOR: type === "LABOR" ? [...index] : -1,
+              TAG: type === "TAG" ? [...index] : -1,
+            });
+          }
+        }
+      }}
+    >
       <input
         type="hidden"
         name={name}
@@ -47,7 +86,7 @@ export function SelectTags({
       <DropdownMenu
         open={open}
         onOpenChange={(open) => {
-          !open && setOpen && setOpen(open);
+          // !open && setOpen && setOpen(open);
         }}
       >
         {tags.map((tag, i) => (
@@ -152,7 +191,7 @@ export function SelectTags({
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-    </>
+    </div>
   );
 }
 
