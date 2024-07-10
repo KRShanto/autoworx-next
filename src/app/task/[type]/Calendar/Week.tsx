@@ -247,10 +247,39 @@ export default function Week({
       }
     }
   }
+  const sortedEvents = events.slice().sort((a, b) => {
+    const aRowStartIndex = a.rowStartIndex;
+    const aRowEndIndex = a.rowEndIndex;
+    const aBigIndex = aRowEndIndex - aRowStartIndex;
+    const bRowStartIndex = b.rowStartIndex;
+    const bRowEndIndex = b.rowEndIndex;
+    const bBigIndex = bRowEndIndex - bRowStartIndex;
+    if (a.type === "appointment" && b.type !== "appointment") {
+      return -1;
+    }
+    if (a.type !== "appointment" && b.type === "appointment") {
+      return 1;
+    }
+    if (a.type === "appointment" && b.type === "appointment") {
+      return bBigIndex - aBigIndex;
+    }
+
+    return aBigIndex - bBigIndex;
+  });
+
+  // function calculateLeftPosition(taskIndex: number, tasksInRowLength: number) {
+  //   if (parentRef.current) {
+  //     const parentWidth = parentRef.current.offsetWidth;
+  //     const distributionPercentage = (90 / tasksInRowLength) * taskIndex;
+  //     const shiftPercentage = (110 / parentWidth) * 100;
+  //     return `calc(${distributionPercentage}% + ${shiftPercentage}%)`;
+  //   }
+  //   return "0%"; // Default fallback
+  // }
   return (
     <>
       <div
-        className="relative mt-3 h-[90%] overflow-auto border border-b border-l border-t border-neutral-200"
+        className="relative mt-3 h-[90%] overflow-auto border-neutral-200"
         // style={{
         //   backgroundColor: isOver ? "rgba(0, 0, 0, 0.1)" : "transparent",
         // }}
@@ -259,8 +288,8 @@ export default function Week({
         {rows.map((row: any, rowIndex: number) => (
           <div
             className={cn(
-              "flex h-[45px] overflow-hidden border-neutral-200",
-              rowIndex !== rows.length - 1 && "border-b",
+              "flex justify-end h-[71px] border-neutral-200 relative",
+              rowIndex !== rows.length - 1 && "",
             )}
             key={rowIndex}
           >
@@ -276,9 +305,12 @@ export default function Week({
                   ? "font-bold text-[19px] max-[1600px]:text-[15px]"
                   : "text-[17px] max-[1600px]:text-[13px]";
               const cellClasses = cn(
-                "border-r border-neutral-200 h-full text-[#797979] flex justify-center items-center",
+                "border-r border-neutral-200 h-full text-[#797979] flex justify-center items-center border-b ",
                 cellWidth,
                 fontSize,
+                columnIndex === 0 && 'border-0 absolute left-0 p-2 text-end -top-[35.5px] justify-end pr-3',
+                columnIndex === 1 && 'border-l',
+                rowIndex === 0 && 'border-t',
               );
 
               function handleClick() {
@@ -315,7 +347,7 @@ export default function Week({
                         : "transparent",
                   }}
                 >
-                  {column}
+                  {rows[rowIndex][columnIndex].includes('All Day')  ? '' : column}
                 </button>
               );
             })}
@@ -325,26 +357,46 @@ export default function Week({
         {events.map((event, index) => {
           // left according to the cell width
           const left = `calc(10% + 12.9% * ${event.columnIndex})`;
-          let top = `${45 * event.rowStartIndex + 45}px`;
+          let top = `${71 * event.rowStartIndex + 71}px`;
           // if the previous task starts at the same time as this task
           // then move this task down
           if (
             index > 0 &&
             event.rowStartIndex === events[index - 1].rowStartIndex
           ) {
-            top = `${45 * event.rowStartIndex + 45 + 20}px`;
+            top = `${71 * event.rowStartIndex + 71 + 20}px`;
           }
           const height = `${
-            45 * (event.rowEndIndex - event.rowStartIndex + 1)
+            71 * (event.rowEndIndex - event.rowStartIndex + 1)
           }px`;
           // width according to the cell width
-          const width = "11.9%"; // prev = 12.9%
+          let width = "22px"; // prev = 12.9%
           // @ts-ignore
           const backgroundColor = event.priority
             ? // @ts-ignore
               TASK_COLOR[event.priority]
-            : "rgb(100, 116, 139)";
-
+            : "#FAF9F6";
+          // Calculate how many tasks are in the same row
+        //TODO:
+        const eventStartTime = moment(event.startTime, "HH:mm");
+        const eventEndTime = moment(event.endTime, "HH:mm");
+        // sort by big indexes
+        const tasksInRow = sortedEvents.filter((task) => {
+          const taskStartTime = moment(task.startTime, "HH:mm");
+          const taskEndTime = moment(task.endTime, "HH:mm");
+          if (
+            event.rowStartIndex === task.rowStartIndex ||
+            (eventStartTime.isBefore(taskEndTime) &&
+              eventEndTime.isAfter(taskStartTime))
+          ) {
+            return true;
+          }
+        });
+          const taskIndex = tasksInRow.findIndex((task) => task.id === event.id);
+          console.log({taskIndex});
+          // if (tasksInRow.length > 2) {
+          //   width = `${12.9 / tasksInRow.length}%`;
+          // }
           // Define a function to truncate the task title based on the height
           const truncateTitle = (title: string, maxLength: number) => {
             return title.length > maxLength
@@ -386,9 +438,18 @@ export default function Week({
                   settings,
                 }}
               >
-                <p className="z-30 p-1 text-[17px] text-white max-[1600px]:text-[12px]">
+                {/* <p className="z-30 p-1 text-[17px] text-white max-[1600px]:text-[12px]">
                   {truncateTitle(event.title, maxTitleLength)}
-                </p>
+                </p> */}
+                {
+                <>
+                    {event.type === "appointment" && (
+                      <div className="flex h-full flex-col items-start">
+                        <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 rounded-lg border bg-[#6571FF]"></div>
+                      </div>
+                    )}
+                </>
+              }
               </DraggableTaskTooltip>
               <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
                 {event.type === "appointment" ? (

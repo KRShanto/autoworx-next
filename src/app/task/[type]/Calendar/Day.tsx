@@ -214,7 +214,7 @@ export default function Day({
     }
   }
 
-  //scrolling till settings.dAyStart hour
+  //scrolling till settings.dayStart
   const containerRef = useRef<any>(null);
 
   useEffect(() => {
