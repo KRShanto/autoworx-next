@@ -56,6 +56,8 @@ export default function UpdateTask() {
   }
 
   function onChange(e: any) {
+    if (!e) return;
+
     const [start, end] = e;
     setTime({
       startTime: start?.format("HH:mm"),
@@ -107,6 +109,7 @@ export default function UpdateTask() {
                 dayjs(time.startTime, "HH:mm"),
                 dayjs(time.endTime, "HH:mm"),
               ]}
+              needConfirm={false}
             />
           </div>
 

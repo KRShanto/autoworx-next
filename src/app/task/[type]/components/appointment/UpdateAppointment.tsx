@@ -17,6 +17,7 @@ import { cn } from "@/lib/cn";
 import { useListsStore } from "@/stores/lists";
 import { usePopupStore } from "@/stores/popup";
 import { AppointmentFull } from "@/types/db";
+import dayjs from "dayjs";
 import type {
   CalendarSettings,
   Customer,
@@ -42,6 +43,7 @@ import NewOrder from "./NewOrder";
 import { Reminder } from "./Reminder";
 import Selector from "@/components/Selector";
 import { deleteAppointment } from "../../actions/deleteAppointment";
+import { TimePicker } from "antd";
 
 enum Tab {
   Schedule = 0,
@@ -136,6 +138,14 @@ export function UpdateAppointment() {
     }
   }, [templates]);
 
+  function onTimeChange(e: any) {
+    if (!e) return;
+
+    const [start, end] = e;
+    setStartTime(start?.format("HH:mm"));
+    setEndTime(end?.format("HH:mm"));
+  }
+
   const handleSubmit = async (data: FormData) => {
     const res = await editAppointment({
       id: appointment.id,
@@ -220,23 +230,18 @@ export function UpdateAppointment() {
                 required={false}
                 onChange={(event) => setDate(event.currentTarget.value)}
               />
-              <div className="flex grow items-center gap-1">
-                <input
-                  className={cn(slimInputClassName, "flex-auto")}
-                  type="time"
-                  name="start"
-                  value={startTime!}
-                  max={endTime!}
-                  onChange={(event) => setStartTime(event.currentTarget.value)}
-                />
-                <FaArrowRight className="shrink-0" />
-                <input
-                  className={cn(slimInputClassName, "flex-auto")}
-                  type="time"
-                  name="end"
-                  value={endTime!}
-                  min={startTime!}
-                  onChange={(event) => setEndTime(event.currentTarget.value)}
+              <div id="timer-parent">
+                <TimePicker.RangePicker
+                  id="time"
+                  onChange={onTimeChange}
+                  getPopupContainer={() =>
+                    document.getElementById("timer-parent")!
+                  }
+                  use12Hours
+                  format="h:mm a"
+                  className="rounded-md border border-gray-500 p-1 placeholder-slate-800"
+                  needConfirm={false}
+                  value={[dayjs(startTime, "HH:mm"), dayjs(endTime, "HH:mm")]}
                 />
               </div>
             </div>

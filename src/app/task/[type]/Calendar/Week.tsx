@@ -26,7 +26,11 @@ import { FaPen } from "react-icons/fa6";
 import { assignAppointmentDate } from "../actions/assignAppointmentDate";
 import { updateTask } from "../actions/dragTask";
 import DraggableTaskTooltip from "./draggable/DraggableTaskTooltip";
-import { formatDate, formatTime, updateTimeSpace } from "@/utils/taskAndActivity";
+import {
+  formatDate,
+  formatTime,
+  updateTimeSpace,
+} from "@/utils/taskAndActivity";
 import mergeRefs from "merge-refs";
 import Link from "next/link";
 
@@ -103,7 +107,7 @@ export default function Week({
   const today = week.toDate();
 
   const weekStart = settings?.weekStart || "Sunday";
-  const parentRef = useRef<HTMLDivElement>(null)
+  const parentRef = useRef<HTMLDivElement>(null);
 
   // Get the days of the week based on the weekStart
   const days = useMemo(() => {
@@ -187,7 +191,7 @@ export default function Week({
     event: React.DragEvent,
     rowIndex: number,
     columnIndex: number,
-    rowTime: string
+    rowTime: string,
   ) {
     if (rowTime === "All Day" || columnIndex === 0) return;
     const startTime = formatTime(hourlyRows[rowIndex - 1]?.[0]);
@@ -207,11 +211,11 @@ export default function Week({
       // TODO: add tag to the task
     } else if (type === "task") {
       // Get the id of the task from the dataTransfer object
-      const taskId = parseInt(
-        attributeData[1],
-      );
+      const taskId = parseInt(attributeData[1]);
       // Find the task in your state
-      const taskFoundWithoutTime = tasksWithoutTime.find((task) => task.id == taskId);
+      const taskFoundWithoutTime = tasksWithoutTime.find(
+        (task) => task.id == taskId,
+      );
       const oldTask = tasks.find((task) => task.id === taskId);
       if (taskFoundWithoutTime) {
         // Add task to database
@@ -222,30 +226,36 @@ export default function Week({
           endTime: oldTask?.endTime || endTime,
         });
       } else {
-          const { newStartTime, newEndTime} = updateTimeSpace(oldTask?.startTime as string, oldTask?.endTime as string, rowTime);
-          await updateTask({
-            id: oldTask?.id,
-            date: new Date(date),
-            startTime: newStartTime,
-            endTime: newEndTime
-          })
+        const { newStartTime, newEndTime } = updateTimeSpace(
+          oldTask?.startTime as string,
+          oldTask?.endTime as string,
+          rowTime,
+        );
+        await updateTask({
+          id: oldTask?.id,
+          date: new Date(date),
+          startTime: newStartTime,
+          endTime: newEndTime,
+        });
       }
-    } else if(type === 'appointment') {
+    } else if (type === "appointment") {
       // Get the id of the appointment from the dataTransfer object
-      const appointmentId = parseInt(
-        attributeData[1],
-      );
+      const appointmentId = parseInt(attributeData[1]);
       // Find the appointment in your state
       const oldAppointment = appointments.find(
         (appointment) => appointment.id === appointmentId,
       );
-      const { newStartTime, newEndTime} = updateTimeSpace(oldAppointment?.startTime as string, oldAppointment?.endTime as string , rowTime);
+      const { newStartTime, newEndTime } = updateTimeSpace(
+        oldAppointment?.startTime as string,
+        oldAppointment?.endTime as string,
+        rowTime,
+      );
       if (oldAppointment) {
         await assignAppointmentDate({
-            id: oldAppointment.id,
-            date,
-            startTime: newStartTime,
-            endTime: newEndTime,
+          id: oldAppointment.id,
+          date,
+          startTime: newStartTime,
+          endTime: newEndTime,
         });
       }
     }
@@ -281,7 +291,7 @@ export default function Week({
         {rows.map((row: any, rowIndex: number) => (
           <div
             className={cn(
-              "flex justify-end h-[71px] border-neutral-200 relative",
+              "relative flex h-[71px] justify-end border-neutral-200",
               rowIndex !== rows.length - 1 && "",
             )}
             key={rowIndex}
@@ -301,9 +311,10 @@ export default function Week({
                 "border-r border-neutral-200 h-full text-[#797979] flex justify-center items-center border-b ",
                 cellWidth,
                 fontSize,
-                columnIndex === 0 && 'border-0 absolute left-0 p-2 text-end -top-[35.5px] justify-end pr-3',
-                columnIndex === 1 && 'border-l',
-                rowIndex === 0 && 'border-t',
+                columnIndex === 0 &&
+                  "border-0 absolute left-0 p-2 text-end -top-[35.5px] justify-end pr-3",
+                columnIndex === 1 && "border-l",
+                rowIndex === 0 && "border-t",
               );
 
               function handleClick() {
@@ -340,7 +351,9 @@ export default function Week({
                         : "transparent",
                   }}
                 >
-                  {rows[rowIndex][columnIndex].includes('All Day')  ? '' : column}
+                  {rows[rowIndex][columnIndex].includes("All Day")
+                    ? ""
+                    : column}
                 </button>
               );
             })}
@@ -390,7 +403,7 @@ export default function Week({
           const limitOfTasks = 5
           const taskIndex = tasksInRow.findIndex((task) => task.id === event.id);
           const diffByMinutes = eventEndTime.diff(eventStartTime, "minutes");
-          const height = `${(diffByMinutes / 60) * 71}px`;  
+          const height = `${(diffByMinutes / 60) * 71}px`;
           if (taskIndex) {
             left = `calc(10% + 12.9% * ${event.columnIndex} + ${taskIndex * 2}%)`;
           }

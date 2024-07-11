@@ -394,7 +394,7 @@ export default function Month({
               {/* check if either tasks or appointments are present */}
               {(cell[1]?.length || cell[2]?.length) && (
                 <TooltipContent>
-                  <div className="w-[350px]">
+                  <div className="max-h-[350px] w-[350px] overflow-y-scroll">
                     <h3 className="text-lg font-bold">Tasks</h3>
                     <div className="flex flex-col gap-1">
                       {cell[1]?.map((task: CalendarTask, i: number) => (

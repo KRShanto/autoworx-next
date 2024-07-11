@@ -65,7 +65,6 @@ export default function Day({
   settings: CalendarSettings;
   templates: EmailTemplate[];
 }) {
-
   const rows: string[] = [];
 
   rows.push(
@@ -153,7 +152,6 @@ export default function Day({
   async function handleDrop(event: React.DragEvent, rowIndex: number) {
     const startTime = formatTime(rows[rowIndex]);
     const endTime = formatTime(rows[rowIndex + 1]);
-    const date = new Date().toISOString();
 
     // Get the task type
     const attributeData = event.dataTransfer.getData("text/plain").split("|");
@@ -220,16 +218,16 @@ export default function Day({
   useEffect(() => {
     const scrollToStartTime = () => {
       if (containerRef.current) {
-        const startTimeIndex = rows.findIndex(row => {
+        const startTimeIndex = rows.findIndex((row) => {
           const rowTime = formatTime(row);
           return rowTime === settings?.dayStart;
         });
 
         if (startTimeIndex !== -1) {
-          const scrollPosition = startTimeIndex * 75; 
+          const scrollPosition = startTimeIndex * 75;
           containerRef.current.scrollTo({
             top: scrollPosition,
-            behavior: 'smooth',
+            behavior: "smooth",
           });
         }
       }
@@ -280,66 +278,69 @@ export default function Day({
     return aBigIndex - bBigIndex;
   });
 
-
   return (
     <div
-      ref={mergeRefs(dropRef, parentRef,containerRef)}
-      className="relative mt-3 h-[90%] overflow-auto "
+      ref={mergeRefs(dropRef, parentRef, containerRef)}
+      className="relative mt-3 h-[90%] overflow-auto"
     >
       {rows.map((row, i) => {
-          const rowTime = formatTime(row);
-          const dateRangeforBgChanger = rowTime >= settings?.dayStart && rowTime <= settings?.dayEnd;
+        const rowTime = formatTime(row);
+        const dateRangeforBgChanger =
+          rowTime >= settings?.dayStart && rowTime <= settings?.dayEnd;
 
         return (
-        <div key={i} className="relative">
-        
-          <div
-            className={cn(
-              "absolute -top-[37.5px] flex h-full w-[100px] items-center justify-center text-[19px]",
-              i === 0 && "-top-5 "
-            )}
-            style={{
-              color: rowTime >= settings?.dayStart && rowTime <= settings?.dayEnd
-                ? "#d1d1e0"
-                : "#7575a3",
-            }}
-          >
-            {row}
+          <div key={i} className="relative">
+            <div
+              className={cn(
+                "absolute -top-[37.5px] flex h-full w-[100px] items-center justify-center text-[19px]",
+                i === 0 && "-top-5",
+              )}
+              style={{
+                color:
+                  rowTime >= settings?.dayStart && rowTime <= settings?.dayEnd
+                    ? "#d1d1e0"
+                    : "#7575a3",
+              }}
+            >
+              {row}
+            </div>
+            <button
+              type="button"
+              onDrop={(event: React.DragEvent) => {
+                handleDrop(event, i);
+                setDraggedOverRow(null);
+              }}
+              onDragOver={(event: React.DragEvent) => {
+                event.preventDefault();
+                setDraggedOverRow(i);
+              }}
+              onDragLeave={() => setDraggedOverRow(null)}
+              className={cn(
+                "ml-[85px] block h-[75px] border-neutral-200",
+                i !== rows.length && "border-b border-l",
+                i !== 0 ? "cursor-pointer" : "border-t",
+              )}
+              onClick={() => {
+                const date = formatDate(new Date());
+                const startTime = formatTime(row);
+                open("ADD_TASK", { date, startTime, companyUsers });
+              }}
+              disabled={i === 0}
+              style={{
+                backgroundColor:
+                  draggedOverRow === i
+                    ? "#c4c4c4"
+                    : dateRangeforBgChanger
+                      ? " #f2f2f2	"
+                      : "white",
+                width: "calc(100% - 85px)",
+              }}
+            >
+              {/* Row heading */}
+            </button>
           </div>
-          <button
-            type="button"
-            onDrop={(event: React.DragEvent) => {
-              handleDrop(event, i);
-              setDraggedOverRow(null);
-            }}
-            onDragOver={(event: React.DragEvent) => {
-              event.preventDefault();
-              setDraggedOverRow(i);
-            }}
-            onDragLeave={() => setDraggedOverRow(null)}
-            className={cn(
-              "ml-[85px] block h-[75px] border-neutral-200",
-              i !== rows.length && "border-b border-l",
-              i !== 0 ? "cursor-pointer" : "border-t",
-            )}
-            onClick={() => {
-              const date = formatDate(new Date());
-              const startTime = formatTime(row);
-              open("ADD_TASK", { date, startTime, companyUsers });
-            }}
-            disabled={i === 0}
-            style={{
-              backgroundColor: draggedOverRow === i ? "#c4c4c4" : dateRangeforBgChanger ? " #f2f2f2	": "white",
-              width: "calc(100% - 85px)",
-             
-            }}
-          >
-            {/* Row heading */}
-          </button>
-        </div>
-       );
-       
-       })}
+        );
+      })}
 
       {/* Tasks */}
       {events.map((event, index) => {
@@ -425,10 +426,12 @@ export default function Day({
               {
                 <>
                   {event.type === "appointment" ? (
-                    <div className="flex h-full flex-col items-start">
+                    <div className="flex h-full flex-col items-start text-xs">
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
-                          <h3 className="font-semibold">{event.title}</h3>
+                          <h3 className="text-sm font-semibold">
+                            {event.title}
+                          </h3>
                         </div>
                         <p className="text-left">
                           Client:{" "}
@@ -456,52 +459,8 @@ export default function Day({
                 </>
               }
             </DraggableTaskTooltip>
-            <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
-              {event.type === "appointment" ? (
-                <div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold">{event.title}</h3>
-
-                    <button
-                      type="button"
-                      className="text- rounded-full bg-[#6571FF] p-2 text-white"
-                      onClick={() =>
-                        open("UPDATE_APPOINTMENT", {
-                          appointment: appointmentsFull.find(
-                            (appointment) => appointment.id === event.id,
-                          ),
-                          employees: companyUsers,
-                          customers,
-                          vehicles,
-                          orders,
-                          templates,
-                          settings,
-                        })
-                      }
-                    >
-                      <FaPen className="mx-auto text-[10px]" />
-                    </button>
-                  </div>
-
-                  <p>
-                    Client:
-                    {event.customer &&
-                      `${event.customer.firstName} ${event.customer.lastName}`}
-                  </p>
-
-                  <p>
-                    Assigned To:{" "}
-                    {event.assignedUsers
-                      .slice(0, 1)
-                      .map((user: User) => user.name)}
-                  </p>
-
-                  <p>
-                    {moment(event.startTime, "HH:mm").format("hh:mm A")} To{" "}
-                    {moment(event.endTime, "HH:mm").format("hh:mm A")}
-                  </p>
-                </div>
-              ) : (
+            {event.type !== "appointment" && (
+              <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
                 <div>
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold">{event.title}</h3>
@@ -526,8 +485,8 @@ export default function Day({
                   {/* @ts-ignore */}
                   <p className="mt-3">Task Priority: {event.priority}</p>
                 </div>
-              )}
-            </TooltipContent>
+              </TooltipContent>
+            )}
           </Tooltip>
         );
       })}

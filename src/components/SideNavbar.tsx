@@ -100,12 +100,14 @@ export default function SideNavbar() {
     <TooltipProvider delayDuration={500}>
       <nav className="fixed z-10 flex h-screen w-[5%] flex-col items-center gap-8 overflow-y-auto bg-[#0C1427] px-2 py-12">
         {/* logo */}
-        <Image
-          src="/icons/Logo.png"
-          alt="Company Logo"
-          width={40}
-          height={40}
-        />
+        <Link href="/">
+          <Image
+            src="/icons/Logo.png"
+            alt="Company Logo"
+            width={40}
+            height={40}
+          />
+        </Link>
 
         {/* Links */}
         <div className="mb-auto mt-16 flex flex-col items-center gap-4">
