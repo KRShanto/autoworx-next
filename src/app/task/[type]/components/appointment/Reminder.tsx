@@ -25,6 +25,10 @@ export function Reminder({
   setConfirmationTemplateStatus,
   reminderTemplateStatus,
   setReminderTemplateStatus,
+  openConfirmation,
+  openReminder,
+  setOpenReminder,
+  setOpenConfirmation,
 }: {
   client: Customer | null;
   vehicle: Vehicle | null;
@@ -44,13 +48,14 @@ export function Reminder({
   setConfirmationTemplateStatus: (status: boolean) => void;
   reminderTemplateStatus: boolean;
   setReminderTemplateStatus: (status: boolean) => void;
+  openConfirmation: boolean;
+  openReminder: boolean;
+  setOpenReminder: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [time, setTime] = useState<string>("");
   const [dateInput, setDateInput] = useState<string>("");
   const templates = useListsStore((x) => x.templates);
-
-  const [openConfirmation, setOpenConfirmation] = useState(false);
-  const [openReminder, setOpenReminder] = useState(false);
 
   useEffect(() => {
     setOpenConfirmation(false);
