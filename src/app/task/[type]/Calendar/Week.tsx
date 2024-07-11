@@ -42,13 +42,7 @@ function useWeek() {
 
 // Generate the hourly rows
 const hourlyRows = Array.from({ length: 24 }, (_, i) => [
-  i < 11
-    ? `${i + 1} AM`
-    : i === 11
-      ? "12 PM"
-      : i < 23
-        ? `${i - 11} PM`
-        : "12 AM",
+  `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
   // empty cells
   ...Array.from({ length: 7 }, () => ""),
 ]);
@@ -134,12 +128,25 @@ export default function Week({
 
   // Generate the all-day row
   const allDayRow = [
-    "All Day",
+    "",
     // Generate the days of the week with the date
     ...Array.from({ length: 7 }, (_, i) => {
       const date = new Date(today);
       date.setDate(today.getDate() - today.getDay() + i);
-      return `${days[date.getDay()]} ${date.getDate()}`;
+      return (
+        <div
+          key={i}
+          className="flex flex-col items-center justify-center text-sm"
+        >
+          <span className="text-[17px] font-semibold">
+            {days[date.getDay()]}
+          </span>
+          <div className="space-x-1 text-sm font-normal">
+            <span>{date.getDate()}</span>
+            <span>{date.toLocaleDateString("en-US", { month: "short" })}</span>
+          </div>
+        </div>
+      );
     }),
   ];
 
@@ -357,9 +364,7 @@ export default function Week({
                         : "transparent",
                   }}
                 >
-                  {rows[rowIndex][columnIndex].includes("All Day")
-                    ? ""
-                    : column}
+                  {column}
                 </button>
               );
             })}
@@ -461,7 +466,7 @@ export default function Week({
                   {
                     <>
                       {event.type === "appointment" && (
-                        <div className="flex h-full flex-col items-start">
+                        <div className="flex h-full flex-col items-start rounded-lg border border-gray-400">
                           <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 rounded-lg border bg-[#6571FF]"></div>
                         </div>
                       )}
@@ -550,11 +555,11 @@ export default function Week({
                 href={`/task/day?date=${formatDate(new Date(event.date as Date))}`}
                 className={cn(
                   `absolute top-0 flex items-center justify-center rounded-lg border`,
-                  taskIndex === limitOfTasks && "z-40 bg-opacity-25",
+                  taskIndex === limitOfTasks && "bg-opacity-25",
                   lastIndex === taskIndex && "z-40",
                 )}
                 style={{
-                  left: `calc(10% + 23% * ${event.columnIndex})`,
+                  left: `calc(10% + 12.9% * ${event.columnIndex} + 170px)`,
                   top,
                   height,
                   backgroundColor: "rgb(0, 0, 255, 0.2)",
