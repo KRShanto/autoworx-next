@@ -17,7 +17,7 @@ import type {
 import type {
   CalendarSettings,
   Customer,
-  EmailTemplate,
+  EmailTemplate, 
   Order,
   Task,
   User,
@@ -72,57 +72,45 @@ export default function Month({
   }) as [{ canDrop: boolean; isOver: boolean }, any];
   const { open } = usePopupStore();
 
-  // Initialize an array to hold the dates
-  const dates: [Date, CalendarTask[], CalendarAppointment[]][] = [];
-  // Define the total number of dates to be displayed
-  const totalDates = 35;
-  // Get the current date
   const month = useMonth();
   const today = new Date();
 
-  console.log("month", month);
-  console.log("today", today);
+  // Get the start of the current month
+  const startOfMonth = moment(month).startOf("month").toDate();
+  // Get the end of the current month
+  const endOfMonth = moment(month).endOf("month").toDate();
 
-  // Get the index of today's date
-  const todayIndex = month.getDate() - month.getDay() + 1;
+  // Initialize an array to hold the dates
+  const dates: [Date | null, CalendarTask[], CalendarAppointment[]][] = [];
 
-  // Generate the dates before today
-  for (let index = 0; index < todayIndex; index++) {
-    // Calculate the date number
-    const dateNumber = month.getDate() - index - 1;
-    // Create a new date object
-    const date = new Date(month.getFullYear(), month.getMonth(), dateNumber);
-    const tasks = getTasks(date);
-    const appointments = getAppointments(date);
-    // Add the date to the dates array
-    dates.push([date, tasks, appointments]);
+  // Generate the dates to display
+  let currentDate = startOfMonth;
+  while (currentDate.getDay() !== 0) {
+    dates.push([null, [], []]); // Filling initial empty days
+    currentDate = moment(currentDate).subtract(1, "days").toDate();
+  }
+  currentDate = startOfMonth; // Reset to the start of the month
+
+  while (currentDate <= endOfMonth) {
+    const tasks = getTasks(currentDate);
+    const appointments = getAppointments(currentDate);
+    dates.push([currentDate, tasks, appointments]);
+    currentDate = moment(currentDate).add(1, "days").toDate();
   }
 
-  // Reverse the dates array to get the dates in ascending order
-  dates.reverse();
-
-  // Add today's date to the dates array
-  dates.push([month, getTasks(month), getAppointments(month)]);
-
-  // Calculate the number of dates to be generated after today
-  const rest = totalDates - todayIndex - 1;
-
-  // Generate the dates after today
-  for (let index = 0; index < rest; index++) {
-    // Calculate the date number
-    const dateNumber = month.getDate() + index + 1;
-    // Create a new date object
-    const date = new Date(month.getFullYear(), month.getMonth(), dateNumber);
-    // Add the date to the dates array
-    dates.push([date, getTasks(date), getAppointments(date)]);
+  while (dates.length % 7 !== 0) {
+    dates.push([null, [], []]); // Filling remaining empty days
   }
 
+  while (dates.length < 35) {
+    dates.push([null, [], []]); // Ensure 5 rows of 7 days means 35 days
+  }
   function getTasks(date: Date) {
     return tasks.filter(
       (task) =>
         new Date(task.date).getFullYear() === date.getFullYear() &&
         new Date(task.date).getMonth() === date.getMonth() &&
-        new Date(task.date).getDate() === date.getDate(),
+        new Date(task.date).getDate() === date.getDate()
     );
   }
 
@@ -131,7 +119,7 @@ export default function Month({
       (appointment) =>
         new Date(appointment.date!).getFullYear() === date.getFullYear() &&
         new Date(appointment.date!).getMonth() === date.getMonth() &&
-        new Date(appointment.date!).getDate() === date.getDate(),
+        new Date(appointment.date!).getDate() === date.getDate()
     );
   }
 
@@ -145,6 +133,7 @@ export default function Month({
     "Saturday",
     ...dates,
   ];
+
 
   async function handleDrop(event: React.DragEvent, date: string) {
     // 10 am
@@ -162,7 +151,7 @@ export default function Month({
     } else if (type === "task") {
       // Get the id of the task from the dataTransfer object
       const taskId = parseInt(
-        event.dataTransfer.getData("text/plain").split("|")[1],
+        event.dataTransfer.getData("text/plain").split("|")[1]
       );
 
       // Find the task in your state
@@ -180,12 +169,12 @@ export default function Month({
     } else {
       // Get the id of the appointment from the dataTransfer object
       const appointmentId = parseInt(
-        event.dataTransfer.getData("text/plain").split("|")[1],
+        event.dataTransfer.getData("text/plain").split("|")[1]
       );
 
       // Find the appointment in your state
       const appointment = appointments.find(
-        (appointment) => appointment.id == appointmentId,
+        (appointment) => appointment.id == appointmentId
       );
 
       if (appointment) {
@@ -225,176 +214,181 @@ export default function Month({
               type="button"
               className={cn(
                 "relative flex h-full flex-col items-end gap-2 border-b border-r border-neutral-200 p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
-                today.getFullYear() === cell[0].getFullYear() &&
-                  today.getMonth() === cell[0].getMonth() &&
-                  today.getDate() === cell[0].getDate()
+                today.getFullYear() === cell[0]?.getFullYear() &&
+                  today.getMonth() === cell[0]?.getMonth() &&
+                  today.getDate() === cell[0]?.getDate()
                   ? "text-[#6571FF]"
-                  : "text-[#797979]",
+                  : "text-[#797979]"
               )}
               onClick={(event) => {
                 if (
+                  cell[0] &&
                   event.target instanceof Node &&
                   event.currentTarget.contains(event.target)
                 )
                   router.push(
-                    `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`,
+                    `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`
                   );
               }}
               onDrop={(event) =>
-                handleDrop(event, moment(cell[0]).format("YYYY-MM-DD"))
+                handleDrop(event, cell[0] ? moment(cell[0]).format("YYYY-MM-DD") : "")
               }
               onDragOver={(event) => event.preventDefault()}
             >
-              {cell[0].getDate()}
+              {cell[0]?.getDate() || ""}
 
-              <div className="absolute left-2 right-8 top-2 flex max-h-[calc(100%-3rem)] flex-col gap-1">
-                {cell[2]
-                  .slice(0, 1)
-                  .map((appointment: CalendarAppointment, i: number) => {
-                    const moreLeft = cell[2].length - 1;
+              {cell[0] && (
+                <div className="absolute left-2 right-8 top-2 flex max-h-[calc(100%-3rem)] flex-col gap-1">
+                  {cell[2]
+                    .slice(0, 1)
+                    .map((appointment: CalendarAppointment, i: number) => {
+                      const moreLeft = cell[2].length - 1;
 
-                    return (
-                      <Tooltip key={i}>
-                        <TooltipTrigger asChild>
-                          <div className="h-10 max-h-10 rounded border text-sm text-slate-500">
-                            {appointment.title
-                              .slice(0, 20)
-                              .concat(
-                                appointment.title.length > 20 ? "..." : "",
-                              )}
-                          </div>
-                        </TooltipTrigger>
-
-                        {moreLeft > 0 && (
-                          <button
-                            className="text-left text-xs font-normal text-slate-500"
-                            onClick={(event) => {
-                              if (
-                                event.target instanceof Node &&
-                                event.currentTarget.contains(event.target)
-                              )
-                                router.push(
-                                  `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`,
-                                );
-                            }}
-                          >
-                            +{moreLeft} more...
-                          </button>
-                        )}
-
-                        <TooltipPortal>
-                          <TooltipContent>
-                            <div className="w-[300px] rounded-lg bg-white p-3">
-                              <div className="flex items-center justify-between">
-                                <h3 className="font-semibold">
-                                  {appointment.title}
-                                </h3>
-
-                                <button
-                                  type="button"
-                                  className="text- rounded-full bg-[#6571FF] p-2 text-white"
-                                  onClick={() =>
-                                    open("UPDATE_APPOINTMENT", {
-                                      appointment: appointmentsFull.find(
-                                        (appointment) =>
-                                          appointment.id === appointment.id,
-                                      ),
-                                      employees: companyUsers,
-                                      customers,
-                                      vehicles,
-                                      orders,
-                                      templates,
-                                      settings,
-                                    })
-                                  }
-                                >
-                                  <FaPen className="mx-auto text-[10px]" />
-                                </button>
-                              </div>
-
-                              <p>
-                                Client: {appointment.customer?.firstName}{" "}
-                                {appointment.customer?.lastName}
-                              </p>
-
-                              <p>
-                                Assigned To:{" "}
-                                {appointment.assignedUsers
-                                  .slice(0, 1)
-                                  .map((user: User) => user.name)}
-                              </p>
-
-                              <p>
-                                {moment(appointment.startTime, "HH:mm").format(
-                                  "hh:mm A",
-                                )}{" "}
-                                To{" "}
-                                {moment(appointment.endTime, "HH:mm").format(
-                                  "hh:mm A",
-                                )}
-                              </p>
+                      return (
+                        <Tooltip key={i}>
+                          <TooltipTrigger asChild>
+                            <div className="h-10 max-h-10 rounded border text-sm text-slate-500">
+                              {appointment.title}
                             </div>
-                          </TooltipContent>
-                        </TooltipPortal>
-                      </Tooltip>
-                    );
-                  })}
-                {cell[1]?.slice(0, 3).map((task: CalendarTask, i: number) => (
-                  <Tooltip key={i}>
-                    <TooltipTrigger asChild>
-                      <div
-                        className="h-2 max-h-[33.33%] rounded"
-                        style={{
-                          backgroundColor: TASK_COLOR[task.priority],
-                        }}
-                      />
-                    </TooltipTrigger>
-                    <TooltipPortal>
-                      <TooltipContent>
-                        <div className="w-[300px] rounded-lg bg-white p-3">
-                          <div className="flex items-center justify-between">
-                            <h3 className="font-semibold">{task.title}</h3>
+                          </TooltipTrigger>
 
+                          {moreLeft > 0 && (
                             <button
-                              type="button"
-                              className="text- rounded-full bg-[#6571FF] p-2 text-white"
-                              onClick={() =>
-                                open("UPDATE_TASK", {
-                                  task,
-                                  companyUsers,
-                                })
-                              }
+                              className="text-left text-xs font-normal text-slate-500"
+                              onClick={(event) => {
+                                if (
+                                  event.target instanceof Node &&
+                                  event.currentTarget.contains(event.target)
+                                )
+                                  router.push(
+                                    `/task/day?date=${moment(
+                                      cell[0]
+                                    ).format("YYYY-MM-DD")}`
+                                  );
+                              }}
                             >
-                              <FaPen className="mx-auto text-[10px]" />
+                              +{moreLeft} more...
                             </button>
+                          )}
+
+                          <TooltipPortal>
+                            <TooltipContent>
+                              <div className="w-[300px] rounded-lg bg-white p-3">
+                                <div className="flex items-center justify-between">
+                                  <h3 className="font-semibold">
+                                    {appointment.title}
+                                  </h3>
+
+                                  <button
+                                    type="button"
+                                    className="text- rounded-full bg-[#6571FF] p-2 text-white"
+                                    onClick={() =>
+                                      open("UPDATE_APPOINTMENT", {
+                                        appointment: appointmentsFull.find(
+                                          (appointment) =>
+                                            appointment.id ===
+                                            appointment.id
+                                        ),
+                                        employees: companyUsers,
+                                        customers,
+                                        vehicles,
+                                        orders,
+                                        templates,
+                                        settings,
+                                      })
+                                    }
+                                  >
+                                    <FaPen className="mx-auto text-[10px]" />
+                                  </button>
+                                </div>
+
+                                <p>
+                                  Client: {appointment.customer?.firstName}{" "}
+                                  {appointment.customer?.lastName}
+                                </p>
+
+                                <p>
+                                  Assigned To:{" "}
+                                  {appointment.assignedUsers
+                                    .slice(0, 1)
+                                    .map((user: User) => user.name)}
+                                </p>
+
+                                <p>
+                                  {moment(
+                                    appointment.startTime,
+                                    "HH:mm"
+                                  ).format("hh:mm A")}{" "}
+                                  To{" "}
+                                  {moment(appointment.endTime, "HH:mm").format(
+                                    "hh:mm A"
+                                  )}
+                                </p>
+                              </div>
+                            </TooltipContent>
+                          </TooltipPortal>
+                        </Tooltip>
+                      );
+                    })}
+                  {cell[1]?.slice(0, 3).map((task: CalendarTask, i: number) => (
+                    <Tooltip key={i}>
+                      <TooltipTrigger asChild>
+                        <div
+                          className="h-2 max-h-[33.33%] rounded"
+                          style={{
+                            backgroundColor: TASK_COLOR[task.priority],
+                          }}
+                        />
+                      </TooltipTrigger>
+                      <TooltipPortal>
+                        <TooltipContent>
+                          <div className="w-[300px] rounded-lg bg-white p-3">
+                            <div className="flex items-center justify-between">
+                              <h3 className="font-semibold">{task.title}</h3>
+
+                              <button
+                                type="button"
+                                className="text- rounded-full bg-[#6571FF] p-2 text-white"
+                                onClick={() =>
+                                  open("UPDATE_TASK", {
+                                    task,
+                                    companyUsers,
+                                  })
+                                }
+                              >
+                                <FaPen className="mx-auto text-[10px]" />
+                              </button>
+                            </div>
+
+                            <p className="mt-3">{task.description}</p>
+
+                            <p className="mt-3">Task Priority: {task.priority}</p>
                           </div>
+                        </TooltipContent>
+                      </TooltipPortal>
+                    </Tooltip>
+                  ))}
 
-                          <p className="mt-3">{task.description}</p>
-
-                          <p className="mt-3">Task Priority: {task.priority}</p>
-                        </div>
-                      </TooltipContent>
-                    </TooltipPortal>
-                  </Tooltip>
-                ))}
-
-                {cell[1]?.length > 3 && (
-                  <button
-                    className="absolute -bottom-6 text-left text-xs font-normal text-slate-500"
-                    onClick={(event) => {
-                      if (
-                        event.target instanceof Node &&
-                        event.currentTarget.contains(event.target)
-                      )
-                        router.push(
-                          `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`,
-                        );
-                    }}
-                  >
-                    +{cell[1].length - 3} more...
-                  </button>
-                )}
-              </div>
+                  {cell[1]?.length > 3 && (
+                    <button
+                      className="absolute -bottom-6 text-left text-xs font-normal text-slate-500"
+                      onClick={(event) => {
+                        if (
+                          event.target instanceof Node &&
+                          event.currentTarget.contains(event.target)
+                        )
+                          router.push(
+                            `/task/day?date=${moment(cell[0]).format(
+                              "YYYY-MM-DD"
+                            )}`
+                          );
+                      }}
+                    >
+                      +{cell[1].length - 3} more...
+                    </button>
+                  )}
+                </div>
+              )}
             </TooltipTrigger>
 
             <TooltipPortal>
@@ -427,7 +421,7 @@ export default function Month({
                           >
                             <p>{appointment.title}</p>
                           </div>
-                        ),
+                        )
                       )}
                     </div>
                   </div>
