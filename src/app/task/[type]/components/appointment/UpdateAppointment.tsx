@@ -11,13 +11,13 @@ import {
 import FormError from "@/components/FormError";
 import { SelectClient } from "@/components/Lists/SelectClient";
 import { SelectVehicle } from "@/components/Lists/SelectVehicle";
+import Selector from "@/components/Selector";
 import { SlimInput, slimInputClassName } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { cn } from "@/lib/cn";
 import { useListsStore } from "@/stores/lists";
 import { usePopupStore } from "@/stores/popup";
 import { AppointmentFull } from "@/types/db";
-import dayjs from "dayjs";
 import type {
   CalendarSettings,
   Customer,
@@ -26,6 +26,8 @@ import type {
   User,
   Vehicle,
 } from "@prisma/client";
+import { TimePicker } from "antd";
+import dayjs from "dayjs";
 import moment from "moment";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -38,12 +40,10 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import { TbBell, TbCalendar } from "react-icons/tb";
+import { deleteAppointment } from "../../actions/deleteAppointment";
 import { editAppointment } from "../../actions/editAppointment";
 import NewOrder from "./NewOrder";
 import { Reminder } from "./Reminder";
-import Selector from "@/components/Selector";
-import { deleteAppointment } from "../../actions/deleteAppointment";
-import { TimePicker } from "antd";
 
 enum Tab {
   Schedule = 0,
@@ -110,6 +110,13 @@ export function UpdateAppointment() {
 
   const [orderOpen, setOrderOpen] = useState(false);
 
+  //dropdown states
+  const [clientOpenDropdown, setClientOpenDropdown] = useState(false);
+  const [vehicleOpenDropdown, setVehicleOpenDropdown] = useState(false);
+
+  const [openConfirmation, setOpenConfirmation] = useState(false);
+  const [openReminder, setOpenReminder] = useState(false);
+
   const handleSearch = (search: string) => {
     setEmployeesToDisplay(
       employees.filter((employee) =>
@@ -169,7 +176,61 @@ export function UpdateAppointment() {
 
     close();
   };
-
+  useEffect(() => {
+    if (
+      clientOpenDropdown &&
+      (vehicleOpenDropdown || orderOpen || openConfirmation || openReminder)
+    ) {
+      setVehicleOpenDropdown(false);
+      setOrderOpen(false);
+      setOpenConfirmation(false);
+      setOpenReminder(false);
+    } else if (
+      vehicleOpenDropdown &&
+      (clientOpenDropdown || orderOpen || openConfirmation || openReminder)
+    ) {
+      setClientOpenDropdown(false);
+      setOrderOpen(false);
+      setOpenConfirmation(false);
+      setOpenReminder(false);
+    } else if (
+      orderOpen &&
+      (clientOpenDropdown ||
+        vehicleOpenDropdown ||
+        openConfirmation ||
+        openReminder)
+    ) {
+      setClientOpenDropdown(false);
+      setVehicleOpenDropdown(false);
+      setOpenConfirmation(false);
+      setOpenReminder(false);
+    } else if (
+      openConfirmation &&
+      (clientOpenDropdown || vehicleOpenDropdown || orderOpen || openReminder)
+    ) {
+      setClientOpenDropdown(false);
+      setVehicleOpenDropdown(false);
+      setOrderOpen(false);
+      setOpenReminder(false);
+    } else if (
+      openReminder &&
+      (clientOpenDropdown ||
+        vehicleOpenDropdown ||
+        orderOpen ||
+        openConfirmation)
+    ) {
+      setClientOpenDropdown(false);
+      setVehicleOpenDropdown(false);
+      setOrderOpen(false);
+      setOpenConfirmation(false);
+    }
+  }, [
+    orderOpen,
+    clientOpenDropdown,
+    vehicleOpenDropdown,
+    openConfirmation,
+    openReminder,
+  ]);
   return (
     <Dialog open={popup === "UPDATE_APPOINTMENT"} onOpenChange={close}>
       <DialogContent
@@ -333,9 +394,19 @@ export function UpdateAppointment() {
           </div>
 
           <div className="row-start-2 space-y-4 bg-background p-6">
-            <SelectClient value={client} setValue={setClient} />
+            <SelectClient
+              value={client}
+              setValue={setClient}
+              openDropdown={clientOpenDropdown}
+              setOpenDropdown={setClientOpenDropdown}
+            />
 
-            <SelectVehicle value={vehicle} setValue={setVehicle} />
+            <SelectVehicle
+              value={vehicle}
+              setValue={setVehicle}
+              openDropdown={vehicleOpenDropdown}
+              setOpenDropdown={setVehicleOpenDropdown}
+            />
 
             <Selector
               label={(order: Order | null) => (order ? order.name : "Order")}
@@ -423,6 +494,10 @@ export function UpdateAppointment() {
                 setConfirmationTemplateStatus={setConfirmationTemplateStatus}
                 reminderTemplateStatus={reminderTemplateStatus}
                 setReminderTemplateStatus={setReminderTemplateStatus}
+                openConfirmation={openConfirmation}
+                openReminder={openReminder}
+                setOpenReminder={setOpenReminder}
+                setOpenConfirmation={setOpenConfirmation}
               />
             ) : null}
           </div>
