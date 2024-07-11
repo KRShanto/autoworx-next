@@ -133,17 +133,20 @@ export default function Week({
     ...Array.from({ length: 7 }, (_, i) => {
       const date = new Date(today);
       date.setDate(today.getDate() - today.getDay() + i);
-      return <div key={i} className="text-sm flex flex-col justify-center items-center">
-        <span className="font-semibold text-[17px]">
-          {days[date.getDay()]}
-        </span>
-        <div className="space-x-1 text-sm font-normal">
-          <span>
-            {date.getDate()}
+      return (
+        <div
+          key={i}
+          className="flex flex-col items-center justify-center text-sm"
+        >
+          <span className="text-[17px] font-semibold">
+            {days[date.getDay()]}
           </span>
-          <span>{date.toLocaleDateString("en-US", {month: 'short'})}</span>
+          <div className="space-x-1 text-sm font-normal">
+            <span>{date.getDate()}</span>
+            <span>{date.toLocaleDateString("en-US", { month: "short" })}</span>
+          </div>
         </div>
-      </div>;
+      );
     }),
   ];
 
@@ -390,12 +393,12 @@ export default function Week({
             ? // @ts-ignore
               TASK_COLOR[event.priority]
             : "#FAF9F6";
-            // Calculate how many tasks are in the same row
-            //TODO:
-        const eventStartTime = moment(event.startTime, "HH:mm");
-        const eventEndTime = moment(event.endTime, "HH:mm");
-        // sort by big indexes
-        const tasksInRow = sortedEvents.filter((task) => {
+          // Calculate how many tasks are in the same row
+          //TODO:
+          const eventStartTime = moment(event.startTime, "HH:mm");
+          const eventEndTime = moment(event.endTime, "HH:mm");
+          // sort by big indexes
+          const tasksInRow = sortedEvents.filter((task) => {
             if (event.columnIndex === task.columnIndex) {
               const taskStartTime = moment(task.startTime, "HH:mm");
               const taskEndTime = moment(task.endTime, "HH:mm");
@@ -406,10 +409,12 @@ export default function Week({
               ) {
                 return true;
               }
-          }
-        });
-          const limitOfTasks = 5
-          const taskIndex = tasksInRow.findIndex((task) => task.id === event.id);
+            }
+          });
+          const limitOfTasks = 5;
+          const taskIndex = tasksInRow.findIndex(
+            (task) => task.id === event.id,
+          );
           const diffByMinutes = eventEndTime.diff(eventStartTime, "minutes");
           const height = `${(diffByMinutes / 60) * 71}px`;
           if (taskIndex) {
@@ -433,7 +438,7 @@ export default function Week({
                 : event.title.length;
           if (taskIndex < limitOfTasks) {
             return (
-              <Tooltip key={event.id} >
+              <Tooltip key={event.id}>
                 <DraggableTaskTooltip
                   //@ts-ignore
                   className={`absolute top-0 rounded-lg border`}
@@ -442,7 +447,7 @@ export default function Week({
                     top,
                     height,
                     backgroundColor,
-                    width
+                    width,
                   }}
                   task={event}
                   updateTaskData={{ event, companyUsers }}
@@ -461,20 +466,19 @@ export default function Week({
                   {
                     <>
                       {event.type === "appointment" && (
-                        <div  className="flex h-full flex-col items-start border border-gray-400 rounded-lg">
-                          <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 border rounded-lg bg-[#6571FF]"></div>
+                        <div className="flex h-full flex-col items-start rounded-lg border border-gray-400">
+                          <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 rounded-lg border bg-[#6571FF]"></div>
                         </div>
                       )}
-                      
-                  </>
-                }
+                    </>
+                  }
                 </DraggableTaskTooltip>
                 <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
                   {event.type === "appointment" ? (
                     <div>
                       <div className="flex items-center justify-between">
                         <h3 className="font-semibold">{event.title}</h3>
-  
+
                         <button
                           type="button"
                           className="text- rounded-full bg-[#6571FF] p-2 text-white"
@@ -495,20 +499,20 @@ export default function Week({
                           <FaPen className="mx-auto text-[10px]" />
                         </button>
                       </div>
-  
+
                       <p>
                         Client:
                         {event.customer &&
                           `${event.customer.firstName} ${event.customer.lastName}`}
                       </p>
-  
+
                       <p>
                         Assigned To:{" "}
                         {event.assignedUsers
                           .slice(0, 1)
                           .map((user: User) => user.name)}
                       </p>
-  
+
                       <p>
                         {moment(event.startTime, "HH:mm").format("hh:mm A")} To{" "}
                         {moment(event.endTime, "HH:mm").format("hh:mm A")}
@@ -518,7 +522,7 @@ export default function Week({
                     <div>
                       <div className="flex items-center justify-between">
                         <h3 className="font-semibold">{event.title}</h3>
-  
+
                         <button
                           type="button"
                           className="text- rounded-full bg-[#6571FF] p-2 text-white"
@@ -532,10 +536,10 @@ export default function Week({
                           <FaPen className="mx-auto text-[10px]" />
                         </button>
                       </div>
-  
+
                       {/* @ts-ignore */}
                       <p className="mt-3">{event.description}</p>
-  
+
                       {/* @ts-ignore */}
                       <p className="mt-3">Task Priority: {event.priority}</p>
                     </div>
@@ -545,22 +549,29 @@ export default function Week({
             );
           } else {
             const lastIndex = tasksInRow.length - 1;
-            if (lastIndex !== taskIndex) return null
+            if (lastIndex !== taskIndex) return null;
             return (
-              <Link href={`/task/day?date=${formatDate(new Date(event.date as Date))}`} className={cn(`absolute top-0 flex justify-center items-center rounded-lg border
-            `, taskIndex === limitOfTasks && 'bg-opacity-25', lastIndex === taskIndex && 'z-40')}
-                  style={{
-                    left: `calc(10% + 12.9% * ${event.columnIndex} + 170px)`,
-                    top,
-                    height,
-                    backgroundColor: 'rgb(0, 0, 255, 0.2)',
-                    width
-                  }} key={event.id}>
-                <span className="z-30 text-sm text-center text-white ">
+              <Link
+                href={`/task/day?date=${formatDate(new Date(event.date as Date))}`}
+                className={cn(
+                  `absolute top-0 flex items-center justify-center rounded-lg border`,
+                  taskIndex === limitOfTasks && "bg-opacity-25",
+                  lastIndex === taskIndex && "z-40",
+                )}
+                style={{
+                  left: `calc(10% + 12.9% * ${event.columnIndex} + 170px)`,
+                  top,
+                  height,
+                  backgroundColor: "rgb(0, 0, 255, 0.2)",
+                  width,
+                }}
+                key={event.id}
+              >
+                <span className="z-30 text-center text-sm text-white">
                   {tasksInRow?.length - 5}+
                 </span>
               </Link>
-            )
+            );
           }
         })}
       </div>
