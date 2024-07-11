@@ -132,6 +132,8 @@ export function NewAppointment({
   }, [templates]);
 
   function onTimeChange(e: any) {
+    if (!e) return;
+
     const [start, end] = e;
     setStartTime(start?.format("HH:mm"));
     setEndTime(end?.format("HH:mm"));
@@ -268,6 +270,7 @@ export function NewAppointment({
                     use12Hours
                     format="h:mm a"
                     className="rounded-md border border-gray-500 p-1 placeholder-slate-800"
+                    needConfirm={false}
                   />
                 </div>
               </div>

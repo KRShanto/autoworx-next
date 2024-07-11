@@ -54,6 +54,8 @@ export default function NewTask({
   }
 
   function onChange(e: any) {
+    if (!e) return;
+
     const [start, end] = e;
     setTime({
       startTime: start?.format("HH:mm"),
@@ -107,6 +109,7 @@ export default function NewTask({
               use12Hours
               format="h:mm a"
               className="mt-2 rounded-md border-2 border-gray-500 p-1 placeholder-slate-800"
+              needConfirm={false}
             />
           </div>
 
