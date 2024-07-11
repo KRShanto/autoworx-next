@@ -128,12 +128,22 @@ export default function Week({
 
   // Generate the all-day row
   const allDayRow = [
-    "All Day",
+    "",
     // Generate the days of the week with the date
     ...Array.from({ length: 7 }, (_, i) => {
       const date = new Date(today);
       date.setDate(today.getDate() - today.getDay() + i);
-      return `${days[date.getDay()]} ${date.getDate()}`;
+      return <div key={i} className="text-sm flex flex-col justify-center items-center">
+        <span className="font-semibold text-[17px]">
+          {days[date.getDay()]}
+        </span>
+        <div className="space-x-1 text-sm font-normal">
+          <span>
+            {date.getDate()}
+          </span>
+          <span>{date.toLocaleDateString("en-US", {month: 'short'})}</span>
+        </div>
+      </div>;
     }),
   ];
 
@@ -351,9 +361,7 @@ export default function Week({
                         : "transparent",
                   }}
                 >
-                  {rows[rowIndex][columnIndex].includes("All Day")
-                    ? ""
-                    : column}
+                  {column}
                 </button>
               );
             })}
@@ -453,8 +461,8 @@ export default function Week({
                   {
                     <>
                       {event.type === "appointment" && (
-                        <div  className="flex h-full flex-col items-start">
-                          <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 rounded-lg border bg-[#6571FF]"></div>
+                        <div  className="flex h-full flex-col items-start border border-gray-400 rounded-lg">
+                          <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 border rounded-lg bg-[#6571FF]"></div>
                         </div>
                       )}
                       
@@ -539,10 +547,10 @@ export default function Week({
             const lastIndex = tasksInRow.length - 1;
             if (lastIndex !== taskIndex) return null
             return (
-              <Link href={`/task/day?date=${formatDate(new Date(event.date as Date))}`} className={cn(`absolute top-0 flex justify-center items-center rounded-lg border 
-            `, taskIndex === limitOfTasks && 'bg-opacity-25 z-40', lastIndex === taskIndex && 'z-40')}
+              <Link href={`/task/day?date=${formatDate(new Date(event.date as Date))}`} className={cn(`absolute top-0 flex justify-center items-center rounded-lg border
+            `, taskIndex === limitOfTasks && 'bg-opacity-25', lastIndex === taskIndex && 'z-40')}
                   style={{
-                    left: `calc(10% + 23% * ${event.columnIndex})`,
+                    left: `calc(10% + 12.9% * ${event.columnIndex} + 170px)`,
                     top,
                     height,
                     backgroundColor: 'rgb(0, 0, 255, 0.2)',
