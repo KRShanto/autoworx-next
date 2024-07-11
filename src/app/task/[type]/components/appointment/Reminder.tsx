@@ -1,13 +1,13 @@
+import Selector from "@/components/Selector";
 import { Switch } from "@/components/Switch";
 import { useListsStore } from "@/stores/lists";
 import type { Customer, EmailTemplate, Vehicle } from "@prisma/client";
 import moment from "moment";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaTimes, FaTrash } from "react-icons/fa";
 import { TbUserX } from "react-icons/tb";
 import NewTemplate from "../../../../../components/Lists/NewTemplate";
 import { deleteTemplate } from "../../actions/deleteTemplate";
-import Selector from "@/components/Selector";
 import UpdateTemplate from "./UpdateTemplateComponent";
 
 export function Reminder({
@@ -51,6 +51,13 @@ export function Reminder({
 
   const [openConfirmation, setOpenConfirmation] = useState(false);
   const [openReminder, setOpenReminder] = useState(false);
+
+  useEffect(() => {
+    setOpenConfirmation(false);
+  }, [openReminder]);
+  useEffect(() => {
+    setOpenReminder(false);
+  }, [openConfirmation]);
 
   async function handleDelete({ id, type }: { id: number; type: string }) {
     await deleteTemplate(id);
