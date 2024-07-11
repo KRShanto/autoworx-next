@@ -33,7 +33,7 @@ import { dragTask } from "../actions/dragTask";
 function useMonth() {
   const searchParams = useSearchParams();
   const month = moment(searchParams.get("month"), moment.HTML5_FMT.MONTH);
-  return (month.isValid() ? month : moment()).toDate();
+  return (month.isValid() ? month : moment().startOf("month")).toDate();
 }
 
 export default function Month({
@@ -79,6 +79,9 @@ export default function Month({
   // Get the current date
   const month = useMonth();
   const today = new Date();
+
+  console.log("month", month);
+  console.log("today", today);
 
   // Get the index of today's date
   const todayIndex = month.getDate() - month.getDay() + 1;
@@ -254,7 +257,11 @@ export default function Month({
                       <Tooltip key={i}>
                         <TooltipTrigger asChild>
                           <div className="h-10 max-h-10 rounded border text-sm text-slate-500">
-                            {appointment.title}
+                            {appointment.title
+                              .slice(0, 20)
+                              .concat(
+                                appointment.title.length > 20 ? "..." : "",
+                              )}
                           </div>
                         </TooltipTrigger>
 
