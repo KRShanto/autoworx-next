@@ -32,6 +32,7 @@ import {
   updateTimeSpace,
 } from "@/utils/taskAndActivity";
 import mergeRefs from "merge-refs";
+import Link from "next/link";
 
 function useWeek() {
   const searchParams = useSearchParams();
@@ -41,7 +42,13 @@ function useWeek() {
 
 // Generate the hourly rows
 const hourlyRows = Array.from({ length: 24 }, (_, i) => [
-  `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
+  i < 11
+    ? `${i + 1} AM`
+    : i === 11
+      ? "12 PM"
+      : i < 23
+        ? `${i - 11} PM`
+        : "12 AM",
   // empty cells
   ...Array.from({ length: 7 }, () => ""),
 ]);
@@ -424,122 +431,143 @@ export default function Week({
               : height === "90px"
                 ? 30
                 : event.title.length;
-          return (
-            <Tooltip key={event.id}>
-              <DraggableTaskTooltip
-                //@ts-ignore
-                className={`absolute top-0 rounded-lg border border-gray-400 ${taskIndex === limitOfTasks && "bg-opacity-25"}`}
+          if (taskIndex < limitOfTasks) {
+            return (
+              <Tooltip key={event.id}>
+                <DraggableTaskTooltip
+                  //@ts-ignore
+                  className={`absolute top-0 rounded-lg border`}
+                  style={{
+                    left,
+                    top,
+                    height,
+                    backgroundColor,
+                    width,
+                  }}
+                  task={event}
+                  updateTaskData={{ event, companyUsers }}
+                  updateAppointmentData={{
+                    appointment: appointmentsFull.find(
+                      (appointment) => appointment.id === event.id,
+                    ),
+                    employees: companyUsers,
+                    customers,
+                    vehicles,
+                    orders,
+                    templates,
+                    settings,
+                  }}
+                >
+                  {
+                    <>
+                      {event.type === "appointment" && (
+                        <div className="flex h-full flex-col items-start">
+                          <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 rounded-lg border bg-[#6571FF]"></div>
+                        </div>
+                      )}
+                    </>
+                  }
+                </DraggableTaskTooltip>
+                <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
+                  {event.type === "appointment" ? (
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold">{event.title}</h3>
+
+                        <button
+                          type="button"
+                          className="text- rounded-full bg-[#6571FF] p-2 text-white"
+                          onClick={() =>
+                            open("UPDATE_APPOINTMENT", {
+                              appointment: appointmentsFull.find(
+                                (appointment) => appointment.id === event.id,
+                              ),
+                              employees: companyUsers,
+                              customers,
+                              vehicles,
+                              orders,
+                              templates,
+                              settings,
+                            })
+                          }
+                        >
+                          <FaPen className="mx-auto text-[10px]" />
+                        </button>
+                      </div>
+
+                      <p>
+                        Client:
+                        {event.customer &&
+                          `${event.customer.firstName} ${event.customer.lastName}`}
+                      </p>
+
+                      <p>
+                        Assigned To:{" "}
+                        {event.assignedUsers
+                          .slice(0, 1)
+                          .map((user: User) => user.name)}
+                      </p>
+
+                      <p>
+                        {moment(event.startTime, "HH:mm").format("hh:mm A")} To{" "}
+                        {moment(event.endTime, "HH:mm").format("hh:mm A")}
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold">{event.title}</h3>
+
+                        <button
+                          type="button"
+                          className="text- rounded-full bg-[#6571FF] p-2 text-white"
+                          onClick={() =>
+                            open("UPDATE_TASK", {
+                              task: event,
+                              companyUsers,
+                            })
+                          }
+                        >
+                          <FaPen className="mx-auto text-[10px]" />
+                        </button>
+                      </div>
+
+                      {/* @ts-ignore */}
+                      <p className="mt-3">{event.description}</p>
+
+                      {/* @ts-ignore */}
+                      <p className="mt-3">Task Priority: {event.priority}</p>
+                    </div>
+                  )}
+                </TooltipContent>
+              </Tooltip>
+            );
+          } else {
+            const lastIndex = tasksInRow.length - 1;
+            if (lastIndex !== taskIndex) return null;
+            return (
+              <Link
+                href={`/task/day?date=${formatDate(new Date(event.date as Date))}`}
+                className={cn(
+                  `absolute top-0 flex items-center justify-center rounded-lg border`,
+                  taskIndex === limitOfTasks && "z-40 bg-opacity-25",
+                  lastIndex === taskIndex && "z-40",
+                )}
                 style={{
-                  left,
+                  left: `calc(10% + 23% * ${event.columnIndex})`,
                   top,
                   height,
-                  backgroundColor:
-                    taskIndex === limitOfTasks ? "#6571FF" : backgroundColor,
+                  backgroundColor: "rgb(0, 0, 255, 0.2)",
                   width,
-                  display: taskIndex > limitOfTasks && "none",
                 }}
-                task={event}
-                updateTaskData={{ event, companyUsers }}
-                updateAppointmentData={{
-                  appointment: appointmentsFull.find(
-                    (appointment) => appointment.id === event.id,
-                  ),
-                  employees: companyUsers,
-                  customers,
-                  vehicles,
-                  orders,
-                  templates,
-                  settings,
-                }}
+                key={event.id}
               >
-                {
-                  <>
-                    {event.type === "appointment" && (
-                      <div className="flex h-full flex-col items-start">
-                        <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 rounded-lg border bg-[#6571FF]"></div>
-                      </div>
-                    )}
-                    <p className="z-30 text-sm text-white">
-                      {taskIndex === limitOfTasks &&
-                        `${tasksInRow?.length - limitOfTasks}+`}
-                    </p>
-                  </>
-                }
-              </DraggableTaskTooltip>
-              <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
-                {event.type === "appointment" ? (
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold">{event.title}</h3>
-
-                      <button
-                        type="button"
-                        className="text- rounded-full bg-[#6571FF] p-2 text-white"
-                        onClick={() =>
-                          open("UPDATE_APPOINTMENT", {
-                            appointment: appointmentsFull.find(
-                              (appointment) => appointment.id === event.id,
-                            ),
-                            employees: companyUsers,
-                            customers,
-                            vehicles,
-                            orders,
-                            templates,
-                            settings,
-                          })
-                        }
-                      >
-                        <FaPen className="mx-auto text-[10px]" />
-                      </button>
-                    </div>
-
-                    <p>
-                      Client:
-                      {event.customer &&
-                        `${event.customer.firstName} ${event.customer.lastName}`}
-                    </p>
-
-                    <p>
-                      Assigned To:{" "}
-                      {event.assignedUsers
-                        .slice(0, 1)
-                        .map((user: User) => user.name)}
-                    </p>
-
-                    <p>
-                      {moment(event.startTime, "HH:mm").format("hh:mm A")} To{" "}
-                      {moment(event.endTime, "HH:mm").format("hh:mm A")}
-                    </p>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold">{event.title}</h3>
-
-                      <button
-                        type="button"
-                        className="text- rounded-full bg-[#6571FF] p-2 text-white"
-                        onClick={() =>
-                          open("UPDATE_TASK", {
-                            task: event,
-                            companyUsers,
-                          })
-                        }
-                      >
-                        <FaPen className="mx-auto text-[10px]" />
-                      </button>
-                    </div>
-
-                    {/* @ts-ignore */}
-                    <p className="mt-3">{event.description}</p>
-
-                    {/* @ts-ignore */}
-                    <p className="mt-3">Task Priority: {event.priority}</p>
-                  </div>
-                )}
-              </TooltipContent>
-            </Tooltip>
-          );
+                <span className="z-30 text-center text-sm text-white">
+                  {tasksInRow?.length - 5}+
+                </span>
+              </Link>
+            );
+          }
         })}
       </div>
     </>
