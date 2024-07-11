@@ -152,7 +152,6 @@ export default function Day({
   async function handleDrop(event: React.DragEvent, rowIndex: number) {
     const startTime = formatTime(rows[rowIndex]);
     const endTime = formatTime(rows[rowIndex + 1]);
-    const date = new Date().toISOString();
 
     // Get the task type
     const attributeData = event.dataTransfer.getData("text/plain").split("|");
