@@ -103,6 +103,9 @@ export function NewAppointment({
   const [clientOpenDropdown, setClientOpenDropdown] = useState(false);
   const [vehicleOpenDropdown, setVehicleOpenDropdown] = useState(false);
 
+  const [openConfirmation, setOpenConfirmation] = useState(false);
+  const [openReminder, setOpenReminder] = useState(false);
+
   const handleSearch = (search: string) => {
     setEmployeesToDisplay(
       employees.filter((employee) =>
@@ -185,17 +188,60 @@ export function NewAppointment({
     close();
   };
   useEffect(() => {
-    if (clientOpenDropdown && (vehicleOpenDropdown || orderOpen)) {
+    if (
+      clientOpenDropdown &&
+      (vehicleOpenDropdown || orderOpen || openConfirmation || openReminder)
+    ) {
       setVehicleOpenDropdown(false);
       setOrderOpen(false);
-    } else if (vehicleOpenDropdown && (clientOpenDropdown || orderOpen)) {
+      setOpenConfirmation(false);
+      setOpenReminder(false);
+    } else if (
+      vehicleOpenDropdown &&
+      (clientOpenDropdown || orderOpen || openConfirmation || openReminder)
+    ) {
       setClientOpenDropdown(false);
       setOrderOpen(false);
-    } else if (orderOpen && (clientOpenDropdown || vehicleOpenDropdown)) {
+      setOpenConfirmation(false);
+      setOpenReminder(false);
+    } else if (
+      orderOpen &&
+      (clientOpenDropdown ||
+        vehicleOpenDropdown ||
+        openConfirmation ||
+        openReminder)
+    ) {
       setClientOpenDropdown(false);
       setVehicleOpenDropdown(false);
+      setOpenConfirmation(false);
+      setOpenReminder(false);
+    } else if (
+      openConfirmation &&
+      (clientOpenDropdown || vehicleOpenDropdown || orderOpen || openReminder)
+    ) {
+      setClientOpenDropdown(false);
+      setVehicleOpenDropdown(false);
+      setOrderOpen(false);
+      setOpenReminder(false);
+    } else if (
+      openReminder &&
+      (clientOpenDropdown ||
+        vehicleOpenDropdown ||
+        orderOpen ||
+        openConfirmation)
+    ) {
+      setClientOpenDropdown(false);
+      setVehicleOpenDropdown(false);
+      setOrderOpen(false);
+      setOpenConfirmation(false);
     }
-  }, [orderOpen, clientOpenDropdown, vehicleOpenDropdown]);
+  }, [
+    orderOpen,
+    clientOpenDropdown,
+    vehicleOpenDropdown,
+    openConfirmation,
+    openReminder,
+  ]);
   return (
     <div className="newAppointment">
       <Dialog open={popup === "ADD_TASK"} onOpenChange={setOpen}>
@@ -461,6 +507,10 @@ export function NewAppointment({
                   setConfirmationTemplateStatus={setConfirmationTemplateStatus}
                   reminderTemplateStatus={reminderTemplateStatus}
                   setReminderTemplateStatus={setReminderTemplateStatus}
+                  openConfirmation={openConfirmation}
+                  openReminder={openReminder}
+                  setOpenReminder={setOpenReminder}
+                  setOpenConfirmation={setOpenConfirmation}
                 />
               ) : null}
             </div>
