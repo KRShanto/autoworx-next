@@ -298,8 +298,8 @@ export default function Day({
               style={{
                 color:
                   rowTime >= settings?.dayStart && rowTime <= settings?.dayEnd
-                    ? "#d1d1e0"
-                    : "#7575a3",
+                    ? "#7575a3"
+                    : "#d1d1e0",
               }}
             >
               {row}
@@ -331,8 +331,8 @@ export default function Day({
                   draggedOverRow === i
                     ? "#c4c4c4"
                     : dateRangeforBgChanger
-                      ? " #f2f2f2	"
-                      : "white",
+                      ? " white	"
+                      : "#f2f2f2",
                 width: "calc(100% - 85px)",
               }}
             >
