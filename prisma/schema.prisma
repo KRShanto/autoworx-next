@@ -625,17 +625,18 @@ model WorkOrder {
 // Technician of a InvoiceItem.
 // One InvoiceItem can have multiple technicians.
 model Technician {
-  id          Int              @id @default(autoincrement())
-  userId      Int              @map("user_id")
-  date        DateTime?        @map("assigned_date")
-  due         DateTime?        @default(now())
-  amount      Decimal?         @default(0)
-  priority    Priority?        @default(Low)
-  status      TechnicianStatus @default(Pending)
-  note        String?          @map("new_note")
-  materialId  Int?             @map("material_id")
-  serviceId   Int?             @map("service_id")
-  workOrderId Int?             @map("work_order_id")
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  date        DateTime? @map("assigned_date")
+  due         DateTime? @default(now())
+  amount      Decimal?  @default(0)
+  priority    Priority? @default(Low)
+  status      String?
+  statusColor String?
+  note        String?   @map("new_note")
+  materialId  Int?      @map("material_id")
+  serviceId   Int?      @map("service_id")
+  workOrderId Int?      @map("work_order_id")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -644,13 +645,6 @@ model Technician {
   material  Material?  @relation(fields: [materialId], references: [id])
   service   Service?   @relation(fields: [serviceId], references: [id])
   workOrder WorkOrder? @relation(fields: [workOrderId], references: [id])
-}
-
-enum TechnicianStatus {
-  Pending
-  InProgress
-  Completed
-  Cancel
 }
 
 // Email template for a company.
