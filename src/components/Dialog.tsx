@@ -17,19 +17,16 @@ const DialogContentBlank = DialogPrimitive.DialogContent;
 
 type DialogOverlayProps = React.ComponentPropsWithoutRef<
   typeof DialogPrimitive.Overlay
-> & {
-  bgShadow?: boolean;
-};
+>;
 
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
   DialogOverlayProps
->(({ bgShadow, className, ...props }, ref) => (
+>(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50",
-      bgShadow ? "bg-black/80" : "bg-black/40",
+      "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
       className,
     )}
     {...props}
@@ -41,14 +38,13 @@ const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     form?: boolean;
-    bgShadow?: boolean;
   }
->(({ bgShadow = true, className, form, children, ...props }, ref) => {
+>(({ className, form, children, ...props }, ref) => {
   const Tag = form ? "form" : React.Fragment;
 
   return (
     <DialogPortal>
-      <DialogOverlay bgShadow={bgShadow} />
+      <DialogOverlay />
       <DialogPrimitive.Content
         ref={ref}
         className={cn(

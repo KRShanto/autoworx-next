@@ -23,6 +23,12 @@ export async function replenish({
   lot?: string;
   notes?: string;
 }): Promise<ServerAction> {
+  const vendor = vendorId
+    ? await db.vendor.findUnique({
+        where: { id: vendorId },
+      })
+    : null;
+
   const newHistory = await db.inventoryProductHistory.create({
     data: {
       productId,
@@ -30,6 +36,8 @@ export async function replenish({
       quantity,
       notes,
       type: "Purchase",
+      price,
+      vendorName: vendor?.name,
     },
   });
 

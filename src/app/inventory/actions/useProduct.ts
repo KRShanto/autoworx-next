@@ -15,6 +15,12 @@ export async function useProduct({
   quantity: number;
   notes: string;
 }): Promise<ServerAction> {
+  // update product quantity
+  const product = await db.inventoryProduct.findUnique({
+    where: { id: productId },
+    include: { vendor: true },
+  });
+
   const newHistory = await db.inventoryProductHistory.create({
     data: {
       productId,
@@ -22,12 +28,9 @@ export async function useProduct({
       quantity,
       notes,
       type: "Sale",
+      price: product?.price,
+      vendorName: product?.vendor?.name,
     },
-  });
-
-  // update product quantity
-  const product = await db.inventoryProduct.findUnique({
-    where: { id: productId },
   });
 
   const newQuantity = product!.quantity! - quantity;

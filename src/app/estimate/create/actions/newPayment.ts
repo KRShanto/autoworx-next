@@ -48,7 +48,12 @@ export async function newPayment({
       // productId not null
       productId: { not: null },
     },
+    include: {
+      vendor: true,
+    },
   });
+
+  console.log("Materials: ", materials);
 
   // merge all the same products and sum the quantity
   const productsWithQuantity = materials.reduce(
@@ -79,6 +84,9 @@ export async function newPayment({
           productId: product.id,
           date: new Date(date),
           quantity: product.quantity,
+          price: materials.find((m) => m.productId === product.id)?.sell,
+          vendorName: materials.find((m) => m.productId === product.id)?.vendor
+            ?.name,
           notes,
           type: "Sale",
           invoiceId,

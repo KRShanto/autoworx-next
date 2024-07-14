@@ -39,7 +39,7 @@ export default function UseProductForm({ productId }: { productId: number }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button className="w-28 rounded-md bg-[#FF6262] p-1 text-white">
-          Use
+          Loss
         </button>
       </DialogTrigger>
 

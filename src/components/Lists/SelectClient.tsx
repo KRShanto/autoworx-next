@@ -76,7 +76,10 @@ export function SelectClient({
               .includes(search.toLowerCase()),
           )
         }
-        openState={[openDropdown as boolean, setOpenDropdown as Dispatch<SetStateAction<boolean>>]}
+        openState={[
+          openDropdown as boolean,
+          setOpenDropdown as Dispatch<SetStateAction<boolean>>,
+        ]}
         selectedItem={client}
         setSelectedItem={setClient}
       />
