@@ -42,13 +42,7 @@ function useWeek() {
 
 // Generate the hourly rows
 const hourlyRows = Array.from({ length: 24 }, (_, i) => [
-  i < 11
-    ? `${i + 1} AM`
-    : i === 11
-      ? "12 PM"
-      : i < 23
-        ? `${i - 11} PM`
-        : "12 AM",
+  `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
   // empty cells
   ...Array.from({ length: 7 }, () => ""),
 ]);
@@ -139,17 +133,20 @@ export default function Week({
     ...Array.from({ length: 7 }, (_, i) => {
       const date = new Date(today);
       date.setDate(today.getDate() - today.getDay() + i);
-      return <div key={i} className="text-sm flex flex-col justify-center items-center">
-        <span className="font-semibold text-[17px]">
-          {days[date.getDay()]}
-        </span>
-        <div className="space-x-1 text-sm font-normal">
-          <span>
-            {date.getDate()}
+      return (
+        <div
+          key={i}
+          className="flex flex-col items-center justify-center text-sm"
+        >
+          <span className="text-[17px] font-semibold">
+            {days[date.getDay()]}
           </span>
-          <span>{date.toLocaleDateString("en-US", {month: 'short'})}</span>
+          <div className="space-x-1 text-sm font-normal">
+            <span>{date.getDate()}</span>
+            <span>{date.toLocaleDateString("en-US", { month: "short" })}</span>
+          </div>
         </div>
-      </div>;
+      );
     }),
   ];
 
@@ -414,7 +411,7 @@ export default function Week({
               }
             }
           });
-          const limitOfTasks = 5;
+              const limitOfTasks = 5;
           const taskIndex = tasksInRow.findIndex(
             (task) => task.id === event.id,
           );
@@ -469,8 +466,8 @@ export default function Week({
                   {
                     <>
                       {event.type === "appointment" && (
-                        <div  className="flex h-full flex-col items-start border border-gray-400 rounded-lg">
-                          <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 border rounded-lg bg-[#6571FF]"></div>
+                        <div className="flex h-full flex-col items-start rounded-lg border border-gray-400">
+                          <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 rounded-lg border bg-[#6571FF]"></div>
                         </div>
                       )}
                     </>
@@ -554,16 +551,23 @@ export default function Week({
             const lastIndex = tasksInRow.length - 1;
             if (lastIndex !== taskIndex) return null;
             return (
-              <Link href={`/task/day?date=${formatDate(new Date(event.date as Date))}`} className={cn(`absolute top-0 flex justify-center items-center rounded-lg border
-            `, taskIndex === limitOfTasks && 'bg-opacity-25', lastIndex === taskIndex && 'z-40')}
-                  style={{
-                    left: `calc(10% + 12.9% * ${event.columnIndex} + 170px)`,
-                    top,
-                    height,
-                    backgroundColor: 'rgb(0, 0, 255, 0.2)',
-                    width
-                  }} key={event.id}>
-                <span className="z-30 text-sm text-center text-white ">
+              <Link
+                href={`/task/day?date=${formatDate(new Date(event.date as Date))}`}
+                className={cn(
+                  `absolute top-0 flex items-center justify-center rounded-lg border`,
+                  taskIndex === limitOfTasks && "bg-opacity-25",
+                  lastIndex === taskIndex && "z-40",
+                )}
+                style={{
+                  left: `calc(10% + 12.9% * ${event.columnIndex} + 170px)`,
+                  top,
+                  height,
+                  backgroundColor: "rgb(0, 0, 255, 0.2)",
+                  width,
+                }}
+                key={event.id}
+              >
+                <span className="z-30 text-center text-sm text-white">
                   {tasksInRow?.length - 5}+
                 </span>
               </Link>
