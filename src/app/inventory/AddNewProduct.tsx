@@ -19,6 +19,7 @@ import { useListsStore } from "@/stores/lists";
 import { Category, InventoryProductType, Vendor } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { createProduct } from "./actions/create";
+import { useFormErrorStore } from "@/stores/form-error";
 
 export default function AddNewProduct() {
   const [open, setOpen] = useState(false);
@@ -27,6 +28,7 @@ export default function AddNewProduct() {
   const [category, setCategory] = useState<Category | null>();
   const [vendorOpen, setVendorOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const { showError } = useFormErrorStore();
 
   async function handleSubmit(data: FormData) {
     const name = data.get("productName") as string;
@@ -54,14 +56,17 @@ export default function AddNewProduct() {
 
     if (res.type === "success") {
       setOpen(false);
+    } else {
+      showError({
+        field: res.field ?? "all",
+        message: res.message ?? "An error occurred",
+      });
     }
   }
-  useEffect(() => {
-    setVendorOpen(false);
-  }, [categoryOpen]);
-  useEffect(() => {
-    setCategoryOpen(false);
-  }, [vendorOpen]);
+
+  useEffect(() => setVendorOpen(false), [categoryOpen]);
+  useEffect(() => setCategoryOpen(false), [vendorOpen]);
+
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>

@@ -106,7 +106,22 @@ export default function ReplenishProductForm({
 
           <div className="flex gap-3">
             <SlimInput name="quantity" required={false} />
-            <SlimInput name="price" required={false} />
+
+            <div>
+              <label htmlFor="price" className="px-2 font-medium">
+                Price
+              </label>
+              <div className="mt-1 flex gap-1 rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6">
+                <span className="text-lg">$</span>
+                <input
+                  type="text"
+                  name="price"
+                  className="w-full outline-none"
+                  id="price"
+                />
+              </div>
+            </div>
+
             <SlimInput name="unit" required={false} />
             <SlimInput name="lot" required={false} />
           </div>

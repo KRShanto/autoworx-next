@@ -111,10 +111,14 @@ function Table({
             <td className="h-12 text-center">
               <p>{history.id}</p>
             </td>
-            <td className="text-nowrap text-center">{vendorName}</td>
-            <td className="text-nowrap text-center">${price}</td>
+            <td className="text-nowrap text-center">{history.vendorName}</td>
+            <td className="text-nowrap text-center">
+              ${history.price?.toString()}
+            </td>
             <td className="text-center">{history.quantity}</td>
-            <td className="text-center">${price * history.quantity}</td>
+            <td className="text-center">
+              ${parseFloat(history.price?.toString() || "0") * history.quantity}
+            </td>
             <td className="text-center">
               {moment(history.date).format(
                 // date.month.year

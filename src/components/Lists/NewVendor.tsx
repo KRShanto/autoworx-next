@@ -71,7 +71,6 @@ export default function NewVendor({
       <DialogContent
         className="max-h-full max-w-xl grid-rows-[auto,1fr,auto]"
         form
-        bgShadow={bgShadow}
       >
         <DialogHeader>
           <DialogTitle>Add New Vendor</DialogTitle>

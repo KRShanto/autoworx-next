@@ -73,7 +73,9 @@ export function NewAppointment({
   );
   const [tab, setTab] = useState(Tab.Schedule);
 
-  const [date, setDate] = useState<string | undefined>();
+  const [date, setDate] = useState<string | undefined>(
+    new Date().toISOString().split("T")[0],
+  );
   const [startTime, setStartTime] = useState<string | undefined>();
   const [endTime, setEndTime] = useState<string | undefined>();
   const [orderList, setOrderList] = useState<Order[]>(orders);
@@ -129,9 +131,9 @@ export function NewAppointment({
   }, [allDay, settings]);
 
   useEffect(() => {
-    if (templates) {
+    if (templates) 
       useListsStore.setState({ templates });
-    }
+    
   }, [templates]);
 
   function onTimeChange(e: any) {
