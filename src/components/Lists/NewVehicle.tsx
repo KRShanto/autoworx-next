@@ -57,7 +57,7 @@ export default function NewVehicle() {
     });
 
     if (res.type === "error") {
-      console.log(res);
+      // console.log(res);
       showError({
         field: res.field || "make",
         message: res.message || "",

@@ -186,10 +186,10 @@ export default async function Page({ params }: { params: { type: string } }) {
         })
       : null;
 
-    console.log(
-      "Reminder Email Template: ",
-      appointment.reminderEmailTemplateId,
-    );
+    // console.log(
+    //   "Reminder Email Template: ",
+    //   appointment.reminderEmailTemplateId,
+    // );
 
     const appointmentUsers = await db.appointmentUser.findMany({
       where: { appointmentId: appointment.id },

@@ -160,7 +160,7 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
       currentSelectedCategoryId: null,
     }),
   removeMaterial({ itemIndex, materialIndex }) {
-    console.log("removeMaterial", itemIndex, materialIndex);
+    // console.log("removeMaterial", itemIndex, materialIndex);
 
     set((state) => {
       const items = state.items.map((item, index) => {
