@@ -39,7 +39,6 @@ export default async function CreateWorkOrder({
         where: { id: invoice.vehicleId },
       })
     : null;
-
   return (
     <InterceptedDialog>
       <DialogContent className="max-w-[740px]">

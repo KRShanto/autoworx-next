@@ -22,7 +22,7 @@ export function InvoiceItems({
   >;
 }) {
   const [openService, setOpenService] = useState<number | null>(null);
-  console.log(items);
+  console.log({ items });
   return items.map((item) => {
     if (!item.service) return null;
 
@@ -60,7 +60,10 @@ export function InvoiceItems({
                 </div>
               );
             })}
-            <LaborItems lober={item.labor} />
+            <LaborItems
+              serviceId={item?.serviceId as number}
+              labor={item.labor}
+            />
           </div>
         )}
       </div>

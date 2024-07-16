@@ -9,63 +9,185 @@ import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { SelectStatus } from "../../components/Lists/SelectStatus";
-import { useState } from "react";
-export default function CreateAndEditLabor({ laborId }: { laborId?: string }) {
-  const [statusOpenDropdown, setStatusOpenDropdown] = useState(true);
+import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from "react";
+import { Status, Technician, User } from "@prisma/client";
+import { addTechnician } from "./@modal/(.)view/[id]/actions/addTechnician";
+import { useRouter } from "next/navigation";
+type TPriority = string;
+type TEmployee = Partial<User>;
+const priorities: TPriority[] = ["Low", "Medium", "High"];
+type TechnicianPayload = {
+  serviceId: number;
+  date: string;
+  due: string;
+  amount: number;
+  note: string;
+  userId: number | undefined;
+  priority: string;
+  status: string | undefined;
+  statusColor: string | undefined;
+};
+export default function CreateAndEditLabor({
+  employees,
+  serviceId,
+  technician,
+}: {
+  employees: {
+    id: number;
+    name: string;
+  }[];
+  serviceId: string;
+  technician?: Technician;
+}) {
+  const router = useRouter();
+  const [statusOpenDropdown, setStatusOpenDropdown] = useState(false);
+  const [priorityOpen, setPriorityOpen] = useState(false);
+  const [employeeOpen, setEmployeeOpen] = useState(false);
+  const [employee, setEmployee] = useState<TEmployee | null>(null);
+  const [status, setStatus] = useState<Status | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [inputValues, setInputValues] = useState({
+    date: "",
+    due: "",
+    amount: "",
+    note: "",
+  });
+  const [priority, setPriority]: [
+    TPriority,
+    Dispatch<SetStateAction<TPriority>>,
+  ] = useState<TPriority>(priorities[0]);
+  // edit technician
+  useEffect(() => {
+    if (technician) {
+      
+    }
+  }, [technician])
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = event.target;
+    if (name === "amount" && parseInt(value) <= 0) {
+      setError("Amount must be greater than zero");
+      return;
+    } else if (
+      name === "amount" &&
+      value !== "" &&
+      Number.isNaN(parseInt(value))
+    ) {
+      setError("Amount must be a number");
+      return;
+    } else {
+      setError(null);
+      setInputValues((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
+  };
+  console.log(status);
+  // form submit
+  const handleSubmit: (
+    event: MouseEvent<HTMLButtonElement>,
+  ) => Promise<void> = async (event) => {
+    setError(null);
+    try {
+      const payload = {
+        serviceId: Number(serviceId),
+        date: new Date(inputValues.date).toISOString(),
+        due: new Date(inputValues.due).toISOString(),
+        amount: Number(inputValues.amount),
+        note: inputValues.note,
+        userId: employee?.id,
+        priority,
+        status: status?.name,
+        statusColor: status?.bgColor,
+        materialId: 0,
+        workOrderId: 0,
+      };
+      // await (laborId ? updateLabor(laborId, payload) : createLabor(payload));
+      const response = await addTechnician(
+        payload as Technician & TechnicianPayload,
+      );
+      if (response.type === "success") {
+        router.back();
+      }
+    } catch (error) {
+      setError("Failed to update labor");
+    }
+  };
   return (
     <InterceptedDialog>
       <DialogContent>
+        {error && <p className="text-center text-red-500">{error}</p>}
         <div className="grid grid-cols-3 gap-4">
           {/* Assigned by */}
           <div>
             <label>Assigned by</label>
-
-            {/* <Selector
-              label={(vendor: Vendor | null) =>
-                vendor ? vendor.name || `Vendor ${vendor.id}` : "Vendor"
+            <Selector
+              label={(employee) =>
+                employee?.name ? employee.name : "Employee"
               }
-              newButton={
-                <NewVendor
-                  bgShadow={false}
-                  afterSubmit={(ven) => {
-                    setVendor(ven);
-                    setVendorOpen(false);
-                  }}
-                  button={
-                    <button type="button" className="text-xs text-[#6571FF]">
-                      + New Vendor
-                    </button>
-                  }
-                />
-              }
-              items={vendors}
-              displayList={(vendor: Vendor) => <p>{vendor.name}</p>}
+              newButton={<div></div>}
+              items={employees}
+              displayList={(employee: TEmployee) => <p>{employee.name}</p>}
               onSearch={(search: string) =>
-                vendors.filter((vendor) =>
-                  vendor.name.toLowerCase().includes(search.toLowerCase()),
+                employees.filter((employee) =>
+                  employee.name.toLowerCase().includes(search.toLowerCase()),
                 )
               }
-              openState={[vendorOpen, setVendorOpen]}
-              selectedItem={vendor}
-              setSelectedItem={setVendor}
-            /> */}
+              openState={[employeeOpen, setEmployeeOpen]}
+              selectedItem={employee}
+              //@ts-ignore
+              setSelectedItem={setEmployee}
+            />
           </div>
-          <SlimInput label="Assigned Date" name="" />
-          <SlimInput label="Due Date" name="" />
-          <SlimInput label="Amount" name="" />
-          <SlimInput label="Priority" name="" />
+          <SlimInput
+            onChange={handleChange}
+            label="Assigned Date"
+            name="date"
+            type="date"
+          />
+          <SlimInput
+            onChange={handleChange}
+            label="Due Date"
+            name="due"
+            type="date"
+          />
+          <SlimInput onChange={handleChange} label="Amount" name="amount" />
           <div>
-            {!statusOpenDropdown && <SlimInput label="Status" name="" />}
+            <label>Priority</label>
+
+            <Selector
+              label={(priority) => (priority ? priority : "Priority")}
+              items={priorities}
+              displayList={(priority: TPriority) => <p>{priority}</p>}
+              onSearch={(search: string) =>
+                priorities.filter((priority) =>
+                  priority.toLowerCase().includes(search.toLowerCase()),
+                )
+              }
+              openState={[priorityOpen, setPriorityOpen]}
+              selectedItem={priority}
+              //@ts-ignore
+              setSelectedItem={setPriority}
+            />
+          </div>
+          <div>
+            <label htmlFor="status">Status</label>
             <SelectStatus
+              value={status}
+              //@ts-ignore
+              setValue={setStatus}
               open={statusOpenDropdown}
               setOpen={setStatusOpenDropdown}
             />
           </div>
         </div>
         <div>
-          <label htmlFor="deposit-notes">New Note</label>
+          <label htmlFor="note">New Note</label>
           <textarea
-            name="deposit-notes"
+            onChange={handleChange}
+            name="note"
             className="h-32 w-full resize-none rounded-md border-2 border-slate-400 p-2 outline-none"
             // defaultValue={depositNotes}
           />
@@ -90,7 +212,7 @@ export default function CreateAndEditLabor({ laborId }: { laborId?: string }) {
           <DialogClose className="rounded-lg border-2 border-slate-400 p-2">
             Cancel
           </DialogClose>
-          {laborId ? (
+          {technician ? (
             <Submit
               className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
               // formAction={handleSubmit}
@@ -98,12 +220,12 @@ export default function CreateAndEditLabor({ laborId }: { laborId?: string }) {
               Update
             </Submit>
           ) : (
-            <Submit
+            <button
               className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
-              // formAction={handleSubmit}
+              onClick={handleSubmit}
             >
               Add
-            </Submit>
+            </button>
           )}
         </DialogFooter>
       </DialogContent>
