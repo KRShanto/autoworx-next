@@ -182,7 +182,7 @@ export default async function ViewEstimate({
             <p>Thank you for shopping with Autoworx</p>
           </div>
           <div className="flex h-[90vh] w-[394px] shrink grow-0 flex-col gap-4">
-            <div className="grid flex-1 gap-4 overflow-y-auto border bg-background p-6 shadow-lg">
+            <div className="grid flex-1 grid-cols-1 gap-4 overflow-y-auto border bg-background p-6 shadow-lg">
               <h2 className="col-span-full text-3xl font-bold uppercase text-slate-500">
                 Attachments
               </h2>
