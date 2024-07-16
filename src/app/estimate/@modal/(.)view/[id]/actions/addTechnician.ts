@@ -4,17 +4,7 @@ import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { Technician } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-type TechnicianInput = Technician & {
-  serviceId: number;
-  date: string;
-  due: string;
-  amount: number;
-  note: string;
-  userId: number | undefined;
-  priority: string;
-  status: string | undefined;
-  statusColor: string | undefined;
-};
+type TechnicianInput = Technician;
 export async function addTechnician(
   payload: TechnicianInput,
 ): Promise<ServerAction> {

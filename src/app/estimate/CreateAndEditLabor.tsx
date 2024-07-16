@@ -9,10 +9,18 @@ import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { SelectStatus } from "../../components/Lists/SelectStatus";
-import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  MouseEvent,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import { Status, Technician, User } from "@prisma/client";
 import { addTechnician } from "./@modal/(.)view/[id]/actions/addTechnician";
 import { useRouter } from "next/navigation";
+import moment from "moment";
+import { updateTechnician } from "./@modal/(.)view/[id]/actions/updateTechnician";
 type TPriority = string;
 type TEmployee = Partial<User>;
 const priorities: TPriority[] = ["Low", "Medium", "High"];
@@ -26,17 +34,23 @@ type TechnicianPayload = {
   priority: string;
   status: string | undefined;
   statusColor: string | undefined;
+  materialId: number | undefined;
+  workOrderId: number | undefined;
 };
 export default function CreateAndEditLabor({
   employees,
   serviceId,
   technician,
+  materialId: materialId,
+  workOrderId,
 }: {
   employees: {
     id: number;
     name: string;
   }[];
   serviceId: string;
+  materialId?: string;
+  workOrderId?: string;
   technician?: Technician;
 }) {
   const router = useRouter();
@@ -59,9 +73,20 @@ export default function CreateAndEditLabor({
   // edit technician
   useEffect(() => {
     if (technician) {
-      
+      const { amount, date, due, note, priority, status, statusColor, userId } =
+        technician;
+      const formattedDate = moment(date).format("YYYY-MM-DD");
+      const formattedDue = moment(due).format("YYYY-MM-DD");
+      setInputValues({
+        date: formattedDate,
+        due: formattedDue,
+        amount: amount?.toString() as string,
+        note: note as string,
+      });
+      setPriority(priority as string);
+      setEmployee(employees.find((e) => e.id === userId) as TEmployee);
     }
-  }, [technician])
+  }, [technician]);
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -91,30 +116,53 @@ export default function CreateAndEditLabor({
   ) => Promise<void> = async (event) => {
     setError(null);
     try {
-      const payload = {
-        serviceId: Number(serviceId),
-        date: new Date(inputValues.date).toISOString(),
-        due: new Date(inputValues.due).toISOString(),
-        amount: Number(inputValues.amount),
-        note: inputValues.note,
-        userId: employee?.id,
-        priority,
-        status: status?.name,
-        statusColor: status?.bgColor,
-        materialId: 0,
-        workOrderId: 0,
-      };
       // await (laborId ? updateLabor(laborId, payload) : createLabor(payload));
-      const response = await addTechnician(
-        payload as Technician & TechnicianPayload,
-      );
-      if (response.type === "success") {
-        router.back();
+      if (technician) {
+        const updatedPayload = {
+          ...technician,
+          date: new Date(inputValues.date).toISOString(),
+          due: new Date(inputValues.due).toISOString(),
+          amount: Number(inputValues.amount),
+          note: inputValues.note,
+          userId: employee?.id,
+          status: status?.name || technician.status,
+          statusColor: status?.bgColor || technician.statusColor,
+          priority,
+        };
+        const response = await updateTechnician(
+          technician.id,
+          updatedPayload as Technician & TechnicianPayload,
+        );
+        if (response.type === "success") {
+          router.back();
+        }
+      } else {
+        const payload = {
+          serviceId: Number(serviceId),
+          date: new Date(inputValues.date).toISOString(),
+          due: new Date(inputValues.due).toISOString(),
+          amount: Number(inputValues.amount),
+          note: inputValues.note,
+          userId: employee?.id,
+          priority,
+          status: status?.name,
+          statusColor: status?.bgColor,
+          materialId: Number(materialId),
+          workOrderId: Number(workOrderId),
+        };
+        const response = await addTechnician(
+          payload as Technician & TechnicianPayload,
+        );
+        if (response.type === "success") {
+          router.back();
+        }
       }
     } catch (error) {
       setError("Failed to update labor");
     }
   };
+  const date = moment(technician?.createdAt);
+  const formattedDate = date.format("h:mmA Do MMMM YYYY");
   return (
     <InterceptedDialog>
       <DialogContent>
@@ -142,6 +190,7 @@ export default function CreateAndEditLabor({
             />
           </div>
           <SlimInput
+            value={inputValues.date}
             onChange={handleChange}
             label="Assigned Date"
             name="date"
@@ -149,11 +198,17 @@ export default function CreateAndEditLabor({
           />
           <SlimInput
             onChange={handleChange}
+            value={inputValues.due}
             label="Due Date"
             name="due"
             type="date"
           />
-          <SlimInput onChange={handleChange} label="Amount" name="amount" />
+          <SlimInput
+            onChange={handleChange}
+            value={inputValues.amount}
+            label="Amount"
+            name="amount"
+          />
           <div>
             <label>Priority</label>
 
@@ -187,38 +242,44 @@ export default function CreateAndEditLabor({
           <label htmlFor="note">New Note</label>
           <textarea
             onChange={handleChange}
+            value={inputValues.note}
             name="note"
             className="h-32 w-full resize-none rounded-md border-2 border-slate-400 p-2 outline-none"
-            // defaultValue={depositNotes}
           />
         </div>
-        <div>
-          <div className="flex justify-between">
-            <p className="text-left text-lg font-bold">Work Note</p>
-            <p className="text-right text-lg font-bold">Status</p>
-          </div>
-          <div className="flex justify-between bg-blue-100 p-3">
-            <div className="w-3/5 space-y-2">
-              <p>Date: 10:00PM 5th January 2024</p>
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Temporibus, consequuntur!
-              </p>
+        {technician && (
+          <div>
+            <div className="flex justify-between">
+              <p className="text-left text-lg font-bold">Work Note</p>
+              <p className="text-right text-lg font-bold">Status</p>
             </div>
-            <div>status</div>
+            <div className="flex justify-between bg-blue-100 p-3">
+              <div className="w-3/5 space-y-2">
+                <p>Date: {formattedDate}</p>
+                <p>{technician?.note || "No notes"}</p>
+              </div>
+              <div>
+                <p
+                  className={`rounded-full px-2 py-1 text-black`}
+                  style={{ backgroundColor: technician?.statusColor as string }}
+                >
+                  {technician?.status}
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
         <DialogFooter>
           <DialogClose className="rounded-lg border-2 border-slate-400 p-2">
             Cancel
           </DialogClose>
           {technician ? (
-            <Submit
+            <button
               className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
-              // formAction={handleSubmit}
+              onClick={handleSubmit}
             >
               Update
-            </Submit>
+            </button>
           ) : (
             <button
               className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"

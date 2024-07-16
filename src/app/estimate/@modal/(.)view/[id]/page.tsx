@@ -13,6 +13,7 @@ import Image from "next/image";
 import Link from "next/link";
 import moment from "moment";
 import { auth } from "@/app/auth";
+import CreateWorkOrderBtn from "./CreateWorkOrderBtn";
 
 export default async function ViewEstimate({
   params: { id },
@@ -49,7 +50,6 @@ export default async function ViewEstimate({
         where: { id: invoice.vehicleId },
       })
     : null;
-
   return (
     <InterceptedDialog>
       <DialogPortal>
@@ -208,12 +208,7 @@ export default async function ViewEstimate({
                 </div>
               ))}
             </div>
-            <Link
-              href={`/estimate/create-work-order/${id}`}
-              className="rounded-md bg-[#6571FF] py-2 text-center text-white"
-            >
-              Create Work Order
-            </Link>
+            <CreateWorkOrderBtn invoiceId={invoice.id} id={id} />
           </div>
         </DialogContentBlank>
       </DialogPortal>

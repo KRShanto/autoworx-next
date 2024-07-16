@@ -3,11 +3,14 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { InvoiceItems } from "./InvoiceItems";
 import moment from "moment";
+import SaveWorkOrderBtn from "./SaveWorkOrderBtn";
 
 export default async function CreateWorkOrder({
   params: { id1 },
+  searchParams: { workOrderId },
 }: {
   params: { id1: string };
+  searchParams: { workOrderId: string };
 }) {
   const invoice = await db.invoice.findUnique({
     where: { id: id1 },
@@ -103,6 +106,7 @@ export default async function CreateWorkOrder({
 
         <div className="space-y-2">
           <InvoiceItems
+            workOrderId={workOrderId}
             items={JSON.parse(JSON.stringify(invoice.invoiceItems))}
           />
         </div>
@@ -111,9 +115,7 @@ export default async function CreateWorkOrder({
          * Submit
          */}
         <div className="flex">
-          <button className="mx-auto rounded bg-[#6571FF] px-8 py-2 text-white">
-            Save Work Order
-          </button>
+          <SaveWorkOrderBtn />
         </div>
         <div>
           <p className="font-bold text-slate-500">{invoice.company.name}</p>

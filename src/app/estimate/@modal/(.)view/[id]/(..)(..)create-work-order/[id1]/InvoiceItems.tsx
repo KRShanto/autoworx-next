@@ -2,12 +2,13 @@
 
 import { cn } from "@/lib/cn";
 import type { db } from "@/lib/db";
-import { useState } from "react";
+import React, { useState } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import LaborItems from "./LaborItems";
 
 export function InvoiceItems({
   items,
+  workOrderId,
 }: {
   items: Awaited<
     ReturnType<
@@ -20,6 +21,7 @@ export function InvoiceItems({
       }>
     >
   >;
+  workOrderId: string;
 }) {
   const [openService, setOpenService] = useState<number | null>(null);
   console.log({ items });
@@ -27,7 +29,10 @@ export function InvoiceItems({
     if (!item.service) return null;
 
     return (
-      <div key={item.id} className="rounded-md border border-[#6571FF] py-1">
+      <div
+        key={item.id}
+        className="overflow-y-auto rounded-md border border-[#6571FF] py-1"
+      >
         <div
           className={cn(
             "flex w-full justify-between text-[#6571FF]",
@@ -50,20 +55,22 @@ export function InvoiceItems({
           <div className="my-2 grid w-full grid-cols-1 gap-3 text-[#6571FF]">
             {/* TODO */}
             {item.materials.map((material, index) => {
+              console.log(material);
               if (!material) return null;
               return (
-                <div
-                  key={index}
-                  className="rounded-md border border-solid border-[#6571FF] p-2"
-                >
-                  <p>{material.name}</p>
-                </div>
+                <React.Fragment key={index}>
+                  <div className="ml-10">
+                    <p className="capitalize">{material.name}</p>
+                  </div>
+                  <LaborItems
+                    workOrderId={Number(workOrderId)}
+                    materialId={material.id}
+                    serviceId={item?.serviceId as number}
+                    labor={item.labor}
+                  />
+                </React.Fragment>
               );
             })}
-            <LaborItems
-              serviceId={item?.serviceId as number}
-              labor={item.labor}
-            />
           </div>
         )}
       </div>

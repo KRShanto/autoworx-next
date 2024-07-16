@@ -10,6 +10,7 @@ export default async function EditLaborPage({
   searchParams: { serviceId: string };
 }) {
   const employees = await db.user.findMany({
+    // where: {role: 'employee'},
     select: { id: true, name: true },
   });
   const technician = await db.technician.findUnique({
