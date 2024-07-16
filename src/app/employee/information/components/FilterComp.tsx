@@ -1,14 +1,9 @@
 "use client";
 
 import { SearchOutlined } from "@ant-design/icons";
-import type { DatePickerProps } from "antd";
 
-import type { Dayjs } from "dayjs";
 import DateRange from "./DateRange";
 
-const onChange: DatePickerProps<Dayjs[]>["onChange"] = (date, dateString) => {
-  // console.log(date, dateString);
-};
 
 export default function FilterComp() {
   return (
