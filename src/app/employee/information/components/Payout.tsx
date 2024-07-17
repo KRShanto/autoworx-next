@@ -8,20 +8,17 @@ export default function Payout() {
         title="Previous Month Payout"
         amount="$3464"
         percentage="100%"
-       
-        
       />
       <PayoutCard
         title="Current Month Payout"
         amount="$2780"
         percentage="90%"
-        
+
       />
       <PayoutCard
         title="YTD Payout"
         amount="$4000"
         percentage="85%"
-       
       />
     </div>
   )
