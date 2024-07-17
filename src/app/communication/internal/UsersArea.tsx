@@ -82,7 +82,7 @@ export default function UsersArea({
     };
   }, []);
 
-  // console.log("Message Que", messages);
+  console.log("Message Que", messages);
 
   return (
     <div className="flex w-full flex-wrap gap-4">

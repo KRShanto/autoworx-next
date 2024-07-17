@@ -213,7 +213,7 @@ function QuickAddForm({
     const res = await newTag({ name, ...selectedColor });
 
     if (res.type === "error") {
-      // console.log(res);
+      console.log(res);
       showError({
         field: res.field || "name",
         message: res.message || "",

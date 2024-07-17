@@ -7,7 +7,6 @@ import type {
   EmailTemplate,
   Labor,
   Material,
-  Order,
   Service,
   Tag,
   User,
@@ -15,13 +14,13 @@ import type {
   Vendor,
   Status,
   PaymentMethod,
+  Invoice,
 } from "@prisma/client";
 import { useEffect } from "react";
 
 export function SyncLists({
   customers = [],
   vehicles = [],
-  orders = [],
   employees = [],
   templates = [],
   categories = [],
@@ -32,10 +31,10 @@ export function SyncLists({
   vendors = [],
   statuses = [],
   paymentMethods = [],
+  estimates = [],
 }: {
   customers?: Customer[];
   vehicles?: Vehicle[];
-  orders?: Order[];
   employees?: User[];
   templates?: EmailTemplate[];
   categories?: Category[];
@@ -46,12 +45,12 @@ export function SyncLists({
   vendors?: Vendor[];
   statuses?: Status[];
   paymentMethods?: PaymentMethod[];
+  estimates?: Invoice[];
 }) {
   useEffect(() => {
     useListsStore.setState({
       customers,
       vehicles,
-      orders,
       employees,
       templates,
       categories,
@@ -62,11 +61,11 @@ export function SyncLists({
       vendors,
       statuses,
       paymentMethods,
+      estimates,
     });
   }, [
     customers,
     vehicles,
-    orders,
     employees,
     templates,
     categories,
@@ -77,6 +76,7 @@ export function SyncLists({
     vendors,
     statuses,
     paymentMethods,
+    estimates,
   ]);
   return null;
 }
