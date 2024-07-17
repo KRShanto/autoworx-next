@@ -8,7 +8,7 @@ export async function sendEmail(props: {
   text: string;
   html?: string;
 }) {
-  console.log("email props: ", props);
+  // console.log("email props: ", props);
 
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,

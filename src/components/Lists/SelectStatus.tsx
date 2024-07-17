@@ -188,7 +188,7 @@ function QuickAddForm({
     });
 
     if (res.type === "error") {
-      console.log(res);
+      // console.log(res);
       showError({
         field: res.field || "name",
         message: res.message || "",

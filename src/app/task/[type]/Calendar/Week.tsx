@@ -408,7 +408,7 @@ export default function Week({
               }
             }
           });
-          const limitOfTasks = 5;
+              const limitOfTasks = 5;
           const taskIndex = tasksInRow.findIndex(
             (task) => task.id === event.id,
           );

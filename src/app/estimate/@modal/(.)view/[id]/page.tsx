@@ -13,6 +13,7 @@ import Image from "next/image";
 import Link from "next/link";
 import moment from "moment";
 import { auth } from "@/app/auth";
+import CreateWorkOrderBtn from "./CreateWorkOrderBtn";
 
 export default async function ViewEstimate({
   params: { id },
@@ -49,13 +50,12 @@ export default async function ViewEstimate({
         where: { id: invoice.vehicleId },
       })
     : null;
-
   return (
     <InterceptedDialog>
       <DialogPortal>
         <DialogOverlay />
         <DialogContentBlank className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] fixed left-[50%] top-[50%] z-50 flex max-h-full translate-x-[-50%] translate-y-[-50%] justify-center gap-4 duration-200">
-          <div className="relative grid w-[740px] shrink grow-0 gap-4 overflow-y-auto border bg-background p-6 shadow-lg">
+          <div className="relative grid h-[90vh] w-[740px] shrink grow-0 gap-4 overflow-y-auto border bg-background p-6 shadow-lg">
             {/**
              * Logo, Contact Information
              */}
@@ -181,23 +181,34 @@ export default async function ViewEstimate({
             </div>
             <p>Thank you for shopping with Autoworx</p>
           </div>
-          <div className="flex w-[394px] shrink grow-0 flex-col gap-4">
-            <div className="grid flex-1 gap-4 overflow-y-auto border bg-background p-6 shadow-lg">
+          <div className="flex h-[90vh] w-[394px] shrink grow-0 flex-col gap-4">
+            <div className="grid flex-1 grid-cols-1 gap-4 overflow-y-auto border bg-background p-6 shadow-lg">
               <h2 className="col-span-full text-3xl font-bold uppercase text-slate-500">
                 Attachments
               </h2>
               {invoice.photos.map((x) => (
                 <div key={x.id} className="relative aspect-square">
-                  <Image src={`/uploads/${x.photo}`} fill alt="attachment" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    alt="attachment"
+                    loading="lazy"
+                    decoding="async"
+                    data-nimg="fill"
+                    sizes="100vw"
+                    src={`/uploads/${x?.photo}`}
+                    style={{
+                      position: "absolute",
+                      height: "100%",
+                      width: "100%",
+                      inset: "0px",
+                      color: "transparent",
+                    }}
+                  />
+                  {/* <Image src={`/uploads/${x?.photo}`} fill alt="attachment" /> */}
                 </div>
               ))}
             </div>
-            <Link
-              href={`/estimate/create-work-order/${id}`}
-              className="rounded-md bg-[#6571FF] py-2 text-center text-white"
-            >
-              Create Work Order
-            </Link>
+            <CreateWorkOrderBtn invoiceId={invoice.id} id={id} />
           </div>
         </DialogContentBlank>
       </DialogPortal>

@@ -463,7 +463,6 @@ export default function Day({
                 <div>
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold">{event.title}</h3>
-
                     <button
                       type="button"
                       className="text- rounded-full bg-[#6571FF] p-2 text-white"
