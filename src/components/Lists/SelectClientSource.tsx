@@ -40,7 +40,7 @@ interface SelectorProps<T> {
  * @param {boolean} [props.clickabled] - Optional prop to enable/disable item selection.
  * @returns {JSX.Element} The rendered Selector component.
  */
-export default function Selector<T>({
+export default function SelectClientSource<T>({
   label,
   items,
   border,
@@ -109,7 +109,7 @@ export default function Selector<T>({
         <DropdownMenuTrigger
           onClick={() => setIsOpen(true)}
           className={cn(
-            "flex h-10 w-full items-center justify-between rounded-md border-2 border-slate-400 px-4",
+            "flex w-full items-center justify-between rounded-md border-2 border-slate-400 px-4 py-1",
             isOpen && "invisible",
           )}
         >

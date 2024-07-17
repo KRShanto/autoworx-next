@@ -1,18 +1,18 @@
-'use client';
-import React, { useState } from 'react';
-import { DateRangePicker } from 'react-date-range';
-import 'react-date-range/dist/styles.css'; // main style file
-import 'react-date-range/dist/theme/default.css'; // theme css file
+"use client";
+import { format } from "date-fns";
+import React, { useState } from "react";
+import { DateRangePicker } from "react-date-range";
+import "react-date-range/dist/styles.css"; // main style file
+import "react-date-range/dist/theme/default.css"; // theme css file
 import { CiCalendar } from "react-icons/ci";
-import { format } from 'date-fns';
 
 const DateRange = () => {
   const [state, setState] = useState({
     selection: {
       startDate: new Date(),
       endDate: new Date(),
-      key: 'selection',
-    }
+      key: "selection",
+    },
   });
 
   const [showPicker, setShowPicker] = useState(false);
@@ -34,24 +34,27 @@ const DateRange = () => {
   };
 
   const formatRange = (start: Date, end: Date) => {
-    const formattedStart = format(start, 'MM/dd/yyyy');
-    const formattedEnd = format(end, 'MM/dd/yyyy');
+    const formattedStart = format(start, "MM/dd/yyyy");
+    const formattedEnd = format(end, "MM/dd/yyyy");
     return `${formattedStart} - ${formattedEnd}`;
   };
 
   return (
     <div>
-      <button onClick={togglePicker} className="flex items-center gap-2 rounded-lg border border-gray-400 p-2 w-full text-gray-400 text-sm hover:border-blue-600">
+      <button
+        onClick={togglePicker}
+        className="flex w-full items-center gap-2 rounded-lg border border-gray-400 p-2 text-sm text-gray-400 hover:border-blue-600"
+      >
         <span>
           {isRangeSelected
             ? formatRange(state.selection.startDate, state.selection.endDate)
-            : 'Date Range'}
+            : "Date Range"}
         </span>
         <CiCalendar />
       </button>
 
       {showPicker && (
-        <div className="absolute z-10 bg-white border border-gray-300 p-4 shadow-lg">
+        <div className="absolute z-10 border border-gray-300 bg-white p-4 shadow-lg">
           <DateRangePicker
             ranges={[tempRange]}
             onChange={handleSelect}
@@ -61,9 +64,16 @@ const DateRange = () => {
             preventSnapRefocus={true}
             calendarFocus="forwards"
           />
-          <div className="flex justify-end mt-2">
-            <button onClick={handleOk} className="mr-2 bg-blue-500 text-white p-2 rounded">OK</button>
-            <button onClick={togglePicker} className="bg-gray-300 p-2 rounded">Cancel</button>
+          <div className="mt-2 flex justify-end">
+            <button
+              onClick={handleOk}
+              className="mr-2 rounded bg-blue-500 p-2 text-white"
+            >
+              OK
+            </button>
+            <button onClick={togglePicker} className="rounded bg-gray-300 p-2">
+              Cancel
+            </button>
           </div>
         </div>
       )}
