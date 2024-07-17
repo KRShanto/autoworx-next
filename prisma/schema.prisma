@@ -33,6 +33,7 @@ model Company {
   statuses          Status[]
   paymentMethods    PaymentMethod[]
   inventoryProducts InventoryProduct[]
+  VehicleColor      VehicleColor[]
 }
 
 // User model.
@@ -144,20 +145,30 @@ model Vehicle {
   model        String?
   submodel     String?
   type         String?
-  textColor    String? // hex (with #)
-  bgColor      String? // hex (with #)
   transmission String?
   engineSize   String?
   license      String?
   vin          String?
   notes        String?
+  colorId      Int?          @map("color_id")
   companyId    Int           @map("company_id")
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
   company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   appointments Appointment[]
+  color        VehicleColor? @relation(fields: [colorId], references: [id], onDelete: SetNull)
 
   @@index([companyId], name: "fk_vehicles_company")
+}
+
+model VehicleColor {
+  id        Int       @id @default(autoincrement())
+  name      String
+  companyId Int       @map("company_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+  Vehicle   Vehicle[]
+  company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 // Invoice of a company.
