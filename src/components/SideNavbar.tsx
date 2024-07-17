@@ -86,9 +86,18 @@ const navList = [
     ],
   },
   {
-    title: "Employee",
+    title: "Directory",
     icon: "/icons/navbar/Employee.png",
-    link: "/employee",
+    subnav: [
+      {
+        title: "Employee",
+        link: "/employee",
+      },
+      {
+        title: "Client",
+        link: "/client",
+      },
+    ],
   },
 ];
 

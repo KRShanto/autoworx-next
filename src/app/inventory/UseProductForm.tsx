@@ -14,9 +14,19 @@ import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { useState } from "react";
 import { useProduct as productUse } from "./actions/useProduct";
+import Selector from "@/components/Selector";
 
-export default function UseProductForm({ productId }: { productId: number }) {
+export default function UseProductForm({
+  productId,
+  invoiceIds,
+  cost,
+}: {
+  productId: number;
+  invoiceIds: string[];
+  cost: number;
+}) {
   const [open, setOpen] = useState(false);
+  const [invoiceId, setInvoiceId] = useState<string | null>(null);
 
   async function handleSubmit(formData: FormData) {
     const date = formData.get("date") as string;
@@ -28,6 +38,7 @@ export default function UseProductForm({ productId }: { productId: number }) {
       date: new Date(date),
       quantity: parseInt(quantity),
       notes,
+      invoiceId,
     });
 
     if (res.type === "success") {
@@ -51,8 +62,26 @@ export default function UseProductForm({ productId }: { productId: number }) {
         <FormError />
 
         <div className="grid grid-cols-2 gap-3 overflow-y-auto p-2">
-          <SlimInput name="date" type="date" className="col-span-1" />
+          <SlimInput
+            name="date"
+            type="date"
+            className="col-span-1"
+            defaultValue={new Date().toISOString().split("T")[0]}
+          />
           <SlimInput name="quantity" className="col-span-1" />
+          <SlimInput name="cost" className="col-span-1" value={cost} disabled />
+
+          <div className="col-span-2">
+            <Selector
+              label={(invoice: string | null) => invoice || "Select Invoice"}
+              items={invoiceIds}
+              selectedItem={invoiceId}
+              setSelectedItem={setInvoiceId}
+              displayList={(invoiceId) => <p>{invoiceId}</p>}
+              newButton={<></>}
+            />
+          </div>
+
           <div className="col-span-2">
             <label htmlFor="notes"> Notes</label>
             <textarea

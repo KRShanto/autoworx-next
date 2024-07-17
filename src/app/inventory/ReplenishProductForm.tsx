@@ -69,7 +69,12 @@ export default function ReplenishProductForm({
         <FormError />
 
         <div className="flex flex-col gap-3 p-2">
-          <SlimInput name="date" type="date" className="col-span-1" />
+          <SlimInput
+            name="date"
+            type="date"
+            className="col-span-1"
+            defaultValue={new Date().toISOString().split("T")[0]}
+          />
           {/* TODO: make reusable component */}
           <div>
             <label>Vendor</label>

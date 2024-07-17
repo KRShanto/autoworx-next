@@ -659,6 +659,8 @@ model InventoryProduct {
   lot                     String?
   vendorId                Int?                      @map("vendor_id")
   type                    InventoryProductType
+  receipt                 String?
+  lowInventoryAlert       Int?                      @map("low_inventory_alert")
   companyId               Int                       @map("company_id")
   createdAt               DateTime                  @default(now()) @map("created_at")
   updatedAt               DateTime                  @default(now()) @updatedAt @map("updated_at")

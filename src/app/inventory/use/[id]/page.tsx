@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import React from "react";
 import UseProductForm from "../../UseProductForm";
 import ReplenishProductForm from "../../ReplenishProductForm";
+import { getCompanyId } from "@/lib/companyId";
 
 export default async function Page({
   params: { id },
@@ -11,9 +12,19 @@ export default async function Page({
 }) {
   if (!id) return notFound();
 
+  const companyId = await getCompanyId();
+
   const productId = parseInt(id);
   const product = await db.inventoryProduct.findUnique({
     where: { id: productId },
+  });
+  const invoices = await db.invoice.findMany({
+    where: { companyId, type: "Invoice" },
+    select: { id: true },
+  });
+  const lastHistory = await db.inventoryProductHistory.findFirst({
+    where: { productId },
+    orderBy: { date: "desc" },
   });
 
   if (!product) return notFound();
@@ -41,7 +52,11 @@ export default async function Page({
         </div>
       </div>
       <div className="mt-3 flex justify-end gap-3">
-        <UseProductForm productId={productId} />
+        <UseProductForm
+          productId={productId}
+          invoiceIds={invoices.map((invoice) => invoice.id)}
+          cost={parseInt(lastHistory?.price?.toString() || "0")}
+        />
         <ReplenishProductForm productId={productId} />
       </div>
     </div>

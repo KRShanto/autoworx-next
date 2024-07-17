@@ -41,6 +41,8 @@ export default function AddNewProduct() {
     const type =
       (data.get("type") as InventoryProductType) ||
       InventoryProductType.Product;
+    const receipt = data.get("receipt") as string;
+    const lowInventory = data.get("lowInventory") as string;
 
     const res = await createProduct({
       name,
@@ -52,6 +54,8 @@ export default function AddNewProduct() {
       unit,
       lot,
       type,
+      receipt,
+      lowInventoryAlert: lowInventory ? Number(lowInventory) : undefined,
     });
 
     if (res.type === "success") {
@@ -180,6 +184,19 @@ export default function AddNewProduct() {
 
               <SlimInput name="unit" required={false} />
               <SlimInput name="lot" label="Lot#" required={false} />
+            </div>
+            <div>
+              <SlimInput name="receipt" label="Receipt#" required={false} />
+            </div>
+            <div className="rounded-md bg-[#6571FF5E] p-2">
+              <p className="font-semibold">Quantity for Low Inventory</p>
+              <i className="text-xs">(Leave blank to disable notifications)</i>
+              <SlimInput
+                name="lowInventory"
+                label={""}
+                type="number"
+                required={false}
+              />
             </div>
           </div>
 

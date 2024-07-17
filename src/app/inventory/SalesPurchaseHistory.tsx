@@ -9,7 +9,6 @@ export default async function SalesPurchaseHistory({
   const product = productId
     ? await db.inventoryProduct.findUnique({
         where: { id: productId },
-        select: { vendor: true, price: true, quantity: true },
       })
     : undefined;
   const history = productId
@@ -19,12 +18,5 @@ export default async function SalesPurchaseHistory({
       })
     : [];
 
-  return (
-    <SalesPurchaseHistoryClient
-      histories={history}
-      vendorName={product?.vendor?.name || ""}
-      price={product?.price as any}
-      productId={productId}
-    />
-  );
+  return <SalesPurchaseHistoryClient histories={history} product={product!} />;
 }

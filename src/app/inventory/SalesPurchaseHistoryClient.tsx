@@ -1,7 +1,11 @@
 "use client";
 
 import { cn } from "@/lib/cn";
-import { InventoryProductHistory } from "@prisma/client";
+import {
+  InventoryProduct,
+  InventoryProductHistory,
+  InventoryProductHistoryType,
+} from "@prisma/client";
 import * as Tabs from "@radix-ui/react-tabs";
 import moment from "moment";
 import Link from "next/link";
@@ -17,15 +21,11 @@ const evenColor = "bg-white";
 const oddColor = "bg-[#F8FAFF]";
 
 export default function SalesPurchaseHistoryClient({
-  productId,
+  product,
   histories,
-  vendorName,
-  price,
 }: {
-  productId: number | undefined;
+  product?: InventoryProduct;
   histories: InventoryProductHistory[];
-  vendorName: string;
-  price: number;
 }) {
   const [tab, setTab] = useState<Tab>(Tab.Sales);
 
@@ -60,8 +60,8 @@ export default function SalesPurchaseHistoryClient({
           <Tabs.Content value={Tab.Sales}>
             <Table
               histories={histories.filter((history) => history.type === "Sale")}
-              vendorName={vendorName}
-              price={price}
+              type="Sale"
+              product={product}
             />
           </Tabs.Content>
           <Tabs.Content value={Tab.Purchase}>
@@ -69,8 +69,8 @@ export default function SalesPurchaseHistoryClient({
               histories={histories.filter(
                 (history) => history.type === "Purchase",
               )}
-              vendorName={vendorName}
-              price={price}
+              type="Purchase"
+              product={product}
             />
           </Tabs.Content>
         </div>
@@ -81,24 +81,27 @@ export default function SalesPurchaseHistoryClient({
 
 function Table({
   histories,
-  vendorName,
-  price,
+  type,
+  product,
 }: {
   histories: InventoryProductHistory[];
-  vendorName: string;
-  price: number;
+  type: InventoryProductHistoryType;
+  product?: InventoryProduct;
 }) {
   return (
     <table className="w-full text-sm 2xl:text-base">
       <thead className="bg-white">
         <tr className="h-10 border-b">
-          <th className="text-center">#</th>
+          {product?.type === "Product" && (
+            <th className="text-center">
+              {type === "Sale" ? "Invoice" : "Receipt"}
+            </th>
+          )}
           <th className="text-center">Name</th>
           <th className="text-center">Price</th>
           <th className="text-center">Quantity</th>
           <th className="text-center">Total</th>
           <th className="text-center">Date</th>
-          <th className="text-center">Invoice</th>
         </tr>
       </thead>
 
@@ -108,9 +111,24 @@ function Table({
             key={history.id}
             className={cn("py-3", index % 2 === 0 ? evenColor : oddColor)}
           >
-            <td className="h-12 text-center">
-              <p>{history.id}</p>
-            </td>
+            {product?.type === "Product" && (
+              <>
+                {type === "Sale" ? (
+                  <td className="text-center text-[#6571FF]">
+                    {history.invoiceId && (
+                      <Link href={`/estimate/view/${history.invoiceId}`}>
+                        {history.invoiceId}
+                      </Link>
+                    )}
+                  </td>
+                ) : (
+                  <td className="text-center text-[#6571FF]">
+                    <p>{product && product.receipt}</p>
+                  </td>
+                )}
+              </>
+            )}
+
             <td className="text-nowrap text-center">{history.vendorName}</td>
             <td className="text-nowrap text-center">
               ${history.price?.toString()}
@@ -123,16 +141,6 @@ function Table({
               {moment(history.date).format(
                 // date.month.year
                 "DD.MM.YYYY",
-              )}
-            </td>
-            <td className="">
-              {history.invoiceId && (
-                <Link
-                  href={`/estimate/view/${history.invoiceId}`}
-                  className="relative left-1/2 -translate-x-1/2 transform"
-                >
-                  <HiExternalLink />
-                </Link>
               )}
             </td>
           </tr>

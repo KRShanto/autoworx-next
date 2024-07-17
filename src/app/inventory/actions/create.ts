@@ -17,6 +17,8 @@ const CreateProductInputSchema = z.object({
   unit: z.string().optional(),
   lot: z.string().optional(),
   type: z.enum([InventoryProductType.Product, InventoryProductType.Supply]),
+  receipt: z.string().optional(),
+  lowInventoryAlert: z.number().optional(),
 });
 
 export async function createProduct(

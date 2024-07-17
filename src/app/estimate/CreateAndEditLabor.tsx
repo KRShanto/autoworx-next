@@ -61,7 +61,7 @@ export default function CreateAndEditLabor({
   const [status, setStatus] = useState<Status | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [inputValues, setInputValues] = useState({
-    date: "",
+    date: new Date().toISOString().split("T")[0],
     due: "",
     amount: "",
     note: "",

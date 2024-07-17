@@ -38,6 +38,8 @@ type TInputType = {
   unit: string | null;
   lot: string | null;
   type: InventoryProductType;
+  receipt: string | null;
+  lowInventory: number | null;
 };
 
 export default function EditProduct({ productData }: TProps) {
@@ -57,6 +59,8 @@ export default function EditProduct({ productData }: TProps) {
     unit: productData.unit,
     lot: productData.lot,
     type: productData.type,
+    receipt: productData.receipt,
+    lowInventory: productData.lowInventoryAlert,
   });
 
   const handleChange = (
@@ -76,6 +80,8 @@ export default function EditProduct({ productData }: TProps) {
     const unit = product.unit as string;
     const lot = product.lot as string;
     const type = product.type as InventoryProductType;
+    const receipt = product.receipt as string;
+    const lowInventory = Number(product.lowInventory) as number;
 
     try {
       if (!(price > 0 && quantity > 0)) {
@@ -92,6 +98,8 @@ export default function EditProduct({ productData }: TProps) {
         unit,
         lot,
         type,
+        receipt,
+        lowInventoryAlert: lowInventory,
       });
 
       if (res.type === "success") {
@@ -235,6 +243,27 @@ export default function EditProduct({ productData }: TProps) {
                 name="lot"
                 label="Lot#"
                 required={false}
+              />
+            </div>
+            <div>
+              <SlimInput
+                onChange={handleChange}
+                value={product.receipt as string}
+                name="receipt"
+                label="Receipt#"
+                required={false}
+              />
+            </div>
+            <div className="rounded-md bg-[#6571FF5E] p-2">
+              <p className="font-semibold">Quantity for Low Inventory</p>
+              <i className="text-xs">(Leave blank to disable notifications)</i>
+              <SlimInput
+                name="lowInventory"
+                label={""}
+                type="number"
+                required={false}
+                value={product.lowInventory as number}
+                onChange={handleChange}
               />
             </div>
           </div>

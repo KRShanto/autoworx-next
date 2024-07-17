@@ -40,6 +40,7 @@ import { TbBell, TbCalendar } from "react-icons/tb";
 import { addAppointment } from "../../actions/addAppointment";
 import { Reminder } from "./Reminder";
 import { customAlphabet } from "nanoid";
+import dayjs from "dayjs";
 
 enum Tab {
   Schedule = 0,
@@ -324,6 +325,11 @@ export function NewAppointment({
                     format="h:mm a"
                     className="rounded-md border border-gray-500 p-1 placeholder-slate-800"
                     needConfirm={false}
+                    // set default time
+                    defaultValue={[
+                      dayjs(settings && settings.dayStart, "HH:mm"),
+                      dayjs(settings && settings.dayEnd, "HH:mm"),
+                    ]}
                   />
                 </div>
               </div>

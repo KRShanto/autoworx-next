@@ -5,10 +5,21 @@ import { FaPrint } from "react-icons/fa6";
 import ReplenishProductForm from "./ReplenishProductForm";
 import SalesPurchaseHistory from "./SalesPurchaseHistory";
 import UseProductForm from "./UseProductForm";
+import { getCompanyId } from "@/lib/companyId";
 
 export default async function Sidebar({ productId }: { productId: number }) {
+  const companyId = await getCompanyId();
+
   const product = productId
     ? await db.inventoryProduct.findUnique({ where: { id: productId } })
+    : null;
+
+  // Find the last history for this product
+  const lastHistory = productId
+    ? await db.inventoryProductHistory.findFirst({
+        where: { productId },
+        orderBy: { date: "desc" },
+      })
     : null;
 
   const imgUrl = product
@@ -16,6 +27,11 @@ export default async function Sidebar({ productId }: { productId: number }) {
         `${process.env.NEXT_PUBLIC_APP_URL}inventory/use/${product.id}`,
       )
     : null;
+
+  const invoices = await db.invoice.findMany({
+    where: { companyId, type: "Invoice" },
+    select: { id: true },
+  });
 
   return (
     <div className="mt-12 flex h-[88.5%] w-1/2 flex-col">
@@ -101,7 +117,11 @@ export default async function Sidebar({ productId }: { productId: number }) {
             </div>
             {product && (
               <div className="mt-3 flex justify-end gap-3">
-                <UseProductForm productId={productId} />
+                <UseProductForm
+                  productId={productId}
+                  invoiceIds={invoices.map((invoice) => invoice.id)}
+                  cost={parseInt(lastHistory?.price?.toString() || "0")}
+                />
                 <ReplenishProductForm productId={productId} />
               </div>
             )}

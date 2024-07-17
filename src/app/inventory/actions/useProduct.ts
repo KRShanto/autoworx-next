@@ -6,11 +6,13 @@ import { revalidatePath } from "next/cache";
 
 export async function useProduct({
   productId,
+  invoiceId,
   date,
   quantity,
   notes,
 }: {
   productId: number;
+  invoiceId: string | null;
   date: Date;
   quantity: number;
   notes: string;
@@ -24,6 +26,7 @@ export async function useProduct({
   const newHistory = await db.inventoryProductHistory.create({
     data: {
       productId,
+      invoiceId,
       date,
       quantity,
       notes,

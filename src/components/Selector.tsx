@@ -93,7 +93,7 @@ export default function Selector<T>({
     setSelected(item);
     if (setSelectedItem) setSelectedItem(item);
     if (onSelect) onSelect(item);
-    setIsOpen(false);
+    if (setIsOpen) setIsOpen(false);
   }
 
   /**
