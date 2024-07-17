@@ -1,4 +1,5 @@
 "use client";
+import { format } from "date-fns";
 import React, { useState } from "react";
 import { DateRangePicker } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main style file
@@ -16,6 +17,7 @@ const DateRange = () => {
 
   const [showPicker, setShowPicker] = useState(false);
   const [tempRange, setTempRange] = useState(state.selection);
+  const [isRangeSelected, setIsRangeSelected] = useState(false);
 
   const handleSelect = (ranges: any) => {
     setTempRange(ranges.selection);
@@ -28,15 +30,26 @@ const DateRange = () => {
   const handleOk = () => {
     setState({ selection: tempRange });
     setShowPicker(false);
+    setIsRangeSelected(true);
+  };
+
+  const formatRange = (start: Date, end: Date) => {
+    const formattedStart = format(start, "MM/dd/yyyy");
+    const formattedEnd = format(end, "MM/dd/yyyy");
+    return `${formattedStart} - ${formattedEnd}`;
   };
 
   return (
-    <div className="#w-full">
+    <div>
       <button
         onClick={togglePicker}
         className="flex w-full items-center gap-2 rounded-lg border border-gray-400 p-2 text-sm text-gray-400 hover:border-blue-600"
       >
-        <span>Date Range</span>
+        <span>
+          {isRangeSelected
+            ? formatRange(state.selection.startDate, state.selection.endDate)
+            : "Date Range"}
+        </span>
         <CiCalendar />
       </button>
 
@@ -45,7 +58,6 @@ const DateRange = () => {
           <DateRangePicker
             ranges={[tempRange]}
             onChange={handleSelect}
-            // showSelectionPreview={true}
             moveRangeOnFirstSelection={false}
             months={1}
             direction="horizontal"

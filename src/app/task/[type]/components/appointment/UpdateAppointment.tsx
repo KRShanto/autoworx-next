@@ -22,7 +22,6 @@ import type {
   CalendarSettings,
   Customer,
   EmailTemplate,
-  Order,
   User,
   Vehicle,
 } from "@prisma/client";
@@ -42,8 +41,8 @@ import {
 import { TbBell, TbCalendar } from "react-icons/tb";
 import { deleteAppointment } from "../../actions/deleteAppointment";
 import { editAppointment } from "../../actions/editAppointment";
-import NewOrder from "./NewOrder";
 import { Reminder } from "./Reminder";
+import { customAlphabet } from "nanoid";
 
 enum Tab {
   Schedule = 0,
@@ -52,23 +51,15 @@ enum Tab {
 
 export function UpdateAppointment() {
   const { popup, data, close } = usePopupStore();
-  const {
-    appointment,
-    customers,
-    vehicles,
-    orders,
-    settings,
-    employees,
-    templates,
-  } = data as {
+  const { appointment, settings, employees, templates } = data as {
     appointment: AppointmentFull;
     customers: Customer[];
     vehicles: Vehicle[];
-    orders: Order[];
     settings: CalendarSettings;
     employees: User[];
     templates: EmailTemplate[];
   };
+  const { estimates } = useListsStore();
 
   const [tab, setTab] = useState(Tab.Schedule);
 
@@ -80,13 +71,16 @@ export function UpdateAppointment() {
   const [startTime, setStartTime] = useState<string | null>(
     appointment.startTime,
   );
+
+  console.log("draft: ", appointment.draftEstimate);
+
   const [endTime, setEndTime] = useState<string | null>(appointment.endTime);
-  const [orderList, setOrderList] = useState(orders);
+  const [draft, setDraft] = useState<string | null>(appointment.draftEstimate);
+  const [draftEstimates, setDraftEstimates] = useState<string[]>([]);
   const [allDay, setAllDay] = useState(false);
 
   const [client, setClient] = useState<Customer | null>(appointment.customer);
   const [vehicle, setVehicle] = useState<Vehicle | null>(appointment.vehicle);
-  const [order, setOrder] = useState<Order | null>(appointment.order);
   const [assignedUsers, setAssignedUsers] = useState<User[]>(
     appointment.assignedUsers,
   );
@@ -108,7 +102,7 @@ export function UpdateAppointment() {
     appointment.reminderEmailTemplateStatus,
   );
 
-  const [orderOpen, setOrderOpen] = useState(false);
+  const [draftOpen, setDraftOpen] = useState(false);
 
   //dropdown states
   const [clientOpenDropdown, setClientOpenDropdown] = useState(false);
@@ -145,6 +139,19 @@ export function UpdateAppointment() {
     }
   }, [templates]);
 
+  useEffect(() => {
+    if (estimates) {
+      // filter all estimates where clientId is client.id
+      const filteredEstimates = estimates.filter(
+        (estimate) => estimate.customerId === client?.id,
+      );
+      // map the filtered estimates to get the id
+      const estimateIds = filteredEstimates.map((estimate) => estimate.id);
+      // set the draft estimates
+      setDraftEstimates(estimateIds);
+    }
+  }, [estimates, client]);
+
   function onTimeChange(e: any) {
     if (!e) return;
 
@@ -164,7 +171,7 @@ export function UpdateAppointment() {
         assignedUsers: assignedUsers.map((user) => user.id),
         customerId: client ? client.id : undefined,
         vehicleId: vehicle ? vehicle.id : undefined,
-        orderId: order ? order.id : undefined,
+        draftEstimate: draft,
         notes,
         confirmationEmailTemplateId: confirmationTemplate?.id,
         reminderEmailTemplateId: reminderTemplate?.id,
@@ -179,22 +186,22 @@ export function UpdateAppointment() {
   useEffect(() => {
     if (
       clientOpenDropdown &&
-      (vehicleOpenDropdown || orderOpen || openConfirmation || openReminder)
+      (vehicleOpenDropdown || draftOpen || openConfirmation || openReminder)
     ) {
       setVehicleOpenDropdown(false);
-      setOrderOpen(false);
+      setDraftOpen(false);
       setOpenConfirmation(false);
       setOpenReminder(false);
     } else if (
       vehicleOpenDropdown &&
-      (clientOpenDropdown || orderOpen || openConfirmation || openReminder)
+      (clientOpenDropdown || draftOpen || openConfirmation || openReminder)
     ) {
       setClientOpenDropdown(false);
-      setOrderOpen(false);
+      setDraftOpen(false);
       setOpenConfirmation(false);
       setOpenReminder(false);
     } else if (
-      orderOpen &&
+      draftOpen &&
       (clientOpenDropdown ||
         vehicleOpenDropdown ||
         openConfirmation ||
@@ -206,26 +213,26 @@ export function UpdateAppointment() {
       setOpenReminder(false);
     } else if (
       openConfirmation &&
-      (clientOpenDropdown || vehicleOpenDropdown || orderOpen || openReminder)
+      (clientOpenDropdown || vehicleOpenDropdown || draftOpen || openReminder)
     ) {
       setClientOpenDropdown(false);
       setVehicleOpenDropdown(false);
-      setOrderOpen(false);
+      setDraftOpen(false);
       setOpenReminder(false);
     } else if (
       openReminder &&
       (clientOpenDropdown ||
         vehicleOpenDropdown ||
-        orderOpen ||
+        draftOpen ||
         openConfirmation)
     ) {
       setClientOpenDropdown(false);
       setVehicleOpenDropdown(false);
-      setOrderOpen(false);
+      setDraftOpen(false);
       setOpenConfirmation(false);
     }
   }, [
-    orderOpen,
+    draftOpen,
     clientOpenDropdown,
     vehicleOpenDropdown,
     openConfirmation,
@@ -409,22 +416,30 @@ export function UpdateAppointment() {
             />
 
             <Selector
-              label={(order: Order | null) => (order ? order.name : "Order")}
-              openState={[orderOpen, setOrderOpen]}
-              newButton={
-                <NewOrder
-                  setOrder={setOrder}
-                  setOrders={setOrderList}
-                  setOrderOpen={setOrderOpen}
-                />
+              label={(draft: string | null) =>
+                draft ? draft : "Draft Estimates"
               }
-              items={orderList}
-              selectedItem={order}
-              setSelectedItem={setOrder}
-              displayList={(item) => <p>{item.name}</p>}
+              openState={[draftOpen, setDraftOpen]}
+              newButton={
+                <button
+                  className="text-[#6571FF] disabled:text-zinc-400"
+                  onClick={() => {
+                    setDraft(customAlphabet("1234567890", 10)());
+                    setDraftOpen(false);
+                  }}
+                  disabled={!client || !vehicle}
+                  type="button"
+                >
+                  + New Draft Estimate
+                </button>
+              }
+              items={draftEstimates}
+              selectedItem={draft}
+              setSelectedItem={setDraft}
+              displayList={(item) => <p className="text-[#6571FF]">{item}</p>}
               onSearch={(search) => {
-                return orderList.filter((order) =>
-                  order.name.toLowerCase().includes(search.toLowerCase()),
+                return draftEstimates.filter((draft) =>
+                  draft.toLowerCase().includes(search.toLowerCase()),
                 );
               }}
             />

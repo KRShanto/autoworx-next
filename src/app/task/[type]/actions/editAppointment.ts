@@ -1,7 +1,9 @@
 "use server";
 
+import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
+import { AuthSession } from "@/types/auth";
 import { revalidatePath } from "next/cache";
 
 interface AppointmentToAdd {
@@ -12,7 +14,7 @@ interface AppointmentToAdd {
   assignedUsers: number[];
   customerId?: number;
   vehicleId?: number;
-  orderId?: number;
+  draftEstimate?: string | null;
   notes?: string;
   confirmationEmailTemplateId?: number;
   reminderEmailTemplateId?: number;
@@ -28,6 +30,40 @@ export async function editAppointment({
   id: number;
   appointment: AppointmentToAdd;
 }): Promise<ServerAction> {
+  const session = (await auth()) as AuthSession;
+  const companyId = session.user.companyId;
+
+  if (appointment.draftEstimate) {
+    // Check if the draftEstimate is same as the previous one
+    const existingAppointment = await db.appointment.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (existingAppointment?.draftEstimate !== appointment.draftEstimate) {
+      // Create draft estimate (if doesn't exist)
+      const draftEstimate = await db.invoice.findFirst({
+        where: {
+          id: appointment.draftEstimate,
+        },
+      });
+
+      if (!draftEstimate) {
+        await db.invoice.create({
+          data: {
+            id: appointment.draftEstimate,
+            type: "Estimate",
+            customerId: appointment.customerId,
+            vehicleId: appointment.vehicleId,
+            userId: session.user.id as any,
+            companyId,
+          },
+        });
+      }
+    }
+  }
+
   // Update the appointment
   await db.appointment.update({
     where: {
@@ -40,7 +76,7 @@ export async function editAppointment({
       endTime: appointment.endTime,
       customerId: appointment.customerId,
       vehicleId: appointment.vehicleId,
-      orderId: appointment.orderId,
+      draftEstimate: appointment.draftEstimate,
       notes: appointment.notes,
       confirmationEmailTemplateId: appointment.confirmationEmailTemplateId,
       confirmationEmailTemplateStatus:

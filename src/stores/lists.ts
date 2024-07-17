@@ -4,7 +4,6 @@ import type {
   EmailTemplate,
   Labor,
   Material,
-  Order,
   Service,
   Tag,
   User,
@@ -12,13 +11,14 @@ import type {
   Vendor,
   Status,
   PaymentMethod,
+  Invoice,
 } from "@prisma/client";
 import { create } from "zustand";
 
 export const useListsStore = create(() => ({
   customers: [] as Customer[],
   vehicles: [] as Vehicle[],
-  orders: [] as Order[],
+  estimates: [] as Invoice[],
   employees: [] as User[],
   templates: [] as EmailTemplate[],
   categories: [] as Category[],

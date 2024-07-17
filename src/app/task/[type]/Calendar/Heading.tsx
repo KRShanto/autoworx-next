@@ -1,12 +1,6 @@
 import { CalendarType } from "@/types/calendar";
 import type { EmailTemplate } from "@prisma/client";
-import {
-  CalendarSettings,
-  Customer,
-  Order,
-  User,
-  Vehicle,
-} from "@prisma/client";
+import { CalendarSettings, Customer, User, Vehicle } from "@prisma/client";
 import { sentenceCase } from "change-case";
 import moment, { Moment } from "moment";
 import Link from "next/link";
@@ -46,7 +40,6 @@ export default function Heading({
   type,
   customers,
   vehicles,
-  orders,
   settings,
   employees,
   templates,
@@ -54,7 +47,6 @@ export default function Heading({
   type: CalendarType;
   customers: Customer[];
   vehicles: Vehicle[];
-  orders: Order[];
   settings: CalendarSettings;
   employees: User[];
   templates: EmailTemplate[];
@@ -93,8 +85,8 @@ export default function Heading({
             const validDate = getNextValidDate(
               date.subtract(1, `${type}s`),
               -1,
-              weekend1 ? weekend1 : "", 
-              weekend2 ? weekend2 : "", 
+              weekend1 ? weekend1 : "",
+              weekend2 ? weekend2 : "",
             );
             router.push(
               `/task/${type}?${q}=${(date.isValid() ? validDate : moment()).format(moment.HTML5_FMT[q.toUpperCase() as Uppercase<typeof q>])}`,
@@ -114,8 +106,8 @@ export default function Heading({
             const validDate = getNextValidDate(
               date.add(1, `${type}s`),
               1,
-              weekend1 ? weekend1 : "", 
-              weekend2 ? weekend2 : "", 
+              weekend1 ? weekend1 : "",
+              weekend2 ? weekend2 : "",
             );
             router.push(
               `/task/${type}?${q}=${(date.isValid() ? validDate : moment()).format(moment.HTML5_FMT[q.toUpperCase() as Uppercase<typeof q>])}`,
@@ -140,9 +132,6 @@ export default function Heading({
 
         {/* New Appointment button */}
         <NewAppointment
-          customers={customers}
-          vehicles={vehicles}
-          orders={orders}
           settings={settings}
           employees={employees}
           templates={templates}

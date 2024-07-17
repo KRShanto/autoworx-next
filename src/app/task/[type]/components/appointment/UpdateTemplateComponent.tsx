@@ -59,7 +59,7 @@ export default function UpdateTemplate({
     }
   }
 
-  console.log("UpdateTemplateComponent.tsx");
+  // console.log("UpdateTemplateComponent.tsx");
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

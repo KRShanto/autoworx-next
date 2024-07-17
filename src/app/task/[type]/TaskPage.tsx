@@ -6,7 +6,6 @@ import type { EmailTemplate } from "@prisma/client";
 import {
   CalendarSettings,
   Customer,
-  Order,
   Task,
   User,
   Vehicle,
@@ -24,7 +23,6 @@ export default function TaskPage({
   tasks,
   customers,
   vehicles,
-  orders,
   settings,
   appointments,
   templates,
@@ -37,7 +35,6 @@ export default function TaskPage({
   tasks: Task[];
   customers: Customer[];
   vehicles: Vehicle[];
-  orders: Order[];
   settings: CalendarSettings;
   appointments: CalendarAppointment[];
   templates: EmailTemplate[];
@@ -60,7 +57,6 @@ export default function TaskPage({
         companyUsers={companyUsers}
         customers={customers}
         vehicles={vehicles}
-        orders={orders}
         settings={settings}
         appointments={appointments}
         templates={templates}
