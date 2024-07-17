@@ -5,8 +5,9 @@ import newStatus from "@/app/estimate/create/actions/newStatus";
 import { INVOICE_COLORS } from "@/lib/consts";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
+import { ClientTag } from "@/types/client";
 import { Status } from "@prisma/client";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   FaArrowDown,
   FaChevronDown,
@@ -27,7 +28,13 @@ import Submit from "../Submit";
 import { SelectProps } from "./select-props";
 
 type SelectedColor = { textColor: string; bgColor: string } | null;
-const Input = ({ search, setSearch }) => {
+const Input = ({
+  search,
+  setSearch,
+}: {
+  search: string;
+  setSearch: React.Dispatch<React.SetStateAction<string>>;
+}) => {
   return (
     <input
       type="text"
@@ -50,10 +57,9 @@ export function SelectClientTags({
 }: SelectProps<any>) {
   const state = useState(value);
   const [tag, setTag] = setValue ? [value, setValue] : state;
-  const [tagList, setTagList] = useState([]);
-  const [filteredTagList, setFilteredTagList] = useState(tagList);
-  const [search, setSearch] = useState("");
-  // const [open, setOpen] = useState(false);
+  const [tagList, setTagList] = useState<ClientTag[]>([]);
+  const [filteredTagList, setFilteredTagList] = useState<ClientTag[]>(tagList);
+  const [search, setSearch] = useState<string>("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
   useEffect(() => {
@@ -67,9 +73,7 @@ export function SelectClientTags({
       setFilteredTagList(tagList);
     }
   }, [search]);
-  // useEffect(() => {
-  //   setFilteredTagList(tagList);
-  // }, [tagList]);
+
   useEffect(() => {
     setFilteredTagList(tagList);
   }, [tagList]);
@@ -130,9 +134,7 @@ export function SelectClientTags({
                   backgroundColor: tagItem?.bgColor,
                   color: tagItem?.textColor,
                   border:
-                    tagItem?.id === status?.id
-                      ? `1px solid ${status.textColor}`
-                      : "",
+                    tagItem?.id === tag?.id ? `1px solid ${tag.textColor}` : "",
                 }}
               >
                 {tagItem.tag}
@@ -203,10 +205,10 @@ function QuickAddForm({
   onSuccess?: (value: Status) => void;
   setPickerOpen: any;
   selectedColor: SelectedColor;
-  tag: any;
-  setTag: any;
-  tagList: any;
-  setTagList: any;
+  tag: string;
+  setTag: React.Dispatch<React.SetStateAction<string>>;
+  tagList: ClientTag[];
+  setTagList: React.Dispatch<React.SetStateAction<ClientTag[]>>;
 }) {
   async function handleSubmit() {
     setTagList([
@@ -214,8 +216,8 @@ function QuickAddForm({
       {
         id: tagList.length + 1,
         tag,
-        bgColor: selectedColor?.bgColor,
-        textColor: selectedColor?.textColor,
+        bgColor: selectedColor?.bgColor || "white",
+        textColor: selectedColor?.textColor || "black",
       },
     ]);
     setTag("");
@@ -228,6 +230,7 @@ function QuickAddForm({
         type="text"
         required
         className="flex-1 rounded-sm border border-solid border-black p-1"
+        value={tag}
         onChange={(e) => {
           setTag(e.target.value);
         }}

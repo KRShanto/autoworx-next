@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -18,33 +17,20 @@ import { SelectClientTags } from "@/components/Lists/SelectClientTags";
 import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
+import { ClientSource, ClientTag } from "@/types/client";
 import { useEffect, useRef, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { RxAvatar } from "react-icons/rx";
 import NewClientSource from "./NewClientSource";
-export const OkInput = ({ search, setSearch }) => {
-  return (
-    <input
-      type="text"
-      placeholder="Search"
-      className="w-full rounded-md border-2 border-slate-400 p-1 pl-6 pr-10 focus:outline-none"
-      value={search}
-      onChange={(e) => {
-        setSearch(e.target.value);
-      }}
-      key="ok"
-    />
-  );
-};
+
 export default function AddNewClient() {
   const [open, setOpen] = useState(false);
   const profilePicRef = useRef<HTMLInputElement>(null);
-  const [clientSource, setClientSource] = useState<any>(null);
+  const [clientSource, setClientSource] = useState<ClientSource | null>(null);
   const [openClientSource, setOpenClientSource] = useState(false);
   const [tagOpenDropdown, setTagOpenDropdown] = useState(false);
-  const [tags, setTags] = useState(null);
-  console.log("Add New Client");
-  const [clientSources, setClientSources] = useState<any>([
+  const [tags, setTags] = useState<ClientTag[]>([]);
+  const [clientSources, setClientSources] = useState<ClientSource[]>([
     {
       id: 1,
       source: "Facebook",
@@ -121,13 +107,10 @@ export default function AddNewClient() {
                     <NewClientSource
                       clientSources={clientSources}
                       setClientSources={setClientSources}
-                      // type="Confirmation"
-                      // clientName={client.firstName + " " + client.lastName}
-                      // vehicleModel={vehicle?.model!}
                     />
                   }
                   items={clientSources}
-                  displayList={(clientSource: any) => (
+                  displayList={(clientSource: ClientSource) => (
                     <div className="flex">
                       <button
                         className="w-full text-left text-sm font-bold"
@@ -140,15 +123,10 @@ export default function AddNewClient() {
                         {clientSource.source}
                       </button>
                       <div className="flex items-center gap-2">
-                        {/* <UpdateTemplate
-                        id={template.id}
-                        subject={template.subject}
-                        message={template.message || ""}
-                      /> */}
                         <button
                           type="button"
                           onClick={() => {
-                            setClientSources((prev) => {
+                            setClientSources((prev: ClientSource[]) => {
                               return prev.filter(
                                 (c) => c.id !== clientSource.id,
                               );
@@ -163,7 +141,7 @@ export default function AddNewClient() {
                   selectedItem={clientSource}
                   setSelectedItem={setClientSource}
                   onSearch={(search: string) => {
-                    return clientSources.filter((clientSource) =>
+                    return clientSources.filter((clientSource: ClientSource) =>
                       clientSource.source
                         .toLowerCase()
                         .includes(search.toLowerCase()),
@@ -187,10 +165,7 @@ export default function AddNewClient() {
             <DialogClose className="rounded-lg border-2 border-slate-400 p-2">
               Cancel
             </DialogClose>
-            <button
-              className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
-              // formAction={handleSubmit}
-            >
+            <button className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white">
               Add
             </button>
           </DialogFooter>
