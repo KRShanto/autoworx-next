@@ -3,7 +3,6 @@ import { TiDeleteOutline } from "react-icons/ti";
 import Link from "next/link";
 import { Technician } from "@prisma/client";
 import { getTechnician } from "../../query/getTechnician";
-import { db } from "@/lib/db";
 import { deleteTechnician } from "../../actions/deleteTechnician";
 export default function LaborItems({
   workOrderId,
@@ -16,8 +15,11 @@ export default function LaborItems({
   serviceId: number;
   labor: any;
 }) {
-  const [technicians, setTechnicians] = useState<Technician[]>([]);
+  const [technicians, setTechnicians] = useState<
+    (Technician & { name: string })[]
+  >([]);
   const [error, setError] = useState("");
+
   useEffect(() => {
     const fetchTechnicians = async () => {
       try {
@@ -33,6 +35,7 @@ export default function LaborItems({
     };
     fetchTechnicians();
   }, []);
+
   const handleTechnicianDelete = async (technicianId: number) => {
     try {
       await deleteTechnician(technicianId);
@@ -45,10 +48,13 @@ export default function LaborItems({
       setError(err.message);
     }
   };
+
   return (
     <div className="mx-10 h-32 overflow-y-auto rounded-md border border-solid border-[#6571FF] p-2">
       {error && <p className="text-center text-sm text-red-400">{error}</p>}
+
       <p className="py-1 capitalize">{labor?.name}</p>
+
       <div className="grid grid-cols-4 gap-2">
         <Link
           href={`/estimate/labor/create?serviceId=${serviceId}&materialId=${materialId}&workOrderId=${workOrderId}`}
@@ -56,6 +62,7 @@ export default function LaborItems({
         >
           + Add Labor
         </Link>
+
         {technicians.map((technician, index) => (
           <button
             key={technician.id}
@@ -65,7 +72,7 @@ export default function LaborItems({
               href={`/estimate/labor/edit/${technician?.id}`}
               className="text-white"
             >
-              labor {index + 1}
+              {technician?.name}
             </Link>
             <TiDeleteOutline
               onClick={() => handleTechnicianDelete(technician?.id)}
