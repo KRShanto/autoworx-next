@@ -6,7 +6,6 @@ import {
   CheckPayment,
   Customer,
   EmailTemplate,
-  Order,
   OtherPayment,
   Payment,
   PaymentMethod,
@@ -115,6 +114,7 @@ export interface CalendarAppointment {
   customer: Customer | null;
   companyId: number;
   assignedUsers: User[];
+  draftEstimate: string | null;
 }
 
 export interface AppointmentFull {
@@ -125,7 +125,7 @@ export interface AppointmentFull {
   endTime: string | null;
   customer: Customer | null;
   vehicle: Vehicle | null;
-  order: Order | null;
+  draftEstimate: string | null;
   notes: string | null;
   confirmationEmailTemplate: EmailTemplate | null;
   reminderEmailTemplate: EmailTemplate | null;

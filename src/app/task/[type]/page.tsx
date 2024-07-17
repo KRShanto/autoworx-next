@@ -137,10 +137,6 @@ export default async function Page({ params }: { params: { type: string } }) {
     where: { companyId },
   });
 
-  const orders = await db.order.findMany({
-    where: { companyId },
-  });
-
   const settings = (await db.calendarSettings.findFirst({
     where: {
       companyId,
@@ -168,12 +164,6 @@ export default async function Page({ params }: { params: { type: string } }) {
         })
       : null;
 
-    const order = appointment.orderId
-      ? await db.order.findUnique({
-          where: { id: appointment.orderId },
-        })
-      : null;
-
     const confirmationEmailTemplate = appointment.confirmationEmailTemplateId
       ? await db.emailTemplate.findUnique({
           where: { id: appointment.confirmationEmailTemplateId },
@@ -185,11 +175,6 @@ export default async function Page({ params }: { params: { type: string } }) {
           where: { id: appointment.reminderEmailTemplateId },
         })
       : null;
-
-    console.log(
-      "Reminder Email Template: ",
-      appointment.reminderEmailTemplateId,
-    );
 
     const appointmentUsers = await db.appointmentUser.findMany({
       where: { appointmentId: appointment.id },
@@ -208,12 +193,16 @@ export default async function Page({ params }: { params: { type: string } }) {
       times: appointment.times as string[],
       customer,
       vehicle,
-      order,
       confirmationEmailTemplate: confirmationEmailTemplate as any,
       reminderEmailTemplate: reminderEmailTemplate as any,
       assignedUsers,
     });
   }
+  const estimates = await db.invoice.findMany({
+    where: {
+      type: "Estimate",
+    },
+  });
 
   return (
     <>
@@ -223,9 +212,9 @@ export default async function Page({ params }: { params: { type: string } }) {
         <SyncLists
           customers={customers}
           vehicles={vehicles}
-          orders={orders}
           employees={companyUsers}
           templates={emailTemplates}
+          estimates={estimates}
         />
         <TaskPage
           type={params.type as CalendarType}
@@ -235,7 +224,6 @@ export default async function Page({ params }: { params: { type: string } }) {
           tasks={tasks}
           customers={customers}
           vehicles={vehicles}
-          orders={orders}
           settings={settings}
           appointments={calendarAppointments!}
           templates={emailTemplates}

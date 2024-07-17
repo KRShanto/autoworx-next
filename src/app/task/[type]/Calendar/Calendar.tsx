@@ -4,7 +4,6 @@ import type { EmailTemplate } from "@prisma/client";
 import {
   CalendarSettings,
   Customer,
-  Order,
   Task,
   User,
   Vehicle,
@@ -20,7 +19,6 @@ export default function Calender({
   tasksWithoutTime,
   customers,
   vehicles,
-  orders,
   settings,
   appointments,
   appointmentsFull,
@@ -32,7 +30,6 @@ export default function Calender({
   tasksWithoutTime: Task[];
   customers: Customer[];
   vehicles: Vehicle[];
-  orders: Order[];
   settings: CalendarSettings;
   appointments: CalendarAppointment[];
   appointmentsFull: AppointmentFull[];
@@ -44,7 +41,6 @@ export default function Calender({
         type={type as any}
         customers={customers}
         vehicles={vehicles}
-        orders={orders}
         settings={settings}
         employees={companyUsers}
         templates={templates}
@@ -59,7 +55,6 @@ export default function Calender({
           appointmentsFull={appointmentsFull}
           customers={customers}
           vehicles={vehicles}
-          orders={orders}
           settings={settings}
           templates={templates}
         />

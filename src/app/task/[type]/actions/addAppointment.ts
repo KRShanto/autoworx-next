@@ -16,7 +16,7 @@ interface AppointmentToAdd {
   assignedUsers: number[];
   customerId?: number;
   vehicleId?: number;
-  orderId?: number;
+  draftEstimate: string | null;
   notes?: string;
   confirmationEmailTemplateId?: number;
   reminderEmailTemplateId?: number;
@@ -47,7 +47,7 @@ export async function addAppointment(
       endTime: appointment.endTime,
       customerId: appointment.customerId,
       vehicleId: appointment.vehicleId,
-      orderId: appointment.orderId,
+      draftEstimate: appointment.draftEstimate,
       notes: appointment.notes,
       userId: parseInt(session.user.id),
       confirmationEmailTemplateId: appointment.confirmationEmailTemplateId,
@@ -78,6 +78,28 @@ export async function addAppointment(
         eventId: "null-for-now",
       },
     });
+  }
+
+  // Create draft estimate (if doesn't exist)
+  if (appointment.draftEstimate) {
+    const draftEstimate = await db.invoice.findFirst({
+      where: {
+        id: appointment.draftEstimate,
+      },
+    });
+
+    if (!draftEstimate) {
+      await db.invoice.create({
+        data: {
+          id: appointment.draftEstimate,
+          type: "Estimate",
+          customerId: appointment.customerId,
+          vehicleId: appointment.vehicleId,
+          userId: session.user.id as any,
+          companyId,
+        },
+      });
+    }
   }
 
   revalidatePath("/task");

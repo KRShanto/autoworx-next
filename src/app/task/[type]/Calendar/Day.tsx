@@ -13,7 +13,6 @@ import type {
   CalendarSettings,
   Customer,
   EmailTemplate,
-  Order,
   Task,
   User,
   Vehicle,
@@ -49,7 +48,6 @@ export default function Day({
   appointmentsFull,
   customers,
   vehicles,
-  orders,
   settings,
   templates,
 }: {
@@ -61,7 +59,6 @@ export default function Day({
   appointmentsFull: AppointmentFull[];
   customers: Customer[];
   vehicles: Vehicle[];
-  orders: Order[];
   settings: CalendarSettings;
   templates: EmailTemplate[];
 }) {
@@ -418,7 +415,6 @@ export default function Day({
                 employees: companyUsers,
                 customers,
                 vehicles,
-                orders,
                 templates,
                 settings,
               }}
@@ -447,6 +443,9 @@ export default function Day({
                         <p className="text-left">
                           {moment(event.startTime, "HH:mm").format("hh:mm A")}{" "}
                           To {moment(event.endTime, "HH:mm").format("hh:mm A")}
+                        </p>
+                        <p className="text-left">
+                          Draft Estimate: {event.draftEstimate}
                         </p>
                       </div>
                       <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 rounded-lg border bg-[#6571FF]"></div>

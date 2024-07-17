@@ -23,7 +23,6 @@ import type {
   CalendarSettings,
   Customer,
   EmailTemplate,
-  Order,
   User,
   Vehicle,
 } from "@prisma/client";
@@ -32,7 +31,6 @@ import moment from "moment";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import {
-  FaArrowRight,
   FaChevronLeft,
   FaChevronRight,
   FaSearch,
@@ -40,8 +38,8 @@ import {
 } from "react-icons/fa";
 import { TbBell, TbCalendar } from "react-icons/tb";
 import { addAppointment } from "../../actions/addAppointment";
-import NewOrder from "./NewOrder";
 import { Reminder } from "./Reminder";
+import { customAlphabet } from "nanoid";
 
 enum Tab {
   Schedule = 0,
@@ -49,16 +47,10 @@ enum Tab {
 }
 
 export function NewAppointment({
-  customers,
-  vehicles,
-  orders,
   settings,
   employees,
   templates,
 }: {
-  customers: Customer[];
-  vehicles: Vehicle[];
-  orders: Order[];
   settings: CalendarSettings;
   employees: User[];
   templates: EmailTemplate[];
@@ -71,6 +63,8 @@ export function NewAppointment({
     },
     [open, close],
   );
+  const { estimates } = useListsStore();
+
   const [tab, setTab] = useState(Tab.Schedule);
 
   const [date, setDate] = useState<string | undefined>(
@@ -78,12 +72,12 @@ export function NewAppointment({
   );
   const [startTime, setStartTime] = useState<string | undefined>();
   const [endTime, setEndTime] = useState<string | undefined>();
-  const [orderList, setOrderList] = useState<Order[]>(orders);
   const [allDay, setAllDay] = useState(false);
 
   const [client, setClient] = useState<Customer | null>(null);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
-  const [order, setOrder] = useState<Order | null>(null);
+  const [draft, setDraft] = useState<string | null>(null);
+  const [draftEstimates, setDraftEstimates] = useState<string[]>([]);
   const [assignedUsers, setAssignedUsers] = useState<User[]>([]);
 
   const [addSalesPersonOpen, setAddSalesPersonOpen] = useState(false);
@@ -99,9 +93,9 @@ export function NewAppointment({
     useState(true);
   const [reminderTemplateStatus, setReminderTemplateStatus] = useState(true);
 
-  const [orderOpen, setOrderOpen] = useState(false);
+  const [draftOpen, setDraftOpen] = useState(false);
 
-  //dropdown states
+  // dropdown states
   const [clientOpenDropdown, setClientOpenDropdown] = useState(false);
   const [vehicleOpenDropdown, setVehicleOpenDropdown] = useState(false);
 
@@ -131,10 +125,21 @@ export function NewAppointment({
   }, [allDay, settings]);
 
   useEffect(() => {
-    if (templates) 
-      useListsStore.setState({ templates });
-    
+    if (templates) useListsStore.setState({ templates });
   }, [templates]);
+
+  useEffect(() => {
+    if (estimates) {
+      // filter all estimates where clientId is client.id
+      const filteredEstimates = estimates.filter(
+        (estimate) => estimate.customerId === client?.id,
+      );
+      // map the filtered estimates to get the id
+      const estimateIds = filteredEstimates.map((estimate) => estimate.id);
+      // set the draft estimates
+      setDraftEstimates(estimateIds);
+    }
+  }, [estimates, client]);
 
   function onTimeChange(e: any) {
     if (!e) return;
@@ -156,7 +161,7 @@ export function NewAppointment({
       assignedUsers: assignedUsers.map((user) => user.id),
       customerId: client ? client.id : undefined,
       vehicleId: vehicle ? vehicle.id : undefined,
-      orderId: order ? order.id : undefined,
+      draftEstimate: draft,
       notes,
       confirmationEmailTemplateId: confirmationTemplate?.id,
       reminderEmailTemplateId: reminderTemplate?.id,
@@ -179,7 +184,7 @@ export function NewAppointment({
     setEndTime(undefined);
     setClient(null);
     setVehicle(null);
-    setOrder(null);
+    setDraft(null);
     setAssignedUsers([]);
     setConfirmationTemplate(null);
     setReminderTemplate(null);
@@ -192,22 +197,22 @@ export function NewAppointment({
   useEffect(() => {
     if (
       clientOpenDropdown &&
-      (vehicleOpenDropdown || orderOpen || openConfirmation || openReminder)
+      (vehicleOpenDropdown || draftOpen || openConfirmation || openReminder)
     ) {
       setVehicleOpenDropdown(false);
-      setOrderOpen(false);
+      setDraftOpen(false);
       setOpenConfirmation(false);
       setOpenReminder(false);
     } else if (
       vehicleOpenDropdown &&
-      (clientOpenDropdown || orderOpen || openConfirmation || openReminder)
+      (clientOpenDropdown || draftOpen || openConfirmation || openReminder)
     ) {
       setClientOpenDropdown(false);
-      setOrderOpen(false);
+      setDraftOpen(false);
       setOpenConfirmation(false);
       setOpenReminder(false);
     } else if (
-      orderOpen &&
+      draftOpen &&
       (clientOpenDropdown ||
         vehicleOpenDropdown ||
         openConfirmation ||
@@ -219,26 +224,26 @@ export function NewAppointment({
       setOpenReminder(false);
     } else if (
       openConfirmation &&
-      (clientOpenDropdown || vehicleOpenDropdown || orderOpen || openReminder)
+      (clientOpenDropdown || vehicleOpenDropdown || draftOpen || openReminder)
     ) {
       setClientOpenDropdown(false);
       setVehicleOpenDropdown(false);
-      setOrderOpen(false);
+      setDraftOpen(false);
       setOpenReminder(false);
     } else if (
       openReminder &&
       (clientOpenDropdown ||
         vehicleOpenDropdown ||
-        orderOpen ||
+        draftOpen ||
         openConfirmation)
     ) {
       setClientOpenDropdown(false);
       setVehicleOpenDropdown(false);
-      setOrderOpen(false);
+      setDraftOpen(false);
       setOpenConfirmation(false);
     }
   }, [
-    orderOpen,
+    draftOpen,
     clientOpenDropdown,
     vehicleOpenDropdown,
     openConfirmation,
@@ -425,22 +430,30 @@ export function NewAppointment({
               />
 
               <Selector
-                label={(order: Order | null) => (order ? order.name : "Order")}
-                openState={[orderOpen, setOrderOpen]}
-                newButton={
-                  <NewOrder
-                    setOrder={setOrder}
-                    setOrders={setOrderList}
-                    setOrderOpen={setOrderOpen}
-                  />
+                label={(draft: string | null) =>
+                  draft ? draft : "Draft Estimates"
                 }
-                items={orderList}
-                selectedItem={order}
-                setSelectedItem={setOrder}
-                displayList={(item) => <p>{item.name}</p>}
+                openState={[draftOpen, setDraftOpen]}
+                newButton={
+                  <button
+                    className="text-[#6571FF] disabled:text-zinc-400"
+                    onClick={() => {
+                      setDraft(customAlphabet("1234567890", 10)());
+                      setDraftOpen(false);
+                    }}
+                    disabled={!client || !vehicle}
+                    type="button"
+                  >
+                    + New Draft Estimate
+                  </button>
+                }
+                items={draftEstimates}
+                selectedItem={draft}
+                setSelectedItem={setDraft}
+                displayList={(item) => <p className="text-[#6571FF]">{item}</p>}
                 onSearch={(search) => {
-                  return orderList.filter((order) =>
-                    order.name.toLowerCase().includes(search.toLowerCase()),
+                  return draftEstimates.filter((draft) =>
+                    draft.toLowerCase().includes(search.toLowerCase()),
                   );
                 }}
               />

@@ -17,8 +17,7 @@ import type {
 import type {
   CalendarSettings,
   Customer,
-  EmailTemplate, 
-  Order,
+  EmailTemplate,
   Task,
   User,
   Vehicle,
@@ -44,7 +43,6 @@ export default function Month({
   appointmentsFull,
   customers,
   vehicles,
-  orders,
   settings,
   templates,
 }: {
@@ -55,7 +53,6 @@ export default function Month({
   appointmentsFull: AppointmentFull[];
   customers: Customer[];
   vehicles: Vehicle[];
-  orders: Order[];
   settings: CalendarSettings;
   templates: EmailTemplate[];
 }) {
@@ -110,7 +107,7 @@ export default function Month({
       (task) =>
         new Date(task.date).getFullYear() === date.getFullYear() &&
         new Date(task.date).getMonth() === date.getMonth() &&
-        new Date(task.date).getDate() === date.getDate()
+        new Date(task.date).getDate() === date.getDate(),
     );
   }
 
@@ -119,7 +116,7 @@ export default function Month({
       (appointment) =>
         new Date(appointment.date!).getFullYear() === date.getFullYear() &&
         new Date(appointment.date!).getMonth() === date.getMonth() &&
-        new Date(appointment.date!).getDate() === date.getDate()
+        new Date(appointment.date!).getDate() === date.getDate(),
     );
   }
 
@@ -133,7 +130,6 @@ export default function Month({
     "Saturday",
     ...dates,
   ];
-
 
   async function handleDrop(event: React.DragEvent, date: string) {
     // 10 am
@@ -151,7 +147,7 @@ export default function Month({
     } else if (type === "task") {
       // Get the id of the task from the dataTransfer object
       const taskId = parseInt(
-        event.dataTransfer.getData("text/plain").split("|")[1]
+        event.dataTransfer.getData("text/plain").split("|")[1],
       );
 
       // Find the task in your state
@@ -169,12 +165,12 @@ export default function Month({
     } else {
       // Get the id of the appointment from the dataTransfer object
       const appointmentId = parseInt(
-        event.dataTransfer.getData("text/plain").split("|")[1]
+        event.dataTransfer.getData("text/plain").split("|")[1],
       );
 
       // Find the appointment in your state
       const appointment = appointments.find(
-        (appointment) => appointment.id == appointmentId
+        (appointment) => appointment.id == appointmentId,
       );
 
       if (appointment) {
@@ -218,7 +214,7 @@ export default function Month({
                   today.getMonth() === cell[0]?.getMonth() &&
                   today.getDate() === cell[0]?.getDate()
                   ? "text-[#6571FF]"
-                  : "text-[#797979]"
+                  : "text-[#797979]",
               )}
               onClick={(event) => {
                 if (
@@ -227,11 +223,14 @@ export default function Month({
                   event.currentTarget.contains(event.target)
                 )
                   router.push(
-                    `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`
+                    `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`,
                   );
               }}
               onDrop={(event) =>
-                handleDrop(event, cell[0] ? moment(cell[0]).format("YYYY-MM-DD") : "")
+                handleDrop(
+                  event,
+                  cell[0] ? moment(cell[0]).format("YYYY-MM-DD") : "",
+                )
               }
               onDragOver={(event) => event.preventDefault()}
             >
@@ -261,9 +260,9 @@ export default function Month({
                                   event.currentTarget.contains(event.target)
                                 )
                                   router.push(
-                                    `/task/day?date=${moment(
-                                      cell[0]
-                                    ).format("YYYY-MM-DD")}`
+                                    `/task/day?date=${moment(cell[0]).format(
+                                      "YYYY-MM-DD",
+                                    )}`,
                                   );
                               }}
                             >
@@ -286,13 +285,11 @@ export default function Month({
                                       open("UPDATE_APPOINTMENT", {
                                         appointment: appointmentsFull.find(
                                           (appointment) =>
-                                            appointment.id ===
-                                            appointment.id
+                                            appointment.id === appointment.id,
                                         ),
                                         employees: companyUsers,
                                         customers,
                                         vehicles,
-                                        orders,
                                         templates,
                                         settings,
                                       })
@@ -317,11 +314,11 @@ export default function Month({
                                 <p>
                                   {moment(
                                     appointment.startTime,
-                                    "HH:mm"
+                                    "HH:mm",
                                   ).format("hh:mm A")}{" "}
                                   To{" "}
                                   {moment(appointment.endTime, "HH:mm").format(
-                                    "hh:mm A"
+                                    "hh:mm A",
                                   )}
                                 </p>
                               </div>
@@ -362,7 +359,9 @@ export default function Month({
 
                             <p className="mt-3">{task.description}</p>
 
-                            <p className="mt-3">Task Priority: {task.priority}</p>
+                            <p className="mt-3">
+                              Task Priority: {task.priority}
+                            </p>
                           </div>
                         </TooltipContent>
                       </TooltipPortal>
@@ -379,8 +378,8 @@ export default function Month({
                         )
                           router.push(
                             `/task/day?date=${moment(cell[0]).format(
-                              "YYYY-MM-DD"
-                            )}`
+                              "YYYY-MM-DD",
+                            )}`,
                           );
                       }}
                     >
@@ -421,7 +420,7 @@ export default function Month({
                           >
                             <p>{appointment.title}</p>
                           </div>
-                        )
+                        ),
                       )}
                     </div>
                   </div>

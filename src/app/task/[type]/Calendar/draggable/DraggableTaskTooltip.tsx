@@ -23,7 +23,6 @@ export default function DraggableDayTooltip({
     employees: any;
     customers: any;
     vehicles: any;
-    orders: any;
     templates: any;
     settings: any;
   };
@@ -46,7 +45,6 @@ export default function DraggableDayTooltip({
     customers,
     employees,
     vehicles,
-    orders,
     templates,
     settings,
   } = updateAppointmentData;
@@ -74,7 +72,6 @@ export default function DraggableDayTooltip({
             employees,
             customers,
             vehicles,
-            orders,
             templates,
             settings,
           });

@@ -13,7 +13,6 @@ import type {
   CalendarSettings,
   Customer,
   EmailTemplate,
-  Order,
   Task,
   User,
   Vehicle,
@@ -55,7 +54,6 @@ export default function Week({
   appointmentsFull,
   customers,
   vehicles,
-  orders,
   settings,
   templates,
 }: {
@@ -66,7 +64,6 @@ export default function Week({
   appointmentsFull: AppointmentFull[];
   customers: Customer[];
   vehicles: Vehicle[];
-  orders: Order[];
   settings: CalendarSettings;
   templates: EmailTemplate[];
 }) {
@@ -458,7 +455,6 @@ export default function Week({
                     employees: companyUsers,
                     customers,
                     vehicles,
-                    orders,
                     templates,
                     settings,
                   }}
@@ -490,7 +486,6 @@ export default function Week({
                               employees: companyUsers,
                               customers,
                               vehicles,
-                              orders,
                               templates,
                               settings,
                             })
