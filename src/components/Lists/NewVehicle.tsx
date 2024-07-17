@@ -21,7 +21,11 @@ import Selector from "../Selector";
 import { addVehicleColor } from "@/app/task/[type]/actions/addVehicleColor";
 import { getVehicleColors } from "@/app/task/[type]/actions/getVehicleColor";
 
-export default function NewVehicle() {
+export default function NewVehicle({
+  newButton,
+}: {
+  newButton?: React.ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
 
@@ -85,9 +89,13 @@ export default function NewVehicle() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button type="button" className="text-xs text-[#6571FF]">
-          + New Vehicle
-        </button>
+        {newButton ? (
+          newButton
+        ) : (
+          <button type="button" className="text-xs text-[#6571FF]">
+            + New Vehicle
+          </button>
+        )}
       </DialogTrigger>
 
       <DialogContent
