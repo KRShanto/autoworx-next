@@ -109,7 +109,7 @@ export default function SelectColor<T>({
         <DropdownMenuTrigger
           onClick={() => setIsOpen(true)}
           className={cn(
-            "flex w-full items-center justify-between rounded-md border-2 border-slate-400 px-4 py-1",
+            "w-full flex items-center justify-between rounded-md border-2 border-slate-400 px-4 py-1",
             isOpen && "invisible",
           )}
         >
@@ -117,17 +117,17 @@ export default function SelectColor<T>({
           <p className="text-sm font-medium text-slate-400">
             {selected ? label(selected) : label(null)}
           </p>
-          <FaChevronDown className="text-[#797979]" />
+          <FaChevronDown className="ml-8 text-[#797979]" />
         </DropdownMenuTrigger>
 
         <DropdownMenuContent
           align="start"
           sideOffset={-40}
-          className="z-50 w-full rounded-lg border-2 border-slate-400 bg-white"
-          style={{
-            minWidth: "var(--radix-popper-anchor-width)",
-            maxWidth: "var(--radix-popper-anchor-width)",
-          }}
+          className="#max-w-[50rem] z-50 rounded-lg border-2 border-slate-400 bg-white"
+          // style={{
+          //   minWidth: "var(--radix-popper-anchor-width)",
+          //   maxWidth: "var(--radix-popper-anchor-width)",
+          // }}
         >
           {/* Search input */}
           <div className="relative m-2">

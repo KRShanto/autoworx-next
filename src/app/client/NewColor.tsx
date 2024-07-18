@@ -14,18 +14,19 @@ import { SlimInput, slimInputClassName } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useEffect, useState } from "react";
+import { Color } from "./AddNewVehicle";
 
 export default function NewColor({
   colors,
   setColors,
 }: {
-  colors: any;
-  setColors: any;
+  colors: Color[];
+  setColors: React.Dispatch<React.SetStateAction<Color[]>>;
 }) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
-  const [color, setColor] = useState("");
-  const handleSubmit = () => {
+  const [color, setColor] = useState<string>("");
+  const handleSubmit = async () => {
     setColors((prev) => [...prev, { id: Math.random() * 100, color: color }]);
     setColor("");
     setOpen(false);

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { deleteStatus } from "@/app/estimate/create/actions/deleteStatus";
@@ -8,15 +9,9 @@ import { useListsStore } from "@/stores/lists";
 import { ClientTag } from "@/types/client";
 import { Status } from "@prisma/client";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  FaArrowDown,
-  FaChevronDown,
-  FaChevronUp,
-  FaSearch,
-  FaTimes,
-} from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaSearch } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
-import { PiPaletteBold, PiPulse } from "react-icons/pi";
+import { PiPaletteBold } from "react-icons/pi";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +23,7 @@ import Submit from "../Submit";
 import { SelectProps } from "./select-props";
 
 type SelectedColor = { textColor: string; bgColor: string } | null;
+
 const Input = ({
   search,
   setSearch,
@@ -62,6 +58,24 @@ export function SelectClientTags({
   const [search, setSearch] = useState<string>("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      setOpen && setOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   useEffect(() => {
     if (search) {
       setFilteredTagList(
@@ -77,6 +91,7 @@ export function SelectClientTags({
   useEffect(() => {
     setFilteredTagList(tagList);
   }, [tagList]);
+
   async function handleDelete(id: number) {}
 
   return (
@@ -85,7 +100,7 @@ export function SelectClientTags({
       <DropdownMenu
         open={open}
         onOpenChange={(open) => {
-          // !open && setOpen && setOpen(open);
+          setOpen && setOpen(open);
         }}
       >
         <DropdownMenuTrigger
@@ -107,6 +122,7 @@ export function SelectClientTags({
           align="start"
           sideOffset={8}
           className="space-y-1 p-0"
+          ref={dropdownRef}
         >
           {/* Search */}
           <div className="relative m-2">
@@ -152,7 +168,6 @@ export function SelectClientTags({
             onSuccess={(tag) => {
               setTag(tag);
               if (setOpen) setOpen(false);
-              // setOpen(false);
             }}
             tag={tag}
             setTag={setTag}
@@ -203,7 +218,7 @@ function QuickAddForm({
   setTagList,
 }: {
   onSuccess?: (value: Status) => void;
-  setPickerOpen: any;
+  setPickerOpen: React.Dispatch<React.SetStateAction<boolean>>;
   selectedColor: SelectedColor;
   tag: string;
   setTag: React.Dispatch<React.SetStateAction<string>>;

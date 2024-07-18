@@ -12,6 +12,7 @@ import {
 import FormError from "@/components/FormError";
 import NewVendor from "@/components/Lists/NewVendor";
 import SelectCategory from "@/components/Lists/SelectCategory";
+import SelectColor from "@/components/Lists/SelectColor";
 import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
@@ -19,12 +20,15 @@ import { useEffect, useRef, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { RxAvatar } from "react-icons/rx";
 import NewColor from "./NewColor";
-import SelectColor from "@/components/Lists/SelectColor";
 
+export interface Color {
+  id: number;
+  color: string;
+}
 export default function AddNewVehicle() {
   const [open, setOpen] = useState(false);
-  const [color, setColor] = useState<any>(null);
-  const [colors, setColors] = useState<any>([
+  const [color, setColor] = useState<Color | null>(null);
+  const [colors, setColors] = useState<Color[]>([
     {
       id: 1,
       color: "Red",
@@ -59,31 +63,23 @@ export default function AddNewVehicle() {
           <FormError />
 
           <div className="space-y-2 overflow-y-auto">
-            <div className="#justify-evenly flex items-center gap-4">
+            <div className="flex items-center justify-between gap-4">
               <SlimInput name="year" />
               <SlimInput name="make" />
             </div>
-            <div className="#justify-between flex items-center gap-4">
+            <div className="flex items-center justify-between gap-4">
               <SlimInput name="model" />
               <SlimInput name="subModel" />
             </div>
 
-            <div className="#justify-between flex items-center gap-4">
+            <div className="flex items-center justify-between gap-4">
               <SlimInput name="type" />
-              <div className="w-full">
+              <div className="w-[15rem]">
                 <p className="mb-1 font-medium">Color</p>
                 <SelectColor
                   clickabled={false}
                   label={(colour) => (color ? color.color : "Color")}
-                  newButton={
-                    <NewColor
-                      colors={colors}
-                      setColors={setColors}
-                      // type="Confirmation"
-                      // clientName={client.firstName + " " + client.lastName}
-                      // vehicleModel={vehicle?.model!}
-                    />
-                  }
+                  newButton={<NewColor colors={colors} setColors={setColors} />}
                   items={colors}
                   displayList={(color: any) => (
                     <div className="flex">
@@ -98,11 +94,6 @@ export default function AddNewVehicle() {
                         {color.color}
                       </button>
                       <div className="flex items-center gap-2">
-                        {/* <UpdateTemplate
-                        id={template.id}
-                        subject={template.subject}
-                        message={template.message || ""}
-                      /> */}
                         <button
                           type="button"
                           onClick={() => {

@@ -10,3 +10,8 @@ export interface EmployeeType {
   employee_type: "Salary" | "Hourly" | "Contract Based";
   employee_department: "Sales" | "Management" | "Workshop";
 }
+
+export interface IEmployeeType {
+  id: number;
+  name: "Sales" | "Technician";
+}

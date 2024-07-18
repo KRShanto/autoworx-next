@@ -251,9 +251,7 @@ export default function Page() {
                   // currentProductId === product.id &&
                   // "border-2 border-[#6571FF]",
                 )}
-                // onClick={() => {
-                // router.push(`/inventory?productId=${product.id}`)
-                // }}
+
               >
                 <td className="border-b px-4 py-2 text-center">
                   <Link
