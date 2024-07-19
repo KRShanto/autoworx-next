@@ -2,7 +2,6 @@ import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 
-
 export async function POST(request: NextRequest) {
   try {
     const email = request.nextUrl.searchParams.get("email");
@@ -10,7 +9,7 @@ export async function POST(request: NextRequest) {
     const clientName = request.nextUrl.searchParams.get("client_name") || "";
     const vehicleInfo = request.nextUrl.searchParams.get("vehicle_info") || "";
     const services = request.nextUrl.searchParams.get("services") || "";
-    const source = request.nextUrl.searchParams.get("source")  || "";
+    const source = request.nextUrl.searchParams.get("source") || "";
     const comments = request.nextUrl.searchParams.get("comments") || "";
 
     // check if email and password is provided
@@ -36,8 +35,13 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
+    // check if the required fields are provided
+    if (!clientName || !vehicleInfo || !services || !source) {
+      return Response.json({ error: "Invalid input" }, { status: 400 });
+    }
+
     // Save the leads
-    await db.lead.create({
+    const newLead = await db.lead.create({
       data: {
         clientName,
         vehicleInfo,
@@ -46,15 +50,23 @@ export async function POST(request: NextRequest) {
         comments,
         userId: user.id,
         companyId: user.companyId,
-        },
+      },
     });
 
     // return success response
-    return NextResponse.json({
-      type: "success",
-      name: `${user.firstName} ${user.lastName}`,
-      email: user.email,
-    });
+    return Response.json(
+      [
+        {
+          id: newLead.id,
+          clientName: newLead.clientName,
+          vehicleInfo: newLead.vehicleInfo,
+          services: newLead.services,
+          source: newLead.source,
+          comments: newLead.comments,
+        },
+      ],
+      { status: 201 },
+    );
   } catch (error: any) {
     // check if this is json parse error
     if (error instanceof SyntaxError) {
