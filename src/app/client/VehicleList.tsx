@@ -25,7 +25,6 @@ export default function VehicleList({
       <Title>Vehicle List</Title>
 
       <div className="flex items-center justify-between">
-        {/* <Title>Employee List</Title> */}
         <div className="flex items-center gap-x-8"></div>
         <AddNewVehicle />
       </div>

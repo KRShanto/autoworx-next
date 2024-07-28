@@ -22,16 +22,10 @@ import { RiEditFill } from "react-icons/ri";
 import { RxAvatar } from "react-icons/rx";
 
 import SelectEmployeeType from "./SelectEmployeeType";
-// import { createProduct } from "./actions/create";
 
 export default function EditEmployee() {
   const [open, setOpen] = useState(false);
-  const { vendors } = useListsStore();
-  const [vendor, setVendor] = useState<Vendor | null>(null);
-  const [category, setCategory] = useState<Category | null>();
-  const [vendorOpen, setVendorOpen] = useState(false);
-  const [vendorSearch, setVendorSearch] = useState("");
-  const [vendorsToDisplay, setVendorsToDisplay] = useState<Vendor[]>([]);
+  const [employeeTypeOpen, setEmployeeTypeOpen] = useState(false);
   const profilePicRef = useRef<HTMLInputElement>(null);
   return (
     <>
@@ -88,7 +82,10 @@ export default function EditEmployee() {
               <SlimInput name="commission%" />
             </div>
             <div className="flex items-center justify-between gap-x-4">
-              <SelectEmployeeType />
+              <SelectEmployeeType
+                employeeTypeOpen={employeeTypeOpen}
+                setEmployeeTypeOpen={setEmployeeTypeOpen}
+              />
               <SlimInput
                 name="date"
                 label="Time"

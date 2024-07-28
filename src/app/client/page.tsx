@@ -188,7 +188,6 @@ export default function Page({ params }: { params: { clientId: string } }) {
       <Title>Client List</Title>
 
       <div className="flex items-center justify-between">
-        {/* <Title>Employee List</Title> */}
         <div className="flex items-center gap-x-8">
           <div className="flex w-[500px] items-center gap-x-2 rounded-md border border-gray-300 px-4 py-1 text-gray-400">
             <span className="">
@@ -223,12 +222,9 @@ export default function Page({ params }: { params: { clientId: string } }) {
                 className={cn(
                   "cursor-pointer rounded-md py-3",
                   index % 2 === 0 ? "bg-white" : "bg-blue-100",
-                  // currentProductId === product.id &&
-                  // "border-2 border-[#6571FF]",
+
                 )}
-                // onClick={() => {
-                // router.push(`/inventory?productId=${product.id}`)
-                // }}
+
               >
                 <td className="border-b px-4 py-2 text-center">
                   <Link className="text-blue-500" href={`/client/${client.id}`}>

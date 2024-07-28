@@ -13,19 +13,20 @@ import FormError from "@/components/FormError";
 import { SlimInput, slimInputClassName } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { useFormErrorStore } from "@/stores/form-error";
+import { ClientSource } from "@/types/client";
 import { useEffect, useState } from "react";
 
 export default function NewClientSource({
   clientSources,
   setClientSources,
 }: {
-  clientSources: any;
-  setClientSources: any;
+  clientSources: ClientSource[];
+  setClientSources: React.Dispatch<React.SetStateAction<ClientSource[]>>;
 }) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
   const [source, setSource] = useState("");
-  const handleSubmit = () => {
+  const handleSubmit = async (data: FormData) => {
     setClientSources((prev) => [...prev, { id: Math.random() * 100, source }]);
     setSource("");
     setOpen(false);
