@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "prettier": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
-    "prettier:fix": "npm run prettier --fix"
+    "prettier:fix": "npm run prettier --fix",
+    "tsc": "tsc"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^1.5.2",
