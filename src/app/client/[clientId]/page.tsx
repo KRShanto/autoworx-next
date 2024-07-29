@@ -1,12 +1,9 @@
 import Title from "@/components/Title";
-import React, { useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
-import AddNewClient from "../AddNewClient";
 import ClientInformation from "../ClientInformation";
-import OrderList from "../OrderList";
-import VehicleList from "../VehicleList";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
+import NewCustomer from "@/components/Lists/NewCustomer2";
 export type Order = {
   invoiceId: number;
   price: number;
@@ -68,7 +65,13 @@ const Page = async (props: Props) => {
               />
             </div>
           </div>
-          <AddNewClient />
+          <NewCustomer
+            buttonElement={
+              <button className="rounded-md bg-[#6571FF] p-2 px-5 text-white">
+                + Add New Client
+              </button>
+            }
+          />
         </div>
       </div>
 

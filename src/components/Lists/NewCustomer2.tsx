@@ -23,7 +23,11 @@ import { addCustomer } from "@/app/customer/add";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
 
-export default function NewCustomer() {
+export default function NewCustomer({
+  buttonElement,
+}: {
+  buttonElement?: JSX.Element;
+}) {
   const [open, setOpen] = useState(false);
   const [clientSource, setClientSource] = useState<Source | null>(null);
   const [openClientSource, setOpenClientSource] = useState(false);
@@ -130,7 +134,11 @@ export default function NewCustomer() {
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <button className="text-xs text-[#6571FF]">+ Add New Client</button>
+          {buttonElement ? (
+            buttonElement
+          ) : (
+            <button className="text-xs text-[#6571FF]">+ Add New Client</button>
+          )}
         </DialogTrigger>
         <DialogContent
           className="max-h-full max-w-xl grid-rows-[auto,1fr,auto]"
@@ -200,7 +208,11 @@ export default function NewCustomer() {
             </div>
 
             <div className="flex items-center justify-between gap-x-4">
-              <SlimInput name="companyName" required={false} />
+              <SlimInput
+                name="customerCompany"
+                required={false}
+                label="Company"
+              />
 
               <div className="w-full">
                 <p className="mb-1 font-medium">Client Source</p>

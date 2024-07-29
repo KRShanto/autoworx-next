@@ -1,21 +1,15 @@
-import Input from "@/components/Input";
 import Title from "@/components/Title";
 import { cn } from "@/lib/cn";
 import Link from "next/link";
 import React from "react";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
-import { FaTimes } from "react-icons/fa";
-import { IoPieChartOutline, IoSearchOutline } from "react-icons/io5";
-
-import AddNewClient from "./AddNewClient";
+import { IoSearchOutline } from "react-icons/io5";
 import EditClient from "./EditClient";
 import { db } from "@/lib/db";
 import { getCompanyId } from "@/lib/companyId";
 import DeleteClient from "./DeleteClient";
-
-const evenColor = "bg-white";
-const oddColor = "bg-slate-100";
+import NewCustomer from "@/components/Lists/NewCustomer2";
 
 export default async function Page() {
   const companyId = await getCompanyId();
@@ -42,7 +36,13 @@ export default async function Page() {
             />
           </div>
         </div>
-        <AddNewClient />
+        <NewCustomer
+          buttonElement={
+            <button className="rounded-md bg-[#6571FF] p-2 px-5 text-white">
+              + Add New Client
+            </button>
+          }
+        />
       </div>
       <div>
         <div className="app-shadow w-full rounded-lg bg-white p-3">
@@ -85,7 +85,6 @@ export default async function Page() {
                   </td>
                   <td className="border-b border-l bg-white px-4 py-2 text-center">
                     <div className="flex items-center justify-center gap-2">
-                      <EditClient />
                       <EditClient client={client} />
                       <DeleteClient id={client.id} />
                     </div>
