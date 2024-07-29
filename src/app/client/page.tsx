@@ -19,7 +19,10 @@ const oddColor = "bg-slate-100";
 
 export default async function Page() {
   const companyId = await getCompanyId();
-  const clients = await db.customer.findMany({ where: { companyId } });
+  const clients = await db.customer.findMany({
+    where: { companyId },
+    include: { tag: true, source: true },
+  });
 
   return (
     <div className="h-full w-full space-y-8">
@@ -83,6 +86,7 @@ export default async function Page() {
                   <td className="border-b border-l bg-white px-4 py-2 text-center">
                     <div className="flex items-center justify-center gap-2">
                       <EditClient />
+                      <EditClient client={client} />
                       <DeleteClient id={client.id} />
                     </div>
                   </td>
