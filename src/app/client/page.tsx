@@ -9,7 +9,7 @@ import EditClient from "./EditClient";
 import { db } from "@/lib/db";
 import { getCompanyId } from "@/lib/companyId";
 import DeleteClient from "./DeleteClient";
-import NewCustomer from "@/components/Lists/NewCustomer2";
+import NewCustomer from "@/components/Lists/NewCustomer";
 
 export default async function Page() {
   const companyId = await getCompanyId();

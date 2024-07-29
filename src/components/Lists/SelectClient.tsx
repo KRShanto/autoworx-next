@@ -6,7 +6,7 @@ import { Customer } from "@prisma/client";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import NewCustomer from "./NewCustomer2";
+import NewCustomer from "./NewCustomer";
 import { SelectProps } from "./select-props";
 
 export function SelectClient({

@@ -9,7 +9,7 @@ import {
 } from "@/components/Dialog";
 import FormError from "@/components/FormError";
 import SelectClientSource from "@/components/Lists/SelectClientSource";
-import { SelectClientTags } from "@/components/Lists/SelectClientTags2";
+import { SelectClientTags } from "@/components/Lists/SelectClientTags";
 import { SlimInput } from "@/components/SlimInput";
 import { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";

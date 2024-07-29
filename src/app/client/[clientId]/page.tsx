@@ -3,7 +3,7 @@ import { IoSearchOutline } from "react-icons/io5";
 import ClientInformation from "../ClientInformation";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
-import NewCustomer from "@/components/Lists/NewCustomer2";
+import NewCustomer from "@/components/Lists/NewCustomer";
 export type Order = {
   invoiceId: number;
   price: number;

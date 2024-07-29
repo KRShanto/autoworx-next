@@ -10,12 +10,11 @@ import {
   DialogTrigger,
 } from "@/components/Dialog";
 import FormError from "@/components/FormError";
-import { SlimInput, slimInputClassName } from "@/components/SlimInput";
+import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { useFormErrorStore } from "@/stores/form-error";
-import { ClientSource } from "@/types/client";
 import { Source } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { newSource } from "./newSource";
 
 export default function NewClientSource({
