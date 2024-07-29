@@ -10,26 +10,30 @@ import {
   DialogTrigger,
 } from "@/components/Dialog";
 import FormError from "@/components/FormError";
-import { SlimInput, slimInputClassName } from "@/components/SlimInput";
+import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { useFormErrorStore } from "@/stores/form-error";
-import { ClientSource } from "@/types/client";
-import { useEffect, useState } from "react";
+import { Source } from "@prisma/client";
+import { useState } from "react";
+import { newSource } from "./newSource";
 
 export default function NewClientSource({
-  clientSources,
   setClientSources,
 }: {
-  clientSources: ClientSource[];
-  setClientSources: React.Dispatch<React.SetStateAction<ClientSource[]>>;
+  setClientSources: React.Dispatch<React.SetStateAction<Source[]>>;
 }) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
   const [source, setSource] = useState("");
+
   const handleSubmit = async (data: FormData) => {
-    setClientSources((prev) => [...prev, { id: Math.random() * 100, source }]);
-    setSource("");
-    setOpen(false);
+    const res = await newSource(source);
+
+    if (res.type === "success") {
+      setClientSources((prev) => [...prev, res.data]);
+      setSource("");
+      setOpen(false);
+    }
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>

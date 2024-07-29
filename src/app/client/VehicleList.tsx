@@ -1,36 +1,29 @@
 "use client";
-import Input from "@/components/Input";
-import Title from "@/components/Title";
 import { cn } from "@/lib/cn";
-import Link from "next/link";
 import React from "react";
-import "react-date-range/dist/styles.css"; // main style file
-import "react-date-range/dist/theme/default.css"; // theme css file
-import { FaTimes } from "react-icons/fa";
-import { IoPieChartOutline, IoSearchOutline } from "react-icons/io5";
-
-import AddNewClient from "./AddNewClient";
-import AddNewVehicle from "./AddNewVehicle";
-import EditClient from "./EditClient";
-const evenColor = "bg-white";
-const oddColor = "bg-slate-100";
+import NewVehicle from "@/components/Lists/NewVehicle";
 
 export default function VehicleList({
   vehicles,
   selectedVehicle,
   setSelectedVehicle,
+}: {
+  vehicles: any[];
+  selectedVehicle: any;
+  setSelectedVehicle: any;
 }) {
   return (
-    <div className="h-full w-full space-y-8 px-4">
+    <div className="h-full w-full space-y-2 px-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-x-8">
-          <h3 className="font-semibold">Vehicle List</h3>
+          <h3 className="text-lg font-semibold">Vehicle List</h3>
         </div>
-        <AddNewVehicle />
+        <NewVehicle />
       </div>
-      <div>
-        <table className="w-full shadow-md">
-          <thead className="bg-white">
+      {/* TODO: make it scrollable */}
+      <div className="">
+        <table className="w-full">
+          <thead>
             <tr className="h-10 border-b">
               <th className="px-4 text-left 2xl:px-10">Year</th>
               <th className="px-4 text-left 2xl:px-10">Make</th>
