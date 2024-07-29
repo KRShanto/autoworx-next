@@ -251,7 +251,6 @@ export default function Page() {
                   // currentProductId === product.id &&
                   // "border-2 border-[#6571FF]",
                 )}
-
               >
                 <td className="border-b px-4 py-2 text-center">
                   <Link
@@ -276,7 +275,7 @@ export default function Page() {
                 <td className="border-b px-4 py-2 text-center">
                   {employee.type}
                 </td>
-                <td className="border-b bg-white px-4 py-2 text-center">
+                <td className="border-b border-l bg-white px-4 py-2 text-center">
                   <div className="flex items-center justify-center gap-2">
                     <EditEmployee />
 

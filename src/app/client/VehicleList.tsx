@@ -21,11 +21,11 @@ export default function VehicleList({
   setSelectedVehicle,
 }) {
   return (
-    <div className="h-full w-full space-y-8">
-      <Title>Vehicle List</Title>
-
+    <div className="h-full w-full space-y-8 px-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-x-8"></div>
+        <div className="flex items-center gap-x-8">
+          <h3 className="font-semibold">Vehicle List</h3>
+        </div>
         <AddNewVehicle />
       </div>
       <div>
@@ -39,7 +39,7 @@ export default function VehicleList({
             </tr>
           </thead>
 
-          <tbody>
+          <tbody className="border border-gray-200">
             {vehicles.map((vehicle, index) => (
               <tr
                 key={index}
@@ -53,14 +53,18 @@ export default function VehicleList({
                   setSelectedVehicle(vehicle);
                 }}
               >
-                <td className=" py-1 text-nowrap px-4 text-left 2xl:px-10">
+                <td className="text-nowrap px-4 py-1 text-left 2xl:px-10">
                   {vehicle.year}
                 </td>
-                <td className=" py-1 text-nowrap px-4 text-left 2xl:px-10">
+                <td className="text-nowrap px-4 py-1 text-left 2xl:px-10">
                   {vehicle.make}
                 </td>
-                <td className=" py-1 px-4 text-left 2xl:px-10">{vehicle.model}</td>
-                <td className=" py-1 px-4 text-left 2xl:px-10">{vehicle.plate}</td>
+                <td className="px-4 py-1 text-left 2xl:px-10">
+                  {vehicle.model}
+                </td>
+                <td className="px-4 py-1 text-left 2xl:px-10">
+                  {vehicle.plate}
+                </td>
               </tr>
             ))}
           </tbody>

@@ -6,9 +6,20 @@ import AddNewClient from "../AddNewClient";
 import ClientInformation from "../ClientInformation";
 import OrderList from "../OrderList";
 import VehicleList from "../VehicleList";
-
+export type Order = {
+  invoiceId: number;
+  price: number;
+  status: string;
+};
+type Vehicle = {
+  year: number;
+  make: string;
+  model: string;
+  plate: string;
+  orders: Order[];
+};
 type Props = {};
-const vehicles = [
+const vehicles: Vehicle[] = [
   {
     year: 2022,
     make: "Toyota",
@@ -378,12 +389,13 @@ const vehicles = [
   orders: vehicle.orders.map((order, index) => ({ ...order, id: index + 1 })),
 }));
 const page = (props: Props) => {
-  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   return (
-    <div>
+    <div className="h-full py-4">
       <div className="heading">
-        <Title>Client List</Title>
-        <div className="flex items-center justify-between">
+        <Title>Client</Title>
+        <div className="my-4 flex items-center justify-between">
           <div className="flex items-center gap-x-8">
             <div className="flex w-[500px] items-center gap-x-2 rounded-md border border-gray-300 px-4 py-1 text-gray-400">
               <span className="">
@@ -400,7 +412,7 @@ const page = (props: Props) => {
           <AddNewClient />
         </div>
       </div>
-      <div className="content flex items-start justify-between gap-x-4">
+      <div className="content flex h-full items-start justify-between gap-x-4">
         <div className="box-1 w-1/2">
           <ClientInformation />
           <VehicleList
@@ -409,8 +421,8 @@ const page = (props: Props) => {
             setSelectedVehicle={setSelectedVehicle}
           />
         </div>
-        <div className="box-2 orderList w-1/2">
-          <OrderList orders={selectedVehicle?.orders} />
+        <div className="box-2 orderList h-full w-1/2">
+          {selectedVehicle ? <OrderList orders={selectedVehicle.orders} /> : null}
         </div>
       </div>
     </div>
