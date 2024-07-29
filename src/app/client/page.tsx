@@ -240,7 +240,7 @@ export default function Page({ params }: { params: { clientId: string } }) {
                 <td className="border-b px-4 py-2 text-center">
                   {client.phone}
                 </td>
-                <td className="border-b bg-white px-4 py-2 text-center">
+                <td className="border-b border-l bg-white px-4 py-2 text-center">
                   <div className="flex items-center justify-center gap-2">
                     <EditClient />
 
