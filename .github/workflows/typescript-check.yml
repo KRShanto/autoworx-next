@@ -9,20 +9,16 @@ on:
       - master
 
 jobs:
-  typescript-check:
+  tsc:
+    name: tsc
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v1
+      - name: install node v12
+        uses: actions/setup-node@v1
         with:
-          node-version: "16"
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run TypeScript check
-        run: npm run tsc
+          node-version: 12
+      - name: yarn install
+        run: yarn install
+      - name: tsc
+        uses: icrawl/action-tsc@v1
