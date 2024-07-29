@@ -19,205 +19,8 @@ type Vehicle = {
   orders: Order[];
 };
 type Props = {};
+
 const vehicles: Vehicle[] = [
-  {
-    year: 2022,
-    make: "Toyota",
-    model: "Corolla",
-    plate: "1A-ABC-123",
-    orders: [
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "pending",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "paid",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "pending",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "paid",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "due",
-      },
-    ],
-  },
-  {
-    year: 2022,
-    make: "Toyota",
-    model: "Corolla",
-    plate: "1A-ABC-123",
-    orders: [
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "pending",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "paid",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "pending",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "paid",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "due",
-      },
-    ],
-  },
-  {
-    year: 2022,
-    make: "Toyota",
-    model: "Corolla",
-    plate: "1A-ABC-123",
-    orders: [
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "pending",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "paid",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "pending",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "paid",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "due",
-      },
-    ],
-  },
-  {
-    year: 2022,
-    make: "Toyota",
-    model: "Corolla",
-    plate: "1A-ABC-123",
-    orders: [
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "pending",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "paid",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "pending",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "paid",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "due",
-      },
-    ],
-  },
-  {
-    year: 2022,
-    make: "Toyota",
-    model: "Corolla",
-    plate: "1A-ABC-123",
-    orders: [
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "pending",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "paid",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "pending",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "paid",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "due",
-      },
-    ],
-  },
-  {
-    year: 2022,
-    make: "Toyota",
-    model: "Corolla",
-    plate: "1A-ABC-123",
-    orders: [
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "pending",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "paid",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "pending",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "paid",
-      },
-      {
-        invoiceId: 1234567890,
-        price: 450,
-        status: "due",
-      },
-    ],
-  },
   {
     year: 2022,
     make: "Toyota",
@@ -388,15 +191,16 @@ const vehicles: Vehicle[] = [
   id: index + 1,
   orders: vehicle.orders.map((order, index) => ({ ...order, id: index + 1 })),
 }));
-const page = (props: Props) => {
+
+const Page = (props: Props) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   return (
-    <div className="h-full py-4">
-      <div className="heading">
+    <div className="mb-2">
+      <div className="h-[15vh] 2xl:h-[12vh]">
         <Title>Client</Title>
         <div className="my-4 flex items-center justify-between">
-          <div className="flex items-center gap-x-8">
+          <div className="flex items-center gap-x-8 bg-white">
             <div className="flex w-[500px] items-center gap-x-2 rounded-md border border-gray-300 px-4 py-1 text-gray-400">
               <span className="">
                 <IoSearchOutline />
@@ -404,7 +208,7 @@ const page = (props: Props) => {
               <input
                 name="search"
                 type="text"
-                className="w-full rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-md border border-slate-400 px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Search"
               />
             </div>
@@ -412,8 +216,9 @@ const page = (props: Props) => {
           <AddNewClient />
         </div>
       </div>
-      <div className="content flex h-full items-start justify-between gap-x-4">
-        <div className="box-1 w-1/2">
+
+      <div className="flex h-[70vh] items-start justify-between gap-x-4 2xl:h-[78vh]">
+        <div className="app-shadow h-full w-1/2 rounded-lg bg-white p-4">
           <ClientInformation />
           <VehicleList
             vehicles={vehicles}
@@ -422,10 +227,16 @@ const page = (props: Props) => {
           />
         </div>
         <div className="box-2 orderList h-full w-1/2">
-          {selectedVehicle ? <OrderList orders={selectedVehicle.orders} /> : null}
+          {selectedVehicle ? (
+            <OrderList orders={selectedVehicle.orders} />
+          ) : (
+            <div className="app-shadow flex h-full w-full items-center justify-center rounded-lg bg-white p-4">
+              Select Vehicle to view Ordes
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
-export default page;
+export default Page;

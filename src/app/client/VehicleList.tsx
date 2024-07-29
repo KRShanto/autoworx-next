@@ -21,16 +21,17 @@ export default function VehicleList({
   setSelectedVehicle,
 }) {
   return (
-    <div className="h-full w-full space-y-8 px-4">
+    <div className="h-full w-full space-y-2 px-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-x-8">
-          <h3 className="font-semibold">Vehicle List</h3>
+          <h3 className="text-lg font-semibold">Vehicle List</h3>
         </div>
         <AddNewVehicle />
       </div>
-      <div>
-        <table className="w-full shadow-md">
-          <thead className="bg-white">
+      {/* TODO: make it scrollable */}
+      <div className="">
+        <table className="w-full">
+          <thead>
             <tr className="h-10 border-b">
               <th className="px-4 text-left 2xl:px-10">Year</th>
               <th className="px-4 text-left 2xl:px-10">Make</th>

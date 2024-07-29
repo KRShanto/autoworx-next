@@ -4,10 +4,10 @@ import { IoMdSettings } from "react-icons/io";
 
 export default function ClientInformation() {
   return (
-    <div className="mb-8 w-full px-4 py-8 shadow-md">
-      <h3 className="my-2 font-semibold">Client Details</h3>
-      <div className="">
-        <div className="relative flex w-full items-center rounded border border-gray-200 bg-white p-3">
+    <div className="mb-3 w-full p-2">
+      <h3 className="text-lg font-semibold">Client Details</h3>
+      <div className="rounded-md border border-gray-200 p-3">
+        <div className="relative flex w-full items-center rounded">
           <div className="mr-3 flex flex-col items-center">
             <Image
               src="/icons/salesEmp.png"
@@ -16,7 +16,6 @@ export default function ClientInformation() {
               height={200}
               className="h-auto w-auto rounded-full"
             />
-            {/* <div className="mt-2 text-gray-600">{role}</div> */}
           </div>
 
           <div className="w-full space-y-2 text-sm">

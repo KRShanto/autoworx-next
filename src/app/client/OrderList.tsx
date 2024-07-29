@@ -7,11 +7,13 @@ type Props = {};
 
 const OrderList = ({ orders }: { orders: Order[] }) => {
   return (
-    <div className="h-full w-full py-8">
+    <div className="app-shadow h-full w-full rounded-lg bg-white p-4">
+      <h3 className="text-lg font-semibold">Order List</h3>
+
       <div className="table h-full w-full">
         {orders ? (
-          <table className="w-full shadow-md">
-            <thead className="bg-white">
+          <table className="w-full">
+            <thead>
               <tr className="h-10 border-b">
                 <th className="px-4 text-left 2xl:px-10">Invoice#</th>
                 <th className="px-4 text-left 2xl:px-10">Price</th>
