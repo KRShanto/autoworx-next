@@ -34,6 +34,7 @@ model Company {
   paymentMethods    PaymentMethod[]
   inventoryProducts InventoryProduct[]
   VehicleColor      VehicleColor[]
+  Source            Source[]
 }
 
 // User model.
@@ -125,16 +126,29 @@ model Customer {
   city            String?
   state           String?
   zip             String?
-  photo           String?       @default("/images/default.png")
+  photo           String        @default("/images/default.png")
+  sourceId        Int?          @map("source_id")
   companyId       Int           @map("company_id")
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @default(now()) @updatedAt @map("updated_at")
   company         Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   customerCompany String?       @map("customer_company")
-  tag             String?       @default("")
+  tagId           Int?          @map("tag_id")
   appointments    Appointment[]
+  source          Source?       @relation(fields: [sourceId], references: [id])
+  tag             Tag?          @relation(fields: [tagId], references: [id])
 
   @@index([companyId], name: "fk_customers_company")
+}
+
+model Source {
+  id        Int        @id @default(autoincrement())
+  name      String
+  companyId Int        @map("company_id")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @default(now()) @updatedAt @map("updated_at")
+  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Customer  Customer[]
 }
 
 // Vehicle of a company.
@@ -376,6 +390,7 @@ model Tag {
   items     ItemTag[]
   materials MaterialTag[]
   labors    LaborTag[]
+  Customer  Customer[]
 }
 
 // Many to many relation between Item and Tag.

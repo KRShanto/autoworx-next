@@ -109,7 +109,7 @@ export default function SelectClientSource<T>({
         <DropdownMenuTrigger
           onClick={() => setIsOpen(true)}
           className={cn(
-            "flex w-full items-center justify-between rounded-md border-2 border-slate-400 px-4 py-1",
+            "flex h-auto w-full items-center justify-between rounded-md border-2 border-slate-400 px-4 py-1",
             isOpen && "invisible",
           )}
         >

@@ -6,7 +6,7 @@ import { Customer } from "@prisma/client";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import NewCustomer from "./NewCustomer";
+import NewCustomer from "./NewCustomer2";
 import { SelectProps } from "./select-props";
 
 export function SelectClient({
@@ -54,7 +54,7 @@ export function SelectClient({
         displayList={(client: Customer) => (
           <div className="flex gap-3">
             <Image
-              src={client.photo || "/images/default.png"}
+              src={client.photo}
               alt="Client Image"
               width={50}
               height={50}
