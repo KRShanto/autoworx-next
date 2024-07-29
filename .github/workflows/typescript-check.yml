@@ -24,4 +24,4 @@ jobs:
         run: npm ci --force
 
       - name: npm tsc
-        run: npm run tsc
+        uses: icrawl/action-tsc@v1
