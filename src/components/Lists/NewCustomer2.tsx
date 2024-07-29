@@ -182,7 +182,7 @@ export default function NewCustomer() {
 
             <div className="flex items-center justify-between">
               <SlimInput name="email" />
-              <SlimInput name="mobileNumber" required={false} />
+              <SlimInput name="mobile" required={false} />
             </div>
 
             <div className="flex items-center justify-between">
