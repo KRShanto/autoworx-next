@@ -12,6 +12,7 @@ import AddNewClient from "./AddNewClient";
 import EditClient from "./EditClient";
 import { db } from "@/lib/db";
 import { getCompanyId } from "@/lib/companyId";
+import DeleteClient from "./DeleteClient";
 
 const evenColor = "bg-white";
 const oddColor = "bg-slate-100";
@@ -82,10 +83,7 @@ export default async function Page() {
                   <td className="border-b border-l bg-white px-4 py-2 text-center">
                     <div className="flex items-center justify-center gap-2">
                       <EditClient />
-
-                      <button className="text-xl text-red-400">
-                        <FaTimes />
-                      </button>
+                      <DeleteClient id={client.id} />
                     </div>
                   </td>
                 </tr>
