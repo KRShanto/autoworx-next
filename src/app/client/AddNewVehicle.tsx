@@ -49,7 +49,7 @@ export default function AddNewVehicle() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button className="rounded-md bg-[#6571FF] p-2 px-5 text-white">
-            Add New Vehicle
+            + New Vehicle
           </button>
         </DialogTrigger>
         <DialogContent

@@ -1,13 +1,14 @@
 "use client";
 import { cn } from "@/lib/cn";
 import React from "react";
+import { Order } from "./[clientId]/page";
 
 type Props = {};
 
-const OrderList = ({ orders }) => {
+const OrderList = ({ orders }: { orders: Order[] }) => {
   return (
-    <div className="w-full">
-      <div className="table w-full">
+    <div className="h-full w-full py-8">
+      <div className="table h-full w-full">
         {orders ? (
           <table className="w-full shadow-md">
             <thead className="bg-white">
@@ -23,19 +24,17 @@ const OrderList = ({ orders }) => {
                 <tr
                   key={index}
                   className={cn(
-                    "cursor-pointer rounded-md py-3",
+                    "cursor-pointer rounded-md",
                     index % 2 === 0 ? "bg-white" : "bg-[#EEF4FF]",
-
                   )}
-
                 >
-                  <td className="text-nowrap px-4 py-1 text-left 2xl:px-10">
+                  <td className="text-nowrap px-4 py-2 text-left 2xl:px-10">
                     {order.invoiceId}
                   </td>
-                  <td className="text-nowrap px-4 py-1 text-left 2xl:px-10">
+                  <td className="text-nowrap px-4 py-2 text-left 2xl:px-10">
                     {order.price}
                   </td>
-                  <td className="px-4 py-1 text-left 2xl:px-10">
+                  <td className="px-4 py-2 text-left 2xl:px-10">
                     {order.status}
                   </td>
                 </tr>
@@ -43,7 +42,7 @@ const OrderList = ({ orders }) => {
             </tbody>
           </table>
         ) : (
-          <div className="flex items-center justify-center">
+          <div className="flex h-full w-full items-center justify-center">
             Select a vehicle to view orders
           </div>
         )}
