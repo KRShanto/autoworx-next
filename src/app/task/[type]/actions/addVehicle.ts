@@ -5,6 +5,7 @@ import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { z } from "zod";
 import { ServerAction } from "@/types/action";
+import { revalidatePath } from "next/cache";
 
 export async function addVehicle(data: {
   year: number;
@@ -18,6 +19,7 @@ export async function addVehicle(data: {
   license: string;
   vin: string;
   notes: string;
+  customerId: number;
 }): Promise<ServerAction> {
   try {
     const session = (await auth()) as AuthSession;
@@ -30,6 +32,8 @@ export async function addVehicle(data: {
         companyId,
       },
     });
+
+    revalidatePath("/client");
 
     return {
       type: "success",

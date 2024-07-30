@@ -4,18 +4,9 @@ import ClientInformation from "../ClientInformation";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import NewCustomer from "@/components/Lists/NewCustomer";
-export type Order = {
-  invoiceId: number;
-  price: number;
-  status: string;
-};
-type Vehicle = {
-  year: number;
-  make: string;
-  model: string;
-  plate: string;
-  orders: Order[];
-};
+import VehicleList from "../VehicleList";
+import OrderList from "../OrderList";
+
 type Props = {
   params: {
     clientId: string;
@@ -40,11 +31,23 @@ const Page = async (props: Props) => {
 
   if (!client) return notFound();
 
-  const vehicle = vehicleId
+  const selectedVehicle = vehicleId
     ? await db.vehicle.findUnique({
         where: { id: Number(vehicleId) },
+        include: {
+          invoices: {
+            where: {
+              type: "Invoice",
+            },
+            include: { status: true },
+          },
+        },
       })
     : null;
+
+  const vehicles = await db.vehicle.findMany({
+    where: { customerId: Number(clientId) },
+  });
 
   return (
     <div className="mb-2">
@@ -78,16 +81,11 @@ const Page = async (props: Props) => {
       <div className="flex h-[70vh] items-start justify-between gap-x-4 2xl:h-[78vh]">
         <div className="app-shadow h-full w-1/2 rounded-lg bg-white p-4">
           <ClientInformation client={client} />
-          {/* <VehicleList
-            vehicles={vehicles}
-            selectedVehicle={selectedVehicle}
-            setSelectedVehicle={setSelectedVehicle}
-          /> */}
+          <VehicleList clientId={Number(clientId)} vehicles={vehicles} />
         </div>
         <div className="box-2 orderList h-full w-1/2">
-          {vehicle ? (
-            // <OrderList orders={selectedVehicle.orders} />
-            <></>
+          {selectedVehicle ? (
+            <OrderList vehicle={selectedVehicle as any} />
           ) : (
             <div className="app-shadow flex h-full w-full items-center justify-center rounded-lg bg-white p-4">
               Select Vehicle to view Ordes

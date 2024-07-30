@@ -21,12 +21,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "src/app/invoice/removeEmployee"
-, "src/app/task/[type]/Calendar/dropable/DropRowButton.jsx", "src/app/task/[type]/Calendar/dropable/DropWeekRowButton.jsx"  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

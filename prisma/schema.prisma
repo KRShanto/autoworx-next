@@ -137,6 +137,7 @@ model Customer {
   appointments    Appointment[]
   source          Source?       @relation(fields: [sourceId], references: [id])
   tag             Tag?          @relation(fields: [tagId], references: [id])
+  Vehicle         Vehicle[]
 
   @@index([companyId], name: "fk_customers_company")
 }
@@ -165,12 +166,15 @@ model Vehicle {
   vin          String?
   notes        String?
   colorId      Int?          @map("color_id")
+  customerId   Int?          @map("customer_id")
   companyId    Int           @map("company_id")
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
   company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   appointments Appointment[]
   color        VehicleColor? @relation(fields: [colorId], references: [id], onDelete: SetNull)
+  customer     Customer?     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  invoices     Invoice[]
 
   @@index([companyId], name: "fk_vehicles_company")
 }
@@ -221,6 +225,7 @@ model Invoice {
   Material                Material[]
   InventoryProductHistory InventoryProductHistory[]
   WorkOrder               WorkOrder[]
+  Vehicle                 Vehicle?                  @relation(fields: [vehicleId], references: [id])
 
   @@index([companyId], name: "fk_invoices_company")
 }
