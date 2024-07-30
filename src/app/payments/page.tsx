@@ -4,6 +4,8 @@ import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import Link from "next/link";
 import HeaderSearch from "./components/HeaderSearch";
+import LogoCard from "./components/LogoCard";
+
 
 
 
@@ -98,6 +100,7 @@ export default function Page() {
     
 
   return (
+    
     <div>
       <Title>Payments</Title>
 
@@ -118,7 +121,11 @@ export default function Page() {
         </TabsContent>
 
         <TabsContent value="integrations">
-          <Table data={[]} />
+          <div className="flex justify-evenly">
+           <LogoCard />
+          <LogoCard />
+          <LogoCard />
+          </div>
         </TabsContent>
         <TabsContent value="coupons">
           <Table data={[]} />
