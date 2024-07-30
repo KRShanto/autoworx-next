@@ -6,6 +6,7 @@ import { Vehicle } from "@prisma/client";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NewVehicle from "./NewVehicle";
 import { SelectProps } from "./select-props";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export function SelectVehicle({
   name = "vehicleId",
@@ -18,7 +19,10 @@ export function SelectVehicle({
   const [vehicle, setVehicle] = setValue ? [value, setValue] : state;
   const vehicleList = useListsStore((x) => x.vehicles);
   const { newAddedVehicle } = useListsStore();
-  // const [openDropdown, setOpenDropdown] = useState(false);
+
+  const search = useSearchParams();
+
+  console.log("Search: ", search);
 
   useEffect(() => {
     if (newAddedVehicle && setOpenDropdown) {
@@ -38,17 +42,23 @@ export function SelectVehicle({
       <input type="hidden" name={name} value={vehicle?.id ?? ""} />
 
       <Selector
+        disabledDropdown={search.get("clientId") ? false : true}
         label={(vehicle: Vehicle | null) =>
           vehicle ? vehicle.model || `Vehicle ${vehicle.id}` : "Vehicle"
         }
         newButton={<NewVehicle />}
-        items={vehicleList}
+        items={vehicleList.filter(
+          (vehicle) => vehicle.customerId === +search.get("clientId")!,
+        )}
         onSearch={(search: string) =>
           vehicleList.filter((vehicle) =>
             vehicle.model?.toLowerCase().includes(search.toLowerCase()),
           )
         }
-        openState={[openDropdown as boolean, setOpenDropdown as Dispatch<SetStateAction<boolean>>]}
+        openState={[
+          openDropdown as boolean,
+          setOpenDropdown as Dispatch<SetStateAction<boolean>>,
+        ]}
         selectedItem={vehicle}
         setSelectedItem={setVehicle}
         displayList={(item) => <p>{item.model}</p>}
