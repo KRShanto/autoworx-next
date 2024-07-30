@@ -149,7 +149,9 @@ export default function Selector<T>({
               if (clickabled) {
                 return (
                   <button
-                    onClick={() => handleSelectItem(item)}
+                    onClick={() => {
+                      handleSelectItem(item);
+                    }}
                     type="button"
                     key={index}
                     className={cn(
@@ -165,6 +167,7 @@ export default function Selector<T>({
                 return (
                   <div
                     key={index}
+                  
                     className={cn(
                       "w-full p-1 px-2 text-left hover:bg-gray-100",
                       border &&

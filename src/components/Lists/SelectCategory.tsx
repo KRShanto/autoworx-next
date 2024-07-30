@@ -43,7 +43,7 @@ export default function SelectCategory({
       });
       setCategory(res.data);
       setCategoryInput("");
-      setCategoryOpen(false);
+      setCategoryOpen && setCategoryOpen(false);
     }
   }
 
