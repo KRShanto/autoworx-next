@@ -15,14 +15,14 @@ import { SlimInput } from "@/components/SlimInput";
 import Selector from "@/components/Selector";
 import { useListsStore } from "@/stores/lists";
 import { cn } from "@/lib/cn";
-import { newPaymentMethod } from "./actions/newPaymentMethod";
+import { newPaymentMethod } from "../../../actions/payment/newPaymentMethod";
 import { CardType, PaymentMethod, PaymentType } from "@prisma/client";
-import { newPayment } from "./actions/newPayment";
+import { newPayment } from "../../../actions/payment/newPayment";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { useInvoiceCreate } from "@/hooks/useInvoiceCreate";
 import { usePathname, useRouter } from "next/navigation";
 import moment from "moment";
-import { updatePayment } from "./actions/updatePayment";
+import { updatePayment } from "../../../actions/payment/updatePayment";
 
 function TabTrigger({
   value,

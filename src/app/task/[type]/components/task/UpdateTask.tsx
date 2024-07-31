@@ -16,10 +16,10 @@ import Image from "next/image";
 import { useState } from "react";
 import { FaChevronDown, FaChevronUp, FaTractor, FaTrash } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa6";
-import { editTask } from "../../actions/editTask";
+import { editTask } from "../../../../../actions/task/editTask";
 import { TimePicker } from "antd";
 import dayjs from "dayjs";
-import { deleteTask } from "../../actions/deleteTask";
+import { deleteTask } from "../../../../../actions/task/deleteTask";
 
 export default function UpdateTask() {
   const { popup, data, close } = usePopupStore();

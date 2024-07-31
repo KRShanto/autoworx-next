@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 
-export async function deleteEstimate(id: string): Promise<ServerAction> {
+export async function deleteInvoice(id: string): Promise<ServerAction> {
   await db.invoice.delete({
     where: {
       id,

@@ -15,7 +15,7 @@ import Submit from "@/components/Submit";
 import { useFormErrorStore } from "@/stores/form-error";
 import { Source } from "@prisma/client";
 import { useState } from "react";
-import { newSource } from "./newSource";
+import { newSource } from "../../actions/source/newSource";
 
 export default function NewClientSource({
   setClientSources,

@@ -8,7 +8,7 @@ import { redirect, useRouter } from "next/navigation";
 import React from "react";
 import { CiEdit } from "react-icons/ci";
 import { FaTimes } from "react-icons/fa";
-import { deleteVendor } from "./actions/deleteVendor";
+import { deleteVendor } from "../../../actions/vendor/deleteVendor";
 
 const evenColor = "bg-white";
 const oddColor = "bg-[#F8FAFF]";

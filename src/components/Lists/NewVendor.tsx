@@ -14,7 +14,7 @@ import {
 import Submit from "../Submit";
 import { SlimInput } from "../SlimInput";
 import { useListsStore } from "@/stores/lists";
-import { newVendor } from "@/app/inventory/vendor/actions/newVendor";
+import { newVendor } from "@/actions/vendor/newVendor";
 import { SlimTextarea } from "../SlimTextarea";
 
 export default function NewVendor({

@@ -14,7 +14,7 @@ import {
 import Submit from "../Submit";
 import { SlimInput } from "../SlimInput";
 import { useListsStore } from "@/stores/lists";
-import { editVendor } from "@/app/inventory/vendor/actions/editVendor";
+import { editVendor } from "@/actions/vendor/editVendor";
 import { SlimTextarea } from "../SlimTextarea";
 
 export default function EditVendor({
@@ -81,19 +81,56 @@ export default function EditVendor({
 
         <div className="grid gap-2 overflow-y-auto sm:grid-cols-2">
           <SlimInput name="contactName" defaultValue={vendor.name} />
-          <SlimInput name="companyName" defaultValue={vendor.companyName ?? ""} required={false} />
-          <SlimInput name="phone" defaultValue={vendor.phone ?? ""} required={false} />
-          <SlimInput name="email" defaultValue={vendor.email ?? ""}  required={false} />
-          <SlimInput name="address" defaultValue={vendor.address ?? ""} required={false} />
+          <SlimInput
+            name="companyName"
+            defaultValue={vendor.companyName ?? ""}
+            required={false}
+          />
+          <SlimInput
+            name="phone"
+            defaultValue={vendor.phone ?? ""}
+            required={false}
+          />
+          <SlimInput
+            name="email"
+            defaultValue={vendor.email ?? ""}
+            required={false}
+          />
+          <SlimInput
+            name="address"
+            defaultValue={vendor.address ?? ""}
+            required={false}
+          />
           <div className="flex gap-3">
-            <SlimInput name="city" defaultValue={vendor.city ?? ""} required={false} />
-            <SlimInput name="state" defaultValue={vendor.state ?? ""} required={false} />
-            <SlimInput name="zip" defaultValue={vendor.zip ?? ""} required={false} />
+            <SlimInput
+              name="city"
+              defaultValue={vendor.city ?? ""}
+              required={false}
+            />
+            <SlimInput
+              name="state"
+              defaultValue={vendor.state ?? ""}
+              required={false}
+            />
+            <SlimInput
+              name="zip"
+              defaultValue={vendor.zip ?? ""}
+              required={false}
+            />
           </div>
 
           <div className="sm:col-span-2">
-          <SlimInput name="website" defaultValue={vendor.website ?? ""} required={false} />
-          <SlimTextarea name="notes" defaultValue={vendor.notes ?? ""} placeholder="Add notes" required={false} />
+            <SlimInput
+              name="website"
+              defaultValue={vendor.website ?? ""}
+              required={false}
+            />
+            <SlimTextarea
+              name="notes"
+              defaultValue={vendor.notes ?? ""}
+              placeholder="Add notes"
+              required={false}
+            />
           </div>
         </div>
 

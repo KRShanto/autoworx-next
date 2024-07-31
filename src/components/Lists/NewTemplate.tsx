@@ -14,7 +14,7 @@ import Submit from "@/components/Submit";
 import { useEffect, useState } from "react";
 import FormError from "@/components/FormError";
 import { useFormErrorStore } from "@/stores/form-error";
-import { addTemplate } from "../../app/task/[type]/actions/addTemplate";
+import { addTemplate } from "../../actions/appointment/addTemplate";
 import { EmailTemplateType } from "@prisma/client";
 import { useListsStore } from "@/stores/lists";
 

@@ -39,8 +39,8 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import { TbBell, TbCalendar } from "react-icons/tb";
-import { deleteAppointment } from "../../actions/deleteAppointment";
-import { editAppointment } from "../../actions/editAppointment";
+import { deleteAppointment } from "../../../../../actions/appointment/deleteAppointment";
+import { editAppointment } from "../../../../../actions/appointment/editAppointment";
 import { Reminder } from "./Reminder";
 import { customAlphabet } from "nanoid";
 

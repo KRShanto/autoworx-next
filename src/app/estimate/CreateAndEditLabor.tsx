@@ -17,10 +17,10 @@ import {
   useState,
 } from "react";
 import { Status, Technician, User } from "@prisma/client";
-import { addTechnician } from "./@modal/(.)view/[id]/actions/addTechnician";
+import { addTechnician } from "../../actions/estimate/technician/addTechnician";
 import { useRouter } from "next/navigation";
 import moment from "moment";
-import { updateTechnician } from "./@modal/(.)view/[id]/actions/updateTechnician";
+import { updateTechnician } from "../../actions/estimate/technician/updateTechnician";
 type TPriority = string;
 type TEmployee = Partial<User>;
 const priorities: TPriority[] = ["Low", "Medium", "High"];

@@ -13,7 +13,7 @@ import FormError from "@/components/FormError";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { useState } from "react";
-import { useProduct as productUse } from "./actions/useProduct";
+import { useProduct as productUse } from "../../actions/inventory/useProduct";
 import Selector from "@/components/Selector";
 
 export default function UseProductForm({

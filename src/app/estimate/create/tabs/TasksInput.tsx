@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteTask } from "@/app/task/[type]/actions/deleteTask";
+import { deleteTask } from "@/actions/task/deleteTask";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { create } from "mutative";
 import { HiOutlinePlusCircle, HiXCircle } from "react-icons/hi2";

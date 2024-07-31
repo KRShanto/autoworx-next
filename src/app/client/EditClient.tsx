@@ -16,11 +16,11 @@ import { FaTimes } from "react-icons/fa";
 import { RxAvatar } from "react-icons/rx";
 import NewClientSource from "@/components/Lists/NewClientSource";
 import { Client, Source, Tag } from "@prisma/client";
-import { getSources } from "@/components/Lists/getSources";
-import { deleteSource } from "@/components/Lists/deleteSource";
+import { getSources } from "@/actions/source/getSources";
+import { deleteSource } from "@/actions/source/deleteSource";
 import { useFormErrorStore } from "@/stores/form-error";
 import { FaPenToSquare } from "react-icons/fa6";
-import { editClient } from "../customer/edit";
+import { editClient } from "../../actions/client/edit";
 
 export default function EditCustomer({
   client,

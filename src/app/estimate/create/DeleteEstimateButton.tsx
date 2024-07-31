@@ -14,7 +14,7 @@ import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { useState } from "react";
 import { HiTrash } from "react-icons/hi2";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { deleteEstimate } from "./actions/delete";
+import { deleteInvoice } from "../../../actions/estimate/invoice/delete";
 
 export default function DeleteEstimateButton() {
   const [open, setOpen] = useState(false);
@@ -25,7 +25,7 @@ export default function DeleteEstimateButton() {
   async function handleDelete() {
     if (pathname.includes("/estimate/edit/")) {
       const { id } = params as { id: string };
-      const res = await deleteEstimate(id);
+      const res = await deleteInvoice(id);
     }
 
     useEstimateCreateStore.getState().reset();

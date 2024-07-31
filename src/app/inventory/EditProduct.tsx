@@ -24,7 +24,7 @@ import {
 } from "@prisma/client";
 import { useState } from "react";
 import { CiEdit } from "react-icons/ci";
-import { editProduct } from "./actions/edit";
+import { editProduct } from "../../actions/inventory/edit";
 
 type TProps = {
   productData: InventoryProduct & { category: Category; vendor: Vendor };

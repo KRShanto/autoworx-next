@@ -1,5 +1,5 @@
 // CategorySelector.tsx
-import newCategory from "@/app/estimate/create/actions/newCategory";
+import newCategory from "@/actions/category/newCategory";
 import Selector from "@/components/Selector";
 import { cn } from "@/lib/cn";
 import { useListsStore } from "@/stores/lists";

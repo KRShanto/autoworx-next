@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { TiDeleteOutline } from "react-icons/ti";
 import Link from "next/link";
 import { Technician } from "@prisma/client";
-import { getTechnician } from "../../query/getTechnician";
-import { deleteTechnician } from "../../actions/deleteTechnician";
+import { getTechnician } from "../../../../../../../actions/estimate/technician/getTechnician";
+import { deleteTechnician } from "../../../../../../../actions/estimate/technician/deleteTechnician";
 export default function LaborItems({
   workOrderId,
   materialId,

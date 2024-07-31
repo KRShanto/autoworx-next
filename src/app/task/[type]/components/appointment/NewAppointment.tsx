@@ -37,7 +37,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { TbBell, TbCalendar } from "react-icons/tb";
-import { addAppointment } from "../../actions/addAppointment";
+import { addAppointment } from "../../../../../actions/appointment/addAppointment";
 import { Reminder } from "./Reminder";
 import { customAlphabet } from "nanoid";
 import dayjs from "dayjs";

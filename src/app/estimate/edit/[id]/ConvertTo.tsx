@@ -3,7 +3,7 @@
 import { Invoice } from "@prisma/client";
 import React from "react";
 import { SiConvertio } from "react-icons/si";
-import { convertInvoice } from "./actions/convert";
+import { convertInvoice } from "../../../../actions/estimate/invoice/convert";
 import { useRouter } from "next/navigation";
 
 export default function ConvertTo({ invoice }: { invoice: Invoice }) {

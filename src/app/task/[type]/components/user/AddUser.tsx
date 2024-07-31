@@ -3,7 +3,7 @@ import Popup from "@/components/Popup";
 import { usePopupStore } from "@/stores/popup";
 import FormError from "@/components/FormError";
 import Submit from "@/components/Submit";
-import { addUser } from "../../actions/addUser";
+import { addUser } from "../../../../../actions/user/addUser";
 import { useFormErrorStore } from "@/stores/form-error";
 
 export default function AddUser() {

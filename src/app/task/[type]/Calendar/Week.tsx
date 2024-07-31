@@ -22,8 +22,8 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDrop } from "react-dnd";
 import { FaPen } from "react-icons/fa6";
-import { assignAppointmentDate } from "../actions/assignAppointmentDate";
-import { updateTask } from "../actions/dragTask";
+import { assignAppointmentDate } from "../../../../actions/appointment/assignAppointmentDate";
+import { updateTask } from "../../../../actions/task/dragTask";
 import DraggableTaskTooltip from "./draggable/DraggableTaskTooltip";
 import {
   formatDate,
