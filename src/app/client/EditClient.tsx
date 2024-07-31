@@ -15,17 +15,17 @@ import { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { RxAvatar } from "react-icons/rx";
 import NewClientSource from "@/components/Lists/NewClientSource";
-import { Customer, Source, Tag } from "@prisma/client";
+import { Client, Source, Tag } from "@prisma/client";
 import { getSources } from "@/components/Lists/getSources";
 import { deleteSource } from "@/components/Lists/deleteSource";
 import { useFormErrorStore } from "@/stores/form-error";
 import { FaPenToSquare } from "react-icons/fa6";
-import { editCustomer } from "../customer/edit";
+import { editClient } from "../customer/edit";
 
 export default function EditCustomer({
   client,
 }: {
-  client: Customer & { tag: Tag | null; source: Source | null };
+  client: Client & { tag: Tag | null; source: Source | null };
 }) {
   const [open, setOpen] = useState(false);
   const [clientSource, setClientSource] = useState<Source | null>(
@@ -71,7 +71,7 @@ export default function EditCustomer({
     const state = document.querySelector<HTMLInputElement>("#state")?.value;
     const zip = document.querySelector<HTMLInputElement>("#zip")?.value;
 
-    const res = await editCustomer({
+    const res = await editClient({
       id: client.id,
       firstName,
       lastName,

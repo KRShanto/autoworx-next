@@ -39,16 +39,16 @@ export default async function Page({ params }: { params: { type: string } }) {
       },
     });
 
-    const customer = appointment.customerId
-      ? await db.customer.findUnique({
-          where: { id: appointment.customerId },
+    const client = appointment.clientId
+      ? await db.client.findUnique({
+          where: { id: appointment.clientId },
         })
       : null;
 
     calendarAppointments.push({
       ...appointment,
       assignedUsers: users,
-      customer,
+      client,
     });
   }
 
@@ -129,7 +129,7 @@ export default async function Page({ params }: { params: { type: string } }) {
     });
   }
 
-  const customers = await db.customer.findMany({
+  const customers = await db.client.findMany({
     where: { companyId },
   });
 
@@ -152,9 +152,9 @@ export default async function Page({ params }: { params: { type: string } }) {
   let appointmentsFull: AppointmentFull[] = [];
 
   for (const appointment of appointments) {
-    const customer = appointment.customerId
-      ? await db.customer.findUnique({
-          where: { id: appointment.customerId },
+    const client = appointment.clientId
+      ? await db.client.findUnique({
+          where: { id: appointment.clientId },
         })
       : null;
 
@@ -191,7 +191,7 @@ export default async function Page({ params }: { params: { type: string } }) {
     appointmentsFull.push({
       ...appointment,
       times: appointment.times as string[],
-      customer,
+      client,
       vehicle,
       confirmationEmailTemplate: confirmationEmailTemplate as any,
       reminderEmailTemplate: reminderEmailTemplate as any,

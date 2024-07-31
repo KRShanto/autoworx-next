@@ -11,7 +11,7 @@ import type {
 } from "@/types/db";
 import type {
   CalendarSettings,
-  Customer,
+  Client,
   EmailTemplate,
   Task,
   User,
@@ -62,7 +62,7 @@ export default function Week({
   tasksWithoutTime: Task[];
   appointments: CalendarAppointment[];
   appointmentsFull: AppointmentFull[];
-  customers: Customer[];
+  customers: Client[];
   vehicles: Vehicle[];
   settings: CalendarSettings;
   templates: EmailTemplate[];
@@ -408,7 +408,7 @@ export default function Week({
               }
             }
           });
-              const limitOfTasks = 5;
+          const limitOfTasks = 5;
           const taskIndex = tasksInRow.findIndex(
             (task) => task.id === event.id,
           );
@@ -497,8 +497,8 @@ export default function Week({
 
                       <p>
                         Client:
-                        {event.customer &&
-                          `${event.customer.firstName} ${event.customer.lastName}`}
+                        {event.client &&
+                          `${event.client.firstName} ${event.client.lastName}`}
                       </p>
 
                       <p>

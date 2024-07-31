@@ -1,13 +1,7 @@
 import { CalendarType } from "@/types/calendar";
 import { AppointmentFull, CalendarAppointment, CalendarTask } from "@/types/db";
 import type { EmailTemplate } from "@prisma/client";
-import {
-  CalendarSettings,
-  Customer,
-  Task,
-  User,
-  Vehicle,
-} from "@prisma/client";
+import { CalendarSettings, Client, Task, User, Vehicle } from "@prisma/client";
 import { Suspense } from "react";
 import Body from "./Body";
 import Heading from "./Heading";
@@ -28,7 +22,7 @@ export default function Calender({
   tasks: CalendarTask[];
   companyUsers: User[];
   tasksWithoutTime: Task[];
-  customers: Customer[];
+  customers: Client[];
   vehicles: Vehicle[];
   settings: CalendarSettings;
   appointments: CalendarAppointment[];

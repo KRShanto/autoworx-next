@@ -20,7 +20,7 @@ import { usePopupStore } from "@/stores/popup";
 import { AppointmentFull } from "@/types/db";
 import type {
   CalendarSettings,
-  Customer,
+  Client,
   EmailTemplate,
   User,
   Vehicle,
@@ -53,7 +53,7 @@ export function UpdateAppointment() {
   const { popup, data, close } = usePopupStore();
   const { appointment, settings, employees, templates } = data as {
     appointment: AppointmentFull;
-    customers: Customer[];
+    customers: Client[];
     vehicles: Vehicle[];
     settings: CalendarSettings;
     employees: User[];
@@ -72,14 +72,12 @@ export function UpdateAppointment() {
     appointment.startTime,
   );
 
-  console.log("draft: ", appointment.draftEstimate);
-
   const [endTime, setEndTime] = useState<string | null>(appointment.endTime);
   const [draft, setDraft] = useState<string | null>(appointment.draftEstimate);
   const [draftEstimates, setDraftEstimates] = useState<string[]>([]);
   const [allDay, setAllDay] = useState(false);
 
-  const [client, setClient] = useState<Customer | null>(appointment.customer);
+  const [client, setClient] = useState<Client | null>(appointment.client);
   const [vehicle, setVehicle] = useState<Vehicle | null>(appointment.vehicle);
   const [assignedUsers, setAssignedUsers] = useState<User[]>(
     appointment.assignedUsers,
@@ -143,7 +141,7 @@ export function UpdateAppointment() {
     if (estimates) {
       // filter all estimates where clientId is client.id
       const filteredEstimates = estimates.filter(
-        (estimate) => estimate.customerId === client?.id,
+        (estimate) => estimate.clientId === client?.id,
       );
       // map the filtered estimates to get the id
       const estimateIds = filteredEstimates.map((estimate) => estimate.id);
@@ -169,7 +167,7 @@ export function UpdateAppointment() {
         startTime: startTime as string,
         endTime: endTime as string,
         assignedUsers: assignedUsers.map((user) => user.id),
-        customerId: client ? client.id : undefined,
+        clientId: client ? client.id : undefined,
         vehicleId: vehicle ? vehicle.id : undefined,
         draftEstimate: draft,
         notes,

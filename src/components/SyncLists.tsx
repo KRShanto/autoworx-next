@@ -3,7 +3,7 @@
 import { useListsStore } from "@/stores/lists";
 import type {
   Category,
-  Customer,
+  Client,
   EmailTemplate,
   Labor,
   Material,
@@ -33,7 +33,7 @@ export function SyncLists({
   paymentMethods = [],
   estimates = [],
 }: {
-  customers?: Customer[];
+  customers?: Client[];
   vehicles?: Vehicle[];
   employees?: User[];
   templates?: EmailTemplate[];

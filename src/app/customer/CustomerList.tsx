@@ -6,7 +6,7 @@ import CustomerListOptions from "./CustomerListOptions";
 
 export default async function CustomerList() {
   const session = (await auth()) as AuthSession;
-  const customers = await db.customer.findMany({
+  const customers = await db.client.findMany({
     where: {
       companyId: session.user.companyId,
     },

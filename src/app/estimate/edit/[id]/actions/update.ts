@@ -9,7 +9,7 @@ import { Labor, Material, Service, Tag } from "@prisma/client";
 interface UpdateEstimateInput {
   id: string;
 
-  customerId: number | undefined;
+  clientId: number | undefined;
   vehicleId: number | undefined;
   statusId: number | undefined;
 
@@ -47,7 +47,7 @@ export async function update(data: UpdateEstimateInput): Promise<ServerAction> {
       id: data.id,
     },
     data: {
-      customerId: data.customerId,
+      clientId: data.clientId,
       vehicleId: data.vehicleId,
       statusId: data.statusId,
       subtotal: data.subtotal,

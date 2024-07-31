@@ -16,14 +16,14 @@ export default async function PaymentTab({
 }) {
   if (!clientId) return null;
 
-  const client = await db.customer.findUnique({
+  const client = await db.client.findUnique({
     where: { id: clientId },
   });
 
   if (!client) return null;
 
   const invoices = await db.invoice.findMany({
-    where: { customerId: clientId },
+    where: { clientId },
     orderBy: { createdAt: "desc" },
     select: {
       invoiceItems: { select: { service: true, serviceId: true, id: true } },

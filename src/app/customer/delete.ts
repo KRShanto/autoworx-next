@@ -3,12 +3,12 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 
-export async function deleteCustomer(id: number) {
-  await db.customer.delete({
+export async function deleteClient(id: number) {
+  await db.client.delete({
     where: {
       id,
     },
   });
 
-  revalidatePath("/customer");
+  revalidatePath("/client");
 }

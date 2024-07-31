@@ -1,6 +1,6 @@
 import { CalendarType } from "@/types/calendar";
 import type { EmailTemplate } from "@prisma/client";
-import { CalendarSettings, Customer, User, Vehicle } from "@prisma/client";
+import { CalendarSettings, Client, User, Vehicle } from "@prisma/client";
 import { sentenceCase } from "change-case";
 import moment, { Moment } from "moment";
 import Link from "next/link";
@@ -45,7 +45,7 @@ export default function Heading({
   templates,
 }: {
   type: CalendarType;
-  customers: Customer[];
+  customers: Client[];
   vehicles: Vehicle[];
   settings: CalendarSettings;
   employees: User[];

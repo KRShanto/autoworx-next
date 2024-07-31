@@ -5,98 +5,91 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import Link from "next/link";
 import HeaderSearch from "./components/HeaderSearch";
 
-
-
-
-
 interface TransactionData {
-    invoiceNumber: string;
-    customer: string;
-    vehicleInfo: string;
-    transactionDate: string;
-    amount: number;
-    method: string;
-  }
-  
-  const dummyData: TransactionData[] = [
-    {
-      invoiceNumber: "INV001",
-      customer: "John Doe",
-      vehicleInfo: "Toyota Camry 2020",
-      transactionDate: "2024-07-01",
-      amount: 250.0,
-      method: "Credit Card",
-    },
-    {
-      invoiceNumber: "INV002",
-      customer: "Jane Smith",
-      vehicleInfo: "Honda Accord 2019",
-      transactionDate: "2024-07-02",
-      amount: 300.0,
-      method: "PayPal",
-    },
-    {
-      invoiceNumber: "INV003",
-      customer: "Mike Johnson",
-      vehicleInfo: "Ford Focus 2018",
-      transactionDate: "2024-07-03",
-      amount: 150.0,
-      method: "Bank Transfer",
-    },
-    {
-      invoiceNumber: "INV003",
-      customer: "Mike Johnson",
-      vehicleInfo: "Ford Focus 2018",
-      transactionDate: "2024-07-03",
-      amount: 150.0,
-      method: "Bank Transfer",
-    },
-    {
-      invoiceNumber: "INV003",
-      customer: "Mike Johnson",
-      vehicleInfo: "Ford Focus 2018",
-      transactionDate: "2024-07-03",
-      amount: 150.0,
-      method: "Bank Transfer",
-    },
-    {
-      invoiceNumber: "INV003",
-      customer: "Mike Johnson",
-      vehicleInfo: "Ford Focus 2018",
-      transactionDate: "2024-07-03",
-      amount: 150.0,
-      method: "Bank Transfer",
-    },
-    {
-      invoiceNumber: "INV003",
-      customer: "Mike Johnson",
-      vehicleInfo: "Ford Focus 2018",
-      transactionDate: "2024-07-03",
-      amount: 150.0,
-      method: "Bank Transfer",
-    },
-    {
-      invoiceNumber: "INV003",
-      customer: "Mike Johnson",
-      vehicleInfo: "Ford Focus 2018",
-      transactionDate: "2024-07-03",
-      amount: 150.0,
-      method: "Bank Transfer",
-    },
-    {
-      invoiceNumber: "INV003",
-      customer: "Mike Johnson",
-      vehicleInfo: "Ford Focus 2018",
-      transactionDate: "2024-07-03",
-      amount: 150.0,
-      method: "Bank Transfer",
-    },
-  ];
+  invoiceNumber: string;
+  customer: string;
+  vehicleInfo: string;
+  transactionDate: string;
+  amount: number;
+  method: string;
+}
+
+const dummyData: TransactionData[] = [
+  {
+    invoiceNumber: "INV001",
+    customer: "John Doe",
+    vehicleInfo: "Toyota Camry 2020",
+    transactionDate: "2024-07-01",
+    amount: 250.0,
+    method: "Credit Card",
+  },
+  {
+    invoiceNumber: "INV002",
+    customer: "Jane Smith",
+    vehicleInfo: "Honda Accord 2019",
+    transactionDate: "2024-07-02",
+    amount: 300.0,
+    method: "PayPal",
+  },
+  {
+    invoiceNumber: "INV003",
+    customer: "Mike Johnson",
+    vehicleInfo: "Ford Focus 2018",
+    transactionDate: "2024-07-03",
+    amount: 150.0,
+    method: "Bank Transfer",
+  },
+  {
+    invoiceNumber: "INV003",
+    customer: "Mike Johnson",
+    vehicleInfo: "Ford Focus 2018",
+    transactionDate: "2024-07-03",
+    amount: 150.0,
+    method: "Bank Transfer",
+  },
+  {
+    invoiceNumber: "INV003",
+    customer: "Mike Johnson",
+    vehicleInfo: "Ford Focus 2018",
+    transactionDate: "2024-07-03",
+    amount: 150.0,
+    method: "Bank Transfer",
+  },
+  {
+    invoiceNumber: "INV003",
+    customer: "Mike Johnson",
+    vehicleInfo: "Ford Focus 2018",
+    transactionDate: "2024-07-03",
+    amount: 150.0,
+    method: "Bank Transfer",
+  },
+  {
+    invoiceNumber: "INV003",
+    customer: "Mike Johnson",
+    vehicleInfo: "Ford Focus 2018",
+    transactionDate: "2024-07-03",
+    amount: 150.0,
+    method: "Bank Transfer",
+  },
+  {
+    invoiceNumber: "INV003",
+    customer: "Mike Johnson",
+    vehicleInfo: "Ford Focus 2018",
+    transactionDate: "2024-07-03",
+    amount: 150.0,
+    method: "Bank Transfer",
+  },
+  {
+    invoiceNumber: "INV003",
+    customer: "Mike Johnson",
+    vehicleInfo: "Ford Focus 2018",
+    transactionDate: "2024-07-03",
+    amount: 150.0,
+    method: "Bank Transfer",
+  },
+];
 
 export default function Page() {
-
-    
-
   return (
     <div>
       <Title>Payments</Title>
@@ -135,28 +128,41 @@ function Table({ data }: { data: TransactionData[] }) {
         {/*  Header */}
         <thead className="bg-white">
           <tr className="h-10 border-b">
-            <th className="py-2 px-4 border-b">Invoice#</th>
-            <th className="py-2 px-4 border-b">Customer</th>
-            <th className="py-2 px-4 border-b">Vehicle Info</th>
-            <th className="py-2 px-4 border-b">Transaction Date</th>
-            <th className="py-2 px-4 border-b">Amount</th>
-            <th className="py-2 px-4 border-b">Method</th>
+            <th className="border-b px-4 py-2">Invoice#</th>
+            <th className="border-b px-4 py-2">Customer</th>
+            <th className="border-b px-4 py-2">Vehicle Info</th>
+            <th className="border-b px-4 py-2">Transaction Date</th>
+            <th className="border-b px-4 py-2">Amount</th>
+            <th className="border-b px-4 py-2">Method</th>
           </tr>
         </thead>
 
         <tbody>
           {data.map((item, index) => (
-            <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-[#EEF4FF]"}>
-              <td className="py-2 px-4 border-b text-center"><Link href="/" className="text-blue-500 hover:underline">
-              {item.invoiceNumber}
-                </Link></td>
-              <td className="py-2 px-4 border-b text-center"><Link href="/" className="text-blue-500 hover:underline">
-              {item.customer}
-                </Link></td>
-              <td className="py-2 px-4 border-b text-center">{item.vehicleInfo}</td>
-              <td className="py-2 px-4 border-b text-center">{item.transactionDate}</td>
-              <td className="py-2 px-4 border-b text-center">{item.amount.toFixed(2)}</td>
-              <td className="py-2 px-4 border-b text-center">{item.method}</td>
+            <tr
+              key={index}
+              className={index % 2 === 0 ? "bg-white" : "bg-[#EEF4FF]"}
+            >
+              <td className="border-b px-4 py-2 text-center">
+                <Link href="/" className="text-blue-500 hover:underline">
+                  {item.invoiceNumber}
+                </Link>
+              </td>
+              <td className="border-b px-4 py-2 text-center">
+                <Link href="/" className="text-blue-500 hover:underline">
+                  {item.customer}
+                </Link>
+              </td>
+              <td className="border-b px-4 py-2 text-center">
+                {item.vehicleInfo}
+              </td>
+              <td className="border-b px-4 py-2 text-center">
+                {item.transactionDate}
+              </td>
+              <td className="border-b px-4 py-2 text-center">
+                {item.amount.toFixed(2)}
+              </td>
+              <td className="border-b px-4 py-2 text-center">{item.method}</td>
             </tr>
           ))}
         </tbody>

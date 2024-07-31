@@ -1,11 +1,11 @@
-import { Customer, Source, Tag } from "@prisma/client";
+import { Client, Source, Tag } from "@prisma/client";
 import Image from "next/image";
 import React from "react";
 
 export default function ClientInformation({
   client,
 }: {
-  client: Customer & { tag: Tag | null; source: Source | null };
+  client: Client & { tag: Tag | null; source: Source | null };
 }) {
   return (
     <div className="mb-3 w-full p-2">

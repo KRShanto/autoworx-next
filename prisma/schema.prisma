@@ -18,7 +18,7 @@ model Company {
   updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at")
   users             User[]
   tasks             Task[]
-  customers         Customer[]
+  clients           Client[]
   services          Service[]
   vehicles          Vehicle[]
   invoices          Invoice[]
@@ -114,9 +114,9 @@ model OAuthToken {
   @@index([userId], name: "fk_oauth_tokens_user")
 }
 
-// Customer of a company.
-// Customer is just data, they can't login.
-model Customer {
+// Client of a company.
+// Client is just data, they can't login.
+model Client {
   id              Int           @id @default(autoincrement())
   firstName       String        @map("first_name")
   lastName        String?       @map("last_name")
@@ -140,16 +140,17 @@ model Customer {
   Vehicle         Vehicle[]
 
   @@index([companyId], name: "fk_customers_company")
+  @@map("Client")
 }
 
 model Source {
-  id        Int        @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   name      String
-  companyId Int        @map("company_id")
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @default(now()) @updatedAt @map("updated_at")
-  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  Customer  Customer[]
+  companyId Int      @map("company_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Client    Client[]
 }
 
 // Vehicle of a company.
@@ -166,14 +167,14 @@ model Vehicle {
   vin          String?
   notes        String?
   colorId      Int?          @map("color_id")
-  customerId   Int?          @map("customer_id")
+  clientId     Int?          @map("customer_id")
   companyId    Int           @map("company_id")
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
   company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   appointments Appointment[]
   color        VehicleColor? @relation(fields: [colorId], references: [id], onDelete: SetNull)
-  customer     Customer?     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  client       Client?       @relation(fields: [clientId], references: [id], onDelete: Cascade)
   invoices     Invoice[]
 
   @@index([companyId], name: "fk_vehicles_company")
@@ -197,7 +198,7 @@ model Invoice {
   createdAt               DateTime                  @default(now()) @map("created_at")
   updatedAt               DateTime                  @default(now()) @updatedAt @map("updated_at")
   type                    InvoiceType               @default(Invoice)
-  customerId              Int?                      @map("customer_id")
+  clientId                Int?                      @map("customer_id")
   vehicleId               Int?                      @map("vehicle_id")
   subtotal                Decimal?                  @default(0) @db.Decimal(8, 2)
   discount                Decimal?                  @default(0) @db.Decimal(8, 2)
@@ -277,7 +278,7 @@ enum InvoiceItemMaterialType {
 // One invoice can have multiple InvoiceItems.
 // And one InvoiceItem can have one service.
 // Service itself is an independant model, So one service can be in multiple invoices.
-// And if you want to fetch services for a customer, you need to fetch all invoices and then all invoice items and then you'll get services.
+// And if you want to fetch services for a client, you need to fetch all invoices and then all invoice items and then you'll get services.
 model Service {
   id           Int           @id @default(autoincrement())
   createdAt    DateTime      @default(now()) @map("created_at")
@@ -299,7 +300,7 @@ model Service {
 // One invoice can have multiple InvoiceItems.
 // And one InvoiceItem can have one material.
 // Material itself is an independant model, So one material can be in multiple invoices.
-// And if you want to fetch materials for a customer, you need to fetch all invoices and then all invoice items and then you'll get materials.
+// And if you want to fetch materials for a client, you need to fetch all invoices and then all invoice items and then you'll get materials.
 model Material {
   id            Int      @id @default(autoincrement())
   name          String
@@ -395,7 +396,7 @@ model Tag {
   items     ItemTag[]
   materials MaterialTag[]
   labors    LaborTag[]
-  Customer  Customer[]
+  Client    Client[]
 }
 
 // Many to many relation between Item and Tag.
@@ -595,7 +596,7 @@ model Appointment {
   startTime                       String?           @map("start_time")
   endTime                         String?           @map("end_time")
   companyId                       Int               @map("company_id")
-  customerId                      Int?              @map("customer_id")
+  clientId                        Int?              @map("customer_id")
   vehicleId                       Int?              @map("vehicle_id")
   draftEstimate                   String?           @map("draft_estimate")
   notes                           String?
@@ -609,7 +610,7 @@ model Appointment {
   user                            User              @relation(fields: [userId], references: [id])
   company                         Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
   appointmentUsers                AppointmentUser[]
-  customer                        Customer?         @relation(fields: [customerId], references: [id])
+  client                          Client?           @relation(fields: [clientId], references: [id])
   vehicle                         Vehicle?          @relation(fields: [vehicleId], references: [id])
 
   @@index([userId], name: "fk_tasks_user")

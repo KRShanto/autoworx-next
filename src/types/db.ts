@@ -4,7 +4,7 @@ import {
   CardPayment,
   CashPayment,
   CheckPayment,
-  Customer,
+  Client,
   EmailTemplate,
   OtherPayment,
   Payment,
@@ -111,7 +111,7 @@ export interface CalendarAppointment {
   date: Date | null;
   startTime: string | null;
   endTime: string | null;
-  customer: Customer | null;
+  client: Client | null;
   companyId: number;
   assignedUsers: User[];
   draftEstimate: string | null;
@@ -123,7 +123,7 @@ export interface AppointmentFull {
   date: Date | null;
   startTime: string | null;
   endTime: string | null;
-  customer: Customer | null;
+  client: Client | null;
   vehicle: Vehicle | null;
   draftEstimate: string | null;
   notes: string | null;

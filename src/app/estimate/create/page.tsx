@@ -22,7 +22,7 @@ export default async function Page({
 }) {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
-  const customers = await db.customer.findMany({ where: { companyId } });
+  const customers = await db.client.findMany({ where: { companyId } });
   const vehicles = await db.vehicle.findMany({ where: { companyId } });
   const categories = await db.category.findMany({ where: { companyId } });
   const services = await db.service.findMany({ where: { companyId } });

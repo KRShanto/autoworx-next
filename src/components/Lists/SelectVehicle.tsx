@@ -48,7 +48,7 @@ export function SelectVehicle({
         }
         newButton={<NewVehicle />}
         items={vehicleList.filter(
-          (vehicle) => vehicle.customerId === +search.get("clientId")!,
+          (vehicle) => vehicle.clientId === +search.get("clientId")!,
         )}
         onSearch={(search: string) =>
           vehicleList.filter((vehicle) =>

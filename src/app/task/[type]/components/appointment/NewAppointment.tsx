@@ -21,7 +21,7 @@ import { useListsStore } from "@/stores/lists";
 import { usePopupStore } from "@/stores/popup";
 import type {
   CalendarSettings,
-  Customer,
+  Client,
   EmailTemplate,
   User,
   Vehicle,
@@ -75,7 +75,7 @@ export function NewAppointment({
   const [endTime, setEndTime] = useState<string | undefined>();
   const [allDay, setAllDay] = useState(false);
 
-  const [client, setClient] = useState<Customer | null>(null);
+  const [client, setClient] = useState<Client | null>(null);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [draft, setDraft] = useState<string | null>(null);
   const [draftEstimates, setDraftEstimates] = useState<string[]>([]);
@@ -133,7 +133,7 @@ export function NewAppointment({
     if (estimates) {
       // filter all estimates where clientId is client.id
       const filteredEstimates = estimates.filter(
-        (estimate) => estimate.customerId === client?.id,
+        (estimate) => estimate.clientId === client?.id,
       );
       // map the filtered estimates to get the id
       const estimateIds = filteredEstimates.map((estimate) => estimate.id);
@@ -160,7 +160,7 @@ export function NewAppointment({
       startTime,
       endTime,
       assignedUsers: assignedUsers.map((user) => user.id),
-      customerId: client ? client.id : undefined,
+      clientId: client ? client.id : undefined,
       vehicleId: vehicle ? vehicle.id : undefined,
       draftEstimate: draft,
       notes,

@@ -34,7 +34,7 @@ export async function addCustomer(data: {
     const session = (await auth()) as AuthSession;
     const companyId = session.user.companyId;
 
-    const newCustomer = await db.customer.create({
+    const newCustomer = await db.client.create({
       data: {
         ...data,
         companyId,

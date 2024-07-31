@@ -1,24 +1,24 @@
 "use client";
 
 import { usePopupStore } from "@/stores/popup";
-import { Customer } from "@prisma/client";
+import { Client } from "@prisma/client";
 import React, { useState } from "react";
 import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { ThreeDots } from "react-loader-spinner";
-import { deleteCustomer } from "./delete";
+import { deleteClient } from "./delete";
 
 export default function CustomerListOptions({
   customer,
 }: {
-  customer: Customer;
+  customer: Client;
 }) {
   const [loading, setLoading] = useState(false);
   const { open } = usePopupStore();
 
   async function handleDelete() {
     setLoading(true);
-    await deleteCustomer(customer.id!);
+    await deleteClient(customer.id!);
     setLoading(false);
   }
 

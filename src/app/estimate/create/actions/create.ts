@@ -74,7 +74,7 @@ export async function create({
     data: {
       id: invoiceId,
       type,
-      customerId: clientId,
+      clientId,
       vehicleId,
       statusId,
       subtotal,
