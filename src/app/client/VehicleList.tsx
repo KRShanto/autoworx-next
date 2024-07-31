@@ -14,10 +14,12 @@ import AddNewVehicle from "./AddNewVehicle";
 import EditClient from "./EditClient";
 const evenColor = "bg-white";
 const oddColor = "bg-slate-100";
-
 export default function VehicleList({
+  //@ts-ignore
   vehicles,
+  //@ts-ignore
   selectedVehicle,
+  //@ts-ignore
   setSelectedVehicle,
 }) {
   return (
@@ -40,6 +42,7 @@ export default function VehicleList({
           </thead>
 
           <tbody>
+            {/* @ts-ignore */}
             {vehicles.map((vehicle, index) => (
               <tr
                 key={index}
@@ -53,14 +56,18 @@ export default function VehicleList({
                   setSelectedVehicle(vehicle);
                 }}
               >
-                <td className=" py-1 text-nowrap px-4 text-left 2xl:px-10">
+                <td className="text-nowrap px-4 py-1 text-left 2xl:px-10">
                   {vehicle.year}
                 </td>
-                <td className=" py-1 text-nowrap px-4 text-left 2xl:px-10">
+                <td className="text-nowrap px-4 py-1 text-left 2xl:px-10">
                   {vehicle.make}
                 </td>
-                <td className=" py-1 px-4 text-left 2xl:px-10">{vehicle.model}</td>
-                <td className=" py-1 px-4 text-left 2xl:px-10">{vehicle.plate}</td>
+                <td className="px-4 py-1 text-left 2xl:px-10">
+                  {vehicle.model}
+                </td>
+                <td className="px-4 py-1 text-left 2xl:px-10">
+                  {vehicle.plate}
+                </td>
               </tr>
             ))}
           </tbody>

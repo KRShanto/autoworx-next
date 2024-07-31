@@ -2,9 +2,11 @@
 import { cn } from "@/lib/cn";
 import React from "react";
 
-type Props = {};
+type Props = {
+  orders: { id: number; invoiceId: number; price: number; status: string }[];
+};
 
-const OrderList = ({ orders }) => {
+const OrderList = ({ orders }: Props) => {
   return (
     <div className="w-full">
       <div className="table w-full">
@@ -25,9 +27,7 @@ const OrderList = ({ orders }) => {
                   className={cn(
                     "cursor-pointer rounded-md py-3",
                     index % 2 === 0 ? "bg-white" : "bg-[#EEF4FF]",
-
                   )}
-
                 >
                   <td className="text-nowrap px-4 py-1 text-left 2xl:px-10">
                     {order.invoiceId}

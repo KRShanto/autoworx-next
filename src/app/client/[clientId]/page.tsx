@@ -377,8 +377,20 @@ const vehicles = [
   id: index + 1,
   orders: vehicle.orders.map((order, index) => ({ ...order, id: index + 1 })),
 }));
-const page = (props: Props) => {
-  const [selectedVehicle, setSelectedVehicle] = useState(null);
+const ClientPage = (props: Props) => {
+  const [selectedVehicle, setSelectedVehicle] = useState<{
+    id: number;
+    orders: {
+      id: number;
+      invoiceId: number;
+      price: number;
+      status: string;
+    }[];
+    year: number;
+    make: string;
+    model: string;
+    plate: string;
+  } | null>(null);
   return (
     <div>
       <div className="heading">
@@ -410,10 +422,19 @@ const page = (props: Props) => {
           />
         </div>
         <div className="box-2 orderList w-1/2">
-          <OrderList orders={selectedVehicle?.orders} />
+          <OrderList
+            orders={
+              selectedVehicle?.orders as {
+                id: number;
+                invoiceId: number;
+                price: number;
+                status: string;
+              }[]
+            }
+          />
         </div>
       </div>
     </div>
   );
 };
-export default page;
+export default ClientPage;
