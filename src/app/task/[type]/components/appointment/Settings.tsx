@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { updateCalendarSettings } from "../../actions/updateCalendarSettings";
+import { updateCalendarSettings } from "../../../../../actions/appointment/updateCalendarSettings";
 import {
   Dialog,
   DialogContent,

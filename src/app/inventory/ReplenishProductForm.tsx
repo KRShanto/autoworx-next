@@ -15,7 +15,7 @@ import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { useState } from "react";
 import { Vendor } from "@prisma/client";
-import { replenish } from "./actions/replenish";
+import { replenish } from "../../actions/inventory/replenish";
 import { useListsStore } from "@/stores/lists";
 import NewVendor from "@/components/Lists/NewVendor";
 

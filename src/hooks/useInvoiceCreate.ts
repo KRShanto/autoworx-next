@@ -1,9 +1,9 @@
 // useInvoiceCreate.ts
 import { useEstimateCreateStore } from "@/stores/estimate-create";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { InvoiceType } from "@prisma/client";
-import { create } from "@/app/estimate/create/actions/create";
-import { update } from "@/app/estimate/edit/[id]/actions/update";
+import { createInvoice } from "@/actions/estimate/invoice/create";
+import { updateInvoice } from "@/actions/estimate/invoice/update";
 import { ServerAction } from "@/types/action";
 import { useListsStore } from "@/stores/lists";
 
@@ -62,7 +62,7 @@ export function useInvoiceCreate(type: InvoiceType) {
 
     let res;
     if (isEditPage) {
-      res = await update({
+      res = await updateInvoice({
         id: invoiceId,
         clientId: clientId ? +clientId : undefined,
         vehicleId: vehicleId ? +vehicleId : undefined,
@@ -85,7 +85,7 @@ export function useInvoiceCreate(type: InvoiceType) {
         tasks,
       });
     } else {
-      res = await create({
+      res = await createInvoice({
         invoiceId,
         type,
         clientId: clientId ? +clientId : undefined,

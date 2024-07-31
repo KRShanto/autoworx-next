@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormErrorStore } from "@/stores/form-error";
-import { register } from "./register";
+import { register } from "../../../actions/auth/register";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Submit from "@/components/Submit";
@@ -40,7 +40,7 @@ export default function SubmitButton() {
 
   return (
     <Submit
-      className="bg-blue-500 text-white py-2 px-10 rounded-md mx-auto block mt-4"
+      className="mx-auto mt-4 block rounded-md bg-blue-500 px-10 py-2 text-white"
       formAction={handler}
     >
       Submit

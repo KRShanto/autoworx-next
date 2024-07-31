@@ -7,7 +7,7 @@ import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useListsStore } from "@/stores/lists";
 import { Category, Tag, Vendor } from "@prisma/client";
 import React, { useEffect, useState } from "react";
-import { newMaterial } from "./actions/newMaterial";
+import { newMaterial } from "../../../actions/estimate/material/newMaterial";
 import Close from "./CloseEstimate";
 
 export default function MaterialCreate() {

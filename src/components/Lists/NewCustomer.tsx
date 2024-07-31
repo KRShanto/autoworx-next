@@ -16,9 +16,9 @@ import { FaTimes } from "react-icons/fa";
 import { RxAvatar } from "react-icons/rx";
 import NewClientSource from "./NewClientSource";
 import { Source, Tag } from "@prisma/client";
-import { getSources } from "./getSources";
-import { deleteSource } from "./deleteSource";
-import { addCustomer } from "@/app/customer/add";
+import { getSources } from "../../actions/source/getSources";
+import { deleteSource } from "../../actions/source/deleteSource";
+import { addCustomer } from "@/actions/client/add";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
 

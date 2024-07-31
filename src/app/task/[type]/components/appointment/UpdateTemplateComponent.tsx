@@ -12,7 +12,7 @@ import Submit from "@/components/Submit";
 import { useState } from "react";
 import FormError from "@/components/FormError";
 import { useFormErrorStore } from "@/stores/form-error";
-import { updateTemplate } from "../../actions/updateTemplate";
+import { updateTemplate } from "../../../../../actions/appointment/updateTemplate";
 import { useListsStore } from "@/stores/lists";
 
 export default function UpdateTemplate({

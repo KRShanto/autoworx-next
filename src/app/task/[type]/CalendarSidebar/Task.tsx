@@ -3,7 +3,7 @@ import React, { LegacyRef } from "react";
 import { Task } from "@prisma/client";
 import { useDrag } from "react-dnd";
 import { FaRegCheckCircle } from "react-icons/fa";
-import { deleteTask } from "../actions/deleteTask";
+import { deleteTask } from "../../../../actions/task/deleteTask";
 import moment from "moment";
 import Link from "next/link";
 
@@ -23,7 +23,7 @@ export default function TaskComponent({ task }: { task: Task }) {
   const handleDelete = async () => {
     await deleteTask(task.id);
   };
-  const existingDate = moment(task?.date).format('YYYY-MM-DD')
+  const existingDate = moment(task?.date).format("YYYY-MM-DD");
   // console.log({existingDate});
   return (
     <div
@@ -38,7 +38,9 @@ export default function TaskComponent({ task }: { task: Task }) {
       draggable={task.date ? false : true}
       onDragStart={task.date ? undefined : handleDragStart}
     >
-      <Link href={`/task/day?date=${existingDate}`} className="w-[90%]">{task.title}</Link>
+      <Link href={`/task/day?date=${existingDate}`} className="w-[90%]">
+        {task.title}
+      </Link>
       <FaRegCheckCircle
         className="cursor-pointer text-xl text-white hover:text-gray-400"
         onClick={handleDelete}

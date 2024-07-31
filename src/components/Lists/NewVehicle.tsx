@@ -15,11 +15,11 @@ import Submit from "@/components/Submit";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
 import { useEffect, useState } from "react";
-import { addVehicle } from "../../app/task/[type]/actions/addVehicle";
+import { addVehicle } from "../../actions/vehicle/addVehicle";
 import { VehicleColor } from "@prisma/client";
 import Selector from "../Selector";
-import { addVehicleColor } from "@/app/task/[type]/actions/addVehicleColor";
-import { getVehicleColors } from "@/app/task/[type]/actions/getVehicleColor";
+import { addVehicleColor } from "@/actions/vehicle/addVehicleColor";
+import { getVehicleColors } from "@/actions/vehicle/getVehicleColor";
 import { usePathname, useSearchParams } from "next/navigation";
 
 export default function NewVehicle({

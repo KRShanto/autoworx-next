@@ -26,8 +26,8 @@ import moment from "moment";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDrop } from "react-dnd";
 import { FaPen } from "react-icons/fa6";
-import { assignAppointmentDate } from "../actions/assignAppointmentDate";
-import { dragTask } from "../actions/dragTask";
+import { assignAppointmentDate } from "../../../../actions/appointment/assignAppointmentDate";
+import { dragTask } from "../../../../actions/task/dragTask";
 
 function useMonth() {
   const searchParams = useSearchParams();

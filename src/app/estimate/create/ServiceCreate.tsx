@@ -1,7 +1,7 @@
 import { useListsStore } from "@/stores/lists";
 import { Category } from "@prisma/client";
 import { useEffect, useState } from "react";
-import newService from "./actions/newService";
+import newService from "../../../actions/estimate/service/newService";
 import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import Close from "./CloseEstimate";

@@ -1,6 +1,6 @@
 "use client";
 
-import newTag from "@/app/estimate/create/actions/newTag";
+import newTag from "@/actions/tag/newTag";
 import { INVOICE_COLORS } from "@/lib/consts";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";

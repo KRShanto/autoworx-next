@@ -1,6 +1,6 @@
 "use server";
 
-import { createTask } from "@/app/task/[type]/actions/createTask";
+import { createTask } from "@/actions/task/createTask";
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
@@ -38,7 +38,9 @@ interface UpdateEstimateInput {
   tasks: { id: undefined | number; task: string }[];
 }
 
-export async function update(data: UpdateEstimateInput): Promise<ServerAction> {
+export async function updateInvoice(
+  data: UpdateEstimateInput,
+): Promise<ServerAction> {
   const companyId = await getCompanyId();
 
   // update invoice itself

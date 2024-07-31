@@ -1,14 +1,14 @@
 "use server";
 
 import { auth } from "@/app/auth";
-import { createTask } from "@/app/task/[type]/actions/createTask";
+import { createTask } from "@/actions/task/createTask";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
 import { InvoiceType, Service, Material, Labor, Tag } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
-export async function create({
+export async function createInvoice({
   invoiceId,
   type,
 

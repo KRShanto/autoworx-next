@@ -14,9 +14,9 @@ import {
 } from "../DropdownMenu";
 import FormError from "../FormError";
 import Submit from "../Submit";
-import newTag from "@/app/estimate/create/actions/newTag";
-import { getTags } from "./getTags";
-import { deleteTag } from "./deleteTag";
+import newTag from "@/actions/tag/newTag";
+import { getTags } from "../../actions/tag/getTags";
+import { deleteTag } from "../../actions/tag/deleteTag";
 
 type SelectedColor = { textColor: string; bgColor: string } | null;
 

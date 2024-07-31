@@ -5,7 +5,7 @@ import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useListsStore } from "@/stores/lists";
 import { Category, Tag } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { newLabor } from "./actions/newLabor";
+import { newLabor } from "../../../actions/estimate/labor/newLabor";
 import Close from "./CloseEstimate";
 
 export default function LaborCreate() {

@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { FaTimes, FaTrash } from "react-icons/fa";
 import { TbUserX } from "react-icons/tb";
 import NewTemplate from "../../../../../components/Lists/NewTemplate";
-import { deleteTemplate } from "../../actions/deleteTemplate";
+import { deleteTemplate } from "../../../../../actions/appointment/deleteTemplate";
 import UpdateTemplate from "./UpdateTemplateComponent";
 
 export function Reminder({

@@ -1,7 +1,7 @@
 "use client";
 
-import { deleteStatus } from "@/app/estimate/create/actions/deleteStatus";
-import newStatus from "@/app/estimate/create/actions/newStatus";
+import { deleteStatus } from "@/actions/status/deleteStatus";
+import newStatus from "@/actions/status/newStatus";
 import { INVOICE_COLORS } from "@/lib/consts";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";

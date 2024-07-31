@@ -18,7 +18,7 @@ import Submit from "@/components/Submit";
 import { useListsStore } from "@/stores/lists";
 import { Category, InventoryProductType, Vendor } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { createProduct } from "./actions/create";
+import { createProduct } from "../../actions/inventory/create";
 import { useFormErrorStore } from "@/stores/form-error";
 
 export default function AddNewProduct() {
