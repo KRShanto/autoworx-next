@@ -19,6 +19,7 @@ interface SelectorProps<T> {
   selectedItem?: T | null | undefined;
   setSelectedItem?: React.Dispatch<React.SetStateAction<T | null>>;
   clickabled?: boolean;
+  disabledDropdown?: boolean;
 }
 
 /**
@@ -38,6 +39,7 @@ interface SelectorProps<T> {
  * @param {T | null | undefined} [props.selectedItem] - The currently selected item.
  * @param {React.Dispatch<React.SetStateAction<T | null>>} [props.setSelectedItem] - Function to set the selected item.
  * @param {boolean} [props.clickabled] - Optional prop to enable/disable item selection.
+ * @param {boolean} [props.disabledDropdown] - Optional prop to disable the dropdown.
  * @returns {JSX.Element} The rendered Selector component.
  */
 export default function Selector<T>({
@@ -52,6 +54,7 @@ export default function Selector<T>({
   selectedItem,
   setSelectedItem,
   clickabled = true,
+  disabledDropdown = false,
 }: SelectorProps<T>): JSX.Element {
   // Using provided open state or setting local state
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -107,6 +110,7 @@ export default function Selector<T>({
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <div className="basis-full md:basis-96">
         <DropdownMenuTrigger
+          disabled={disabledDropdown}
           onClick={() => setIsOpen(true)}
           className={cn(
             "flex h-10 w-full items-center justify-between rounded-md border-2 border-slate-400 px-4",
@@ -149,7 +153,9 @@ export default function Selector<T>({
               if (clickabled) {
                 return (
                   <button
-                    onClick={() => handleSelectItem(item)}
+                    onClick={() => {
+                      handleSelectItem(item);
+                    }}
                     type="button"
                     key={index}
                     className={cn(
@@ -165,6 +171,7 @@ export default function Selector<T>({
                 return (
                   <div
                     key={index}
+                  
                     className={cn(
                       "w-full p-1 px-2 text-left hover:bg-gray-100",
                       border &&

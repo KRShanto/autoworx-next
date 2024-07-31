@@ -1,38 +1,39 @@
 "use client";
-import Input from "@/components/Input";
-import Title from "@/components/Title";
 import { cn } from "@/lib/cn";
-import Link from "next/link";
 import React from "react";
-import "react-date-range/dist/styles.css"; // main style file
-import "react-date-range/dist/theme/default.css"; // theme css file
-import { FaTimes } from "react-icons/fa";
-import { IoPieChartOutline, IoSearchOutline } from "react-icons/io5";
+import NewVehicle from "@/components/Lists/NewVehicle";
+import { Vehicle } from "@prisma/client";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import AddNewClient from "./AddNewClient";
-import AddNewVehicle from "./AddNewVehicle";
-import EditClient from "./EditClient";
-const evenColor = "bg-white";
-const oddColor = "bg-slate-100";
 export default function VehicleList({
-  //@ts-ignore
+  clientId,
   vehicles,
-  //@ts-ignore
-  selectedVehicle,
-  //@ts-ignore
-  setSelectedVehicle,
+}: {
+  clientId: number;
+  vehicles: Vehicle[];
 }) {
-  return (
-    <div className="h-full w-full space-y-8">
-      <Title>Vehicle List</Title>
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const vehicleId = Number(searchParams.get("vehicleId"));
 
+  return (
+    <div className="h-full w-full space-y-2 px-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-x-8"></div>
-        <AddNewVehicle />
+        <div className="flex items-center gap-x-8">
+          <h3 className="text-lg font-semibold">Vehicle List</h3>
+        </div>
+        <NewVehicle
+          newButton={
+            <button className="rounded-md bg-[#6571FF] p-2 px-5 text-white">
+              + Add New Vehicle
+            </button>
+          }
+        />
       </div>
-      <div>
-        <table className="w-full shadow-md">
-          <thead className="bg-white">
+      {/* TODO: make it scrollable */}
+      <div className="">
+        <table className="w-full">
+          <thead>
             <tr className="h-10 border-b">
               <th className="px-4 text-left 2xl:px-10">Year</th>
               <th className="px-4 text-left 2xl:px-10">Make</th>
@@ -41,19 +42,19 @@ export default function VehicleList({
             </tr>
           </thead>
 
-          <tbody>
-            {/* @ts-ignore */}
+          <tbody className="border border-gray-200">
             {vehicles.map((vehicle, index) => (
               <tr
                 key={index}
                 className={cn(
                   "cursor-pointer rounded-md py-3",
                   index % 2 === 0 ? "bg-white" : "bg-[#EEF4FF]",
-                  selectedVehicle?.id === vehicle?.id &&
+                  vehicleId &&
+                    vehicleId === vehicle?.id &&
                     "border-2 border-[#6571FF]",
                 )}
                 onClick={() => {
-                  setSelectedVehicle(vehicle);
+                  router.push(`/client/${clientId}?vehicleId=${vehicle.id}`);
                 }}
               >
                 <td className="text-nowrap px-4 py-1 text-left 2xl:px-10">
@@ -66,7 +67,7 @@ export default function VehicleList({
                   {vehicle.model}
                 </td>
                 <td className="px-4 py-1 text-left 2xl:px-10">
-                  {vehicle.plate}
+                  {vehicle.license}
                 </td>
               </tr>
             ))}

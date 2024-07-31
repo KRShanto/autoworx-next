@@ -5,8 +5,11 @@ import { auth } from "../auth";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { AuthSession } from "@/types/auth";
+import { Source, Tag } from "@prisma/client";
+import { ServerAction } from "@/types/action";
 
 const CustomerSchema = z.object({
+  // TODO: Add validation
   firstName: z.string(),
   email: z.string().email().nullable(),
 });
@@ -21,9 +24,10 @@ export async function addCustomer(data: {
   state?: string;
   zip?: string;
   customerCompany?: string;
-  tag?: string;
-  image?: string;
-}) {
+  tagId?: number;
+  photo?: string;
+  sourceId?: number;
+}): Promise<ServerAction> {
   try {
     CustomerSchema.parse(data);
 
@@ -34,27 +38,33 @@ export async function addCustomer(data: {
       data: {
         ...data,
         companyId,
+        photo: data.photo ? `/uploads/${data.photo}` : undefined,
       },
     });
 
-    revalidatePath("/customer");
+    console.log("New Customer", newCustomer);
 
-    return newCustomer;
+    revalidatePath("/client");
+
+    return { type: "success", data: newCustomer };
   } catch (error: any) {
     console.log(error);
 
     if (error instanceof z.ZodError) {
       return {
         message: error.errors[0].message,
-        field: error.errors[0].path[0],
+        type: "error",
+        field: error.errors[0].path[0] as string,
       };
     } else if (error.code === "P2002") {
       return {
+        type: "error",
         message: "Mobile already exists",
         field: "mobile",
       };
     } else {
       return {
+        type: "error",
         message: error.message,
       };
     }

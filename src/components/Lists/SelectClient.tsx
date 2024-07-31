@@ -54,7 +54,7 @@ export function SelectClient({
         displayList={(client: Customer) => (
           <div className="flex gap-3">
             <Image
-              src={client.photo || "/images/default.png"}
+              src={client.photo}
               alt="Client Image"
               width={50}
               height={50}

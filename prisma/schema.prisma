@@ -34,6 +34,7 @@ model Company {
   paymentMethods    PaymentMethod[]
   inventoryProducts InventoryProduct[]
   VehicleColor      VehicleColor[]
+  Source            Source[]
 }
 
 // User model.
@@ -125,16 +126,30 @@ model Customer {
   city            String?
   state           String?
   zip             String?
-  photo           String?       @default("/images/default.png")
+  photo           String        @default("/images/default.png")
+  sourceId        Int?          @map("source_id")
   companyId       Int           @map("company_id")
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @default(now()) @updatedAt @map("updated_at")
   company         Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   customerCompany String?       @map("customer_company")
-  tag             String?       @default("")
+  tagId           Int?          @map("tag_id")
   appointments    Appointment[]
+  source          Source?       @relation(fields: [sourceId], references: [id])
+  tag             Tag?          @relation(fields: [tagId], references: [id])
+  Vehicle         Vehicle[]
 
   @@index([companyId], name: "fk_customers_company")
+}
+
+model Source {
+  id        Int        @id @default(autoincrement())
+  name      String
+  companyId Int        @map("company_id")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @default(now()) @updatedAt @map("updated_at")
+  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Customer  Customer[]
 }
 
 // Vehicle of a company.
@@ -151,12 +166,15 @@ model Vehicle {
   vin          String?
   notes        String?
   colorId      Int?          @map("color_id")
+  customerId   Int?          @map("customer_id")
   companyId    Int           @map("company_id")
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
   company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   appointments Appointment[]
   color        VehicleColor? @relation(fields: [colorId], references: [id], onDelete: SetNull)
+  customer     Customer?     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  invoices     Invoice[]
 
   @@index([companyId], name: "fk_vehicles_company")
 }
@@ -207,6 +225,7 @@ model Invoice {
   Material                Material[]
   InventoryProductHistory InventoryProductHistory[]
   WorkOrder               WorkOrder[]
+  Vehicle                 Vehicle?                  @relation(fields: [vehicleId], references: [id])
 
   @@index([companyId], name: "fk_invoices_company")
 }
@@ -376,6 +395,7 @@ model Tag {
   items     ItemTag[]
   materials MaterialTag[]
   labors    LaborTag[]
+  Customer  Customer[]
 }
 
 // Many to many relation between Item and Tag.

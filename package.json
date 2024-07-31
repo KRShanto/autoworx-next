@@ -8,9 +8,11 @@
     "start": "next start",
     "lint": "next lint",
     "prettier": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
-    "prettier:fix": "npm run prettier --fix"
+    "prettier:fix": "npm run prettier --fix",
+    "tsc": "tsc"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.4.0",
     "@auth/prisma-adapter": "^1.5.2",
     "@nextui-org/react": "^2.4.2",
     "@onedoc/react-print": "^0.1.131",

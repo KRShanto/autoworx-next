@@ -25,6 +25,7 @@ export function SlimInput({
         type="text"
         required
         className={cn(slimInputClassName, className)}
+        id={props.id ?? props.name}
         {...props}
       />
     </label>

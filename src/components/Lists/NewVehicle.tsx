@@ -20,6 +20,7 @@ import { VehicleColor } from "@prisma/client";
 import Selector from "../Selector";
 import { addVehicleColor } from "@/app/task/[type]/actions/addVehicleColor";
 import { getVehicleColors } from "@/app/task/[type]/actions/getVehicleColor";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export default function NewVehicle({
   newButton,
@@ -31,6 +32,9 @@ export default function NewVehicle({
 
   const [colors, setColors] = useState<VehicleColor[]>([]);
   const [selectedColor, setSelectedColor] = useState<VehicleColor | null>(null);
+
+  const pathname = usePathname();
+  const search = useSearchParams();
 
   async function getColors() {
     const res = await getVehicleColors();
@@ -56,6 +60,17 @@ export default function NewVehicle({
     const license = data.get("license") as string;
     const vin = data.get("vin") as string;
     const notes = data.get("notes") as string;
+    let clientId;
+
+    // take the clientid
+    // if its the /client page, then get the next param
+    // else get clientId from search
+    // TODO if the clientId not present, then show error
+    if (pathname.includes("/client")) {
+      clientId = Number(pathname.split("/")[2]);
+    } else {
+      clientId = Number(search.get("clientId"));
+    }
 
     const res = await addVehicle({
       year,
@@ -69,6 +84,7 @@ export default function NewVehicle({
       license,
       vin,
       notes,
+      customerId: clientId,
     });
 
     if (res.type === "error") {

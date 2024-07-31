@@ -3,52 +3,33 @@
 import { db } from "@/lib/db";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-
-const CustomerSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  email: z.string().email(),
-  mobile: z.number(),
-  address: z.string(),
-  city: z.string(),
-  state: z.string(),
-  zip: z.string(),
-});
+import { ServerAction } from "@/types/action";
 
 export async function editCustomer(data: {
   id: number;
-  name: string;
-  email: string;
-  mobile: string;
-  address: string;
-  city: string;
-  state: string;
-  zip: string;
-}) {
-  try {
-    CustomerSchema.parse(data);
+  firstName: string;
+  lastName?: string;
+  email?: string;
+  mobile?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  customerCompany?: string;
+  tagId?: number;
+  photo?: string;
+  sourceId?: number;
+}): Promise<ServerAction> {
+  await db.customer.update({
+    where: {
+      id: data.id,
+    },
+    data: {
+      ...data,
+    },
+  });
 
-    await db.customer.update({
-      where: {
-        id: data.id,
-      },
-      data: {
-        ...data,
-      },
-    });
+  revalidatePath("/client");
 
-    revalidatePath("/customer");
-  } catch (error: any) {
-    if (error instanceof z.ZodError) {
-      return {
-        message: error.errors[0].message,
-        field: error.errors[0].path[0],
-      };
-    } else {
-      return {
-        message: error.message,
-        field: "all",
-      };
-    }
-  }
+  return { type: "success" };
 }

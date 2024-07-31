@@ -16,6 +16,7 @@ export default function ServiceCreate() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState<Category | undefined>();
   const [description, setDescription] = useState("");
+  const [categoryOpen, setCategoryOpen] = useState(false);
 
   useEffect(() => {
     if (data?.service && data.edit) {
@@ -112,6 +113,8 @@ export default function ServiceCreate() {
         onCategoryChange={setCategory}
         labelPosition="none"
         categoryData={category}
+        categoryOpen={categoryOpen}
+        setCategoryOpen={setCategoryOpen}
       />
 
       <textarea

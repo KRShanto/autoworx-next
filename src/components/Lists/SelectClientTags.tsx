@@ -1,13 +1,8 @@
-
 "use client";
 
-import { deleteStatus } from "@/app/estimate/create/actions/deleteStatus";
-import newStatus from "@/app/estimate/create/actions/newStatus";
 import { INVOICE_COLORS } from "@/lib/consts";
 import { useFormErrorStore } from "@/stores/form-error";
-import { useListsStore } from "@/stores/lists";
-import { ClientTag } from "@/types/client";
-import { Status } from "@prisma/client";
+import { Tag } from "@prisma/client";
 import React, { useEffect, useRef, useState } from "react";
 import { FaChevronDown, FaChevronUp, FaSearch } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
@@ -15,50 +10,87 @@ import { PiPaletteBold } from "react-icons/pi";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../DropdownMenu";
 import FormError from "../FormError";
 import Submit from "../Submit";
-import { SelectProps } from "./select-props";
+import newTag from "@/app/estimate/create/actions/newTag";
+import { getTags } from "./getTags";
+import { deleteTag } from "./deleteTag";
 
 type SelectedColor = { textColor: string; bgColor: string } | null;
 
-const Input = ({
-  search,
-  setSearch,
-}: {
-  search: string;
-  setSearch: React.Dispatch<React.SetStateAction<string>>;
-}) => {
-  return (
-    <input
-      type="text"
-      placeholder="Search"
-      className="w-full rounded-md border-2 border-slate-400 p-1 pl-6 pr-10 focus:outline-none"
-      value={search}
-      onChange={(e) => {
-        setSearch(e.target.value);
-      }}
-    />
-  );
-};
-
 export function SelectClientTags({
   name = "tagId",
-  value = null,
+  value,
   setValue,
   open,
   setOpen,
-}: SelectProps<any>) {
+}: {
+  name?: string;
+  value?: Tag;
+  setValue?: React.Dispatch<React.SetStateAction<Tag | undefined>>;
+  open?: boolean;
+  setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const state = useState(value);
   const [tag, setTag] = setValue ? [value, setValue] : state;
-  const [tagList, setTagList] = useState<ClientTag[]>([]);
-  const [filteredTagList, setFilteredTagList] = useState<ClientTag[]>(tagList);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [filteredTagList, setFilteredTagList] = useState<Tag[]>(tags);
   const [search, setSearch] = useState<string>("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetchTags();
+  }, []);
+
+  useEffect(() => {
+    if (search) {
+      setFilteredTagList(
+        tags.filter((tag) =>
+          tag.name.toLowerCase().includes(search.toLowerCase()),
+        ),
+      );
+    } else {
+      setFilteredTagList(tags);
+    }
+  }, [search]);
+
+  useEffect(() => {
+    setFilteredTagList(tags);
+  }, [tags]);
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  async function fetchTags() {
+    const res = await getTags();
+    if (res.type === "success") {
+      setTags(res.data);
+    }
+  }
+
+  async function handleDelete(id: number) {
+    const res = await deleteTag(id);
+
+    if (res.type === "success") {
+      setTags((prev: Tag[]) => {
+        return prev.filter((tag) => tag.id !== id);
+      });
+
+      if (tag?.id === id) {
+        setTag(undefined!);
+      }
+
+      if (setOpen) setOpen(false);
+    }
+  }
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -68,31 +100,6 @@ export function SelectClientTags({
       setOpen && setOpen(false);
     }
   };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (search) {
-      setFilteredTagList(
-        tagList.filter((tag) =>
-          tag.tag.toLowerCase().includes(search.toLowerCase()),
-        ),
-      );
-    } else {
-      setFilteredTagList(tagList);
-    }
-  }, [search]);
-
-  useEffect(() => {
-    setFilteredTagList(tagList);
-  }, [tagList]);
-
-  async function handleDelete(id: number) {}
 
   return (
     <>
@@ -104,16 +111,17 @@ export function SelectClientTags({
         }}
       >
         <DropdownMenuTrigger
-          className="flex h-10 items-center gap-x-8 rounded-md bg-white px-2 py-1"
+          className="flex h-10 items-center gap-x-8 rounded-md border-2 border-slate-400 px-2 py-1"
           style={{
             backgroundColor: tag?.bgColor,
             color: tag?.textColor,
+            border: tag ? `1px solid ${tag.textColor}` : "",
           }}
           onClick={() => {
             setOpen && setOpen(!open);
           }}
         >
-          <span>{tag?.tag ?? "Select Tag"}</span>
+          <span>{tag?.name ?? "Select Tag"}</span>
           <FaChevronDown />
         </DropdownMenuTrigger>
 
@@ -141,10 +149,6 @@ export function SelectClientTags({
             {filteredTagList.map((tagItem) => (
               <div
                 key={tagItem.id}
-                onClick={() => {
-                  setTag(tagItem);
-                  setOpen && setOpen(false);
-                }}
                 className="mx-4 flex cursor-pointer items-center justify-between rounded-full px-4"
                 style={{
                   backgroundColor: tagItem?.bgColor,
@@ -153,7 +157,15 @@ export function SelectClientTags({
                     tagItem?.id === tag?.id ? `1px solid ${tag.textColor}` : "",
                 }}
               >
-                {tagItem.tag}
+                <button
+                  onClick={() => {
+                    setTag(tagItem);
+                    setOpen && setOpen(false);
+                  }}
+                  className="w-full text-left"
+                >
+                  {tagItem.name}
+                </button>
                 <button
                   className="text-lg text-[#66738C]"
                   onClick={() => handleDelete(tagItem.id)}
@@ -169,10 +181,7 @@ export function SelectClientTags({
               setTag(tag);
               if (setOpen) setOpen(false);
             }}
-            tag={tag}
-            setTag={setTag}
-            tagList={tagList}
-            setTagList={setTagList}
+            setTags={setTags}
             setPickerOpen={setPickerOpen}
             selectedColor={selectedColor}
           />
@@ -208,47 +217,67 @@ export function SelectClientTags({
   );
 }
 
+const Input = ({
+  search,
+  setSearch,
+}: {
+  search: string;
+  setSearch: React.Dispatch<React.SetStateAction<string>>;
+}) => {
+  return (
+    <input
+      type="text"
+      placeholder="Search"
+      className="w-full rounded-md border-2 border-slate-400 p-1 pl-6 pr-10 focus:outline-none"
+      value={search}
+      onChange={(e) => {
+        setSearch(e.target.value);
+      }}
+    />
+  );
+};
+
 function QuickAddForm({
   onSuccess,
   setPickerOpen,
   selectedColor,
-  tag,
-  setTag,
-  tagList,
-  setTagList,
+  setTags,
 }: {
-  onSuccess?: (value: Status) => void;
-  setPickerOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onSuccess?: (value: Tag) => void;
+  setPickerOpen: any;
   selectedColor: SelectedColor;
-  tag: string;
-  setTag: React.Dispatch<React.SetStateAction<string>>;
-  tagList: ClientTag[];
-  setTagList: React.Dispatch<React.SetStateAction<ClientTag[]>>;
+  setTags: React.Dispatch<React.SetStateAction<Tag[]>>;
 }) {
-  async function handleSubmit() {
-    setTagList([
-      ...tagList,
-      {
-        id: tagList.length + 1,
-        tag,
-        bgColor: selectedColor?.bgColor || "white",
-        textColor: selectedColor?.textColor || "black",
-      },
-    ]);
-    setTag("");
+  const { showError } = useFormErrorStore();
+  const formRef = useRef<HTMLFormElement | null>(null);
+
+  async function handleSubmit(data: FormData) {
+    const name = data.get("name") as string;
+
+    const res = await newTag({ name, ...selectedColor });
+
+    if (res.type === "error") {
+      console.log(res);
+      showError({
+        field: res.field || "name",
+        message: res.message || "",
+      });
+    } else {
+      setTags((prev: Tag[]) => {
+        return [...prev, res.data];
+      });
+      formRef.current?.reset();
+      onSuccess?.(res.data);
+    }
   }
 
   return (
-    <div className="flex gap-2 p-2">
+    <form ref={formRef} className="flex gap-2 p-2">
       <input
         name="name"
         type="text"
         required
         className="flex-1 rounded-sm border border-solid border-black p-1"
-        value={tag}
-        onChange={(e) => {
-          setTag(e.target.value);
-        }}
       />
 
       <button
@@ -259,13 +288,13 @@ function QuickAddForm({
         <PiPaletteBold />
       </button>
 
-      <button
+      <Submit
         className="rounded bg-slate-500 p-1 text-xs leading-3 text-white"
-        onClick={handleSubmit}
+        formAction={handleSubmit}
       >
         Quick
         <br /> Add
-      </button>
-    </div>
+      </Submit>
+    </form>
   );
 }
