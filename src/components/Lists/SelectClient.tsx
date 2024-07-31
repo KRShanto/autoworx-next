@@ -2,7 +2,7 @@
 
 import Selector from "@/components/Selector";
 import { useListsStore } from "@/stores/lists";
-import { Customer } from "@prisma/client";
+import { Client } from "@prisma/client";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -10,12 +10,12 @@ import NewCustomer from "./NewCustomer";
 import { SelectProps } from "./select-props";
 
 export function SelectClient({
-  name = "customerId",
+  name = "clientId",
   value = null,
   setValue,
   openDropdown,
   setOpenDropdown,
-}: SelectProps<Customer | null>) {
+}: SelectProps<Client | null>) {
   const state = useState(value);
   const [client, setClient] = setValue ? [value, setValue] : state;
   const clientList = useListsStore((x) => x.customers);
@@ -38,7 +38,7 @@ export function SelectClient({
       params.set("clientId", client.id.toString());
       replace(`${pathname}?${params.toString()}`);
 
-      useListsStore.setState({ customer: client });
+      useListsStore.setState({ client });
     }
   }, [client]);
 
@@ -47,11 +47,11 @@ export function SelectClient({
       <input type="hidden" name={name} value={client?.id ?? ""} />
 
       <Selector
-        label={(client: Customer | null) =>
+        label={(client: Client | null) =>
           client ? `${client.firstName} ${client.lastName}` : "Client"
         }
         newButton={<NewCustomer />}
-        displayList={(client: Customer) => (
+        displayList={(client: Client) => (
           <div className="flex gap-3">
             <Image
               src={client.photo}

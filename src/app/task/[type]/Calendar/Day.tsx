@@ -11,7 +11,7 @@ import type {
 } from "@/types/db";
 import type {
   CalendarSettings,
-  Customer,
+  Client,
   EmailTemplate,
   Task,
   User,
@@ -57,7 +57,7 @@ export default function Day({
   tasksWithoutTime: Task[];
   appointments: CalendarAppointment[];
   appointmentsFull: AppointmentFull[];
-  customers: Customer[];
+  customers: Client[];
   vehicles: Vehicle[];
   settings: CalendarSettings;
   templates: EmailTemplate[];
@@ -431,8 +431,8 @@ export default function Day({
                         </div>
                         <p className="text-left">
                           Client:{" "}
-                          {event.customer &&
-                            `${event.customer.firstName} ${event.customer.lastName}`}
+                          {event.client &&
+                            `${event.client.firstName} ${event.client.lastName}`}
                         </p>
                         <p className="text-left">
                           Assigned To:{" "}

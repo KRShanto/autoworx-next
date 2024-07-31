@@ -19,7 +19,7 @@ export async function addVehicle(data: {
   license: string;
   vin: string;
   notes: string;
-  customerId: number;
+  clientId: number;
 }): Promise<ServerAction> {
   try {
     const session = (await auth()) as AuthSession;

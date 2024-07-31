@@ -5,7 +5,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { ServerAction } from "@/types/action";
 
-export async function editCustomer(data: {
+export async function editClient(data: {
   id: number;
   firstName: string;
   lastName?: string;
@@ -20,7 +20,7 @@ export async function editCustomer(data: {
   photo?: string;
   sourceId?: number;
 }): Promise<ServerAction> {
-  await db.customer.update({
+  await db.client.update({
     where: {
       id: data.id,
     },

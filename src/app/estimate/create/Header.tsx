@@ -4,7 +4,7 @@ import { SelectClient } from "@/components/Lists/SelectClient";
 import { SelectStatus } from "@/components/Lists/SelectStatus";
 import { SelectVehicle } from "@/components/Lists/SelectVehicle";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
-import { Customer, Status, Vehicle } from "@prisma/client";
+import { Client, Status, Vehicle } from "@prisma/client";
 import { customAlphabet } from "nanoid";
 import { useEffect, useState } from "react";
 import { CreateEstimateActionsButtons } from "./CreateEstimateActionButtons";
@@ -12,12 +12,12 @@ import { CreateEstimateActionsButtons } from "./CreateEstimateActionButtons";
 export default function Header({
   id,
   vehicle,
-  customer,
+  client,
   status,
 }: {
   id?: string;
   vehicle?: Vehicle;
-  customer?: Customer;
+  client?: Client;
   status?: Status;
 }) {
   const { invoiceId, setInvoiceId } = useEstimateCreateStore();
@@ -56,7 +56,7 @@ export default function Header({
 
       <div className="flex basis-full flex-wrap items-center gap-3">
         <SelectClient
-          value={customer}
+          value={client}
           openDropdown={clientOpenDropdown}
           setOpenDropdown={setClientOpenDropdown}
         />

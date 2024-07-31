@@ -27,13 +27,13 @@ export function useInvoiceCreate(type: InvoiceType) {
     tasks,
     items,
   } = useEstimateCreateStore();
-  const { customer, vehicle, status } = useListsStore();
+  const { client, vehicle, status } = useListsStore();
 
   const pathaname = usePathname();
 
   async function handleSubmit(): Promise<ServerAction> {
     const photoPaths = [];
-    const clientId = customer?.id;
+    const clientId = client?.id;
     const vehicleId = vehicle?.id;
     const statusId = status?.id;
     const isEditPage = pathaname.includes("/estimate/edit/");
@@ -64,7 +64,7 @@ export function useInvoiceCreate(type: InvoiceType) {
     if (isEditPage) {
       res = await update({
         id: invoiceId,
-        customerId: clientId ? +clientId : undefined,
+        clientId: clientId ? +clientId : undefined,
         vehicleId: vehicleId ? +vehicleId : undefined,
         statusId: statusId ? +statusId : undefined,
         subtotal,

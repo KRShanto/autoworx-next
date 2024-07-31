@@ -1,17 +1,5 @@
 import { FullPayment } from "@/types/db";
-import {
-  Customer,
-  InventoryProduct,
-  Labor,
-  Material,
-  Payment,
-  Service,
-  Status,
-  Tag,
-  Task,
-  Vehicle,
-} from "@prisma/client";
-import { customAlphabet } from "nanoid";
+import { Labor, Material, Service, Tag, Task } from "@prisma/client";
 import { create } from "zustand";
 
 export interface Item {

@@ -53,9 +53,9 @@ async function fetchAndTransformData(
             where: { id: item.vehicleId },
           })
         : null;
-      const customer = item.customerId
-        ? await db.customer.findFirst({
-            where: { id: item.customerId },
+      const client = item.clientId
+        ? await db.client.findFirst({
+            where: { id: item.clientId },
           })
         : null;
       const status = item.statusId
@@ -66,10 +66,10 @@ async function fetchAndTransformData(
 
       return {
         id: item.id,
-        clientName: customer?.firstName + " " + customer?.lastName || "",
+        clientName: client?.firstName + " " + client?.lastName || "",
         vehicle: vehicle?.model || "",
-        email: customer?.email || "",
-        phone: customer?.mobile || "",
+        email: client?.email || "",
+        phone: client?.mobile || "",
         grandTotal: item.grandTotal as any,
         createdAt: item.createdAt,
         status: status?.name || "",

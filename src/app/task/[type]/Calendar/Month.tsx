@@ -16,7 +16,7 @@ import type {
 } from "@/types/db";
 import type {
   CalendarSettings,
-  Customer,
+  Client,
   EmailTemplate,
   Task,
   User,
@@ -51,7 +51,7 @@ export default function Month({
   tasksWithoutTime: Task[];
   appointments: CalendarAppointment[];
   appointmentsFull: AppointmentFull[];
-  customers: Customer[];
+  customers: Client[];
   vehicles: Vehicle[];
   settings: CalendarSettings;
   templates: EmailTemplate[];
@@ -300,8 +300,8 @@ export default function Month({
                                 </div>
 
                                 <p>
-                                  Client: {appointment.customer?.firstName}{" "}
-                                  {appointment.customer?.lastName}
+                                  Client: {appointment.client?.firstName}{" "}
+                                  {appointment.client?.lastName}
                                 </p>
 
                                 <p>

@@ -84,7 +84,7 @@ export default function NewVehicle({
       license,
       vin,
       notes,
-      customerId: clientId,
+      clientId,
     });
 
     if (res.type === "error") {

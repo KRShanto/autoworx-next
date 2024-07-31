@@ -3,13 +3,7 @@
 import { CalendarType } from "@/types/calendar";
 import { AppointmentFull, CalendarAppointment } from "@/types/db";
 import type { EmailTemplate } from "@prisma/client";
-import {
-  CalendarSettings,
-  Customer,
-  Task,
-  User,
-  Vehicle,
-} from "@prisma/client";
+import { CalendarSettings, Client, Task, User, Vehicle } from "@prisma/client";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Calendar from "./Calendar/Calendar";
@@ -33,7 +27,7 @@ export default function TaskPage({
   companyUsers: User[];
   usersWithTasks: any; // TODO: Fix this type
   tasks: Task[];
-  customers: Customer[];
+  customers: Client[];
   vehicles: Vehicle[];
   settings: CalendarSettings;
   appointments: CalendarAppointment[];

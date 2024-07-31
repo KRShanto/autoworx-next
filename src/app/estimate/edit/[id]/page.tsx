@@ -33,8 +33,8 @@ export default async function Page({
   const vehicle = invoice.vehicleId
     ? await db.vehicle.findUnique({ where: { id: invoice.vehicleId } })
     : null;
-  const customer = invoice.customerId
-    ? await db.customer.findUnique({ where: { id: invoice.customerId } })
+  const client = invoice.clientId
+    ? await db.client.findUnique({ where: { id: invoice.clientId } })
     : null;
   const status = invoice.statusId
     ? await db.status.findUnique({ where: { id: invoice.statusId } })
@@ -61,7 +61,7 @@ export default async function Page({
 
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
-  const customers = await db.customer.findMany({ where: { companyId } });
+  const customers = await db.client.findMany({ where: { companyId } });
   const vehicles = await db.vehicle.findMany({ where: { companyId } });
   const categories = await db.category.findMany({ where: { companyId } });
   const services = await db.service.findMany({ where: { companyId } });
@@ -152,7 +152,7 @@ export default async function Page({
 
       <Header
         id={invoice.id}
-        customer={customer!}
+        client={client!}
         vehicle={vehicle!}
         status={status!}
       />

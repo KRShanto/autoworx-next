@@ -13,7 +13,7 @@ import NewCustomer from "@/components/Lists/NewCustomer";
 
 export default async function Page() {
   const companyId = await getCompanyId();
-  const clients = await db.customer.findMany({
+  const clients = await db.client.findMany({
     where: { companyId },
     include: { tag: true, source: true },
   });

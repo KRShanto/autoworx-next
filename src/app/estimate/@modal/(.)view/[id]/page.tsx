@@ -40,9 +40,9 @@ export default async function ViewEstimate({
 
   if (!invoice) notFound();
 
-  const customer = invoice.customerId
-    ? await db.customer.findUnique({
-        where: { id: invoice.customerId },
+  const clientId = invoice.clientId
+    ? await db.client.findUnique({
+        where: { id: invoice.clientId },
       })
     : null;
   const vehicle = invoice.vehicleId
@@ -88,10 +88,10 @@ export default async function ViewEstimate({
                 <div>
                   <h2 className="font-bold text-slate-500">Estimate To:</h2>
                   <p>
-                    {customer?.firstName} {customer?.lastName}
+                    {clientId?.firstName} {clientId?.lastName}
                   </p>
-                  <p>{customer?.mobile}</p>
-                  <p>{customer?.email}</p>
+                  <p>{clientId?.mobile}</p>
+                  <p>{clientId?.email}</p>
                 </div>
                 <div>
                   <h2 className="font-bold text-slate-500">Vehicle Details:</h2>

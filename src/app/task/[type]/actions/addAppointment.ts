@@ -14,7 +14,7 @@ interface AppointmentToAdd {
   startTime?: string;
   endTime?: string;
   assignedUsers: number[];
-  customerId?: number;
+  clientId?: number;
   vehicleId?: number;
   draftEstimate: string | null;
   notes?: string;
@@ -45,7 +45,7 @@ export async function addAppointment(
       date: appointment.date ? new Date(appointment.date) : undefined,
       startTime: appointment.startTime,
       endTime: appointment.endTime,
-      customerId: appointment.customerId,
+      clientId: appointment.clientId,
       vehicleId: appointment.vehicleId,
       draftEstimate: appointment.draftEstimate,
       notes: appointment.notes,
@@ -93,7 +93,7 @@ export async function addAppointment(
         data: {
           id: appointment.draftEstimate,
           type: "Estimate",
-          customerId: appointment.customerId,
+          clientId: appointment.clientId,
           vehicleId: appointment.vehicleId,
           userId: session.user.id as any,
           companyId,
@@ -110,9 +110,9 @@ export async function addAppointment(
     },
   });
 
-  const customer = await db.customer.findFirst({
+  const client = await db.client.findFirst({
     where: {
-      id: appointment.customerId,
+      id: appointment.clientId,
     },
   });
 
@@ -141,7 +141,7 @@ export async function addAppointment(
     );
     confirmationSubject = confirmationSubject?.replace(
       "<CLIENT>",
-      customer ? customer.firstName + " " + customer.lastName : "",
+      client ? client.firstName + " " + client.lastName : "",
     );
 
     confirmationMessage = confirmationMessage?.replace(
@@ -150,16 +150,16 @@ export async function addAppointment(
     );
     confirmationMessage = confirmationMessage?.replace(
       "<CLIENT>",
-      customer ? customer.firstName + " " + customer.lastName : "",
+      client ? client.firstName + " " + client.lastName : "",
     );
 
     // send the confirmation email
     if (appointment.confirmationEmailTemplateStatus) {
       // send email
-      if (customer) {
+      if (client) {
         sendEmail({
           from: "Autoworx",
-          to: customer.email || "",
+          to: client.email || "",
           subject: confirmationSubject,
           text: confirmationMessage,
         });
@@ -178,7 +178,7 @@ export async function addAppointment(
     );
     reminderSubject = reminderSubject?.replace(
       "<CLIENT>",
-      customer ? customer.firstName + " " + customer.lastName : "",
+      client ? client.firstName + " " + client.lastName : "",
     );
 
     reminderMessage = reminderMessage?.replace(
@@ -187,7 +187,7 @@ export async function addAppointment(
     );
     reminderMessage = reminderMessage?.replace(
       "<CLIENT>",
-      customer ? customer.firstName + " " + customer.lastName : "",
+      client ? client.firstName + " " + client.lastName : "",
     );
 
     const times = appointment.times;
@@ -207,10 +207,10 @@ export async function addAppointment(
 
         // schedule the email
         cron.schedule(cronExpression, () => {
-          if (customer) {
+          if (client) {
             sendEmail({
               from: "Autoworx",
-              to: customer.email || "",
+              to: client.email || "",
               subject: reminderSubject,
               text: reminderMessage,
             });

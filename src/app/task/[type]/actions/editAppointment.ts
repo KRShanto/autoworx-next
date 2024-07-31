@@ -12,7 +12,7 @@ interface AppointmentToAdd {
   startTime?: string;
   endTime?: string;
   assignedUsers: number[];
-  customerId?: number;
+  clientId?: number;
   vehicleId?: number;
   draftEstimate?: string | null;
   notes?: string;
@@ -54,7 +54,7 @@ export async function editAppointment({
           data: {
             id: appointment.draftEstimate,
             type: "Estimate",
-            customerId: appointment.customerId,
+            clientId: appointment.clientId,
             vehicleId: appointment.vehicleId,
             userId: session.user.id as any,
             companyId,
@@ -74,7 +74,7 @@ export async function editAppointment({
       date: appointment.date ? new Date(appointment.date) : undefined,
       startTime: appointment.startTime,
       endTime: appointment.endTime,
-      customerId: appointment.customerId,
+      clientId: appointment.clientId,
       vehicleId: appointment.vehicleId,
       draftEstimate: appointment.draftEstimate,
       notes: appointment.notes,

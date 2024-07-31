@@ -32,9 +32,9 @@ export default async function CreateWorkOrder({
 
   if (!invoice) notFound();
 
-  const customer = invoice.customerId
-    ? await db.customer.findUnique({
-        where: { id: invoice.customerId },
+  const client = invoice.clientId
+    ? await db.client.findUnique({
+        where: { id: invoice.clientId },
       })
     : null;
   const vehicle = invoice.vehicleId
@@ -73,10 +73,10 @@ export default async function CreateWorkOrder({
             <div>
               <h2 className="font-bold text-slate-500">Estimate To:</h2>
               <p>
-                {customer?.firstName} {customer?.lastName}
+                {client?.firstName} {client?.lastName}
               </p>
-              <p>{customer?.mobile}</p>
-              <p>{customer?.email}</p>
+              <p>{client?.mobile}</p>
+              <p>{client?.email}</p>
             </div>
             <div>
               <h2 className="font-bold text-slate-500">Vehicle Details:</h2>

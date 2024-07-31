@@ -21,7 +21,7 @@ const Page = async (props: Props) => {
   const { clientId } = params;
   const { vehicleId } = searchParams;
 
-  const client = await db.customer.findUnique({
+  const client = await db.client.findUnique({
     where: { id: Number(clientId) },
     include: {
       source: true,
@@ -46,7 +46,7 @@ const Page = async (props: Props) => {
     : null;
 
   const vehicles = await db.vehicle.findMany({
-    where: { customerId: Number(clientId) },
+    where: { clientId: Number(clientId) },
   });
 
   return (
