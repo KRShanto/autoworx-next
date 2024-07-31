@@ -4,6 +4,8 @@ import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import Link from "next/link";
 import HeaderSearch from "./components/HeaderSearch";
+import LogoCard from "./components/LogoCard";
+
 
 
 
@@ -98,6 +100,7 @@ export default function Page() {
     
 
   return (
+    
     <div>
       <Title>Payments</Title>
 
@@ -118,7 +121,11 @@ export default function Page() {
         </TabsContent>
 
         <TabsContent value="integrations">
-          <Table data={[]} />
+          <div className="flex justify-evenly">
+           <LogoCard />
+          <LogoCard />
+          <LogoCard />
+          </div>
         </TabsContent>
         <TabsContent value="coupons">
           <Table data={[]} />
@@ -147,16 +154,16 @@ function Table({ data }: { data: TransactionData[] }) {
         <tbody>
           {data.map((item, index) => (
             <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-[#EEF4FF]"}>
-              <td className="py-2 px-4 border-b text-center"><Link href="/" className="text-blue-500 hover:underline">
+              <td className="py-2 px-4 border-b text-left"><Link href="/" className="text-blue-500 hover:underline">
               {item.invoiceNumber}
                 </Link></td>
-              <td className="py-2 px-4 border-b text-center"><Link href="/" className="text-blue-500 hover:underline">
+              <td className="py-2 px-4 border-b text-left"><Link href="/" className="text-blue-500 hover:underline">
               {item.customer}
                 </Link></td>
-              <td className="py-2 px-4 border-b text-center">{item.vehicleInfo}</td>
-              <td className="py-2 px-4 border-b text-center">{item.transactionDate}</td>
-              <td className="py-2 px-4 border-b text-center">{item.amount.toFixed(2)}</td>
-              <td className="py-2 px-4 border-b text-center">{item.method}</td>
+              <td className="py-2 px-4 border-b text-left">{item.vehicleInfo}</td>
+              <td className="py-2 px-4 border-b text-left">{item.transactionDate}</td>
+              <td className="py-2 px-4 border-b text-left">{item.amount.toFixed(2)}</td>
+              <td className="py-2 px-4 border-b text-left">{item.method}</td>
             </tr>
           ))}
         </tbody>
