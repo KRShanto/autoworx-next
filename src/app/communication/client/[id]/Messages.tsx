@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { cn } from "@/lib/cn";
-import Attachment from "@/../public/icons/Attachment.svg";
-import Send from "@/../public/icons/Send.svg";
+// import Attachment from "@/public/icons/Attachment.svg";
+// import Send from "@/public/icons/Send.svg";
 
 export default function Messages({ user }: { user: any }) {
   const messages = [
@@ -94,14 +94,19 @@ export default function Messages({ user }: { user: any }) {
       </div>
 
       <form className="flex h-[5%] items-center gap-2 rounded-b-md bg-[#D9D9D9] px-2">
-        <Image src={Attachment} alt="attachment" width={32} height={32} />
+        <Image
+          src="/icons/Attachment.svg"
+          alt="attachment"
+          width={32}
+          height={32}
+        />
         <input
           type="text"
           placeholder="Send Message..."
           className="w-full rounded-md border-none px-2 py-0 text-[10px]"
         />
         <button className="">
-          <Image src={Send} alt="send" width={32} height={32} />
+          <Image src="/icons/Send.svg" alt="send" width={32} height={32} />
         </button>
       </form>
     </>
