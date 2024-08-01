@@ -1,9 +1,12 @@
 "use client";
 import Title from "@/components/Title";
 import React from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
+import { PaymentTab, TabsContent, TabsList, TabsTrigger } from "./components/PaymentTab";
 import Link from "next/link";
 import HeaderSearch from "./components/HeaderSearch";
+import LogoCard from "./components/LogoCard";
+import CuponComponent from "./components/CuponComponent";
+
 
 interface TransactionData {
   invoiceNumber: string;
@@ -88,6 +91,237 @@ const dummyData: TransactionData[] = [
     method: "Bank Transfer",
   },
 ];
+// Dummy data for coupons
+
+interface Coupon {
+  couponName: string;
+  code: string;
+  discount: string;
+  startDate: string;
+  status: string;
+  redemptionCount: string;
+}
+
+// Dummy data for coupons
+const dummyCoupons: Coupon[] = [
+  {
+    couponName: "Summer Sale",
+    code: "SUMMER2024",
+    discount: "20%",
+    startDate: "2024-06-01",
+    status: "Active",
+    redemptionCount: "150",
+  },
+  {
+    couponName: "Winter Clearance",
+    code: "WINTER2024",
+    discount: "30%",
+    startDate: "2024-12-01",
+    status: "Scheduled",
+    redemptionCount: "50",
+  },
+  {
+    couponName: "Black Friday Deal",
+    code: "BLACKFRIDAY",
+    discount: "50%",
+    startDate: "2024-11-25",
+    status: "Expired",
+    redemptionCount: "200",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+  {
+    couponName: "New Year Promo",
+    code: "NEWYEAR2024",
+    discount: "15%",
+    startDate: "2024-01-01",
+    status: "Active",
+    redemptionCount: "75",
+  },
+];
+
 
 export default function Page() {
   return (
@@ -99,7 +333,7 @@ export default function Page() {
         <HeaderSearch />
       </div>
 
-      <Tabs defaultValue="transactions" className="mt-5 grid-cols-1">
+      <PaymentTab defaultValue="transactions" className="mt-5 grid-cols-1">
         <TabsList>
           <TabsTrigger value="coupons">Coupons</TabsTrigger>
           <TabsTrigger value="integrations">Integrations</TabsTrigger>
@@ -110,13 +344,19 @@ export default function Page() {
           <Table data={dummyData} />
         </TabsContent>
 
-        <TabsContent value="integrations">
-          <Table data={[]} />
+        <TabsContent value="integrations" >
+          
+          <div className="flex justify-evenly">
+          <LogoCard/>
+          <LogoCard/>
+          <LogoCard/>
+          </div>
         </TabsContent>
-        <TabsContent value="coupons">
-          <Table data={[]} />
+        <TabsContent value="coupons" style={{ width: '100%',height: '100%' , backgroundColor: 'transparent' ,padding: 0}}>
+          <CuponComponent coupons={dummyCoupons}/>
+          
         </TabsContent>
-      </Tabs>
+      </PaymentTab>
     </div>
   );
 }
