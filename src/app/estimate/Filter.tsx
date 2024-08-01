@@ -1,6 +1,6 @@
 "use client";
 
-import FilterImage from "@/../public/icons/Filter.svg";
+// import FilterImage from "@/../public/icons/Filter.svg";
 import {
   Dialog,
   DialogContent,
@@ -48,7 +48,7 @@ export function Filter() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className="flex h-10 items-center gap-2 rounded-md border-2 border-slate-400 p-1">
         <Image
-          src={FilterImage}
+          src="/icons/Filter.svg"
           alt="Filter"
           width={20}
           height={20}
