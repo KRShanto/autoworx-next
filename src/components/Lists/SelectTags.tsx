@@ -1,6 +1,7 @@
 "use client";
 
 import newTag from "@/actions/tag/newTag";
+import useOutsideClickTags from "@/hooks/useOutsideClickTags";
 import { INVOICE_COLORS } from "@/lib/consts";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
@@ -19,7 +20,6 @@ import {
 import FormError from "../FormError";
 import Submit from "../Submit";
 import { SelectProps } from "./select-props";
-
 type SelectedColor = { textColor: string; bgColor: string } | null;
 
 export function SelectTags({
@@ -40,6 +40,9 @@ export function SelectTags({
   const [open, setOpen] = openStates || useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
+  useOutsideClickTags(() => {
+    setOpen(false);
+  });
   useEffect(() => {
     if (type) {
       if (
