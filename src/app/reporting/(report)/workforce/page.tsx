@@ -9,8 +9,8 @@ import FilterBySelection from "../../components/filter/FilterBySelection";
 type TProps = {
   searchParams: {
     category?: string;
-    startDate: string;
-    endDate: string;
+    startDate?: string;
+    endDate?: string;
     service?: string;
     search?: string;
   };
@@ -25,8 +25,8 @@ export default function WorkforceReportPage({ searchParams }: TProps) {
         <div className="flex flex-1 items-center space-x-4">
           <FilterBySearchBox searchText={searchParams.search as string} />
           <FilterByDateRange
-            startDate={decodeURIComponent(searchParams.startDate)}
-            endDate={decodeURIComponent(searchParams.endDate)}
+            startDate={decodeURIComponent(searchParams.startDate as string)}
+            endDate={decodeURIComponent(searchParams.endDate as string)}
           />
         </div>
         <div className="flex items-center space-x-4">
