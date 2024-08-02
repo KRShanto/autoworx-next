@@ -388,21 +388,21 @@ function Table({ data }: { data: TransactionData[] }) {
                   {item.invoiceNumber}
                 </Link>
               </td>
-              <td className="border-b px-4 py-2 text-center">
+              <td className="border-b px-4 py-2 ">
                 <Link href="/" className="text-blue-500 hover:underline">
                   {item.customer}
                 </Link>
               </td>
-              <td className="border-b px-4 py-2 text-center">
+              <td className="border-b px-4 py-2 ">
                 {item.vehicleInfo}
               </td>
-              <td className="border-b px-4 py-2 text-center">
+              <td className="border-b px-4 py-2 ">
                 {item.transactionDate}
               </td>
-              <td className="border-b px-4 py-2 text-center">
+              <td className="border-b px-4 py-2 ">
                 {item.amount.toFixed(2)}
               </td>
-              <td className="border-b px-4 py-2 text-center">{item.method}</td>
+              <td className="border-b px-4 py-2 ">{item.method}</td>
             </tr>
           ))}
         </tbody>

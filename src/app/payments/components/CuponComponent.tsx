@@ -1,5 +1,7 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
+import NewCoupon from "./NewCoupon";
+import QrCodeForCoupon from "./QrCodeForCoupon";
 
 // Define the structure of a coupon
 
@@ -19,32 +21,38 @@ interface CouponTableProps {
 
 // CuponComponet component
 const CuponComponet = ({ coupons }: CouponTableProps) => {
+  const [showQr, setShowQr] = useState(false);
+  const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
+  const handleCouponQr=(coupon:Coupon)=>{
+    setSelectedCoupon(coupon);
+    setShowQr(true);
+  }
+
   return (
-    <div className="flex w-full gap-4 p-4">
+    <div className="flex w-full gap-4">
       {/* first half */}
       <div className="flex h-[65vh] w-[75vw] flex-col rounded-lg border bg-white p-4 shadow-lg">
         {/* Button Bar */}
 
         <div className="flex justify-between">
           <div className="mb-4 flex gap-2">
-            <button className="rounded-lg border-2 border-blue-600 px-4 py-2 text-blue-600 hover:bg-blue-100">
+            <button className="rounded-lg border-2 border-[#6571FF] px-4 py-2 text-blue-600 hover:bg-blue-100">
               All
             </button>
-            <button className="rounded-lg border-2 border-blue-600 px-4 py-2 text-blue-600 hover:bg-blue-100">
+            <button className="rounded-lg border-2 border-[#6571FF] px-4 py-2 text-blue-600 hover:bg-blue-100">
               Active
             </button>
-            <button className="rounded-lg border-2 border-blue-600 px-4 py-2 text-blue-600 hover:bg-blue-100">
+            <button className="rounded-lg border-2 border-[#6571FF] px-4 py-2 text-blue-600 hover:bg-blue-100">
               Scheduled
             </button>
-            <button className="rounded-lg border-2 border-blue-600 px-4 py-2 text-blue-600 hover:bg-blue-100">
+            <button className="rounded-lg border-2 border-[#6571FF] px-4 py-2 text-blue-600 hover:bg-blue-100">
               Expired
             </button>
           </div>
 
           <div>
-            <button className="rounded-lg border-2 bg-[#6571FF] px-4 py-2 text-white">
-              New +
-            </button>
+            <NewCoupon/>
+            
           </div>
         </div>
 
@@ -78,7 +86,7 @@ const CuponComponet = ({ coupons }: CouponTableProps) => {
               {coupons.map((coupon, index) => (
                 <tr
                   key={index}
-                  onClick={() => {}}
+                  onClick={()=>handleCouponQr(coupon)}
                   className={`${index % 2 === 0 ? "bg-white" : "bg-[#EEF4FF]"}`}
                   style={{ cursor: "pointer" }}
                 >
@@ -109,11 +117,9 @@ const CuponComponet = ({ coupons }: CouponTableProps) => {
 
       {/* second half */}
       <div className="flex h-[65vh] w-[20vw] flex-col rounded-lg border bg-white p-4 shadow-lg">
-        <div className="mb-4 w-full  font-bold text-xl">Coupon Details</div>
+        <div className="mb-4 w-full font-bold text-xl">Coupon Details</div>
         <div className="flex flex-grow items-center justify-center">
-          <div className="text-center text-gray-300">
-            Select a coupon to view details
-          </div>
+          {showQr && selectedCoupon  ? <QrCodeForCoupon showQr={showQr} coupon={selectedCoupon} /> : "Select a coupon to view details"}
         </div>
       </div>
     </div>
