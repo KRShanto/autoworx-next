@@ -2,6 +2,7 @@
 
 import { deleteStatus } from "@/actions/status/deleteStatus";
 import newStatus from "@/actions/status/newStatus";
+import useOutsideClick from "@/hooks/useOutsideClick";
 import { INVOICE_COLORS } from "@/lib/consts";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
@@ -54,9 +55,12 @@ export function SelectStatus({
       }
     }
   }
-
+  useOutsideClick(() => {
+    // alert("outside click");
+    setOpen && setOpen(false);
+  });
   return (
-    <>
+    <div>
       <input type="hidden" name={name} value={status?.id ?? ""} />
       <DropdownMenu
         open={open}
@@ -100,13 +104,15 @@ export function SelectStatus({
               <FaChevronUp className="absolute right-2 top-1/2 -translate-y-1/2 transform text-[#797979]" />
             </button>
           </div>
-
           <div className="space-y-1">
             {statusList.map((statusItem) => (
-              <DropdownMenuItem
+              <div
                 key={statusItem.id}
-                onClick={() => setStatus(statusItem)}
-                className="mx-4 flex cursor-pointer items-center justify-between"
+                onClick={() => {
+                  setStatus(statusItem);
+                  setOpen && setOpen(false);
+                }}
+                className="flex w-full cursor-pointer items-center justify-between rounded border-none px-4 py-2"
                 style={{
                   backgroundColor: statusItem?.bgColor,
                   color: statusItem?.textColor,
@@ -123,7 +129,7 @@ export function SelectStatus({
                 >
                   <IoMdClose />
                 </button>
-              </DropdownMenuItem>
+              </div>
             ))}
           </div>
           <FormError />
@@ -164,7 +170,7 @@ export function SelectStatus({
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-    </>
+    </div>
   );
 }
 
