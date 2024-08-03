@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-function useOutsideClickTags(callback: () => void) {
+function useOutsideClick(callback: () => void) {
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
       const popperContentWrapper = document.querySelector(
@@ -13,7 +13,9 @@ function useOutsideClickTags(callback: () => void) {
         event.target instanceof Node &&
         !popperContentWrapper.contains(event.target)
       ) {
-        callback();
+        setTimeout(() => {
+          callback();
+        }, 100);
       }
     };
 
@@ -25,4 +27,4 @@ function useOutsideClickTags(callback: () => void) {
   }, [callback]);
 }
 
-export default useOutsideClickTags;
+export default useOutsideClick;
