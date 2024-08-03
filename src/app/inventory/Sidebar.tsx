@@ -6,6 +6,7 @@ import ReplenishProductForm from "./ReplenishProductForm";
 import SalesPurchaseHistory from "./SalesPurchaseHistory";
 import UseProductForm from "./UseProductForm";
 import { getCompanyId } from "@/lib/companyId";
+import { FaCircleExclamation } from "react-icons/fa6";
 
 export default async function Sidebar({ productId }: { productId: number }) {
   const companyId = await getCompanyId();
@@ -32,7 +33,7 @@ export default async function Sidebar({ productId }: { productId: number }) {
     where: { companyId, type: "Invoice" },
     select: { id: true },
   });
-
+  const isWarningForQuantity = product && product.quantity! < 50;
   return (
     <div className="mt-12 flex h-[88.5%] w-1/2 flex-col">
       <div className="#h-[35%] flex gap-4">
@@ -71,8 +72,8 @@ export default async function Sidebar({ productId }: { productId: number }) {
         </div>
         <div className="app-shadow w-full rounded-lg bg-white p-4 text-xs 2xl:text-base">
           <>
-            <div className="flex gap-4">
-              <div className="w-[70%]">
+            <div className="grid grid-cols-5">
+              <div className="col-span-2">
                 <h3 className="text-lg font-semibold">Inventory Details</h3>
                 <p className="mt-2">
                   <span className="font-semibold">Name: </span>{" "}
@@ -88,43 +89,53 @@ export default async function Sidebar({ productId }: { productId: number }) {
                 </p>
               </div>
               {product && (
-                <div className="w-[30%]">
-                  <p className="text-nowrap text-center font-semibold">
-                    {product && product.quantity} {product && product.unit}{" "}
-                    remaining
-                  </p>
+                <div className="col-span-3 grid grid-cols-2">
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="relative text-nowrap rounded-lg border p-4 text-center font-semibold">
+                      {isWarningForQuantity && (
+                        <div className="absolute right-2 top-2">
+                          <FaCircleExclamation className="text-2xl text-red-600" />
+                        </div>
+                      )}
+                      <div>
+                        <span className="text-6xl">{product.quantity}</span>
+                        <span>/pc</span>
+                      </div>
+                      <span>Remaining</span>
+                    </div>
+                    <div className="mt-3 flex flex-col space-y-2">
+                      <UseProductForm
+                        productId={productId}
+                        invoiceIds={invoices.map((invoice) => invoice.id)}
+                        cost={parseInt(lastHistory?.price?.toString() || "0")}
+                      />
+                      <ReplenishProductForm productId={productId} />
+                    </div>
+                  </div>
                   {/* qr code */}
                   <div>
-                    {imgUrl && (
-                      //  eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={imgUrl}
-                        alt="qr code"
-                        className="mx-auto h-24 w-24"
-                      />
-                    )}
+                    <div>
+                      {imgUrl && (
+                        //  eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={imgUrl}
+                          alt="qr code"
+                          className="mx-auto h-40 w-40 rounded-lg border border-gray-500 p-0.5"
+                        />
+                      )}
+                    </div>
+                    <a
+                      className="mx-auto mt-3 flex w-fit items-center gap-1 rounded-md border border-slate-400 p-1 px-3"
+                      href={imgUrl!}
+                      download={`${product && product.name} Qrcode.png`}
+                    >
+                      <FaPrint className="text-sm" />
+                      Print
+                    </a>
                   </div>
-                  <a
-                    className="mx-auto mt-3 flex w-fit items-center gap-1 rounded-md border border-slate-400 p-1 px-3"
-                    href={imgUrl!}
-                    download={`${product && product.name} Qrcode.png`}
-                  >
-                    <FaPrint className="text-sm" />
-                    Print
-                  </a>
                 </div>
               )}
             </div>
-            {product && (
-              <div className="mt-3 flex justify-end gap-3">
-                <UseProductForm
-                  productId={productId}
-                  invoiceIds={invoices.map((invoice) => invoice.id)}
-                  cost={parseInt(lastHistory?.price?.toString() || "0")}
-                />
-                <ReplenishProductForm productId={productId} />
-              </div>
-            )}
           </>
         </div>
       </div>
