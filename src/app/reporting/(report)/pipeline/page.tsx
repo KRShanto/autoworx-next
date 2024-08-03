@@ -1,9 +1,12 @@
 import FilterDateRange from "../../components/filter/FilterByDateRange";
 import PipelineCardContainer from "../../components/pipeline/PipelineCardContainer";
-import PipelineBarChart from "../../components/pipeline/PipelineBarChart";
+import LeadsBarChartContainer from "../../components/pipeline/chart/LeadsBarChartContainer";
+import EstimateBarChartContainer from "../../components/pipeline/chart/EstimateBarChartContainer";
+import InvoicesBarChartContainer from "../../components/pipeline/chart/InvoicesBarChartContainer";
+import SalesActivityChartContainer from "../../components/pipeline/chart/SalesActivityChartContainer";
 export default function PipelinePage() {
   return (
-    <div className="grid grid-cols-3 gap-x-[71px]">
+    <div className="grid grid-cols-3 gap-x-6">
       <div className="col-span-1 space-y-5">
         <div className="flex items-center space-x-4">
           <FilterDateRange
@@ -18,31 +21,11 @@ export default function PipelinePage() {
         </div>
         <PipelineCardContainer />
       </div>
-      <div className="col-span-2 grid grid-cols-2 gap-x-[71px] gap-y-10">
-        <div className="flex max-h-96 min-w-[500px] items-center justify-center rounded-lg border border-gray-300 bg-white p-3">
-          <PipelineBarChart
-            height={300}
-            title="Total Leads Generated per Month"
-          />
-        </div>
-        <div className="flex max-h-96 min-w-[500px] items-center justify-center rounded-lg border border-gray-300 bg-white p-3">
-          <PipelineBarChart
-            height={300}
-            title="Total Leads Generated per Month"
-          />
-        </div>
-        <div className="flex max-h-96 min-w-[500px] items-center justify-center rounded-lg border border-gray-300 bg-white p-3">
-          <PipelineBarChart
-            height={300}
-            title="Total Leads Generated per Month"
-          />
-        </div>
-        <div className="flex max-h-96 min-w-[500px] items-center justify-center rounded-lg border border-gray-300 bg-white p-3">
-          <PipelineBarChart
-            height={300}
-            title="Total Leads Generated per Month"
-          />
-        </div>
+      <div className="col-span-2 grid grid-cols-2 gap-x-6 gap-y-10">
+        <LeadsBarChartContainer />
+        <EstimateBarChartContainer />
+        <InvoicesBarChartContainer />
+        <SalesActivityChartContainer />
       </div>
     </div>
   );
