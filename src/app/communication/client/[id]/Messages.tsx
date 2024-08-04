@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { cn } from "@/lib/cn";
+import Image from "next/image";
 // import Attachment from "@/public/icons/Attachment.svg";
 // import Send from "@/public/icons/Send.svg";
 
@@ -93,21 +93,23 @@ export default function Messages({ user }: { user: any }) {
         ))}
       </div>
 
-      <form className="flex h-[5%] items-center gap-2 rounded-b-md bg-[#D9D9D9] px-2">
+      <form className="flex h-[5%] items-center gap-x-2 rounded-b-md bg-[#D9D9D9] px-2 py-1">
         <Image
           src="/icons/Attachment.svg"
           alt="attachment"
-          width={32}
-          height={32}
+          width={20}
+          height={20}
         />
-        <input
-          type="text"
-          placeholder="Send Message..."
-          className="w-full rounded-md border-none px-2 py-0 text-[10px]"
-        />
-        <button className="">
-          <Image src="/icons/Send.svg" alt="send" width={32} height={32} />
-        </button>
+        <div className="flex h-full w-full items-center gap-x-2 rounded-md bg-white">
+          <input
+            type="text"
+            placeholder="Send Message..."
+            className="h-full w-full rounded-md border-none px-2 py-0 text-[10px]"
+          />
+          <button className="px-2">
+            <Image src="/icons/Send.svg" alt="send" width={20} height={20} />
+          </button>
+        </div>
       </form>
     </>
   );

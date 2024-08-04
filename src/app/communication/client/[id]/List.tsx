@@ -1,28 +1,22 @@
-import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { tempClients } from "@/lib/tempClients";
 import Image from "next/image";
+import Link from "next/link";
 
 // TODO: use layout for this component
 export default function List({ id }: { id: number }) {
   return (
-    <div className="app-shadow h-[83vh] w-[20%] rounded-lg bg-white p-3">
+    <div className="app-shadow h-[83vh] w-[20%] rounded-lg border border-emerald-600 bg-white p-3">
       {/* Header */}
       <h2 className="text-[14px] text-[#797979]">Client List</h2>
 
       {/* Search */}
-      <form>
+      <form className="w-full">
         <input
           type="text"
           placeholder="Search here..."
-          className="my-3 mr-2 rounded-md border-none p-2 text-[12px] text-[#797979] max-[1822px]:w-full"
+          className="my-6 mr-2 w-full rounded-md border border-emerald-600 p-2 text-[12px] text-[#797979]"
         />
-        <button
-          type="submit"
-          className="h-[26px] w-[62px] rounded-md bg-[#797979] text-[12px] text-white"
-        >
-          Filter
-        </button>
       </form>
 
       {/* List */}
@@ -54,6 +48,14 @@ export default function List({ id }: { id: number }) {
                   )}
                 >
                   {user.name}
+                </p>
+                <p
+                  className={cn(
+                    "mt-2 text-xs",
+                    selected ? "text-white" : "text-[#797979]",
+                  )}
+                >
+                  Client Company
                 </p>
               </div>
             </Link>
