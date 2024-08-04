@@ -483,7 +483,6 @@ model Payment {
   updatedAt DateTime      @default(now()) @updatedAt @map("updated_at")
   invoice   Invoice?      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   Company   Company?      @relation(fields: [companyId], references: [id])
-  companyId Int?
 }
 
 model CardPayment {
