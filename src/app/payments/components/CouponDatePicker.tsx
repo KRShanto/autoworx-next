@@ -5,9 +5,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 interface propsType {
+  name: string;
   customTitle: string;
 }
-export default function CouponDateComponent({ customTitle }: propsType) {
+export default function CouponDateComponent({ name, customTitle }: propsType) {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DemoContainer components={["DatePicker"]}>
@@ -20,6 +21,7 @@ export default function CouponDateComponent({ customTitle }: propsType) {
             },
             border: "rounded",
           }}
+          name={name}
         />
       </DemoContainer>
     </LocalizationProvider>

@@ -36,6 +36,7 @@ model Company {
   VehicleColor      VehicleColor[]
   Source            Source[]
   Payment           Payment[]
+  Coupon            Coupon[]
 }
 
 // User model.
@@ -481,7 +482,8 @@ model Payment {
   createdAt DateTime      @default(now()) @map("created_at")
   updatedAt DateTime      @default(now()) @updatedAt @map("updated_at")
   invoice   Invoice?      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  company   Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Company   Company?      @relation(fields: [companyId], references: [id])
+  companyId Int?
 }
 
 model CardPayment {
@@ -746,4 +748,26 @@ model Message {
 
   @@index([to], name: "fk_messages_to")
   @@index([from], name: "fk_messages_from")
+}
+
+model Coupon {
+  id           Int          @id @default(autoincrement())
+  name         String
+  code         String
+  type         String
+  startDate    DateTime
+  endDate      DateTime
+  discount     Decimal
+  discountType DiscountType
+  status       String
+  redemptions  Int
+  companyId    Int          @map("company_id")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @default(now()) @updatedAt @map("updated_at")
+  company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+enum DiscountType {
+  Percentage
+  Fixed
 }

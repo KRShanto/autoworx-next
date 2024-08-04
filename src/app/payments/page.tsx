@@ -1,6 +1,6 @@
 "use client";
 import Title from "@/components/Title";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   PaymentTab,
   TabsContent,
@@ -14,239 +14,16 @@ import CuponComponent from "./components/CuponComponent";
 import { ReturnPayment, getPayments } from "@/actions/payment/getPayments";
 import { useServerGet } from "@/hooks/useServerGet";
 import moment from "moment";
-
-// Dummy data for coupons
-interface Coupon {
-  couponName: string;
-  code: string;
-  discount: string;
-  startDate: string;
-  status: string;
-  redemptionCount: string;
-}
-
-// Dummy data for coupons
-const dummyCoupons: Coupon[] = [
-  {
-    couponName: "Summer Sale",
-    code: "SUMMER2024",
-    discount: "20%",
-    startDate: "2024-06-01",
-    status: "Active",
-    redemptionCount: "150",
-  },
-  {
-    couponName: "Winter Clearance",
-    code: "WINTER2024",
-    discount: "30%",
-    startDate: "2024-12-01",
-    status: "Scheduled",
-    redemptionCount: "50",
-  },
-  {
-    couponName: "Black Friday Deal",
-    code: "BLACKFRIDAY",
-    discount: "50%",
-    startDate: "2024-11-25",
-    status: "Expired",
-    redemptionCount: "200",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-  {
-    couponName: "New Year Promo",
-    code: "NEWYEAR2024",
-    discount: "15%",
-    startDate: "2024-01-01",
-    status: "Active",
-    redemptionCount: "75",
-  },
-];
+import { getCoupons } from "@/actions/coupon/getCoupons";
 
 export default function Page() {
-  const { data: payments, loading, error } = useServerGet(getPayments);
+  const { data: payments } = useServerGet(getPayments);
+  const { data: couponsData } = useServerGet(getCoupons);
+  const [coupons, setCoupons] = useState(couponsData);
+
+  useEffect(() => {
+    setCoupons(couponsData);
+  }, [couponsData]);
 
   return (
     <div>
@@ -265,7 +42,7 @@ export default function Page() {
         </TabsList>
 
         <TabsContent value="transactions">
-          {payments && <Table data={payments} />}
+          <Table data={payments || []} />
         </TabsContent>
 
         <TabsContent value="integrations">
@@ -275,6 +52,7 @@ export default function Page() {
             <LogoCard />
           </div>
         </TabsContent>
+
         <TabsContent
           value="coupons"
           style={{
@@ -284,7 +62,7 @@ export default function Page() {
             padding: 0,
           }}
         >
-          <CuponComponent coupons={dummyCoupons} />
+          <CuponComponent coupons={coupons || []} setCoupons={setCoupons} />
         </TabsContent>
       </PaymentTab>
     </div>
