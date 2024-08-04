@@ -1,6 +1,6 @@
 "use client";
-import { Bar, Label, XAxis, YAxis } from "recharts";
-import PipelineBarChartComponent from "../PipelineBarChartComponent";
+import { Bar, XAxis, YAxis } from "recharts";
+import BarChartComponent from "../../BarChartComponent";
 
 const data = [
   {
@@ -49,7 +49,7 @@ const CustomLabel = (props: any) => {
 export default function SalesActivityChartContainer() {
   return (
     <div className="chart-container">
-      <PipelineBarChartComponent
+      <BarChartComponent
         height={350}
         title="Opportunity Conversion Rate"
         data={data}
@@ -62,7 +62,7 @@ export default function SalesActivityChartContainer() {
           shape={<CustomBar />}
           label={<CustomLabel />}
         />
-      </PipelineBarChartComponent>
+      </BarChartComponent>
     </div>
   );
 }

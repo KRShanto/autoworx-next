@@ -6,6 +6,7 @@ import FilterBySelection from "../../components/filter/FilterBySelection";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { getClientsData } from "../../data";
+import Analytics from "./Analytics";
 
 type TProps = {
   searchParams: {
@@ -98,6 +99,7 @@ export default function RevenueReportPage({ searchParams }: TProps) {
           </tbody>
         </table>
       </div>
+      <Analytics />
     </div>
   );
 }

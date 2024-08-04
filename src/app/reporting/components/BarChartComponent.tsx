@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { BarChart, ResponsiveContainer, XAxis, YAxis, Label } from "recharts";
+import { BarChart, ResponsiveContainer } from "recharts";
 
 interface TProps {
   height: number | string;
@@ -9,7 +9,7 @@ interface TProps {
   children?: React.ReactNode;
 }
 
-export default function PipelineBarChartComponent({
+export default function BarChartComponent({
   title,
   height,
   data,

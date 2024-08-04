@@ -1,6 +1,6 @@
 "use client";
 import { Bar, Label, XAxis, YAxis } from "recharts";
-import PipelineBarChartComponent from "../PipelineBarChartComponent";
+import BarChartComponent from "../../BarChartComponent";
 
 const data = [
   {
@@ -85,7 +85,7 @@ const CustomLabel = (props: any) => {
 export default function LeadsBarChartContainer() {
   return (
     <div className="chart-container">
-      <PipelineBarChartComponent
+      <BarChartComponent
         height={350}
         title="Total Leads Generated per Month"
         data={data}
@@ -112,7 +112,7 @@ export default function LeadsBarChartContainer() {
           shape={<CustomBar />}
           label={<CustomLabel />}
         />
-      </PipelineBarChartComponent>
+      </BarChartComponent>
     </div>
   );
 }
