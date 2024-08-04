@@ -1,58 +1,59 @@
 import { cn } from "@/lib/cn";
 import Image from "next/image";
+import { useRef } from "react";
 // import Attachment from "@/public/icons/Attachment.svg";
 // import Send from "@/public/icons/Send.svg";
+const messages = [
+  {
+    id: 1,
+    message: "Hello",
+    sender: "client",
+  },
+  {
+    id: 2,
+    message: "Hello there. How are you? I am fine. What about you?",
+    sender: "user",
+  },
+  {
+    id: 3,
+    message: "I am fine. Thanks for asking. What about you?",
+    sender: "client",
+  },
+  {
+    id: 4,
+    message: "I am fine. Thanks for asking. What about you?",
+    sender: "client",
+  },
+  {
+    id: 5,
+    message: "I am fine. Thanks for asking. What about you?",
+    sender: "client",
+  },
+  {
+    id: 6,
+    message: "Hello there. How are you? I am fine. What about you?",
+    sender: "user",
+  },
 
+  {
+    id: 7,
+    message: "I am fine. Thanks for asking. What about you?",
+    sender: "client",
+  },
+  {
+    id: 8,
+    message: "Hello there. How are you? I am fine. What about you?",
+    sender: "user",
+  },
+
+  {
+    id: 9,
+    message: "I am fine. Thanks for asking. What about you?",
+    sender: "client",
+  },
+];
 export default function Messages({ user }: { user: any }) {
-  const messages = [
-    {
-      id: 1,
-      message: "Hello",
-      sender: "client",
-    },
-    {
-      id: 2,
-      message: "Hello there. How are you? I am fine. What about you?",
-      sender: "user",
-    },
-    {
-      id: 3,
-      message: "I am fine. Thanks for asking. What about you?",
-      sender: "client",
-    },
-    {
-      id: 4,
-      message: "I am fine. Thanks for asking. What about you?",
-      sender: "client",
-    },
-    {
-      id: 5,
-      message: "I am fine. Thanks for asking. What about you?",
-      sender: "client",
-    },
-    {
-      id: 6,
-      message: "Hello there. How are you? I am fine. What about you?",
-      sender: "user",
-    },
-
-    {
-      id: 7,
-      message: "I am fine. Thanks for asking. What about you?",
-      sender: "client",
-    },
-    {
-      id: 8,
-      message: "Hello there. How are you? I am fine. What about you?",
-      sender: "user",
-    },
-
-    {
-      id: 9,
-      message: "I am fine. Thanks for asking. What about you?",
-      sender: "client",
-    },
-  ];
+  const fileRef = useRef<HTMLInputElement>(null);
 
   return (
     <>
@@ -94,11 +95,16 @@ export default function Messages({ user }: { user: any }) {
       </div>
 
       <form className="flex h-[5%] items-center gap-x-2 rounded-b-md bg-[#D9D9D9] px-2 py-1">
+        <input type="file" ref={fileRef} className="hidden" />
         <Image
           src="/icons/Attachment.svg"
           alt="attachment"
           width={20}
           height={20}
+          className="cursor-pointer"
+          onClick={() => {
+            fileRef?.current?.click();
+          }}
         />
         <div className="flex h-full w-full items-center gap-x-2 rounded-md bg-white">
           <input
