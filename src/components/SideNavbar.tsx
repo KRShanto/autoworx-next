@@ -55,7 +55,7 @@ const navList = [
   {
     title: "Analytics and Reporting",
     icon: "/icons/navbar/Analytics.svg",
-    link: "/analytics",
+    link: "/reporting/revenue",
   },
   {
     title: "Invoices",
