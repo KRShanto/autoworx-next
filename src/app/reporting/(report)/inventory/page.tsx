@@ -13,6 +13,8 @@ type TProps = {
     endDate?: string;
     service?: string;
     search?: string;
+    leftChart: string;
+    rightChart: string;
   };
 };
 export default function InventoryReportPage({ searchParams }: TProps) {
@@ -98,7 +100,10 @@ export default function InventoryReportPage({ searchParams }: TProps) {
           </tbody>
         </table>
       </div>
-      <Analytics />
+      <Analytics
+        leftChart={searchParams.leftChart}
+        rightChart={searchParams.rightChart}
+      />
     </div>
   );
 }

@@ -30,7 +30,7 @@ const CustomBar = (props: any) => {
   return (
     <rect
       x={x}
-      y={y - 10}
+      y={y - 25}
       width={width}
       height={height}
       fill={fill}
@@ -45,11 +45,10 @@ const CustomLabel = (props: any) => {
   return (
     <text
       x={x + width / 2}
-      y={y - 15}
+      y={y - 25}
       fill="#66738C"
       textAnchor="middle"
       dy={-6}
-      style={{ fontWeight: "bold" }}
     >
       ${value}
     </text>
@@ -71,12 +70,12 @@ const CustomTooltip = ({ active, payload }: any) => {
 export default function PaymentBarChartContainer() {
   return (
     <div className="chart-container">
-      <BarChartComponent
-        height={500}
-        title="Opportunity Conversion Rate"
-        data={data}
-      >
-        <XAxis tickLine={false} dataKey={"method"} />
+      <BarChartComponent height={500} title="" data={data}>
+        <XAxis
+          tickLine={false}
+          dataKey={"method"}
+          style={{ fontSize: "18px", fontWeight: "600" }}
+        />
         <YAxis tick={false} />
         <Bar
           dataKey={"payment"}
