@@ -1,5 +1,6 @@
 "use server";
 
+import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { CardType, PaymentType } from "@prisma/client";
@@ -41,6 +42,8 @@ export async function newPayment({
   notes,
   additionalData,
 }: PaymentData): Promise<ServerAction> {
+  const companyId = await getCompanyId();
+
   // get all the product materials
   const materials = await db.material.findMany({
     where: {
@@ -113,6 +116,7 @@ export async function newPayment({
     case "CARD":
       newPayment = await db.payment.create({
         data: {
+          companyId,
           invoiceId,
           date: new Date(date),
           notes: notes,
@@ -133,6 +137,7 @@ export async function newPayment({
     case "CHECK":
       newPayment = await db.payment.create({
         data: {
+          companyId,
           invoiceId,
           date: new Date(date),
           notes: notes,
@@ -152,6 +157,7 @@ export async function newPayment({
     case "CASH":
       newPayment = await db.payment.create({
         data: {
+          companyId,
           invoiceId,
           date: new Date(date),
           notes: notes,
@@ -171,6 +177,7 @@ export async function newPayment({
     case "OTHER":
       newPayment = await db.payment.create({
         data: {
+          companyId,
           invoiceId,
           date: new Date(date),
           notes: notes,

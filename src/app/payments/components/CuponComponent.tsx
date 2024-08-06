@@ -1,50 +1,50 @@
 "use client";
-import React from "react";
-
-// Define the structure of a coupon
-
-interface Coupon {
-  couponName: string;
-  code: string;
-  discount: string;
-  startDate: string;
-  status: string;
-  redemptionCount: string;
-}
+import React, { useState } from "react";
+import NewCoupon from "./NewCoupon";
+import QrCodeForCoupon from "./QrCodeForCoupon";
+import { Coupon } from "@prisma/client";
+import moment from "moment";
 
 // Define the props for the CouponTable component
 interface CouponTableProps {
   coupons: Coupon[];
+  setCoupons: React.Dispatch<React.SetStateAction<Coupon[] | null>>;
 }
 
 // CuponComponet component
-const CuponComponet = ({ coupons }: CouponTableProps) => {
+const CuponComponet = ({ coupons, setCoupons }: CouponTableProps) => {
+  const [showQr, setShowQr] = useState(false);
+  const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
+
+  const handleCouponQr = (coupon: Coupon) => {
+    setSelectedCoupon(coupon);
+    setShowQr(true);
+  };
+
   return (
-    <div className="flex w-full gap-4 p-4">
+    <div className="flex w-full gap-4">
       {/* first half */}
       <div className="flex h-[65vh] w-[75vw] flex-col rounded-lg border bg-white p-4 shadow-lg">
         {/* Button Bar */}
 
         <div className="flex justify-between">
           <div className="mb-4 flex gap-2">
-            <button className="rounded-lg border-2 border-blue-600 px-4 py-2 text-blue-600 hover:bg-blue-100">
+            <button className="rounded-lg border-2 border-[#6571FF] px-4 py-2 text-blue-600 hover:bg-blue-100">
               All
             </button>
-            <button className="rounded-lg border-2 border-blue-600 px-4 py-2 text-blue-600 hover:bg-blue-100">
+            <button className="rounded-lg border-2 border-[#6571FF] px-4 py-2 text-blue-600 hover:bg-blue-100">
               Active
             </button>
-            <button className="rounded-lg border-2 border-blue-600 px-4 py-2 text-blue-600 hover:bg-blue-100">
+            <button className="rounded-lg border-2 border-[#6571FF] px-4 py-2 text-blue-600 hover:bg-blue-100">
               Scheduled
             </button>
-            <button className="rounded-lg border-2 border-blue-600 px-4 py-2 text-blue-600 hover:bg-blue-100">
+            <button className="rounded-lg border-2 border-[#6571FF] px-4 py-2 text-blue-600 hover:bg-blue-100">
               Expired
             </button>
           </div>
 
           <div>
-            <button className="rounded-lg border-2 bg-[#6571FF] px-4 py-2 text-white">
-              New +
-            </button>
+            <NewCoupon setCoupons={setCoupons} />
           </div>
         </div>
 
@@ -78,27 +78,34 @@ const CuponComponet = ({ coupons }: CouponTableProps) => {
               {coupons.map((coupon, index) => (
                 <tr
                   key={index}
-                  onClick={() => {}}
+                  onClick={() => handleCouponQr(coupon)}
                   className={`${index % 2 === 0 ? "bg-white" : "bg-[#EEF4FF]"}`}
-                  style={{ cursor: "pointer" }}
+                  style={{
+                    cursor: "pointer",
+                    // give border to the selected coupon
+                    border:
+                      selectedCoupon?.id === coupon.id
+                        ? "2px solid #6571FF"
+                        : "",
+                  }}
                 >
                   <td className="border-b border-gray-200 px-4 py-2">
-                    {coupon.couponName}
+                    {coupon.name}
                   </td>
                   <td className="border-b border-gray-200 px-4 py-2">
                     {coupon.code}
                   </td>
                   <td className="border-b border-gray-200 px-4 py-2">
-                    {coupon.discount}
+                    {Number(coupon.discount)}
                   </td>
                   <td className="border-b border-gray-200 px-4 py-2">
-                    {coupon.startDate}
+                    {moment(coupon.startDate).format("DD/MM/YYYY")}
                   </td>
                   <td className="border-b border-gray-200 px-4 py-2">
                     {coupon.status}
                   </td>
                   <td className="border-b border-gray-200 px-4 py-2">
-                    {coupon.redemptionCount}
+                    {coupon.redemptions}
                   </td>
                 </tr>
               ))}
@@ -109,11 +116,13 @@ const CuponComponet = ({ coupons }: CouponTableProps) => {
 
       {/* second half */}
       <div className="flex h-[65vh] w-[20vw] flex-col rounded-lg border bg-white p-4 shadow-lg">
-        <div className="mb-4 w-full  font-bold text-xl">Coupon Details</div>
+        <div className="mb-4 w-full text-xl font-bold">Coupon Details</div>
         <div className="flex flex-grow items-center justify-center">
-          <div className="text-center text-gray-300">
-            Select a coupon to view details
-          </div>
+          {showQr && selectedCoupon ? (
+            <QrCodeForCoupon showQr={showQr} coupon={selectedCoupon} />
+          ) : (
+            "Select a coupon to view details"
+          )}
         </div>
       </div>
     </div>

@@ -29,14 +29,7 @@ export function CreateTab() {
   return (
     <>
       <div className="-mx-8">
-        <table className="w-full border-separate border-spacing-x-8 border-spacing-y-4">
-          <colgroup>
-            <col className="w-1/4" />
-            <col className="w-1/4" />
-            <col className="w-1/4" />
-            <col className="w-1/5" />
-            <col />
-          </colgroup>
+        <table className="w-full border-separate border-spacing-x-8 border-spacing-y-5">
           <thead>
             <tr>
               {["Services", "Materials/Parts", "Labor", "Tags"].map((x) => (
@@ -102,7 +95,7 @@ export function CreateTab() {
                         />
                       )}
                     </td>
-                    <td>
+                    <td className="relative">
                       <ItemSelector
                         type="MATERIAL"
                         label="Materials/Parts"
@@ -150,7 +143,7 @@ export function CreateTab() {
                       {j === item.materials.length - 1 ? (
                         <button
                           type="button"
-                          className="flex items-center gap-1 text-[#6571FF]"
+                          className="absolute flex items-center gap-1 text-sm text-[#6571FF]"
                           onClick={() => {
                             useEstimateCreateStore.setState((x) =>
                               create(x, (x) => {
