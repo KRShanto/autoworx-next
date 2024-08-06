@@ -13,14 +13,14 @@ export default function MessageBox({ id }: { id: number }) {
   );
 
   return (
-    <div className="app-shadow h-[83vh] w-[30%] rounded-lg bg-white max-[1400px]:w-[40%]">
+    <div className="app-shadow h-[83vh] w-[25%] rounded-lg bg-white">
       {/* Header */}
-      <h2 className="h-[5%] border p-3 text-[14px] text-[#797979]">
+      <h2 className="h-[10%] border p-3 text-[14px] text-[#797979] 2xl:h-[5%]">
         Client Message
       </h2>
 
       {/* Chat Header */}
-      <div className="flex h-[10%] items-center justify-between gap-2 rounded-md bg-[#006D77] p-2 text-white">
+      <div className="flex h-[15%] items-center justify-between gap-2 rounded-md bg-[#006D77] p-2 text-white 2xl:h-[10%]">
         <div className="flex items-center">
           <Image
             src={user.image}
