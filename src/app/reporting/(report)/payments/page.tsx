@@ -4,6 +4,7 @@ import FilterByDateRange from "../../components/filter/FilterByDateRange";
 import { cn } from "@/lib/cn";
 import { getClientsData } from "../../data";
 import FilterBySelection from "../../components/filter/FilterBySelection";
+import Analytics from "./Analytics";
 type TProps = {
   searchParams: {
     category?: string;
@@ -90,6 +91,7 @@ export default function PaymentReportPage({ searchParams }: TProps) {
           </tbody>
         </table>
       </div>
+      <Analytics />
     </div>
   );
 }
