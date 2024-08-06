@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import Messages from "./Messages";
-import Email from "./Email";
 import { tempClients } from "@/lib/tempClients";
 import Image from "next/image";
+import { useState } from "react";
+import Email from "./Email";
+import Messages from "./Messages";
 
 export default function MessageBox({ id }: { id: number }) {
-  const user = tempClients.find((user: any) => user.id === id);
+  const user = tempClients[0];
   const [selected, setSelected] = useState<"MESSAGES" | "EMAILS" | "PHONE">(
     "MESSAGES",
   );
@@ -21,21 +21,19 @@ export default function MessageBox({ id }: { id: number }) {
 
       {/* Chat Header */}
       <div className="flex h-[10%] items-center justify-between gap-2 rounded-md bg-[#006D77] p-2 text-white">
-        {user && (
-          <div className="flex items-center">
-            <Image
-              src={user.image}
-              alt="user"
-              width={50}
-              height={50}
-              className="rounded-full"
-            />
-            <div className="flex flex-col">
-              <p className="text-[14px] font-bold">{user.name}</p>
-              <p className="text-[8px]">{user.company}</p>
-            </div>
+        <div className="flex items-center">
+          <Image
+            src={user.image}
+            alt="user"
+            width={50}
+            height={50}
+            className="rounded-full"
+          />
+          <div className="flex flex-col">
+            <p className="text-[14px] font-bold">{user.name}</p>
+            <p className="text-[8px]">{user.company}</p>
           </div>
-        )}
+        </div>
 
         <div className="mr-5 flex items-center">
           <button
