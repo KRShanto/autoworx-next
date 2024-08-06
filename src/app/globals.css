@@ -266,3 +266,8 @@ html body[data-scroll-locked] {
   --removed-body-scroll-bar-size: 0 !important;
   margin-right: 0 !important;
 }
+
+/* reporting pipeline chart css*/
+.chart-container {
+  @apply flex min-h-96 min-w-[550px] items-center justify-center rounded-lg border border-gray-300 bg-white px-2 py-5;
+}
