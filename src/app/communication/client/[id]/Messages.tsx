@@ -56,8 +56,8 @@ export default function Messages({ user }: { user: any }) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   return (
-    <>
-      <div className="h-[80%] overflow-y-scroll">
+    <div className="h-[75%] 2xl:h-[85%]">
+      <div className="h-[95%] overflow-y-scroll">
         {messages.map((message: any, index: number) => (
           <div
             key={message.id}
@@ -117,6 +117,6 @@ export default function Messages({ user }: { user: any }) {
           </button>
         </div>
       </form>
-    </>
+    </div>
   );
 }
