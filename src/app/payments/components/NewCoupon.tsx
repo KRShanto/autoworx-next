@@ -16,20 +16,51 @@ import CouponDateComponent from "./CouponDatePicker";
 
 import { useState } from "react";
 import { CouponCode, DiscountInput } from "./CodeDiscount";
+import { newCoupon } from "@/actions/coupon/new";
+import { useRouter } from "next/navigation";
+import { Coupon } from "@prisma/client";
 
-async function handleSubmit(data: FormData) {
-  const couponName = data.get("couponName");
-  const couponCode = data.get("couponCode");
-  const discountType = data.get("discountType");
-  const discountValue = data.get("discountValue");
-  const startDate = data.get("startDate");
-  const endDate = data.get("endDate");
-  const limitToProducts = data.get("limitToProducts");
-  const limitPerCustomer = data.get("limitPerCustomer");
-  const applyToRecurring = data.get("applyToRecurring");
-}
-export default function NewCoupon() {
+export default function NewCoupon({
+  setCoupons,
+}: {
+  setCoupons: React.Dispatch<React.SetStateAction<Coupon[] | null>>;
+}) {
   const [open, setOpen] = useState(false);
+
+  async function handleSubmit(data: FormData) {
+    const couponName = data.get("couponName");
+    const couponCode = data.get("couponCode");
+    const couponType = data.get("couponType");
+    const discountType = data.get("discountType");
+    const discountValue = data.get("discountValue");
+    const startDate = data.get("startDate");
+    const endDate = data.get("endDate");
+
+    console.log({
+      couponName,
+      couponCode,
+      discountType,
+      discountValue,
+      startDate,
+      endDate,
+      couponType,
+    });
+
+    const res = await newCoupon({
+      couponName: couponName as string,
+      couponCode: couponCode as string,
+      discountType: discountType as string,
+      discountValue: Number(discountValue),
+      startDate: startDate as string,
+      endDate: endDate as string,
+      couponType: couponType as string,
+    });
+
+    if (res.type === "success") {
+      setOpen(false);
+      setCoupons((prev) => [...(prev || []), res.data]);
+    }
+  }
 
   return (
     <>
@@ -52,37 +83,15 @@ export default function NewCoupon() {
           <div className="grid gap-5 overflow-y-auto p-4">
             <SlimInput name="couponName" label="Coupon Name" />
             <CouponCode />
-            <SlimInput
-              name="couponType"
-              label="Coupon Type"
-              style={{ width: "300px" }}
-            />
+            <SlimInput name="couponType" style={{ width: "300px" }} />
 
             <div className="flex items-center gap-4">
-              <CouponDateComponent customTitle="Start Date" />
-              <CouponDateComponent customTitle="End Date" />
+              <CouponDateComponent customTitle="Start Date" name="startDate" />
+              <CouponDateComponent customTitle="End Date" name="endDate" />
             </div>
 
             <div>
               <DiscountInput />
-            </div>
-            <div>
-              <input type="checkbox" name="limitToProducts" />
-              <label className="font-medium ml-4">
-                Limit this coupon to selected products/offers
-              </label>
-            </div>
-            <div>
-              <input type="checkbox" name="limitPerCustomer" />
-              <label className="font-medium ml-4">
-                Limit to one use per customer
-              </label>
-            </div>
-            <div>
-              <input type="checkbox" name="applyToRecurring" />
-              <label className="font-medium ml-4">
-                Also apply to recurring/future payments, if applicable
-              </label>
             </div>
           </div>
 

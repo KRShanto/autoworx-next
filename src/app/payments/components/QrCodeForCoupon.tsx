@@ -1,39 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import QRCode from 'qrcode';
-import Image from 'next/image'; // Assuming you're using Next.js
+import React, { useEffect, useState } from "react";
+import QRCode from "qrcode";
+import Image from "next/image";
+import { Coupon } from "@prisma/client";
+import moment from "moment";
 
-
-interface Coupon {
-  couponName: string;
-  code: string;
-  discount: string;
-  startDate: string;
-  status: string;
-  redemptionCount: string;
-}
 interface CouponQRCodeProps {
   showQr: boolean;
-  coupon: Coupon; 
+  coupon: Coupon;
 }
 
-const CouponQRCode = ({ showQr, coupon}: CouponQRCodeProps) => {
-  const [qrCodeUrl, setQrCodeUrl] = useState('');
+const CouponQRCode = ({ showQr, coupon }: CouponQRCodeProps) => {
+  const [qrCodeUrl, setQrCodeUrl] = useState("");
 
   useEffect(() => {
     if (showQr) {
-      const couponUrl = 'https://github.com/Md-AbdullahAl-Noman'; // Replace with your coupon URL
+      const couponUrl = "https://github.com/Md-AbdullahAl-Noman"; // TODO Replace with your coupon URL
       QRCode.toDataURL(couponUrl)
-        .then(url => {
+        .then((url) => {
           setQrCodeUrl(url);
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
         });
     }
   }, [showQr, coupon]);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       <div className="flex flex-col gap-4">
         {/* QR Code Section */}
         <div className="flex flex-col items-start">
@@ -49,24 +42,12 @@ const CouponQRCode = ({ showQr, coupon}: CouponQRCodeProps) => {
         </div>
 
         {/*  coupon details or content */}
-        <div>Coupon Name:
-         {coupon?coupon.couponName:""}
-        </div>
-        <div>Coupon Code:
-         {coupon.code}
-        </div>
-        <div>Discount:
-         {coupon?coupon.discount:""}
-        </div>
-        <div>Start Date:
-         {coupon?coupon.startDate:""}
-        </div>
-        <div>End Date:
-         {coupon?coupon.startDate:""}
-        </div>
-        <div>Numer of Times Activated:
-         {coupon?coupon.redemptionCount:""}
-        </div>
+        <div>Coupon Name: {coupon ? coupon.name : ""}</div>
+        <div>Coupon Code: {coupon.code}</div>
+        <div>Discount: {Number(coupon.discount)}</div>
+        <div>Start Date: {moment(coupon.startDate).format("DD/MM/YYYY")}</div>
+        <div>End Date: {moment(coupon.endDate).format("DD/MM/YYYY")}</div>
+        <div>Numer of Times Activated: {coupon.redemptions}</div>
       </div>
     </div>
   );

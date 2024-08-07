@@ -35,6 +35,8 @@ model Company {
   inventoryProducts InventoryProduct[]
   VehicleColor      VehicleColor[]
   Source            Source[]
+  Payment           Payment[]
+  Coupon            Coupon[]
 }
 
 // User model.
@@ -138,6 +140,7 @@ model Client {
   source          Source?       @relation(fields: [sourceId], references: [id])
   tag             Tag?          @relation(fields: [tagId], references: [id])
   Vehicle         Vehicle[]
+  Invoice         Invoice[]
 
   @@index([companyId], name: "fk_customers_company")
   @@map("Client")
@@ -226,7 +229,8 @@ model Invoice {
   Material                Material[]
   InventoryProductHistory InventoryProductHistory[]
   WorkOrder               WorkOrder[]
-  Vehicle                 Vehicle?                  @relation(fields: [vehicleId], references: [id])
+  vehicle                 Vehicle?                  @relation(fields: [vehicleId], references: [id])
+  client                  Client?                   @relation(fields: [clientId], references: [id])
 
   @@index([companyId], name: "fk_invoices_company")
 }
@@ -474,9 +478,11 @@ model Payment {
   cash      CashPayment?
   other     OtherPayment?
   invoiceId String?       @map("invoice_id")
+  companyId Int           @map("company_id")
   createdAt DateTime      @default(now()) @map("created_at")
   updatedAt DateTime      @default(now()) @updatedAt @map("updated_at")
   invoice   Invoice?      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  Company   Company?      @relation(fields: [companyId], references: [id])
 }
 
 model CardPayment {
@@ -741,4 +747,26 @@ model Message {
 
   @@index([to], name: "fk_messages_to")
   @@index([from], name: "fk_messages_from")
+}
+
+model Coupon {
+  id           Int          @id @default(autoincrement())
+  name         String
+  code         String
+  type         String
+  startDate    DateTime
+  endDate      DateTime
+  discount     Decimal
+  discountType DiscountType
+  status       String
+  redemptions  Int
+  companyId    Int          @map("company_id")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @default(now()) @updatedAt @map("updated_at")
+  company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+enum DiscountType {
+  Percentage
+  Fixed
 }
