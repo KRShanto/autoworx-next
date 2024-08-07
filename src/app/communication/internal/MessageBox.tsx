@@ -4,17 +4,22 @@ import { ThreeDots } from "react-loader-spinner";
 import { cn } from "@/lib/cn";
 import Image from "next/image";
 import { Message, MessageQue } from "./UsersArea";
+import { FiMessageCircle } from "react-icons/fi";
 
 export default function MessageBox({
   user,
   setUsersList,
   messages,
+  totalMessageBox,
   setMessages,
+  setIsTrigger,
 }: {
   user: any; // TODO: type this
   setUsersList: React.Dispatch<React.SetStateAction<any[]>>;
   messages: Message[];
+  totalMessageBox: number;
   setMessages: React.Dispatch<React.SetStateAction<MessageQue[]>>;
+  setIsTrigger: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [message, setMessage] = useState("");
   const messageBoxRef = useRef<HTMLDivElement>(null);
@@ -49,6 +54,8 @@ export default function MessageBox({
         sender: "USER",
       };
 
+      setIsTrigger((trigger) => !trigger); // toggle message trigger when sending a new message
+
       setMessages((messages) => {
         const newMessages = messages.map((m) => {
           if (m.user === user.id) {
@@ -69,9 +76,27 @@ export default function MessageBox({
   }
 
   return (
-    <div className="app-shadow h-[40vh] w-[18%] overflow-hidden rounded-lg border bg-white max-[1400px]:w-[40%]">
+    <div
+      className={cn(
+        "app-shadow flex w-full flex-col overflow-hidden rounded-lg border bg-white max-[1400px]:w-[100%]",
+        totalMessageBox > 2 && "h-[44vh]",
+      )}
+    >
+      {/* name and delete */}
+      <div className="flex items-center justify-between rounded-md bg-white px-2 py-1">
+        <p className="text-sm">User Message</p>
+        <FaTimes
+          className="cursor-pointer text-sm"
+          onClick={() => {
+            setUsersList((usersList) =>
+              usersList.filter((u) => u.id !== user.id),
+            );
+          }}
+        />
+      </div>
+
       {/* Chat Header */}
-      <div className="flex h-[10%] items-center justify-between gap-2 rounded-md bg-[#006D77] p-2 text-white">
+      <div className="flex h-[10%] items-center justify-between gap-2 rounded-sm bg-[#006D77] p-2 text-white">
         <div className="flex items-center gap-1">
           <Image
             src={user.image}
@@ -81,21 +106,16 @@ export default function MessageBox({
             className="rounded-full"
           />
           <div className="flex flex-col">
-            <p className="text-[10px] font-bold">{user.name}</p>
+            <p className="text-[20px] font-bold">{user.name}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <Image src="/icons/Email.png" alt="email" width={10} height={10} />
-          <Image src="/icons/Phone.png" alt="phone" width={10} height={10} />
-          <FaTimes
-            className="cursor-pointer text-sm"
-            onClick={() => {
-              setUsersList((usersList) =>
-                usersList.filter((u) => u.id !== user.id),
-              );
-            }}
-          />
+          <div className="rounded-full bg-[#579FA5] p-1">
+            <FiMessageCircle className="size-5" />
+          </div>
+          <Image src="/icons/Email.png" alt="email" width={20} height={20} />
+          <Image src="/icons/Phone.png" alt="phone" width={15} height={10} />
         </div>
       </div>
 
@@ -111,7 +131,7 @@ export default function MessageBox({
             <div className="flex items-center gap-2 p-1">
               <p
                 className={cn(
-                  "max-w-[220px] rounded-xl p-2 text-[10px]",
+                  "max-w-[220px] rounded-xl p-2 text-sm",
                   message.sender === "CLIENT"
                     ? "bg-[#D9D9D9] text-slate-800"
                     : "bg-[#006D77] text-white",
@@ -138,7 +158,7 @@ export default function MessageBox({
         <input
           type="text"
           placeholder="Send Message..."
-          className="h-5 w-full rounded-md border-none px-1 py-0 text-[8px]"
+          className="h-5 w-full rounded-md border-none px-1 py-3 text-[8px] focus:outline-none"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />

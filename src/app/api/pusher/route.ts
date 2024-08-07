@@ -28,7 +28,6 @@ export async function POST(req: Request, res: Response) {
       from: userId,
       message,
     });
-
     // Save to the database
     await db.message.create({
       data: {
@@ -38,7 +37,7 @@ export async function POST(req: Request, res: Response) {
       },
     });
 
-    // revalidatePath("/communication/internal");
+    revalidatePath("/communication/internal");
 
     // send json
     return new Response(
