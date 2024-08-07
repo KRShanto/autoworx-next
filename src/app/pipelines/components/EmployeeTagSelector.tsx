@@ -1,85 +1,128 @@
 "use client";
 
-import { deleteStatus } from "@/actions/status/deleteStatus";
-import newStatus from "@/actions/status/newStatus";
-import useOutsideClick from "@/hooks/useOutsideClick";
 import { INVOICE_COLORS } from "@/lib/consts";
 import { useFormErrorStore } from "@/stores/form-error";
-import { useListsStore } from "@/stores/lists";
-import { Status } from "@prisma/client";
-import { useEffect, useRef, useState } from "react";
-import { FaChevronUp, FaSearch, FaTimes } from "react-icons/fa";
+import { Tag } from "@prisma/client";
+import React, { useEffect, useRef, useState } from "react";
+import { FaChevronDown, FaChevronUp, FaSearch } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
-import { PiPaletteBold, PiPulse } from "react-icons/pi";
+import { PiPaletteBold } from "react-icons/pi";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../DropdownMenu";
-import FormError from "../FormError";
-import Submit from "../Submit";
-import { SelectProps } from "./select-props";
+} from "@/components/DropdownMenu";
+import FormError from "@/components/FormError";
+import Submit from "@/components/Submit"; 
+import newTag from "@/actions/tag/newTag";
+import { getTags } from "@/actions/tag/getTags";
+import { deleteTag } from "@/actions/tag/deleteTag";
 
 type SelectedColor = { textColor: string; bgColor: string } | null;
 
-export function SelectStatus({
-  name = "statusId",
-  value = null,
+export function EmployeeTagSelector({
+  name = "tagId",
+  value,
   setValue,
   open,
   setOpen,
-}: SelectProps<Status | null>) {
+}: {
+  name?: string;
+  value?: Tag;
+  setValue?: (tag: Tag | undefined) => void;
+  open?: boolean;
+  setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const state = useState(value);
-  const [status, setStatus] = setValue ? [value, setValue] : state;
-  const statusList = useListsStore((x) => x.statuses);
-  // const [open, setOpen] = useState(false);
+  const [tag, setTag] = setValue ? [value, setValue] : state;
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [filteredTagList, setFilteredTagList] = useState<Tag[]>(tags);
+  const [search, setSearch] = useState<string>("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (status) {
-      useListsStore.setState({ status });
+    fetchTags();
+  }, []);
+
+  useEffect(() => {
+    if (search) {
+      setFilteredTagList(
+        tags.filter((tag) =>
+          tag.name.toLowerCase().includes(search.toLowerCase()),
+        ),
+      );
+    } else {
+      setFilteredTagList(tags);
     }
-  }, [statusList]);
+  }, [search]);
 
-  async function handleDelete(id: number) {
-    const res = await deleteStatus(id);
+  useEffect(() => {
+    setFilteredTagList(tags);
+  }, [tags]);
 
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  async function fetchTags() {
+    const res = await getTags();
     if (res.type === "success") {
-      useListsStore.setState(({ statuses }) => ({
-        statuses: statuses.filter((status) => status.id !== id),
-      }));
-      if (status?.id === id) {
-        setStatus(null);
-      }
+      setTags(res.data);
     }
   }
-  useOutsideClick(() => {
-    // alert("outside click");
-    setOpen && setOpen(false);
-  });
+
+  async function handleDelete(id: number) {
+    const res = await deleteTag(id);
+
+    if (res.type === "success") {
+      setTags((prev: Tag[]) => {
+        return prev.filter((tag) => tag.id !== id);
+      });
+
+      if (tag?.id === id) {
+        setTag(undefined!);
+      }
+
+      if (setOpen) setOpen(false);
+    }
+  }
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      setOpen && setOpen(false);
+    }
+  };
+
   return (
-    <div>
-      <input type="hidden" name={name} value={status?.id ?? ""} />
+    <>
+      <input type="hidden" name={name} value={tag?.id ?? ""} />
       <DropdownMenu
         open={open}
         onOpenChange={(open) => {
-          // !open && setOpen && setOpen(open);
+          setOpen && setOpen(open);
         }}
       >
         <DropdownMenuTrigger
-          className="flex h-10 items-center gap-2 rounded-md bg-slate-100 px-2 py-1"
+          className="flex h-10 items-center gap-x-8 rounded-md border-2 border-slate-400 px-2 py-1"
           style={{
-            backgroundColor: status?.bgColor,
-            color: status?.textColor,
+            backgroundColor: tag?.bgColor,
+            color: tag?.textColor,
+            border: tag ? `1px solid ${tag.textColor}` : "",
           }}
           onClick={() => {
             setOpen && setOpen(!open);
           }}
         >
-          <PiPulse />
-          {status?.name ?? "Status"}
+          <span>{tag?.name ?? "Select Tag"}</span>
+          <FaChevronDown />
         </DropdownMenuTrigger>
 
         <DropdownMenuContent
@@ -87,15 +130,12 @@ export function SelectStatus({
           align="start"
           sideOffset={8}
           className="space-y-1 p-0"
+          ref={dropdownRef}
         >
           {/* Search */}
           <div className="relative m-2">
             <FaSearch className="absolute left-2 top-1/2 -translate-y-1/2 transform text-[#797979]" />
-            <input
-              type="text"
-              placeholder="Search"
-              className="w-full rounded-md border-2 border-slate-400 p-1 pl-6 pr-10 focus:outline-none"
-            />
+            <Input search={search} setSearch={setSearch} key="search" />
             <button
               onClick={() => {
                 setOpen && setOpen(!open);
@@ -104,28 +144,31 @@ export function SelectStatus({
               <FaChevronUp className="absolute right-2 top-1/2 -translate-y-1/2 transform text-[#797979]" />
             </button>
           </div>
+
           <div className="space-y-1">
-            {statusList.map((statusItem) => (
+            {filteredTagList.map((tagItem) => (
               <div
-                key={statusItem.id}
-                onClick={() => {
-                  setStatus(statusItem);
-                  setOpen && setOpen(false);
-                }}
-                className="flex w-full cursor-pointer items-center justify-between rounded border-none px-4 py-2"
+                key={tagItem.id}
+                className="mx-4 flex cursor-pointer items-center justify-between rounded-full px-4"
                 style={{
-                  backgroundColor: statusItem?.bgColor,
-                  color: statusItem?.textColor,
+                  backgroundColor: tagItem?.bgColor,
+                  color: tagItem?.textColor,
                   border:
-                    statusItem?.id === status?.id
-                      ? `1px solid ${status.textColor}`
-                      : "",
+                    tagItem?.id === tag?.id ? `1px solid ${tag.textColor}` : "",
                 }}
               >
-                {statusItem.name}
+                <button
+                  onClick={() => {
+                    setTag(tagItem);
+                    setOpen && setOpen(false);
+                  }}
+                  className="w-full text-left"
+                >
+                  {tagItem.name}
+                </button>
                 <button
                   className="text-lg text-[#66738C]"
-                  onClick={() => handleDelete(statusItem.id)}
+                  onClick={() => handleDelete(tagItem.id)}
                 >
                   <IoMdClose />
                 </button>
@@ -134,11 +177,11 @@ export function SelectStatus({
           </div>
           <FormError />
           <QuickAddForm
-            onSuccess={(status) => {
-              setStatus(status);
+            onSuccess={(tag) => {
+              setTag(tag);
               if (setOpen) setOpen(false);
-              // setOpen(false);
             }}
+            setTags={setTags}
             setPickerOpen={setPickerOpen}
             selectedColor={selectedColor}
           />
@@ -170,39 +213,59 @@ export function SelectStatus({
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-    </div>
+    </>
   );
 }
+
+const Input = ({
+  search,
+  setSearch,
+}: {
+  search: string;
+  setSearch: React.Dispatch<React.SetStateAction<string>>;
+}) => {
+  return (
+    <input
+      type="text"
+      placeholder="Search"
+      className="w-full rounded-md border-2 border-slate-400 p-1 pl-6 pr-10 focus:outline-none"
+      value={search}
+      onChange={(e) => {
+        setSearch(e.target.value);
+      }}
+    />
+  );
+};
 
 function QuickAddForm({
   onSuccess,
   setPickerOpen,
   selectedColor,
+  setTags,
 }: {
-  onSuccess?: (value: Status) => void;
+  onSuccess?: (value: Tag) => void;
   setPickerOpen: any;
   selectedColor: SelectedColor;
+  setTags: React.Dispatch<React.SetStateAction<Tag[]>>;
 }) {
   const { showError } = useFormErrorStore();
   const formRef = useRef<HTMLFormElement | null>(null);
+
   async function handleSubmit(data: FormData) {
     const name = data.get("name") as string;
 
-    const res = await newStatus({
-      name,
-      ...selectedColor,
-    });
+    const res = await newTag({ name, ...selectedColor });
 
     if (res.type === "error") {
-      // console.log(res);
+      console.log(res);
       showError({
         field: res.field || "name",
         message: res.message || "",
       });
     } else {
-      useListsStore.setState(({ statuses }) => ({
-        statuses: [...statuses, res.data],
-      }));
+      setTags((prev: Tag[]) => {
+        return [...prev, res.data];
+      });
       formRef.current?.reset();
       onSuccess?.(res.data);
     }
