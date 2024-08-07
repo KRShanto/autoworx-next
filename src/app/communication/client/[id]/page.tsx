@@ -1,9 +1,9 @@
 import Title from "@/components/Title";
+import { Metadata } from "next";
 import React from "react";
+import Details from "./Details";
 import List from "./List";
 import MessageBox from "./MessageBox";
-import Details from "./Details";
-import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Communication Hub - Client",
@@ -15,7 +15,7 @@ export default function Page({ params }: { params: { id: number } }) {
     <div>
       <Title>Communication Hub - Client</Title>
 
-      <div className="mt-5 flex gap-5">
+      <div className="mt-5 flex justify-around">
         <List id={params.id} />
         <MessageBox id={params.id} />
         <Details id={params.id} />

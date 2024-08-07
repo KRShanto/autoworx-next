@@ -21,7 +21,7 @@ jobs:
           node-version: 16
 
       - name: npm install
-        run: npm ci --force
+        run: npm install --force
 
       - name: npm tsc
         uses: icrawl/action-tsc@v1

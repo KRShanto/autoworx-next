@@ -5,6 +5,7 @@ import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { getClientsData } from "../../data";
 import FilterBySelection from "../../components/filter/FilterBySelection";
+import Analytics from "./Analytics";
 type TProps = {
   searchParams: {
     category?: string;
@@ -97,6 +98,7 @@ export default function InventoryReportPage({ searchParams }: TProps) {
           </tbody>
         </table>
       </div>
+      <Analytics />
     </div>
   );
 }
