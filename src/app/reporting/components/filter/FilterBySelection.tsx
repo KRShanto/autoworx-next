@@ -31,14 +31,14 @@ export default function FilterBySelection({
         onClick={() => setShow(!show)}
         className={cn(
           `flex w-44 items-center justify-center gap-2 border border-gray-400 p-1 px-5 text-sm text-gray-400 hover:border-blue-600`,
-          show ? "rounded-tl-lg rounded-tr-lg" : "rounded-lg",
+          show ? "rounded-tl-sm rounded-tr-sm" : "rounded-sm",
         )}
       >
         <span>{selectedItem ? selectedItem : type}</span>
         <IoMdArrowDropdown />
       </button>
       {show && (
-        <div className="absolute flex max-h-52 w-44 flex-col space-y-1 overflow-y-auto rounded-bl-lg rounded-br-lg border border-t-0 border-gray-400 bg-white p-3">
+        <div className="absolute flex max-h-52 w-44 flex-col space-y-1 overflow-y-auto rounded-bl-sm rounded-br-sm border border-t-0 border-gray-400 bg-white p-3 hover:z-10">
           {items.map((item) => (
             <button
               onClick={() => handleSelection(item)}

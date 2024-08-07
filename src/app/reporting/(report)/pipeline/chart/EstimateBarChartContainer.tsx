@@ -1,6 +1,6 @@
 "use client";
+import BarChartComponent from "@/app/reporting/components/BarChartComponent";
 import { Bar, Label, XAxis, YAxis } from "recharts";
-import BarChartComponent from "../../BarChartComponent";
 
 const data = [
   {
@@ -82,12 +82,12 @@ const CustomLabel = (props: any) => {
     </text>
   );
 };
-export default function InvoicesBarChartContainer() {
+export default function EstimateBarChartContainer() {
   return (
     <div className="chart-container">
       <BarChartComponent
         height={350}
-        title="Opportunity Conversion Rate"
+        title="Leads Converted per Month"
         data={data}
       >
         <XAxis tickLine={false} dataKey={"month"} />
@@ -103,7 +103,7 @@ export default function InvoicesBarChartContainer() {
               fontWeight: "bold",
             }}
           >
-            Invoices
+            Estimates
           </Label>
         </YAxis>
         <Bar

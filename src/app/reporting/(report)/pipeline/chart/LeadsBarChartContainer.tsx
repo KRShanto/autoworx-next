@@ -1,6 +1,6 @@
 "use client";
 import { Bar, Label, XAxis, YAxis } from "recharts";
-import BarChartComponent from "../../BarChartComponent";
+import BarChartComponent from "@/app/reporting/components/BarChartComponent";
 
 const data = [
   {
