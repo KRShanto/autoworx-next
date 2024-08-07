@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Header from "./Header";
 import WorkOrders from "./WorkOrders";
+import Pipelines from "./components/Pipelines";
 
 type Props = {};
 
@@ -13,7 +14,7 @@ const Page = (props: Props) => {
   return (
     <div className="space-y-8">
       <Header onToggleView={viewHandler} activeView={view} />
-      {view === "workOrders" ? <WorkOrders /> : null}
+      {view === "workOrders" ? <WorkOrders /> : <Pipelines/>}
     </div>
   );
 };
