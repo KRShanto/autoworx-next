@@ -106,7 +106,6 @@ export default async function CreateWorkOrder({
 
         <div className="space-y-2">
           <InvoiceItems
-            workOrderId={workOrderId}
             items={JSON.parse(JSON.stringify(invoice.invoiceItems))}
           />
         </div>
@@ -119,7 +118,9 @@ export default async function CreateWorkOrder({
         </div>
         <div>
           <p className="font-bold text-slate-500">{invoice.company.name}</p>
-          <p>{invoice.user.name}</p>
+          <p>
+            {invoice.user.firstName} {invoice.user.lastName}
+          </p>
         </div>
       </DialogContent>
     </InterceptedDialog>

@@ -36,7 +36,10 @@ export const updateTechnician = async (
 
     return {
       type: "success",
-      data: { ...updatedTechnician, name: user?.name },
+      data: {
+        ...updatedTechnician,
+        name: user?.firstName + " " + user?.lastName,
+      },
     };
   } catch (err) {
     throw err;

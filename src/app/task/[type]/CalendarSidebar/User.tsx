@@ -29,7 +29,7 @@ export default function UserComponent({
     <>
       <button
         className={cn(
-          "mt-2 flex w-full items-center rounded-lg py-2  sm:h-[12%] ",
+          "mt-2 flex w-full items-center rounded-lg py-2 sm:h-[12%]",
           isSelected ? "bg-[#006D77]" : "bg-[#F8F9FA]",
         )}
         onClick={handleClick}
@@ -49,7 +49,7 @@ export default function UserComponent({
             minimized && "sr-only",
           )}
         >
-          {user.name}
+          {user.firstName} {user.lastName}
         </p>
       </button>
 

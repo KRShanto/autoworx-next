@@ -44,33 +44,36 @@ model Company {
 // When user registers, they have to create a company. So, every new user is an admin.
 // After that, they can add employees to the company.
 model User {
-  id                 Int                @id @default(autoincrement())
-  name               String
-  email              String             @unique
-  emailVerifiedAt    DateTime?          @map("email_verified_at")
-  image              String             @default("/images/default.png")
-  password           String
-  provider           Provider           @default(email)
-  timezone           String             @default("UTC")
-  phone              String?
-  address            String?
-  city               String?
-  state              String?
-  zip                String?
-  role               Role               @default(admin)
-  employeeType       EmployeeType       @default(None)
-  employeeDepartment EmployeeDepartment @default(None)
-  companyId          Int                @map("company_id")
-  createdAt          DateTime           @default(now()) @map("created_at")
-  updatedAt          DateTime           @default(now()) @updatedAt @map("updated_at")
-  company            Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  tasks              Task[]
-  oauthTokens        OAuthToken[]
-  taskUsers          TaskUser[]
-  appointments       Appointment[]
-  appointmentUsers   AppointmentUser[]
-  invoices           Invoice[]
-  Technician         Technician[]
+  id               Int               @id @default(autoincrement())
+  firstName        String
+  lastName         String?
+  email            String            @unique
+  emailVerifiedAt  DateTime?         @map("email_verified_at")
+  image            String            @default("/images/default.png")
+  password         String
+  provider         Provider          @default(email)
+  timezone         String            @default("UTC")
+  phone            String?
+  address          String?
+  city             String?
+  state            String?
+  zip              String?
+  companyName      String?           @map("company_name")
+  commission       Decimal?          @default(0)
+  role             Role              @default(admin)
+  employeeType     EmployeeType      @default(Sales)
+  joinDate         DateTime?         @map("join_date")
+  companyId        Int               @map("company_id")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @default(now()) @updatedAt @map("updated_at")
+  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  tasks            Task[]
+  oauthTokens      OAuthToken[]
+  taskUsers        TaskUser[]
+  appointments     Appointment[]
+  appointmentUsers AppointmentUser[]
+  invoices         Invoice[]
+  Technician       Technician[]
 
   @@index([companyId], name: "fk_users_company")
 }
@@ -87,17 +90,8 @@ enum Role {
 }
 
 enum EmployeeType {
-  Salary
-  Hourly
-  ContractBased @map("Contract Based")
-  None
-}
-
-enum EmployeeDepartment {
   Sales
-  Management
-  Workshop
-  None
+  Technician
 }
 
 // OAuth token for user.

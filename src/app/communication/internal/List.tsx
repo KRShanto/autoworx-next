@@ -47,7 +47,7 @@ export default function List({
             >
               <Image
                 src={user.image}
-                alt={user.name}
+                alt="User image"
                 // className="h-[60px] w-[60px] rounded-full max-[1400px]:h-[40px] max-[1400px]:w-[40px]"
                 width={60}
                 height={60}
@@ -55,7 +55,7 @@ export default function List({
               />
               <div className="flex flex-col">
                 <p className="text-[14px] font-bold text-[#797979]">
-                  {user.name}
+                  {user.firstName} {user.lastName}
                 </p>
               </div>
             </button>

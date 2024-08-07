@@ -505,7 +505,10 @@ export default function Week({
                         Assigned To:{" "}
                         {event.assignedUsers
                           .slice(0, 1)
-                          .map((user: User) => user.name)}
+                          .map(
+                            (user: User) =>
+                              `${user.firstName} ${user.lastName}`,
+                          )}
                       </p>
 
                       <p>

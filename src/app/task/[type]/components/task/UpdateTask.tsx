@@ -156,12 +156,14 @@ export default function UpdateTask() {
                     />
                     <Image
                       src={user.image}
-                      alt={user.name}
+                      alt={user.firstName}
                       width={40}
                       height={40}
                       className="rounded-full"
                     />
-                    <span>{user.name}</span>
+                    <span>
+                      {user.firstName} {user.lastName}
+                    </span>
                   </label>
                 ))}
               </div>

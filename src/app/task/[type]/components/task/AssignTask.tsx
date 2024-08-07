@@ -40,7 +40,9 @@ export default function AssignTask() {
               height={50}
               className="rounded-full"
             />
-            <p className="text-xl font-bold">{user.name}</p>
+            <p className="text-xl font-bold">
+              {user.firstName} {user.lastName}
+            </p>
           </div>
 
           <h2 className="mt-5 text-lg font-bold">Select tasks</h2>

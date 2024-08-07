@@ -33,7 +33,10 @@ export async function addTechnician(
       where: { id: newTechnician.userId },
     });
 
-    return { type: "success", data: { ...newTechnician, name: user?.name } };
+    return {
+      type: "success",
+      data: { ...newTechnician, name: user?.firstName + " " + user?.lastName },
+    };
   } catch (error) {
     throw error;
   }

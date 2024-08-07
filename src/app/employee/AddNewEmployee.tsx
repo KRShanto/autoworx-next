@@ -5,28 +5,68 @@ import {
   DialogClose,
   DialogContent,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/Dialog";
 import FormError from "@/components/FormError";
-import NewVendor from "@/components/Lists/NewVendor";
-import SelectCategory from "@/components/Lists/SelectCategory";
-import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { useListsStore } from "@/stores/lists";
-import { Category, InventoryProductType, Vendor } from "@prisma/client";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { RxAvatar } from "react-icons/rx";
-
 import SelectEmployeeType from "./SelectEmployeeType";
-// import { createProduct } from "./actions/create";
+import { useServerGet } from "@/hooks/useServerGet";
+import { getCompany } from "@/actions/settings/getCompany";
+import { useFormErrorStore } from "@/stores/form-error";
+import { addEmployee } from "@/actions/employee/add";
+import { EmployeeType } from "@prisma/client";
 
 export default function AddNewEmployee() {
   const [open, setOpen] = useState(false);
   const [employeeTypeOpen, setEmployeeTypeOpen] = useState(false);
   const profilePicRef = useRef<HTMLInputElement>(null);
+  const { data: companyName } = useServerGet(getCompany);
+  const { showError } = useFormErrorStore();
+
+  async function handleSubmit(data: FormData) {
+    const firstName = data.get("firstName") as string;
+    const lastName = data.get("lastName") as string;
+    const email = data.get("email") as string;
+    const mobileNumber = data.get("mobileNumber") as string;
+    const address = data.get("address") as string;
+    const city = data.get("city") as string;
+    const state = data.get("state") as string;
+    const zip = data.get("zip") as string;
+    const commission = data.get("commission") as string;
+    const date = data.get("date") as string;
+    const type = data.get("type") as string;
+    const password = data.get("password") as string;
+    const confirmPassword = data.get("confirmPassword") as string;
+
+    const res = await addEmployee({
+      firstName,
+      lastName,
+      email,
+      mobileNumber,
+      address,
+      city,
+      state,
+      zip,
+      companyName: companyName?.name,
+      commission: Number(commission),
+      date,
+      type: (type || EmployeeType.Sales) as EmployeeType,
+      profilePicture: undefined,
+      password,
+      confirmPassword,
+    });
+
+    if (res.type === "error") {
+      showError({ field: "all", message: res.message || "An error occurred" });
+      return;
+    } else {
+      setOpen(false);
+    }
+  }
+
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -41,6 +81,7 @@ export default function AddNewEmployee() {
         >
           <div className="mt-8 flex items-center justify-between">
             <h1 className="text-2xl font-bold">Add Employee</h1>
+
             <button
               onClick={() => {
                 profilePicRef.current?.click();
@@ -70,27 +111,40 @@ export default function AddNewEmployee() {
               <SlimInput name="mobileNumber" />
             </div>
             <div className="flex items-center justify-between">
-              <SlimInput rootClassName="flex-1" name="address" />
-            </div>
-            <div className="flex items-center justify-between gap-x-2">
-              <SlimInput name="city" />
-              <SlimInput name="state" />
-              <SlimInput name="zip" />
+              <SlimInput name="password" type="password" />
+              <SlimInput name="confirmPassword" type="password" />
             </div>
             <div className="flex items-center justify-between">
-              <SlimInput name="companyName" />
-              <SlimInput name="commission%" />
+              <SlimInput
+                rootClassName="flex-1"
+                name="address"
+                required={false}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-x-2">
+              <SlimInput name="city" required={false} />
+              <SlimInput name="state" required={false} />
+              <SlimInput name="zip" required={false} />
+            </div>
+            <div className="flex items-center justify-between">
+              <SlimInput name="companyName" defaultValue={companyName?.name} />
+              <SlimInput
+                name="commission"
+                label="Commission %"
+                required={false}
+              />
             </div>
             <div className="flex items-center justify-between gap-x-4">
-              <SelectEmployeeType employeeTypeOpen={employeeTypeOpen} setEmployeeTypeOpen={setEmployeeTypeOpen} />
+              <SelectEmployeeType
+                employeeTypeOpen={employeeTypeOpen}
+                setEmployeeTypeOpen={setEmployeeTypeOpen}
+              />
               <SlimInput
                 name="date"
-                label="Time"
+                label="Date joined"
                 rootClassName="grow"
                 type="date"
-                value={""}
                 required={false}
-                onChange={(event) => {}}
               />
             </div>
           </div>
@@ -101,7 +155,7 @@ export default function AddNewEmployee() {
             </DialogClose>
             <Submit
               className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
-              // formAction={handleSubmit}
+              formAction={handleSubmit}
             >
               Add
             </Submit>

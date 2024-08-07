@@ -189,14 +189,22 @@ export default function CreateAndEditLabor({
             <label>Assign To</label>
             <Selector
               label={(employee) =>
-                employee?.name ? employee.name : "Employee"
+                employee?.firstName
+                  ? `${employee.firstName} ${employee.lastName}`
+                  : "Employee"
               }
               newButton={<div></div>}
               items={employeeList}
-              displayList={(employee: User) => <p>{employee.name}</p>}
+              displayList={(employee: User) => (
+                <p>
+                  {employee.firstName} {employee.lastName}
+                </p>
+              )}
               onSearch={(search: string) =>
                 employeeList.filter((employee) =>
-                  employee.name.toLowerCase().includes(search.toLowerCase()),
+                  `${employee.firstName} ${employee.lastName}`
+                    .toLowerCase()
+                    .includes(search.toLowerCase()),
                 )
               }
               openState={[employeeOpen, setEmployeeOpen]}

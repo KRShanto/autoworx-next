@@ -174,7 +174,9 @@ export default async function ViewEstimate({
                 <p className="font-bold text-slate-500">
                   {invoice.company.name}
                 </p>
-                <p>{invoice.user.name}</p>
+                <p>
+                  {invoice.user.firstName} {invoice.user.lastName}
+                </p>
               </div>
               <button className="rounded bg-[#6571FF] px-8 text-white">
                 Authorize

@@ -155,12 +155,14 @@ export default function NewTask({
                     />
                     <Image
                       src={user.image}
-                      alt={user.name}
+                      alt="User image"
                       width={40}
                       height={40}
                       className="rounded-full"
                     />
-                    <span>{user.name}</span>
+                    <span>
+                      {user.firstName} {user.lastName}
+                    </span>
                   </label>
                 ))}
               </div>

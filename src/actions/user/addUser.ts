@@ -8,12 +8,14 @@ import bcrypt from "bcrypt";
 import { revalidatePath } from "next/cache";
 
 export async function addUser({
-  name,
+  firstName,
+  lastName,
   email,
   password,
   confirmPassword,
 }: {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -32,7 +34,8 @@ export async function addUser({
 
   await db.user.create({
     data: {
-      name,
+      firstName,
+      lastName,
       email,
       password: encPassword,
       role: "employee",

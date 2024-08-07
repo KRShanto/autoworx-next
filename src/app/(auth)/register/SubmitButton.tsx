@@ -11,12 +11,19 @@ export default function SubmitButton() {
   const router = useRouter();
 
   const handler = async (formData: FormData) => {
-    const name = formData.get("name") as string;
+    const firstName = formData.get("firstName") as string;
+    const lastName = formData.get("lastName") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const company = formData.get("company") as string;
 
-    const res = await register({ name, email, password, company });
+    const res = await register({
+      firstName,
+      lastName,
+      email,
+      password,
+      company,
+    });
 
     if (res.error) {
       showError(res.error);

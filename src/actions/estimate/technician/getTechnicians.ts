@@ -28,7 +28,7 @@ export const getTechnicians = async ({
 
     technicians.forEach((technician) => {
       const user = users.find((user) => user.id === technician.userId);
-      technician.name = user?.name || "Unknown";
+      technician.name = `${user?.firstName || "Unknown"} ${user?.lastName || ""}`;
     });
 
     return JSON.parse(JSON.stringify(technicians));

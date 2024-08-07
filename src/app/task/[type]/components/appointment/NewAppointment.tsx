@@ -106,7 +106,9 @@ export function NewAppointment({
   const handleSearch = (search: string) => {
     setEmployeesToDisplay(
       employees.filter((employee) =>
-        employee.name.toLowerCase().includes(search.toLowerCase()),
+        `${employee.firstName} ${employee.lastName}`
+          .toLowerCase()
+          .includes(search.toLowerCase()),
       ),
     );
   };
@@ -371,7 +373,9 @@ export function NewAppointment({
                       height={30}
                       className="rounded-full"
                     />
-                    <p>{user.name}</p>
+                    <p>
+                      {user.firstName} {user.lastName}
+                    </p>
                   </div>
                 ))
               }
@@ -413,7 +417,9 @@ export function NewAppointment({
                           height={50}
                           className="rounded-full"
                         />
-                        <p className="font-medium">{employee.name}</p>
+                        <p className="font-medium">
+                          {employee.firstName} {employee.lastName}
+                        </p>
                       </button>
                     ))}
                 </div>
