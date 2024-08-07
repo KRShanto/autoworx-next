@@ -53,7 +53,7 @@ const CustomLabel = (props: any) => {
     </text>
   );
 };
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const { payload: data } = payload[0];
     return (

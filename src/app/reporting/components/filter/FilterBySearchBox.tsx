@@ -37,7 +37,7 @@ export default function FilterBySearchBox({ searchText }: TProps) {
           setSearchTerm(e.target.value);
         }}
         value={searchTerm}
-        className="w-full rounded-md border py-1 pl-8 focus:outline-none"
+        className="w-full rounded-sm border py-1 pl-8 focus:outline-none"
         type="text"
         placeholder="search"
       />

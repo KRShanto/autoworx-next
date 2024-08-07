@@ -1,23 +1,61 @@
 import FilterDateRange from "../../components/filter/FilterByDateRange";
-import PipelineCardContainer from "../../components/pipeline/PipelineCardContainer";
-import LeadsBarChartContainer from "../../components/pipeline/chart/LeadsBarChartContainer";
-import EstimateBarChartContainer from "../../components/pipeline/chart/EstimateBarChartContainer";
-import InvoicesBarChartContainer from "../../components/pipeline/chart/InvoicesBarChartContainer";
-import SalesActivityChartContainer from "../../components/pipeline/chart/SalesActivityChartContainer";
-export default function PipelinePage() {
+import PipelineCardContainer from "./PipelineCardContainer";
+import LeadsBarChartContainer from "./chart/LeadsBarChartContainer";
+import EstimateBarChartContainer from "./chart/EstimateBarChartContainer";
+import InvoicesBarChartContainer from "./chart/InvoicesBarChartContainer";
+import SalesActivityChartContainer from "./chart/SalesActivityChartContainer";
+import FilterByMultiple from "../../components/filter/FilterByMultiple";
+
+type TProps = {
+  searchParams: {
+    startDate?: string;
+    endDate?: string;
+  };
+};
+
+type TSliderData = {
+  id: number;
+  min: number;
+  max: number;
+  defaultValue?: [number, number];
+  type: "price" | "cost" | "profit";
+};
+const filterMultipleSliders: TSliderData[] = [
+  {
+    id: 1,
+    type: "price",
+    min: 0,
+    max: 300,
+    // defaultValue: [50, 250],
+  },
+  {
+    id: 2,
+    type: "cost",
+    min: 0,
+    max: 400,
+    // defaultValue: [100, 300],
+  },
+  {
+    id: 3,
+    type: "profit",
+    min: 0,
+    max: 500,
+  },
+];
+
+export default function PipelinePage({ searchParams }: TProps) {
   return (
     <div className="grid grid-cols-3 gap-x-6">
       <div className="col-span-1 space-y-5">
         <div className="flex items-center space-x-4">
           <FilterDateRange
-            // startDate={decodeURIComponent(searchParams?.startDate as string)}
-            // endDate={decodeURIComponent(searchParams?.endDate as string)}
-            startDate="12/4/2023"
-            endDate="12/4/2023"
+            startDate={decodeURIComponent(searchParams?.startDate as string)}
+            endDate={decodeURIComponent(searchParams?.endDate as string)}
           />
-          <button className="flex max-w-80 items-center gap-2 rounded-lg border border-gray-400 p-1 px-5 text-sm text-gray-400 hover:border-blue-600">
-            <span>Filter</span>
-          </button>
+          <FilterByMultiple
+            filterSliders={filterMultipleSliders}
+            searchParamsValue={searchParams}
+          />
         </div>
         <PipelineCardContainer />
       </div>
