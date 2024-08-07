@@ -8,11 +8,6 @@ import FilterforPayment from "./FilterforPayment";
 import { useState } from "react";
 
 export default function HeaderSearch() {
-  const [showFilter, setShowFilter] = useState(false);
-
-  const handleFilterApply = () => {
-    setShowFilter(false); // Close the filter dropdown
-  };
   return (
     <div className="mt-5 flex w-full items-center justify-between">
       <div className="flex w-full max-w-4xl rounded-md border border-gray-300 bg-white p-2">
@@ -29,19 +24,7 @@ export default function HeaderSearch() {
             <div className="z-50 m-2 px-4">
               <DateRange />
             </div>
-            <div className="relative">
-              <button
-                className="flex h-[40px] w-[100px] items-center justify-center rounded border border-[#66738C] p-2 text-gray-400"
-                onClick={() => setShowFilter((prev) => !prev)}
-              >
-                Filter
-              </button>
-              {showFilter && (
-                <div className="absolute z-40">
-                  <FilterforPayment onApply={handleFilterApply} />
-                </div>
-              )}
-            </div>
+            <FilterforPayment />
           </div>
         </div>
       </div>

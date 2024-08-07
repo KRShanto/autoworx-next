@@ -1,6 +1,7 @@
 "use client";
+import { usePaymentFilterStore } from "@/stores/paymentFilter";
 import { format } from "date-fns";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { DateRangePicker } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
@@ -14,10 +15,19 @@ const DateRange = () => {
       key: "selection",
     },
   });
+  const ref = useRef<HTMLDivElement>(null);
 
   const [showPicker, setShowPicker] = useState(false);
   const [tempRange, setTempRange] = useState(state.selection);
   const [isRangeSelected, setIsRangeSelected] = useState(false);
+  const { setFilter } = usePaymentFilterStore();
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleSelect = (ranges: any) => {
     setTempRange(ranges.selection);
@@ -31,6 +41,13 @@ const DateRange = () => {
     setState({ selection: tempRange });
     setShowPicker(false);
     setIsRangeSelected(true);
+    setFilter({ dateRange: [tempRange.startDate, tempRange.endDate] });
+  };
+
+  const handleClickOutside = (event: any) => {
+    if (ref.current && !ref.current.contains(event.target)) {
+      setShowPicker(false);
+    }
   };
 
   const formatRange = (start: Date, end: Date) => {
@@ -40,7 +57,7 @@ const DateRange = () => {
   };
 
   return (
-    <div>
+    <div ref={ref}>
       <button
         onClick={togglePicker}
         className="flex w-full items-center gap-2 rounded-lg border border-gray-400 p-2 text-sm text-gray-400 hover:border-blue-600"
@@ -54,7 +71,7 @@ const DateRange = () => {
       </button>
 
       {showPicker && (
-        <div className="absolute z-10 border border-gray-300 bg-white p-4 shadow-lg w-[600px]">
+        <div className="absolute z-10 w-[600px] border border-gray-300 bg-white p-4 shadow-lg">
           <DateRangePicker
             ranges={[tempRange]}
             onChange={handleSelect}

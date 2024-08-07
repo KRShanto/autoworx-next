@@ -15,6 +15,7 @@ import { ReturnPayment, getPayments } from "@/actions/payment/getPayments";
 import { useServerGet } from "@/hooks/useServerGet";
 import moment from "moment";
 import { getCoupons } from "@/actions/coupon/getCoupons";
+import { usePaymentFilterStore } from "@/stores/paymentFilter";
 
 export default function Page() {
   const { data: payments } = useServerGet(getPayments);
@@ -70,6 +71,24 @@ export default function Page() {
 }
 
 function Table({ data }: { data: ReturnPayment[] }) {
+  const { dateRange, amount, paidStatus, paymentMethod } =
+    usePaymentFilterStore();
+  const [filteredData, setFilteredData] = useState(data);
+
+  console.log({ dateRange, amount, paidStatus, paymentMethod });
+
+  // filter using dateRange and amount
+  useEffect(() => {
+    setFilteredData(
+      data.filter(
+        (item) =>
+          moment(item.date).isBetween(dateRange[0], dateRange[1]) &&
+          item.amount >= amount[0] &&
+          item.amount <= amount[1],
+      ),
+    );
+  }, [data, dateRange, amount]);
+
   return (
     <div className="min-h-[65vh] overflow-x-scroll rounded-md bg-white xl:overflow-hidden">
       <table className="w-full">
@@ -86,7 +105,7 @@ function Table({ data }: { data: ReturnPayment[] }) {
         </thead>
 
         <tbody>
-          {data.map((item, index) => (
+          {filteredData.map((item, index) => (
             <tr
               key={index}
               className={index % 2 === 0 ? "bg-white" : "bg-[#EEF4FF]"}
