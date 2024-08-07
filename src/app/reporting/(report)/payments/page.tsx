@@ -29,14 +29,13 @@ const filterMultipleSliders: TSliderData[] = [
     type: "price",
     min: 0,
     max: 300,
-    defaultValue: [50, 250],
+    // defaultValue: [50, 250],
   },
   {
     id: 2,
     type: "cost",
     min: 0,
     max: 400,
-    defaultValue: [100, 300],
   },
   {
     id: 3,
@@ -59,7 +58,10 @@ export default function PaymentReportPage({ searchParams }: TProps) {
           />
         </div>
         <div className="flex items-center space-x-4">
-          <FilterByMultiple filterSliders={filterMultipleSliders} />
+          <FilterByMultiple
+            searchParamsValue={searchParams}
+            filterSliders={filterMultipleSliders}
+          />
           <FilterBySelection
             selectedItem={searchParams?.category as string}
             items={["product", "parts", "wheel"]}

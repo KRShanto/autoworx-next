@@ -26,14 +26,14 @@ const filterMultipleSliders: TSliderData[] = [
     type: "price",
     min: 0,
     max: 300,
-    defaultValue: [50, 250],
+    // defaultValue: [50, 250],
   },
   {
     id: 2,
     type: "cost",
     min: 0,
     max: 400,
-    defaultValue: [100, 300],
+    // defaultValue: [100, 300],
   },
   {
     id: 3,
@@ -52,7 +52,10 @@ export default function PipelinePage({ searchParams }: TProps) {
             startDate={decodeURIComponent(searchParams?.startDate as string)}
             endDate={decodeURIComponent(searchParams?.endDate as string)}
           />
-          <FilterByMultiple filterSliders={filterMultipleSliders} />
+          <FilterByMultiple
+            filterSliders={filterMultipleSliders}
+            searchParamsValue={searchParams}
+          />
         </div>
         <PipelineCardContainer />
       </div>

@@ -6,8 +6,15 @@ type TProps = {
   type: string;
   min: number;
   max: number;
+  onValueChange: (value: [number, number]) => void;
 };
-export default function SliderRange({ defaultValue, type, min, max }: TProps) {
+export default function SliderRange({
+  defaultValue,
+  type,
+  min,
+  max,
+  onValueChange,
+}: TProps) {
   return (
     <div>
       <p className="mb-0.5 text-sm capitalize">{type}</p>
@@ -16,10 +23,11 @@ export default function SliderRange({ defaultValue, type, min, max }: TProps) {
         <Slider.Root
           className="relative flex h-5 w-[180px] touch-none select-none items-center"
           defaultValue={defaultValue || [min, max]}
+          onValueChange={onValueChange}
           min={min}
           max={max}
           step={1}
-          minStepsBetweenThumbs={8}
+          minStepsBetweenThumbs={10}
         >
           <Slider.Track className="relative h-[3px] grow rounded-full bg-[#D9D9D9]">
             <Slider.Range className="absolute h-full rounded-full bg-[#66738C]" />
