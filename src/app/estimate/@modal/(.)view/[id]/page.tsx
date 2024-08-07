@@ -13,6 +13,8 @@ import Image from "next/image";
 import Link from "next/link";
 import moment from "moment";
 import { auth } from "@/app/auth";
+import { FaShare } from "react-icons/fa";
+import { FaRegShareFromSquare } from "react-icons/fa6";
 
 export default async function ViewEstimate({
   params: { id },
@@ -212,6 +214,10 @@ export default async function ViewEstimate({
             >
               View Work Order
             </Link>
+            <button className="flex items-center justify-center gap-2 rounded-md bg-white py-2 text-[#6571FF]">
+              Share Invoice
+              <FaRegShareFromSquare />
+            </button>
           </div>
         </DialogContentBlank>
       </DialogPortal>
