@@ -26,7 +26,10 @@ export async function addTechnician(
     }
 
     const newTechnician = await db.technician.create({
-      data: payload,
+      data: {
+        ...payload,
+        dateClosed: payload.status === "Complete" ? new Date() : null,
+      },
     });
 
     const user = await db.user.findUnique({

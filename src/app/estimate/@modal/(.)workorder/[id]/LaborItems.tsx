@@ -60,7 +60,7 @@ export default function LaborItems({
         {technicians.map((technician, index) => (
           <button
             key={technician.id}
-            className="flex items-center justify-evenly space-x-1 rounded-full border bg-[#6571FF] px-3 py-0.5"
+            className="flex items-center justify-evenly space-x-1 text-nowrap rounded-full border bg-[#6571FF] px-3 py-0.5"
           >
             <CreateAndEditLabor
               invoiceId={invoiceId}

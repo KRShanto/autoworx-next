@@ -27,7 +27,10 @@ export const updateTechnician = async (
 
     const updatedTechnician = await db.technician.update({
       where: { id: technicianId },
-      data: payload,
+      data: {
+        ...payload,
+        dateClosed: payload.status === "Complete" ? new Date() : null,
+      },
     });
 
     const user = await db.user.findUnique({

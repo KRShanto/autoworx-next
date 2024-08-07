@@ -82,6 +82,7 @@ export default function AddNewEmployee() {
           <div className="mt-8 flex items-center justify-between">
             <h1 className="text-2xl font-bold">Add Employee</h1>
 
+            {/* TODO */}
             <button
               onClick={() => {
                 profilePicRef.current?.click();

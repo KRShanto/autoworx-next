@@ -631,16 +631,17 @@ model AppointmentUser {
 // Technician of a InvoiceItem.
 // One InvoiceItem can have multiple technicians.
 model Technician {
-  id        Int       @id @default(autoincrement())
-  userId    Int       @map("user_id")
-  date      DateTime? @map("assigned_date")
-  due       DateTime? @default(now())
-  amount    Decimal?  @default(0)
-  priority  Priority? @default(Low)
-  status    String?
-  note      String?   @map("new_note")
-  serviceId Int       @map("service_id")
-  invoiceId String    @map("invoice_id")
+  id         Int       @id @default(autoincrement())
+  userId     Int       @map("user_id")
+  date       DateTime? @map("assigned_date")
+  dateClosed DateTime? @map("date_closed")
+  due        DateTime? @default(now())
+  amount     Decimal?  @default(0)
+  priority   Priority? @default(Low)
+  status     String?
+  note       String?   @map("new_note")
+  serviceId  Int       @map("service_id")
+  invoiceId  String    @map("invoice_id")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
