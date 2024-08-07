@@ -6,6 +6,7 @@ import { getClientsData } from "../../data";
 import { FaPenToSquare } from "react-icons/fa6";
 import { FaTimes } from "react-icons/fa";
 import FilterBySelection from "../../components/filter/FilterBySelection";
+import FilterByMultiple from "../../components/filter/FilterByMultiple";
 type TProps = {
   searchParams: {
     category?: string;
@@ -15,6 +16,35 @@ type TProps = {
     search?: string;
   };
 };
+
+type TSliderData = {
+  id: number;
+  min: number;
+  max: number;
+  defaultValue?: [number, number];
+  type: "price" | "cost" | "profit";
+};
+const filterMultipleSliders: TSliderData[] = [
+  {
+    id: 1,
+    type: "price",
+    min: 0,
+    max: 300,
+  },
+  {
+    id: 2,
+    type: "cost",
+    min: 0,
+    max: 400,
+    // defaultValue: [100, 300],
+  },
+  {
+    id: 3,
+    type: "profit",
+    min: 0,
+    max: 500,
+  },
+];
 export default function WorkforceReportPage({ searchParams }: TProps) {
   const clients = getClientsData();
   return (
@@ -30,9 +60,10 @@ export default function WorkforceReportPage({ searchParams }: TProps) {
           />
         </div>
         <div className="flex items-center space-x-4">
-          <button className="flex max-w-80 items-center gap-2 rounded-lg border border-gray-400 p-1 px-5 text-sm text-gray-400 hover:border-blue-600">
-            <span>Filter</span>
-          </button>
+          <FilterByMultiple
+            searchParamsValue={searchParams}
+            filterSliders={filterMultipleSliders}
+          />
           <FilterBySelection
             selectedItem={searchParams?.category as string}
             items={["product", "parts", "wheel"]}

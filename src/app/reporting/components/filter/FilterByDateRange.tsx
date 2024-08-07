@@ -59,7 +59,6 @@ export default function FilterDateRange({ startDate, endDate }: TProps) {
     if (startDate !== "undefined" && endDate !== "undefined") {
       return `${startDate} - ${endDate}`;
     } else if (isRangeSelected) {
-      console.log("formattedDate ", true);
       return `${formattedStart} - ${formattedEnd}`;
     } else {
       return "Date Range";
@@ -69,7 +68,7 @@ export default function FilterDateRange({ startDate, endDate }: TProps) {
     <div>
       <button
         onClick={togglePicker}
-        className="flex max-w-80 items-center gap-2 rounded-lg border border-gray-400 p-1 text-sm text-gray-400 hover:border-blue-600"
+        className="flex max-w-80 items-center gap-2 rounded-sm border border-gray-400 p-1 text-sm text-gray-400 hover:border-blue-600"
       >
         <span>
           {formatRange(state.selection.startDate, state.selection.endDate)}
@@ -78,7 +77,7 @@ export default function FilterDateRange({ startDate, endDate }: TProps) {
       </button>
 
       {showPicker && (
-        <div className="absolute z-10 border border-gray-300 bg-white p-4 shadow-lg">
+        <div className="absolute hover:z-10 border border-gray-300 bg-white p-4 shadow-lg">
           <DateRangePicker
             ranges={[tempRange]}
             onChange={handleSelect}

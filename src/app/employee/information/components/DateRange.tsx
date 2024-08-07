@@ -54,7 +54,7 @@ const DateRange = () => {
       </button>
 
       {showPicker && (
-        <div className="absolute z-10 border border-gray-300 bg-white p-4 shadow-lg">
+        <div className="absolute z-10 border border-gray-300 bg-white p-4 shadow-lg w-[600px]">
           <DateRangePicker
             ranges={[tempRange]}
             onChange={handleSelect}
