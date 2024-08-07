@@ -228,9 +228,9 @@ model Invoice {
   user                    User                      @relation(fields: [userId], references: [id])
   Material                Material[]
   InventoryProductHistory InventoryProductHistory[]
-  WorkOrder               WorkOrder[]
   vehicle                 Vehicle?                  @relation(fields: [vehicleId], references: [id])
   client                  Client?                   @relation(fields: [clientId], references: [id])
+  technician              Technician[]
 
   @@index([companyId], name: "fk_invoices_company")
 }
@@ -329,7 +329,6 @@ model Material {
   invoiceItem InvoiceItem?      @relation(fields: [invoiceItemId], references: [id])
   product     InventoryProduct? @relation(fields: [productId], references: [id])
   invoice     Invoice?          @relation(fields: [invoiceId], references: [id])
-  Technician  Technician[]
 
   @@index([companyId], name: "fk_materials_company")
 }
@@ -635,38 +634,26 @@ model AppointmentUser {
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model WorkOrder {
-  id         Int          @id @default(autoincrement())
-  invoiceId  String
-  createdAt  DateTime     @default(now()) @map("created_at")
-  updatedAt  DateTime     @default(now()) @updatedAt @map("updated_at")
-  invoice    Invoice      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  Technician Technician[]
-}
-
 // Technician of a InvoiceItem.
 // One InvoiceItem can have multiple technicians.
 model Technician {
-  id          Int       @id @default(autoincrement())
-  userId      Int       @map("user_id")
-  date        DateTime? @map("assigned_date")
-  due         DateTime? @default(now())
-  amount      Decimal?  @default(0)
-  priority    Priority? @default(Low)
-  status      String?
-  statusColor String?
-  note        String?   @map("new_note")
-  materialId  Int?      @map("material_id")
-  serviceId   Int?      @map("service_id")
-  workOrderId Int?      @map("work_order_id")
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  date      DateTime? @map("assigned_date")
+  due       DateTime? @default(now())
+  amount    Decimal?  @default(0)
+  priority  Priority? @default(Low)
+  status    String?
+  note      String?   @map("new_note")
+  serviceId Int       @map("service_id")
+  invoiceId String    @map("invoice_id")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  material  Material?  @relation(fields: [materialId], references: [id])
-  service   Service?   @relation(fields: [serviceId], references: [id])
-  workOrder WorkOrder? @relation(fields: [workOrderId], references: [id])
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  service Service? @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  invoice Invoice? @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
 
 // Email template for a company.

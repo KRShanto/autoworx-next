@@ -39,3 +39,10 @@ export const INVOICE_COLORS: { textColor: string; bgColor: string }[] = [
   { textColor: "#B156C0", bgColor: "#FAD9FF" },
   { textColor: "#9B446E", bgColor: "#FFDAEC" },
 ];
+
+export const WORK_ORDER_STATUS_COLOR: { [key: string]: string } = {
+  Pending: "#FFC107",
+  Completed: "#28A745",
+  "In Progress": "#007BFF",
+  Cancel: "#DC3545",
+};

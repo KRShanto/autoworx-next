@@ -13,7 +13,6 @@ import Image from "next/image";
 import Link from "next/link";
 import moment from "moment";
 import { auth } from "@/app/auth";
-import CreateWorkOrderBtn from "./CreateWorkOrderBtn";
 
 export default async function ViewEstimate({
   params: { id },
@@ -204,11 +203,15 @@ export default async function ViewEstimate({
                       color: "transparent",
                     }}
                   />
-                  {/* <Image src={`/uploads/${x?.photo}`} fill alt="attachment" /> */}
                 </div>
               ))}
             </div>
-            <CreateWorkOrderBtn invoiceId={invoice.id} id={id} />
+            <Link
+              href={`/estimate/workorder/${id}`}
+              className="rounded-md bg-[#6571FF] py-2 text-center text-white disabled:bg-gray-400"
+            >
+              View Work Order
+            </Link>
           </div>
         </DialogContentBlank>
       </DialogPortal>

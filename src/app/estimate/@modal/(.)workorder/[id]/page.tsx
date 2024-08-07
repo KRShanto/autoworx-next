@@ -1,19 +1,17 @@
 import { DialogContent, InterceptedDialog } from "@/components/Dialog";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
-import { InvoiceItems } from "../../../../(.)workorder/[id]/InvoiceItems";
+import { InvoiceItems } from "./InvoiceItems";
 import moment from "moment";
-import SaveWorkOrderBtn from "./SaveWorkOrderBtn";
+import SaveWorkOrderBtn from "../../(.)view/[id]/(..)(..)create-work-order/[id1]/SaveWorkOrderBtn";
 
-export default async function CreateWorkOrder({
-  params: { id1 },
-  searchParams: { workOrderId },
+export default async function WorkOrderPage({
+  params: { id },
 }: {
-  params: { id1: string };
-  searchParams: { workOrderId: string };
+  params: { id: string };
 }) {
   const invoice = await db.invoice.findUnique({
-    where: { id: id1 },
+    where: { id },
     include: {
       company: true,
       invoiceItems: {
@@ -27,21 +25,13 @@ export default async function CreateWorkOrder({
       tasks: true,
       status: true,
       user: true,
+      client: true,
+      vehicle: true,
     },
   });
 
   if (!invoice) notFound();
 
-  const client = invoice.clientId
-    ? await db.client.findUnique({
-        where: { id: invoice.clientId },
-      })
-    : null;
-  const vehicle = invoice.vehicleId
-    ? await db.vehicle.findUnique({
-        where: { id: invoice.vehicleId },
-      })
-    : null;
   return (
     <InterceptedDialog>
       <DialogContent className="max-w-[740px]">
@@ -73,18 +63,18 @@ export default async function CreateWorkOrder({
             <div>
               <h2 className="font-bold text-slate-500">Estimate To:</h2>
               <p>
-                {client?.firstName} {client?.lastName}
+                {invoice.client?.firstName} {invoice.client?.lastName}
               </p>
-              <p>{client?.mobile}</p>
-              <p>{client?.email}</p>
+              <p>{invoice.client?.mobile}</p>
+              <p>{invoice.client?.email}</p>
             </div>
             <div>
               <h2 className="font-bold text-slate-500">Vehicle Details:</h2>
-              <p>{vehicle?.year}</p>
-              <p>{vehicle?.make}</p>
-              <p>{vehicle?.model}</p>
-              <p>{vehicle?.submodel}</p>
-              <p>{vehicle?.type}</p>
+              <p>{invoice.vehicle?.year}</p>
+              <p>{invoice.vehicle?.make}</p>
+              <p>{invoice.vehicle?.model}</p>
+              <p>{invoice.vehicle?.submodel}</p>
+              <p>{invoice.vehicle?.type}</p>
             </div>
             <div>
               <h2 className="font-bold text-slate-500">Estimate Details:</h2>
@@ -106,7 +96,6 @@ export default async function CreateWorkOrder({
 
         <div className="space-y-2">
           <InvoiceItems
-            workOrderId={workOrderId}
             items={JSON.parse(JSON.stringify(invoice.invoiceItems))}
           />
         </div>
