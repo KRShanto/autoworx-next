@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import AttendancePerformance from "../information/components/AttendancePerformance";
-import EmployeeInformation from "../information/components/EmployeeInformation";
-import EmployeeInfoTable from "../information/components/EmployeeInfoTable";
-import FilterComp from "../information/components/FilterComp";
-import Header from "../information/components/Header";
+import AttendancePerformance from "../components/AttendancePerformance";
+import EmployeeInformation from "../components/EmployeeInformation";
+import EmployeeInfoTable from "../components/EmployeeInfoTable";
+import FilterComp from "../components/FilterComp";
+import Header from "../components/Header";
 
 interface Employee {
   name: string;

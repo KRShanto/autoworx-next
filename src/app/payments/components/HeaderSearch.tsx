@@ -2,14 +2,13 @@
 
 import { SearchOutlined } from "@ant-design/icons";
 
-import DateRange from "@/app/employee/information/components/DateRange";
+import DateRange from "@/app/employee/components/DateRange";
 import { IoPieChartOutline } from "react-icons/io5";
 import FilterforPayment from "./FilterforPayment";
 import { useState } from "react";
 
 export default function HeaderSearch() {
   const [showFilter, setShowFilter] = useState(false);
-
 
   const handleFilterApply = () => {
     setShowFilter(false); // Close the filter dropdown
@@ -23,33 +22,33 @@ export default function HeaderSearch() {
             <input
               type="text"
               placeholder="Search..."
-              className="w-full rounded border border-[#66738C]  p-2 pl-10"
+              className="w-full rounded border border-[#66738C] p-2 pl-10"
             />
           </div>
           <div className="flex items-center gap-4">
-            <div className="m-2 px-4 z-50">
+            <div className="z-50 m-2 px-4">
               <DateRange />
             </div>
-            <div className="relative ">
+            <div className="relative">
               <button
-                className="flex rounded border border-[#66738C] p-2 text-gray-400 w-[100px] h-[40px] items-center justify-center"
-                onClick={() => setShowFilter((prev)=> !prev)}
-              >Filter 
+                className="flex h-[40px] w-[100px] items-center justify-center rounded border border-[#66738C] p-2 text-gray-400"
+                onClick={() => setShowFilter((prev) => !prev)}
+              >
+                Filter
               </button>
-              {showFilter &&
-                    <div className="absolute z-40"> 
-                <FilterforPayment onApply={handleFilterApply}/>
-
+              {showFilter && (
+                <div className="absolute z-40">
+                  <FilterforPayment onApply={handleFilterApply} />
                 </div>
-              }
+              )}
             </div>
           </div>
         </div>
       </div>
 
       <div className="mr-4 flex gap-4">
-      <div>
-          <button className="flex items-center gap-x-2 border border-[#66738C] rounded bg-white p-2 px-5 text-[#6571FF] shadow-md ">
+        <div>
+          <button className="flex items-center gap-x-2 rounded border border-[#66738C] bg-white p-2 px-5 text-[#6571FF] shadow-md">
             <IoPieChartOutline />
             <span>Payment Reporting</span>
           </button>

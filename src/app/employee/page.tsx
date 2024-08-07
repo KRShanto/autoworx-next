@@ -10,9 +10,9 @@ import { IoPieChartOutline, IoSearchOutline } from "react-icons/io5";
 
 import AddNewEmployee from "./AddNewEmployee";
 import EditEmployee from "./EditEmployee";
-import DateRange from "./information/components/DateRange";
-import HorizontalPayoutCard from "./information/components/HorizontalPayoutCard";
-import PayoutCard from "./information/components/PayoutCard";
+import DateRange from "./components/DateRange";
+import HorizontalPayoutCard from "./components/HorizontalPayoutCard";
+import PayoutCard from "./components/PayoutCard";
 const evenColor = "bg-white";
 const oddColor = "bg-slate-100";
 const employees = [
