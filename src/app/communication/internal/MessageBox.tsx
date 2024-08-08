@@ -12,21 +12,21 @@ export default function MessageBox({
   messages,
   totalMessageBox,
   setMessages,
-  setIsTrigger,
 }: {
   user: any; // TODO: type this
   setUsersList: React.Dispatch<React.SetStateAction<any[]>>;
   messages: Message[];
   totalMessageBox: number;
   setMessages: React.Dispatch<React.SetStateAction<MessageQue[]>>;
-  setIsTrigger: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [message, setMessage] = useState("");
   const messageBoxRef = useRef<HTMLDivElement>(null);
-
+  console.log({ messages });
   useEffect(() => {
+    console.dir(messageBoxRef.current);
     if (messageBoxRef.current) {
-      messageBoxRef.current.scrollIntoView({ behavior: "smooth" });
+      messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
+      // messageBoxRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
@@ -53,8 +53,6 @@ export default function MessageBox({
         message,
         sender: "USER",
       };
-
-      setIsTrigger((trigger) => !trigger); // toggle message trigger when sending a new message
 
       setMessages((messages) => {
         const newMessages = messages.map((m) => {
@@ -120,7 +118,11 @@ export default function MessageBox({
       </div>
 
       {/* Messages */}
-      <div className="h-[82%] overflow-y-scroll" ref={messageBoxRef}>
+      <div
+        id="messageBox"
+        className="h-[82%] overflow-y-scroll"
+        ref={messageBoxRef}
+      >
         {messages.map((message: Message, index: number) => (
           <div
             key={index}

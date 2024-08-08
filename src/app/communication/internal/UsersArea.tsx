@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import MessageBox from "./MessageBox";
 import { User } from "next-auth";
 import { pusher } from "@/lib/pusher/client";
@@ -27,7 +27,6 @@ export default function UsersArea({
   previousMessages: DbMessage[];
 }) {
   const [messages, setMessages] = useState<MessageQue[]>([]);
-  const [isTrigger, setIsTrigger] = useState(false);
   useEffect(() => {
     const messages: MessageQue[] = [];
 
@@ -57,15 +56,15 @@ export default function UsersArea({
       .bind(
         "message",
         ({ from, message }: { from: number; message: string }) => {
-          console.log({ from, message });
-          const user = usersList.find((u) => u.id === from);
+          const user = usersList.find((u) => {
+            return u.id === from;
+          });
           if (!user) {
             return;
           }
 
           const newMessages = [...messages];
           const userMessages = newMessages.find((m) => m.user === from);
-
           if (userMessages) {
             userMessages.messages.push({ message, sender: "CLIENT" });
           } else {
@@ -74,7 +73,6 @@ export default function UsersArea({
               messages: [{ message, sender: "CLIENT" }],
             });
           }
-
           setMessages(newMessages);
         },
       );
@@ -82,10 +80,9 @@ export default function UsersArea({
     return () => {
       channel.unbind();
     };
-  }, []);
-  
-  const totalUserListLength = usersList.length;
+  }, [usersList, messages]);
 
+  const totalUserListLength = usersList.length;
   return (
     <div
       className={cn(
@@ -94,14 +91,15 @@ export default function UsersArea({
       )}
     >
       {usersList.map((user) => {
+        const findMessages =
+          messages.find((m) => m.user === user.id)?.messages || [];
         return (
           <MessageBox
             key={user.id}
             user={user}
             setUsersList={setUsersList}
-            messages={messages.find((m) => m.user === user.id)?.messages || []}
+            messages={[...findMessages]}
             setMessages={setMessages}
-            setIsTrigger={setIsTrigger}
             totalMessageBox={totalUserListLength}
           />
         );
