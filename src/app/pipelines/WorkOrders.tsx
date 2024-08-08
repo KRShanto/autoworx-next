@@ -2,7 +2,7 @@ import { cn } from "@/lib/cn";
 import Link from "next/link";
 import React from "react";
 import { IoSearchOutline } from "react-icons/io5";
-import DateRange from "../employee/components/DateRange";
+import DateRange from "../../components/DateRange";
 import FilterBySelection from "../reporting/components/filter/FilterBySelection";
 import Filter from "./Filter";
 
@@ -104,7 +104,14 @@ const WorkOrders = (props: Props) => {
               placeholder="Search"
             />
           </div>
-          <DateRange />
+          <DateRange
+            onOk={(start, end) => {
+              /*TODO*/
+            }}
+            onCancel={() => {
+              /*TODO*/
+            }}
+          />
           <Filter />
         </div>
       </div>

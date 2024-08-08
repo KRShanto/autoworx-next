@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 import { EditOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import Link from "next/link";
@@ -6,12 +8,67 @@ import { EmployeeWorkInfo } from "./employeeWorkInfoType";
 import moment from "moment";
 import { WORK_ORDER_STATUS_COLOR } from "@/lib/consts";
 import { FaTimes } from "react-icons/fa";
+import { useEmployeeWorkFilterStore } from "@/stores/employeeWorkFilter";
 
 export default function EmployeeInfoTable({
   info,
 }: {
   info: EmployeeWorkInfo;
 }) {
+  const { amount, dateRange, search } = useEmployeeWorkFilterStore();
+  const [filteredInfo, setFilteredInfo] =
+    React.useState<EmployeeWorkInfo>(info);
+
+  // filter through search, dateRange and amount
+  // search by invoice id, client name, vehicle info
+  // filter dateRange by dateAssigned
+  useEffect(() => {
+    const filtered = info.filter((row) => {
+      if (search) {
+        const searchValue = search.toLowerCase();
+        if (
+          row.invoice?.id.toLowerCase().includes(searchValue) ||
+          `${row.invoice?.client?.firstName} ${row.invoice?.client?.lastName}`
+            .toLowerCase()
+            .includes(searchValue) ||
+          `${row.invoice?.vehicle?.make} ${row.invoice?.vehicle?.model}`
+            .toLowerCase()
+            .includes(searchValue)
+        ) {
+          return true;
+        }
+        return false;
+      }
+      return true;
+    });
+
+    const filteredDate = filtered.filter((row) => {
+      if (dateRange) {
+        const [start, end] = dateRange;
+        if (start && end) {
+          const rowDate = moment(Number(row.date));
+          return (
+            rowDate.isSameOrAfter(start, "day") &&
+            rowDate.isSameOrBefore(end, "day")
+          );
+        }
+        return true;
+      }
+      return true;
+    });
+
+    const filteredAmount = filteredDate.filter((row) => {
+      if (amount) {
+        return (
+          Number(row.amount) >= amount[0] && Number(row.amount) <= amount[1]
+        );
+      }
+      return true;
+    });
+
+    setFilteredInfo(filteredAmount);
+  }, [search, dateRange, amount]);
+
   return (
     <div className="mt-5 w-full">
       <table className="min-w-full bg-white">
@@ -28,7 +85,7 @@ export default function EmployeeInfoTable({
           </tr>
         </thead>
         <tbody>
-          {info.map((row, index) => (
+          {filteredInfo.map((row, index) => (
             <tr
               key={index}
               className={index % 2 === 0 ? "bg-white" : "bg-blue-100"}

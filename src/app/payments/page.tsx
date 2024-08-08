@@ -96,7 +96,6 @@ function Table({ data }: { data: ReturnPayment[] }) {
 
   // filter using dateRange and amount and paymentMethod
   useEffect(() => {
-    console.log("Item: ", data);
     setFilteredData(
       data.filter((item) =>
         dateRange[0] !== null
