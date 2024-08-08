@@ -22,8 +22,8 @@ export default function EmployeeInfoTable({
             <th className="border-b px-4 py-2 text-left">Vehicle Info</th>
             <th className="border-b px-4 py-2 text-left">Date Assigned</th>
             <th className="border-b px-4 py-2 text-left">Date Closed</th>
-            <th className="border-b px-4 py-2 text-left">Status</th>
             <th className="border-b px-4 py-2 text-left">Total Payout</th>
+            <th className="border-b px-4 py-2 text-center">Status</th>
             <th className="border-b px-4 py-2 text-center">Actions</th>
           </tr>
         </thead>
@@ -55,7 +55,10 @@ export default function EmployeeInfoTable({
                   ? moment(Number(row.dateClosed)).format("DD.MM.YYYY")
                   : "-"}
               </td>
-              <td className="border-b px-4 py-2 text-left">
+              <td className="backdrop border-b px-4 py-2 text-left">
+                ${Number(row.amount)}
+              </td>
+              <td className="border-b py-2 text-center">
                 <p
                   style={{
                     backgroundColor: WORK_ORDER_STATUS_COLOR[row.status!],
@@ -64,9 +67,6 @@ export default function EmployeeInfoTable({
                 >
                   {row.status}
                 </p>
-              </td>
-              <td className="backdrop border-b px-4 py-2 text-left">
-                ${Number(row.amount)}
               </td>
               <td className="cursor-pointer border-b bg-white px-4 py-2 text-left">
                 <div className="flex items-center justify-center gap-2">
