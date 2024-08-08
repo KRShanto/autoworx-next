@@ -1,5 +1,6 @@
 "use server";
 
+import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { Priority } from "@prisma/client";
@@ -20,6 +21,8 @@ type TechnicianInput = {
 export async function addTechnician(
   payload: TechnicianInput,
 ): Promise<ServerAction> {
+  const companyId = await getCompanyId();
+
   try {
     if (!payload) {
       return { type: "error", message: "Invalid payload" };
@@ -28,6 +31,7 @@ export async function addTechnician(
     const newTechnician = await db.technician.create({
       data: {
         ...payload,
+        companyId,
         dateClosed: payload.status === "Complete" ? new Date() : null,
       },
     });

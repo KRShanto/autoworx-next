@@ -37,6 +37,7 @@ model Company {
   Source            Source[]
   Payment           Payment[]
   Coupon            Coupon[]
+  Technician        Technician[]
 }
 
 // User model.
@@ -642,6 +643,7 @@ model Technician {
   note       String?   @map("new_note")
   serviceId  Int       @map("service_id")
   invoiceId  String    @map("invoice_id")
+  companyId  Int       @map("company_id")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -649,6 +651,7 @@ model Technician {
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   service Service? @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   invoice Invoice? @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  company Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 // Email template for a company.

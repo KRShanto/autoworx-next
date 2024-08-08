@@ -2,12 +2,15 @@
 
 import { SearchOutlined } from "@ant-design/icons";
 
-import DateRange from "@/app/employee/components/DateRange";
+import DateRange from "@/components/DateRange";
 import { IoPieChartOutline } from "react-icons/io5";
 import FilterforPayment from "./FilterforPayment";
 import { useState } from "react";
+import { usePaymentFilterStore } from "@/stores/paymentFilter";
 
 export default function HeaderSearch() {
+  const { setFilter } = usePaymentFilterStore();
+
   return (
     <div className="mt-5 flex w-full items-center justify-between">
       <div className="flex w-full max-w-4xl rounded-md border border-gray-300 bg-white p-2">
@@ -22,7 +25,10 @@ export default function HeaderSearch() {
           </div>
           <div className="flex items-center gap-4">
             <div className="z-50 m-2 px-4">
-              <DateRange />
+              <DateRange
+                onOk={(start, end) => setFilter({ dateRange: [start, end] })}
+                onCancel={() => setFilter({ dateRange: [null, null] })}
+              />
             </div>
             <FilterforPayment />
           </div>
