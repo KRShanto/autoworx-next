@@ -13,7 +13,8 @@ import Image from "next/image";
 import Link from "next/link";
 import moment from "moment";
 import { auth } from "@/app/auth";
-import CreateWorkOrderBtn from "./CreateWorkOrderBtn";
+import { FaShare } from "react-icons/fa";
+import { FaRegShareFromSquare } from "react-icons/fa6";
 
 export default async function ViewEstimate({
   params: { id },
@@ -173,7 +174,9 @@ export default async function ViewEstimate({
                 <p className="font-bold text-slate-500">
                   {invoice.company.name}
                 </p>
-                <p>{invoice.user.name}</p>
+                <p>
+                  {invoice.user.firstName} {invoice.user.lastName}
+                </p>
               </div>
               <button className="rounded bg-[#6571FF] px-8 text-white">
                 Authorize
@@ -204,11 +207,19 @@ export default async function ViewEstimate({
                       color: "transparent",
                     }}
                   />
-                  {/* <Image src={`/uploads/${x?.photo}`} fill alt="attachment" /> */}
                 </div>
               ))}
             </div>
-            <CreateWorkOrderBtn invoiceId={invoice.id} id={id} />
+            <Link
+              href={`/estimate/workorder/${id}`}
+              className="rounded-md bg-[#6571FF] py-2 text-center text-white disabled:bg-gray-400"
+            >
+              View Work Order
+            </Link>
+            <button className="flex items-center justify-center gap-2 rounded-md bg-white py-2 text-[#6571FF]">
+              Share Invoice
+              <FaRegShareFromSquare />
+            </button>
           </div>
         </DialogContentBlank>
       </DialogPortal>

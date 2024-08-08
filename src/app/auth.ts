@@ -108,7 +108,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return {
         ...token,
         id: dbUser.id,
-        name: dbUser.name,
+        name: dbUser.firstName + " " + dbUser.lastName,
         email: dbUser.email,
         role: dbUser.role,
         companyId: dbUser.companyId,

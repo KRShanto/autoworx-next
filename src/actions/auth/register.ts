@@ -7,7 +7,8 @@ import { FormErrorType } from "@/types/form-errror";
 import { MIN_PASSWORD_LENGTH } from "@/lib/consts";
 
 interface RegisterData {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   company: string;
@@ -19,13 +20,14 @@ interface Response {
 }
 
 export async function register({
-  name,
+  firstName,
+  lastName,
   email,
   password,
   company,
 }: RegisterData): Promise<Response> {
   // Check if any field is missing
-  if (!name || !email || !password) {
+  if (!firstName || !email || !password) {
     return {
       error: { message: "You need to fill all the fields", field: "all" },
     };
@@ -73,7 +75,8 @@ export async function register({
 
     await db.user.create({
       data: {
-        name,
+        firstName,
+        lastName,
         email,
         password: hashedPassword,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, // TODO: temporary solution

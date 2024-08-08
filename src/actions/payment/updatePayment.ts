@@ -28,6 +28,7 @@ interface PaymentData {
   type: PaymentType;
   date: Date;
   notes: string;
+  amount: number;
   additionalData:
     | CardPaymentData
     | CheckPaymentData
@@ -40,6 +41,7 @@ export async function updatePayment({
   type,
   date,
   notes,
+  amount,
   additionalData,
 }: PaymentData): Promise<ServerAction> {
   let updatedPayment;
@@ -50,7 +52,8 @@ export async function updatePayment({
         where: { id },
         data: {
           date: new Date(date),
-          notes: notes,
+          notes,
+          amount,
           card: {
             update: {
               cardType: (additionalData as CardPaymentData).cardType,
@@ -66,7 +69,8 @@ export async function updatePayment({
         where: { id },
         data: {
           date: new Date(date),
-          notes: notes,
+          notes,
+          amount,
           check: {
             update: {
               checkNumber: (additionalData as CheckPaymentData).checkNumber,
@@ -81,7 +85,8 @@ export async function updatePayment({
         where: { id },
         data: {
           date: new Date(date),
-          notes: notes,
+          notes,
+          amount,
           cash: {
             update: {
               receivedCash: (additionalData as CashPaymentData).receivedCash,
@@ -96,12 +101,12 @@ export async function updatePayment({
         where: { id },
         data: {
           date: new Date(date),
-          notes: notes,
+          notes,
+          amount,
           other: {
             update: {
               paymentMethodId: (additionalData as OtherPaymentData)
                 .paymentMethodId,
-              amount: (additionalData as OtherPaymentData).amount,
             },
           },
         },

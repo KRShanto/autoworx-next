@@ -14,6 +14,7 @@ export interface ReturnPayment {
   date: Date;
   amount: number;
   method: string;
+  paid: boolean;
 }
 
 export async function getPayments(): Promise<ReturnPayment[]> {
@@ -54,19 +55,20 @@ export async function getPayments(): Promise<ReturnPayment[]> {
       },
       vehicle: `${payment?.invoice?.vehicle?.year} ${payment?.invoice?.vehicle?.make} ${payment?.invoice?.vehicle?.model}`,
       date: payment.date as Date,
-      amount: Number(payment.invoice?.grandTotal),
+      amount: Number(payment.amount),
       method: getPaymentMethod(payment),
+      paid: Number(payment.invoice?.grandTotal) <= Number(payment.amount),
     };
   });
 }
 
 function getPaymentMethod(payment: any) {
   if (payment.card) {
-    return "Credit Card";
+    return "Card";
   } else if (payment.cash) {
     return "Cash";
   } else if (payment.check) {
-    return "Check";
+    return "Cheque";
   } else if (payment.other) {
     return payment.other.paymentMethod?.name;
   } else {

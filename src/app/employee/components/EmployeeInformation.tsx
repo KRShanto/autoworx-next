@@ -1,17 +1,18 @@
-import React from "react";
 import Image from "next/image";
 import Payout from "./Payout";
 import { IoMdSettings } from "react-icons/io";
-
-interface EmployeeInformationProps {
-  role: string;
-}
+import { User } from "@prisma/client";
+import { EmployeeWorkInfo } from "./employeeWorkInfoType";
 
 export default function EmployeeInformation({
-  role,
-}: EmployeeInformationProps) {
+  employee,
+  info,
+}: {
+  employee: User;
+  info: EmployeeWorkInfo;
+}) {
   return (
-    <div className="mt-5 flex w-full justify-between gap-5 px-4 mb-8">
+    <div className="mb-8 mt-5 flex w-full justify-between gap-5 px-4">
       <div className="relative flex w-full items-center rounded border border-gray-300 bg-white p-3">
         <div className="absolute left-3 top-3">
           <button>
@@ -20,13 +21,13 @@ export default function EmployeeInformation({
         </div>
         <div className="mr-3 flex flex-col items-center">
           <Image
-            src="/icons/salesEmp.png"
+            src={employee.image}
             alt="Employee"
             width={100}
             height={100}
             className="h-auto w-auto rounded-full"
           />
-          <div className="mt-2 text-gray-600">{role}</div>
+          <div className="mt-2 text-gray-600">{employee.employeeType}</div>
         </div>
 
         <div className="w-full text-sm">
@@ -34,7 +35,7 @@ export default function EmployeeInformation({
             <label className="mr-6 block w-20 text-gray-600">Name</label>
             <input
               type="text"
-              value="John Doe"
+              value={`${employee.firstName} ${employee.lastName}`}
               readOnly
               className="block w-full rounded border border-gray-300 p-1 text-gray-600"
             />
@@ -43,7 +44,7 @@ export default function EmployeeInformation({
             <label className="mr-6 block w-20 text-gray-600">Email</label>
             <input
               type="email"
-              value="noman@website.com"
+              value={employee.email}
               readOnly
               className="block w-full rounded border border-gray-300 p-1 text-gray-600"
             />
@@ -52,7 +53,7 @@ export default function EmployeeInformation({
             <label className="mr-6 block w-20 text-gray-600">Phone</label>
             <input
               type="text"
-              value="01244645587"
+              value={employee.phone!}
               readOnly
               className="block w-full rounded border border-gray-300 p-1 text-gray-600"
             />
@@ -61,7 +62,7 @@ export default function EmployeeInformation({
             <label className="mr-6 block w-20 text-gray-600">Address</label>
             <input
               type="text"
-              value="Bangladesh, Dhaka"
+              value={employee.address!}
               readOnly
               className="block w-full rounded border border-gray-300 p-1 text-gray-600"
             />
@@ -69,7 +70,7 @@ export default function EmployeeInformation({
         </div>
       </div>
 
-      <Payout />
+      <Payout info={info} />
     </div>
   );
 }

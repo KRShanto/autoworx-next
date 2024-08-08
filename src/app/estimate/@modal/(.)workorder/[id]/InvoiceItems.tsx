@@ -8,7 +8,6 @@ import LaborItems from "./LaborItems";
 
 export function InvoiceItems({
   items,
-  workOrderId,
 }: {
   items: Awaited<
     ReturnType<
@@ -21,7 +20,6 @@ export function InvoiceItems({
       }>
     >
   >;
-  workOrderId: string;
 }) {
   const [openService, setOpenService] = useState<number | null>(null);
   console.log({ items });
@@ -52,25 +50,21 @@ export function InvoiceItems({
         </div>
 
         {openService === item.id && (
-          <div className="my-2 grid w-full grid-cols-1 gap-3 text-[#6571FF]">
-            {/* TODO */}
-            {item.materials.map((material, index) => {
-              console.log(material);
-              if (!material) return null;
-              return (
-                <React.Fragment key={index}>
-                  <div className="ml-10">
-                    <p className="capitalize">{material.name}</p>
-                  </div>
-                  <LaborItems
-                    workOrderId={Number(workOrderId)}
-                    materialId={material.id}
-                    serviceId={item?.serviceId as number}
-                    labor={item.labor}
-                  />
-                </React.Fragment>
-              );
-            })}
+          <div className="my-2 grid w-full grid-cols-1 gap-1 text-[#6571FF]">
+            {item.materials.map((material, index) => (
+              <div key={index} className="ml-10">
+                <p className="capitalize">{material.name}</p>
+              </div>
+            ))}
+
+            <div className="ml-10">
+              <p className="font-bold capitalize">{item.labor?.name}</p>
+            </div>
+
+            <LaborItems
+              invoiceId={item.invoiceId as string}
+              serviceId={item?.serviceId as number}
+            />
           </div>
         )}
       </div>

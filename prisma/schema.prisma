@@ -44,33 +44,36 @@ model Company {
 // When user registers, they have to create a company. So, every new user is an admin.
 // After that, they can add employees to the company.
 model User {
-  id                 Int                @id @default(autoincrement())
-  name               String
-  email              String             @unique
-  emailVerifiedAt    DateTime?          @map("email_verified_at")
-  image              String             @default("/images/default.png")
-  password           String
-  provider           Provider           @default(email)
-  timezone           String             @default("UTC")
-  phone              String?
-  address            String?
-  city               String?
-  state              String?
-  zip                String?
-  role               Role               @default(admin)
-  employeeType       EmployeeType       @default(None)
-  employeeDepartment EmployeeDepartment @default(None)
-  companyId          Int                @map("company_id")
-  createdAt          DateTime           @default(now()) @map("created_at")
-  updatedAt          DateTime           @default(now()) @updatedAt @map("updated_at")
-  company            Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  tasks              Task[]
-  oauthTokens        OAuthToken[]
-  taskUsers          TaskUser[]
-  appointments       Appointment[]
-  appointmentUsers   AppointmentUser[]
-  invoices           Invoice[]
-  Technician         Technician[]
+  id               Int               @id @default(autoincrement())
+  firstName        String
+  lastName         String?
+  email            String            @unique
+  emailVerifiedAt  DateTime?         @map("email_verified_at")
+  image            String            @default("/images/default.png")
+  password         String
+  provider         Provider          @default(email)
+  timezone         String            @default("UTC")
+  phone            String?
+  address          String?
+  city             String?
+  state            String?
+  zip              String?
+  companyName      String?           @map("company_name")
+  commission       Decimal?          @default(0)
+  role             Role              @default(admin)
+  employeeType     EmployeeType      @default(Sales)
+  joinDate         DateTime?         @map("join_date")
+  companyId        Int               @map("company_id")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @default(now()) @updatedAt @map("updated_at")
+  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  tasks            Task[]
+  oauthTokens      OAuthToken[]
+  taskUsers        TaskUser[]
+  appointments     Appointment[]
+  appointmentUsers AppointmentUser[]
+  invoices         Invoice[]
+  Technician       Technician[]
 
   @@index([companyId], name: "fk_users_company")
 }
@@ -87,17 +90,8 @@ enum Role {
 }
 
 enum EmployeeType {
-  Salary
-  Hourly
-  ContractBased @map("Contract Based")
-  None
-}
-
-enum EmployeeDepartment {
   Sales
-  Management
-  Workshop
-  None
+  Technician
 }
 
 // OAuth token for user.
@@ -228,9 +222,9 @@ model Invoice {
   user                    User                      @relation(fields: [userId], references: [id])
   Material                Material[]
   InventoryProductHistory InventoryProductHistory[]
-  WorkOrder               WorkOrder[]
   vehicle                 Vehicle?                  @relation(fields: [vehicleId], references: [id])
   client                  Client?                   @relation(fields: [clientId], references: [id])
+  technician              Technician[]
 
   @@index([companyId], name: "fk_invoices_company")
 }
@@ -329,7 +323,6 @@ model Material {
   invoiceItem InvoiceItem?      @relation(fields: [invoiceItemId], references: [id])
   product     InventoryProduct? @relation(fields: [productId], references: [id])
   invoice     Invoice?          @relation(fields: [invoiceId], references: [id])
-  Technician  Technician[]
 
   @@index([companyId], name: "fk_materials_company")
 }
@@ -472,6 +465,7 @@ model Payment {
   id        Int           @id @default(autoincrement())
   date      DateTime?
   notes     String?
+  amount    Decimal?
   type      PaymentType
   card      CardPayment?
   check     CheckPayment?
@@ -511,7 +505,6 @@ model OtherPayment {
   id              Int            @id @default(autoincrement())
   paymentId       Int            @unique
   paymentMethodId Int?
-  amount          Float?
   payment         Payment        @relation(fields: [paymentId], references: [id])
   paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
 }
@@ -635,38 +628,27 @@ model AppointmentUser {
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model WorkOrder {
-  id         Int          @id @default(autoincrement())
-  invoiceId  String
-  createdAt  DateTime     @default(now()) @map("created_at")
-  updatedAt  DateTime     @default(now()) @updatedAt @map("updated_at")
-  invoice    Invoice      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  Technician Technician[]
-}
-
 // Technician of a InvoiceItem.
 // One InvoiceItem can have multiple technicians.
 model Technician {
-  id          Int       @id @default(autoincrement())
-  userId      Int       @map("user_id")
-  date        DateTime? @map("assigned_date")
-  due         DateTime? @default(now())
-  amount      Decimal?  @default(0)
-  priority    Priority? @default(Low)
-  status      String?
-  statusColor String?
-  note        String?   @map("new_note")
-  materialId  Int?      @map("material_id")
-  serviceId   Int?      @map("service_id")
-  workOrderId Int?      @map("work_order_id")
+  id         Int       @id @default(autoincrement())
+  userId     Int       @map("user_id")
+  date       DateTime? @map("assigned_date")
+  dateClosed DateTime? @map("date_closed")
+  due        DateTime? @default(now())
+  amount     Decimal?  @default(0)
+  priority   Priority? @default(Low)
+  status     String?
+  note       String?   @map("new_note")
+  serviceId  Int       @map("service_id")
+  invoiceId  String    @map("invoice_id")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  material  Material?  @relation(fields: [materialId], references: [id])
-  service   Service?   @relation(fields: [serviceId], references: [id])
-  workOrder WorkOrder? @relation(fields: [workOrderId], references: [id])
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  service Service? @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  invoice Invoice? @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
 
 // Email template for a company.

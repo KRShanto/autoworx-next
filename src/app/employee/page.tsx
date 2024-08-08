@@ -10,174 +10,23 @@ import { IoPieChartOutline, IoSearchOutline } from "react-icons/io5";
 
 import AddNewEmployee from "./AddNewEmployee";
 import EditEmployee from "./EditEmployee";
-import DateRange from "./information/components/DateRange";
-import HorizontalPayoutCard from "./information/components/HorizontalPayoutCard";
-import PayoutCard from "./information/components/PayoutCard";
-const evenColor = "bg-white";
-const oddColor = "bg-slate-100";
-const employees = [
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-  {
-    id: 1234567890,
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1234567890",
-    type: "Employee",
-    joined: "2023-01-01",
-  },
-];
-export default function Page() {
+import DateRange from "./components/DateRange";
+import HorizontalPayoutCard from "./components/HorizontalPayoutCard";
+import { db } from "@/lib/db";
+import { getCompanyId } from "@/lib/companyId";
+import moment from "moment";
+import DeleteEmployee from "./DeleteEmployee";
+
+export default async function Page() {
+  const companyId = await getCompanyId();
+  const employees = await db.user.findMany({
+    where: {
+      companyId,
+      role: "employee",
+    },
+    // TODO don't fetch password
+  });
+
   return (
     <div className="h-full w-full space-y-8">
       <Title>Employee List</Title>
@@ -202,8 +51,8 @@ export default function Page() {
           </button>
         </div>
       </div>
+
       <div className="flex items-center justify-between">
-        {/* <Title>Employee List</Title> */}
         <div className="flex items-center gap-x-8">
           <div className="flex w-[500px] items-center gap-x-2 rounded-md border border-gray-300 px-4 py-1 text-gray-400">
             <span className="">
@@ -227,6 +76,7 @@ export default function Page() {
         </div>
         <AddNewEmployee />
       </div>
+
       <div>
         <table className="w-full shadow-md">
           <thead className="bg-white">
@@ -245,12 +95,7 @@ export default function Page() {
             {employees.map((employee, index) => (
               <tr
                 key={index}
-                className={cn(
-                  "cursor-pointer rounded-md",
-                  index % 2 === 0 ? "bg-white" : "bg-blue-100",
-                  // currentProductId === product.id &&
-                  // "border-2 border-[#6571FF]",
-                )}
+                className={cn(index % 2 === 0 ? "bg-white" : "bg-blue-100")}
               >
                 <td className="border-b px-4 py-2 text-center">
                   <Link
@@ -261,7 +106,7 @@ export default function Page() {
                   </Link>
                 </td>
                 <td className="border-b px-4 py-2 text-center">
-                  {employee.name}
+                  {employee.firstName} {employee.lastName}
                 </td>
                 <td className="border-b px-4 py-2 text-center">
                   {employee.email}
@@ -270,18 +115,15 @@ export default function Page() {
                   {employee.phone}
                 </td>
                 <td className="border-b px-4 py-2 text-center">
-                  {employee.joined}
+                  {moment(employee.joinDate).format("MM/DD/YYYY")}
                 </td>
                 <td className="border-b px-4 py-2 text-center">
-                  {employee.type}
+                  {employee.employeeType}
                 </td>
                 <td className="border-b border-l bg-white px-4 py-2 text-center">
                   <div className="flex items-center justify-center gap-2">
-                    <EditEmployee />
-
-                    <button className="text-xl text-red-400">
-                      <FaTimes />
-                    </button>
+                    <EditEmployee employee={employee} />
+                    <DeleteEmployee employee={employee} />
                   </div>
                 </td>
               </tr>

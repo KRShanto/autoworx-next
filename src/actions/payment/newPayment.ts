@@ -28,6 +28,7 @@ interface PaymentData {
   type: PaymentType;
   date: Date;
   notes: string;
+  amount: number;
   additionalData:
     | CardPaymentData
     | CheckPaymentData
@@ -40,6 +41,7 @@ export async function newPayment({
   type,
   date,
   notes,
+  amount,
   additionalData,
 }: PaymentData): Promise<ServerAction> {
   const companyId = await getCompanyId();
@@ -119,7 +121,8 @@ export async function newPayment({
           companyId,
           invoiceId,
           date: new Date(date),
-          notes: notes,
+          notes,
+          amount,
           type: "CARD",
           card: {
             create: {
@@ -140,7 +143,8 @@ export async function newPayment({
           companyId,
           invoiceId,
           date: new Date(date),
-          notes: notes,
+          notes,
+          amount,
           type: "CHECK",
           check: {
             create: {
@@ -160,7 +164,8 @@ export async function newPayment({
           companyId,
           invoiceId,
           date: new Date(date),
-          notes: notes,
+          notes,
+          amount,
           type: "CASH",
           cash: {
             create: {
@@ -180,13 +185,13 @@ export async function newPayment({
           companyId,
           invoiceId,
           date: new Date(date),
-          notes: notes,
+          notes,
+          amount,
           type: "OTHER",
           other: {
             create: {
               paymentMethodId: (additionalData as OtherPaymentData)
                 .paymentMethodId,
-              amount: (additionalData as OtherPaymentData).amount,
             },
           },
         },

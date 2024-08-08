@@ -1,14 +1,16 @@
 "use client";
 import {
+  Dialog,
   DialogClose,
   DialogContent,
   DialogFooter,
+  DialogTrigger,
   InterceptedDialog,
 } from "@/components/Dialog";
 import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { SelectStatus } from "../../components/Lists/SelectStatus";
+import { SelectStatus } from "../../../../../components/Lists/SelectStatus";
 import {
   Dispatch,
   MouseEvent,
@@ -16,49 +18,37 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Status, Technician, User } from "@prisma/client";
-import { addTechnician } from "../../actions/estimate/technician/addTechnician";
+import { Priority, Status, Technician, User } from "@prisma/client";
+import { addTechnician } from "../../../../../actions/estimate/technician/addTechnician";
 import { useRouter } from "next/navigation";
 import moment from "moment";
-import { updateTechnician } from "../../actions/estimate/technician/updateTechnician";
-type TPriority = string;
-type TEmployee = Partial<User>;
-const priorities: TPriority[] = ["Low", "Medium", "High"];
-type TechnicianPayload = {
-  serviceId: number;
-  date: string;
-  due: string;
-  amount: number;
-  note: string;
-  userId: number | undefined;
-  priority: string;
-  status: string | undefined;
-  statusColor: string | undefined;
-  materialId: number | undefined;
-  workOrderId: number | undefined;
-};
+import { updateTechnician } from "../../../../../actions/estimate/technician/updateTechnician";
+import { getEmployees } from "@/actions/employee/get";
+import { getTechnician } from "@/actions/estimate/technician/getTechnician";
+import { WORK_ORDER_STATUS_COLOR } from "@/lib/consts";
+
 export default function CreateAndEditLabor({
-  employees,
+  invoiceId,
   serviceId,
   technician,
-  materialId: materialId,
-  workOrderId,
+  setTechnicians,
 }: {
-  employees: {
-    id: number;
-    name: string;
-  }[];
-  serviceId: string;
-  materialId?: string;
-  workOrderId?: string;
-  technician?: Technician;
+  invoiceId: string;
+  serviceId: number;
+  technician?: Technician & { name: string };
+  setTechnicians: Dispatch<SetStateAction<(Technician & { name: string })[]>>;
 }) {
-  const router = useRouter();
-  const [statusOpenDropdown, setStatusOpenDropdown] = useState(false);
+  const [open, setOpen] = useState(false);
+  // const [statusOpenDropdown, setStatusOpenDropdown] = useState(false);
   const [priorityOpen, setPriorityOpen] = useState(false);
   const [employeeOpen, setEmployeeOpen] = useState(false);
-  const [employee, setEmployee] = useState<TEmployee | null>(null);
-  const [status, setStatus] = useState<Status | null>(null);
+
+  const [employeeList, setEmployeeList] = useState<User[]>([]);
+
+  const [employee, setEmployee] = useState<User | null>(null);
+  const [status, setStatus] = useState<
+    "Pending" | "In Progress" | "Complete" | "Cancel"
+  >("Pending");
   const [error, setError] = useState<string | null>(null);
   const [inputValues, setInputValues] = useState({
     date: new Date().toISOString().split("T")[0],
@@ -66,15 +56,20 @@ export default function CreateAndEditLabor({
     amount: "",
     note: "",
   });
-  const [priority, setPriority]: [
-    TPriority,
-    Dispatch<SetStateAction<TPriority>>,
-  ] = useState<TPriority>(priorities[0]);
+  const [priority, setPriority] = useState<Priority>("Low");
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      const employees = await getEmployees();
+      setEmployeeList(employees);
+    };
+    fetchEmployees();
+  }, []);
+
   // edit technician
   useEffect(() => {
     if (technician) {
-      const { amount, date, due, note, priority, status, statusColor, userId } =
-        technician;
+      const { amount, date, due, note, priority, userId } = technician;
       const formattedDate = moment(date).format("YYYY-MM-DD");
       const formattedDue = moment(due).format("YYYY-MM-DD");
       setInputValues({
@@ -83,10 +78,12 @@ export default function CreateAndEditLabor({
         amount: amount?.toString() as string,
         note: note as string,
       });
-      setPriority(priority as string);
-      setEmployee(employees.find((e) => e.id === userId) as TEmployee);
+      setPriority(priority as Priority);
+      // TODO: set status
+      setEmployee(employeeList.find((e) => e.id === userId) || null);
     }
-  }, [technician]);
+  }, [technician, employeeList]);
+
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -109,52 +106,57 @@ export default function CreateAndEditLabor({
       }));
     }
   };
-  console.log(status);
+
   // form submit
-  const handleSubmit: (
-    event: MouseEvent<HTMLButtonElement>,
-  ) => Promise<void> = async (event) => {
+  const handleSubmit = async (event: MouseEvent) => {
     setError(null);
+
+    if (!employee) {
+      setError("Employee is required");
+      return;
+    }
+
     try {
-      // await (laborId ? updateLabor(laborId, payload) : createLabor(payload));
       if (technician) {
         const updatedPayload = {
-          ...technician,
-          date: new Date(inputValues.date).toISOString(),
-          due: new Date(inputValues.due).toISOString(),
+          date: new Date(inputValues.date),
+          due: new Date(inputValues.due),
           amount: Number(inputValues.amount),
           note: inputValues.note,
           userId: employee?.id,
-          status: status?.name || technician.status,
-          statusColor: status?.bgColor || technician.statusColor,
+          status,
           priority,
+          invoiceId,
+          serviceId,
         };
-        const response = await updateTechnician(
-          technician.id,
-          updatedPayload as Technician & TechnicianPayload,
-        );
+
+        const response = await updateTechnician(technician.id, updatedPayload);
+
         if (response.type === "success") {
-          router.back();
+          setOpen(false);
+          // @ts-ignore
+          setTechnicians((prev) =>
+            prev.map((tech) =>
+              tech.id === technician.id ? response.data : tech,
+            ),
+          );
         }
       } else {
         const payload = {
           serviceId: Number(serviceId),
-          date: new Date(inputValues.date).toISOString(),
-          due: new Date(inputValues.due).toISOString(),
+          date: new Date(inputValues.date),
+          due: new Date(inputValues.due),
           amount: Number(inputValues.amount),
           note: inputValues.note,
           userId: employee?.id,
           priority,
-          status: status?.name,
-          statusColor: status?.bgColor,
-          materialId: Number(materialId),
-          workOrderId: Number(workOrderId),
+          status,
+          invoiceId,
         };
-        const response = await addTechnician(
-          payload as Technician & TechnicianPayload,
-        );
+        const response = await addTechnician(payload);
         if (response.type === "success") {
-          router.back();
+          setOpen(false);
+          setTechnicians((prev) => [...prev, response.data]);
         }
       }
     } catch (error) {
@@ -163,24 +165,46 @@ export default function CreateAndEditLabor({
   };
   const date = moment(technician?.createdAt);
   const formattedDate = date.format("h:mmA Do MMMM YYYY");
+
   return (
-    <InterceptedDialog>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {technician ? (
+          <p className="text-white">{technician.name}</p>
+        ) : (
+          <button className="rounded-full border border-[#6571FF] px-3 py-0.5">
+            + Add Labor
+          </button>
+        )}
+      </DialogTrigger>
       <DialogContent>
+        <h2 className="text-xl font-bold">
+          {technician ? "Edit Technician" : "Assign Technician"}
+        </h2>
+
         {error && <p className="text-center text-red-500">{error}</p>}
         <div className="grid grid-cols-3 gap-4">
           {/* Assigned by */}
           <div>
-            <label>Assigned by</label>
+            <label>Assign To</label>
             <Selector
               label={(employee) =>
-                employee?.name ? employee.name : "Employee"
+                employee?.firstName
+                  ? `${employee.firstName} ${employee.lastName}`
+                  : "Employee"
               }
               newButton={<div></div>}
-              items={employees}
-              displayList={(employee: TEmployee) => <p>{employee.name}</p>}
+              items={employeeList}
+              displayList={(employee: User) => (
+                <p>
+                  {employee.firstName} {employee.lastName}
+                </p>
+              )}
               onSearch={(search: string) =>
-                employees.filter((employee) =>
-                  employee.name.toLowerCase().includes(search.toLowerCase()),
+                employeeList.filter((employee) =>
+                  `${employee.firstName} ${employee.lastName}`
+                    .toLowerCase()
+                    .includes(search.toLowerCase()),
                 )
               }
               openState={[employeeOpen, setEmployeeOpen]}
@@ -214,20 +238,15 @@ export default function CreateAndEditLabor({
 
             <Selector
               label={(priority) => (priority ? priority : "Priority")}
-              items={priorities}
-              displayList={(priority: TPriority) => <p>{priority}</p>}
-              onSearch={(search: string) =>
-                priorities.filter((priority) =>
-                  priority.toLowerCase().includes(search.toLowerCase()),
-                )
-              }
+              items={["Low", "Medium", "High"]}
+              displayList={(priority: Priority) => <p>{priority}</p>}
               openState={[priorityOpen, setPriorityOpen]}
               selectedItem={priority}
               //@ts-ignore
               setSelectedItem={setPriority}
             />
           </div>
-          <div>
+          {/* <div>
             <label htmlFor="status">Status</label>
             <SelectStatus
               value={status}
@@ -236,6 +255,21 @@ export default function CreateAndEditLabor({
               open={statusOpenDropdown}
               setOpen={setStatusOpenDropdown}
             />
+          </div> */}
+          <div>
+            <label htmlFor="status">Status</label>
+            {/* TODO: use better UI */}
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value as any)}
+              className="cursor-pointer rounded-md border-2 border-slate-400 p-2 outline-none"
+              id="status"
+            >
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Complete">Complete</option>
+              <option value="Cancel">Cancel</option>
+            </select>
           </div>
         </div>
         <div>
@@ -260,8 +294,11 @@ export default function CreateAndEditLabor({
               </div>
               <div>
                 <p
-                  className={`rounded-full px-2 py-1 text-black`}
-                  style={{ backgroundColor: technician?.statusColor as string }}
+                  className={`rounded-full px-2 py-1 text-white`}
+                  style={{
+                    backgroundColor:
+                      WORK_ORDER_STATUS_COLOR[technician?.status as string],
+                  }}
                 >
                   {technician?.status}
                 </p>
@@ -290,6 +327,6 @@ export default function CreateAndEditLabor({
           )}
         </DialogFooter>
       </DialogContent>
-    </InterceptedDialog>
+    </Dialog>
   );
 }

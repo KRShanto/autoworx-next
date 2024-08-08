@@ -10,14 +10,16 @@ export default function AddUser() {
   const { close } = usePopupStore();
   const { showError } = useFormErrorStore();
 
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
   async function handleSubmit() {
     const res = await addUser({
-      name,
+      firstName,
+      lastName,
       email,
       password,
       confirmPassword: passwordConfirmation,
@@ -41,19 +43,35 @@ export default function AddUser() {
         <FormError />
 
         <div>
-          <label htmlFor="name" className="mb-2 block">
-            Name
+          <label htmlFor="firstName" className="mb-2 block">
+            First Name
           </label>
 
           <input
-            id="name"
+            id="firstName"
             type="text"
-            name="name"
+            name="firstName"
             className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
             required
             autoFocus
+          />
+        </div>
+
+        <div className="mt-4">
+          <label htmlFor="lastName" className="mb-2 block">
+            Last Name
+          </label>
+
+          <input
+            id="lastName"
+            type="text"
+            name="lastName"
+            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
           />
         </div>
 

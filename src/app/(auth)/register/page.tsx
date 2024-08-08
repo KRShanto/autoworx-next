@@ -18,16 +18,29 @@ export default function Page() {
         <FormError />
 
         <div>
-          <label htmlFor="name" className="mb-2 block">
-            Name
+          <label htmlFor="firstName" className="mb-2 block">
+            First Name
           </label>
 
           <Input
             type="text"
-            name="name"
+            name="firstName"
             className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
             autoFocus
+          />
+        </div>
+
+        <div className="mt-4">
+          <label htmlFor="lastName" className="mb-2 block">
+            Last Name
+          </label>
+
+          <Input
+            type="text"
+            name="lastName"
+            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
           />
         </div>
 
