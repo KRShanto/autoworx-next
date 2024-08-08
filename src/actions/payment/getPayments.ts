@@ -14,6 +14,7 @@ export interface ReturnPayment {
   date: Date;
   amount: number;
   method: string;
+  paid: boolean;
 }
 
 export async function getPayments(): Promise<ReturnPayment[]> {
@@ -56,6 +57,7 @@ export async function getPayments(): Promise<ReturnPayment[]> {
       date: payment.date as Date,
       amount: Number(payment.amount),
       method: getPaymentMethod(payment),
+      paid: Number(payment.invoice?.grandTotal) <= Number(payment.amount),
     };
   });
 }

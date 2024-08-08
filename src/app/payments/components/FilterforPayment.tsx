@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import SliderRange from "./SliderRange";
-import { PaymentMethod, usePaymentFilterStore } from "@/stores/paymentFilter";
+import {
+  PaymentMethod,
+  PaymentStatus,
+  usePaymentFilterStore,
+} from "@/stores/paymentFilter";
 import { cn } from "@/lib/cn";
 
 const FilterforPayment = () => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("All");
   const [amount, setAmount] = useState<[number, number]>([1, 3000]);
-  const [status, setStatus] = useState<string>("all");
+  const [status, setStatus] = useState<PaymentStatus>("All");
   const [showFilter, setShowFilter] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const { setFilter } = usePaymentFilterStore();
@@ -78,7 +82,7 @@ const FilterforPayment = () => {
             </div>
             <div className="mb-4">
               <div className="text-Inter flex space-x-2">
-                {["all", "paid", "unpaid"].map((statusOption) => (
+                {["All", "Paid", "Unpaid"].map((statusOption) => (
                   <label
                     key={statusOption}
                     className="flex items-center space-x-1"
@@ -88,12 +92,9 @@ const FilterforPayment = () => {
                       name="status"
                       value={statusOption}
                       checked={status === statusOption}
-                      onChange={() => setStatus(statusOption)}
+                      onChange={() => setStatus(statusOption as PaymentStatus)}
                     />
-                    <span>
-                      {statusOption.charAt(0).toUpperCase() +
-                        statusOption.slice(1)}
-                    </span>
+                    <span>{statusOption}</span>
                   </label>
                 ))}
               </div>
@@ -110,7 +111,7 @@ const FilterforPayment = () => {
                 onClick={() => {
                   setPaymentMethod("All");
                   setAmount([1, 30_000]);
-                  setStatus("all");
+                  setStatus("All");
                 }}
               >
                 Clear All

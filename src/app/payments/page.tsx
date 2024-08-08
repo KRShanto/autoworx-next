@@ -96,7 +96,7 @@ function Table({ data }: { data: ReturnPayment[] }) {
 
   // filter using dateRange and amount and paymentMethod
   useEffect(() => {
-    console.log("Payment method: ", paymentMethod);
+    console.log("Item: ", data);
     setFilteredData(
       data.filter((item) =>
         dateRange[0] !== null
@@ -104,7 +104,12 @@ function Table({ data }: { data: ReturnPayment[] }) {
           : true &&
             item.amount >= amount[0] &&
             item.amount <= amount[1] &&
-            checkPaymentMethod(item.method),
+            checkPaymentMethod(item.method) &&
+            (paidStatus === "All"
+              ? true
+              : paidStatus === "Paid"
+                ? item.paid
+                : !item.paid),
       ),
     );
   }, [data, dateRange, amount, paidStatus, paymentMethod]);
