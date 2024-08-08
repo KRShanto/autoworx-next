@@ -24,7 +24,9 @@ export default function Users({
   function searchUser(formData: FormData) {
     const searchValue = formData.get("search") as string;
     const filteredUsers = users.filter((user) =>
-      user.name.toLowerCase().includes(searchValue.toLowerCase()),
+      `${user.firstName} ${user.lastName}`
+        .toLowerCase()
+        .includes(searchValue.toLowerCase()),
     );
     setUsersToDisplay(filteredUsers);
   }

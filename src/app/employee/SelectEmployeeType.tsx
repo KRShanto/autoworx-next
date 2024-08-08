@@ -1,33 +1,30 @@
-import newCategory from "@/actions/category/newCategory";
 import Selector from "@/components/Selector";
 import { cn } from "@/lib/cn";
-import { useListsStore } from "@/stores/lists";
-import { Category } from "@prisma/client";
 import { useEffect, useState } from "react";
 
-export interface IEmployeeType {
-  id: number;
-  name: "Sales" | "Technician";
-}
+export type IEmployeeType = "Sales" | "Technician";
 
-const employeeTypes: IEmployeeType[] = [
-  { id: 1, name: "Sales" },
-  { id: 2, name: "Technician" },
-];
+const employeeTypes: IEmployeeType[] = ["Sales", "Technician"];
 
 export default function SelectEmployeeType({
   labelPosition = "top",
   employeeTypeOpen,
   setEmployeeTypeOpen,
+  defaultType,
 }: {
   labelPosition?: "top" | "left" | "none";
   employeeTypeOpen: boolean;
   setEmployeeTypeOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  defaultType?: IEmployeeType;
 }) {
-  const [employeeType, setEmployeeType] = useState<IEmployeeType | null>(null);
+  const [employeeType, setEmployeeType] = useState<IEmployeeType | null>(
+    defaultType || null,
+  );
 
   return (
     <div className={cn("w-1/2")}>
+      <input type="hidden" name="type" value={employeeType || ""} />
+
       {labelPosition !== "none" && (
         <label
           className={cn("text-semibold", {
@@ -39,15 +36,13 @@ export default function SelectEmployeeType({
       )}
 
       <Selector
-        label={() => (employeeType ? employeeType.name : "Type")}
+        label={() => (employeeType ? employeeType : "Type")}
         newButton={<div className="flex gap-2"></div>}
         items={employeeTypes}
-        displayList={(employeeType: IEmployeeType) => (
-          <p>{employeeType.name}</p>
-        )}
+        displayList={(employeeType: IEmployeeType) => <p>{employeeType}</p>}
         onSearch={(search: string) =>
           employeeTypes.filter((type) =>
-            type.name.toLowerCase().includes(search.toLowerCase()),
+            type.toLowerCase().includes(search.toLowerCase()),
           )
         }
         openState={[employeeTypeOpen as boolean, setEmployeeTypeOpen]}

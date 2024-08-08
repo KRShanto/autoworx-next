@@ -1,23 +1,50 @@
 "use server";
 
+import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
-import { Technician } from "@prisma/client";
+import { Priority } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-type TechnicianInput = Technician;
+
+type TechnicianInput = {
+  date: Date;
+  due: Date;
+  amount: number;
+  priority: Priority;
+  status: string;
+  note: string;
+  userId: number;
+  serviceId: number;
+  invoiceId: string;
+};
+
 export async function addTechnician(
   payload: TechnicianInput,
 ): Promise<ServerAction> {
+  const companyId = await getCompanyId();
+
   try {
     if (!payload) {
       return { type: "error", message: "Invalid payload" };
     }
-    await db.technician.create({
-      data: payload as TechnicianInput,
+
+    const newTechnician = await db.technician.create({
+      data: {
+        ...payload,
+        companyId,
+        dateClosed: payload.status === "Complete" ? new Date() : null,
+      },
     });
-    revalidatePath('/estimate')
-    return { type: "success" };
+
+    const user = await db.user.findUnique({
+      where: { id: newTechnician.userId },
+    });
+
+    return {
+      type: "success",
+      data: { ...newTechnician, name: user?.firstName + " " + user?.lastName },
+    };
   } catch (error) {
-    throw error
+    throw error;
   }
 }

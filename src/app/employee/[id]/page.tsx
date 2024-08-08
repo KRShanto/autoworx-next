@@ -1,50 +1,34 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import AttendancePerformance from "../information/components/AttendancePerformance";
-import EmployeeInformation from "../information/components/EmployeeInformation";
-import EmployeeInfoTable from "../information/components/EmployeeInfoTable";
-import FilterComp from "../information/components/FilterComp";
-import Header from "../information/components/Header";
+import EmployeeInformation from "../components/EmployeeInformation";
+import Header from "../components/Header";
+import EmployeeWorkInformation from "../components/EmployeeWorkInformation";
+import { db } from "@/lib/db";
+import { notFound } from "next/navigation";
 
-interface Employee {
-  name: string;
-  role: string;
-}
+export default async function Page({ params }: { params: { id: string } }) {
+  const employee = await db.user.findUnique({
+    where: { id: parseInt(params.id) },
+  });
 
-interface EmployeeData {
-  [key: string]: Employee;
-}
+  if (!employee) return notFound();
 
-const employeeData: EmployeeData = {
-  sales: { name: "Shanto", role: "Sales" },
-  technician: { name: "Noman", role: "Technician" },
-};
-
-export default function Page({ params }: { params: { id: string } }) {
-  const [view, setView] = useState("details");
-
-  const employee = employeeData[params.id] || {
-    name: "Default",
-    role: "Employee",
-  };
-
-  const viewHandler = (view: string) => {
-    setView(view);
-  };
+  // TODO: don't fetch "technicians" if the employee is not a technician
+  const technicians = await db.technician.findMany({
+    where: { userId: employee.id },
+    include: {
+      invoice: {
+        include: {
+          client: true,
+          vehicle: true,
+        },
+      },
+    },
+  });
 
   return (
     <>
-      <Header onToggleView={viewHandler} activeView={view} />
-      <EmployeeInformation role={employee.role} />
-
-      {view === "details" ? (
-        <>
-          <FilterComp />
-          <EmployeeInfoTable />
-        </>
-      ) : (
-        <AttendancePerformance />
-      )}
+      <Header />
+      <EmployeeInformation employee={employee} info={technicians} />
+      <EmployeeWorkInformation info={technicians} />
     </>
   );
 }

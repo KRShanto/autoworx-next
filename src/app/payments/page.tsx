@@ -15,6 +15,7 @@ import { ReturnPayment, getPayments } from "@/actions/payment/getPayments";
 import { useServerGet } from "@/hooks/useServerGet";
 import moment from "moment";
 import { getCoupons } from "@/actions/coupon/getCoupons";
+import { usePaymentFilterStore } from "@/stores/paymentFilter";
 
 export default function Page() {
   const { data: payments } = useServerGet(getPayments);
@@ -70,6 +71,48 @@ export default function Page() {
 }
 
 function Table({ data }: { data: ReturnPayment[] }) {
+  const { dateRange, amount, paidStatus, paymentMethod } =
+    usePaymentFilterStore();
+  const [filteredData, setFilteredData] = useState(data);
+
+  function checkPaymentMethod(method: string) {
+    if (paymentMethod === "All") {
+      return true;
+    } else if (method === paymentMethod) {
+      return true;
+    } else if (
+      paymentMethod === "Other" &&
+      method !== "Card" &&
+      method !== "Cash" &&
+      method !== "Cheque"
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  console.log({ dateRange, amount, paidStatus, paymentMethod });
+
+  // filter using dateRange and amount and paymentMethod
+  useEffect(() => {
+    setFilteredData(
+      data.filter((item) =>
+        dateRange[0] !== null
+          ? moment(item.date).isBetween(dateRange[0], dateRange[1])
+          : true &&
+            item.amount >= amount[0] &&
+            item.amount <= amount[1] &&
+            checkPaymentMethod(item.method) &&
+            (paidStatus === "All"
+              ? true
+              : paidStatus === "Paid"
+                ? item.paid
+                : !item.paid),
+      ),
+    );
+  }, [data, dateRange, amount, paidStatus, paymentMethod]);
+
   return (
     <div className="min-h-[65vh] overflow-x-scroll rounded-md bg-white xl:overflow-hidden">
       <table className="w-full">
@@ -86,7 +129,7 @@ function Table({ data }: { data: ReturnPayment[] }) {
         </thead>
 
         <tbody>
-          {data.map((item, index) => (
+          {filteredData.map((item, index) => (
             <tr
               key={index}
               className={index % 2 === 0 ? "bg-white" : "bg-[#EEF4FF]"}

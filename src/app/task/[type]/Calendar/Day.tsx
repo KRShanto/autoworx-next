@@ -438,7 +438,10 @@ export default function Day({
                           Assigned To:{" "}
                           {event.assignedUsers
                             .slice(0, 1)
-                            .map((user: User) => user.name)}
+                            .map(
+                              (user: User) =>
+                                `${user.firstName} ${user.lastName}`,
+                            )}
                         </p>
                         <p className="text-left">
                           {moment(event.startTime, "HH:mm").format("hh:mm A")}{" "}
