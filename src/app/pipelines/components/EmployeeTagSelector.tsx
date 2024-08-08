@@ -111,7 +111,7 @@ export function EmployeeTagSelector({
         }}
       >
         <DropdownMenuTrigger
-          className="flex h-10 items-center gap-x-8 rounded-md border-2 border-slate-400 px-2 py-1"
+          // className="flex h-10 items-center gap-x-8 rounded-md border-2 border-slate-400 px-2 py-1"
           style={{
             backgroundColor: tag?.bgColor,
             color: tag?.textColor,
@@ -121,8 +121,8 @@ export function EmployeeTagSelector({
             setOpen && setOpen(!open);
           }}
         >
-          <span>{tag?.name ?? "Select Tag"}</span>
-          <FaChevronDown />
+          {/* <span>{tag?.name ?? "Select Tag"}</span>
+          <FaChevronDown /> */}
         </DropdownMenuTrigger>
 
         <DropdownMenuContent

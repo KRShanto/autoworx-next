@@ -10,11 +10,15 @@ import { EmployeeSelector } from "./EmployeeSelector";
 import Link from "next/link";
 import { Tag } from "@prisma/client";
 import { EmployeeTagSelector } from "./EmployeeTagSelector";
-
+import ServiceSelector from "./ServiceSelector";
 
 const newLeads = [{ name: "Al Noman", email: "noman@me.com", phone: "123456" }];
 
-const leadsGenerated = Array(5).fill({ name: "ali nur", email: "xyz@gmail.com", phone: "123456789" });
+const leadsGenerated = Array(5).fill({
+  name: "ali nur",
+  email: "xyz@gmail.com",
+  phone: "123456789",
+});
 const followUp = Array(5).fill({ name: "", email: "", phone: "" });
 const estimatesCreated = Array(5).fill({ name: "", email: "", phone: "" });
 const archived = Array(5).fill({ name: "", email: "", phone: "" });
@@ -29,6 +33,34 @@ const data = [
   { title: "Converted", leads: converted },
 ];
 
+//dummy services
+
+const services = [
+  {
+    id: 1,
+    name: "Service 1",
+  },
+  {
+    id: 2,
+    name: "Service 2",
+  },
+  {
+    id: 3,
+    name: "Service 3",
+  },
+  {
+    id: 4,
+    name: "Service 4",
+  },
+  {
+    id: 5,
+    name: "Service 5",
+  },
+];
+interface Service {
+  id: number;
+  name: string;
+}
 interface Employee {
   id: number;
   firstName: string;
@@ -46,8 +78,19 @@ export default function Pipelines() {
 
   // const [tagOpenDropdown, setTagOpenDropdown] = useState(false);
   const [tag, setTag] = useState<Tag>();
-  const [tagDropdownStates, setTagDropdownStates] = useState<{ [key: string]: boolean }>({});
+  const [tagDropdownStates, setTagDropdownStates] = useState<{
+    [key: string]: boolean;
+  }>({});
   const [leadTags, setLeadTags] = useState<{ [key: string]: Tag[] }>({});
+
+  // Track selected services per item
+  const [selectedServices, setSelectedServices] = useState<{
+    [key: string]: Service | null;
+  }>({});
+  const [showAllServices, setShowAllServices] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [openServiceDropdown, setOpenServiceDropdown] = useState<{ [key: string]: boolean }>({});
 
   const handleDropdownToggle = (categoryIndex: number, leadIndex: number) => {
     if (
@@ -59,8 +102,6 @@ export default function Pipelines() {
       setOpenDropdownIndex({ category: categoryIndex, index: leadIndex });
     }
   };
-
-
 
   const getInitials = (employee: Employee | null) => {
     if (employee) {
@@ -82,36 +123,69 @@ export default function Pipelines() {
       setOpenDropdownIndex(null);
     };
 
-    const handleTagDropdownToggle = (categoryIndex: number, leadIndex: number) => {
+  const handleTagDropdownToggle = (
+    categoryIndex: number,
+    leadIndex: number,
+  ) => {
+    const key = `${categoryIndex}-${leadIndex}`;
+    setTagDropdownStates((prevState) => ({
+      ...prevState,
+      [key]: !prevState[key],
+    }));
+  };
+  //for tag handling
+  const handleTagSelect = (
+    categoryIndex: number,
+    leadIndex: number,
+    selectedTag: Tag | undefined,
+  ) => {
+    if (selectedTag) {
       const key = `${categoryIndex}-${leadIndex}`;
-      setTagDropdownStates((prevState) => ({
-        ...prevState,
-        [key]: !prevState[key],
-      }));
-    };
-    //for tag handling
-    const handleTagSelect = (categoryIndex: number, leadIndex: number, selectedTag: Tag | undefined) => {
-      if (selectedTag) {
-        const key = `${categoryIndex}-${leadIndex}`;
-        setLeadTags((prevState) => {
-          const existingTags = prevState[key] || [];
-          const tagExists = existingTags.find(tag => tag.id === selectedTag.id);
-    
-          if (tagExists) {
-            return {
-              ...prevState,
-              [key]: existingTags.filter(tag => tag.id !== selectedTag.id),
-            };
-          } else {
-            return {
-              ...prevState,
-              [key]: [...existingTags, selectedTag],
-            };
-          }
-        });
-      }
-    };
-    
+      setLeadTags((prevState) => {
+        const existingTags = prevState[key] || [];
+        const tagExists = existingTags.find((tag) => tag.id === selectedTag.id);
+        //deleting each tag
+        if (tagExists) {
+          return {
+            ...prevState,
+            [key]: existingTags.filter((tag) => tag.id !== selectedTag.id),
+          };
+        } else {
+          return {
+            ...prevState,
+            [key]: [...existingTags, selectedTag],
+          };
+        }
+      });
+    }
+  };
+
+  //service
+
+  const handleServiceSelect = (categoryIndex: number, leadIndex: number, service: Service) => {
+    const key = `${categoryIndex}-${leadIndex}`;
+    setSelectedServices((prevState) => ({
+      ...prevState,
+      [key]: service,
+    }));
+    setShowAllServices((prevState) => ({
+      ...prevState,
+      [key]: false,
+    }));
+    setOpenServiceDropdown((prevState) => ({
+      ...prevState,
+      [key]: false, // Close dropdown after selection
+    }));
+  };
+
+  const handleServiceDropdownToggle = (categoryIndex: number, leadIndex: number) => {
+    const key = `${categoryIndex}-${leadIndex}`;
+    setOpenServiceDropdown((prevState) => ({
+      ...prevState,
+      [key]: !prevState[key],
+    }));
+  };
+
   return (
     <div className="h-full overflow-hidden">
       <div className="flex justify-between">
@@ -138,16 +212,19 @@ export default function Pipelines() {
                 const isDropdownOpen =
                   openDropdownIndex?.category === categoryIndex &&
                   openDropdownIndex.index === leadIndex;
-                
-                  
+
                 const isTagDropdownOpen = tagDropdownStates[key];
                 const tagsForLead = leadTags[key] || [];
 
-                
+                const selectedService = selectedServices[key];
+                const showAll = showAllServices[key] || false;
+
+                const isServiceDropdownOpen = openServiceDropdown[key] || false;
+
                 return (
                   <li
                     key={leadIndex}
-                    className="relative mx-2 max-h-[150px] min-h-[150px] rounded-xl border bg-white p-2"
+                    className="relative mx-2 rounded-xl border bg-white p-2"
                   >
                     <div className="flex items-center justify-between">
                       <h3 className="font-inter overflow-auto pb-2 font-semibold text-black">
@@ -169,7 +246,7 @@ export default function Pipelines() {
                         </button>
                       )}
                       {isDropdownOpen && (
-                        <div className="absolute top-8 right-0 z-10">
+                        <div className="absolute right-0 top-8 z-10">
                           <EmployeeSelector
                             name="employeeId"
                             value={selectedEmployee}
@@ -182,63 +259,130 @@ export default function Pipelines() {
                           />
                         </div>
                       )}
-                          
                     </div>
-                    
-                        
-                    
-                    <div className="mb-1 flex items-center">
-                    {tagsForLead.map((tag) => (
-                      <span
-                        key={tag.id}
-                        className="mr-2 inline-flex items-center rounded bg-gray-300 px-1 py-1 text-xs font-semibold text-gray-700"
-                      >
-                        {tag.name}
-                      </span>
-                    ))}
-                      
-                      <button
-                      onClick={() => handleTagDropdownToggle(categoryIndex, leadIndex)}
-                      className="inline-flex items-center rounded bg-blue-500 px-1 py-1 text-xs font-semibold text-white"
-                    >
-                      + Add
-                    </button>
-                  </div>
-                  {isTagDropdownOpen && (
-                    <div className="absolute top-8 right-0 z-20">
-                      <EmployeeTagSelector
-                        value={tag}
-                        setValue={(selectedTag) => handleTagSelect(categoryIndex, leadIndex, selectedTag)}
-                        open={isTagDropdownOpen}
-                        setOpen={() => handleTagDropdownToggle(categoryIndex, leadIndex)}
-                      />
-                    </div>
-                  )}
 
-                    <div>
-                      <p className="overflow-auto pb-2 text-sm">lead sources</p>
-                      
+                    <div className="mb-1 flex items-center">
+                      {tagsForLead.slice(0, 2).map((tag) => (
+                        <span
+                          key={tag.id}
+                          className="mr-2 inline-flex h-[18px] items-center rounded bg-gray-300 px-1 py-1 text-xs font-semibold text-white"
+                          style={{
+                            backgroundColor: tag?.bgColor,
+                            // color: tag?.textColor,
+                          }}
+                        >
+                          {tag.name}
+                          <button
+                            className="ml-1 text-xs text-white"
+                            onClick={() =>
+                              handleTagSelect(categoryIndex, leadIndex, tag)
+                            }
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                      {/* {tagsForLead.length > 3 && (
+                        <span className="text-xs font-semibold text-gray-700">
+                          +{tagsForLead.length - 3} more
+                        </span>
+                      )} */}
+
+                      <button
+                        onClick={() =>
+                          handleTagDropdownToggle(categoryIndex, leadIndex)
+                        }
+                        className="inline-flex h-[20px] items-center justify-center rounded bg-blue-500 px-1 py-1 text-xs font-semibold text-white"
+                      >
+                        + Add
+                      </button>
+                    </div>
+                    {isTagDropdownOpen && (
+                      <div className="absolute right-0 top-8 z-20">
+                        <EmployeeTagSelector
+                          value={tag}
+                          setValue={(selectedTag) =>
+                            handleTagSelect(
+                              categoryIndex,
+                              leadIndex,
+                              selectedTag,
+                            )
+                          }
+                          open={isTagDropdownOpen}
+                          setOpen={() =>
+                            handleTagDropdownToggle(categoryIndex, leadIndex)
+                          }
+                        />
+                      </div>
+                    )}
+
+                    {/* Service selection */}
+                    <div className="relative">
+                      {/* Display selected service or dropdown toggle */}
+                      <div
+                        onClick={() => handleServiceDropdownToggle(categoryIndex, leadIndex)}
+                        className="flex justify-between cursor-pointer  border rounded-md border-[#6571FF] px-2 py-1 text-xs   }"
+                      >
+                        {selectedService ? (
+                          <span className="text-[#6571FF]" >
+                            {selectedService.name}
+                          </span>
+                        ) : (
+                          <span className="inline-flex text-[#6571FF] ">
+                            {services.length > 1
+                              ? `${services[0].name}... + ${services.length - 1}`
+                              : "Select a service"}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Dropdown menu */}
+                      {isServiceDropdownOpen && (
+                        <div className="border rounded-md border-[#6571FF] text-[#6571FF] font-Inter ">
+
+                          {services.map((service) => (
+                            <div
+                              key={service.id}
+                              onClick={() => {
+                                handleServiceSelect(
+                                  categoryIndex,
+                                  leadIndex,
+                                  service,
+                                );
+                              }}
+                              className={`cursor-pointer  px-2 py-1 text-sm hover:bg-gray-200 ${selectedService?.id === service.id ? "bg-white" : ""}`}
+                            >
+                              {service.name}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <div>
-                      <p className="overflow-auto pb-2 text-sm">services selections</p>
-                      
+                      <p className="overflow-auto pb-2 text-sm">
+                        services selections
+                      </p>
                     </div>
 
                     <div className="flex justify-between">
-
-                    <div className="flex items-center  gap-2">
-                      <Link href="/">
-                      <PiWechatLogoLight size={18}/>
-                      </Link>
-                      <Link href="/">
-                      <img src="/icons/invoice.png" alt="" width={12} height={12}  style={{marginBottom: "0px"}}/>
-                       </Link>
-                       <Link href="/">
-                      <CiCalendar size={18}/>
-                      </Link>
-                      
-                    </div>
-                    <button className="bg-whiet border-2 border-[#66738C] rounded-md  px-2  text-center text-gray-500 text-xs">
+                      <div className="flex items-center gap-2">
+                        <Link href="/">
+                          <PiWechatLogoLight size={18} />
+                        </Link>
+                        <Link href="/">
+                          <img
+                            src="/icons/invoice.png"
+                            alt=""
+                            width={12}
+                            height={12}
+                            style={{ marginBottom: "0px" }}
+                          />
+                        </Link>
+                        <Link href="/">
+                          <CiCalendar size={18} />
+                        </Link>
+                      </div>
+                      <button className="bg-whiet rounded-md border-2 border-[#66738C] px-2 text-center text-xs text-gray-500">
                         Add Task
                       </button>
                     </div>
