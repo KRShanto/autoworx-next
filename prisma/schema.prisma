@@ -465,6 +465,7 @@ model Payment {
   id        Int           @id @default(autoincrement())
   date      DateTime?
   notes     String?
+  amount    Decimal?
   type      PaymentType
   card      CardPayment?
   check     CheckPayment?
@@ -504,7 +505,6 @@ model OtherPayment {
   id              Int            @id @default(autoincrement())
   paymentId       Int            @unique
   paymentMethodId Int?
-  amount          Float?
   payment         Payment        @relation(fields: [paymentId], references: [id])
   paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
 }

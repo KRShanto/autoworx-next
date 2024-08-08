@@ -50,7 +50,7 @@ function TabTrigger({
 
 export default function MakePayment() {
   const { paymentMethods } = useListsStore();
-  const { payment } = useEstimateCreateStore();
+  const { payment, grandTotal } = useEstimateCreateStore();
   const createInvoice = useInvoiceCreate("Invoice");
   const router = useRouter();
   const pathaname = usePathname();
@@ -66,7 +66,7 @@ export default function MakePayment() {
   const [cardType, setCardType] = useState("MASTERCARD");
   const [check, setCheck] = useState("");
   const [cash, setCash] = useState<number | string>("");
-  const [amount, setAmount] = useState<number | string>("");
+  const [amount, setAmount] = useState<number | string>(grandTotal);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(
     null,
   );
@@ -78,6 +78,7 @@ export default function MakePayment() {
       setTab(payment.type);
       setDate(payment.date || new Date());
       setNotes(payment.notes || "");
+      setAmount(Number(payment.amount));
 
       switch (payment.type) {
         case "CARD":
@@ -91,7 +92,6 @@ export default function MakePayment() {
           setCash(payment.cash?.receivedCash || "");
           break;
         case "OTHER":
-          setAmount(payment.other?.amount || "");
           setPaymentMethod(payment.other?.paymentMethod || null);
           break;
       }
@@ -109,13 +109,13 @@ export default function MakePayment() {
         type: tab as PaymentType,
         date,
         notes,
+        amount: Number(amount),
         additionalData: {
           creditCard: card,
           cardType: cardType ? (cardType as CardType) : "MASTERCARD",
           checkNumber: check,
           receivedCash: Number(cash),
           paymentMethodId: paymentMethod?.id,
-          amount: Number(amount),
         },
       });
     } else {
@@ -124,13 +124,13 @@ export default function MakePayment() {
         type: tab as PaymentType,
         date,
         notes,
+        amount: Number(amount),
         additionalData: {
           creditCard: card,
           cardType: cardType ? (cardType as CardType) : "MASTERCARD",
           checkNumber: check,
           receivedCash: Number(cash),
           paymentMethodId: paymentMethod?.id,
-          amount: Number(amount),
         },
       });
     }
@@ -236,7 +236,14 @@ export default function MakePayment() {
                 </div>
               </div>
 
-              <div className="mt-5 flex items-center gap-5">
+              <div className="mt-5 flex items-end gap-5">
+                <SlimInput
+                  name="amount"
+                  type="text"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                />
+
                 <div className="flex items-center gap-1">
                   <input
                     type="radio"
@@ -296,7 +303,7 @@ export default function MakePayment() {
 
             <Tabs.Content value="CHECK">
               <div className="mt-5 flex justify-between gap-3">
-                <div>
+                <div className="w-[40%]">
                   <SlimInput
                     name="date"
                     type="date"
@@ -305,7 +312,7 @@ export default function MakePayment() {
                   />
                 </div>
 
-                <div className="w-full">
+                <div className="w-[60%]">
                   <SlimInput
                     name="check"
                     type="text"
@@ -314,6 +321,15 @@ export default function MakePayment() {
                     onChange={(e) => setCheck(e.target.value)}
                   />
                 </div>
+              </div>
+
+              <div className="w-[40%]">
+                <SlimInput
+                  name="amount"
+                  type="text"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                />
               </div>
 
               <div className="mt-5">
@@ -330,7 +346,7 @@ export default function MakePayment() {
 
             <Tabs.Content value="CASH">
               <div className="mt-5 flex justify-between gap-3">
-                <div>
+                <div className="w-[40%]">
                   <SlimInput
                     name="date"
                     type="date"
@@ -339,7 +355,7 @@ export default function MakePayment() {
                   />
                 </div>
 
-                <div className="w-full">
+                <div className="w-[60%]">
                   <SlimInput
                     name="cash"
                     type="text"
@@ -348,6 +364,15 @@ export default function MakePayment() {
                     onChange={(e) => setCash(e.target.value)}
                   />
                 </div>
+              </div>
+
+              <div className="w-[40%]">
+                <SlimInput
+                  name="amount"
+                  type="text"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                />
               </div>
 
               <div className="mt-5">
