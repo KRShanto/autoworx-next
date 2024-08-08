@@ -75,19 +75,39 @@ function Table({ data }: { data: ReturnPayment[] }) {
     usePaymentFilterStore();
   const [filteredData, setFilteredData] = useState(data);
 
+  function checkPaymentMethod(method: string) {
+    if (paymentMethod === "All") {
+      return true;
+    } else if (method === paymentMethod) {
+      return true;
+    } else if (
+      paymentMethod === "Other" &&
+      method !== "Card" &&
+      method !== "Cash" &&
+      method !== "Cheque"
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   console.log({ dateRange, amount, paidStatus, paymentMethod });
 
-  // filter using dateRange and amount
+  // filter using dateRange and amount and paymentMethod
   useEffect(() => {
+    console.log("Payment method: ", paymentMethod);
     setFilteredData(
-      data.filter(
-        (item) =>
-          moment(item.date).isBetween(dateRange[0], dateRange[1]) &&
-          item.amount >= amount[0] &&
-          item.amount <= amount[1],
+      data.filter((item) =>
+        dateRange[0] !== null
+          ? moment(item.date).isBetween(dateRange[0], dateRange[1])
+          : true &&
+            item.amount >= amount[0] &&
+            item.amount <= amount[1] &&
+            checkPaymentMethod(item.method),
       ),
     );
-  }, [data, dateRange, amount]);
+  }, [data, dateRange, amount, paidStatus, paymentMethod]);
 
   return (
     <div className="min-h-[65vh] overflow-x-scroll rounded-md bg-white xl:overflow-hidden">

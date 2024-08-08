@@ -66,7 +66,7 @@ export default function MakePayment() {
   const [cardType, setCardType] = useState("MASTERCARD");
   const [check, setCheck] = useState("");
   const [cash, setCash] = useState<number | string>("");
-  const [amount, setAmount] = useState<number | string>(grandTotal);
+  const [amount, setAmount] = useState<number | string>(0);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(
     null,
   );
@@ -97,6 +97,13 @@ export default function MakePayment() {
       }
     }
   }, [payment]);
+
+  // set grandTotal to amount when grandTotal changes
+  useEffect(() => {
+    if (grandTotal && !payment) {
+      setAmount(grandTotal);
+    }
+  }, [grandTotal]);
 
   async function handleSubmit() {
     const res1 = await createInvoice();

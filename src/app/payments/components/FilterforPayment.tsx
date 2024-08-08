@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import SliderRange from "./SliderRange";
-import { usePaymentFilterStore } from "@/stores/paymentFilter";
+import { PaymentMethod, usePaymentFilterStore } from "@/stores/paymentFilter";
+import { cn } from "@/lib/cn";
 
 const FilterforPayment = () => {
-  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("All");
   const [amount, setAmount] = useState<[number, number]>([1, 3000]);
   const [status, setStatus] = useState<string>("all");
   const [showFilter, setShowFilter] = useState(false);
@@ -31,7 +32,7 @@ const FilterforPayment = () => {
     setFilter({
       amount,
       paidStatus: status as any,
-      paymentMethod: paymentMethod || "all",
+      paymentMethod,
     });
     setShowFilter(false);
   };
@@ -51,15 +52,16 @@ const FilterforPayment = () => {
             <div className="mb-4">
               <div className="font-Inter mb-2">Payment Method</div>
               <div className="flex space-x-2">
-                {["Method 1", "Method 2", "Method 3"].map((method) => (
+                {["All", "Cash", "Card", "Cheque", "Other"].map((method) => (
                   <button
                     key={method}
-                    className={` ${
+                    className={cn(
+                      "flex items-center justify-center rounded border px-3 py-1 text-base",
                       paymentMethod === method
-                        ? "flex h-[24px] w-[89px] items-center justify-center rounded border bg-blue-500 px-1 py-1 text-xs text-[white]"
-                        : "text-[#66738C flex h-[24px] w-[89px] items-center justify-center rounded border border-gray-300 px-1 py-1 text-xs"
-                    }`}
-                    onClick={() => setPaymentMethod(method)}
+                        ? "bg-blue-500 text-[white]"
+                        : "border-gray-300 text-[#66738C]",
+                    )}
+                    onClick={() => setPaymentMethod(method as PaymentMethod)}
                   >
                     {method}
                   </button>
@@ -106,7 +108,7 @@ const FilterforPayment = () => {
               <button
                 className="rounded border border-gray-300 px-4 py-2"
                 onClick={() => {
-                  setPaymentMethod(null);
+                  setPaymentMethod("All");
                   setAmount([1, 30_000]);
                   setStatus("all");
                 }}

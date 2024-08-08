@@ -1,10 +1,12 @@
 import { create } from "zustand";
 
+export type PaymentMethod = "Card" | "Cash" | "Cheque" | "Other" | "All";
+
 interface PaymentFilterState {
   dateRange: [Date | null, Date | null];
   amount: [number, number];
   paidStatus: "All" | "Paid" | "Unpaid";
-  paymentMethod: string;
+  paymentMethod: PaymentMethod;
   setFilter({
     dateRange,
     amount,
@@ -14,7 +16,7 @@ interface PaymentFilterState {
     dateRange?: [Date, Date];
     amount?: [number, number];
     paidStatus?: "All" | "Paid" | "Unpaid";
-    paymentMethod?: string;
+    paymentMethod?: PaymentMethod;
   }): void;
 }
 
@@ -22,7 +24,7 @@ export const usePaymentFilterStore = create<PaymentFilterState>((set) => ({
   dateRange: [null, null],
   amount: [1, 30000], // TODO
   paidStatus: "All",
-  paymentMethod: "Method 1",
+  paymentMethod: "All",
   setFilter: ({ dateRange, amount, paidStatus, paymentMethod }) =>
     set((state) => ({
       dateRange: dateRange || state.dateRange,
