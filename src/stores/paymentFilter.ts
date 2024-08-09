@@ -14,7 +14,7 @@ interface PaymentFilterState {
     paidStatus,
     paymentMethod,
   }: {
-    dateRange?: [Date, Date];
+    dateRange?: [Date | null, Date | null];
     amount?: [number, number];
     paidStatus?: PaymentStatus;
     paymentMethod?: PaymentMethod;

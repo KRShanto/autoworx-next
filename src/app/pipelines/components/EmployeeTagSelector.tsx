@@ -111,7 +111,7 @@ export function EmployeeTagSelector({
         }}
       >
         <DropdownMenuTrigger
-          // className="flex h-10 items-center gap-x-8 rounded-md border-2 border-slate-400 px-2 py-1"
+          
           style={{
             backgroundColor: tag?.bgColor,
             color: tag?.textColor,
@@ -128,9 +128,10 @@ export function EmployeeTagSelector({
         <DropdownMenuContent
           side="bottom"
           align="start"
-          sideOffset={8}
-          className="space-y-1 p-0"
+          sideOffset={-10}
+          className="space-y-1 p-0 "
           ref={dropdownRef}
+          style={{width:"70%"}}
         >
           {/* Search */}
           <div className="relative m-2">
@@ -272,12 +273,12 @@ function QuickAddForm({
   }
 
   return (
-    <form ref={formRef} className="flex gap-2 p-2">
+    <form ref={formRef} className="flex gap-2 p-2 w-[200px]">
       <input
         name="name"
         type="text"
         required
-        className="flex-1 rounded-sm border border-solid border-black p-1"
+        className="flex-1 rounded-sm border border-solid border-black p-1 w-[80%]"
       />
 
       <button

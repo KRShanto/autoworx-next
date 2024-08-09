@@ -1,5 +1,4 @@
 "use client";
-import { usePaymentFilterStore } from "@/stores/paymentFilter";
 import { format } from "date-fns";
 import React, { useEffect, useRef, useState } from "react";
 import { DateRangePicker } from "react-date-range";
@@ -7,7 +6,13 @@ import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
 import { CiCalendar } from "react-icons/ci";
 
-const DateRange = () => {
+const DateRange = ({
+  onOk,
+  onCancel,
+}: {
+  onOk: (start: Date, end: Date) => void;
+  onCancel: () => void;
+}) => {
   const [state, setState] = useState({
     selection: {
       startDate: new Date(),
@@ -20,7 +25,6 @@ const DateRange = () => {
   const [showPicker, setShowPicker] = useState(false);
   const [tempRange, setTempRange] = useState(state.selection);
   const [isRangeSelected, setIsRangeSelected] = useState(false);
-  const { setFilter } = usePaymentFilterStore();
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -41,13 +45,32 @@ const DateRange = () => {
     setState({ selection: tempRange });
     setShowPicker(false);
     setIsRangeSelected(true);
-    setFilter({ dateRange: [tempRange.startDate, tempRange.endDate] });
+    onOk(tempRange.startDate, tempRange.endDate);
   };
 
   const handleClickOutside = (event: any) => {
     if (ref.current && !ref.current.contains(event.target)) {
       setShowPicker(false);
     }
+  };
+
+  const handleCancel = () => {
+    togglePicker();
+    // reset everything
+    setState({
+      selection: {
+        startDate: new Date(),
+        endDate: new Date(),
+        key: "selection",
+      },
+    });
+    setIsRangeSelected(false);
+    setTempRange({
+      startDate: new Date(),
+      endDate: new Date(),
+      key: "selection",
+    });
+    onCancel();
   };
 
   const formatRange = (start: Date, end: Date) => {
@@ -88,7 +111,7 @@ const DateRange = () => {
             >
               OK
             </button>
-            <button onClick={togglePicker} className="rounded bg-gray-300 p-2">
+            <button onClick={handleCancel} className="rounded bg-gray-300 p-2">
               Cancel
             </button>
           </div>

@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-
+import { User } from "@prisma/client";
 import React, { SetStateAction, useState } from "react";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { PiWechatLogoLight } from "react-icons/pi";
@@ -11,6 +11,7 @@ import Link from "next/link";
 import { Tag } from "@prisma/client";
 import { EmployeeTagSelector } from "./EmployeeTagSelector";
 import ServiceSelector from "./ServiceSelector";
+import TaskForm from "./TaskForm";
 
 const newLeads = [{ name: "Al Noman", email: "noman@me.com", phone: "123456" }];
 
@@ -57,6 +58,8 @@ const services = [
     name: "Service 5",
   },
 ];
+
+//interfaces
 interface Service {
   id: number;
   name: string;
@@ -67,7 +70,20 @@ interface Employee {
   lastName: string;
 }
 
-export default function Pipelines() {
+interface Task {
+  title: string;
+  description: string;
+  startTime: string;
+  endTime: string;
+  allDay: boolean;
+  assignedTo: string;
+  priority: string;
+}
+interface CompPropsType{
+  users:User[]
+}
+export default function Pipelines({
+  users}:CompPropsType) {
   const [selectedEmployees, setSelectedEmployees] = useState<{
     [key: string]: Employee | null;
   }>({});
@@ -90,7 +106,10 @@ export default function Pipelines() {
   const [showAllServices, setShowAllServices] = useState<{
     [key: string]: boolean;
   }>({});
-  const [openServiceDropdown, setOpenServiceDropdown] = useState<{ [key: string]: boolean }>({});
+  const [openServiceDropdown, setOpenServiceDropdown] = useState<{
+    [key: string]: boolean;
+  }>({});
+
 
   const handleDropdownToggle = (categoryIndex: number, leadIndex: number) => {
     if (
@@ -162,7 +181,11 @@ export default function Pipelines() {
 
   //service
 
-  const handleServiceSelect = (categoryIndex: number, leadIndex: number, service: Service) => {
+  const handleServiceSelect = (
+    categoryIndex: number,
+    leadIndex: number,
+    service: Service,
+  ) => {
     const key = `${categoryIndex}-${leadIndex}`;
     setSelectedServices((prevState) => ({
       ...prevState,
@@ -178,7 +201,10 @@ export default function Pipelines() {
     }));
   };
 
-  const handleServiceDropdownToggle = (categoryIndex: number, leadIndex: number) => {
+  const handleServiceDropdownToggle = (
+    categoryIndex: number,
+    leadIndex: number,
+  ) => {
     const key = `${categoryIndex}-${leadIndex}`;
     setOpenServiceDropdown((prevState) => ({
       ...prevState,
@@ -298,7 +324,7 @@ export default function Pipelines() {
                       </button>
                     </div>
                     {isTagDropdownOpen && (
-                      <div className="absolute right-0 top-8 z-20">
+                      <div className="-left-100 absolute top-12 z-20">
                         <EmployeeTagSelector
                           value={tag}
                           setValue={(selectedTag) =>
@@ -320,15 +346,22 @@ export default function Pipelines() {
                     <div className="relative">
                       {/* Display selected service or dropdown toggle */}
                       <div
-                        onClick={() => handleServiceDropdownToggle(categoryIndex, leadIndex)}
-                        className="flex justify-between cursor-pointer  border rounded-md border-[#6571FF] px-2 py-1 text-xs   }"
+                        onClick={() =>
+                          handleServiceDropdownToggle(categoryIndex, leadIndex)
+                        }
+                        className="} flex cursor-pointer justify-between rounded-md border border-[#6571FF] px-2 py-1 text-xs"
+                        style={{
+                          visibility: isServiceDropdownOpen
+                            ? "hidden"
+                            : "visible",
+                        }}
                       >
                         {selectedService ? (
-                          <span className="text-[#6571FF]" >
+                          <span className="text-[#6571FF]">
                             {selectedService.name}
                           </span>
                         ) : (
-                          <span className="inline-flex text-[#6571FF] ">
+                          <span className="inline-flex text-[#6571FF]">
                             {services.length > 1
                               ? `${services[0].name}... + ${services.length - 1}`
                               : "Select a service"}
@@ -338,8 +371,7 @@ export default function Pipelines() {
 
                       {/* Dropdown menu */}
                       {isServiceDropdownOpen && (
-                        <div className="border rounded-md border-[#6571FF] text-[#6571FF] font-Inter ">
-
+                        <div className="-top-18 font-Inter z-10 rounded-md border border-[#6571FF] text-[#6571FF]">
                           {services.map((service) => (
                             <div
                               key={service.id}
@@ -350,7 +382,7 @@ export default function Pipelines() {
                                   service,
                                 );
                               }}
-                              className={`cursor-pointer  px-2 py-1 text-sm hover:bg-gray-200 ${selectedService?.id === service.id ? "bg-white" : ""}`}
+                              className={`cursor-pointer px-2 py-1 text-sm hover:bg-gray-200 ${selectedService?.id === service.id ? "bg-white" : ""}`}
                             >
                               {service.name}
                             </div>
@@ -358,10 +390,9 @@ export default function Pipelines() {
                         </div>
                       )}
                     </div>
+
                     <div>
-                      <p className="overflow-auto pb-2 text-sm">
-                        services selections
-                      </p>
+                      <p className="overflow-auto pb-2 text-xs">Lead Source</p>
                     </div>
 
                     <div className="flex justify-between">
@@ -382,9 +413,8 @@ export default function Pipelines() {
                           <CiCalendar size={18} />
                         </Link>
                       </div>
-                      <button className="bg-whiet rounded-md border-2 border-[#66738C] px-2 text-center text-xs text-gray-500">
-                        Add Task
-                      </button>
+
+                      <TaskForm companyUsers={users} />
                     </div>
                   </li>
                 );
