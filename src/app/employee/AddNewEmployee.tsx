@@ -22,11 +22,13 @@ import { EmployeeType } from "@prisma/client";
 export default function AddNewEmployee() {
   const [open, setOpen] = useState(false);
   const [employeeTypeOpen, setEmployeeTypeOpen] = useState(false);
-  const profilePicRef = useRef<HTMLInputElement>(null);
+  const [profilePic, setProfilePic] = useState<File | null>(null);
   const { data: companyName } = useServerGet(getCompany);
   const { showError } = useFormErrorStore();
 
   async function handleSubmit(data: FormData) {
+    let photo;
+
     const firstName = data.get("firstName") as string;
     const lastName = data.get("lastName") as string;
     const email = data.get("email") as string;
@@ -41,6 +43,25 @@ export default function AddNewEmployee() {
     const password = data.get("password") as string;
     const confirmPassword = data.get("confirmPassword") as string;
 
+    // upload photo
+    if (profilePic) {
+      const formData = new FormData();
+      formData.append("photos", profilePic);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        showError({ field: "all", message: "An error occurred" });
+        return;
+      }
+
+      const json = await res.json();
+      photo = json.data[0];
+    }
+
     const res = await addEmployee({
       firstName,
       lastName,
@@ -54,7 +75,7 @@ export default function AddNewEmployee() {
       commission: Number(commission),
       date,
       type: (type || EmployeeType.Sales) as EmployeeType,
-      profilePicture: undefined,
+      profilePicture: photo,
       password,
       confirmPassword,
     });
@@ -82,22 +103,37 @@ export default function AddNewEmployee() {
           <div className="mt-8 flex items-center justify-between">
             <h1 className="text-2xl font-bold">Add Employee</h1>
 
-            {/* TODO */}
-            <button
-              onClick={() => {
-                profilePicRef.current?.click();
-              }}
-              className="flex items-center justify-center gap-x-2 rounded-full border border-slate-400 pl-2"
-            >
-              <span>Upload a profile picture</span> <RxAvatar size={48} />
-            </button>
-            <input
-              ref={profilePicRef}
-              type="file"
-              name="profilePicture"
-              hidden
-              accept="image/*"
-            />
+            {profilePic ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={URL.createObjectURL(profilePic)}
+                alt="profile"
+                className="h-14 w-14 cursor-pointer rounded-full border border-slate-400"
+                onClick={() => {
+                  setProfilePic(null);
+                }}
+              />
+            ) : (
+              <label
+                className="flex cursor-pointer items-center justify-center gap-x-2 rounded-full border border-slate-400 pl-2"
+                htmlFor="profilePicture"
+              >
+                <input
+                  type="file"
+                  name="profilePicture"
+                  id="profilePicture"
+                  hidden
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setProfilePic(file);
+                    }
+                  }}
+                />
+                <span>Upload a profile picture</span> <RxAvatar size={48} />
+              </label>
+            )}
           </div>
 
           <FormError />

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import MessageBox from "./MessageBox";
 import { User } from "next-auth";
 import { pusher } from "@/lib/pusher/client";
 import { Message as DbMessage } from "@prisma/client";
+import { cn } from "@/lib/cn";
 
 export interface MessageQue {
   user: number;
@@ -26,7 +27,6 @@ export default function UsersArea({
   previousMessages: DbMessage[];
 }) {
   const [messages, setMessages] = useState<MessageQue[]>([]);
-
   useEffect(() => {
     const messages: MessageQue[] = [];
 
@@ -56,14 +56,15 @@ export default function UsersArea({
       .bind(
         "message",
         ({ from, message }: { from: number; message: string }) => {
-          const user = usersList.find((u) => u.id === from);
+          const user = usersList.find((u) => {
+            return u.id === from;
+          });
           if (!user) {
             return;
           }
 
           const newMessages = [...messages];
           const userMessages = newMessages.find((m) => m.user === from);
-
           if (userMessages) {
             userMessages.messages.push({ message, sender: "CLIENT" });
           } else {
@@ -72,7 +73,6 @@ export default function UsersArea({
               messages: [{ message, sender: "CLIENT" }],
             });
           }
-
           setMessages(newMessages);
         },
       );
@@ -80,23 +80,44 @@ export default function UsersArea({
     return () => {
       channel.unbind();
     };
-  }, []);
+  }, [usersList, messages]);
 
-  console.log("Message Que", messages);
-
+  const totalUserListLength = usersList.length;
   return (
-    <div className="flex w-full flex-wrap gap-4">
+    <div
+      className={cn(
+        "grid h-[88vh] w-full gap-3",
+        totalUserListLength > 1 ? "grid-cols-2" : "grid-cols-1",
+      )}
+    >
       {usersList.map((user) => {
+        const findMessages =
+          messages.find((m) => m.user === user.id)?.messages || [];
         return (
           <MessageBox
             key={user.id}
             user={user}
             setUsersList={setUsersList}
-            messages={messages.find((m) => m.user === user.id)?.messages || []}
+            messages={[...findMessages]}
             setMessages={setMessages}
+            totalMessageBox={totalUserListLength}
           />
         );
       })}
+      {totalUserListLength === 3 && (
+        <div
+          className={cn(
+            "app-shadow flex w-full border-spacing-4 flex-col overflow-hidden rounded-lg max-[1400px]:w-[100%]",
+            totalUserListLength > 2 && "h-[44vh]",
+          )}
+          style={{
+            borderWidth: "4px",
+            borderColor: "#006D77",
+            borderStyle: "dashed",
+            backgroundColor: "#DFEBED",
+          }}
+        />
+      )}
     </div>
   );
 }

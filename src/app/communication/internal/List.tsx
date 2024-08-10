@@ -9,7 +9,7 @@ export default function List({
   setUsersList: React.Dispatch<React.SetStateAction<User[]>>;
 }) {
   return (
-    <div className="app-shadow h-[83vh] w-[20%] rounded-lg bg-white p-3">
+    <div className="app-shadow w-[20%] rounded-lg bg-white p-3">
       {/* Header */}
       <h2 className="text-[14px] text-[#797979]">User List</h2>
 
@@ -38,6 +38,7 @@ export default function List({
               onClick={() => {
                 // add this user to the list (if not already in it)
                 setUsersList((usersList) => {
+                  if (usersList.length >= 4) return usersList;
                   if (usersList.find((u) => u.id === user.id)) {
                     return usersList;
                   }
