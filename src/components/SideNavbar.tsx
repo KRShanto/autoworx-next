@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ReactNode, useState } from "react";
+import { act, ReactNode, useEffect, useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -104,6 +104,7 @@ const navList = [
 export default function SideNavbar() {
   const pathName = usePathname();
   const [visibleTooltip, setVisibleTooltip] = useState<number | null>(null);
+  const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -125,6 +126,9 @@ export default function SideNavbar() {
               <Dropdown
                 key={index}
                 title={item.title}
+                index={index}
+                activeDropdown={activeDropdown}
+                setActiveDropdown={setActiveDropdown}
                 icon={
                   <Image
                     src={item.icon}
@@ -134,15 +138,16 @@ export default function SideNavbar() {
                   />
                 }
               >
-                {item.subnav.map((subnavItem, index) => (
-                  <DropdownMenuItem
-                    key={index}
-                    asChild
-                    className="border border-solid border-white bg-white shadow-lg hover:bg-slate-500/80 hover:text-white focus:bg-slate-500/80 focus:text-white"
-                  >
-                    <Link href={subnavItem.link}>{subnavItem.title}</Link>
-                  </DropdownMenuItem>
-                ))}
+                {activeDropdown === index &&
+                  item.subnav.map((subnavItem, index) => (
+                    <DropdownMenuItem
+                      key={index}
+                      asChild
+                      className="cursor-pointer border border-solid border-white bg-white shadow-lg hover:bg-slate-500/80 hover:text-white focus:bg-slate-500/80 focus:text-white"
+                    >
+                      <Link href={subnavItem.link}>{subnavItem.title}</Link>
+                    </DropdownMenuItem>
+                  ))}
               </Dropdown>
             ) : (
               <Tooltip key={index}>
@@ -208,15 +213,27 @@ export default function SideNavbar() {
 function Dropdown({
   title,
   icon,
+  index,
+  activeDropdown,
+  setActiveDropdown,
   children,
 }: {
   title: string;
   icon: ReactNode;
+  index: number;
+  activeDropdown: number | null;
+  setActiveDropdown: React.Dispatch<React.SetStateAction<number | null>>;
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const [toolTip, setTooltip] = useState(false);
   const [visibleTooltip, setVisibleTooltip] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setActiveDropdown(index);
+    }
+  }, [open]);
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -231,7 +248,7 @@ function Dropdown({
               type="button"
               className={cn(
                 "rounded-sm p-2 hover:bg-white/25",
-                open && "!bg-black invert",
+                open && activeDropdown === index && "!bg-black invert",
               )}
             >
               {icon}
