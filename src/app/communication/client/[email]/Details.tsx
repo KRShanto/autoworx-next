@@ -53,7 +53,12 @@ function downloadAttachment(
   document.body.removeChild(link);
 }
 
-export default function Details({ id, conversations }: any) {
+export default function Details({
+  id,
+  conversations,
+  base64Data,
+  setBase64Data,
+}: any) {
   const user = tempClients.find((user: any) => user.id == id);
 
   return (
