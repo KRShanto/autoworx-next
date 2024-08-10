@@ -1,7 +1,9 @@
 import { cn } from "@/lib/cn";
-import { convert } from "html-to-text";
+
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+
 // import Attachment from "@/public/icons/Attachment.svg";
 // import Send from "@/public/icons/Send.svg";
 // const messages = [
@@ -53,12 +55,14 @@ import { useRef, useState } from "react";
 //     sender: "client",
 //   },
 // ];
-export default function Messages({ conversations, email }: any) {
+export default function Messages({ conversations, email, loading }: any) {
   const fileRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [messageInput, setMessageInput] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const router = useRouter();
 
-  const handleSendMessage = async (e) => {
+  const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("recipient", email);
@@ -72,12 +76,21 @@ export default function Messages({ conversations, email }: any) {
       body: formData,
     });
     setMessageInput("");
+    setFile(null);
+    location.reload();
   };
+
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight + 100;
+    }
+  }, [conversations]);
+
   return (
-    <div className="h-[75%] 2xl:h-[85%]">
-      <div className="h-[95%] overflow-y-scroll">
+    <div className="mb-2 h-[75%] 2xl:h-[85%]">
+      <div ref={containerRef} className="h-[95%] overflow-y-scroll">
         {conversations
-          .filter((convo) => convo.body)
+          .filter((convo: any) => convo.body)
           .map((message: any, index: number) => (
             <div
               key={index}
@@ -86,16 +99,15 @@ export default function Messages({ conversations, email }: any) {
               }`}
             >
               <div className="flex items-start gap-2 p-1">
-                {message.labelIds[0] !== "SENT" &&
-                  conversations[index - 1]?.labelIds[0] !== "SENT" && (
-                    <Image
-                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNL_ZnOTpXSvhf1UaK7beHey2BX42U6solRA&s"
-                      alt="user"
-                      width={50}
-                      height={50}
-                      className="rounded-full"
-                    />
-                  )}
+                {message.labelIds[0] !== "SENT" && (
+                  <Image
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNL_ZnOTpXSvhf1UaK7beHey2BX42U6solRA&s"
+                    alt="user"
+                    width={30}
+                    height={30}
+                    className="rounded-full"
+                  />
+                )}
 
                 <p
                   className={cn(
@@ -103,8 +115,8 @@ export default function Messages({ conversations, email }: any) {
                     message.labelIds[0] !== "SENT"
                       ? "bg-[#D9D9D9] text-slate-800"
                       : "bg-[#006D77] text-white",
-                    conversations[index - 1]?.labelIds[0] !== "SENT" &&
-                      "ml-[58px]",
+                    // conversations[index - 1]?.labelIds[0] !== "SENT" &&
+                    //   "ml-[58px]",
                   )}
                 >
                   {message.body}
@@ -114,12 +126,25 @@ export default function Messages({ conversations, email }: any) {
           ))}
       </div>
 
+      {loading && conversations.length === 0 && (
+        <div className="flex w-full items-center justify-center pb-12">
+          Loading...
+        </div>
+      )}
+
       <form
         onSubmit={handleSendMessage}
         className="flex h-[5%] items-center gap-x-2 rounded-b-md bg-[#D9D9D9] px-2 py-1"
       >
+        {file && (
+          <div className="text-xs text-[#006D77]">
+            {file.name.length > 10 ? file.name.slice(0, 10) + "..." : file.name}
+          </div>
+        )}
         <input
-          onChange={(e) => setFile(e.target.files[0])}
+          onChange={(e) =>
+            e?.target?.files?.length && setFile(e?.target?.files[0])
+          }
           type="file"
           className="hidden"
           ref={fileRef}

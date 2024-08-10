@@ -30,6 +30,7 @@
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@react-pdf/renderer": "^3.4.2",
+    "@types/html-to-text": "^9.0.4",
     "@types/react-qr-reader": "^2.1.7",
     "@uiw/react-color-hue": "^2.3.0",
     "antd": "^5.19.0",

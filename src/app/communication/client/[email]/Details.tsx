@@ -23,7 +23,11 @@ const sharedFiles = [
     url: "/icons/bar.png",
   },
 ];
-function downloadAttachment(filename, mimeType, base64Data) {
+function downloadAttachment(
+  filename: string,
+  mimeType: string,
+  base64Data: string,
+) {
   // Replace URL-safe base64 characters
   base64Data = base64Data.replace(/-/g, "+").replace(/_/g, "/");
 
@@ -61,9 +65,11 @@ export default function Details({ id, conversations }: any) {
           <h2 className="p-3 text-white">Client Data</h2>
           {/* Content */}
           <div className="flex flex-col items-center gap-5 px-5 2xl:flex-row">
-            <img
+            <Image
               src={user!.image}
               alt="user"
+              width={50}
+              height={50}
               className="m h-[50px] w-[50px] 2xl:h-[110px] 2xl:w-[110px]"
             />
 
@@ -112,8 +118,8 @@ export default function Details({ id, conversations }: any) {
         <div>
           <p>Shared Files</p>
           <div className="mt-4 flex flex-wrap items-center gap-5">
-            {conversations.map((email) =>
-              email.attachments.map((attachment, index) => (
+            {conversations.map((email: any) =>
+              email.attachments.map((attachment: any, index: number) => (
                 <div
                   className="rounded-md border border-emerald-600 p-5"
                   key={index}

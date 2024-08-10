@@ -1,11 +1,13 @@
 import formidable from "formidable";
 import fs from "fs";
 import { google } from "googleapis";
+import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-import { pipeline } from "stream";
+import { pipeline, Readable } from "stream";
 import { promisify } from "util";
 const pump = promisify(pipeline);
-export async function GET(request) {
+
+export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
     const emailAddress = url.searchParams.get("email");
@@ -25,7 +27,6 @@ export async function GET(request) {
     const refreshToken = process.env.GMAIL_REFRESH_TOKEN;
 
     const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret);
-
     oAuth2Client.setCredentials({ refresh_token: refreshToken });
 
     const gmail = google.gmail({ version: "v1", auth: oAuth2Client });
@@ -44,18 +45,19 @@ export async function GET(request) {
       for (const message of messages) {
         const msg = await gmail.users.messages.get({
           userId: "me",
-          id: message.id,
+          id: message.id as string, // Ensure `message.id` is treated as a string
           format: "full",
         });
 
-        const parts = msg.data.payload.parts || [];
+        const parts = msg.data.payload?.parts || [];
         const attachments = await Promise.all(
           parts.map(async (part) => {
-            if (part.filename && part.body.attachmentId) {
+            // Ensure that part.body and part.body.attachmentId are defined
+            if (part.filename && part.body && part.body.attachmentId) {
               const attachment = await gmail.users.messages.attachments.get({
                 userId: "me",
-                messageId: message.id,
-                id: part.body.attachmentId,
+                messageId: message.id as string, // Ensure `message.id` is treated as a string
+                id: part.body.attachmentId as string, // Ensure `attachmentId` is treated as a string
               });
 
               const data = attachment.data.data; // base64 data
@@ -72,7 +74,7 @@ export async function GET(request) {
 
         emails.push({
           ...msg.data,
-          internalDate: parseInt(msg.data.internalDate),
+          internalDate: parseInt(msg.data.internalDate as string), // Ensure `internalDate` is treated as a string
           attachments: attachments.filter(Boolean),
         });
       }
@@ -93,19 +95,46 @@ export async function GET(request) {
   }
 }
 
-// send mail with attachments
-export async function POST(req) {
+// Helper function to convert Web Stream to Node.js Readable stream
+function webStreamToNodeStream(
+  webStream: ReadableStream<Uint8Array>,
+): Readable {
+  const reader = webStream.getReader();
+
+  return new Readable({
+    async read() {
+      const { done, value } = await reader.read();
+      if (done) {
+        this.push(null); // End of stream
+      } else {
+        this.push(Buffer.from(value));
+      }
+    },
+  });
+}
+
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     // Parse the incoming form data
     const formData = await req.formData();
-    const file = formData.get("file") as File;
-    const recipient = formData.get("recipient");
-    const subject = formData.get("subject");
-    const text = formData.get("text");
+    const file = formData.get("file") as File | null;
+    const recipient = formData.get("recipient") as string | null;
+    const subject = formData.get("subject") as string | null;
+    const text = formData.get("text") as string | null;
+
+    if (!file || !recipient || !subject || !text) {
+      return NextResponse.json(
+        { success: false, error: "Missing required form data" },
+        { status: 400 },
+      );
+    }
+
+    // Convert Web Stream to Node.js Readable stream
+    const nodeStream = webStreamToNodeStream(file.stream());
 
     // Save the file to the server temporarily
     const filePath = `./public/uploads/${file.name}`;
-    await pump(file.stream(), fs.createWriteStream(filePath));
+    await pump(nodeStream, fs.createWriteStream(filePath));
 
     // Nodemailer transporter with OAuth2
     const transporter = nodemailer.createTransport({
@@ -113,14 +142,14 @@ export async function POST(req) {
       port: 465,
       secure: true,
       auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS,
+        user: process.env.GMAIL_USER as string,
+        pass: process.env.GMAIL_PASS as string,
       },
     });
 
     // Send the email with the file attachment
     const mailOptions = {
-      from: process.env.GMAIL_USER,
+      from: process.env.GMAIL_USER as string,
       to: recipient,
       subject: subject,
       text: text,
@@ -137,9 +166,11 @@ export async function POST(req) {
     // Remove the file from the server after sending the email
     fs.unlinkSync(filePath);
 
-    return Response.json({ success: true, result });
-  } catch (error) {
+    return NextResponse.json({ success: true, result });
+  } catch (error: unknown) {
     console.error("Error sending email:", error);
-    return Response.json({ success: false, error: error.message });
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ success: false, error: errorMessage });
   }
 }
