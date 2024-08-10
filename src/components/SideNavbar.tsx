@@ -102,11 +102,11 @@ const navList = [
 ];
 
 export default function SideNavbar() {
-  const [openNav, setOpenNav] = useState<string | null>(null);
   const pathName = usePathname();
+  const [visibleTooltip, setVisibleTooltip] = useState<number | null>(null);
 
   return (
-    <TooltipProvider delayDuration={500}>
+    <TooltipProvider delayDuration={200}>
       <nav className="fixed z-10 flex h-screen w-[5%] flex-col items-center gap-8 overflow-y-auto bg-[#0C1427] px-2 py-12">
         {/* logo */}
         <Link href="/">
@@ -146,7 +146,11 @@ export default function SideNavbar() {
               </Dropdown>
             ) : (
               <Tooltip key={index}>
-                <TooltipTrigger asChild>
+                <TooltipTrigger
+                  asChild
+                  onMouseEnter={() => setVisibleTooltip(index)}
+                  onMouseLeave={() => setVisibleTooltip(null)}
+                >
                   <Link
                     className={cn(
                       "rounded-sm p-2 hover:bg-white/25",
@@ -162,13 +166,15 @@ export default function SideNavbar() {
                     />
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent
-                  side="right"
-                  sideOffset={8}
-                  className="border border-solid border-white bg-slate-500/80 text-white"
-                >
-                  {item.title}
-                </TooltipContent>
+                {visibleTooltip === index && (
+                  <TooltipContent
+                    side="right"
+                    sideOffset={8}
+                    className="border border-solid border-white bg-slate-500/80 text-white"
+                  >
+                    {item.title}
+                  </TooltipContent>
+                )}
               </Tooltip>
             ),
           )}
@@ -210,11 +216,16 @@ function Dropdown({
 }) {
   const [open, setOpen] = useState(false);
   const [toolTip, setTooltip] = useState(false);
+  const [visibleTooltip, setVisibleTooltip] = useState(false);
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <Tooltip open={!open && toolTip} onOpenChange={setTooltip}>
-        <TooltipTrigger asChild>
+        <TooltipTrigger
+          asChild
+          onMouseEnter={() => setVisibleTooltip(true)}
+          onMouseLeave={() => setVisibleTooltip(false)}
+        >
           <DropdownMenuTrigger asChild>
             <button
               type="button"
@@ -227,13 +238,16 @@ function Dropdown({
             </button>
           </DropdownMenuTrigger>
         </TooltipTrigger>
-        <TooltipContent
-          side="right"
-          sideOffset={8}
-          className="border border-solid border-white bg-slate-500/80 text-white"
-        >
-          {title}
-        </TooltipContent>
+
+        {visibleTooltip && (
+          <TooltipContent
+            side="right"
+            sideOffset={8}
+            className="border border-solid border-white bg-slate-500/80 text-white"
+          >
+            {title}
+          </TooltipContent>
+        )}
       </Tooltip>
 
       <DropdownMenuContent
