@@ -23,7 +23,37 @@ const sharedFiles = [
     url: "/icons/bar.png",
   },
 ];
-export default function Details({ id }: { id: number }) {
+function downloadAttachment(
+  filename: string,
+  mimeType: string,
+  base64Data: string,
+) {
+  // Replace URL-safe base64 characters
+  base64Data = base64Data.replace(/-/g, "+").replace(/_/g, "/");
+
+  // Handle padding (if needed)
+  const padding = "=".repeat((4 - (base64Data.length % 4)) % 4);
+  base64Data += padding;
+
+  const byteCharacters = atob(base64Data);
+  const byteNumbers = new Array(byteCharacters.length);
+
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray], { type: mimeType });
+
+  const link = document.createElement("a");
+  link.href = window.URL.createObjectURL(blob);
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+export default function Details({ id, conversations }: any) {
   const user = tempClients.find((user: any) => user.id == id);
 
   return (
@@ -35,9 +65,11 @@ export default function Details({ id }: { id: number }) {
           <h2 className="p-3 text-white">Client Data</h2>
           {/* Content */}
           <div className="flex flex-col items-center gap-5 px-5 2xl:flex-row">
-            <img
+            <Image
               src={user!.image}
               alt="user"
+              width={50}
+              height={50}
               className="m h-[50px] w-[50px] 2xl:h-[110px] 2xl:w-[110px]"
             />
 
@@ -86,14 +118,29 @@ export default function Details({ id }: { id: number }) {
         <div>
           <p>Shared Files</p>
           <div className="mt-4 flex flex-wrap items-center gap-5">
-            {sharedFiles.map((file: any, index: number) => (
-              <div
-                className="rounded-md border border-emerald-600 p-5"
-                key={index}
-              >
-                <Image width={20} height={20} src={file.url} alt="file" />
-              </div>
-            ))}
+            {conversations.map((email: any) =>
+              email.attachments.map((attachment: any, index: number) => (
+                <div
+                  className="rounded-md border border-emerald-600 p-5"
+                  key={index}
+                  onClick={() =>
+                    downloadAttachment(
+                      attachment.filename,
+                      attachment.mimeType,
+                      attachment.data,
+                    )
+                  }
+                >
+                  <Image
+                    width={20}
+                    height={20}
+                    src="/icons/image.png"
+                    alt="file"
+                  />
+                  <p>{attachment.filename}</p>
+                </div>
+              )),
+            )}
           </div>
         </div>
         {/* estimate and invoices */}

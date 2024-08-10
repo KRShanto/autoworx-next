@@ -42,3 +42,7 @@ next-env.d.ts
 autoworx-next.zip
 
 public/uploads/*
+
+credentials.js
+credentials.json
+token.json
