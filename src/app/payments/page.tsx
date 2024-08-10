@@ -71,7 +71,7 @@ export default function Page() {
 }
 
 function Table({ data }: { data: ReturnPayment[] }) {
-  const { dateRange, amount, paidStatus, paymentMethod } =
+  const { search, dateRange, amount, paidStatus, paymentMethod } =
     usePaymentFilterStore();
   const [filteredData, setFilteredData] = useState(data);
 
@@ -92,26 +92,43 @@ function Table({ data }: { data: ReturnPayment[] }) {
     }
   }
 
-  console.log({ dateRange, amount, paidStatus, paymentMethod });
-
-  // filter using dateRange and amount and paymentMethod
   useEffect(() => {
     setFilteredData(
-      data.filter((item) =>
-        dateRange[0] !== null
-          ? moment(item.date).isBetween(dateRange[0], dateRange[1])
-          : true &&
-            item.amount >= amount[0] &&
-            item.amount <= amount[1] &&
-            checkPaymentMethod(item.method) &&
-            (paidStatus === "All"
-              ? true
-              : paidStatus === "Paid"
-                ? item.paid
-                : !item.paid),
-      ),
+      data.filter((item) => {
+        const isWithinDateRange =
+          dateRange[0] && dateRange[1]
+            ? moment(item.date).isSameOrAfter(dateRange[0], "day") &&
+              moment(item.date).isSameOrBefore(dateRange[1], "day")
+            : true;
+
+        const isWithinAmountRange =
+          item.amount >= amount[0] && item.amount <= amount[1];
+
+        const isPaymentMethodMatch = checkPaymentMethod(item.method);
+
+        const isPaidStatusMatch =
+          paidStatus === "All"
+            ? true
+            : paidStatus === "Paid"
+              ? item.paid
+              : !item.paid;
+
+        const isSearchMatch = search
+          ? item.vehicle?.toLowerCase().includes(search.toLowerCase()) ||
+            item.invoiceId.toLowerCase().includes(search.toLowerCase()) ||
+            item.client.name?.toLowerCase().includes(search.toLowerCase())
+          : true;
+
+        return (
+          isWithinDateRange &&
+          isWithinAmountRange &&
+          isPaymentMethodMatch &&
+          isPaidStatusMatch &&
+          isSearchMatch
+        );
+      }),
     );
-  }, [data, dateRange, amount, paidStatus, paymentMethod]);
+  }, [data, dateRange, amount, paidStatus, paymentMethod, search]);
 
   return (
     <div className="min-h-[65vh] overflow-x-scroll rounded-md bg-white xl:overflow-hidden">

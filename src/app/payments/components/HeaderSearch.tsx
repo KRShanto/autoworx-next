@@ -21,6 +21,7 @@ export default function HeaderSearch() {
               type="text"
               placeholder="Search..."
               className="w-full rounded border border-[#66738C] p-2 pl-10"
+              onChange={(e) => setFilter({ search: e.target.value })}
             />
           </div>
           <div className="flex items-center gap-4">
