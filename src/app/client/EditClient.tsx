@@ -148,7 +148,6 @@ export default function EditCustomer({
           <div className="mt-8 flex items-center justify-between">
             <h1 className="text-2xl font-bold">Edit Client</h1>
 
-            {/* TODO: update profile pic */}
             {profilePic ? (
               <label
                 className="relative cursor-pointer"

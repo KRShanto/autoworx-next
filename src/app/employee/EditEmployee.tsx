@@ -21,15 +21,21 @@ import { useServerGet } from "@/hooks/useServerGet";
 import { getCompany } from "@/actions/settings/getCompany";
 import { useFormErrorStore } from "@/stores/form-error";
 import { updateEmployee } from "@/actions/employee/update";
+import { DEFAULT_IMAGE_URL } from "@/lib/consts";
+import { FaPen } from "react-icons/fa";
 
 export default function EditEmployee({ employee }: { employee: User }) {
   const [open, setOpen] = useState(false);
   const [employeeTypeOpen, setEmployeeTypeOpen] = useState(false);
-  const profilePicRef = useRef<HTMLInputElement>(null);
+  const [profilePic, setProfilePic] = useState<string | null>(
+    employee.image !== DEFAULT_IMAGE_URL ? employee.image : null,
+  );
+  const [newProfilePic, setNewProfilePic] = useState<File | null>(null);
   const { showError } = useFormErrorStore();
   const { data: companyName } = useServerGet(getCompany);
 
   async function handleSubmit(data: FormData) {
+    let photo;
     const firstName = data.get("firstName") as string;
     const lastName = data.get("lastName") as string;
     const email = data.get("email") as string;
@@ -41,6 +47,33 @@ export default function EditEmployee({ employee }: { employee: User }) {
     const commission = data.get("commission") as string;
     const date = data.get("date") as string;
     const type = data.get("type") as string;
+
+    // delete the old photo
+    if (newProfilePic && profilePic !== DEFAULT_IMAGE_URL) {
+      await fetch("/api/upload", {
+        method: "DELETE",
+        body: JSON.stringify({ filePath: profilePic }),
+      });
+    }
+
+    // update photo
+    if (newProfilePic) {
+      const formData = new FormData();
+      formData.append("photos", newProfilePic);
+
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        console.error("Failed to upload photos");
+        return uploadRes.json();
+      }
+
+      const json = await uploadRes.json();
+      photo = json.data[0];
+    }
 
     const res = await updateEmployee({
       firstName,
@@ -55,7 +88,7 @@ export default function EditEmployee({ employee }: { employee: User }) {
       commission: Number(commission),
       date,
       type: type as EmployeeType,
-      profilePicture: undefined,
+      profilePicture: photo,
     });
 
     if (res.type === "error") {
@@ -80,22 +113,61 @@ export default function EditEmployee({ employee }: { employee: User }) {
         >
           <div className="mt-8 flex items-center justify-between">
             <h1 className="text-2xl font-bold">Edit Employee</h1>
-            <button
-              onClick={() => {
-                profilePicRef.current?.click();
-              }}
-              className="flex items-center justify-center gap-x-2 rounded-full border border-slate-400 pl-2"
-            >
-              <span>Upload a profile picture</span> <RxAvatar size={48} />
-            </button>
 
-            <input
-              ref={profilePicRef}
-              type="file"
-              name="profilePicture"
-              hidden
-              accept="image/*"
-            />
+            {profilePic ? (
+              <label
+                className="relative cursor-pointer"
+                htmlFor="profilePicture"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={
+                    newProfilePic
+                      ? URL.createObjectURL(newProfilePic)
+                      : profilePic
+                  }
+                  alt="profile"
+                  className="h-20 w-20 rounded-full border border-slate-400 hover:border-dashed hover:opacity-80"
+                />
+                <span className="absolute bottom-0 left-2 text-lg text-[#6571FF]">
+                  <FaPen />
+                </span>
+
+                <input
+                  type="file"
+                  name="profilePicture"
+                  id="profilePicture"
+                  hidden
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setNewProfilePic(file);
+                    }
+                  }}
+                />
+              </label>
+            ) : (
+              <label
+                className="flex cursor-pointer items-center justify-center gap-x-2 rounded-full border border-slate-400 pl-2"
+                htmlFor="profilePicture"
+              >
+                <input
+                  type="file"
+                  name="profilePicture"
+                  id="profilePicture"
+                  hidden
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setNewProfilePic(file);
+                    }
+                  }}
+                />
+                <span>Upload a profile picture</span> <RxAvatar size={48} />
+              </label>
+            )}
           </div>
 
           <FormError />
