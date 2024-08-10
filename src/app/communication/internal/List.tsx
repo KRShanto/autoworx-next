@@ -8,6 +8,7 @@ export default function List({
   users: User[];
   setUsersList: React.Dispatch<React.SetStateAction<User[]>>;
 }) {
+  console.log("user", users);
   return (
     <div className="app-shadow w-[20%] rounded-lg bg-white p-3">
       {/* Header */}
