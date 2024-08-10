@@ -20,7 +20,9 @@ import { getSources } from "@/actions/source/getSources";
 import { deleteSource } from "@/actions/source/deleteSource";
 import { useFormErrorStore } from "@/stores/form-error";
 import { FaPenToSquare } from "react-icons/fa6";
+import { FaPen } from "react-icons/fa6";
 import { editClient } from "../../actions/client/edit";
+import { DEFAULT_IMAGE_URL } from "@/lib/consts";
 
 export default function EditCustomer({
   client,
@@ -34,7 +36,10 @@ export default function EditCustomer({
   const [openClientSource, setOpenClientSource] = useState(false);
   const [tagOpenDropdown, setTagOpenDropdown] = useState(false);
   const [tag, setTag] = useState<Tag | undefined>(client.tag!);
-  const [profilePic, setProfilePic] = useState<File | null>(null);
+  const [profilePic, setProfilePic] = useState<string | null>(
+    client.photo !== DEFAULT_IMAGE_URL ? client.photo : null,
+  );
+  const [newProfilePic, setNewProfilePic] = useState<File | null>(null);
   const [clientSources, setClientSources] = useState<Source[]>([]);
   const { showError } = useFormErrorStore();
 
@@ -55,6 +60,8 @@ export default function EditCustomer({
     }
   }
 
+  console.log("profilePic", profilePic);
+
   async function handleSubmit() {
     let photo;
 
@@ -71,6 +78,33 @@ export default function EditCustomer({
     const state = document.querySelector<HTMLInputElement>("#state")?.value;
     const zip = document.querySelector<HTMLInputElement>("#zip")?.value;
 
+    // delete the old photo
+    if (newProfilePic && profilePic !== DEFAULT_IMAGE_URL) {
+      await fetch("/api/upload", {
+        method: "DELETE",
+        body: JSON.stringify({ filePath: profilePic }),
+      });
+    }
+
+    // update photo
+    if (newProfilePic) {
+      const formData = new FormData();
+      formData.append("photos", newProfilePic);
+
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        console.error("Failed to upload photos");
+        return uploadRes.json();
+      }
+
+      const json = await uploadRes.json();
+      photo = json.data[0];
+    }
+
     const res = await editClient({
       id: client.id,
       firstName,
@@ -84,6 +118,7 @@ export default function EditCustomer({
       zip,
       tagId: tag?.id,
       sourceId: clientSource?.id,
+      photo,
     });
 
     if (res.type !== "success") {
@@ -115,15 +150,38 @@ export default function EditCustomer({
 
             {/* TODO: update profile pic */}
             {profilePic ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={URL.createObjectURL(profilePic)}
-                alt="profile"
-                className="h-14 w-14 cursor-pointer rounded-full border border-slate-400"
-                onClick={() => {
-                  setProfilePic(null);
-                }}
-              />
+              <label
+                className="relative cursor-pointer"
+                htmlFor="profilePicture"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={
+                    newProfilePic
+                      ? URL.createObjectURL(newProfilePic)
+                      : profilePic
+                  }
+                  alt="profile"
+                  className="h-20 w-20 rounded-full border border-slate-400 hover:border-dashed hover:opacity-80"
+                />
+                <span className="absolute bottom-0 left-2 text-lg text-[#6571FF]">
+                  <FaPen />
+                </span>
+
+                <input
+                  type="file"
+                  name="profilePicture"
+                  id="profilePicture"
+                  hidden
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setNewProfilePic(file);
+                    }
+                  }}
+                />
+              </label>
             ) : (
               <label
                 className="flex cursor-pointer items-center justify-center gap-x-2 rounded-full border border-slate-400 pl-2"
@@ -138,7 +196,7 @@ export default function EditCustomer({
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      setProfilePic(file);
+                      setNewProfilePic(file);
                     }
                   }}
                 />
@@ -272,7 +330,7 @@ export default function EditCustomer({
               className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
               onClick={handleSubmit}
             >
-              Add
+              Update
             </button>
           </DialogFooter>
         </DialogContent>
