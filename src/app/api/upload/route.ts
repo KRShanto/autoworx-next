@@ -35,3 +35,22 @@ export async function POST(req: NextRequest, res: NextResponse) {
     return NextResponse.json({ status: "fail", data: e });
   }
 }
+
+// Delete the file
+export async function DELETE(req: NextRequest, res: NextResponse) {
+  try {
+    const json = await req.json();
+    let { filePath } = json;
+    filePath = `public/${filePath}`;
+
+    // Ensure the file exists
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      return NextResponse.json({ status: "success" });
+    }
+
+    return NextResponse.json({ status: "fail", data: "File not found" });
+  } catch (e) {
+    return NextResponse.json({ status: "fail", data: e });
+  }
+}
