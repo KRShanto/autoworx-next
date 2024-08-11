@@ -1,10 +1,11 @@
 import { FaTimes } from "react-icons/fa";
 import { useEffect, useRef, useState } from "react";
-import { ThreeDots } from "react-loader-spinner";
+// import { ThreeDots } from "react-loader-spinner";
 import { cn } from "@/lib/cn";
 import Image from "next/image";
 import { Message, MessageQue } from "./UsersArea";
 import { FiMessageCircle } from "react-icons/fi";
+import { IoMdSend } from "react-icons/io";
 
 export default function MessageBox({
   user,
@@ -21,9 +22,8 @@ export default function MessageBox({
 }) {
   const [message, setMessage] = useState("");
   const messageBoxRef = useRef<HTMLDivElement>(null);
-  console.log({ messages });
+
   useEffect(() => {
-    console.dir(messageBoxRef.current);
     if (messageBoxRef.current) {
       messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
       // messageBoxRef.current.scrollIntoView({ behavior: "smooth" });
@@ -72,7 +72,7 @@ export default function MessageBox({
       setMessage("");
     }
   }
-
+  console.log(user);
   return (
     <div
       className={cn(
@@ -94,26 +94,28 @@ export default function MessageBox({
       </div>
 
       {/* Chat Header */}
-      <div className="flex h-[10%] items-center justify-between gap-2 rounded-sm bg-[#006D77] p-2 text-white">
+      <div className="flex h-[10%] items-center justify-between gap-2 rounded-sm bg-[#006D77] p-2 px-4 text-white">
         <div className="flex items-center gap-1">
           <Image
             src={user.image}
             alt="user"
-            width={25}
-            height={25}
+            width={50}
+            height={50}
             className="rounded-full"
           />
           <div className="flex flex-col">
-            <p className="text-[20px] font-bold">{user.name}</p>
+            <p className="text-[20px] font-bold">
+              {user.firstName} {user.lastName}
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-x-4">
           <div className="rounded-full bg-[#579FA5] p-1">
-            <FiMessageCircle className="size-5" />
+            <FiMessageCircle className="size-6" />
           </div>
-          <Image src="/icons/Email.png" alt="email" width={20} height={20} />
-          <Image src="/icons/Phone.png" alt="phone" width={15} height={10} />
+          <Image src="/icons/Email.png" alt="email" width={24} height={24} />
+          <Image src="/icons/Phone.png" alt="phone" width={20} height={15} />
         </div>
       </div>
 
@@ -131,9 +133,18 @@ export default function MessageBox({
             }`}
           >
             <div className="flex items-center gap-2 p-1">
+              {message.sender === "CLIENT" && (
+                <Image
+                  src={user.image}
+                  alt="user"
+                  width={40}
+                  height={40}
+                  className="rounded-full"
+                />
+              )}
               <p
                 className={cn(
-                  "max-w-[220px] rounded-xl p-2 text-sm",
+                  "max-w-[220px] rounded-xl p-2 text-base",
                   message.sender === "CLIENT"
                     ? "bg-[#D9D9D9] text-slate-800"
                     : "bg-[#006D77] text-white",
@@ -153,19 +164,20 @@ export default function MessageBox({
       >
         <Image
           src="/icons/Attachment.svg"
-          width={15}
-          height={15}
+          width={24}
+          height={24}
           alt="attachment"
         />
         <input
           type="text"
           placeholder="Send Message..."
-          className="h-5 w-full rounded-md border-none px-1 py-3 text-[8px] focus:outline-none"
+          className="h-5 w-full rounded-md border-none px-2 py-5 text-base focus:outline-none"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
         <button className="">
-          <Image src="/icons/Send.svg" width={20} height={20} alt="send" />
+          {/* <Image src="/icons/Send.svg" width={20} height={20} alt="send" /> */}
+          <IoMdSend className="size-6 text-[#006D77]" />
         </button>
       </form>
     </div>
