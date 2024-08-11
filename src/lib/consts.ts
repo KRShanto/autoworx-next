@@ -1,4 +1,5 @@
 export const MIN_PASSWORD_LENGTH = 6;
+export const DEFAULT_IMAGE_URL = "/images/default.png";
 
 export const TASK_COLOR = {
   Low: "#6571FF",

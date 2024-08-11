@@ -54,15 +54,6 @@ export default function NewCustomer({
   }
 
   async function handleSubmit() {
-    // const firstName = data.get("first-name") as string;
-    // const lastName = data.get("last-name") as string;
-    // const email = data.get("email") as string;
-    // const mobile = data.get("mobile") as string;
-    // const company = data.get("company") as string;
-    // const address = data.get("address") as string;
-    // const city = data.get("city") as string;
-    // const state = data.get("state") as string;
-    // const zip = data.get("zip") as string;
     let photo;
 
     const firstName = document.querySelector<HTMLInputElement>("#firstName")

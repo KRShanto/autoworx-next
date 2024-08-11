@@ -1,7 +1,6 @@
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { AuthSession } from "@/types/auth";
-import { useState } from "react";
 import Body from "./Body";
 import { Metadata } from "next";
 

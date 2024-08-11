@@ -1,0 +1,378 @@
+[
+
+        "id": "19132f02c2013d4c",
+        "threadId": "19132f00861a05e7",
+        "labelIds": [
+            "SENT"
+        ],
+        "snippet": "whats up?",
+        "payload": {
+            "partId": "",
+            "mimeType": "multipart/alternative",
+            "filename": "",
+            "headers": [
+                {
+                    "name": "MIME-Version",
+                    "value": "1.0"
+                },
+                {
+                    "name": "Date",
+                    "value": "Thu, 8 Aug 2024 22:59:22 +0600"
+                },
+                {
+                    "name": "Message-ID",
+                    "value": "<CAMnG81Sfmy1qCct6PAM1RFnLC6U_LgiCiCKTeEfHsBbPDuhqSQ@mail.gmail.com>"
+                },
+                {
+                    "name": "Subject",
+                    "value": "Hi"
+                },
+                {
+                    "name": "From",
+                    "value": "Sanjim Mahmud <sunxiiim@gmail.com>"
+                },
+                {
+                    "name": "To",
+                    "value": "\"sunmaxboom2@gmail.com\" <sunmaxboom2@gmail.com>"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "multipart/alternative; boundary=\"0000000000002c493b061f2efa10\""
+                }
+            ],
+            "body": {
+                "size": 0
+            },
+            "parts": [
+                {
+                    "partId": "0",
+                    "mimeType": "text/plain",
+                    "filename": "",
+                    "headers": [
+                        {
+                            "name": "Content-Type",
+                            "value": "text/plain; charset=\"UTF-8\""
+                        }
+                    ],
+                    "body": {
+                        "size": 11,
+                        "data": "d2hhdHMgdXA_DQo="
+                    }
+                },
+                {
+                    "partId": "1",
+                    "mimeType": "text/html",
+                    "filename": "",
+                    "headers": [
+                        {
+                            "name": "Content-Type",
+                            "value": "text/html; charset=\"UTF-8\""
+                        }
+                    ],
+                    "body": {
+                        "size": 32,
+                        "data": "PGRpdiBkaXI9Imx0ciI-d2hhdHMgdXA_PC9kaXY-DQo="
+                    }
+                }
+            ]
+        },
+        "sizeEstimate": 560,
+        "historyId": "14143",
+        "internalDate": 1723136362000,
+        "attachments": [],
+        "body": "<div dir=\"ltr\">whats up?</div>\r\n"
+    
+    {
+        "id": "191333ce5abf5c24",
+        "threadId": "191333ce5abf5c24",
+        "labelIds": [
+            "UNREAD",
+            "IMPORTANT",
+            "CATEGORY_PERSONAL",
+            "INBOX"
+        ],
+        "snippet": "FIne, You?",
+        "payload": {
+            "partId": "",
+            "mimeType": "multipart/alternative",
+            "filename": "",
+            "headers": [
+                {
+                    "name": "Delivered-To",
+                    "value": "sunxiiim@gmail.com"
+                },
+                {
+                    "name": "Received",
+                    "value": "by 2002:a05:6000:1e44:b0:36b:cbf2:1cec with SMTP id hg4csp780918wrb;        Thu, 8 Aug 2024 11:25:14 -0700 (PDT)"
+                },
+                {
+                    "name": "X-Received",
+                    "value": "by 2002:a05:6871:14b:b0:261:198f:13cd with SMTP id 586e51a60fabf-2692b7b8ddemr3381918fac.32.1723141514717;        Thu, 08 Aug 2024 11:25:14 -0700 (PDT)"
+                },
+                {
+                    "name": "ARC-Seal",
+                    "value": "i=1; a=rsa-sha256; t=1723141514; cv=none;        d=google.com; s=arc-20160816;        b=orl05IU98Q1Sk2T26frLRMmjsxET1Aj6XTTK47+xjUyn0It56o/602njiNTvYmIbHR         GAq+YQBi3kgUZCsePN0kihqqEdWlD7bufvWWqJR7LLdZ96wtP5ESGQUGEe3WLwm5O83U         kSCF20zHU/JnH8mvDpubu0mM3DEt7AXJOIfnnBA3zZ/1bDNLfYUNTqJUeKg7y8VrXDtR         x6uOa72SGKH1IUYzQwQI0fNokYWnDK0X7+ievv4CLNUYtDjFcnCwUyC6fddfq9L8HMyO         UMTfaCqrGqP/pln+x4Q8EhunE8MTRWtvkBTMkQyfMwviAn7V7oZiBI804mHS3jsHGoY7         z2fA=="
+                },
+                {
+                    "name": "ARC-Message-Signature",
+                    "value": "i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;        h=to:subject:message-id:date:from:mime-version:dkim-signature;        bh=pdrC3ysuCuSphkh0XnuR3j1OvOOD90oViOdhNzBa7Sc=;        fh=MosqquTnHWhkXjD6uCSsXjfZKZKVu2JjFrBo31hIgqk=;        b=vufCVjkxLC3PNB0TQgR6L+lghHkySykJyLzJi8twXrWXqZUvWC7o4SkuqeWaqmJggf         l6VO4ECc2ICWwi1Xj5CzBf/QzGVGiTtpuIz3wOmp2c4IplC+231X9vjPTAGehUXH+nxM         6i7AUJvI8jaiSzON/kvJzXLyjpVo2gQ1ogczYLsa8VkCqXY4EYA9thLlTzZKOubklAop         x78RRfpMim/o67IIdOvWG70V96yE9uSwifpKyf6KnJZNscdhVWsc/ly0uHD7CtAtzOdA         mfd8DCelGHHFDGv72QBItv6jfAkX6Gv2+H8SYGVBdxQAxAK1yAUbqu46qYDGdO/ZIQ/Q         Wl+g==;        dara=google.com"
+                },
+                {
+                    "name": "ARC-Authentication-Results",
+                    "value": "i=1; mx.google.com;       dkim=pass header.i=@gmail.com header.s=20230601 header.b=BmADZWth;       spf=pass (google.com: domain of sunmaxboom2@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=sunmaxboom2@gmail.com;       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;       dara=pass header.i=@gmail.com"
+                },
+                {
+                    "name": "Return-Path",
+                    "value": "<sunmaxboom2@gmail.com>"
+                },
+                {
+                    "name": "Received",
+                    "value": "from mail-sor-f41.google.com (mail-sor-f41.google.com. [209.85.220.41])        by mx.google.com with SMTPS id 46e09a7af769-70a31ebeb62sor6753254a34.9.2024.08.08.11.25.14        for <sunxiiim@gmail.com>        (Google Transport Security);        Thu, 08 Aug 2024 11:25:14 -0700 (PDT)"
+                },
+                {
+                    "name": "Received-SPF",
+                    "value": "pass (google.com: domain of sunmaxboom2@gmail.com designates 209.85.220.41 as permitted sender) client-ip=209.85.220.41;"
+                },
+                {
+                    "name": "Authentication-Results",
+                    "value": "mx.google.com;       dkim=pass header.i=@gmail.com header.s=20230601 header.b=BmADZWth;       spf=pass (google.com: domain of sunmaxboom2@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=sunmaxboom2@gmail.com;       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;       dara=pass header.i=@gmail.com"
+                },
+                {
+                    "name": "DKIM-Signature",
+                    "value": "v=1; a=rsa-sha256; c=relaxed/relaxed;        d=gmail.com; s=20230601; t=1723141514; x=1723746314; dara=google.com;        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject         :date:message-id:reply-to;        bh=pdrC3ysuCuSphkh0XnuR3j1OvOOD90oViOdhNzBa7Sc=;        b=BmADZWthulJWEb1Qv6yaPxunGwYyc+woUNTHDTGc9k/e4usgvvdKyyKym1ymAqqLcm         0IUBsXhbvpCuWJcpep2yvepfkjO3Z6P4DXG/wq7sbp3rfnx0PFK+FCA60xy/XMlxA2G/         lZZ+wJjj8oUfpA0IPcYMJ/1Yygl1kMVOBF1Ot+MzhtLJaZP8SdXB9p0wrmSuJqXzg8aH         lbSKxF0rcSV9Osda7fiU2ydRd3gM5BkgE8sESKlEZw3RuZ2SVyLUexfgnaaIu0O57fdj         3NHRFUoimac6q56Axl1pc2W3i9eCQNO5OXihBniGHEgHhcS3DZq5aHcjPeF39lJsQStN         PiGg=="
+                },
+                {
+                    "name": "X-Google-DKIM-Signature",
+                    "value": "v=1; a=rsa-sha256; c=relaxed/relaxed;        d=1e100.net; s=20230601; t=1723141514; x=1723746314;        h=to:subject:message-id:date:from:mime-version:x-gm-message-state         :from:to:cc:subject:date:message-id:reply-to;        bh=pdrC3ysuCuSphkh0XnuR3j1OvOOD90oViOdhNzBa7Sc=;        b=RKh0RLYatbCWxdOkJHSdfEDK85NekCPhGwwWpWvWGiEcFhvNASQL7boYoGCiQwtm2y         B0dXaNa2zq75OGYsOakyfIyzFWVEwMN+5Q+aNhyaKgdDzpluOg67bu++RrWcU0zaphPC         f+JssokzCKBKgCCNmqUQPT+me7le6u+ShA/oerDpeVmPfuEJ0RTk3gXdejMHfFslORSi         CMgaNfxtV2bCgfBtSW/hymAjFYDMo2rbVw8lzeqEeL5dnx51dEBsBZIQU73p8OB3ea+V         BeFwy5l9RuUGNPTcQl5hEdQaiVoolmQ/3uWWViUaKKAzVo9PzpR5hebZ2fwudIpXSPL+         z8ww=="
+                },
+                {
+                    "name": "X-Gm-Message-State",
+                    "value": "AOJu0YxX+EmLQok5FQj9qF5skB42fPtQyV9t7ywMjPNsSne3JPypuTqH BB3R96jSvf8+Rf7Sw2K8YkciqVo3HDKIDzPRWTe35BVlBhEHFs+OeJpGtUA3V4PQBLN2J7vcBef IBDSGnlGin8sZ+nHOcIyI55aM+xL4MCaBN0c="
+                },
+                {
+                    "name": "X-Google-Smtp-Source",
+                    "value": "AGHT+IE+cBAGJqdrkwOu2O0zGG2y3yjmAEYw13FIJowY7OaGwKDmZfEO0sXm0vwFmiGzZlQDz0f+7aSkjBUqDXOxPGM="
+                },
+                {
+                    "name": "X-Received",
+                    "value": "by 2002:a4a:ee8c:0:b0:5d5:c805:acae with SMTP id 006d021491bc7-5d855bc4515mr2673093eaf.5.1723141513896; Thu, 08 Aug 2024 11:25:13 -0700 (PDT)"
+                },
+                {
+                    "name": "MIME-Version",
+                    "value": "1.0"
+                },
+                {
+                    "name": "From",
+                    "value": "Sunzim <sunmaxboom2@gmail.com>"
+                },
+                {
+                    "name": "Date",
+                    "value": "Fri, 9 Aug 2024 00:22:59 +0600"
+                },
+                {
+                    "name": "Message-ID",
+                    "value": "<CADxrSZCLGY+3jAKhrprKHXLdqtM+Uhzw-hNvaVEeq=xW2oMnKg@mail.gmail.com>"
+                },
+                {
+                    "name": "Subject",
+                    "value": "Msg"
+                },
+                {
+                    "name": "To",
+                    "value": "\"sunxiiim@gmail.com\" <sunxiiim@gmail.com>"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "multipart/alternative; boundary=\"000000000000d57293061f302534\""
+                }
+            ],
+            "body": {
+                "size": 0
+            },
+            "parts": [
+                {
+                    "partId": "0",
+                    "mimeType": "text/plain",
+                    "filename": "",
+                    "headers": [
+                        {
+                            "name": "Content-Type",
+                            "value": "text/plain; charset=\"UTF-8\""
+                        }
+                    ],
+                    "body": {
+                        "size": 12,
+                        "data": "RkluZSwgWW91Pw0K"
+                    }
+                },
+                {
+                    "partId": "1",
+                    "mimeType": "text/html",
+                    "filename": "",
+                    "headers": [
+                        {
+                            "name": "Content-Type",
+                            "value": "text/html; charset=\"UTF-8\""
+                        }
+                    ],
+                    "body": {
+                        "size": 33,
+                        "data": "PGRpdiBkaXI9Imx0ciI-RkluZSwgWW91PzwvZGl2Pg0K"
+                    }
+                }
+            ]
+        },
+        "sizeEstimate": 5242,
+        "historyId": "14270",
+        "internalDate": 1723141379000,
+        "attachments": [],
+        "body": "<div dir=\"ltr\">FIne, You?</div>\r\n"
+    },
+    {
+        "id": "1913368203872b4f",
+        "threadId": "1913368203872b4f",
+        "labelIds": [
+            "SENT"
+        ],
+        "snippet": "just testing",
+        "payload": {
+            "partId": "",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [
+                {
+                    "name": "Return-Path",
+                    "value": "<sunxiiim@gmail.com>"
+                },
+                {
+                    "name": "Received",
+                    "value": "from [127.0.0.1] ([210.4.73.21])        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff5905ff30sm127407635ad.156.2024.08.08.12.12.26        for <sunmaxboom2@gmail.com>        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);        Thu, 08 Aug 2024 12:12:27 -0700 (PDT)"
+                },
+                {
+                    "name": "From",
+                    "value": "sunxiiim@gmail.com"
+                },
+                {
+                    "name": "To",
+                    "value": "sunmaxboom2@gmail.com"
+                },
+                {
+                    "name": "Subject",
+                    "value": "testing"
+                },
+                {
+                    "name": "Message-ID",
+                    "value": "<3f83ea6d-3855-5a88-53fa-925f964da096@gmail.com>"
+                },
+                {
+                    "name": "Content-Transfer-Encoding",
+                    "value": "7bit"
+                },
+                {
+                    "name": "Date",
+                    "value": "Thu, 08 Aug 2024 19:10:20 +0000"
+                },
+                {
+                    "name": "MIME-Version",
+                    "value": "1.0"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "text/plain; charset=utf-8"
+                }
+            ],
+            "body": {
+                "size": 14,
+                "data": "anVzdCB0ZXN0aW5nDQo="
+            }
+        },
+        "sizeEstimate": 620,
+        "historyId": "14305",
+        "internalDate": 1723144220000,
+        "attachments": [],
+        "body": "just testing\r\n"
+    },
+    {
+        "id": "19133704916531b1",
+        "threadId": "19133704916531b1",
+        "labelIds": [
+            "SENT"
+        ],
+        "snippet": "hi bro",
+        "payload": {
+            "partId": "",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [
+                {
+                    "name": "Return-Path",
+                    "value": "<sunxiiim@gmail.com>"
+                },
+                {
+                    "name": "Received",
+                    "value": "from [127.0.0.1] ([210.4.73.21])        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-710cb2fc0e3sm1443296b3a.210.2024.08.08.12.21.21        for <sunmaxboom2@gmail.com>        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);        Thu, 08 Aug 2024 12:21:22 -0700 (PDT)"
+                },
+                {
+                    "name": "From",
+                    "value": "sunxiiim@gmail.com"
+                },
+                {
+                    "name": "To",
+                    "value": "sunmaxboom2@gmail.com"
+                },
+                {
+                    "name": "Subject",
+                    "value": "test"
+                },
+                {
+                    "name": "Message-ID",
+                    "value": "<f106ceff-d763-fe0e-0983-7d1cb89d28f5@gmail.com>"
+                },
+                {
+                    "name": "Content-Transfer-Encoding",
+                    "value": "7bit"
+                },
+                {
+                    "name": "Date",
+                    "value": "Thu, 08 Aug 2024 19:19:13 +0000"
+                },
+                {
+                    "name": "MIME-Version",
+                    "value": "1.0"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "text/plain; charset=utf-8"
+                }
+            ],
+            "body": {
+                "size": 8,
+                "data": "aGkgYnJvDQo="
+            }
+        },
+        "sizeEstimate": 610,
+        "historyId": "14331",
+        "internalDate": 1723144753000,
+        "attachments": [],
+        "body": "hi bro\r\n"
+    }
+] for the fine, you? message it outputs like this : <div dir="ltr">FIne, You?</div>
+function decodeEmails(message) {
+  let body = "";
+
+  if (message.payload.parts) {
+    message.payload.parts.forEach((part) => {
+      if (part.mimeType === "text/plain") {
+        body = part.body.data;
+      } else if (part.mimeType === "text/html") {
+        body = part.body.data;
+      }
+    });
+  } else if (message.payload.body && message.payload.body.data) {
+    body = message.payload.body.data;
+  }
+
+  // Decode the body from base64url format
+  body = Buffer.from(body, "base64").toString("utf-8");
+  return body;
+}

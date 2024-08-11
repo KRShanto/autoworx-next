@@ -108,7 +108,7 @@ export async function addEmployee({
       commission,
       joinDate: new Date(date || Date.now()),
       employeeType: type,
-      image: profilePicture,
+      image: profilePicture ? `/uploads/${profilePicture}` : undefined,
       password: hashedPassword,
       companyId,
       role: "employee",

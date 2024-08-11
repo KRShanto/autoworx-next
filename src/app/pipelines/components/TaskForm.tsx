@@ -153,7 +153,7 @@ export default function TaskForm({
                       className="rounded-full"
                     />
                     <span>
-                      {user?.name} 
+                      {user?.firstName} {user?.lastName}
                     </span>
                   </label>
                 ))}

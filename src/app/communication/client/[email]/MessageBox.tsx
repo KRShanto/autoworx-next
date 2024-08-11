@@ -6,7 +6,7 @@ import { useState } from "react";
 import Email from "./Email";
 import Messages from "./Messages";
 
-export default function MessageBox({ id }: { id: number }) {
+export default function MessageBox({ conversations, email, loading }: any) {
   const user = tempClients[0];
   const [selected, setSelected] = useState<"MESSAGES" | "EMAILS" | "PHONE">(
     "MESSAGES",
@@ -71,7 +71,13 @@ export default function MessageBox({ id }: { id: number }) {
         </div>
       </div>
 
-      {selected === "MESSAGES" && <Messages user={user} />}
+      {selected === "MESSAGES" && (
+        <Messages
+          email={email}
+          conversations={conversations}
+          loading={loading}
+        />
+      )}
       {selected === "EMAILS" && <Email />}
     </div>
   );
