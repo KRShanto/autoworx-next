@@ -56,31 +56,7 @@ export function SelectTags({
     }
   }, [dropdownsOpen]);
   return (
-    <div
-      onClick={() => {
-        if (setDropdownsOpen) {
-          if (
-            type &&
-            dropdownsOpen[type][0] === index[0] &&
-            dropdownsOpen[type][1] === index[1]
-          ) {
-            setDropdownsOpen({
-              SERVICE: [-1, -1],
-              MATERIAL: [-1, -1],
-              LABOR: [-1, -1],
-              TAG: [-1, -1],
-            });
-          } else {
-            setDropdownsOpen({
-              SERVICE: type === "SERVICE" ? [...index] : -1,
-              MATERIAL: type === "MATERIAL" ? [...index] : -1,
-              LABOR: type === "LABOR" ? [...index] : -1,
-              TAG: type === "TAG" ? [...index] : -1,
-            });
-          }
-        }
-      }}
-    >
+    <div>
       <input
         type="hidden"
         name={name}
@@ -114,8 +90,32 @@ export function SelectTags({
           </div>
         ))}
         <DropdownMenuTrigger
+          // onClick={() => {
+          //   setOpen && setOpen(!open);
+          // }}
           onClick={() => {
             setOpen && setOpen(!open);
+            if (setDropdownsOpen) {
+              if (
+                type &&
+                dropdownsOpen[type][0] === index[0] &&
+                dropdownsOpen[type][1] === index[1]
+              ) {
+                setDropdownsOpen({
+                  SERVICE: [-1, -1],
+                  MATERIAL: [-1, -1],
+                  LABOR: [-1, -1],
+                  TAG: [-1, -1],
+                });
+              } else {
+                setDropdownsOpen({
+                  SERVICE: type === "SERVICE" ? [...index] : -1,
+                  MATERIAL: type === "MATERIAL" ? [...index] : -1,
+                  LABOR: type === "LABOR" ? [...index] : -1,
+                  TAG: type === "TAG" ? [...index] : -1,
+                });
+              }
+            }
           }}
           className="flex min-h-10 w-full items-center justify-between rounded-md border-2 border-slate-400 px-4"
         >
