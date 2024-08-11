@@ -197,7 +197,7 @@ export default function Messages({
       </div>
 
       {loading && conversations.length === 0 && (
-        <div className="flex w-full items-center justify-center pb-12">
+        <div className="flex w-full items-center justify-center ">
           Loading...
         </div>
       )}
