@@ -55,30 +55,100 @@ import { useEffect, useRef, useState } from "react";
 //     sender: "client",
 //   },
 // ];
-export default function Messages({ conversations, email, loading }: any) {
+export default function Messages({
+  conversations,
+  email,
+  loading,
+  base64Data,
+  setBase64Data,
+  setConversations,
+}: any) {
   const fileRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [messageInput, setMessageInput] = useState("");
   const [file, setFile] = useState<File | null>(null);
+
   const router = useRouter();
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64String = reader.result as string;
+        resolve(base64String);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
+  const decodeBase64 = (base64String: string): Uint8Array => {
+    // Extract the base64 part from the Data URL
+    const base64Data = base64String.split(",")[1]; // This removes the `data:...;base64,` part
+
+    if (!base64Data) {
+      throw new Error("Invalid base64 string");
+    }
+
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return byteArray;
+  };
 
   const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const formData = new FormData();
     formData.append("recipient", email);
     formData.append("subject", "test");
     formData.append("text", messageInput);
+
+    let base64FileData = "";
     if (file) {
       formData.append("file", file);
+      const base64String = await convertFileToBase64(file); // Convert file to base64 string
+      base64FileData = base64String.split(",")[1]; // Extract the base64 part only
     }
-    await fetch("/api/communication/client", {
-      method: "POST",
-      body: formData,
-    });
+
+    // Optimistic UI update
+    const newConversation = {
+      attachments: file
+        ? [
+            {
+              filename: file.name,
+              mimeType: file.type,
+              data: base64FileData, // Use the cleaned base64 string
+            },
+          ]
+        : [],
+      body: messageInput,
+      labelIds: ["SENT"],
+    };
+
+    setConversations([...conversations, newConversation]);
+
     setMessageInput("");
     setFile(null);
-    location.reload();
+
+    try {
+      const res = await fetch("/api/communication/client", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      console.log("Message sent successfully:", res);
+    } catch (err) {
+      console.error("Error sending message:", err);
+      // Optionally revert optimistic update here if needed
+    }
   };
+
 
   useEffect(() => {
     if (containerRef.current) {
@@ -127,7 +197,7 @@ export default function Messages({ conversations, email, loading }: any) {
       </div>
 
       {loading && conversations.length === 0 && (
-        <div className="flex w-full items-center justify-center pb-12">
+        <div className="flex w-full items-center justify-center ">
           Loading...
         </div>
       )}

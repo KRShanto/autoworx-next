@@ -6,7 +6,14 @@ import { useState } from "react";
 import Email from "./Email";
 import Messages from "./Messages";
 
-export default function MessageBox({ conversations, email, loading }: any) {
+export default function MessageBox({
+  conversations,
+  email,
+  loading,
+  base64Data,
+  setBase64Data,
+  setConversations,
+}: any) {
   const user = tempClients[0];
   const [selected, setSelected] = useState<"MESSAGES" | "EMAILS" | "PHONE">(
     "MESSAGES",
@@ -76,6 +83,8 @@ export default function MessageBox({ conversations, email, loading }: any) {
           email={email}
           conversations={conversations}
           loading={loading}
+          setConversations={setConversations}
+          setBase64Data={setBase64Data}
         />
       )}
       {selected === "EMAILS" && <Email />}
