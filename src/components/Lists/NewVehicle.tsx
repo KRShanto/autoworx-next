@@ -28,6 +28,7 @@ export default function NewVehicle({
   newButton?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const [colorOpen, setColorOpen] = useState(false);
   const { showError } = useFormErrorStore();
 
   const [colors, setColors] = useState<VehicleColor[]>([]);
@@ -137,9 +138,16 @@ export default function NewVehicle({
               label={(color: VehicleColor | null) => (color ? color.name : "")}
               items={colors}
               displayList={(color: VehicleColor) => <p>{color.name}</p>}
-              newButton={<NewVehicleColor setColors={setColors} />}
+              newButton={
+                <NewVehicleColor
+                  setColors={setColors}
+                  setColor={setSelectedColor}
+                  setColorOpen={setColorOpen}
+                />
+              }
               selectedItem={selectedColor}
               setSelectedItem={setSelectedColor}
+              openState={[colorOpen, setColorOpen]}
             />
           </div>
 
@@ -172,8 +180,12 @@ export default function NewVehicle({
 
 function NewVehicleColor({
   setColors,
+  setColor,
+  setColorOpen,
 }: {
   setColors: React.Dispatch<React.SetStateAction<VehicleColor[]>>;
+  setColor: React.Dispatch<React.SetStateAction<VehicleColor | null>>;
+  setColorOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
@@ -192,6 +204,8 @@ function NewVehicleColor({
     } else {
       setColors((colors) => [...colors, res.data]);
       setOpen(false);
+      setColor(res.data);
+      setColorOpen(false);
     }
   }
 
