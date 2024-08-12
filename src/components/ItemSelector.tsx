@@ -229,7 +229,10 @@ export default function ItemSelector<T>({
               <button
                 type="button"
                 onClick={() => {
-                  openPopup(type, { itemId: item.id });
+                  openPopup(type, {
+                    itemId: item.id,
+                    materialIndex,
+                  });
                   setOpen(false);
                 }}
               >
