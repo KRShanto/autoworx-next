@@ -12,6 +12,7 @@ import {
 import { SlimInput, slimInputClassName } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
 import { cn } from "@/lib/cn";
+import { useEstimateFilterStore } from "@/stores/estimate-filter";
 import { useListsStore } from "@/stores/lists";
 import { Status } from "@prisma/client";
 import { matchSorter } from "match-sorter";
@@ -43,6 +44,7 @@ export function Filter() {
   );
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const { setFilter } = useEstimateFilterStore();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -62,14 +64,6 @@ export function Filter() {
         </DialogHeader>
         <div className="grid grid-cols-2 gap-8">
           <div>
-            {/* <SlimInput
-              name="startDate"
-              label="Start Date"
-              type="date"
-              value={start}
-              onChange={(event) => setStart(event.currentTarget.value)}
-              required={false}
-            /> */}
             <label className="mb-1 px-2 font-medium">Start Date</label>
             <div className="flex">
               <input
@@ -163,12 +157,15 @@ export function Filter() {
           <Submit
             className="mx-auto flex items-center gap-2 rounded-md bg-[#6571FF] px-4 py-1 text-white"
             formAction={async (formData) => {
-              const end = formData.get("endDate");
-              const params = new URLSearchParams();
-              start && params.set("startDate", start);
-              typeof end === "string" && params.set("endDate", end);
-              status && params.set("status", status.id.toString());
-              router.push(`?${params}`);
+              const end = formData.get("endDate") as string;
+
+              setFilter({
+                dateRange: [
+                  start ? new Date(start) : null,
+                  end ? new Date(end) : null,
+                ],
+                status: status?.name,
+              });
               setOpen(false);
             }}
           >
