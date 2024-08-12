@@ -15,24 +15,66 @@ import type {
 } from "@prisma/client";
 import { create } from "zustand";
 
-export const useListsStore = create(() => ({
-  customers: [] as Client[],
-  vehicles: [] as Vehicle[],
-  estimates: [] as Invoice[],
-  employees: [] as User[],
-  templates: [] as EmailTemplate[],
-  categories: [] as Category[],
-  services: [] as Service[],
-  materials: [] as (Material & { tags: Tag[] })[],
-  labors: [] as Labor[],
-  tags: [] as Tag[],
-  vendors: [] as Vendor[],
-  statuses: [] as Status[],
-  newAddedCustomer: null as Client | null,
-  newAddedVehicle: null as Vehicle | null,
-  paymentMethods: [] as PaymentMethod[],
+interface ListsStore {
+  customers: Client[];
+  vehicles: Vehicle[];
+  estimates: Invoice[];
+  employees: User[];
+  templates: EmailTemplate[];
+  categories: Category[];
+  services: Service[];
+  materials: (Material & { tags: Tag[] })[];
+  labors: Labor[];
+  tags: Tag[];
+  vendors: Vendor[];
+  statuses: Status[];
+  newAddedCustomer: Client | null;
+  newAddedVehicle: Vehicle | null;
+  paymentMethods: PaymentMethod[];
+  client: Client | null;
+  vehicle: Vehicle | null;
+  status: Status | null;
+  reset: () => void;
+}
 
-  client: null as Client | null,
-  vehicle: null as Vehicle | null,
-  status: null as Status | null,
+export const useListsStore = create<ListsStore>((set) => ({
+  customers: [],
+  vehicles: [],
+  estimates: [],
+  employees: [],
+  templates: [],
+  categories: [],
+  services: [],
+  materials: [],
+  labors: [],
+  tags: [],
+  vendors: [],
+  statuses: [],
+  newAddedCustomer: null,
+  newAddedVehicle: null,
+  paymentMethods: [],
+  client: null,
+  vehicle: null,
+  status: null,
+  reset: () =>
+    set({
+      customers: [],
+      vehicles: [],
+      estimates: [],
+      employees: [],
+      templates: [],
+      categories: [],
+      services: [],
+      materials: [],
+      labors: [],
+      tags: [],
+      vendors: [],
+      statuses: [],
+      newAddedCustomer: null,
+      newAddedVehicle: null,
+      paymentMethods: [],
+      client: null,
+      vehicle: null,
+      status: null,
+    }),
 }));

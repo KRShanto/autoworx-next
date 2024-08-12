@@ -31,6 +31,9 @@ export default function MaterialCreate() {
   const itemId = data?.itemId;
   const materialIndex = data?.materialIndex;
 
+  console.log("Item ID", itemId);
+  console.log("Material Index", materialIndex);
+
   const [vendorSearch, setVendorSearch] = useState("");
   const [vendorOpen, setVendorOpen] = useState(false);
   const [tagsOpen, setTagsOpen] = useState(false);
@@ -98,13 +101,20 @@ export default function MaterialCreate() {
     });
 
     if (res.type === "success") {
-      // Change the service where itemId is the same
+      // Change the service where itemId is the same and materialIndex is the same
       useEstimateCreateStore.setState((state) => {
         const items = state.items.map((item) => {
           if (item.id === itemId) {
+            const materials = item.materials.map((material, i) => {
+              if (i === materialIndex) {
+                return res.data;
+              }
+              return material;
+            });
+
             return {
               ...item,
-              material: res.data,
+              materials,
             };
           }
           return item;
@@ -286,7 +296,7 @@ export default function MaterialCreate() {
           type="number"
           id="qt"
           value={quantity}
-          onChange={(e) => setQuantity(+e.target.value)}
+          onChange={(e) => setQuantity(parseInt(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
         />
       </div>
@@ -299,7 +309,7 @@ export default function MaterialCreate() {
           type="number"
           id="price"
           value={cost}
-          onChange={(e) => setCost(+e.target.value)}
+          onChange={(e) => setCost(parseInt(e.target.value as any))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
         />
       </div>
@@ -312,7 +322,7 @@ export default function MaterialCreate() {
           type="number"
           id="sell"
           value={sell}
-          onChange={(e) => setSell(+e.target.value)}
+          onChange={(e) => setSell(parseInt(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
         />
       </div>
@@ -325,7 +335,7 @@ export default function MaterialCreate() {
           type="number"
           id="discount"
           value={discount}
-          onChange={(e) => setDiscount(+e.target.value)}
+          onChange={(e) => setDiscount(parseInt(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
         />
       </div>
