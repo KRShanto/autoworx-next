@@ -1,5 +1,6 @@
 import { User } from "@prisma/client";
 import Image from "next/image";
+import CreateGroupModal from "./CreateGroupModal";
 
 export default function List({
   users,
@@ -8,12 +9,13 @@ export default function List({
   users: User[];
   setUsersList: React.Dispatch<React.SetStateAction<User[]>>;
 }) {
-  console.log("user", users);
   return (
     <div className="app-shadow w-[20%] rounded-lg bg-white p-3">
       {/* Header */}
-      <h2 className="text-[14px] text-[#797979]">User List</h2>
-
+      <div className="flex items-center justify-between">
+        <h2 className="text-[14px] text-[#797979]">User List</h2>
+        <CreateGroupModal users={users} />
+      </div>
       {/* Search */}
       <form>
         <input
@@ -28,7 +30,6 @@ export default function List({
           Filter
         </button>
       </form>
-
       {/* List */}
       <div className="mt-2 flex h-[88%] flex-col gap-2 overflow-y-auto max-[2127px]:h-[80%]">
         {users.map((user) => {
