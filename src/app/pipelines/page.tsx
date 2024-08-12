@@ -14,7 +14,8 @@ const Page = (props: Props) => {
   return (
     <div className="space-y-8">
       <Header onToggleView={viewHandler} activeView={view} />
-      {view === "workOrders" ? <WorkOrders /> : <Pipelines/>}
+      {/*  @ts-ignore */}
+      {view === "workOrders" ? <WorkOrders /> : <Pipelines />}
     </div>
   );
 };

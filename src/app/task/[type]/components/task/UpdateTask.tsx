@@ -12,12 +12,13 @@ import Submit from "@/components/Submit";
 import { usePopupStore } from "@/stores/popup";
 import type { CalendarTask } from "@/types/db";
 import type { Priority, User } from "@prisma/client";
+import { TimePicker } from "antd";
 import Image from "next/image";
 import { useState } from "react";
 import { FaChevronDown, FaChevronUp, FaTractor, FaTrash } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa6";
 import { editTask } from "../../../../../actions/task/editTask";
-import { TimePicker } from "antd";
+// @ts-ignore
 import dayjs from "dayjs";
 import { deleteTask } from "../../../../../actions/task/deleteTask";
 

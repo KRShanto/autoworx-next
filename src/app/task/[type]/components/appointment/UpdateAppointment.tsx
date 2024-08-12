@@ -26,8 +26,10 @@ import type {
   Vehicle,
 } from "@prisma/client";
 import { TimePicker } from "antd";
+// @ts-ignore
 import dayjs from "dayjs";
 import moment from "moment";
+import { customAlphabet } from "nanoid";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
@@ -42,7 +44,6 @@ import { TbBell, TbCalendar } from "react-icons/tb";
 import { deleteAppointment } from "../../../../../actions/appointment/deleteAppointment";
 import { editAppointment } from "../../../../../actions/appointment/editAppointment";
 import { Reminder } from "./Reminder";
-import { customAlphabet } from "nanoid";
 
 enum Tab {
   Schedule = 0,
