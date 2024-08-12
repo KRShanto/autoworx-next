@@ -10,7 +10,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const fileNames = [];
 
     // Ensure the uploads directory exists
-    const uploadsDir = "public/uploads/";
+    const uploadsDir = "images/uploads/";
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
@@ -41,7 +41,7 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
   try {
     const json = await req.json();
     let { filePath } = json;
-    filePath = `public/${filePath}`;
+    filePath = `images/${filePath}`;
 
     // Ensure the file exists
     if (fs.existsSync(filePath)) {

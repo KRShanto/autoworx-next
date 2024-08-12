@@ -5,7 +5,6 @@ import { HiXCircle } from "react-icons/hi2";
 
 export function ImagesInput() {
   const { photos, setPhotos } = useEstimateCreateStore();
-
   return (
     <div className="grid grid-cols-2 gap-2 rounded border border-solid border-slate-500 p-2">
       <label className="grid aspect-square cursor-pointer content-center justify-items-center gap-2 rounded-md bg-gray-200 text-center">
