@@ -11,7 +11,8 @@ CREATE TABLE `Company` (
 -- CreateTable
 CREATE TABLE `User` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(191) NOT NULL,
+    `firstName` VARCHAR(191) NOT NULL,
+    `lastName` VARCHAR(191) NULL,
     `email` VARCHAR(191) NOT NULL,
     `email_verified_at` DATETIME(3) NULL,
     `image` VARCHAR(191) NOT NULL DEFAULT '/images/default.png',
@@ -23,9 +24,11 @@ CREATE TABLE `User` (
     `city` VARCHAR(191) NULL,
     `state` VARCHAR(191) NULL,
     `zip` VARCHAR(191) NULL,
+    `company_name` VARCHAR(191) NULL,
+    `commission` DECIMAL(65, 30) NULL DEFAULT 0,
     `role` ENUM('admin', 'employee') NOT NULL DEFAULT 'admin',
-    `employeeType` ENUM('Salary', 'Hourly', 'Contract Based', 'None') NOT NULL DEFAULT 'None',
-    `employeeDepartment` ENUM('Sales', 'Management', 'Workshop', 'None') NOT NULL DEFAULT 'None',
+    `employeeType` ENUM('Sales', 'Technician') NOT NULL DEFAULT 'Sales',
+    `join_date` DATETIME(3) NULL,
     `company_id` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -311,8 +314,10 @@ CREATE TABLE `Payment` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `date` DATETIME(3) NULL,
     `notes` VARCHAR(191) NULL,
+    `amount` DECIMAL(65, 30) NULL,
     `type` ENUM('CARD', 'CHECK', 'CASH', 'OTHER') NOT NULL,
     `invoice_id` VARCHAR(191) NULL,
+    `company_id` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
@@ -355,7 +360,6 @@ CREATE TABLE `OtherPayment` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `paymentId` INTEGER NOT NULL,
     `paymentMethodId` INTEGER NULL,
-    `amount` DOUBLE NULL,
 
     UNIQUE INDEX `OtherPayment_paymentId_key`(`paymentId`),
     PRIMARY KEY (`id`)
@@ -457,29 +461,19 @@ CREATE TABLE `AppointmentUser` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `WorkOrder` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `invoiceId` VARCHAR(191) NOT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `Technician` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `user_id` INTEGER NOT NULL,
     `assigned_date` DATETIME(3) NULL,
+    `date_closed` DATETIME(3) NULL,
     `due` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
     `amount` DECIMAL(65, 30) NULL DEFAULT 0,
     `priority` ENUM('Low', 'Medium', 'High') NULL DEFAULT 'Low',
     `status` VARCHAR(191) NULL,
-    `statusColor` VARCHAR(191) NULL,
     `new_note` VARCHAR(191) NULL,
-    `material_id` INTEGER NULL,
-    `service_id` INTEGER NULL,
-    `work_order_id` INTEGER NULL,
+    `service_id` INTEGER NOT NULL,
+    `invoice_id` VARCHAR(191) NOT NULL,
+    `company_id` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
@@ -551,6 +545,25 @@ CREATE TABLE `Message` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `Coupon` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `code` VARCHAR(191) NOT NULL,
+    `type` VARCHAR(191) NOT NULL,
+    `startDate` DATETIME(3) NOT NULL,
+    `endDate` DATETIME(3) NOT NULL,
+    `discount` DECIMAL(65, 30) NOT NULL,
+    `discountType` ENUM('Percentage', 'Fixed') NOT NULL,
+    `status` VARCHAR(191) NOT NULL,
+    `redemptions` INTEGER NOT NULL,
+    `company_id` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `User` ADD CONSTRAINT `User_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -592,6 +605,9 @@ ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_user_id_fkey` FOREIGN KEY (`user_i
 
 -- AddForeignKey
 ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_vehicle_id_fkey` FOREIGN KEY (`vehicle_id`) REFERENCES `Vehicle`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_customer_id_fkey` FOREIGN KEY (`customer_id`) REFERENCES `Client`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `InvoicePhoto` ADD CONSTRAINT `InvoicePhoto_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -669,6 +685,9 @@ ALTER TABLE `Status` ADD CONSTRAINT `Status_company_id_fkey` FOREIGN KEY (`compa
 ALTER TABLE `Payment` ADD CONSTRAINT `Payment_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `Payment` ADD CONSTRAINT `Payment_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `CardPayment` ADD CONSTRAINT `CardPayment_paymentId_fkey` FOREIGN KEY (`paymentId`) REFERENCES `Payment`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -723,19 +742,16 @@ ALTER TABLE `AppointmentUser` ADD CONSTRAINT `AppointmentUser_appointment_id_fke
 ALTER TABLE `AppointmentUser` ADD CONSTRAINT `AppointmentUser_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `WorkOrder` ADD CONSTRAINT `WorkOrder_invoiceId_fkey` FOREIGN KEY (`invoiceId`) REFERENCES `Invoice`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `Technician` ADD CONSTRAINT `Technician_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Technician` ADD CONSTRAINT `Technician_material_id_fkey` FOREIGN KEY (`material_id`) REFERENCES `Material`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Technician` ADD CONSTRAINT `Technician_service_id_fkey` FOREIGN KEY (`service_id`) REFERENCES `Service`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Technician` ADD CONSTRAINT `Technician_service_id_fkey` FOREIGN KEY (`service_id`) REFERENCES `Service`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Technician` ADD CONSTRAINT `Technician_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Technician` ADD CONSTRAINT `Technician_work_order_id_fkey` FOREIGN KEY (`work_order_id`) REFERENCES `WorkOrder`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Technician` ADD CONSTRAINT `Technician_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `EmailTemplate` ADD CONSTRAINT `EmailTemplate_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -754,3 +770,6 @@ ALTER TABLE `InventoryProductHistory` ADD CONSTRAINT `InventoryProductHistory_in
 
 -- AddForeignKey
 ALTER TABLE `InventoryProductHistory` ADD CONSTRAINT `InventoryProductHistory_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Coupon` ADD CONSTRAINT `Coupon_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `Company`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
