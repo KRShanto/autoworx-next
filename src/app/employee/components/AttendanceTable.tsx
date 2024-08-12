@@ -1,11 +1,12 @@
 "use client";
-import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
-import { CiCircleInfo } from "react-icons/ci";
 import type { DatePickerProps } from "antd";
 import { DatePicker } from "antd";
+import { info } from "console";
+import { CiCircleInfo } from "react-icons/ci";
+import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
+// @ts-ignore
 import type { Dayjs } from "dayjs";
 import { useState } from "react";
-import { info } from "console";
 import DateRange from "../../../components/DateRange";
 
 const onChange: DatePickerProps<Dayjs[]>["onChange"] = (date, dateString) => {
