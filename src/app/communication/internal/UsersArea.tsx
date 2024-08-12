@@ -29,7 +29,7 @@ export default function UsersArea({
   const [messages, setMessages] = useState<MessageQue[]>([]);
   useEffect(() => {
     const messages: MessageQue[] = [];
-
+    console.log(previousMessages);
     for (const user of usersList) {
       const userMessages = previousMessages.filter(
         (m) => m.from === user.id || m.to === user.id,
