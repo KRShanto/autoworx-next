@@ -10,16 +10,18 @@ export default function Body({
   users,
   currentUser,
   messages,
+  groups,
 }: {
   users: User[];
   currentUser: NextAuthUser;
   messages: Message[];
+  groups: any;
 }) {
   const [usersList, setUsersList] = useState<User[]>([]);
-
+  console.log({ usersList });
   return (
     <>
-      <List users={users} setUsersList={setUsersList} />
+      <List groups={groups} users={users} setUsersList={setUsersList} />
       <UsersArea
         usersList={usersList}
         setUsersList={setUsersList}

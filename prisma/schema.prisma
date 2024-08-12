@@ -728,7 +728,7 @@ model Message {
   to        Int?
   message   String
   from      Int
-  groupId   Int?     @map("group_id")
+  groupId   Int?     @map("group_id") 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
@@ -739,7 +739,7 @@ model Message {
 
 model Group {
   id        Int       @id @default(autoincrement())
-  name      String
+  name      String 
   users     User[]    @relation("UserGroups")
 }
 
