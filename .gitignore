@@ -42,7 +42,7 @@ next-env.d.ts
 autoworx-next.zip
 
 public/uploads/*
-images/*
+images
 
 credentials.js
 credentials.json
