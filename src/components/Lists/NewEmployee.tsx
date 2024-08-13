@@ -10,16 +10,22 @@ import {
 import FormError from "@/components/FormError";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { RxAvatar } from "react-icons/rx";
-import SelectEmployeeType from "./SelectEmployeeType";
+import SelectEmployeeType from "../../app/employee/SelectEmployeeType";
 import { useServerGet } from "@/hooks/useServerGet";
 import { getCompany } from "@/actions/settings/getCompany";
 import { useFormErrorStore } from "@/stores/form-error";
 import { addEmployee } from "@/actions/employee/add";
-import { EmployeeType } from "@prisma/client";
+import { EmployeeType, User } from "@prisma/client";
 
-export default function AddNewEmployee() {
+export default function AddNewEmployee({
+  onSuccess,
+  button,
+}: {
+  onSuccess?: (employee: User) => void;
+  button?: React.ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const [employeeTypeOpen, setEmployeeTypeOpen] = useState(false);
   const [profilePic, setProfilePic] = useState<File | null>(null);
@@ -85,6 +91,7 @@ export default function AddNewEmployee() {
       return;
     } else {
       setOpen(false);
+      onSuccess && onSuccess(res.data);
     }
   }
 
@@ -92,9 +99,13 @@ export default function AddNewEmployee() {
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <button className="rounded-md bg-[#6571FF] p-2 px-5 text-white">
-            + Add New Employee
-          </button>
+          {button ? (
+            button
+          ) : (
+            <button className="rounded-md bg-[#6571FF] p-2 px-5 text-white">
+              + Add New Employee
+            </button>
+          )}
         </DialogTrigger>
         <DialogContent
           className="max-h-full max-w-xl grid-rows-[auto,1fr,auto]"
