@@ -3,11 +3,12 @@ import { useEffect, useRef, useState } from "react";
 // import { ThreeDots } from "react-loader-spinner";
 import { cn } from "@/lib/cn";
 import Image from "next/image";
-import { Message, MessageQue } from "./UsersArea";
+import { Message, MessageQue, TGroupMessage } from "./UsersArea";
 import { FiMessageCircle } from "react-icons/fi";
 import { IoMdSend, IoMdSettings } from "react-icons/io";
 import { TiDeleteOutline } from "react-icons/ti";
 import { MdModeEdit } from "react-icons/md";
+import { sendType } from "@/types/Chat";
 
 export default function MessageBox({
   user,
@@ -20,17 +21,18 @@ export default function MessageBox({
   setGroupsList,
 }: {
   user?: any; // TODO: type this
-  setUsersList: React.Dispatch<React.SetStateAction<any[]>>;
-  setGroupsList: React.Dispatch<React.SetStateAction<any[]>>;
+  setUsersList?: React.Dispatch<React.SetStateAction<any[]>>;
+  setGroupsList?: React.Dispatch<React.SetStateAction<any[]>>;
   messages: Message[];
   totalMessageBox: number;
-  setMessages: React.Dispatch<React.SetStateAction<MessageQue[]>>;
+  setMessages: React.Dispatch<React.SetStateAction<any[]>>;
   fromGroup?: boolean;
   group?: any;
 }) {
   const [message, setMessage] = useState("");
   const messageBoxRef = useRef<HTMLDivElement>(null);
   const [openSettings, setOpenSettings] = useState(false);
+  console.log("messages from messagebox", messages);
 
   useEffect(() => {
     if (messageBoxRef.current) {
@@ -50,7 +52,8 @@ export default function MessageBox({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        to: user.id,
+        to: fromGroup ? group.id : user.id,
+        type: fromGroup ? sendType.Group : sendType.User,
         message,
       }),
     });
@@ -62,32 +65,37 @@ export default function MessageBox({
         message,
         sender: "USER",
       };
+      if (fromGroup) {
+        setMessages((messages) => [...messages, newMessage]);
+      } else {
+        setMessages((messages) => {
+          const newMessages = messages.map((m) => {
+            if (m.user === user.id) {
+              return {
+                user: user.id,
+                messages: [...m.messages, newMessage],
+              };
+            }
 
-      setMessages((messages) => {
-        const newMessages = messages.map((m) => {
-          if (m.user === user.id) {
-            return {
-              user: user.id,
-              messages: [...m.messages, newMessage],
-            };
-          }
+            return m;
+          });
 
-          return m;
+          return newMessages;
         });
-
-        return newMessages;
-      });
+      }
 
       setMessage("");
     }
   }
 
   const handleGroupClose = () => {
-    setGroupsList((groupList) => groupList.filter((g) => g.id !== group.id));
+    setGroupsList &&
+      setGroupsList((groupList) => groupList.filter((g) => g.id !== group.id));
   };
 
   const handleUserClose = () => {
-    setUsersList((usersList) => usersList.filter((u) => u.id !== user.id));
+    setUsersList &&
+      setUsersList((usersList) => usersList.filter((u) => u.id !== user.id));
   };
   return (
     <div
@@ -112,10 +120,10 @@ export default function MessageBox({
         <div className="flex items-center gap-1">
           {fromGroup ? (
             <div className="flex">
-              {group.users.map((user: any, index: number) => (
+              {group.users.map((groupUser: any, index: number) => (
                 <Image
-                  key={user.id}
-                  src={user.image}
+                  key={groupUser.id}
+                  src={groupUser.image}
                   alt="user"
                   width={50}
                   height={50}
@@ -210,7 +218,7 @@ export default function MessageBox({
             <div className="flex items-center gap-2 p-1">
               {message.sender === "CLIENT" && (
                 <Image
-                  src={user.image}
+                  src={user?.image}
                   alt="user"
                   width={40}
                   height={40}

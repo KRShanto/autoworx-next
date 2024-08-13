@@ -4,9 +4,15 @@ import { User } from "next-auth";
 import { pusher } from "@/lib/pusher/client";
 import { Message as DbMessage, Group } from "@prisma/client";
 import { cn } from "@/lib/cn";
+import GroupMessageBox from "./GroupMessageBox";
 
 export interface MessageQue {
   user: number;
+  messages: Message[];
+}
+
+export interface TGroupMessage {
+  groupId: number;
   messages: Message[];
 }
 
@@ -31,6 +37,8 @@ export default function UsersArea({
   groupsList: any;
 }) {
   const [messages, setMessages] = useState<MessageQue[]>([]);
+
+  // for normal messages
   useEffect(() => {
     const messages: MessageQue[] = [];
     for (const user of usersList) {
@@ -53,12 +61,14 @@ export default function UsersArea({
     setMessages(messages);
   }, [usersList, previousMessages, currentUser]);
 
+  // for user real-time messages
   useEffect(() => {
     const channel = pusher
       .subscribe(`user-${currentUser.id}`)
       .bind(
         "message",
         ({ from, message }: { from: number; message: string }) => {
+          console.log("Received message", { from, message });
           const user = usersList.find((u) => {
             return u.id === from;
           });
@@ -104,21 +114,14 @@ export default function UsersArea({
             messages={[...findMessages]}
             setMessages={setMessages}
             totalMessageBox={totalMessageBoxLength}
-            setGroupsList={setGroupsList}
           />
         );
       })}
       {groupsList.map((group: any) => {
-        // const findMessages =
-        //   messages.find((m) => m.user === user.id)?.messages || [];
         return (
-          <MessageBox
-            fromGroup
+          <GroupMessageBox
             key={group.id}
             group={group}
-            setUsersList={setUsersList}
-            messages={[]}
-            setMessages={setMessages}
             totalMessageBox={totalMessageBoxLength}
             setGroupsList={setGroupsList}
           />
