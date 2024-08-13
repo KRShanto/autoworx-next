@@ -5,7 +5,9 @@ import { cn } from "@/lib/cn";
 import Image from "next/image";
 import { Message, MessageQue } from "./UsersArea";
 import { FiMessageCircle } from "react-icons/fi";
-import { IoMdSend } from "react-icons/io";
+import { IoMdSend, IoMdSettings } from "react-icons/io";
+import { TiDeleteOutline } from "react-icons/ti";
+import { MdModeEdit } from "react-icons/md";
 
 export default function MessageBox({
   user,
@@ -13,15 +15,22 @@ export default function MessageBox({
   messages,
   totalMessageBox,
   setMessages,
+  fromGroup,
+  group,
+  setGroupsList,
 }: {
-  user: any; // TODO: type this
+  user?: any; // TODO: type this
   setUsersList: React.Dispatch<React.SetStateAction<any[]>>;
+  setGroupsList: React.Dispatch<React.SetStateAction<any[]>>;
   messages: Message[];
   totalMessageBox: number;
   setMessages: React.Dispatch<React.SetStateAction<MessageQue[]>>;
+  fromGroup?: boolean;
+  group?: any;
 }) {
   const [message, setMessage] = useState("");
   const messageBoxRef = useRef<HTMLDivElement>(null);
+  const [openSettings, setOpenSettings] = useState(false);
 
   useEffect(() => {
     if (messageBoxRef.current) {
@@ -72,7 +81,14 @@ export default function MessageBox({
       setMessage("");
     }
   }
-  console.log(user);
+
+  const handleGroupClose = () => {
+    setGroupsList((groupList) => groupList.filter((g) => g.id !== group.id));
+  };
+
+  const handleUserClose = () => {
+    setUsersList((usersList) => usersList.filter((u) => u.id !== user.id));
+  };
   return (
     <div
       className={cn(
@@ -82,32 +98,57 @@ export default function MessageBox({
     >
       {/* name and delete */}
       <div className="flex items-center justify-between rounded-md bg-white px-2 py-1">
-        <p className="text-sm">User Message</p>
+        <p className="text-sm">
+          {fromGroup ? "Group Message" : "User Message"}
+        </p>
         <FaTimes
           className="cursor-pointer text-sm"
-          onClick={() => {
-            setUsersList((usersList) =>
-              usersList.filter((u) => u.id !== user.id),
-            );
-          }}
+          onClick={fromGroup ? handleGroupClose : handleUserClose}
         />
       </div>
 
       {/* Chat Header */}
-      <div className="flex h-[10%] items-center justify-between gap-2 rounded-sm bg-[#006D77] p-2 px-4 text-white">
+      <div className="flex h-[10%] items-center justify-between gap-2 rounded-sm bg-[#006D77] p-6 text-white">
         <div className="flex items-center gap-1">
-          <Image
-            src={user.image}
-            alt="user"
-            width={50}
-            height={50}
-            className="rounded-full"
-          />
+          {fromGroup ? (
+            <div className="flex">
+              {group.users.map((user: any, index: number) => (
+                <Image
+                  key={user.id}
+                  src={user.image}
+                  alt="user"
+                  width={50}
+                  height={50}
+                  className={cn("rounded-full", index === 0 ? "ml-0" : "-ml-9")}
+                />
+              ))}
+            </div>
+          ) : (
+            <Image
+              src={user?.image}
+              alt="user"
+              width={50}
+              height={50}
+              className="rounded-full"
+            />
+          )}
           <div className="flex flex-col">
             <p className="text-[20px] font-bold">
-              {user.firstName} {user.lastName}
+              {fromGroup ? group.name : `${user.firstName} ${user.lastName}`}
             </p>
           </div>
+          {fromGroup && (
+            <>
+              {openSettings ? (
+                <MdModeEdit className="ml-3 size-6 cursor-pointer" />
+              ) : (
+                <IoMdSettings
+                  onClick={() => setOpenSettings(true)}
+                  className="ml-3 size-6 cursor-pointer"
+                />
+              )}
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-x-4">
@@ -118,6 +159,40 @@ export default function MessageBox({
           <Image src="/icons/Phone.png" alt="phone" width={20} height={15} />
         </div>
       </div>
+
+      {/* group user setting */}
+      {fromGroup && openSettings && (
+        <div className="flex w-full items-center justify-between rounded-sm bg-[#D9D9D9] p-3">
+          <div className="flex flex-wrap items-center space-x-2">
+            <div
+              // key={groupUser.id}
+              className="flex items-center justify-between space-x-1 rounded-full bg-[#006D77] px-2 py-1 text-white"
+            >
+              <p className="text-sm">User 1</p>
+              <TiDeleteOutline
+                // onClick={() => handleDeleteFromContactList(groupUser)}
+                className="size-5 cursor-pointer"
+              />
+            </div>
+            <div
+              // key={groupUser.id}
+              className="flex items-center justify-between space-x-1 rounded-full bg-[#006D77] px-2 py-1 text-white"
+            >
+              <p className="text-sm">User 2</p>
+              <TiDeleteOutline
+                // onClick={() => handleDeleteFromContactList(groupUser)}
+                className="size-5 cursor-pointer"
+              />
+            </div>
+          </div>
+          <p>
+            <TiDeleteOutline
+              onClick={() => setOpenSettings(false)}
+              className="size-10 cursor-pointer text-[#006D77]"
+            />
+          </p>
+        </div>
+      )}
 
       {/* Messages */}
       <div

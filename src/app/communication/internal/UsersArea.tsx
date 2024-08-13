@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect, useRef, useState } from "react";
 import MessageBox from "./MessageBox";
 import { User } from "next-auth";
 import { pusher } from "@/lib/pusher/client";
-import { Message as DbMessage } from "@prisma/client";
+import { Message as DbMessage, Group } from "@prisma/client";
 import { cn } from "@/lib/cn";
 
 export interface MessageQue {
@@ -20,16 +20,19 @@ export default function UsersArea({
   usersList,
   setUsersList,
   previousMessages,
+  groupsList,
+  setGroupsList,
 }: {
   currentUser: User;
   usersList: any[];
   setUsersList: React.Dispatch<React.SetStateAction<any[]>>;
+  setGroupsList: React.Dispatch<React.SetStateAction<any[]>>;
   previousMessages: DbMessage[];
+  groupsList: any;
 }) {
   const [messages, setMessages] = useState<MessageQue[]>([]);
   useEffect(() => {
     const messages: MessageQue[] = [];
-    console.log(previousMessages);
     for (const user of usersList) {
       const userMessages = previousMessages.filter(
         (m) => m.from === user.id || m.to === user.id,
@@ -82,12 +85,12 @@ export default function UsersArea({
     };
   }, [usersList, messages]);
 
-  const totalUserListLength = usersList.length;
+  const totalMessageBoxLength = usersList.length + groupsList.length;
   return (
     <div
       className={cn(
         "grid h-[88vh] w-full gap-3",
-        totalUserListLength > 1 ? "grid-cols-2" : "grid-cols-1",
+        totalMessageBoxLength > 1 ? "grid-cols-2" : "grid-cols-1",
       )}
     >
       {usersList.map((user) => {
@@ -100,15 +103,33 @@ export default function UsersArea({
             setUsersList={setUsersList}
             messages={[...findMessages]}
             setMessages={setMessages}
-            totalMessageBox={totalUserListLength}
+            totalMessageBox={totalMessageBoxLength}
+            setGroupsList={setGroupsList}
           />
         );
       })}
-      {totalUserListLength === 3 && (
+      {groupsList.map((group: any) => {
+        // const findMessages =
+        //   messages.find((m) => m.user === user.id)?.messages || [];
+        return (
+          <MessageBox
+            fromGroup
+            key={group.id}
+            group={group}
+            setUsersList={setUsersList}
+            messages={[]}
+            setMessages={setMessages}
+            totalMessageBox={totalMessageBoxLength}
+            setGroupsList={setGroupsList}
+          />
+        );
+      })}
+
+      {totalMessageBoxLength === 3 && (
         <div
           className={cn(
             "app-shadow flex w-full border-spacing-4 flex-col overflow-hidden rounded-lg max-[1400px]:w-[100%]",
-            totalUserListLength > 2 && "h-[44vh]",
+            totalMessageBoxLength > 2 && "h-[44vh]",
           )}
           style={{
             borderWidth: "4px",

@@ -738,9 +738,12 @@ model Message {
 }
 
 model Group {
-  id        Int       @id @default(autoincrement())
-  name      String 
-  users     User[]    @relation("UserGroups")
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      String   @default("Group")
+  users     User[]   @relation("UserGroups")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 }
 
 model Coupon {

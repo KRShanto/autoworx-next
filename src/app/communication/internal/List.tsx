@@ -6,10 +6,14 @@ export default function List({
   users,
   setUsersList,
   groups,
+  setGroupsList,
 }: {
   users: User[];
   setUsersList: React.Dispatch<React.SetStateAction<User[]>>;
-  groups: (Group & { users: User[] })[];
+  setGroupsList: React.Dispatch<
+    React.SetStateAction<(Group & { users: User[] }[]) | []>
+  >;
+  groups: (Group & { users: User[] })[] | [];
 }) {
   return (
     <div className="app-shadow w-[20%] rounded-lg bg-white p-3">
@@ -39,16 +43,16 @@ export default function List({
             <button
               key={group.id}
               className="flex items-center gap-2 rounded-md bg-[#F2F2F2] p-2"
-              // onClick={() => {
-              //   // add this user to the list (if not already in it)
-              //   setUsersList((usersList) => {
-              //     if (usersList.length >= 4) return usersList;
-              //     if (usersList.find((u) => u.id === user.id)) {
-              //       return usersList;
-              //     }
-              //     return [...usersList, user];
-              //   });
-              // }}
+              onClick={() => {
+                // add this user to the list (if not already in it)
+                setGroupsList((groupList: any) => {
+                  if (groupList.length >= 4) return groupList;
+                  if (groupList.find((g: Group) => g?.id === group.id)) {
+                    return groupList;
+                  }
+                  return [...groupList, group];
+                });
+              }}
             >
               <div className="grid grid-cols-2">
                 {group.users.map((user) => {
