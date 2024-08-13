@@ -23,6 +23,7 @@ export default function GroupMessageBox({
       setGroupMessages(
         groupMessages.map((m) => {
           return {
+            userId: m.from,
             message: m.message,
             sender: m.from === parseInt(session?.user?.id!) ? "USER" : "CLIENT",
           };
@@ -40,14 +41,15 @@ export default function GroupMessageBox({
         "message",
         ({ from, message }: { from: number; message: string }) => {
           if (from !== parseInt(session?.user?.id!)) {
-              const newMessage = {
-                message: message,
-                sender: "CLIENT",
-              };
-              setGroupMessages((prevGroupMessages) => [
-                ...prevGroupMessages,
-                newMessage,
-              ]);
+            const newMessage = {
+              userId: from,
+              message: message,
+              sender: "CLIENT",
+            };
+            setGroupMessages((prevGroupMessages) => [
+              ...prevGroupMessages,
+              newMessage,
+            ]);
           }
         },
       );

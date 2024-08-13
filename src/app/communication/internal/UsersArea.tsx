@@ -17,6 +17,7 @@ export interface TGroupMessage {
 }
 
 export interface Message {
+  userId?: number;
   message: string;
   sender: "CLIENT" | "USER";
 }

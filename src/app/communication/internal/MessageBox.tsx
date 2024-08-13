@@ -9,6 +9,8 @@ import { IoMdSend, IoMdSettings } from "react-icons/io";
 import { TiDeleteOutline } from "react-icons/ti";
 import { MdModeEdit } from "react-icons/md";
 import { sendType } from "@/types/Chat";
+import { User } from "@prisma/client";
+// import { useSession } from "next-auth/react";
 
 export default function MessageBox({
   user,
@@ -32,7 +34,7 @@ export default function MessageBox({
   const [message, setMessage] = useState("");
   const messageBoxRef = useRef<HTMLDivElement>(null);
   const [openSettings, setOpenSettings] = useState(false);
-  console.log("messages from messagebox", messages);
+  // const { data: session } = useSession();
 
   useEffect(() => {
     if (messageBoxRef.current) {
@@ -62,6 +64,7 @@ export default function MessageBox({
 
     if (json.success) {
       const newMessage: Message = {
+        // userId: parseInt(session?.user?.id!),
         message,
         sender: "USER",
       };
@@ -208,36 +211,46 @@ export default function MessageBox({
         className="h-[82%] overflow-y-scroll"
         ref={messageBoxRef}
       >
-        {messages.map((message: Message, index: number) => (
-          <div
-            key={index}
-            className={`flex items-center p-1 ${
-              message.sender === "CLIENT" ? "justify-start" : "justify-end"
-            }`}
-          >
-            <div className="flex items-center gap-2 p-1">
-              {message.sender === "CLIENT" && (
-                <Image
-                  src={user?.image}
-                  alt="user"
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                />
-              )}
-              <p
-                className={cn(
-                  "max-w-[220px] rounded-xl p-2 text-base",
-                  message.sender === "CLIENT"
-                    ? "bg-[#D9D9D9] text-slate-800"
-                    : "bg-[#006D77] text-white",
+        {messages.map((message: Message, index: number) => {
+          const findUser = fromGroup
+            ? group?.users.find((user: User) => user.id === message.userId)
+            : user;
+          return (
+            <div
+              key={index}
+              className={`flex items-center p-1 ${
+                message.sender === "CLIENT" ? "justify-start" : "justify-end"
+              }`}
+            >
+              <div className="flex items-start gap-2 p-1">
+                {message.sender === "CLIENT" && (
+                  <div>
+                    <Image
+                      src={findUser?.image}
+                      alt="user"
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                    />
+                    <p className="text-center text-[10px]">
+                      {findUser?.firstName}
+                    </p>
+                  </div>
                 )}
-              >
-                {message.message}
-              </p>
+                <p
+                  className={cn(
+                    "max-w-[220px] rounded-xl p-2 text-base",
+                    message.sender === "CLIENT"
+                      ? "bg-[#D9D9D9] text-slate-800"
+                      : "bg-[#006D77] text-white",
+                  )}
+                >
+                  {message.message}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Input */}
