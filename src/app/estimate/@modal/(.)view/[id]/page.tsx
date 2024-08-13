@@ -1,3 +1,4 @@
+import { auth } from "@/app/auth";
 import {
   DialogClose,
   DialogContentBlank,
@@ -6,16 +7,16 @@ import {
   InterceptedDialog,
 } from "@/components/Dialog";
 import { db } from "@/lib/db";
-import { notFound } from "next/navigation";
-import { HiXMark } from "react-icons/hi2";
-import { InvoiceItems } from "./InvoiceItems";
+import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
-import moment from "moment";
-import { auth } from "@/app/auth";
+import { notFound } from "next/navigation";
+import path from "path";
 import { FaShare } from "react-icons/fa";
 import { FaRegShareFromSquare } from "react-icons/fa6";
-import path from "path";
+import { HiXMark } from "react-icons/hi2";
+import DownloadPDF from "./DownloadPDF";
+import { InvoiceItems } from "./InvoiceItems";
 
 export default async function ViewEstimate({
   params: { id },
@@ -58,10 +59,11 @@ export default async function ViewEstimate({
       <DialogPortal>
         <DialogOverlay />
         <DialogContentBlank className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] fixed left-[50%] top-[50%] z-50 flex max-h-full translate-x-[-50%] translate-y-[-50%] justify-center gap-4 duration-200">
-          <div className="relative grid h-[90vh] w-[740px] shrink grow-0 gap-4 overflow-y-auto border bg-background p-6 shadow-lg">
+          <div className="#shadow-lg relative grid h-[90vh] w-[740px] shrink grow-0 gap-4 overflow-y-auto border bg-background p-6">
             {/**
              * Logo, Contact Information
              */}
+            <DownloadPDF />
             <div className="flex items-center justify-between">
               <div className="flex aspect-square w-32 items-center justify-center bg-slate-500 text-center font-bold text-white">
                 Logo
@@ -186,8 +188,8 @@ export default async function ViewEstimate({
             </div>
             <p>Thank you for shopping with Autoworx</p>
           </div>
-          <div className="flex h-[90vh] w-[394px] shrink grow-0 flex-col gap-4">
-            <div className="grid flex-1 grid-cols-1 gap-4 overflow-y-auto border bg-background p-6 shadow-lg">
+          <div className="flex h-[90vh] w-[394px] shrink grow-0 flex-col gap-4 print:hidden">
+            <div className="#shadow-lg grid flex-1 grid-cols-1 gap-4 overflow-y-auto border bg-background p-6">
               <h2 className="col-span-full text-3xl font-bold uppercase text-slate-500">
                 Attachments
               </h2>
