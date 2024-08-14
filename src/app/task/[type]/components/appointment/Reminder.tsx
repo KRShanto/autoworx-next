@@ -110,6 +110,8 @@ export function Reminder({
               type="Confirmation"
               clientName={client.firstName + " " + client.lastName}
               vehicleModel={vehicle?.model!}
+              setTemplate={setConfirmationTemplate}
+              setOpenTemplate={setOpenConfirmation}
             />
           }
           items={templates.filter(
@@ -176,6 +178,8 @@ export function Reminder({
               type="Reminder"
               clientName={client.firstName + " " + client.lastName}
               vehicleModel={vehicle?.model!}
+              setTemplate={setReminderTemplate}
+              setOpenTemplate={setOpenReminder}
             />
           }
           items={templates.filter(
