@@ -64,9 +64,9 @@ export default function TaskForm({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <button className="bg-white rounded-md border-2 border-[#66738C] px-2 text-center text-xs text-gray-500">
+        <div role="button" className="bg-white rounded-md border-2 border-[#66738C] px-2 text-center text-xs text-gray-500">
         Add Task
-        </button>
+        </div>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
