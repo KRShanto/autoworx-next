@@ -1,9 +1,9 @@
-import "server-only";
-import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
-import NextAuth, { CredentialsSignin } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcrypt";
+import NextAuth, { CredentialsSignin } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import "server-only";
 import { db } from "../lib/db";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -78,7 +78,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
 
   callbacks: {
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       if (token) {
         // @ts-ignore
         session.user.id = token.id;
@@ -94,7 +94,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
 
-    async jwt({ token, user }) {
+    async jwt({ token, user }: any) {
       // find the user
       const dbUser = await db.user.findUnique({
         where: { email: token.email! },
