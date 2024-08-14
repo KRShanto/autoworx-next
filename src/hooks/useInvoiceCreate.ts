@@ -26,8 +26,9 @@ export function useInvoiceCreate(type: InvoiceType) {
     photos,
     tasks,
     items,
+    reset: resetEstimateCreate,
   } = useEstimateCreateStore();
-  const { client, vehicle, status } = useListsStore();
+  const { client, vehicle, status, reset: resetLists } = useListsStore();
 
   const pathaname = usePathname();
 
@@ -108,6 +109,11 @@ export function useInvoiceCreate(type: InvoiceType) {
         items,
         tasks,
       });
+    }
+
+    if (res.type === "success") {
+      resetEstimateCreate();
+      resetLists();
     }
 
     return res;

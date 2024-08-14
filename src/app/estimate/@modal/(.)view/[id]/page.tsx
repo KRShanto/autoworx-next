@@ -15,6 +15,7 @@ import moment from "moment";
 import { auth } from "@/app/auth";
 import { FaShare } from "react-icons/fa";
 import { FaRegShareFromSquare } from "react-icons/fa6";
+import path from "path";
 
 export default async function ViewEstimate({
   params: { id },
@@ -51,6 +52,7 @@ export default async function ViewEstimate({
         where: { id: invoice.vehicleId },
       })
     : null;
+
   return (
     <InterceptedDialog>
       <DialogPortal>
@@ -189,26 +191,17 @@ export default async function ViewEstimate({
               <h2 className="col-span-full text-3xl font-bold uppercase text-slate-500">
                 Attachments
               </h2>
-              {invoice.photos.map((x) => (
-                <div key={x.id} className="relative aspect-square">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    alt="attachment"
-                    loading="lazy"
-                    decoding="async"
-                    data-nimg="fill"
-                    sizes="100vw"
-                    src={`/uploads/${x?.photo}`}
-                    style={{
-                      position: "absolute",
-                      height: "100%",
-                      width: "100%",
-                      inset: "0px",
-                      color: "transparent",
-                    }}
-                  />
-                </div>
-              ))}
+              {invoice.photos.map(async (x) => {
+                return (
+                  <div key={x.id} className="relative aspect-square">
+                    <Image
+                      src={`/api/images/${x.photo}`}
+                      alt="attachment"
+                      fill
+                    />
+                  </div>
+                );
+              })}
             </div>
             <Link
               href={`/estimate/workorder/${id}`}

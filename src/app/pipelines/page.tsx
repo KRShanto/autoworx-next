@@ -20,8 +20,11 @@ const Page = (props: Props) => {
 
   return (
     <div className="space-y-8">
+
       <Header onToggleView={viewHandler} activeView={activeView} />
       {activeView === "pipelines" ? <Pipelines /> : <WorkOrders />}
+
+      
     </div>
   );
 };

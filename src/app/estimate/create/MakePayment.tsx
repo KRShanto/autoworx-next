@@ -146,8 +146,6 @@ export default function MakePayment() {
       setOpen(false);
       // Redirect to the index
       router.push("/estimate");
-      // Reset the states
-      useEstimateCreateStore.getState().reset();
     }
   }
 

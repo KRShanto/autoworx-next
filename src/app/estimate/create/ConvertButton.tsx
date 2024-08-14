@@ -27,8 +27,6 @@ export default function ConvertButton({
 
     // Redirect to the index
     router.push("/estimate");
-    // Reset the states
-    useEstimateCreateStore.getState().reset();
   }
 
   return (

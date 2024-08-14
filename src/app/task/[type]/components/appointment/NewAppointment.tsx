@@ -40,6 +40,7 @@ import { TbBell, TbCalendar } from "react-icons/tb";
 import { addAppointment } from "../../../../../actions/appointment/addAppointment";
 import { Reminder } from "./Reminder";
 import { customAlphabet } from "nanoid";
+// @ts-ignore
 import dayjs from "dayjs";
 
 enum Tab {

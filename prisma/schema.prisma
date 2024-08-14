@@ -68,6 +68,7 @@ model User {
   createdAt        DateTime          @default(now()) @map("created_at")
   updatedAt        DateTime          @default(now()) @updatedAt @map("updated_at")
   company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  groups           Group[]           @relation("UserGroups")
   tasks            Task[]
   oauthTokens      OAuthToken[]
   taskUsers        TaskUser[]
@@ -724,14 +725,22 @@ enum InventoryProductType {
 // Message for chat.
 model Message {
   id        Int      @id @default(autoincrement())
-  to        Int
+  to        Int?
   message   String
   from      Int
+  groupId   Int?     @map("group_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@index([to], name: "fk_messages_to")
   @@index([from], name: "fk_messages_from")
+  @@index([groupId], name: "fk_messages_group")
+}
+
+model Group {
+  id        Int       @id @default(autoincrement())
+  name      String
+  users     User[]    @relation("UserGroups")
 }
 
 model Coupon {
