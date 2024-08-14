@@ -2,7 +2,7 @@
 
 import { IoSearchOutline } from "react-icons/io5";
 import DateRange from "../../../components/DateRange";
-import AddNewEmployee from "../AddNewEmployee";
+import AddNewEmployee from "../../../components/Lists/NewEmployee";
 import { useEmployeeFilterStore } from "@/stores/employeeFilter";
 
 // filter component for /employee page
