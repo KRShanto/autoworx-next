@@ -5,6 +5,7 @@ import Layout from "@/components/Layout";
 import TopLoader from "../components/TopLoader";
 import { auth } from "./auth";
 import { TooltipProvider } from "@/components/Tooltip";
+import { SessionProvider } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,9 +27,11 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <TopLoader />
-        <TooltipProvider delayDuration={150}>
-          <Layout session={session}>{children}</Layout>
-        </TooltipProvider>
+        <SessionProvider session={session}>
+          <TooltipProvider delayDuration={150}>
+            <Layout session={session}>{children}</Layout>
+          </TooltipProvider>
+        </SessionProvider>
       </body>
     </html>
   );
