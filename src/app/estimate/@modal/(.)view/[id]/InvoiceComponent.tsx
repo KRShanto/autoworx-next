@@ -8,7 +8,15 @@ import {
   InterceptedDialog,
 } from "@/components/Dialog";
 import { db } from "@/lib/db";
-import { Invoice, InvoiceItem, Vehicle } from "@prisma/client";
+import {
+  Company,
+  Invoice,
+  InvoiceItem,
+  InvoicePhoto,
+  Status,
+  User,
+  Vehicle,
+} from "@prisma/client";
 import { MdOutlineFileDownload } from "react-icons/md";
 
 import moment from "moment";
@@ -33,8 +41,14 @@ const InvoiceComponent = ({
 }: {
   id: string;
   clientId: any;
-  invoice: Invoice;
-  vehicle: Vehicle;
+  invoice: Invoice & {
+    status: Status | null;
+    company: Company;
+    invoiceItems: InvoiceItem[];
+    photos: InvoicePhoto[];
+    user: User;
+  };
+  vehicle: Vehicle | null;
 }) => {
   const componentRef = useRef(null);
   const handlePrint = useReactToPrint({
@@ -220,4 +234,3 @@ const InvoiceComponent = ({
 };
 
 export default InvoiceComponent;
-
