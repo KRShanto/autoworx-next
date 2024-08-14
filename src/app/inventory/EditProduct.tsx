@@ -22,7 +22,7 @@ import {
   InventoryProductType,
   Vendor,
 } from "@prisma/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CiEdit } from "react-icons/ci";
 import { editProduct } from "../../actions/inventory/edit";
 
@@ -49,8 +49,11 @@ export default function EditProduct({ productData }: TProps) {
   const [category, setCategory] = useState<Category | null>(
     productData.category,
   );
-  const [vendorOpen, setVendorOpen] = useState(false); // useful
+  const [vendorOpen, setVendorOpen] = useState(false);
+  const [categoryOpen, setCategoryOpen] = useState(false);
+
   const [error, setError] = useState<string | null>("");
+
   const [product, setProduct] = useState<TInputType>({
     productName: productData.name,
     description: productData.description,
@@ -62,6 +65,9 @@ export default function EditProduct({ productData }: TProps) {
     receipt: productData.receipt,
     lowInventory: productData.lowInventoryAlert,
   });
+
+  useEffect(() => setVendorOpen(false), [categoryOpen]);
+  useEffect(() => setCategoryOpen(false), [vendorOpen]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -136,6 +142,8 @@ export default function EditProduct({ productData }: TProps) {
               <SelectCategory
                 categoryData={category}
                 onCategoryChange={setCategory}
+                categoryOpen={categoryOpen}
+                setCategoryOpen={setCategoryOpen}
               />
               <SlimInput
                 onChange={handleChange}
