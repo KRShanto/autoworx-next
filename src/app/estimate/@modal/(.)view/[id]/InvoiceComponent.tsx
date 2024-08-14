@@ -21,9 +21,8 @@ import { FaShare } from "react-icons/fa";
 import { FaRegShareFromSquare } from "react-icons/fa6";
 import { HiXMark } from "react-icons/hi2";
 import { useReactToPrint } from "react-to-print";
-import DownloadPDF from "./DownloadPDF";
 import { InvoiceItems } from "./InvoiceItems";
-import "./test.css";
+
 type Props = {};
 
 const InvoiceComponent = ({
@@ -222,12 +221,3 @@ const InvoiceComponent = ({
 
 export default InvoiceComponent;
 
-// @media print {
-//   html,
-//   body {
-//     height: 100vh; /* Use 100% here to support printing more than a single page*/
-//     margin: 0 !important;
-//     padding: 0 !important;
-//     overflow: hidden;
-//   }
-// }

@@ -43,14 +43,12 @@ export default async function ViewEstimate({
 
   return (
     <InterceptedDialog>
-      {vehicle && invoice && (
-        <InvoiceComponent
-          id={id}
-          invoice={invoice}
-          clientId={clientId}
-          vehicle={vehicle}
-        />
-      )}
+      <InvoiceComponent
+        id={id}
+        invoice={invoice}
+        clientId={clientId}
+        vehicle={vehicle}
+      />
     </InterceptedDialog>
   );
 }
