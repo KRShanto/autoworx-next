@@ -55,7 +55,7 @@ export default function List({
               }}
             >
               <div className="grid grid-cols-2">
-                {group.users.map((user) => {
+                {group.users.slice(0, 4).map((user) => {
                   return (
                     <Image
                       key={user.id}

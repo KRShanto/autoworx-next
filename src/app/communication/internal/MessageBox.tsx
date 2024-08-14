@@ -10,6 +10,8 @@ import { TiDeleteOutline } from "react-icons/ti";
 import { MdModeEdit } from "react-icons/md";
 import { sendType } from "@/types/Chat";
 import { User } from "@prisma/client";
+import { deleteUserFromGroup } from "@/actions/communication/internal/deleteUserFromGroup";
+import { useSession } from "next-auth/react";
 // import { useSession } from "next-auth/react";
 
 export default function MessageBox({
@@ -34,7 +36,7 @@ export default function MessageBox({
   const [message, setMessage] = useState("");
   const messageBoxRef = useRef<HTMLDivElement>(null);
   const [openSettings, setOpenSettings] = useState(false);
-  // const { data: session } = useSession();
+  const { data: session } = useSession();
 
   useEffect(() => {
     if (messageBoxRef.current) {
@@ -100,6 +102,28 @@ export default function MessageBox({
     setUsersList &&
       setUsersList((usersList) => usersList.filter((u) => u.id !== user.id));
   };
+
+  const handleDeleteUserFromGroupList = async (userId: number) => {
+    const response = await deleteUserFromGroup(userId, group.id);
+    if (response.status === 200) {
+      if (userId === parseInt(session?.user?.id!)) {
+        handleGroupClose();
+      } else {
+        setGroupsList &&
+          setGroupsList((groupList) =>
+            groupList.map((g) => {
+              if (g.id === group.id) {
+                return {
+                  ...g,
+                  users: g.users.filter((user: User) => user.id !== userId),
+                };
+              }
+              return g;
+            }),
+          );
+      }
+    }
+  };
   return (
     <div
       className={cn(
@@ -123,7 +147,7 @@ export default function MessageBox({
         <div className="flex items-center gap-1">
           {fromGroup ? (
             <div className="flex">
-              {group.users.map((groupUser: any, index: number) => (
+              {group.users.slice(0, 4).map((groupUser: any, index: number) => (
                 <Image
                   key={groupUser.id}
                   src={groupUser.image}
@@ -175,26 +199,18 @@ export default function MessageBox({
       {fromGroup && openSettings && (
         <div className="flex w-full items-center justify-between rounded-sm bg-[#D9D9D9] p-3">
           <div className="flex flex-wrap items-center space-x-2">
-            <div
-              // key={groupUser.id}
-              className="flex items-center justify-between space-x-1 rounded-full bg-[#006D77] px-2 py-1 text-white"
-            >
-              <p className="text-sm">User 1</p>
-              <TiDeleteOutline
-                // onClick={() => handleDeleteFromContactList(groupUser)}
-                className="size-5 cursor-pointer"
-              />
-            </div>
-            <div
-              // key={groupUser.id}
-              className="flex items-center justify-between space-x-1 rounded-full bg-[#006D77] px-2 py-1 text-white"
-            >
-              <p className="text-sm">User 2</p>
-              <TiDeleteOutline
-                // onClick={() => handleDeleteFromContactList(groupUser)}
-                className="size-5 cursor-pointer"
-              />
-            </div>
+            {group.users.map((user: User) => (
+              <div
+                key={user.id}
+                className="flex items-center justify-between space-x-1 rounded-full bg-[#006D77] px-2 py-1 text-white"
+              >
+                <p className="text-sm">{user.firstName}</p>
+                <TiDeleteOutline
+                  onClick={() => handleDeleteUserFromGroupList(user.id)}
+                  className="size-5 cursor-pointer"
+                />
+              </div>
+            ))}
           </div>
           <p>
             <TiDeleteOutline
