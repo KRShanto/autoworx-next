@@ -20,6 +20,13 @@ export default async function InternalPage() {
     },
   });
 
+  const groups = await db.group.findMany({
+    where: { users: { some: { id: parseInt(session?.user?.id) } } },
+    include: {
+      users: true,
+    },
+  });
+
   const messages = await db.message.findMany({
     where: {
       OR: [
@@ -32,10 +39,14 @@ export default async function InternalPage() {
       ],
     },
   });
-
   return (
     <div className="mt-5 flex gap-5">
-      <Body users={users} currentUser={session.user} messages={messages} />
+      <Body
+        users={users}
+        currentUser={session.user}
+        messages={messages}
+        groups={groups}
+      />
     </div>
   );
 }

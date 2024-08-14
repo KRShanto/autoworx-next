@@ -42,6 +42,7 @@ import { Reminder } from "./Reminder";
 import { customAlphabet } from "nanoid";
 // @ts-ignore
 import dayjs from "dayjs";
+import { usePathname, useRouter } from "next/navigation";
 
 enum Tab {
   Schedule = 0,
@@ -103,6 +104,9 @@ export function NewAppointment({
 
   const [openConfirmation, setOpenConfirmation] = useState(false);
   const [openReminder, setOpenReminder] = useState(false);
+
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleSearch = (search: string) => {
     setEmployeesToDisplay(
@@ -195,6 +199,8 @@ export function NewAppointment({
     setConfirmationTemplateStatus(true);
     setReminderTemplateStatus(true);
     setTimes([]);
+    // remove the clientId from the url
+    router.push(pathname);
 
     close();
   };

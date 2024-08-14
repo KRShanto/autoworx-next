@@ -13,6 +13,9 @@ import { CiSearch } from "react-icons/ci";
 import { TiDeleteOutline } from "react-icons/ti";
 import Image from "next/image";
 import { User } from "@prisma/client";
+import { createGroup } from "@/actions/communication/internal/creategroup";
+import { getSession, useSession } from "next-auth/react";
+import { Session } from "next-auth";
 
 type TProps = {
   users: User[];
@@ -24,11 +27,20 @@ type TContactListUser = {
 };
 
 export default function CreateGroupModal({ users }: TProps) {
+  const { data: session }: { data: any } = useSession();
+
   const [open, setOpen] = useState(false);
+
   const [openUserList, setOpenUserList] = useState(false);
+
   const [searchText, setSearchText] = useState("");
+
   const [groupName, setGroupName] = useState("");
+
   const [contactList, setContactList] = useState<Array<TContactListUser>>([]);
+
+  const [error, setError] = useState("");
+
   // add user in contact list
   const handleAddContactList = (user: User) => {
     const modifyUser = {
@@ -36,8 +48,10 @@ export default function CreateGroupModal({ users }: TProps) {
       name: user.firstName + " " + user.lastName,
     };
     if (contactList.some((prevUser) => prevUser.id === user.id)) {
+      setError("User already exists in contact list.");
       return;
     }
+    setError("");
     setContactList((prev) => [...prev, modifyUser]);
     setOpenUserList(false);
   };
@@ -47,6 +61,27 @@ export default function CreateGroupModal({ users }: TProps) {
       prev.filter((prevUser) => prevUser.id !== user.id),
     );
   };
+
+  console.log(contactList);
+  async function handleCreateGroup() {
+    if (contactList.length >= 2) {
+      const usersInGroup = contactList.map((user) => ({
+        id: user.id,
+      }));
+      const group = await createGroup({
+        name: groupName,
+        users: [{ id: session?.user.id }, ...usersInGroup],
+      });
+      if (group.status === 200) {
+        setOpen(false);
+        setError("");
+      } else {
+        setError("Failed to create group.");
+      }
+    } else {
+      setError("At least 2 users are required to create a group.");
+    }
+  }
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -55,6 +90,7 @@ export default function CreateGroupModal({ users }: TProps) {
         </button>
       </DialogTrigger>
       <DialogContent>
+        {error && <p className="text-center text-sm text-red-400">{error}</p>}
         <h2 className="mb-5 text-2xl font-bold">Create Group</h2>
         <div className="grid grid-cols-1">
           {/* group name */}
@@ -159,7 +195,10 @@ export default function CreateGroupModal({ users }: TProps) {
           <DialogClose className="rounded-lg border-2 border-slate-400 p-2">
             Cancel
           </DialogClose>
-          <button className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white">
+          <button
+            onClick={handleCreateGroup}
+            className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
+          >
             Add
           </button>
         </DialogFooter>

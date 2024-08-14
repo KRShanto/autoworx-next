@@ -15,17 +15,21 @@ import { useEffect, useState } from "react";
 import FormError from "@/components/FormError";
 import { useFormErrorStore } from "@/stores/form-error";
 import { addTemplate } from "../../actions/appointment/addTemplate";
-import { EmailTemplateType } from "@prisma/client";
+import { EmailTemplate, EmailTemplateType } from "@prisma/client";
 import { useListsStore } from "@/stores/lists";
 
 export default function NewTemplate({
   type,
   clientName,
   vehicleModel,
+  setTemplate,
+  setOpenTemplate,
 }: {
   type: EmailTemplateType;
   clientName: string;
   vehicleModel: string;
+  setTemplate: React.Dispatch<React.SetStateAction<EmailTemplate | null>>;
+  setOpenTemplate: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
@@ -64,6 +68,8 @@ Vehicle
         templates: [...templates, res.data],
       });
       setOpen(false);
+      setTemplate(res.data);
+      setOpenTemplate(false);
     }
   }
 

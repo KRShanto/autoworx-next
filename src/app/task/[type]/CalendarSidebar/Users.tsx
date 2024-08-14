@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import UserComponent from "./User";
-import { usePopupStore } from "../../../../stores/popup";
 import { Task, User } from "@prisma/client";
 import { MinimizeButton } from "./MinimiseButton";
 import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
 import { cn } from "@/lib/cn";
+import NewEmployee from "@/components/Lists/NewEmployee";
 
 export default function Users({
   users,
@@ -16,7 +16,6 @@ export default function Users({
   tasks: Task[];
 }) {
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
-  const { open } = usePopupStore();
   const minimized = useCalendarSidebarStore((x) => x.minimized);
   const setMinimized = useCalendarSidebarStore((x) => x.setMinimized);
   const [usersToDisplay, setUsersToDisplay] = useState(users);
@@ -92,15 +91,24 @@ export default function Users({
           })}
       </div>
 
-      {!minimized && (
-        <button
-          type="button"
-          className="mt-4 w-full rounded-[5px] bg-blue-600 py-2 text-[15px] text-white"
-          onClick={() => open("ADD_USER")}
-        >
-          Add User
-        </button>
-      )}
+      <NewEmployee
+        button={
+          <button className="mt-4 w-full rounded-[5px] bg-blue-600 py-2 text-[15px] text-white">
+            + Add User
+          </button>
+        }
+        onSuccess={(newUser) => {
+          if (newUser) {
+            setUsersToDisplay([
+              ...usersToDisplay,
+              {
+                ...newUser,
+                tasks: [],
+              },
+            ]);
+          }
+        }}
+      />
     </div>
   );
 }
