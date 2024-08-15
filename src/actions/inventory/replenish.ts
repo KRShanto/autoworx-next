@@ -23,6 +23,10 @@ export async function replenish({
   lot?: string;
   notes?: string;
 }): Promise<ServerAction> {
+  const product = await db.inventoryProduct.findUnique({
+    where: { id: productId },
+  });
+
   const vendor = vendorId
     ? await db.vendor.findUnique({
         where: { id: vendorId },
@@ -36,16 +40,12 @@ export async function replenish({
       quantity,
       notes,
       type: "Purchase",
-      price,
+      price: price || product?.price,
       vendorName: vendor?.name,
     },
   });
 
   // update product quantity
-  const product = await db.inventoryProduct.findUnique({
-    where: { id: productId },
-  });
-
   const newQuantity = product!.quantity! + quantity;
 
   await db.inventoryProduct.update({
