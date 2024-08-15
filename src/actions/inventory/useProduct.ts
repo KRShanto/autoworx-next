@@ -32,7 +32,7 @@ export async function useProduct({
       notes,
       type: "Sale",
       price: product?.price,
-      vendorName: product?.vendor?.name,
+      vendorId: product?.vendor?.id,
     },
   });
 

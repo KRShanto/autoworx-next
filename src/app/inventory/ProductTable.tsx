@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/cn";
 import { Category, InventoryProduct, Vendor } from "@prisma/client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { FaTimes } from "react-icons/fa";
 import EditProduct from "./EditProduct";
@@ -19,6 +19,7 @@ export default function ProductTable({
   products: (InventoryProduct & { category: Category; vendor: Vendor })[];
 }) {
   const router = useRouter();
+  const search = useSearchParams();
 
   return (
     <div>
@@ -43,7 +44,11 @@ export default function ProductTable({
                 index % 2 === 0 ? evenColor : oddColor,
                 currentProductId === product.id && "border-2 border-[#6571FF]",
               )}
-              onClick={() => router.push(`/inventory?productId=${product.id}`)}
+              onClick={() =>
+                router.push(
+                  `/inventory?view=${search.get("view")}&productId=${product.id}`,
+                )
+              }
             >
               <td className="h-12 px-4 text-left 2xl:px-10">
                 <p>{product.id}</p>

@@ -50,7 +50,7 @@ export async function createProduct(
         quantity: newProduct.quantity || 1,
         type: "Purchase",
         price: newProduct.price,
-        vendorName: newProduct.vendorId ? vendor?.name : null,
+        vendorId: newProduct.vendorId ? newProduct.vendorId : null,
       },
     });
 

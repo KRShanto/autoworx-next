@@ -333,24 +333,25 @@ model Material {
 // Vendor is just data, they can't login.
 // Vendor is a part of Material.
 model Vendor {
-  id                Int                @id @default(autoincrement())
-  name              String
-  website           String?
-  email             String?
-  phone             String?
-  address           String?
-  city              String?
-  state             String?
-  zip               String?
+  id                      Int                       @id @default(autoincrement())
+  name                    String
+  website                 String?
+  email                   String?
+  phone                   String?
+  address                 String?
+  city                    String?
+  state                   String?
+  zip                     String?
   // company name for vendor. Its not related to company model.
-  companyName       String?
-  notes             String?
-  companyId         Int                @map("company_id")
-  createdAt         DateTime           @default(now()) @map("created_at")
-  updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at")
-  company           Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  material          Material[]
-  inventoryProducts InventoryProduct[]
+  companyName             String?
+  notes                   String?
+  companyId               Int                       @map("company_id")
+  createdAt               DateTime                  @default(now()) @map("created_at")
+  updatedAt               DateTime                  @default(now()) @updatedAt @map("updated_at")
+  company                 Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  material                Material[]
+  inventoryProducts       InventoryProduct[]
+  InventoryProductHistory InventoryProductHistory[]
 }
 
 // Labor of a invoice.
@@ -697,19 +698,20 @@ model InventoryProduct {
 }
 
 model InventoryProductHistory {
-  id         Int                         @id @default(autoincrement())
-  productId  Int                         @map("inventory_id")
-  price      Decimal?                    @default(0)
-  vendorName String?                     @map("vendor_name")
-  quantity   Int
-  date       DateTime?                   @default(now())
-  notes      String?
-  type       InventoryProductHistoryType
-  invoiceId  String?                     @map("invoice_id")
-  createdAt  DateTime                    @default(now()) @map("created_at")
-  updatedAt  DateTime                    @default(now()) @updatedAt @map("updated_at")
-  product    InventoryProduct            @relation(fields: [productId], references: [id], onDelete: Cascade)
-  invoice    Invoice?                    @relation(fields: [invoiceId], references: [id])
+  id        Int                         @id @default(autoincrement())
+  price     Decimal?                    @default(0)
+  quantity  Int
+  date      DateTime?                   @default(now())
+  notes     String?
+  type      InventoryProductHistoryType
+  productId Int                         @map("inventory_id")
+  invoiceId String?                     @map("invoice_id")
+  vendorId  Int?                        @map("vendor_id")
+  createdAt DateTime                    @default(now()) @map("created_at")
+  updatedAt DateTime                    @default(now()) @updatedAt @map("updated_at")
+  product   InventoryProduct            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  invoice   Invoice?                    @relation(fields: [invoiceId], references: [id])
+  vendor    Vendor?                     @relation(fields: [vendorId], references: [id], onDelete: SetNull)
 }
 
 enum InventoryProductHistoryType {
@@ -728,7 +730,7 @@ model Message {
   to        Int?
   message   String
   from      Int
-  groupId   Int?     @map("group_id") 
+  groupId   Int?     @map("group_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 

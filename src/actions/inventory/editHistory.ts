@@ -4,7 +4,8 @@ import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { revalidatePath } from "next/cache";
 
-export async function replenish({
+export async function editHistory({
+  historyId,
   productId,
   date,
   vendorId,
@@ -14,8 +15,9 @@ export async function replenish({
   lot,
   notes,
 }: {
+  historyId: number;
   productId: number;
-  date: Date;
+  date?: Date;
   vendorId?: number;
   quantity: number;
   price?: number;
@@ -27,26 +29,30 @@ export async function replenish({
     where: { id: productId },
   });
 
+  const history = await db.inventoryProductHistory.findUnique({
+    where: { id: historyId },
+  });
+
   const vendor = vendorId
     ? await db.vendor.findUnique({
         where: { id: vendorId },
       })
     : null;
 
-  const newHistory = await db.inventoryProductHistory.create({
+  // update history
+  const newHistory = await db.inventoryProductHistory.update({
+    where: { id: historyId },
     data: {
-      productId,
-      date,
-      quantity,
-      notes,
-      type: "Purchase",
-      price: price || product?.price,
-      vendorId: vendor?.id,
+      date: date || history?.date,
+      quantity: quantity || history?.quantity,
+      notes: notes || history?.notes,
+      price: price || history?.price,
+      vendorId: vendor ? vendor.id : history?.vendorId,
     },
   });
 
   // update product quantity
-  const newQuantity = product!.quantity! + quantity;
+  const newQuantity = product!.quantity! + quantity - history!.quantity!;
 
   await db.inventoryProduct.update({
     where: { id: productId },
