@@ -7,7 +7,6 @@ export default function ClientInformation({
 }: {
   client: Client & { tag: Tag | null; source: Source | null };
 }) {
-  console.log("client photo", client.photo);
   return (
     <div className="mb-3 w-full p-2">
       <h3 className="text-lg font-semibold">Client Details</h3>

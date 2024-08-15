@@ -21,7 +21,11 @@ export default function EmployeeInformation({
         </div>
         <div className="mr-3 flex flex-col items-center">
           <Image
-            src={employee.image}
+            src={
+              !employee.image?.includes("default.png")
+                ? `/api/images/${employee.image}`
+                : employee.image
+            }
             alt="Employee"
             width={100}
             height={100}
