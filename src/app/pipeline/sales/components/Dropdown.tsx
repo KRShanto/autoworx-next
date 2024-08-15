@@ -7,7 +7,7 @@ import {
   FaHamburger,
 } from "react-icons/fa";
 import { PiDotFill } from "react-icons/pi";
-import Select from "./Select";
+import Select from "../components/Select";
 
 const DropdownMenuDemo = () => {
   const [bookmarksChecked, setBookmarksChecked] = React.useState(true);
