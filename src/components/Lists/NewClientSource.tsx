@@ -19,8 +19,12 @@ import { newSource } from "../../actions/source/newSource";
 
 export default function NewClientSource({
   setClientSources,
+  setClientSource,
+  setOpenClientSource,
 }: {
   setClientSources: React.Dispatch<React.SetStateAction<Source[]>>;
+  setClientSource: React.Dispatch<React.SetStateAction<Source | null>>;
+  setOpenClientSource: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
@@ -33,6 +37,8 @@ export default function NewClientSource({
       setClientSources((prev) => [...prev, res.data]);
       setSource("");
       setOpen(false);
+      setOpenClientSource(false);
+      setClientSource(res.data);
     }
   };
   return (

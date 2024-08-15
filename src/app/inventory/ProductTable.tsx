@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { FaTimes } from "react-icons/fa";
 import EditProduct from "./EditProduct";
+import { deleteInventory } from "@/actions/inventory/delete";
 
 const evenColor = "bg-white";
 const oddColor = "bg-[#F8FAFF]";
@@ -59,7 +60,10 @@ export default function ProductTable({
                 <button className="text-2xl text-blue-600">
                   <EditProduct productData={product} />
                 </button>
-                <button className="text-xl text-red-400">
+                <button
+                  className="text-xl text-red-400"
+                  onClick={() => deleteInventory(product.id)}
+                >
                   <FaTimes />
                 </button>
               </td>

@@ -43,9 +43,18 @@ const navList = [
     ],
   },
   {
-    title: "Sales and Funnel Management",
+    title: "Pipelines",
     icon: "/icons/navbar/Sales.svg",
-    link: "/sales",
+    subnav: [
+      {
+        title: "Shop Pipeline",
+        link: "/pipeline/shop",
+      },
+      {
+        title: "Seles Pipeline",
+        link: "/pipeline/sales",
+      },
+    ],
   },
   {
     title: "Task and Activity Management",
