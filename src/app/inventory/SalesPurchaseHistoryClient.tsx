@@ -5,12 +5,14 @@ import {
   InventoryProduct,
   InventoryProductHistory,
   InventoryProductHistoryType,
+  Vendor,
 } from "@prisma/client";
 import * as Tabs from "@radix-ui/react-tabs";
 import moment from "moment";
 import Link from "next/link";
 import { useState } from "react";
 import { HiExternalLink } from "react-icons/hi";
+import EditHistory from "./EditHistory";
 
 enum Tab {
   Sales = "sales",
@@ -25,7 +27,7 @@ export default function SalesPurchaseHistoryClient({
   histories,
 }: {
   product?: InventoryProduct;
-  histories: InventoryProductHistory[];
+  histories: (InventoryProductHistory & { vendor: Vendor | null })[];
 }) {
   const [tab, setTab] = useState<Tab>(Tab.Sales);
 
@@ -84,7 +86,7 @@ function Table({
   type,
   product,
 }: {
-  histories: InventoryProductHistory[];
+  histories: (InventoryProductHistory & { vendor: Vendor | null })[];
   type: InventoryProductHistoryType;
   product?: InventoryProduct;
 }) {
@@ -102,6 +104,7 @@ function Table({
           <th className="text-center">Quantity</th>
           <th className="text-center">Total</th>
           <th className="text-center">Date</th>
+          {type === "Purchase" && <th className="text-center">Action</th>}
         </tr>
       </thead>
 
@@ -129,7 +132,7 @@ function Table({
               </>
             )}
 
-            <td className="text-nowrap text-center">{history.vendorName}</td>
+            <td className="text-nowrap text-center">{history.vendor?.name}</td>
             <td className="text-nowrap text-center">
               ${history.price?.toString()}
             </td>
@@ -143,6 +146,21 @@ function Table({
                 "DD.MM.YYYY",
               )}
             </td>
+            {type === "Purchase" && (
+              <td className="text-center">
+                <EditHistory
+                  historyId={history.id}
+                  productId={product?.id!}
+                  date={history.date!}
+                  vendor={history.vendor}
+                  quantity={history.quantity}
+                  price={Number(history.price)}
+                  unit={product?.unit!}
+                  lot={product?.lot!}
+                  notes={history.notes!}
+                />
+              </td>
+            )}
           </tr>
         ))}
       </tbody>

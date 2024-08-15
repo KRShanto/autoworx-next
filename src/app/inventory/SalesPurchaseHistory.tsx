@@ -15,6 +15,7 @@ export default async function SalesPurchaseHistory({
     ? await db.inventoryProductHistory.findMany({
         where: { productId },
         orderBy: { date: "desc" },
+        include: { vendor: true },
       })
     : [];
 
