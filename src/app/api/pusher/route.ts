@@ -4,6 +4,14 @@ import { nanoid } from "nanoid";
 import { db } from "@/lib/db";
 import { auth } from "@/app/auth";
 import { revalidatePath } from "next/cache";
+import { sendType } from "@/types/Chat";
+
+type TMessageDate = {
+  from: number;
+  to?: number;
+  groupId?: number;
+  message: string;
+};
 
 const pusher = getPusherInstance();
 
@@ -16,25 +24,35 @@ export async function POST(req: Request, res: Response) {
 
   const userId = parseInt(session.user.id);
   const body = await req.json();
-  const { to, message } = body;
+  const { to, message, type } = body;
 
   if (!to || !message) {
     return new Response("Missing to or message", { status: 400 });
   }
 
   try {
+    let channel = `user-${to}`;
+    let messageData: TMessageDate = {
+      from: userId,
+      to,
+      message,
+    };
+    if (type === sendType.Group) {
+      channel = `group-${to}`;
+      messageData = {
+        from: userId,
+        groupId: to,
+        message,
+      };
+    }
     // send the raw message to the room
-    pusher.trigger(`user-${to}`, "message", {
+    pusher.trigger(channel, "message", {
       from: userId,
       message,
     });
     // Save to the database
     await db.message.create({
-      data: {
-        from: userId,
-        to,
-        message,
-      },
+      data: messageData,
     });
 
     revalidatePath("/communication/internal");
