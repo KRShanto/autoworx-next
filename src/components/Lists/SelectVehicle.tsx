@@ -21,8 +21,7 @@ export function SelectVehicle({
   const { newAddedVehicle } = useListsStore();
 
   const search = useSearchParams();
-
-  console.log("Search: ", search);
+  const clientId = search.get("clientId");
 
   useEffect(() => {
     if (newAddedVehicle && setOpenDropdown) {
@@ -37,19 +36,23 @@ export function SelectVehicle({
     }
   }, [vehicle]);
 
+  useEffect(() => {
+    if (clientId) {
+      setVehicle(null);
+    }
+  }, [clientId]);
+
   return (
     <>
       <input type="hidden" name={name} value={vehicle?.id ?? ""} />
 
       <Selector
-        disabledDropdown={search.get("clientId") ? false : true}
+        disabledDropdown={clientId ? false : true}
         label={(vehicle: Vehicle | null) =>
           vehicle ? vehicle.model || `Vehicle ${vehicle.id}` : "Vehicle"
         }
         newButton={<NewVehicle />}
-        items={vehicleList.filter(
-          (vehicle) => vehicle.clientId === +search.get("clientId")!,
-        )}
+        items={vehicleList.filter((vehicle) => vehicle.clientId === +clientId!)}
         onSearch={(search: string) =>
           vehicleList.filter((vehicle) =>
             vehicle.model?.toLowerCase().includes(search.toLowerCase()),

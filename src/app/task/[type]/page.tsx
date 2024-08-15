@@ -106,6 +106,7 @@ export default async function Page({ params }: { params: { type: string } }) {
   const users = await db.user.findMany({
     where: {
       companyId,
+      role: "employee",
     },
   });
 

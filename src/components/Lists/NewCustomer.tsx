@@ -213,7 +213,11 @@ export default function NewCustomer({
                     clientSource ? clientSource.name : "Client Source"
                   }
                   newButton={
-                    <NewClientSource setClientSources={setClientSources} />
+                    <NewClientSource
+                      setClientSources={setClientSources}
+                      setClientSource={setClientSource}
+                      setOpenClientSource={setOpenClientSource}
+                    />
                   }
                   items={clientSources}
                   displayList={(clientSource: Source) => (
