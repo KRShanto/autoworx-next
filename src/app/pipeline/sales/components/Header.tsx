@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import ManagePipelines from "./components/ManagePipelines";
+import ManagePipelines from "./ManagePipelines";
 
 interface HeaderProps {
   activeView: string;
   onToggleView: (view: string) => void;
+  pipelinesTitle:string;
 }
 
 
 
-export default function Header({ activeView, onToggleView }: HeaderProps) {
+export default function Header({ activeView, onToggleView ,pipelinesTitle}: HeaderProps) {
 
 const [isPipelineManaged, setPipelineManaged] = useState(false);
   const [columns, setColumns] = useState([
@@ -25,7 +26,7 @@ const [isPipelineManaged, setPipelineManaged] = useState(false);
   return (
     <div className="flex items-center justify-between p-4">
       <div className="flex items-center">
-        <h1 className="mr-4 text-2xl font-bold text-gray-600">Sales Pipelines</h1>
+        <h1 className="mr-4 text-2xl font-bold text-[#66738C]">{pipelinesTitle}</h1>
         <div className="flex">
           <button
             onClick={() => onToggleView("workOrders")}

@@ -38,7 +38,7 @@ export async function addCustomer(data: {
       data: {
         ...data,
         companyId,
-        photo: data.photo ? `/uploads/${data.photo}` : undefined,
+        photo: data.photo ? data.photo : undefined,
       },
     });
 

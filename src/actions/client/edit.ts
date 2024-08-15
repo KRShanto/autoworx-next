@@ -26,7 +26,7 @@ export async function editClient(data: {
     },
     data: {
       ...data,
-      photo: data.photo ? `/uploads/${data.photo}` : undefined,
+      photo: data.photo ? data.photo : undefined,
     },
   });
 

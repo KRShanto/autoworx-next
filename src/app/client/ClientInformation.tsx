@@ -14,7 +14,7 @@ export default function ClientInformation({
         <div className="relative flex w-full items-center rounded">
           <div className="mr-3 flex flex-col items-center">
             <Image
-              src={client.photo}
+              src={`/api/images/${client.photo}`}
               alt="Client"
               width={200}
               height={200}

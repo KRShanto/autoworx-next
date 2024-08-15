@@ -9,7 +9,7 @@ import { IoMdSend, IoMdSettings } from "react-icons/io";
 import { TiDeleteOutline } from "react-icons/ti";
 import { MdModeEdit } from "react-icons/md";
 import { sendType } from "@/types/Chat";
-import { User } from "@prisma/client";
+import { Group, User } from "@prisma/client";
 import { deleteUserFromGroup } from "@/actions/communication/internal/deleteUserFromGroup";
 import { useSession } from "next-auth/react";
 // import { useSession } from "next-auth/react";
@@ -24,14 +24,14 @@ export default function MessageBox({
   group,
   setGroupsList,
 }: {
-  user?: any; // TODO: type this
+  user?: User; // TODO: type this
   setUsersList?: React.Dispatch<React.SetStateAction<any[]>>;
   setGroupsList?: React.Dispatch<React.SetStateAction<any[]>>;
   messages: Message[];
   totalMessageBox: number;
   setMessages: React.Dispatch<React.SetStateAction<any[]>>;
   fromGroup?: boolean;
-  group?: any;
+  group?: Group & { users: User[] };
 }) {
   const [message, setMessage] = useState("");
   const messageBoxRef = useRef<HTMLDivElement>(null);
@@ -56,7 +56,7 @@ export default function MessageBox({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        to: fromGroup ? group.id : user.id,
+        to: fromGroup ? group?.id : user?.id,
         type: fromGroup ? sendType.Group : sendType.User,
         message,
       }),
@@ -75,9 +75,9 @@ export default function MessageBox({
       } else {
         setMessages((messages) => {
           const newMessages = messages.map((m) => {
-            if (m.user === user.id) {
+            if (m.user === user?.id) {
               return {
-                user: user.id,
+                user: user?.id,
                 messages: [...m.messages, newMessage],
               };
             }
@@ -95,16 +95,16 @@ export default function MessageBox({
 
   const handleGroupClose = () => {
     setGroupsList &&
-      setGroupsList((groupList) => groupList.filter((g) => g.id !== group.id));
+      setGroupsList((groupList) => groupList.filter((g) => g.id !== group?.id));
   };
 
   const handleUserClose = () => {
     setUsersList &&
-      setUsersList((usersList) => usersList.filter((u) => u.id !== user.id));
+      setUsersList((usersList) => usersList.filter((u) => u.id !== user?.id));
   };
 
   const handleDeleteUserFromGroupList = async (userId: number) => {
-    const response = await deleteUserFromGroup(userId, group.id);
+    const response = await deleteUserFromGroup(userId, group?.id!);
     if (response.status === 200) {
       if (userId === parseInt(session?.user?.id!)) {
         handleGroupClose();
@@ -112,7 +112,7 @@ export default function MessageBox({
         setGroupsList &&
           setGroupsList((groupList) =>
             groupList.map((g) => {
-              if (g.id === group.id) {
+              if (g.id === group?.id) {
                 return {
                   ...g,
                   users: g.users.filter((user: User) => user.id !== userId),
@@ -147,7 +147,7 @@ export default function MessageBox({
         <div className="flex items-center gap-1">
           {fromGroup ? (
             <div className="flex">
-              {group.users.slice(0, 4).map((groupUser: any, index: number) => (
+              {group?.users.slice(0, 4).map((groupUser: any, index: number) => (
                 <Image
                   key={groupUser.id}
                   src={groupUser.image}
@@ -160,7 +160,7 @@ export default function MessageBox({
             </div>
           ) : (
             <Image
-              src={user?.image}
+              src={user?.image!}
               alt="user"
               width={50}
               height={50}
@@ -169,7 +169,7 @@ export default function MessageBox({
           )}
           <div className="flex flex-col">
             <p className="text-[20px] font-bold">
-              {fromGroup ? group.name : `${user.firstName} ${user.lastName}`}
+              {fromGroup ? group?.name : `${user?.firstName} ${user?.lastName}`}
             </p>
           </div>
           {fromGroup && (
@@ -199,7 +199,7 @@ export default function MessageBox({
       {fromGroup && openSettings && (
         <div className="flex w-full items-center justify-between rounded-sm bg-[#D9D9D9] p-3">
           <div className="flex flex-wrap items-center space-x-2">
-            {group.users.map((user: User) => (
+            {group?.users.map((user: User) => (
               <div
                 key={user.id}
                 className="flex items-center justify-between space-x-1 rounded-full bg-[#006D77] px-2 py-1 text-white"
@@ -242,7 +242,7 @@ export default function MessageBox({
                 {message.sender === "CLIENT" && (
                   <div>
                     <Image
-                      src={findUser?.image}
+                      src={findUser?.image!}
                       alt="user"
                       width={40}
                       height={40}
