@@ -15,17 +15,25 @@ export default function Body({
   users: User[];
   currentUser: NextAuthUser;
   messages: Message[];
-  groups: any;
+  groups: (Group & { users: User[] })[];
 }) {
   const [usersList, setUsersList] = useState<User[]>([]);
-  const [groupsList, setGroupsList] = useState<any>([]);
+
+  const [groupsList, setGroupsList] = useState<(Group & { users: User[] })[]>(
+    [],
+  );
+
   return (
     <>
       <List
         groups={groups}
         users={users}
         setUsersList={setUsersList}
-        setGroupsList={setGroupsList}
+        setGroupsList={
+          setGroupsList as React.Dispatch<
+            React.SetStateAction<(Group & { users: User[] }[]) | []>
+          >
+        }
       />
       <UsersArea
         usersList={usersList}

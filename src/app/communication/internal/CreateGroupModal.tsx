@@ -62,7 +62,6 @@ export default function CreateGroupModal({ users }: TProps) {
     );
   };
 
-  console.log(contactList);
   async function handleCreateGroup() {
     if (contactList.length >= 2) {
       const usersInGroup = contactList.map((user) => ({
@@ -75,6 +74,8 @@ export default function CreateGroupModal({ users }: TProps) {
       if (group.status === 200) {
         setOpen(false);
         setError("");
+        setGroupName("");
+        setContactList([]);
       } else {
         setError("Failed to create group.");
       }
