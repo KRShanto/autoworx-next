@@ -192,6 +192,7 @@ export default async function ViewEstimate({
                 Attachments
               </h2>
               {invoice.photos.map(async (x) => {
+                console.log("invoice image", x.photo);
                 return (
                   <div key={x.id} className="relative aspect-square">
                     <Image

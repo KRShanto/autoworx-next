@@ -7,6 +7,7 @@ export default function ClientInformation({
 }: {
   client: Client & { tag: Tag | null; source: Source | null };
 }) {
+  console.log("client photo", client.photo);
   return (
     <div className="mb-3 w-full p-2">
       <h3 className="text-lg font-semibold">Client Details</h3>
@@ -14,7 +15,7 @@ export default function ClientInformation({
         <div className="relative flex w-full items-center rounded">
           <div className="mr-3 flex flex-col items-center">
             <Image
-              src={client.photo}
+              src={`/api/images/${client.photo}`}
               alt="Client"
               width={200}
               height={200}
