@@ -3,11 +3,14 @@ import MessageBox from "./MessageBox";
 import { getGroupMessagesById } from "@/actions/communication/internal/query";
 import { useSession } from "next-auth/react";
 import { pusher } from "@/lib/pusher/client";
+import { Group, User } from "@prisma/client";
 
 type TProps = {
-  setGroupsList: React.Dispatch<React.SetStateAction<any[]>>;
+  setGroupsList: React.Dispatch<
+    React.SetStateAction<(Group & { users: User[] })[]>
+  >;
   totalMessageBox: number;
-  group: any;
+  group: Group & { users: User[] };
 };
 export default function GroupMessageBox({
   group,

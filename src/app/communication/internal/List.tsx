@@ -19,7 +19,7 @@ export default function List({
     <div className="app-shadow w-[20%] rounded-lg bg-white p-3">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-[14px] text-[#797979]">User List</h2>
+        <h2 className="text-[14px] text-[#795252]">User List</h2>
         <CreateGroupModal users={users} />
       </div>
       {/* Search */}

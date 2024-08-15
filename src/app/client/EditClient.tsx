@@ -23,6 +23,7 @@ import { FaPenToSquare } from "react-icons/fa6";
 import { FaPen } from "react-icons/fa6";
 import { editClient } from "../../actions/client/edit";
 import { DEFAULT_IMAGE_URL } from "@/lib/consts";
+import Image from "next/image";
 
 export default function EditCustomer({
   client,
@@ -154,12 +155,14 @@ export default function EditCustomer({
                 htmlFor="profilePicture"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={
                     newProfilePic
                       ? URL.createObjectURL(newProfilePic)
-                      : profilePic
+                      : `/api/images/${profilePic}`
                   }
+                  width={80}
+                  height={80}
                   alt="profile"
                   className="h-20 w-20 rounded-full border border-slate-400 hover:border-dashed hover:opacity-80"
                 />
@@ -269,11 +272,7 @@ export default function EditCustomer({
                     clientSource ? clientSource.name : "Client Source"
                   }
                   newButton={
-                    <NewClientSource
-                      setClientSources={setClientSources}
-                      setClientSource={setClientSource}
-                      setOpenClientSource={setOpenClientSource}
-                    />
+                    <NewClientSource setClientSources={setClientSources} />
                   }
                   items={clientSources}
                   displayList={(clientSource: Source) => (
