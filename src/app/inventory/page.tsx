@@ -1,10 +1,9 @@
 import { SyncLists } from "@/components/SyncLists";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import Title from "@/components/Title";
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import AddNewProduct from "./AddNewProduct";
-import ProductTable from "./ProductTable";
+import InventoryList from "./InventoryList";
 import Sidebar from "./Sidebar";
 
 export default async function Page({
@@ -46,34 +45,11 @@ export default async function Page({
       </header>
 
       <div className="flex h-full w-full justify-between gap-3">
-        <Tabs
-          defaultValue="supplies"
-          className="col-start-1 mt-3 flex h-[93%] min-h-0 w-1/2 flex-col overflow-clip text-xs 2xl:text-base"
-        >
-          <TabsList>
-            <TabsTrigger value="procurement">Procurement</TabsTrigger>
-            <TabsTrigger value="products">Products</TabsTrigger>
-            <TabsTrigger value="supplies">Supplies</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="procurement">
-            <p>Procurement</p>
-          </TabsContent>
-
-          <TabsContent value="products" className="#overflow-x-scroll">
-            <ProductTable
-              products={products as any}
-              currentProductId={parseInt(productId)}
-            />
-          </TabsContent>
-
-          <TabsContent value="supplies">
-            <ProductTable
-              products={supplies as any}
-              currentProductId={parseInt(productId)}
-            />
-          </TabsContent>
-        </Tabs>
+        <InventoryList
+          products={products}
+          supplies={supplies}
+          productId={parseInt(productId)}
+        />
 
         <Sidebar productId={parseInt(productId)} />
       </div>
