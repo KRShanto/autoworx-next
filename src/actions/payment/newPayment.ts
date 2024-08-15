@@ -90,8 +90,8 @@ export async function newPayment({
           date: new Date(date),
           quantity: product.quantity,
           price: materials.find((m) => m.productId === product.id)?.sell,
-          vendorName: materials.find((m) => m.productId === product.id)?.vendor
-            ?.name,
+          vendorId: materials.find((m) => m.productId === product.id)?.vendor
+            ?.id!,
           notes,
           type: "Sale",
           invoiceId,

@@ -197,7 +197,7 @@ export default function SideNavbar() {
         {/* Settings */}
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link href="/settings" className="hover:opacity-50">
+            <Link href="/settings/my-account" className="hover:opacity-50">
               <Image
                 src="/icons/navbar/Settings.svg"
                 alt="Settings"
