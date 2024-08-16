@@ -31,6 +31,33 @@ export function calculatePreviousMonthEarnings(histories: History[]) {
   return previousMonthEarnings;
 }
 
+// calculate the previous month's previous month earnings
+export function calculate2ndPreviousMonthEarnings(histories: History[]) {
+  // Get the start and end of the previous month
+  const startOfPreviousMonth = moment().subtract(2, "months").startOf("month");
+  const endOfPreviousMonth = moment().subtract(2, "months").endOf("month");
+
+  // Filter the technicians who closed tasks in the previous month
+  const previousMonthEarnings = histories.reduce((total, history) => {
+    if (history.dateClosed) {
+      const dateClosed = moment(history.dateClosed);
+      if (
+        dateClosed.isBetween(
+          startOfPreviousMonth,
+          endOfPreviousMonth,
+          null,
+          "[]",
+        )
+      ) {
+        return total + Number(history.amount || 0);
+      }
+    }
+    return total;
+  }, 0);
+
+  return previousMonthEarnings;
+}
+
 export function calculateCurrentMonthEarnings(histories: History[]) {
   // Get the start and end of the current month
   const startOfCurrentMonth = moment().startOf("month");
