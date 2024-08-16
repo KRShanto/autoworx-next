@@ -67,7 +67,10 @@ export default function ProductTable({
                 </button>
                 <button
                   className="text-xl text-red-400"
-                  onClick={() => deleteInventory(product.id)}
+                  onClick={async () => {
+                    await deleteInventory(product.id);
+                    router.push(`/inventory?view=${search.get("view")}`);
+                  }}
                 >
                   <FaTimes />
                 </button>
