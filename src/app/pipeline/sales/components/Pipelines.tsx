@@ -14,10 +14,6 @@ import TaskForm from "./TaskForm";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ServiceSelector from "./ServiceSelector";
 
-
-
-
-
 //dummy services
 
 const services = [
@@ -57,7 +53,7 @@ const services = [
 interface Service {
   id: number;
   name: string;
-  completed : boolean;
+  completed: boolean;
 }
 interface Employee {
   id: number;
@@ -66,17 +62,23 @@ interface Employee {
 }
 interface pipelinesProps {
   pipelinesTitle: string;
-  salesData?: { title: string; leads: { name: string; email: string; phone: string }[] }[];
-  shopData?: { title: string; leads: { name: string; email: string; phone: string }[] }[];
-  
+  salesData?: {
+    title: string;
+    leads: { name: string; email: string; phone: string }[];
+  }[];
+  shopData?: {
+    title: string;
+    leads: { name: string; email: string; phone: string }[];
+  }[];
 }
 
 const users: User[] = [];
 
 export default function Pipelines({
-  pipelinesTitle:pipelineType,salesData,shopData }: pipelinesProps) {
-
-
+  pipelinesTitle: pipelineType,
+  salesData,
+  shopData,
+}: pipelinesProps) {
   const [selectedEmployees, setSelectedEmployees] = useState<{
     [key: string]: Employee | null;
   }>({});
@@ -102,7 +104,7 @@ export default function Pipelines({
   const [openServiceDropdown, setOpenServiceDropdown] = useState<{
     [key: string]: boolean;
   }>({});
-  const initialData = pipelineType==="Sales Pipelines" ? salesData : shopData;
+  const initialData = pipelineType === "Sales Pipelines" ? salesData : shopData;
   const [pipelineData, setPipelineData] = useState(initialData || []);
   const handleDropdownToggle = (categoryIndex: number, leadIndex: number) => {
     if (
@@ -349,17 +351,21 @@ export default function Pipelines({
                                     </div>
                                   </span>
                                 ))}
-                                <button
-                                  onClick={() =>
-                                    handleTagDropdownToggle(
-                                      categoryIndex,
-                                      leadIndex,
-                                    )
-                                  }
-                                  className="inline-flex h-[20px] items-center justify-center rounded bg-[#6571FF] px-1 py-1 text-xs font-semibold text-white"
-                                >
-                                  + Add
-                                </button>
+                                
+                                  <button
+                                    onClick={() =>
+                                      handleTagDropdownToggle(
+                                        categoryIndex,
+                                        leadIndex,
+                                      )
+                                    }
+                                    className="inline-flex h-[20px] items-center justify-center rounded bg-[#6571FF] px-1 py-1 text-xs font-semibold text-white"
+                                  >
+                                    + Add
+                                  </button>
+
+                                  
+                               
                               </div>
                               {isTagDropdownOpen && (
                                 <div className="-left-100 absolute top-12 z-20">
@@ -439,7 +445,11 @@ export default function Pipelines({
                                     </span>
                                   </Link>
                                 </div>
+                                <div className="relative group">
+
                                 <TaskForm companyUsers={users} />
+                                
+                                </div>
                               </div>
                             </li>
                           )}

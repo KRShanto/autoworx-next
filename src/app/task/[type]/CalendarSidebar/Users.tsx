@@ -86,6 +86,7 @@ export default function Users({
                 users={users}
                 index={index}
                 tasks={tasks}
+                setUsers={setUsersToDisplay}
               />
             );
           })}
