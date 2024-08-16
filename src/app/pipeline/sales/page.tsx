@@ -1,33 +1,37 @@
-"use client";
+// "use client";
 
-import React from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import Header from "../components/Header";
-import WorkOrders from "../components/WorkOrders";
-import Pipelines from "../components/Pipelines";
+// import React from "react";
+// import { useSearchParams, useRouter } from "next/navigation";
+// import Header from "../components/Header";
+// import WorkOrders from "../components/WorkOrders";
+// import Pipelines from "../components/Pipelines";
 
-type Props = {};
+// type Props = {};
 
-const Page = (props: Props) => {
-  const searchParams = useSearchParams();
-  const router = useRouter();
+// const Page = (props: Props) => {
+//   const searchParams = useSearchParams();
+//   const router = useRouter();
 
-  const activeView = searchParams.get("view") || "workOrders";
+//   const activeView = searchParams.get("view") || "workOrders";
 
-  const viewHandler = (view: string) => {
-    router.push(`?view=${view}`);
-  };
-  const type = "Sales Pipelines";
-  return (
-    <div className="space-y-8">
-      <Header
-        onToggleView={viewHandler}
-        activeView={activeView}
-        pipelinesTitle={type}
-      />
-      {activeView === "pipelines" ? <Pipelines /> : <WorkOrders />}
-    </div>
-  );
-};
+//   const viewHandler = (view: string) => {
+//     router.push(`?view=${view}`);
+//   };
+//   const type = "Sales Pipelines";
+//   return (
+//     <div className="space-y-8">
+//       <Header
+//         onToggleView={viewHandler}
+//         activeView={activeView}
+//         pipelinesTitle={type}
+//       />
+//       {activeView === "pipelines" ? <Pipelines /> : <WorkOrders />}
+//     </div>
+//   );
+// };
 
-export default Page;
+// export default Page;
+
+export default function TemporaryPage() {
+  return <div>page</div>;
+}
