@@ -1,3 +1,5 @@
+"use client";
+
 import { CheckCircleOutlined } from "@ant-design/icons";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import React from "react";
