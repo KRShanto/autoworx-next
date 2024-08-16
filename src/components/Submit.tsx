@@ -3,7 +3,6 @@
 import { useFormErrorStore } from "@/stores/form-error";
 import { useEffect } from "react";
 import { RotatingLines } from "react-loader-spinner";
-// @ts-ignore
 import { useFormStatus } from "react-dom";
 
 export default function Submit({

@@ -2,8 +2,9 @@ import React from "react";
 
 interface PayoutCardProps {
   title: string;
-  amount: string;
-  percentage: string;
+  amount: number;
+  percentage?: string;
+  increased?: boolean;
   customStyles?: string;
 }
 
@@ -11,6 +12,7 @@ const HorizontalPayoutCard = ({
   title,
   amount,
   percentage,
+  increased,
   customStyles,
 }: PayoutCardProps) => {
   return (
@@ -19,11 +21,18 @@ const HorizontalPayoutCard = ({
     >
       <div className="font-inter text-2xl font-bold text-gray-500">{title}</div>
       <div className="font-inter text-2xl font-semibold text-gray-500">
-        {amount}
+        ${amount}
       </div>
-      <div className="font-inter text-sm font-semibold text-teal-500">
-        {percentage}
-      </div>
+      {percentage && (
+        <div
+          className="font-inter text-sm font-semibold"
+          style={{
+            color: increased ? "#2DCE89" : "#F56565",
+          }}
+        >
+          {percentage}
+        </div>
+      )}
     </div>
   );
 };

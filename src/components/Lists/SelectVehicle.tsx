@@ -6,7 +6,7 @@ import { Vehicle } from "@prisma/client";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NewVehicle from "./NewVehicle";
 import { SelectProps } from "./select-props";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 export function SelectVehicle({
   name = "vehicleId",
@@ -19,6 +19,7 @@ export function SelectVehicle({
   const [vehicle, setVehicle] = setValue ? [value, setValue] : state;
   const vehicleList = useListsStore((x) => x.vehicles);
   const { newAddedVehicle } = useListsStore();
+  const [clientIdChanged, setClientIdChanged] = useState(0);
 
   const search = useSearchParams();
   const clientId = search.get("clientId");
@@ -36,9 +37,16 @@ export function SelectVehicle({
     }
   }, [vehicle]);
 
+  // Reset vehicle when client changes
+  // This is to prevent the user from selecting a vehicle that doesn't belong to the client
+  // Do not reset vehicle on initial render
   useEffect(() => {
     if (clientId) {
-      setVehicle(null);
+      if (clientIdChanged > 0) {
+        setVehicle(null);
+      }
+
+      setClientIdChanged((prev) => prev + 1);
     }
   }, [clientId]);
 

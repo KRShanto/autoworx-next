@@ -1,6 +1,5 @@
 "use client";
 
-import { useEstimateCreateStore } from "@/stores/estimate-create";
 import React from "react";
 import { InvoiceType } from "@prisma/client";
 import Submit from "@/components/Submit";
@@ -30,7 +29,7 @@ export default function ConvertButton({
   }
 
   return (
-    <div className="px-3">
+    <form className="px-3">
       <Submit
         className={cn(
           "flex w-full items-center justify-center gap-2 text-nowrap rounded border border-solid border-slate-600 p-2 text-center text-sm",
@@ -41,6 +40,6 @@ export default function ConvertButton({
         {icon}
         {text}
       </Submit>
-    </div>
+    </form>
   );
 }
