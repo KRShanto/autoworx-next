@@ -5,26 +5,29 @@ interface HeaderProps {
   activeView: string;
   onToggleView: (view: string) => void;
   pipelinesTitle:string;
+  [key:string]:any;
 }
 
 
 
-export default function Header({ activeView, onToggleView ,pipelinesTitle}: HeaderProps) {
+export default function Header({ 
+  activeView,
+   onToggleView ,
+   pipelinesTitle,
+   ...restProps
+
+}: HeaderProps) {
+
+  const{salesColumn,shopColumn}=restProps;
+  const initialColumns= pipelinesTitle==="Sales Pipelines"?salesColumn:shopColumn;
 
 const [isPipelineManaged, setPipelineManaged] = useState(false);
-  const [columns, setColumns] = useState([
-    { id: "1", name: "New Leads" },
-    { id: "2", name: "Leads Generated" },
-    { id: "3", name: "Follow-up" },
-    { id: "4", name: "Estimated Created" },
-    { id: "5", name: "Archived" },
-    { id: "6", name: "Converted" },
-  ]);
+  const [columns, setColumns] = useState(initialColumns || []);
  const handleSaveColumns = (updatedColumns:{id:string,name:string}[]) => {
     setColumns(updatedColumns);
  }
   return (
-    <div className="flex items-center justify-between p-4">
+    <div className="flex items-center justify-between p-4" {...restProps}>
       <div className="flex items-center">
         <h1 className="mr-4 text-2xl font-bold text-[#66738C]">{pipelinesTitle}</h1>
         <div className="flex">

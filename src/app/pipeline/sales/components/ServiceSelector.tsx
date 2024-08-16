@@ -1,58 +1,127 @@
-import React, { useState } from 'react';
+import React from "react";
+import { IoIosCheckmarkCircleOutline } from "react-icons/io";
+import { MdErrorOutline } from "react-icons/md";
 
 interface Service {
   id: number;
   name: string;
+  completed: boolean;
 }
 
 interface ServiceSelectorProps {
   services: Service[];
+  selectedService: Service | null;
+  isServiceDropdownOpen: boolean;
+  handleServiceDropdownToggle: () => void;
+  handleServiceSelect: (service: Service) => void;
+  [key: string]: any;
 }
 
-export default function ServiceSelector({ services }: ServiceSelectorProps) {
-  const [showAllServices, setShowAllServices] = useState(false);
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
-
-  const handleServiceSelect = (service: Service) => {
-    setSelectedService(service);
-    setShowAllServices(false);
-  };
-
+function ServiceSelector({
+  services,
+  selectedService,
+  isServiceDropdownOpen,
+  handleServiceDropdownToggle,
+  handleServiceSelect,
+  ...restProps
+}: ServiceSelectorProps) {
+  
+  const completedServices = services.filter((service) => service.completed);
+  const incompleteServices = services.filter((service) => !service.completed);
+  const { type } = restProps;
   return (
-    <div className="relative inline-block">
-      {selectedService ? (
-        <span
-          className="mr-2 inline-flex h-[18px] items-center rounded bg-gray-300 px-1 py-1 text-xs font-semibold text-white"
-          
+    <div className="relative mb-2" {...restProps}>
+      <div className="flex gap-2">
+        <div
+          onClick={handleServiceDropdownToggle}
+          className="flex w-[60%] cursor-pointer justify-between rounded-md border border-[#6571FF] px-2 py-1 text-xs"
+          style={{
+            visibility: isServiceDropdownOpen ? "hidden" : "visible",
+          }}
         >
-          {selectedService.name}
-        </span>
-      ) : (
-        services.length > 1 && !selectedService && (
-            <button
-              onClick={() => setShowAllServices(!showAllServices)}
-              className="ml-2 text-xs font-semibold text-black border-2 rounded-md"
-            >
-              {services[0].name }... + {services.length - 1}
-            </button>
-          )
-      )}
+          {selectedService ? (
+            <span className="text-[#6571FF]">{selectedService.name}</span>
+          ) : (
+            <span className="inline-flex w-full justify-between text-[#6571FF]">
+              <span className="text-left">
+                {services.length > 1
+                  ? `${services[0].name}...`
+                  : "Select a service"}
+              </span>
+              {services.length > 1 && (
+                <span className="text-right">+ {services.length - 1}</span>
+              )}
+            </span>
+          )}
+        </div>
 
-      
-
-      {showAllServices && !selectedService && (
-        <div className="absolute mt-2 bg-white shadow-lg rounded-md p-2">
-          {services.slice(1).map((service) => (
-            <div
-              key={service.id}
-              onClick={() => handleServiceSelect(service)}
-              className="px-2 py-1 hover:bg-gray-200 cursor-pointer text-sm rounded"
-            >
-              {service.name}
+        {type === "Shop Pipelines" && (
+          <div
+            className="flex gap-1"
+            style={{
+              visibility: isServiceDropdownOpen ? "hidden" : "visible",
+            }}
+          >
+            <div className="flex items-center gap-1 text-green-600">
+              <IoIosCheckmarkCircleOutline />
+              <span>{completedServices.length}</span>
             </div>
-          ))}
+            <div className="flex items-center gap-1 text-yellow-500">
+              <MdErrorOutline />
+              <span>{incompleteServices.length}</span>
+            </div>
+          </div>
+        )}
+      </div>
+      {isServiceDropdownOpen && (
+        <div className="font-Inter z-10 mr-1 ml-1 rounded-md border border-[#6571FF] text-[#6571FF]">
+          {/* Completed Services */}
+          {completedServices.length > 0 && (
+            <>
+              {type === "Shop Pipelines" && (
+                <p className="flex items-center gap-1 px-2 py-1 font-bold text-[#03A7A2]">
+                  Complete <IoIosCheckmarkCircleOutline />
+                </p>
+              )}
+              {completedServices.map((service) => (
+                <div
+                  key={service.id}
+                  onClick={() => handleServiceSelect(service)}
+                  className={`cursor-pointer px-2 py-1 text-sm hover:bg-gray-200 ${
+                    selectedService?.id === service.id ? "bg-white" : ""
+                  }`}
+                >
+                  <span className="text-blue-600">{service.name}</span>
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* Incomplete Services */}
+          {incompleteServices.length > 0 && (
+            <>
+              {type === "Shop Pipelines" && (
+                <p className="flex items-center gap-1 px-2 py-1 font-bold text-yellow-500">
+                  Incomplete <MdErrorOutline />
+                </p>
+              )}
+              {incompleteServices.map((service) => (
+                <div
+                  key={service.id}
+                  onClick={() => handleServiceSelect(service)}
+                  className={`cursor-pointer px-2 py-1 text-sm hover:bg-gray-200 ${
+                    selectedService?.id === service.id ? "bg-white" : ""
+                  }`}
+                >
+                  <span className="text-blue-600">{service.name}</span>
+                </div>
+              ))}
+            </>
+          )}
         </div>
       )}
     </div>
   );
 }
+
+export default ServiceSelector;
