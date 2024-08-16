@@ -81,7 +81,7 @@ export default async function Page({
   });
 
   return (
-    <form className="-my-2 min-h-[93vh] gap-3 space-y-4 overflow-clip py-2 lg:grid lg:grid-cols-[1fr,24rem] lg:grid-rows-[auto,auto,1fr] lg:space-y-0">
+    <div className="-my-2 min-h-[93vh] gap-3 space-y-4 overflow-clip py-2 lg:grid lg:grid-cols-[1fr,24rem] lg:grid-rows-[auto,auto,1fr] lg:space-y-0">
       <Title>Estimate</Title>
 
       <SyncLists
@@ -96,12 +96,12 @@ export default async function Page({
         statuses={statuses}
         paymentMethods={paymentMethods}
       />
-      <div className="flex">
-        <ConvertButton
+      <div>
+        {/* <ConvertButton
           type={InvoiceType.Invoice}
           text="Convert to Invoice"
           icon={<GoFileCode />}
-        />
+        /> */}
         <ConvertButton
           type={InvoiceType.Estimate}
           text="Save as Estimate"
@@ -147,6 +147,6 @@ export default async function Page({
         <Create />
         <BillSummary />
       </div>
-    </form>
+    </div>
   );
 }
