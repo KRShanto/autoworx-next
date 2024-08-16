@@ -36,7 +36,7 @@ export default function UserComponent({
         key={index}
       >
         <Image
-          src={user.image}
+          src={`/api/images/${user.image}`}
           alt="User Image"
           width={50}
           height={50}
