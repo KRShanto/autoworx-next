@@ -1,3 +1,5 @@
+"use client";
+
 import { CheckCircleOutlined } from "@ant-design/icons";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import React from "react";
@@ -7,7 +9,7 @@ import {
   FaHamburger,
 } from "react-icons/fa";
 import { PiDotFill } from "react-icons/pi";
-import Select from "../components/Select";
+import Select from "./Select";
 
 const DropdownMenuDemo = () => {
   const [bookmarksChecked, setBookmarksChecked] = React.useState(true);

@@ -1,26 +1,20 @@
-"use client";
-
 import React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Header from "../sales/components/Header";
-import WorkOrders from "../sales/components/WorkOrders";
-import Pipelines from "../sales/components/Pipelines";
+import Header from "../components/Header";
+import WorkOrders from "../components/WorkOrders";
+import Pipelines from "../components/Pipelines";
 
-type Props = {};
+type Props = {
+  searchParams?: { view?: string };
+};
 
 const Page = (props: Props) => {
-  const searchParams = useSearchParams();
-  const router = useRouter();
+  const activeView = props.searchParams?.view || "workOrders";
+  const type = "Shop Pipelines";
 
-  const activeView = searchParams.get("view") || "workOrders";
-
-  const viewHandler = (view: string) => {
-    router.push(`?view=${view}`);
-  };
-const type="Shop Pipelines";
   return (
     <div className="space-y-8">
-      <Header onToggleView={viewHandler} activeView={activeView} pipelinesTitle={type} />
+      <Header activeView={activeView} pipelinesTitle={type} />
       {activeView === "pipelines" ? <Pipelines /> : <WorkOrders />}
     </div>
   );

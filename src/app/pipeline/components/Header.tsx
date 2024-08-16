@@ -1,17 +1,22 @@
+"use client";
+
 import React, { useState } from "react";
 import ManagePipelines from "./ManagePipelines";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   activeView: string;
-  onToggleView: (view: string) => void;
-  pipelinesTitle:string;
+  // onToggleView: (view: string) => void;
+  pipelinesTitle: string;
 }
 
-
-
-export default function Header({ activeView, onToggleView ,pipelinesTitle}: HeaderProps) {
-
-const [isPipelineManaged, setPipelineManaged] = useState(false);
+export default function Header({
+  activeView,
+  // onToggleView,
+  pipelinesTitle,
+}: HeaderProps) {
+  const router = useRouter();
+  const [isPipelineManaged, setPipelineManaged] = useState(false);
   const [columns, setColumns] = useState([
     { id: "1", name: "New Leads" },
     { id: "2", name: "Leads Generated" },
@@ -20,13 +25,22 @@ const [isPipelineManaged, setPipelineManaged] = useState(false);
     { id: "5", name: "Archived" },
     { id: "6", name: "Converted" },
   ]);
- const handleSaveColumns = (updatedColumns:{id:string,name:string}[]) => {
+  const handleSaveColumns = (
+    updatedColumns: { id: string; name: string }[],
+  ) => {
     setColumns(updatedColumns);
- }
+  };
+
+  const onToggleView = (view: string) => {
+    router.push(`?view=${view}`);
+  };
+
   return (
     <div className="flex items-center justify-between p-4">
       <div className="flex items-center">
-        <h1 className="mr-4 text-2xl font-bold text-[#66738C]">{pipelinesTitle}</h1>
+        <h1 className="mr-4 text-2xl font-bold text-[#66738C]">
+          {pipelinesTitle}
+        </h1>
         <div className="flex">
           <button
             onClick={() => onToggleView("workOrders")}
@@ -47,20 +61,23 @@ const [isPipelineManaged, setPipelineManaged] = useState(false);
       {activeView === "pipelines" && (
         <div>
           <button
-            onClick={() => {setPipelineManaged(true)}}
-            className={`rounded border px-4 py-2  bg-[#6571FF] text-white"  text-white`}
+            onClick={() => {
+              setPipelineManaged(true);
+            }}
+            className={`text-white" rounded border bg-[#6571FF] px-4 py-2 text-white`}
           >
             Manage Pipelines
           </button>
         </div>
       )}
 
-      {isPipelineManaged&&
-      <ManagePipelines 
-      columns={columns} 
-      onSave={handleSaveColumns} 
-      onClose={() => setPipelineManaged(false)}/>
-      }
+      {isPipelineManaged && (
+        <ManagePipelines
+          columns={columns}
+          onSave={handleSaveColumns}
+          onClose={() => setPipelineManaged(false)}
+        />
+      )}
     </div>
   );
 }
