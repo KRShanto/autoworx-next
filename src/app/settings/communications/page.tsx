@@ -63,6 +63,7 @@ export default function CommunicationPage() {
           </div>
         </div>
       </div>
+      {/* Sidebar */}
       <div className="space-y-4">
         {/* SMS Gateway Settings */}
         <div>

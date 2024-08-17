@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 
 export default function PaymentsPage() {
   return (
-    <div className="flex flex-col space-y-5">
+    <div className="flex flex-col space-y-5 p-5">
       {/* taxes */}
       <div className="space-y-3">
         <div className="flex items-center space-x-4">
