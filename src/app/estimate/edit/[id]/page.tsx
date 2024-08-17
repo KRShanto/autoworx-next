@@ -118,7 +118,7 @@ export default async function Page({
   });
 
   return (
-    <form className="-my-2 grid h-[93vh] gap-3 overflow-clip py-2 md:grid-cols-[1fr,24rem] md:grid-rows-[auto,auto,1fr]">
+    <div className="-my-2 grid h-[93vh] gap-3 overflow-clip py-2 md:grid-cols-[1fr,24rem] md:grid-rows-[auto,auto,1fr]">
       <Title>Estimate</Title>
 
       <SyncLists
@@ -140,14 +140,14 @@ export default async function Page({
         payment={payment}
       />
 
-      <div className="flex items-center">
+      <div>
         <ConvertButton
           type={invoice.type}
           text={`Update ${invoice.type}`}
           icon={<FaSave />}
           className="border-none bg-[#6571FF] px-8 text-white"
         />
-        <ConvertTo invoice={invoice} />
+        {/* <ConvertTo invoice={invoice} /> */}
       </div>
 
       <Header
@@ -192,6 +192,6 @@ export default async function Page({
         <Create />
         <BillSummary />
       </div>
-    </form>
+    </div>
   );
 }

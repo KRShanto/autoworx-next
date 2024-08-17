@@ -7,6 +7,7 @@ import SalesPurchaseHistory from "./SalesPurchaseHistory";
 import UseProductForm from "./UseProductForm";
 import { getCompanyId } from "@/lib/companyId";
 import { FaCircleExclamation } from "react-icons/fa6";
+import QRcode from "./QRcode";
 
 export default async function Sidebar({ productId }: { productId: number }) {
   const companyId = await getCompanyId();
@@ -33,7 +34,9 @@ export default async function Sidebar({ productId }: { productId: number }) {
     where: { companyId, type: "Invoice" },
     select: { id: true },
   });
+
   const isWarningForQuantity = product && product.quantity! < 50;
+
   return (
     <div className="mt-12 flex h-[88.5%] w-1/2 flex-col">
       <div className="#h-[35%] flex gap-4">
@@ -124,14 +127,15 @@ export default async function Sidebar({ productId }: { productId: number }) {
                         />
                       )}
                     </div>
-                    <a
+                    {/* <a
                       className="mx-auto mt-3 flex w-fit items-center gap-1 rounded-md border border-slate-400 p-1 px-3"
                       href={imgUrl!}
                       download={`${product && product.name} Qrcode.png`}
                     >
                       <FaPrint className="text-sm" />
                       Print
-                    </a>
+                    </a> */}
+                    <QRcode imgUrl={imgUrl!} />
                   </div>
                 </div>
               )}

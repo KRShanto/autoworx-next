@@ -11,6 +11,9 @@ export default function AssignTask() {
   const { data, close } = usePopupStore();
   const user = data.user as User & { tasks: Task[] };
   const tasks = data.tasks as Task[];
+  const setUsers = data.setUsers as React.Dispatch<
+    React.SetStateAction<(User & { tasks: (Task | null)[] })[]>
+  >;
 
   const [taskDataInput, setTaskDataInput] = useState(
     tasks.map((task) => ({
@@ -19,8 +22,40 @@ export default function AssignTask() {
     })),
   );
 
+  console.log("User: ", user);
+
   async function handleSubmit() {
     await assignTask({ userId: user.id, tasksToAssign: taskDataInput });
+
+    // assign or unassign tasks
+    // if task is to assign, add the task else remove the task
+
+    setUsers((prev) =>
+      prev.map((prevUser) => {
+        if (prevUser?.id === user.id) {
+          return {
+            ...prevUser,
+            tasks: tasks.map((task) => {
+              const assigned = taskDataInput.find(
+                (taskData) => taskData.taskId === task.id,
+              )?.assigned;
+
+              if (assigned) {
+                return {
+                  ...task,
+                  assigned: true,
+                };
+              }
+
+              // remove task
+              return null;
+            }),
+          };
+        }
+        return prevUser;
+      }),
+    );
+
     close();
   }
 
@@ -34,7 +69,7 @@ export default function AssignTask() {
 
           <div className="mt-1 flex items-center gap-2">
             <Image
-              src={user.image}
+              src={`/api/images/${user.image}`}
               alt="User image"
               width={50}
               height={50}
