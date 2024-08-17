@@ -34,14 +34,13 @@ export default function CalendarPage() {
             <p className="font-semibold">View Options</p>
             <div className="flex items-center space-x-2">
               <p>Week start on</p>
-              {/* drop down start */}
+              {/* drop down */}
               <MenuDropDown
                 dropDownItems={days}
                 selected={"Sunday"}
                 height={40}
                 width={239}
               />
-              {/* drop down end */}
             </div>
           </div>
           {/* region */}
