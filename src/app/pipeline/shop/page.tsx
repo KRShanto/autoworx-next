@@ -1,13 +1,9 @@
-"use client";
-
 import React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Header from "../sales/components/Header";
-import WorkOrders from "../sales/components/WorkOrders";
-import Pipelines from "../sales/components/Pipelines";
+import Header from "../components/Header";
+import WorkOrders from "../components/WorkOrders";
+import Pipelines from "../components/Pipelines";
 
-type Props = {};
-const pending  = [{ name: "Al Noman", email: "noman@me.com", phone: "123456" }];
 
 const completed = Array(5).fill({
   name: "Shanto",
@@ -15,6 +11,7 @@ const completed = Array(5).fill({
   phone: "123456789",
 });
 const cancelled = Array(5).fill({ name: "", email: "", phone: "" });
+const pending = Array(5).fill({ name: "", email: "", phone: "" });
 const re_dos = Array(5).fill({ name: "", email: "", phone: "" });
 const optional1 = Array(5).fill({ name: "", email: "", phone: "" });
 const optional2 = Array(5).fill({ name: "", email: "", phone: "" });
@@ -35,20 +32,17 @@ const shopColumn=[
   {id:"5",name:"Optional1"},
   {id:"6",name:"Optional2"},
 ]
+type Props = {
+  searchParams?: { view?: string };
+};
+
 const Page = (props: Props) => {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  const activeView = searchParams.get("view") || "workOrders";
-
-  const viewHandler = (view: string) => {
-    router.push(`?view=${view}`);
-  };
-  const type = "Shop Pipelines";
+  const activeView = props.searchParams?.view || "workOrders";
+  const type = "Shop Pipelines";;
   return (
     <div className="space-y-8">
       <Header
-        onToggleView={viewHandler}
+        
         activeView={activeView}
         pipelinesTitle={type}
         shopColumn={shopColumn}
