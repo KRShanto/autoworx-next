@@ -64,9 +64,24 @@ export default function TaskForm({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <div role="button" className="bg-white rounded-md border-2 border-[#66738C] px-2 text-center text-xs text-gray-500">
-        Add Task
+        <div
+          role="button"
+          className="group rounded-md border-2 border-[#66738C] bg-white px-2 text-center text-xs text-gray-500"
+        >
+          Add Task
         </div>
+        {/* Hover content */}
+        <div className="hidden absolute left-1/3 z-50 mt-1 -top-36 w-[100px] -translate-x-1/2 transform rounded-lg border border-[#66738C] bg-white p-2 group-hover:block">
+                <div className="mb-2 rounded-[3px] bg-[#6571FF] p-1 text-white">
+                  Task 1
+                </div>
+                <div className="mb-2 rounded-[3px] bg-[#25AADD] p-1 text-white">
+                  Task 2
+                </div>
+                <div className="rounded-[3px] bg-[#006D77] p-1 text-white">
+                  Task 3
+                </div>
+              </div>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -203,13 +218,16 @@ export default function TaskForm({
                 Cancel
               </button>
             </DialogClose>
-            <button
-              type="button"
-              className="rounded-md border bg-[#6571FF] px-4 py-1 text-white"
-              onClick={handleSave}
-            >
-              Add
-            </button>
+            
+              <button
+                type="button"
+                className=" rounded-md border bg-[#6571FF] px-4 py-1 text-white"
+                onClick={handleSave}
+              >
+                Add
+              </button>
+              
+            
           </DialogFooter>
         </form>
       </DialogContent>
