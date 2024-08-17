@@ -53,6 +53,13 @@ export default function EstimateAndInvoicePage() {
             </div>
           </div>
         </div>
+        {/* Authorization */}
+        <div>
+          <h2 className="mb-2 text-xl font-semibold">Authorization</h2>
+          <div className="space-y-3 rounded-sm border p-5">
+            {/* TODO: future added */}
+          </div>
+        </div>
       </div>
       <div className="space-y-4">
         {/* Custom Message for Sharing Estimate/Invoice */}
