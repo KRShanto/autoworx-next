@@ -38,6 +38,7 @@ model Company {
   Payment           Payment[]
   Coupon            Coupon[]
   Technician        Technician[]
+  Lead              Lead[]
 }
 
 // User model.
@@ -76,6 +77,7 @@ model User {
   appointmentUsers AppointmentUser[]
   invoices         Invoice[]
   Technician       Technician[]
+  Lead             Lead[]
 
   @@index([companyId], name: "fk_users_company")
 }
@@ -768,4 +770,19 @@ model Coupon {
 enum DiscountType {
   Percentage
   Fixed
+}
+
+model Lead {
+  id          Int      @id @default(autoincrement())
+  clientName  String   @map("client_name")
+  vehicleInfo String   @map("vehicle_info")
+  services    String
+  source      String
+  comments    String?
+  userId      Int      @map("user_id")
+  companyId   Int      @map("company_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
