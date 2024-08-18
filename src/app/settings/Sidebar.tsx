@@ -54,7 +54,7 @@ const businessSettings = [
 const Sidebar = (props: Props) => {
   const path = usePathname();
   return (
-    <div className="w-[20%] px-8 py-8">
+    <div className="sticky top-6 min-h-[85vh] min-w-[300px] max-w-[350px] rounded-2xl bg-white px-6 py-8 shadow-xl">
       <h3 className="mb-4 font-bold">
         <span className="border-b-2 pb-1">Account Settings</span>
       </h3>
