@@ -12,27 +12,7 @@ import { Tag } from "@prisma/client";
 import { EmployeeTagSelector } from "./EmployeeTagSelector";
 import TaskForm from "./TaskForm";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-
-const newLeads = [{ name: "Al Noman", email: "noman@me.com", phone: "123456" }];
-
-const leadsGenerated = Array(5).fill({
-  name: "ali nur",
-  email: "xyz@gmail.com",
-  phone: "123456789",
-});
-const followUp = Array(5).fill({ name: "", email: "", phone: "" });
-const estimatesCreated = Array(5).fill({ name: "", email: "", phone: "" });
-const archived = Array(5).fill({ name: "", email: "", phone: "" });
-const converted = Array(5).fill({ name: "", email: "", phone: "" });
-
-const data = [
-  { title: "New Leads", leads: newLeads },
-  { title: "Leads Generated", leads: leadsGenerated },
-  { title: "Follow-up", leads: followUp },
-  { title: "Estimates Created", leads: estimatesCreated },
-  { title: "Archived", leads: archived },
-  { title: "Converted", leads: converted },
-];
+import ServiceSelector from "./ServiceSelector";
 
 //dummy services
 
@@ -40,6 +20,32 @@ const services = [
   {
     id: 1,
     name: "Service 1",
+    completed: true,
+  },
+  {
+    id: 2,
+    name: "Service 2",
+    completed: true,
+  },
+  {
+    id: 3,
+    name: "Service 3",
+    completed: true,
+  },
+  {
+    id: 4,
+    name: "Service 4",
+    completed: false,
+  },
+  {
+    id: 5,
+    name: "Service 5",
+    completed: true,
+  },
+  {
+    id: 6,
+    name: "Service 6",
+    completed: false,
   },
 ];
 
@@ -47,16 +53,32 @@ const services = [
 interface Service {
   id: number;
   name: string;
+  completed: boolean;
 }
 interface Employee {
   id: number;
   firstName: string;
   lastName: string;
 }
+interface pipelinesProps {
+  pipelinesTitle: string;
+  salesData?: {
+    title: string;
+    leads: { name: string; email: string; phone: string }[];
+  }[];
+  shopData?: {
+    title: string;
+    leads: { name: string; email: string; phone: string }[];
+  }[];
+}
 
 const users: User[] = [];
 
-export default function Pipelines() {
+export default function Pipelines({
+  pipelinesTitle: pipelineType,
+  salesData,
+  shopData,
+}: pipelinesProps) {
   const [selectedEmployees, setSelectedEmployees] = useState<{
     [key: string]: Employee | null;
   }>({});
@@ -82,7 +104,8 @@ export default function Pipelines() {
   const [openServiceDropdown, setOpenServiceDropdown] = useState<{
     [key: string]: boolean;
   }>({});
-  const [pipelineData, setPipelineData] = useState(data);
+  const initialData = pipelineType === "Sales Pipelines" ? salesData : shopData;
+  const [pipelineData, setPipelineData] = useState(initialData || []);
   const handleDropdownToggle = (categoryIndex: number, leadIndex: number) => {
     if (
       openDropdownIndex?.category === categoryIndex &&
@@ -229,7 +252,7 @@ export default function Pipelines() {
                   <h2 className="rounded-lg bg-[#6571FF] px-4 py-3 text-center text-white">
                     <p className="text-base font-bold">{item.title}</p>
                   </h2>
-  
+
                   <ul
                     className="mt-3 flex flex-col gap-1 overflow-auto p-1"
                     style={{ maxHeight: "70vh" }}
@@ -240,15 +263,15 @@ export default function Pipelines() {
                       const isDropdownOpen =
                         openDropdownIndex?.category === categoryIndex &&
                         openDropdownIndex.index === leadIndex;
-  
+
                       const isTagDropdownOpen = tagDropdownStates[key];
                       const tagsForLead = leadTags[key] || [];
-  
+
                       const selectedService = selectedServices[key];
-  
+
                       const isServiceDropdownOpen =
                         openServiceDropdown[key] || false;
-  
+
                       return (
                         <Draggable
                           key={leadIndex}
@@ -268,11 +291,12 @@ export default function Pipelines() {
                                   {lead.name}
                                 </h3>
                                 {!isDropdownOpen && (
-                                  <div role="button"
+                                  <div
+                                    role="button"
                                     onClick={() =>
                                       handleDropdownToggle(
                                         categoryIndex,
-                                        leadIndex
+                                        leadIndex,
                                       )
                                     }
                                   >
@@ -292,7 +316,7 @@ export default function Pipelines() {
                                       value={selectedEmployee}
                                       setValue={createEmployeeSelectHandler(
                                         categoryIndex,
-                                        leadIndex
+                                        leadIndex,
                                       )}
                                       openDropdown={true}
                                       setOpenDropdown={() =>
@@ -302,7 +326,7 @@ export default function Pipelines() {
                                   </div>
                                 )}
                               </div>
-  
+
                               <div className="mb-1 flex items-center">
                                 {tagsForLead.slice(0, 2).map((tag) => (
                                   <span
@@ -319,7 +343,7 @@ export default function Pipelines() {
                                         handleTagSelect(
                                           categoryIndex,
                                           leadIndex,
-                                          tag
+                                          tag,
                                         )
                                       }
                                     >
@@ -327,17 +351,21 @@ export default function Pipelines() {
                                     </div>
                                   </span>
                                 ))}
-                                <button
-                                  onClick={() =>
-                                    handleTagDropdownToggle(
-                                      categoryIndex,
-                                      leadIndex
-                                    )
-                                  }
-                                  className="inline-flex h-[20px] items-center justify-center rounded bg-[#6571FF] px-1 py-1 text-xs font-semibold text-white"
-                                >
-                                  + Add
-                                </button>
+                                
+                                  <button
+                                    onClick={() =>
+                                      handleTagDropdownToggle(
+                                        categoryIndex,
+                                        leadIndex,
+                                      )
+                                    }
+                                    className="inline-flex h-[20px] items-center justify-center rounded bg-[#6571FF] px-1 py-1 text-xs font-semibold text-white"
+                                  >
+                                    + Add
+                                  </button>
+
+                                  
+                               
                               </div>
                               {isTagDropdownOpen && (
                                 <div className="-left-100 absolute top-12 z-20">
@@ -347,14 +375,14 @@ export default function Pipelines() {
                                       handleTagSelect(
                                         categoryIndex,
                                         leadIndex,
-                                        selectedTag
+                                        selectedTag,
                                       )
                                     }
                                     open={isTagDropdownOpen}
                                     setOpen={() =>
                                       handleTagDropdownToggle(
                                         categoryIndex,
-                                        leadIndex
+                                        leadIndex,
                                       )
                                     }
                                   />
@@ -365,64 +393,26 @@ export default function Pipelines() {
                                   Vehicle Year Make Model
                                 </p>
                               </div>
-                              <div className="relative mb-2">
-                                <div
-                                  onClick={() =>
-                                    handleServiceDropdownToggle(
-                                      categoryIndex,
-                                      leadIndex
-                                    )
-                                  }
-                                  className="flex w-[60%] cursor-pointer justify-between rounded-md border border-[#6571FF] px-2 py-1 text-xs"
-                                  style={{
-                                    visibility: isServiceDropdownOpen
-                                      ? "hidden"
-                                      : "visible",
-                                  }}
-                                >
-                                  {selectedService ? (
-                                    <span className="text-[#6571FF]">
-                                      {selectedService.name}
-                                    </span>
-                                  ) : (
-                                    <span className="inline-flex w-full justify-between text-[#6571FF]">
-                                      <span className="text-left">
-                                        {services.length > 1
-                                          ? `${services[0].name}...`
-                                          : "Select a service"}
-                                      </span>
-                                      {services.length > 1 && (
-                                        <span className="text-right">
-                                          + {services.length - 1}
-                                        </span>
-                                      )}
-                                    </span>
-                                  )}
-                                </div>
-                                {isServiceDropdownOpen && (
-                                  <div className="-top-18 font-Inter z-10 rounded-md border border-[#6571FF] text-[#6571FF]">
-                                    {services.map((service) => (
-                                      <div
-                                        key={service.id}
-                                        onClick={() => {
-                                          handleServiceSelect(
-                                            categoryIndex,
-                                            leadIndex,
-                                            service
-                                          );
-                                        }}
-                                        className={`cursor-pointer px-2 py-1 text-sm hover:bg-gray-200 ${
-                                          selectedService?.id === service.id
-                                            ? "bg-white"
-                                            : ""
-                                        }`}
-                                      >
-                                        {service.name}
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
+                              {/* service code */}
+                              <ServiceSelector
+                                services={services}
+                                selectedService={selectedService}
+                                isServiceDropdownOpen={isServiceDropdownOpen}
+                                handleServiceDropdownToggle={() =>
+                                  handleServiceDropdownToggle(
+                                    categoryIndex,
+                                    leadIndex,
+                                  )
+                                }
+                                handleServiceSelect={(service) =>
+                                  handleServiceSelect(
+                                    categoryIndex,
+                                    leadIndex,
+                                    service,
+                                  )
+                                }
+                                type={pipelineType}
+                              />
                               <div>
                                 <p className="overflow-auto pb-2 text-xs">
                                   Lead Source
@@ -455,7 +445,11 @@ export default function Pipelines() {
                                     </span>
                                   </Link>
                                 </div>
+                                <div className="relative group">
+
                                 <TaskForm companyUsers={users} />
+                                
+                                </div>
                               </div>
                             </li>
                           )}
@@ -472,5 +466,4 @@ export default function Pipelines() {
       </div>
     </DragDropContext>
   );
-  
 }

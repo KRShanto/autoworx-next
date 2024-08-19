@@ -7,27 +7,26 @@ import { useRouter } from "next/navigation";
 interface HeaderProps {
   activeView: string;
   // onToggleView: (view: string) => void;
-  pipelinesTitle: string;
+  pipelinesTitle:string;
+  [key:string]:any;
 }
 
-export default function Header({
+
+
+export default function Header({ 
   activeView,
-  // onToggleView,
-  pipelinesTitle,
+  //  onToggleView ,
+   pipelinesTitle,
+   ...restProps
+
 }: HeaderProps) {
   const router = useRouter();
-  const [isPipelineManaged, setPipelineManaged] = useState(false);
-  const [columns, setColumns] = useState([
-    { id: "1", name: "New Leads" },
-    { id: "2", name: "Leads Generated" },
-    { id: "3", name: "Follow-up" },
-    { id: "4", name: "Estimated Created" },
-    { id: "5", name: "Archived" },
-    { id: "6", name: "Converted" },
-  ]);
-  const handleSaveColumns = (
-    updatedColumns: { id: string; name: string }[],
-  ) => {
+  const{salesColumn,shopColumn}=restProps;
+  const initialColumns= pipelinesTitle==="Sales Pipelines"?salesColumn:shopColumn;
+
+const [isPipelineManaged, setPipelineManaged] = useState(false);
+  const [columns, setColumns] = useState(initialColumns || []);
+ const handleSaveColumns = (updatedColumns:{id:string,name:string}[]) => {
     setColumns(updatedColumns);
   };
 
@@ -36,7 +35,7 @@ export default function Header({
   };
 
   return (
-    <div className="flex items-center justify-between p-4">
+    <div className="flex items-center justify-between p-4" {...restProps}>
       <div className="flex items-center">
         <h1 className="mr-4 text-2xl font-bold text-[#66738C]">
           {pipelinesTitle}
@@ -57,7 +56,7 @@ export default function Header({
         </div>
       </div>
 
-      {/* Conditionally rendering the "Manage Pipelines" button */}
+    
       {activeView === "pipelines" && (
         <div>
           <button

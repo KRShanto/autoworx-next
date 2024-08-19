@@ -7,9 +7,12 @@ type Props = {
 
 const layout = ({ children }: Props) => {
   return (
-    <div className="flex items-start h-full">
-      <Sidebar />
-      {children}
+    <div className="bg-[#F8F9FA]">
+      <h1 className="my-4 ml-4 text-3xl font-bold">Settings</h1>
+      <div className="relative flex h-full items-start space-x-4">
+        <Sidebar />
+        {children}
+      </div>
     </div>
   );
 };
