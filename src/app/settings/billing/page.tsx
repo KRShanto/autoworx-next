@@ -128,7 +128,7 @@ export default function Page() {
       </div>
       
     </div>
-    {plansOpen&& <PricePlans setSelectedPlan={setSelectedPlan} setClose={()=>setPlansOpen(false)} />}
+    {plansOpen&& <PricePlans setSelectedPlan={setSelectedPlan} setClose={()=>setPlansOpen(false)} currentPlan={selectedPlan}  />}
     </div>
   );
 }
