@@ -81,7 +81,7 @@ export function useInvoiceCreate(type: InvoiceType) {
         policy,
         customerNotes,
         customerComments,
-        // photos: photoPaths,
+        photos: photoPaths,
         items,
         tasks,
       });

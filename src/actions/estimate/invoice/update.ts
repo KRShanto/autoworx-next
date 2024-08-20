@@ -1,5 +1,5 @@
 "use server";
-
+import fs from "fs";
 import { createTask } from "@/actions/task/createTask";
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
@@ -28,7 +28,7 @@ interface UpdateEstimateInput {
   customerNotes: string;
   customerComments: string;
 
-  //   photos: string[]; // TODO
+  photos: string[];
   items: {
     service: Service | null;
     materials: (Material | null)[];
@@ -68,6 +68,39 @@ export async function updateInvoice(
     },
   });
 
+  // get existing photos
+  const previousPhotos = await db.invoicePhoto.findMany({
+    where: {
+      invoiceId: data.id,
+    },
+  });
+
+  // remove the files
+  previousPhotos.forEach(async (photo) => {
+    const photoPath = `images/uploads/${photo.photo}`;
+
+    if (fs.existsSync(photoPath)) {
+      fs.unlinkSync(photoPath);
+    }
+  });
+
+  // delete existing photos
+  await db.invoicePhoto.deleteMany({
+    where: {
+      invoiceId: data.id,
+    },
+  });
+
+  // create new photos
+  data.photos.forEach(async (photo) => {
+    await db.invoicePhoto.create({
+      data: {
+        invoiceId: data.id,
+        photo,
+      },
+    });
+  });
+
   // delete existing items
   await db.invoiceItem.deleteMany({
     where: {
@@ -75,13 +108,13 @@ export async function updateInvoice(
     },
   });
 
-  // create new items
   data.items.forEach(async (item) => {
     const service = item.service;
     const materials = item.materials;
     const labor = item.labor;
     const tags = item.tags;
 
+    // create new items
     const invoiceItem = await db.invoiceItem.create({
       data: {
         invoiceId: data.id,
