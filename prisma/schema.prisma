@@ -322,7 +322,7 @@ model Material {
   vendor      Vendor?           @relation(fields: [vendorId], references: [id], onDelete: SetNull)
   category    Category?         @relation(fields: [categoryId], references: [id])
   tags        MaterialTag[]
-  invoiceItem InvoiceItem?      @relation(fields: [invoiceItemId], references: [id])
+  invoiceItem InvoiceItem?      @relation(fields: [invoiceItemId], references: [id], onDelete: Cascade)
   product     InventoryProduct? @relation(fields: [productId], references: [id])
   invoice     Invoice?          @relation(fields: [invoiceId], references: [id])
 
@@ -403,7 +403,7 @@ model Tag {
 model ItemTag {
   itemId Int
   tagId  Int
-  item   InvoiceItem @relation(fields: [itemId], references: [id])
+  item   InvoiceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
   tag    Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([itemId, tagId])
