@@ -56,9 +56,9 @@ export default function LaborCreate() {
       setCategory(null);
       setTags([]);
       setNotes("");
-      setHours(1);
-      setCharge(0);
-      setDiscount(0);
+      setHours(undefined);
+      setCharge(undefined);
+      setDiscount(undefined);
       setAddToCannedLabor(false);
     }
   }, [data]);
@@ -199,6 +199,7 @@ export default function LaborCreate() {
           value={hours}
           onChange={(e) => setHours(parseInt(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+          placeholder="1"
         />
       </div>
 
@@ -212,6 +213,7 @@ export default function LaborCreate() {
           value={charge}
           onChange={(e) => setCharge(parseFloat(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+          placeholder="0"
         />
       </div>
 
@@ -225,6 +227,7 @@ export default function LaborCreate() {
           value={discount}
           onChange={(e) => setDiscount(parseFloat(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+          placeholder="0.00"
         />
       </div>
 

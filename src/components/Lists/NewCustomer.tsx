@@ -62,7 +62,8 @@ export default function NewCustomer({
       document.querySelector<HTMLInputElement>("#lastName")?.value;
     const email = document.querySelector<HTMLInputElement>("#email")?.value;
     const mobile = document.querySelector<HTMLInputElement>("#mobile")?.value;
-    const company = document.querySelector<HTMLInputElement>("#company")?.value;
+    const company =
+      document.querySelector<HTMLInputElement>("#customerCompany")?.value;
     const address = document.querySelector<HTMLInputElement>("#address")?.value;
     const city = document.querySelector<HTMLInputElement>("#city")?.value;
     const state = document.querySelector<HTMLInputElement>("#state")?.value;

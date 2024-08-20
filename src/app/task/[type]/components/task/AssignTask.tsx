@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Task, User } from "@prisma/client";
 import Submit from "@/components/Submit";
 import { assignTask } from "../../../../../actions/task/assignTask";
+import Avatar from "@/components/Avatar";
 
 export default function AssignTask() {
   const { data, close } = usePopupStore();
@@ -68,13 +69,7 @@ export default function AssignTask() {
           <FormError />
 
           <div className="mt-1 flex items-center gap-2">
-            <Image
-              src={`/api/images/${user.image}`}
-              alt="User image"
-              width={50}
-              height={50}
-              className="rounded-full"
-            />
+            <Avatar photo={user.image} width={50} height={50} />
             <p className="text-xl font-bold">
               {user.firstName} {user.lastName}
             </p>

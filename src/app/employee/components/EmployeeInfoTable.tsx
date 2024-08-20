@@ -2,7 +2,6 @@
 
 import React, { useEffect } from "react";
 import { EditOutlined } from "@ant-design/icons";
-import Image from "next/image";
 import Link from "next/link";
 import { EmployeeWorkInfo } from "./employeeWorkInfoType";
 import moment from "moment";

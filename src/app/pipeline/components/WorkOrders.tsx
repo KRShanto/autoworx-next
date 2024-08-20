@@ -52,13 +52,13 @@ const WorkOrders = async (props: Props) => {
         <table className="w-full shadow-md">
           <thead className="bg-white">
             <tr className="h-10 border-b">
-              <th className="border-b px-4 py-2 text-center">Work Order#</th>
-              <th className="border-b px-4 py-2 text-center">Client </th>
-              <th className="border-b px-4 py-2 text-center">Vehicle Info</th>
-              <th className="border-b px-4 py-2 text-center">Services</th>
-              <th className="border-b px-4 py-2 text-center">Time Created</th>
-              <th className="border-b px-4 py-2 text-center">Due Date</th>
-              <th className="border-b px-4 py-2 text-center">Status</th>
+              <th className="border-b px-4 py-2 text-left">Work Order#</th>
+              <th className="border-b px-4 py-2 text-left">Client </th>
+              <th className="border-b px-4 py-2 text-left">Vehicle Info</th>
+              <th className="border-b px-4 py-2 text-left">Services</th>
+              <th className="border-b px-4 py-2 text-left">Time Created</th>
+              <th className="border-b px-4 py-2 text-left">Due Date</th>
+              <th className="border-b px-4 py-2 text-left">Status</th>
             </tr>
           </thead>
 
@@ -81,24 +81,59 @@ const WorkOrders = async (props: Props) => {
                     index % 2 === 0 ? "bg-white" : "bg-blue-100",
                   )}
                 >
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     <Link
                       href={`/estimate/workorder/${id}`}
-                      className="text-[#6571FF]"
+                      className="block h-full w-full text-[#6571FF]"
                     >
                       {id}
                     </Link>
                   </td>
-                  <td className="border-b px-4 py-2 text-center">{client}</td>
-                  <td className="border-b px-4 py-2 text-center">{vehicle}</td>
-                  <td className="border-b px-4 py-2 text-center">
-                    {serviceString}
+                  <td className="border-b px-4 py-2 text-left">
+                    <Link
+                      href={`/estimate/workorder/${id}`}
+                      className="block h-full w-full"
+                    >
+                      {client}
+                    </Link>
                   </td>
-                  <td className="border-b px-4 py-2 text-center">
-                    {timeCreated}
+                  <td className="border-b px-4 py-2 text-left">
+                    <Link
+                      href={`/estimate/workorder/${id}`}
+                      className="block h-full w-full"
+                    >
+                      {vehicle}
+                    </Link>
                   </td>
-                  <td className="border-b px-4 py-2 text-center"></td>
-                  <td className="border-b px-4 py-2 text-center"></td>
+                  <td className="border-b px-4 py-2 text-left">
+                    <Link
+                      href={`/estimate/workorder/${id}`}
+                      className="block h-full w-full"
+                    >
+                      {serviceString}
+                    </Link>
+                  </td>
+                  <td className="border-b px-4 py-2 text-left">
+                    <Link
+                      href={`/estimate/workorder/${id}`}
+                      className="block h-full w-full"
+                    >
+                      {timeCreated}
+                    </Link>
+                  </td>
+
+                  <td className="border-b px-4 py-2 text-left">
+                    <Link
+                      href={`/estimate/workorder/${id}`}
+                      className="block h-full w-full"
+                    ></Link>
+                  </td>
+                  <td className="border-b px-4 py-2 text-left">
+                    <Link
+                      href={`/estimate/workorder/${id}`}
+                      className="block h-full w-full"
+                    ></Link>
+                  </td>
                 </tr>
               );
             })}
