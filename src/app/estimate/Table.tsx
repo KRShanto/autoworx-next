@@ -45,7 +45,6 @@ export default function Table({ data }: { data: InvoiceData[] }) {
     });
 
     const filteredStatus = filtered.filter((row) => {
-      console.log(row.status, status);
       if (status) {
         return row.status === status;
       }
@@ -76,15 +75,15 @@ export default function Table({ data }: { data: InvoiceData[] }) {
         {/* Estimate Header */}
         <thead className="bg-white">
           <tr className="h-10 border-b">
-            <th className="px-10 text-left">Invoice ID</th>
-            <th className="px-10 text-left">Client</th>
-            <th className="px-10 text-left">Vehicle</th>
-            <th className="px-10 text-left">Email</th>
-            <th className="px-10 text-left">Phone</th>
-            <th className="px-10 text-left">Price</th>
-            <th className="px-10 text-left">Date</th>
-            <th className="px-10 text-left">Status</th>
-            <th className="px-10 text-left">Edit</th>
+            <th className="px-4 py-2 text-left">Invoice ID</th>
+            <th className="px-4 py-2 text-left">Client</th>
+            <th className="px-4 py-2 text-left">Vehicle</th>
+            <th className="px-4 py-2 text-left">Email</th>
+            <th className="px-4 py-2 text-left">Phone</th>
+            <th className="px-4 py-2 text-left">Price</th>
+            <th className="px-4 py-2 text-left">Date</th>
+            <th className="px-4 py-2 text-left">Status</th>
+            <th className="px-4 py-2 text-left">Edit</th>
           </tr>
         </thead>
 
@@ -95,38 +94,80 @@ export default function Table({ data }: { data: InvoiceData[] }) {
               key={data.id}
               className={cn("py-3", index % 2 === 0 ? evenColor : oddColor)}
             >
-              <td className="h-12 px-10 text-left">
+              <td className="px-4 py-2 text-left">
                 <Link
                   href={`/estimate/view/${data.id}`}
                   passHref
-                  className="text-blue-600"
+                  className="block w-full text-blue-600"
                 >
                   {data.id}
                 </Link>
               </td>
-              <td className="px-10 text-left">{data.clientName}</td>
-              <td className="px-10 text-left">{data.vehicle}</td>
-              <td className="px-10 text-left">{data.email}</td>
-              <td className="px-10 text-left">{data.phone}</td>
-              <td className="px-10 text-left text-[#006D77]">
-                {data.grandTotal?.toString()}
-              </td>
-              <td className="px-10 text-left">
-                {/* format: date.month.year */}
-                {moment(data.createdAt).format("DD.MM.YYYY")}
-              </td>
-              <td className="px-10 text-left">
-                <p
-                  className="rounded-md text-center text-white"
-                  style={{
-                    backgroundColor: data.bgColor,
-                    color: data.textColor,
-                  }}
+              <td className="px-4 py-2 text-left">
+                <Link
+                  href={`/estimate/view/${data.id}`}
+                  className="block h-full w-full"
                 >
-                  {data.status}
-                </p>
+                  {data.clientName}
+                </Link>
               </td>
-              <td className="flex items-center gap-3 px-10">
+              <td className="px-4 py-2 text-left">
+                <Link
+                  href={`/estimate/view/${data.id}`}
+                  className="block h-full w-full"
+                >
+                  {data.vehicle}
+                </Link>
+              </td>
+              <td className="px-4 py-2 text-left">
+                <Link
+                  href={`/estimate/view/${data.id}`}
+                  className="block h-full w-full"
+                >
+                  {data.email}
+                </Link>
+              </td>
+              <td className="px-4 py-2 text-left">
+                <Link
+                  href={`/estimate/view/${data.id}`}
+                  className="block h-full w-full"
+                >
+                  {data.phone}
+                </Link>
+              </td>
+              <td className="px-4 py-2 text-left text-[#006D77]">
+                <Link
+                  href={`/estimate/view/${data.id}`}
+                  className="block h-full w-full"
+                >
+                  {data.grandTotal?.toString()}
+                </Link>
+              </td>
+              <td className="px-4 py-2 text-left">
+                <Link
+                  href={`/estimate/view/${data.id}`}
+                  className="block h-full w-full"
+                >
+                  {moment(data.createdAt).format("DD.MM.YYYY")}
+                </Link>
+              </td>
+              <td className="px-4 py-2 text-left">
+                <Link
+                  href={`/estimate/view/${data.id}`}
+                  className="block h-full w-full"
+                >
+                  <p
+                    className="rounded-md text-center text-white"
+                    style={{
+                      backgroundColor: data.bgColor,
+                      color: data.textColor,
+                    }}
+                  >
+                    {data.status}
+                  </p>
+                </Link>
+              </td>
+              <td className="flex items-center gap-3 px-4 py-2">
                 <ConvertTo id={data.id} />
                 <Link
                   href={`/estimate/edit/${data.id}`}

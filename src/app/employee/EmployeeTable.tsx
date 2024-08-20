@@ -59,22 +59,51 @@ export default function EmployeeTable({ employees }: { employees: User[] }) {
             >
               <td className="border-b px-4 py-2 text-left">
                 <Link
-                  className="text-blue-500"
+                  className="block h-full w-full text-blue-500"
                   href={`/employee/${employee.id}`}
                 >
                   {employee.id}
                 </Link>
               </td>
               <td className="border-b px-4 py-2 text-left">
-                {employee.firstName} {employee.lastName}
+                <Link
+                  className="block h-full w-full"
+                  href={`/employee/${employee.id}`}
+                >
+                  {employee.firstName} {employee.lastName}
+                </Link>
               </td>
-              <td className="border-b px-4 py-2 text-left">{employee.email}</td>
-              <td className="border-b px-4 py-2 text-left">{employee.phone}</td>
               <td className="border-b px-4 py-2 text-left">
-                {moment(employee.joinDate).format("MM/DD/YYYY")}
+                <Link
+                  className="block h-full w-full"
+                  href={`/employee/${employee.id}`}
+                >
+                  {employee.email}
+                </Link>
+              </td>
+              <td className="border-b px-4 py-2 text-left">
+                <Link
+                  className="block h-full w-full"
+                  href={`/employee/${employee.id}`}
+                >
+                  {employee.phone}
+                </Link>
+              </td>
+              <td className="border-b px-4 py-2 text-left">
+                <Link
+                  className="block h-full w-full"
+                  href={`/employee/${employee.id}`}
+                >
+                  {moment(employee.joinDate).format("MM/DD/YYYY")}
+                </Link>
               </td>
               <td className="border-b px-4 py-2 text-center">
-                {employee.employeeType}
+                <Link
+                  className="block h-full w-full"
+                  href={`/employee/${employee.id}`}
+                >
+                  {employee.employeeType}
+                </Link>
               </td>
               <td className="border-b border-l bg-white px-4 py-2 text-center">
                 <div className="flex items-center justify-center gap-2">

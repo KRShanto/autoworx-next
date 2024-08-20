@@ -59,11 +59,28 @@ export default function ClientList({
                   </Link>
                 </td>
                 <td className="border-b px-4 py-2 text-left">
-                  {client.firstName} {client.lastName}
+                  <Link
+                    className="block h-full w-full"
+                    href={`/client/${client.id}`}
+                  >
+                    {client.firstName} {client.lastName}
+                  </Link>
                 </td>
-                <td className="border-b px-4 py-2 text-left">{client.email}</td>
                 <td className="border-b px-4 py-2 text-left">
-                  {client.mobile}
+                  <Link
+                    className="block h-full w-full"
+                    href={`/client/${client.id}`}
+                  >
+                    {client.email}
+                  </Link>
+                </td>
+                <td className="border-b px-4 py-2 text-left">
+                  <Link
+                    className="block h-full w-full"
+                    href={`/client/${client.id}`}
+                  >
+                    {client.mobile}
+                  </Link>
                 </td>
                 <td className="border-b border-l bg-white px-4 py-2 text-center">
                   <div className="flex items-center justify-center gap-2">
