@@ -81,7 +81,7 @@ export default function EditHistory({
 
       <DialogContent className="max-h-full w-[30rem] max-w-xl" form>
         <DialogHeader>
-          <DialogTitle>Edit Replenish history</DialogTitle>
+          <DialogTitle>Edit History</DialogTitle>
         </DialogHeader>
 
         <FormError />

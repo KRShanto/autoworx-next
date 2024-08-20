@@ -1,5 +1,6 @@
 "use server";
 
+import { createProduct } from "@/actions/inventory/create";
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
@@ -34,18 +35,21 @@ export async function newMaterial({
   let newMaterial: Material | InventoryProduct | null = null;
 
   if (addToInventory) {
-    newMaterial = await db.inventoryProduct.create({
-      data: {
-        name,
-        categoryId,
-        vendorId,
-        description: notes,
-        quantity,
-        price: sell,
-        companyId,
-        type: "Product",
-      },
+    const res = await createProduct({
+      name,
+      categoryId,
+      vendorId,
+      description: notes,
+      quantity: quantity || 1,
+      price: sell || 0,
+      type: "Product",
     });
+
+    if (res.type === "error") {
+      return res;
+    } else {
+      newMaterial = res.data;
+    }
   } else {
     newMaterial = await db.material.create({
       data: {
