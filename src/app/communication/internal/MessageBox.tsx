@@ -147,20 +147,25 @@ export default function MessageBox({
         <div className="flex items-center gap-1">
           {fromGroup ? (
             <div className="flex">
-              {group?.users.slice(0, 4).map((groupUser: any, index: number) => (
-                <Image
-                  key={groupUser.id}
-                  src={groupUser.image}
-                  alt="user"
-                  width={50}
-                  height={50}
-                  className={cn("rounded-full", index === 0 ? "ml-0" : "-ml-9")}
-                />
-              ))}
+              {group?.users
+                .slice(0, 4)
+                .map((groupUser: any, index: number) => (
+                  <Image
+                    key={groupUser.id}
+                    src={`/api/images/${groupUser.image}`}
+                    alt="user"
+                    width={50}
+                    height={50}
+                    className={cn(
+                      "rounded-full",
+                      index === 0 ? "ml-0" : "-ml-9",
+                    )}
+                  />
+                ))}
             </div>
           ) : (
             <Image
-              src={user?.image!}
+              src={`/api/images/${user?.image}`}
               alt="user"
               width={50}
               height={50}
@@ -242,7 +247,7 @@ export default function MessageBox({
                 {message.sender === "CLIENT" && (
                   <div>
                     <Image
-                      src={findUser?.image!}
+                      src={`/api/images/${findUser?.image!}`}
                       alt="user"
                       width={40}
                       height={40}

@@ -59,7 +59,7 @@ export default function List({
                   return (
                     <Image
                       key={user.id}
-                      src={user.image}
+                      src={`/api/images/${user.image}`}
                       alt="User image"
                       // className="h-[60px] w-[60px] rounded-full max-[1400px]:h-[40px] max-[1400px]:w-[40px]"
                       width={30}
@@ -95,7 +95,7 @@ export default function List({
               }}
             >
               <Image
-                src={user.image}
+                src={`/api/images/${user.image}`}
                 alt="User image"
                 // className="h-[60px] w-[60px] rounded-full max-[1400px]:h-[40px] max-[1400px]:w-[40px]"
                 width={60}

@@ -141,7 +141,7 @@ export default function CreateGroupModal({ users }: TProps) {
                         onClick={() => handleAddContactList(user)}
                       >
                         <Image
-                          src={user.image}
+                          src={`/api/images/${user.image}`}
                           alt="user"
                           width={60}
                           height={60}
