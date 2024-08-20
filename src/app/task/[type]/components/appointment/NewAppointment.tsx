@@ -188,6 +188,11 @@ export function NewAppointment({
     }
 
     // reset all the fields
+    resetAll();
+    close();
+  };
+
+  function resetAll() {
     setDate(undefined);
     setStartTime(undefined);
     setEndTime(undefined);
@@ -202,9 +207,8 @@ export function NewAppointment({
     setTimes([]);
     // remove the clientId from the url
     router.push(pathname);
+  }
 
-    close();
-  };
   useEffect(() => {
     if (
       clientOpenDropdown &&
@@ -335,10 +339,9 @@ export function NewAppointment({
                     format="h:mm a"
                     className="rounded-md border border-gray-500 p-1 placeholder-slate-800"
                     needConfirm={false}
-                    // set default time
-                    defaultValue={[
-                      dayjs(settings && settings.dayStart, "HH:mm"),
-                      dayjs(settings && settings.dayEnd, "HH:mm"),
+                    value={[
+                      startTime ? dayjs(startTime, "HH:mm") : null,
+                      endTime ? dayjs(endTime, "HH:mm") : null,
                     ]}
                   />
                 </div>
@@ -542,7 +545,11 @@ export function NewAppointment({
 
           <DialogFooter className="justify-end">
             <DialogClose asChild>
-              <button type="button" className="rounded-md border px-4 py-1">
+              <button
+                type="button"
+                className="rounded-md border px-4 py-1"
+                onClick={() => resetAll()}
+              >
                 Cancel
               </button>
             </DialogClose>
