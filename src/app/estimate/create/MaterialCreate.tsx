@@ -65,10 +65,10 @@ export default function MaterialCreate() {
       setVendor(null);
       setTags([]);
       setNotes("");
-      setQuantity(0);
-      setCost(0);
-      setSell(0);
-      setDiscount(0);
+      setQuantity(undefined);
+      setCost(undefined);
+      setSell(undefined);
+      setDiscount(undefined);
       setAddToInventory(false);
     }
   }, [data]);
@@ -298,6 +298,7 @@ export default function MaterialCreate() {
           value={quantity}
           onChange={(e) => setQuantity(parseInt(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+          placeholder="0"
         />
       </div>
 
@@ -311,6 +312,7 @@ export default function MaterialCreate() {
           value={cost}
           onChange={(e) => setCost(parseInt(e.target.value as any))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+          placeholder="0"
         />
       </div>
 
@@ -324,6 +326,7 @@ export default function MaterialCreate() {
           value={sell}
           onChange={(e) => setSell(parseInt(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+          placeholder="0"
         />
       </div>
 
@@ -337,6 +340,7 @@ export default function MaterialCreate() {
           value={discount}
           onChange={(e) => setDiscount(parseInt(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
+          placeholder="0"
         />
       </div>
 
