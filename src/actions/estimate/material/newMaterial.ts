@@ -67,18 +67,19 @@ export async function newMaterial({
   }
 
   // create material tags
-  if (tags && newMaterial) {
-    await Promise.all(
-      tags.map((tag) =>
-        db.materialTag.create({
-          data: {
-            materialId: newMaterial.id,
-            tagId: tag.id,
-          },
-        }),
-      ),
-    );
-  }
+  // TODO: skip this for now
+  // if (tags && newMaterial) {
+  //   await Promise.all(
+  //     tags.map((tag) =>
+  //       db.materialTag.create({
+  //         data: {
+  //           materialId: newMaterial.id,
+  //           tagId: tag.id,
+  //         },
+  //       }),
+  //     ),
+  //   );
+  // }
 
   const newMaterialTags = await db.materialTag.findMany({
     where: {
