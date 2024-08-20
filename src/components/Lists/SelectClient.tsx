@@ -8,6 +8,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NewCustomer from "./NewCustomer";
 import { SelectProps } from "./select-props";
+import Avatar from "../Avatar";
 
 export function SelectClient({
   name = "clientId",
@@ -20,7 +21,6 @@ export function SelectClient({
   const [client, setClient] = setValue ? [value, setValue] : state;
   const clientList = useListsStore((x) => x.customers);
   const { newAddedCustomer } = useListsStore();
-  // const [openDropdown, setOpenDropdown] = useState(false);
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -53,13 +53,7 @@ export function SelectClient({
         newButton={<NewCustomer />}
         displayList={(client: Client) => (
           <div className="flex gap-3">
-            <Image
-              src={`/api/images/${client.photo}`}
-              alt="Client Image"
-              width={50}
-              height={50}
-              className="rounded-full"
-            />
+            <Avatar photo={client.photo} width={50} height={50} />
             <div>
               <h3 className="font-bold">{`${client.firstName} ${client.lastName}`}</h3>
               <p>

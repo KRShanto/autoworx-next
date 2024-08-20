@@ -1,6 +1,6 @@
 import { Group, User } from "@prisma/client";
-import Image from "next/image";
 import CreateGroupModal from "./CreateGroupModal";
+import Avatar from "@/components/Avatar";
 
 export default function List({
   users,
@@ -57,14 +57,11 @@ export default function List({
               <div className="grid grid-cols-2">
                 {group.users.slice(0, 4).map((user) => {
                   return (
-                    <Image
+                    <Avatar
+                      photo={user.image}
+                      width={60}
+                      height={60}
                       key={user.id}
-                      src={`/api/images/${user.image}`}
-                      alt="User image"
-                      // className="h-[60px] w-[60px] rounded-full max-[1400px]:h-[40px] max-[1400px]:w-[40px]"
-                      width={30}
-                      height={30}
-                      className="rounded-full max-[1400px]:h-[40px] max-[1400px]:w-[40px]"
                     />
                   );
                 })}
@@ -94,14 +91,7 @@ export default function List({
                 });
               }}
             >
-              <Image
-                src={`/api/images/${user.image}`}
-                alt="User image"
-                // className="h-[60px] w-[60px] rounded-full max-[1400px]:h-[40px] max-[1400px]:w-[40px]"
-                width={60}
-                height={60}
-                className="rounded-full max-[1400px]:h-[40px] max-[1400px]:w-[40px]"
-              />
+              <Avatar photo={user.image} width={60} height={60} />
               <div className="flex flex-col">
                 <p className="text-[14px] font-bold text-[#797979]">
                   {user.firstName} {user.lastName}

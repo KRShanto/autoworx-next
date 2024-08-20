@@ -3,6 +3,7 @@ import Payout from "./Payout";
 import { IoMdSettings } from "react-icons/io";
 import { User } from "@prisma/client";
 import { EmployeeWorkInfo } from "./employeeWorkInfoType";
+import Avatar from "@/components/Avatar";
 
 export default function EmployeeInformation({
   employee,
@@ -20,17 +21,8 @@ export default function EmployeeInformation({
           </button>
         </div>
         <div className="mr-3 flex flex-col items-center">
-          <Image
-            src={
-              !employee.image?.includes("default.png")
-                ? `/api/images/${employee.image}`
-                : employee.image
-            }
-            alt="Employee"
-            width={100}
-            height={100}
-            className="h-auto w-auto rounded-full"
-          />
+          <Avatar photo={employee.image} width={100} height={100} />
+
           <div className="mt-2 text-gray-600">{employee.employeeType}</div>
         </div>
 

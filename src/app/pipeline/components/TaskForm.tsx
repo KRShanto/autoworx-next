@@ -15,6 +15,7 @@ import { FaCheck, FaPlus } from "react-icons/fa";
 import Image from "next/image";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { TimePicker } from "antd";
+import Avatar from "@/components/Avatar";
 
 export default function TaskForm({
   companyUsers,
@@ -71,17 +72,17 @@ export default function TaskForm({
           Add Task
         </div>
         {/* Hover content */}
-        <div className="hidden absolute left-1/3 z-50 mt-1 -top-36 w-[100px] -translate-x-1/2 transform rounded-lg border border-[#66738C] bg-white p-2 group-hover:block">
-                <div className="mb-2 rounded-[3px] bg-[#6571FF] p-1 text-white">
-                  Task 1
-                </div>
-                <div className="mb-2 rounded-[3px] bg-[#25AADD] p-1 text-white">
-                  Task 2
-                </div>
-                <div className="rounded-[3px] bg-[#006D77] p-1 text-white">
-                  Task 3
-                </div>
-              </div>
+        <div className="absolute -top-36 left-1/3 z-50 mt-1 hidden w-[100px] -translate-x-1/2 transform rounded-lg border border-[#66738C] bg-white p-2 group-hover:block">
+          <div className="mb-2 rounded-[3px] bg-[#6571FF] p-1 text-white">
+            Task 1
+          </div>
+          <div className="mb-2 rounded-[3px] bg-[#25AADD] p-1 text-white">
+            Task 2
+          </div>
+          <div className="rounded-[3px] bg-[#006D77] p-1 text-white">
+            Task 3
+          </div>
+        </div>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -160,13 +161,8 @@ export default function TaskForm({
                         }
                       }}
                     />
-                    <Image
-                      src={user.image}
-                      alt="User image"
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
+
+                    <Avatar photo={user.image} width={40} height={40} />
                     <span>
                       {user?.firstName} {user?.lastName}
                     </span>
@@ -218,16 +214,14 @@ export default function TaskForm({
                 Cancel
               </button>
             </DialogClose>
-            
-              <button
-                type="button"
-                className=" rounded-md border bg-[#6571FF] px-4 py-1 text-white"
-                onClick={handleSave}
-              >
-                Add
-              </button>
-              
-            
+
+            <button
+              type="button"
+              className="rounded-md border bg-[#6571FF] px-4 py-1 text-white"
+              onClick={handleSave}
+            >
+              Add
+            </button>
           </DialogFooter>
         </form>
       </DialogContent>

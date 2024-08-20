@@ -21,6 +21,7 @@ import { editTask } from "../../../../../actions/task/editTask";
 // @ts-ignore
 import dayjs from "dayjs";
 import { deleteTask } from "../../../../../actions/task/deleteTask";
+import Avatar from "@/components/Avatar";
 
 export default function UpdateTask() {
   const { popup, data, close } = usePopupStore();
@@ -155,13 +156,7 @@ export default function UpdateTask() {
                       }}
                       checked={assignedUsers.includes(user.id)}
                     />
-                    <Image
-                      src={user.image}
-                      alt={user.firstName}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
+                    <Avatar photo={user.image} width={40} height={40} />
                     <span>
                       {user.firstName} {user.lastName}
                     </span>
