@@ -2,6 +2,7 @@
 import Title from "@/components/Title";
 import { convert } from "html-to-text";
 import { Metadata } from "next";
+import { redirect, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Details from "./Details";
 import List from "./List";
@@ -134,25 +135,29 @@ export default function Page({
   const [conversations, setConversations] = useState<DecodedEmail[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [base64Data, setBase64Data] = useState("");
+  const router = useRouter();
   async function getEmails(email: string) {
-    setLoading(true);
-    const res = await fetch(
-      `/api/communication/client?email=${decodeURIComponent(email)}`,
-    );
+    try {
+      setLoading(true);
+      const res = await fetch(
+        `/api/communication/client?email=${decodeURIComponent(email)}`,
+      );
 
-    const data: EmailData[] = await res.json();
-    setLoading(false);
+      const data: EmailData[] = await res.json();
+      setLoading(false);
 
-    const emailsWithBody = data?.map((emailData) => {
-      let body = decodeEmails(emailData) || "";
-      return {
-        ...emailData,
-        body,
-      };
-    });
-
-    setConversations(emailsWithBody);
-    console.log(emailsWithBody, "conversations");
+      const emailsWithBody = data?.map((emailData) => {
+        let body = decodeEmails(emailData) || "";
+        return {
+          ...emailData,
+          body,
+        };
+      });
+      setConversations(emailsWithBody);
+    } catch (error) {
+      setLoading(false);
+      router.push("/communication/client");
+    }
   }
 
   useEffect(() => {

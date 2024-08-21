@@ -1,10 +1,11 @@
-import formidable from "formidable";
 import fs from "fs";
 import { google } from "googleapis";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { pipeline, Readable } from "stream";
 import { promisify } from "util";
+
 const pump = promisify(pipeline);
 
 export async function GET(request: NextRequest) {
@@ -24,10 +25,11 @@ export async function GET(request: NextRequest) {
 
     const clientId = process.env.GMAIL_CLIENT_ID;
     const clientSecret = process.env.GMAIL_CLIENT_SECRET;
-    const refreshToken = process.env.GMAIL_REFRESH_TOKEN;
+    const refreshToken = cookies().get("gmail_refresh_token");
 
     const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret);
-    oAuth2Client.setCredentials({ refresh_token: refreshToken });
+    if (refreshToken)
+      oAuth2Client.setCredentials({ refresh_token: refreshToken.value });
 
     const gmail = google.gmail({ version: "v1", auth: oAuth2Client });
 
@@ -87,9 +89,10 @@ export async function GET(request: NextRequest) {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching emails:", error);
+    cookies().delete("gmail_refresh_token");
     return new Response(JSON.stringify({ error: "Failed to fetch emails" }), {
-      status: 500,
+      status: 400,
       headers: { "Content-Type": "application/json" },
     });
   }
