@@ -22,14 +22,16 @@ import { MdOutlineFileDownload } from "react-icons/md";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import path from "path";
 import { useRef } from "react";
-import { FaShare } from "react-icons/fa";
+import { FaPrint, FaRegFile, FaShare } from "react-icons/fa";
 import { FaRegShareFromSquare } from "react-icons/fa6";
 import { HiXMark } from "react-icons/hi2";
 import { useReactToPrint } from "react-to-print";
 import { InvoiceItems } from "./InvoiceItems";
+import { CiFileOn } from "react-icons/ci";
+import { sendInvoiceEmail } from "@/actions/estimate/invoice/sendInvoiceEmail";
 
 type Props = {};
 
@@ -50,10 +52,19 @@ const InvoiceComponent = ({
   };
   vehicle: Vehicle | null;
 }) => {
+  const router = useRouter();
   const componentRef = useRef(null);
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
+
+  const handleDownload = () => {};
+
+  const handleEmail = () => {
+    sendInvoiceEmail({ invoiceId: invoice.id });
+    // close the dialog
+    router.back();
+  };
 
   return (
     <div>
@@ -64,16 +75,32 @@ const InvoiceComponent = ({
             ref={componentRef}
             className="#shadow-lg relative grid h-[90vh] w-[740px] shrink grow-0 gap-4 overflow-y-auto border bg-background p-6"
           >
-            {/**
-             * Logo, Contact Information
-             */}
             <div className="flex items-center justify-center print:hidden">
-              <button
-                className="rounded bg-[#6571FF] px-4 py-2 text-xl font-bold text-white"
-                onClick={handlePrint}
-              >
-                <MdOutlineFileDownload />
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
+                  onClick={handlePrint}
+                >
+                  <FaPrint />
+                  Print
+                </button>
+
+                <button
+                  className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
+                  onClick={handleDownload}
+                >
+                  <FaRegFile />
+                  PDF
+                </button>
+
+                <button
+                  className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
+                  onClick={handleEmail}
+                >
+                  <FaShare />
+                  Share
+                </button>
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex aspect-square w-32 items-center justify-center bg-slate-500 text-center font-bold text-white">
