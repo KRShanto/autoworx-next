@@ -124,20 +124,25 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const recipient = formData.get("recipient") as string | null;
     const subject = formData.get("subject") as string | null;
     const text = formData.get("text") as string | null;
+    let filePath;
 
-    if (!file || !recipient || !subject || !text) {
+    console.log("Form data:", { file, recipient, subject, text });
+
+    if (!recipient || !subject || !text) {
       return NextResponse.json(
         { success: false, error: "Missing required form data" },
         { status: 400 },
       );
     }
 
-    // Convert Web Stream to Node.js Readable stream
-    const nodeStream = webStreamToNodeStream(file.stream());
+    if (file) {
+      // Convert Web Stream to Node.js Readable stream
+      const nodeStream = webStreamToNodeStream(file.stream());
 
-    // Save the file to the server temporarily
-    const filePath = `./public/uploads/${file.name}`;
-    await pump(nodeStream, fs.createWriteStream(filePath));
+      // Save the file to the server temporarily
+      filePath = `./public/uploads/${file.name}`;
+      await pump(nodeStream, fs.createWriteStream(filePath));
+    }
 
     // Nodemailer transporter with OAuth2
     const transporter = nodemailer.createTransport({
@@ -156,18 +161,22 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       to: recipient,
       subject: subject,
       text: text,
-      attachments: [
-        {
-          filename: file.name,
-          path: filePath, // Attach the file using the path where it was saved
-        },
-      ],
+      attachments: file
+        ? [
+            {
+              filename: file.name,
+              path: filePath, // Attach the file using the path where it was saved
+            },
+          ]
+        : [],
     };
 
     const result = await transporter.sendMail(mailOptions);
 
+    console.log("Email sent:", result);
+
     // Remove the file from the server after sending the email
-    fs.unlinkSync(filePath);
+    filePath && fs.unlinkSync(filePath);
 
     return NextResponse.json({ success: true, result });
   } catch (error: unknown) {

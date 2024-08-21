@@ -7,6 +7,7 @@ import { Task, User } from "@prisma/client";
 import Image from "next/image";
 import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
 import React from "react";
+import Avatar from "@/components/Avatar";
 
 export default function UserComponent({
   isSelected,
@@ -38,13 +39,7 @@ export default function UserComponent({
         onClick={handleClick}
         key={index}
       >
-        <Image
-          src={`/api/images/${user.image}`}
-          alt="User Image"
-          width={50}
-          height={50}
-          className="rounded-full sm:max-h-12 sm:max-w-12"
-        />
+        <Avatar photo={user.image} width={50} height={50} />
         <p
           className={cn(
             "ml-2 text-[14px] font-bold sm:text-xs",

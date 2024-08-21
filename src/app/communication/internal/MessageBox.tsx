@@ -1,6 +1,5 @@
 import { FaTimes } from "react-icons/fa";
 import { useEffect, useRef, useState } from "react";
-// import { ThreeDots } from "react-loader-spinner";
 import { cn } from "@/lib/cn";
 import Image from "next/image";
 import { Message, MessageQue, TGroupMessage } from "./UsersArea";
@@ -12,7 +11,7 @@ import { sendType } from "@/types/Chat";
 import { Group, User } from "@prisma/client";
 import { deleteUserFromGroup } from "@/actions/communication/internal/deleteUserFromGroup";
 import { useSession } from "next-auth/react";
-// import { useSession } from "next-auth/react";
+import Avatar from "@/components/Avatar";
 
 export default function MessageBox({
   user,
@@ -147,25 +146,23 @@ export default function MessageBox({
         <div className="flex items-center gap-1">
           {fromGroup ? (
             <div className="flex">
-              {group?.users.slice(0, 4).map((groupUser: any, index: number) => (
-                <Image
-                  key={groupUser.id}
-                  src={groupUser.image}
-                  alt="user"
-                  width={50}
-                  height={50}
-                  className={cn("rounded-full", index === 0 ? "ml-0" : "-ml-9")}
-                />
-              ))}
+              {group?.users
+                .slice(0, 4)
+                .map((groupUser: any, index: number) => (
+                  <Avatar
+                    key={groupUser.id}
+                    photo={groupUser.image}
+                    width={50}
+                    height={50}
+                    className={cn(
+                      "rounded-full",
+                      index === 0 ? "ml-0" : "-ml-9",
+                    )}
+                  />
+                ))}
             </div>
           ) : (
-            <Image
-              src={user?.image!}
-              alt="user"
-              width={50}
-              height={50}
-              className="rounded-full"
-            />
+            <Avatar photo={user?.image} width={50} height={50} />
           )}
           <div className="flex flex-col">
             <p className="text-[20px] font-bold">
@@ -241,13 +238,7 @@ export default function MessageBox({
               <div className="flex items-start gap-2 p-1">
                 {message.sender === "CLIENT" && (
                   <div>
-                    <Image
-                      src={findUser?.image!}
-                      alt="user"
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
+                    <Avatar photo={findUser?.image} width={40} height={40} />
                     <p className="text-center text-[10px]">
                       {findUser?.firstName}
                     </p>

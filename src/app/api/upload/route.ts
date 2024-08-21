@@ -41,7 +41,7 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
   try {
     const json = await req.json();
     let { filePath } = json;
-    filePath = `images/${filePath}`;
+    filePath = `images/uploads/${filePath}`;
 
     // Ensure the file exists
     if (fs.existsSync(filePath)) {

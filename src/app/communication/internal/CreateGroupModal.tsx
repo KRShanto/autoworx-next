@@ -16,6 +16,7 @@ import { User } from "@prisma/client";
 import { createGroup } from "@/actions/communication/internal/creategroup";
 import { getSession, useSession } from "next-auth/react";
 import { Session } from "next-auth";
+import Avatar from "@/components/Avatar";
 
 type TProps = {
   users: User[];
@@ -140,13 +141,7 @@ export default function CreateGroupModal({ users }: TProps) {
                         className="flex cursor-pointer items-center space-x-2 p-1"
                         onClick={() => handleAddContactList(user)}
                       >
-                        <Image
-                          src={user.image}
-                          alt="user"
-                          width={60}
-                          height={60}
-                          className="rounded-full"
-                        />
+                        <Avatar photo={user.image} width={60} height={60} />
                         <div className="flex flex-col overflow-hidden">
                           <p className="text-sm font-bold">
                             {user.firstName} {user.lastName}

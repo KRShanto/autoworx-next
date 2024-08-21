@@ -37,16 +37,33 @@ export function SelectVehicle({
     }
   }, [vehicle]);
 
-  // Reset vehicle when client changes
-  // This is to prevent the user from selecting a vehicle that doesn't belong to the client
-  // Do not reset vehicle on initial render
+  // // Reset vehicle when client changes
+  // // This is to prevent the user from selecting a vehicle that doesn't belong to the client
+  // // Do not reset vehicle on initial render
+  // useEffect(() => {
+  //   if (clientId) {
+  //     if (clientIdChanged > 0) {
+  //       setVehicle(null);
+  //     }
+
+  //     setClientIdChanged((prev) => prev + 1);
+  //   }
+  // }, [clientId]);
+
+  // Select vehicle when client changes
+  // Select the first vehicle that belongs to the client
+  // If there are no vehicles, set vehicle to null
   useEffect(() => {
     if (clientId) {
-      if (clientIdChanged > 0) {
+      const clientVehicles = vehicleList.filter(
+        (vehicle) => vehicle.clientId === +clientId,
+      );
+
+      if (clientVehicles.length > 0) {
+        setVehicle(clientVehicles[0]);
+      } else {
         setVehicle(null);
       }
-
-      setClientIdChanged((prev) => prev + 1);
     }
   }, [clientId]);
 
