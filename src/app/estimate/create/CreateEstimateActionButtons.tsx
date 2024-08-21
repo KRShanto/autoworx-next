@@ -19,13 +19,6 @@ export function CreateEstimateActionsButtons() {
         <HiChatBubbleOvalLeftEllipsis />
         Message
       </button>
-      <button className={btnCN}>
-        <HiPrinter />
-        Print
-      </button>
-      <button className={btnCN}>
-        <HiMiniArrowUpTray /> Share
-      </button>
       <DeleteEstimateButton />
     </div>
   );
