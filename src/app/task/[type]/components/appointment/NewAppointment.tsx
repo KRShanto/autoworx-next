@@ -522,7 +522,7 @@ export function NewAppointment({
                   client={client}
                   // @ts-ignore
                   vehicle={vehicle}
-                  endTime={endTime!}
+                  startTime={startTime!}
                   date={date!}
                   times={times}
                   setTimes={setTimes}
