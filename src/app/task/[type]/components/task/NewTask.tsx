@@ -17,6 +17,7 @@ import Image from "next/image";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { createTask } from "../../../../../actions/task/createTask";
 import { TimePicker } from "antd";
+import Avatar from "@/components/Avatar";
 
 export default function NewTask({
   companyUsers,
@@ -153,13 +154,7 @@ export default function NewTask({
                         }
                       }}
                     />
-                    <Image
-                      src={user.image}
-                      alt="User image"
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
+                    <Avatar photo={user.image} width={40} height={40} />
                     <span>
                       {user.firstName} {user.lastName}
                     </span>

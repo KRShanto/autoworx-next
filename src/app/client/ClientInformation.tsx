@@ -1,5 +1,5 @@
+import Avatar from "@/components/Avatar";
 import { Client, Source, Tag } from "@prisma/client";
-import Image from "next/image";
 import React from "react";
 
 export default function ClientInformation({
@@ -13,13 +13,7 @@ export default function ClientInformation({
       <div className="rounded-md border border-gray-200 p-3">
         <div className="relative flex w-full items-center rounded">
           <div className="mr-3 flex flex-col items-center">
-            <Image
-              src={`/api/images/${client.photo}`}
-              alt="Client"
-              width={200}
-              height={200}
-              className="h-auto w-auto rounded-full"
-            />
+            <Avatar photo={client.photo} width={200} height={200} />
           </div>
 
           <div className="w-full space-y-2 text-sm">

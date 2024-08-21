@@ -1,9 +1,11 @@
+import { cn } from "@/lib/cn";
 import React from "react";
 
 interface PayoutCardProps {
   title: string;
   amount: number;
-  percentage: string;
+  percentage?: string;
+  increased?: boolean;
   customStyles?: string;
 }
 
@@ -11,6 +13,7 @@ const PayoutCard = ({
   title,
   amount,
   percentage,
+  increased,
   customStyles,
 }: PayoutCardProps) => {
   return (
@@ -23,9 +26,16 @@ const PayoutCard = ({
       <div className="font-inter mb-4 text-6xl font-semibold text-gray-500">
         ${amount}
       </div>
-      <div className="font-inter text-xl font-semibold text-teal-500">
-        {percentage}
-      </div>
+      {percentage && (
+        <div
+          className={cn(
+            "font-inter text-xl font-semibold",
+            increased ? "text-green-500" : "text-red-500",
+          )}
+        >
+          {percentage}
+        </div>
+      )}
     </div>
   );
 };

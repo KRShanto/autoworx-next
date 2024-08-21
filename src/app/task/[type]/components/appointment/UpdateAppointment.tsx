@@ -44,6 +44,7 @@ import { TbBell, TbCalendar } from "react-icons/tb";
 import { deleteAppointment } from "../../../../../actions/appointment/deleteAppointment";
 import { editAppointment } from "../../../../../actions/appointment/editAppointment";
 import { Reminder } from "./Reminder";
+import Avatar from "@/components/Avatar";
 
 enum Tab {
   Schedule = 0,
@@ -345,13 +346,7 @@ export function UpdateAppointment() {
               // Assigned users
               assignedUsers.map((user) => (
                 <div key={user.id} className="flex items-center gap-4">
-                  <Image
-                    src={user.image}
-                    alt="Employee Image"
-                    width={30}
-                    height={30}
-                    className="rounded-full"
-                  />
+                  <Avatar photo={user.image} width={30} height={30} />
                   <p>
                     {user.firstName} {user.lastName}
                   </p>
@@ -389,13 +384,7 @@ export function UpdateAppointment() {
                       }}
                       type="button"
                     >
-                      <Image
-                        src={employee.image}
-                        alt="Employee Image"
-                        width={50}
-                        height={50}
-                        className="rounded-full"
-                      />
+                      <Avatar photo={employee.image} width={50} height={50} />
                       <p className="font-medium">
                         {employee.firstName} {employee.lastName}
                       </p>

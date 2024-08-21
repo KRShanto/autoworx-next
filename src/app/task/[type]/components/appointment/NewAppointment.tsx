@@ -43,6 +43,7 @@ import { customAlphabet } from "nanoid";
 // @ts-ignore
 import dayjs from "dayjs";
 import { usePathname, useRouter } from "next/navigation";
+import Avatar from "@/components/Avatar";
 
 enum Tab {
   Schedule = 0,
@@ -187,6 +188,11 @@ export function NewAppointment({
     }
 
     // reset all the fields
+    resetAll();
+    close();
+  };
+
+  function resetAll() {
     setDate(undefined);
     setStartTime(undefined);
     setEndTime(undefined);
@@ -201,9 +207,8 @@ export function NewAppointment({
     setTimes([]);
     // remove the clientId from the url
     router.push(pathname);
+  }
 
-    close();
-  };
   useEffect(() => {
     if (
       clientOpenDropdown &&
@@ -334,10 +339,9 @@ export function NewAppointment({
                     format="h:mm a"
                     className="rounded-md border border-gray-500 p-1 placeholder-slate-800"
                     needConfirm={false}
-                    // set default time
-                    defaultValue={[
-                      dayjs(settings && settings.dayStart, "HH:mm"),
-                      dayjs(settings && settings.dayEnd, "HH:mm"),
+                    value={[
+                      startTime ? dayjs(startTime, "HH:mm") : null,
+                      endTime ? dayjs(endTime, "HH:mm") : null,
                     ]}
                   />
                 </div>
@@ -373,13 +377,7 @@ export function NewAppointment({
                 // Assigned users
                 assignedUsers.map((user) => (
                   <div key={user.id} className="flex items-center gap-4">
-                    <Image
-                      src={user.image}
-                      alt="Employee Image"
-                      width={30}
-                      height={30}
-                      className="rounded-full"
-                    />
+                    <Avatar photo={user.image} width={30} height={30} />
                     <p>
                       {user.firstName} {user.lastName}
                     </p>
@@ -417,13 +415,8 @@ export function NewAppointment({
                         }}
                         type="button"
                       >
-                        <Image
-                          src={employee.image}
-                          alt="Employee Image"
-                          width={50}
-                          height={50}
-                          className="rounded-full"
-                        />
+                        <Avatar photo={employee.image} width={50} height={50} />
+
                         <p className="font-medium">
                           {employee.firstName} {employee.lastName}
                         </p>
@@ -552,7 +545,11 @@ export function NewAppointment({
 
           <DialogFooter className="justify-end">
             <DialogClose asChild>
-              <button type="button" className="rounded-md border px-4 py-1">
+              <button
+                type="button"
+                className="rounded-md border px-4 py-1"
+                onClick={() => resetAll()}
+              >
                 Cancel
               </button>
             </DialogClose>
