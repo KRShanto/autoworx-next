@@ -491,7 +491,7 @@ export function UpdateAppointment() {
               <Reminder
                 client={client}
                 vehicle={vehicle}
-                endTime={endTime!}
+                startTime={startTime!}
                 date={date!}
                 times={times}
                 setTimes={setTimes}

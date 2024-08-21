@@ -13,7 +13,7 @@ import UpdateTemplate from "./UpdateTemplateComponent";
 export function Reminder({
   client,
   vehicle,
-  endTime,
+  startTime,
   date,
   times,
   setTimes,
@@ -32,7 +32,7 @@ export function Reminder({
 }: {
   client: Client | null;
   vehicle: Vehicle | null;
-  endTime: string;
+  startTime: string;
   date: string;
   times: { time: string; date: string }[];
   setTimes: (times: { time: string; date: string }[]) => void;
@@ -255,23 +255,28 @@ export function Reminder({
           {/* also format date and times to use with moment */}
 
           {times.map((timeObj, index) => {
-            // Convert the date and time to a moment object
-            const appointmentTime = moment(`${date} ${endTime}`);
-            // Convert the timeObj date and time to a moment object
-            const timeObjMoment = moment(`${timeObj.date} ${timeObj.time}`);
-            // Calculate the difference in time
+            const appointmentTime = moment(
+              `${date} ${startTime}`,
+              "YYYY-MM-DD HH:mm",
+            ).utc();
+
+            const timeObjMoment = moment(
+              `${timeObj.date} ${timeObj.time}`,
+              "YYYY-MM-DD HH:mm",
+            ).utc();
+
             const diff = moment.duration(appointmentTime.diff(timeObjMoment));
 
-            // Format the difference
             const days = diff.days();
             const hours = diff.hours();
+            const minutes = diff.minutes();
 
             return (
               <div key={index} className="flex justify-between px-5">
                 <p>
                   <span className="text-[#6571FF]">
                     {days} days {hours}
-                    hours
+                    hours {minutes} minutes
                   </span>{" "}
                   before appointment
                 </p>
