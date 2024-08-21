@@ -119,6 +119,12 @@ export function NewAppointment({
     );
   };
 
+  useEffect(() => {
+    if (popup !== "ADD_TASK") {
+      resetAll();
+    }
+  }, [popup]);
+
   const handleDate = (operator: "+" | "-") => {
     const d = new Date();
     d.setDate(d.getDate() + (operator === "+" ? 1 : -1));
