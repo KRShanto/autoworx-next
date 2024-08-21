@@ -9,8 +9,6 @@ import {
 } from "@/components/Dialog";
 import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
-import Submit from "@/components/Submit";
-import { SelectStatus } from "../../../../../components/Lists/SelectStatus";
 import {
   Dispatch,
   MouseEvent,
@@ -246,16 +244,6 @@ export default function CreateAndEditLabor({
               setSelectedItem={setPriority}
             />
           </div>
-          {/* <div>
-            <label htmlFor="status">Status</label>
-            <SelectStatus
-              value={status}
-              //@ts-ignore
-              setValue={setStatus}
-              open={statusOpenDropdown}
-              setOpen={setStatusOpenDropdown}
-            />
-          </div> */}
           <div>
             <label htmlFor="status">Status</label>
             {/* TODO: use better UI */}
