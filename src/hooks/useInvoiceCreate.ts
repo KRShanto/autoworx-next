@@ -65,9 +65,9 @@ export function useInvoiceCreate(type: InvoiceType) {
     if (isEditPage) {
       res = await updateInvoice({
         id: invoiceId,
-        clientId: clientId ? +clientId : undefined,
-        vehicleId: vehicleId ? +vehicleId : undefined,
-        statusId: statusId ? +statusId : undefined,
+        clientId: clientId ? clientId : undefined,
+        vehicleId: vehicleId ? vehicleId : undefined,
+        statusId: statusId ? statusId : undefined,
         subtotal,
         discount,
         tax,
