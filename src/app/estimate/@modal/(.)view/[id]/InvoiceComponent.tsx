@@ -19,19 +19,21 @@ import {
 } from "@prisma/client";
 import { MdOutlineFileDownload } from "react-icons/md";
 
+import { sendInvoiceEmail } from "@/actions/estimate/invoice/sendInvoiceEmail";
+import { pdf, PDFDownloadLink } from "@react-pdf/renderer";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
 import path from "path";
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
+import { CiFileOn } from "react-icons/ci";
 import { FaPrint, FaRegFile, FaShare } from "react-icons/fa";
 import { FaRegShareFromSquare } from "react-icons/fa6";
 import { HiXMark } from "react-icons/hi2";
 import { useReactToPrint } from "react-to-print";
 import { InvoiceItems } from "./InvoiceItems";
-import { CiFileOn } from "react-icons/ci";
-import { sendInvoiceEmail } from "@/actions/estimate/invoice/sendInvoiceEmail";
+import PDFComponent from "./PDFComponent";
 
 type Props = {};
 
@@ -58,7 +60,17 @@ const InvoiceComponent = ({
     content: () => componentRef.current,
   });
 
-  const handleDownload = () => {};
+  // const handleDownload = useCallback(async () => {
+  //   const blob = await pdf(
+  //     <PDFComponent
+  //       id={id}
+  //       invoice={invoice}
+  //       clientId={clientId}
+  //       vehicle={vehicle}
+  //     />,
+  //   ).toBlob();
+  //   FileSaver.saveAs(blob, `invoice-${id}.pdf`);
+  // }, [invoice, clientId, vehicle, id]);
 
   const handleEmail = () => {
     sendInvoiceEmail({ invoiceId: invoice.id });
@@ -85,13 +97,30 @@ const InvoiceComponent = ({
                   Print
                 </button>
 
-                <button
+                <button className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white">
+                  <PDFDownloadLink
+                    document={
+                      <PDFComponent
+                        id={id}
+                        invoice={invoice}
+                        clientId={clientId}
+                        vehicle={vehicle}
+                      />
+                    }
+                    fileName="Invoice.pdf"
+                  >
+                    {({ blob, url, loading, error }) =>
+                      loading ? "Loading PDF..." : "PDF"
+                    }
+                  </PDFDownloadLink>
+                </button>
+                {/* <button
                   className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
                   onClick={handleDownload}
                 >
                   <FaRegFile />
                   PDF
-                </button>
+                </button> */}
 
                 <button
                   className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"

@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 
 import InvoiceComponent from "./InvoiceComponent";
+import PDFComponent from "./PDFComponent";
 
 export default async function ViewEstimate({
   params: { id },
