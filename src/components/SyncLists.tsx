@@ -1,5 +1,6 @@
 "use client";
 
+import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { useListsStore } from "@/stores/lists";
 import type {
   Category,
@@ -47,6 +48,8 @@ export function SyncLists({
   paymentMethods?: PaymentMethod[];
   estimates?: Invoice[];
 }) {
+  const { reset } = useEstimateCreateStore();
+
   useEffect(() => {
     useListsStore.setState({
       customers,
@@ -78,5 +81,10 @@ export function SyncLists({
     paymentMethods,
     estimates,
   ]);
+
+  // Reset the estimate create store when the component mounts
+  useEffect(() => {
+    reset();
+  }, []);
   return null;
 }

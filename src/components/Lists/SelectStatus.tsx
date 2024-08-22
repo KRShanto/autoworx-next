@@ -26,20 +26,29 @@ type SelectedColor = { textColor: string; bgColor: string } | null;
 export function SelectStatus({
   name = "statusId",
   value = null,
-  setValue,
   open,
   setOpen,
 }: SelectProps<Status | null>) {
-  const state = useState(value);
-  const [status, setStatus] = setValue ? [value, setValue] : state;
+  const [status, setStatus] = useState<Status | null>(null);
   const statusList = useListsStore((x) => x.statuses);
-  // const [open, setOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
 
   useEffect(() => {
+    if (value) {
+      setStatus(value);
+    }
+  }, [value]);
+
+  useEffect(() => {
     if (status) {
       useListsStore.setState({ status });
+    }
+  }, [status]);
+
+  useEffect(() => {
+    if (statusList.length === 0) {
+      useListsStore.setState({ status: null });
     }
   }, [statusList]);
 

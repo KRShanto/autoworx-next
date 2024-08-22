@@ -97,11 +97,6 @@ export default async function Page({
         paymentMethods={paymentMethods}
       />
       <div>
-        {/* <ConvertButton
-          type={InvoiceType.Invoice}
-          text="Convert to Invoice"
-          icon={<GoFileCode />}
-        /> */}
         <ConvertButton
           type={InvoiceType.Estimate}
           text="Save as Estimate"
