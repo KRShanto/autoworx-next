@@ -1,5 +1,17 @@
 "use client";
 import {
+  Company,
+  Invoice,
+  InvoiceItem,
+  InvoicePhoto,
+  Labor,
+  Material,
+  Service,
+  Status,
+  User,
+  Vehicle,
+} from "@prisma/client";
+import {
   Document,
   Image,
   Page,
@@ -44,13 +56,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logo: {
-    width: 80,
-    height: 80,
-    backgroundColor: "#ccc",
-    textAlign: "center",
-    lineHeight: 80,
-    fontSize: 24,
-    color: "white",
+    // width: 80,
+    // height: 80,
   },
   textRight: {
     textAlign: "right",
@@ -102,28 +109,63 @@ const styles = StyleSheet.create({
     color: "#6571FF",
   },
   serviceDetails: {
-    marginTop: 5,
+    // marginTop: 5,
+  },
+  mainMaterial: {
+    color: "#6571FF",
+    fontSize: 10,
   },
   materialItem: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+    marginLeft: 5,
   },
   laborItem: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 5,
+    marginLeft: 5,
   },
 });
 
-const PDFComponent = ({ id, clientId, invoice, vehicle }) => {
+const PDFComponent = ({
+  id,
+  clientId,
+  invoice,
+  vehicle,
+}: {
+  id: string;
+  clientId: any;
+  invoice: Invoice & {
+    status: Status | null;
+    company: Company;
+    invoiceItems: (InvoiceItem & {
+      materials: Material[] | [];
+      service: Service | null;
+      invoice: Invoice | null;
+      labor: Labor | null;
+    })[];
+    photos: InvoicePhoto[];
+    user: User;
+  };
+  vehicle: Vehicle | null;
+}) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <View style={styles.logo}>
-            <Text>Logo</Text>
+            <Image
+              src="https://png.pngtree.com/png-vector/20220807/ourmid/pngtree-man-avatar-wearing-gray-suit-png-image_6102786.png"
+              style={{
+                width: 100,
+                height: 100,
+              }}
+              // @ts-ignore
+              alt="logo"
+            />
           </View>
           <View style={styles.textRight}>
             <Text style={styles.boldText}>Contact Information:</Text>
@@ -137,7 +179,9 @@ const PDFComponent = ({ id, clientId, invoice, vehicle }) => {
           <Text style={[styles.boldText, { fontSize: 20 }]}>Estimate</Text>
           <View style={styles.mainSection}>
             <View style={styles.section}>
-              <Text style={styles.boldText}>Estimate To:</Text>
+              <Text style={[styles.boldText, { marginBottom: 2 }]}>
+                Estimate To:
+              </Text>
               <Text style={styles.fontSize10}>
                 {clientId?.firstName} {clientId?.lastName}
               </Text>
@@ -145,7 +189,9 @@ const PDFComponent = ({ id, clientId, invoice, vehicle }) => {
               <Text style={styles.fontSize10}>{clientId?.email}</Text>
             </View>
             <View style={styles.section}>
-              <Text style={styles.boldText}>Vehicle Details:</Text>
+              <Text style={[styles.boldText, { marginBottom: 2 }]}>
+                Vehicle Details:
+              </Text>
               <Text style={styles.fontSize10}>{vehicle?.year}</Text>
               <Text style={styles.fontSize10}>{vehicle?.make}</Text>
               <Text style={styles.fontSize10}>{vehicle?.model}</Text>
@@ -153,7 +199,9 @@ const PDFComponent = ({ id, clientId, invoice, vehicle }) => {
               <Text style={styles.fontSize10}>{vehicle?.type}</Text>
             </View>
             <View style={styles.section}>
-              <Text style={styles.boldText}>Estimate Details:</Text>
+              <Text style={[styles.boldText, { marginBottom: 2 }]}>
+                Estimate Details:
+              </Text>
               <Text style={styles.fontSize10}>{invoice.id}</Text>
               <Text style={styles.fontSize10}>
                 {moment(invoice.createdAt).format("MMM DD, YYYY")}
@@ -169,9 +217,10 @@ const PDFComponent = ({ id, clientId, invoice, vehicle }) => {
                 ["grand total", invoice.grandTotal],
                 ["deposit", invoice.deposit],
                 ["due", invoice.due],
-              ].map(([key, value]) => (
-                <View key={key} style={styles.total}>
-                  <Text style={styles.totalLabel}>{key}</Text>
+              ].map(([field, value], ind) => (
+                <View key={ind} style={styles.total}>
+                  {/* @ts-ignore */}
+                  <Text style={styles.totalLabel}>{field || ""}</Text>
                   <Text style={styles.totalValue}>
                     ${parseFloat("" + value)?.toFixed(2)}
                   </Text>
@@ -181,9 +230,6 @@ const PDFComponent = ({ id, clientId, invoice, vehicle }) => {
           </View>
         </View>
 
-        <PDFInvoiceItems items={invoice.invoiceItems} />
-        <PDFInvoiceItems items={invoice.invoiceItems} />
-        <PDFInvoiceItems items={invoice.invoiceItems} />
         <PDFInvoiceItems items={invoice.invoiceItems} />
 
         <View style={styles.terms}>
@@ -204,7 +250,16 @@ const PDFComponent = ({ id, clientId, invoice, vehicle }) => {
   );
 };
 
-const PDFInvoiceItems = ({ items }) => {
+const PDFInvoiceItems = ({
+  items,
+}: {
+  items: (InvoiceItem & {
+    materials: Material[] | [];
+    service: Service | null;
+    invoice: Invoice | null;
+    labor: Labor | null;
+  })[];
+}) => {
   return items.map((item) => {
     if (!item.service) return null;
 
@@ -212,18 +267,24 @@ const PDFInvoiceItems = ({ items }) => {
       return (
         acc +
         (material && material.sell
-          ? parseFloat(material.sell.toString()) * material.quantity -
-            parseFloat(material.discount?.toString() || 0)
+          ? parseFloat(material.sell.toString()) * (material.quantity ?? 0) -
+            parseFloat(material.discount ? material.discount.toString() : "0")
           : 0)
       );
     }, 0);
 
     const laborCost = item.labor?.charge
-      ? parseFloat(item.labor?.charge.toString()) * item.labor.hours
+      ? parseFloat(item.labor?.charge.toString()) * (item.labor.hours ?? 0)
       : 0;
 
     return (
-      <View key={item.id} style={styles.container}>
+      <View
+        key={item.id}
+        style={{
+          ...styles.container,
+          ...styles.mainMaterial,
+        }}
+      >
         <View style={styles.header}>
           <Text>{item.service.name}</Text>
           <Text>${(materialCost + laborCost).toFixed(2)}</Text>
@@ -240,8 +301,12 @@ const PDFInvoiceItems = ({ items }) => {
                   $
                   {(
                     (material.sell
-                      ? parseFloat(material.sell.toString()) * material.quantity
-                      : 0) - parseFloat(material.discount?.toString() || 0)
+                      ? parseFloat(material.sell.toString()) *
+                        (material.quantity ?? 0)
+                      : 0) -
+                    parseFloat(
+                      material.discount ? material.discount.toString() : "0",
+                    )
                   ).toFixed(2)}
                 </Text>
               </View>

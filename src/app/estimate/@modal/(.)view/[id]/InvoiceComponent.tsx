@@ -13,6 +13,9 @@ import {
   Invoice,
   InvoiceItem,
   InvoicePhoto,
+  Labor,
+  Material,
+  Service,
   Status,
   User,
   Vehicle,
@@ -20,7 +23,7 @@ import {
 import { MdOutlineFileDownload } from "react-icons/md";
 
 import { sendInvoiceEmail } from "@/actions/estimate/invoice/sendInvoiceEmail";
-import { pdf, PDFDownloadLink } from "@react-pdf/renderer";
+import { pdf, PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
@@ -48,7 +51,12 @@ const InvoiceComponent = ({
   invoice: Invoice & {
     status: Status | null;
     company: Company;
-    invoiceItems: InvoiceItem[];
+    invoiceItems: (InvoiceItem & {
+      materials: Material[] | [];
+      service: Service | null;
+      invoice: Invoice | null;
+      labor: Labor | null;
+    })[];
     photos: InvoicePhoto[];
     user: User;
   };
@@ -59,18 +67,6 @@ const InvoiceComponent = ({
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
-
-  // const handleDownload = useCallback(async () => {
-  //   const blob = await pdf(
-  //     <PDFComponent
-  //       id={id}
-  //       invoice={invoice}
-  //       clientId={clientId}
-  //       vehicle={vehicle}
-  //     />,
-  //   ).toBlob();
-  //   FileSaver.saveAs(blob, `invoice-${id}.pdf`);
-  // }, [invoice, clientId, vehicle, id]);
 
   const handleEmail = () => {
     sendInvoiceEmail({ invoiceId: invoice.id });
@@ -255,6 +251,14 @@ const InvoiceComponent = ({
             </div>
             <p>Thank you for shopping with Autoworx</p>
           </div>
+          {/* <PDFViewer width="100%" height="600">
+            <PDFComponent
+              id={id}
+              invoice={invoice}
+              clientId={clientId}
+              vehicle={vehicle}
+            />
+          </PDFViewer> */}
           <div className="flex h-[90vh] w-[394px] shrink grow-0 flex-col gap-4 print:hidden">
             <div className="#shadow-lg grid flex-1 grid-cols-1 gap-4 overflow-y-auto border bg-background p-6">
               <h2 className="col-span-full text-3xl font-bold uppercase text-slate-500">
