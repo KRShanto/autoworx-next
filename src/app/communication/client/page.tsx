@@ -1,3 +1,5 @@
+import { getCompanyId } from "@/lib/companyId";
+import { db } from "@/lib/db";
 import crypto from "crypto";
 import { google } from "googleapis";
 import { cookies } from "next/headers";
@@ -23,13 +25,24 @@ function generateAuthURL() {
   return authorizationUrl;
 }
 
-const Page = (props: Props) => {
+const Page = async (props: Props) => {
   const cookieStore = cookies();
   const hasCookie = cookieStore.has("gmail_refresh_token");
   if (!hasCookie) {
     redirect(generateAuthURL());
   }
-  return <div>page</div>;
+  const companyId = await getCompanyId();
+  const clients = await db.client.findMany({
+    where: { companyId },
+    include: { tag: true, source: true },
+  });
+  console.log("🚀 ~ Page ~ clients:", clients);
+
+  if (clients.length === 0) {
+    return <div>No Clients</div>;
+  } else {
+    redirect(`/communication/client/${clients[0].id}`);
+  }
 };
 
 export default Page;

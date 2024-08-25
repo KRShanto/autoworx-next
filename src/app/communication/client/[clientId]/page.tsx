@@ -130,17 +130,17 @@ function decodeEmails(message: EmailMessage): string {
 export default function Page({
   params,
 }: {
-  params: { email: string };
+  params: { clientId: string };
 }): JSX.Element {
   const [conversations, setConversations] = useState<DecodedEmail[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [base64Data, setBase64Data] = useState("");
   const router = useRouter();
-  async function getEmails(email: string) {
+  async function getEmails(clientId: string) {
     try {
       setLoading(true);
       const res = await fetch(
-        `/api/communication/client?email=${decodeURIComponent(email)}`,
+        `/api/communication/client?clientId=${decodeURIComponent(clientId)}`,
       );
 
       const data: EmailData[] = await res.json();
@@ -161,7 +161,7 @@ export default function Page({
   }
 
   useEffect(() => {
-    getEmails(params.email);
+    getEmails(params.clientId);
   }, [params]);
 
   return (
@@ -172,7 +172,7 @@ export default function Page({
         <List id={1} />
         <MessageBox
           conversations={conversations}
-          email={decodeURIComponent(params.email)}
+          email={decodeURIComponent(params.clientId)}
           loading={loading}
           base64Data={base64Data}
           setBase64Data={setBase64Data}

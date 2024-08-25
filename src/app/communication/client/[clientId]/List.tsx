@@ -1,10 +1,21 @@
 import { cn } from "@/lib/cn";
+import { getCompanyId } from "@/lib/companyId";
+import { db } from "@/lib/db";
 import { tempClients } from "@/lib/tempClients";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { getClients } from "../actions/actions";
 
 // TODO: use layout for this component
 export default function List({ id }: { id: number }) {
+  const [clients, setClients] = useState<any[]>([]);
+  useEffect(() => {
+    getClients().then((data) => {
+      setClients(data);
+    });
+  }, []);
+
   return (
     <div className="app-shadow h-[83vh] w-[20%] rounded-lg border border-emerald-600 bg-white p-3">
       {/* Header */}
@@ -21,7 +32,7 @@ export default function List({ id }: { id: number }) {
 
       {/* List */}
       <div className="mt-2 flex h-[87%] flex-col gap-2 overflow-y-auto max-[1835px]:h-[82%]">
-        {tempClients.map((user: any) => {
+        {clients?.map((user: any) => {
           const selected = id == user.id;
 
           return (
@@ -34,8 +45,8 @@ export default function List({ id }: { id: number }) {
               href={`/communication/client/${user.id}`}
             >
               <Image
-                src={user.image}
-                alt={user.name}
+                src={user.photo}
+                alt={user.firstName + " " + user.lastName}
                 width={60}
                 height={60}
                 className="rounded-full max-[1400px]:h-[40px] max-[1400px]:w-[40px]"
@@ -47,7 +58,7 @@ export default function List({ id }: { id: number }) {
                     selected ? "text-white" : "text-[#797979]",
                   )}
                 >
-                  {user.name}
+                  {user.firstName} {user.lastName}
                 </p>
                 <p
                   className={cn(

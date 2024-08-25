@@ -1,4 +1,6 @@
 "use server";
+import { getCompanyId } from "@/lib/companyId";
+import { db } from "@/lib/db";
 import { google } from "googleapis";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -18,4 +20,13 @@ export async function getToken(code: string) {
     }
   } catch (error) {}
   redirect("/communication/client");
+}
+
+export async function getClients() {
+  const companyId = await getCompanyId();
+  const clients = await db.client.findMany({
+    where: { companyId },
+    include: { tag: true, source: true },
+  });
+  return clients;
 }

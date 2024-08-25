@@ -1,3 +1,4 @@
+import { db } from "@/lib/db";
 import fs from "fs";
 import { google } from "googleapis";
 import { cookies } from "next/headers";
@@ -11,16 +12,26 @@ const pump = promisify(pipeline);
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const emailAddress = url.searchParams.get("email");
+    const ClientId = url.searchParams.get("clientId");
 
-    if (!emailAddress) {
+    if (!ClientId) {
       return new Response(
-        JSON.stringify({ error: "Email query parameter is required" }),
+        JSON.stringify({ error: "Client Id query parameter is required" }),
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
         },
       );
+    }
+    const client = await db.client.findFirst({
+      where: { id: parseInt(ClientId) },
+    });
+
+    if (!client) {
+      return new Response(JSON.stringify({ error: "Client not found" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const clientId = process.env.GMAIL_CLIENT_ID;
@@ -36,7 +47,7 @@ export async function GET(request: NextRequest) {
     // Fetch emails sent from or received by the provided email address
     const res = await gmail.users.messages.list({
       userId: "me",
-      q: `from:${emailAddress} OR to:${emailAddress}`,
+      q: `from:${client.email} OR to:${client.email}`,
       maxResults: 100,
     });
 
