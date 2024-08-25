@@ -28,7 +28,6 @@ export default function DraggableDayTooltip({
   };
 }) {
   const { open } = usePopupStore();
-
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'task',
     collect: (monitor) => ({

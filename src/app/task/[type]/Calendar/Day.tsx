@@ -33,6 +33,10 @@ import {
   updateTimeSpace,
 } from "@/utils/taskAndActivity";
 import { any } from "zod";
+import { ResizableBox } from "react-resizable";
+import "react-resizable/css/styles.css";
+import ResizeTaskTooltip from "./draggable/ResizeTaskTooltip";
+import zIndex from "@mui/material/styles/zIndex";
 
 function useDate() {
   const searchParams = useSearchParams();
@@ -79,13 +83,14 @@ export default function Day({
   );
 
   const date = useDate();
-
+  // TODO:
+  const [boxHeight, setBoxHeight] = useState(200);
   const { open } = usePopupStore();
   const is1300 = useMediaQuery({ query: "(max-width: 1300px)" });
   const [draggedOverRow, setDraggedOverRow] = useState<number | null>(null);
   const parentRef = useRef<HTMLDivElement>(null);
   const [isRefAvailable, setIsRefAvailable] = useState<boolean>(false);
-
+  const [isActiveResize, setIsActiveResize] = useState(false);
   const [{ canDrop, isOver }, dropRef] = useDrop({
     accept: ["tag", "task", "appointment"],
     collect: (monitor) => ({
@@ -177,6 +182,7 @@ export default function Day({
           oldTask?.endTime as string,
           rows[rowIndex],
         );
+        console.log({ newStartTime, newEndTime });
         if (oldTask) {
           await updateTask({
             id: oldTask.id,
@@ -368,7 +374,8 @@ export default function Day({
           }
         });
         const diffByMinutes = eventEndTime.diff(eventStartTime, "minutes");
-        const height = `${(diffByMinutes / 60) * 75}px`; // 75 is the height of one task
+
+        const height = Math.round((diffByMinutes / 60) * 75); // 75 is the height of one task
         // If there are more than one task in the same row
         // then move the task right
         // If there are more than two tasks in the same row
@@ -390,104 +397,114 @@ export default function Day({
         };
 
         // Define the maximum title length based on the height
-        const maxTitleLength =
-          height === "45px" ? 60 : height === "90px" ? 120 : event.title.length;
+        // const maxTitleLength =
+        //   height === "45px" ? 60 : height === "90px" ? 120 : event.title.length;
         if (!isRefAvailable) return null;
         return (
           <Tooltip key={event.id}>
-            <DraggableTaskTooltip
-              //@ts-ignore
-              className={`absolute top-0 z-10 rounded-lg border-2 px-2 py-1 text-[17px] ${event.type === "appointment" ? "overflow-y-auto text-gray-600" : "text-white"} hover:z-20`}
+            <ResizeTaskTooltip
+              task={event}
+              height={height}
               style={{
+                position: "absolute",
                 left: calculateLeftPosition(taskIndex, tasksInRow.length),
                 top,
-                height,
                 backgroundColor,
-                maxWidth: width,
-                minWidth: width,
-              }}
-              task={event}
-              updateTaskData={{ event, companyUsers }}
-              updateAppointmentData={{
-                appointment: appointmentsFull.find(
-                  (appointment) => appointment.id === event.id,
-                ),
-                employees: companyUsers,
-                customers,
-                vehicles,
-                templates,
-                settings,
+                borderRadius: "10px",
               }}
             >
-              {
-                <>
-                  {event.type === "appointment" ? (
-                    <div className="flex h-full flex-col items-start text-xs">
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-sm font-semibold">
-                            {event.title}
-                          </h3>
+              <DraggableTaskTooltip
+                //@ts-ignore
+                className={`rounded-lg border-2 px-2 py-1 text-[17px] ${event.type === "appointment" ? "overflow-y-auto text-gray-600" : "text-white"} hover:z-20`}
+                style={{
+                  height: `${height}px`,
+                  maxWidth: width,
+                  minWidth: width,
+                }}
+                task={event}
+                updateTaskData={{ event, companyUsers }}
+                updateAppointmentData={{
+                  appointment: appointmentsFull.find(
+                    (appointment) => appointment.id === event.id,
+                  ),
+                  employees: companyUsers,
+                  customers,
+                  vehicles,
+                  templates,
+                  settings,
+                }}
+              >
+                {
+                  <>
+                    {event.type === "appointment" ? (
+                      <div className="flex h-full flex-col items-start text-xs">
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-semibold">
+                              {event.title}
+                            </h3>
+                          </div>
+                          <p className="text-left">
+                            Client:{" "}
+                            {event.client &&
+                              `${event.client.firstName} ${event.client.lastName}`}
+                          </p>
+                          <p className="text-left">
+                            Assigned To:{" "}
+                            {event.assignedUsers
+                              .slice(0, 1)
+                              .map(
+                                (user: User) =>
+                                  `${user.firstName} ${user.lastName}`,
+                              )}
+                          </p>
+                          <p className="text-left">
+                            {moment(event.startTime, "HH:mm").format("hh:mm A")}{" "}
+                            To{" "}
+                            {moment(event.endTime, "HH:mm").format("hh:mm A")}
+                          </p>
+                          <p className="text-left">
+                            Draft Estimate: {event.draftEstimate}
+                          </p>
                         </div>
-                        <p className="text-left">
-                          Client:{" "}
-                          {event.client &&
-                            `${event.client.firstName} ${event.client.lastName}`}
-                        </p>
-                        <p className="text-left">
-                          Assigned To:{" "}
-                          {event.assignedUsers
-                            .slice(0, 1)
-                            .map(
-                              (user: User) =>
-                                `${user.firstName} ${user.lastName}`,
-                            )}
-                        </p>
-                        <p className="text-left">
-                          {moment(event.startTime, "HH:mm").format("hh:mm A")}{" "}
-                          To {moment(event.endTime, "HH:mm").format("hh:mm A")}
-                        </p>
-                        <p className="text-left">
-                          Draft Estimate: {event.draftEstimate}
-                        </p>
+                        <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 rounded-lg border bg-[#6571FF]"></div>
                       </div>
-                      <div className="absolute inset-y-1 right-0 h-[calc(100%-0.5rem)] w-1.5 rounded-lg border bg-[#6571FF]"></div>
-                    </div>
-                  ) : (
-                    <div className="flex h-full justify-start">
+                    ) : (
+                      <div className="flex h-full justify-start">
+                        <h3 className="font-semibold">{event.title}</h3>
+                      </div>
+                    )}
+                  </>
+                }
+              </DraggableTaskTooltip>
+              {event.type !== "appointment" && (
+                <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
+                  <div>
+                    <div className="flex items-center justify-between">
                       <h3 className="font-semibold">{event.title}</h3>
+                      <button
+                        type="button"
+                        className="text- rounded-full bg-[#6571FF] p-2 text-white"
+                        onClick={() =>
+                          open("UPDATE_TASK", {
+                            task: event,
+                            companyUsers,
+                          })
+                        }
+                      >
+                        <FaPen className="mx-auto text-[10px]" />
+                      </button>
                     </div>
-                  )}
-                </>
-              }
-            </DraggableTaskTooltip>
-            {event.type !== "appointment" && (
-              <TooltipContent className="w-72 rounded-md border border-slate-400 bg-white p-3">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold">{event.title}</h3>
-                    <button
-                      type="button"
-                      className="text- rounded-full bg-[#6571FF] p-2 text-white"
-                      onClick={() =>
-                        open("UPDATE_TASK", {
-                          task: event,
-                          companyUsers,
-                        })
-                      }
-                    >
-                      <FaPen className="mx-auto text-[10px]" />
-                    </button>
+
+                    {/* @ts-ignore */}
+                    <p className="mt-3">{event.description}</p>
+
+                    {/* @ts-ignore */}
+                    <p className="mt-3">Task Priority: {event.priority}</p>
                   </div>
-
-                  {/* @ts-ignore */}
-                  <p className="mt-3">{event.description}</p>
-
-                  {/* @ts-ignore */}
-                  <p className="mt-3">Task Priority: {event.priority}</p>
-                </div>
-              </TooltipContent>
-            )}
+                </TooltipContent>
+              )}
+            </ResizeTaskTooltip>
           </Tooltip>
         );
       })}
