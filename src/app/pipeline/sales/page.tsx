@@ -1,17 +1,12 @@
+"use client";
 
-
-import React from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import React, { useState } from "react";
 import Header from "../components/Header";
 import WorkOrders from "../components/WorkOrders";
 import Pipelines from "../components/Pipelines";
 
-type Props = {
-  searchParams?: { view?: string };
-};
-
+// Sample data
 const newLeads = [{ name: "Al Noman", email: "noman@me.com", phone: "123456" }];
-
 const leadsGenerated = Array(5).fill({
   name: "ali nur",
   email: "xyz@gmail.com",
@@ -31,27 +26,65 @@ const salesData = [
   { title: "Converted", leads: converted },
 ];
 
-const salesColumn=[
-  {id:"1",name:"New Leads"},
-  {id:"2",name:"Leads Generated"},
-  {id:"3",name:"Follow-up"},
-  {id:"4",name:"Estimates Created"},
-  {id:"5",name:"Archived"},
-  {id:"6",name:"Converted"},
-]
-const Page = (props: Props) => {
-  const activeView = props.searchParams?.view || "workOrders";
 
-  
+
+type Props = {
+  searchParams?: { view?: string };
+};
+
+interface Lead{
+  name: string;
+  email: string;
+  phone: string;
+}
+
+interface PipelineData{
+  title: string;
+  leads: Lead[];
+}
+
+interface Column{
+  id: string;
+  title: string;
+}
+const Page = (props: Props) => {
+ 
+  const activeView = props.searchParams?.view|| "workOrders";
+
+  const salesColumns=[
+    { id: "1", title: "New Leads" },
+    { id: "2", title: "Leads Generated" },
+    { id: "3", title: "Follow-up" },
+    { id: "4", title: "Estimates Created" },
+    { id: "5", title: "Archived" },
+    { id: "6", title: "Converted" },
+  ];
+
+  const [pipelineColumns, setPipelineColumns] = useState<Column[]>(salesColumns);
+  const [salesPipelineData, setSalesPipelineData] = useState<PipelineData[]>(salesData);
+
+  const handleColumnsUpdate = ({ columns, updatedPipelineData }: { columns: Column[], updatedPipelineData: PipelineData[] }) => {
+    setPipelineColumns(columns);
+    setSalesPipelineData(updatedPipelineData);
+  };
   const type = "Sales Pipelines";
+  console.log("data on parent page after added or deleted managed pipeline",salesPipelineData);
+  console.log("columns updated after managed pipeline on parent page",pipelineColumns);
   return (
     <div className="space-y-8">
       <Header
-        
         activeView={activeView}
-        pipelinesTitle={type} salesColumn={salesColumn }
+        pipelinesTitle={type}
+        columns={pipelineColumns}
+        onColumnsUpdate={handleColumnsUpdate}
+        pipelineData={salesPipelineData}
       />
-      {activeView === "pipelines" ? <Pipelines pipelinesTitle={type} salesData={salesData }/> : <WorkOrders />}
+      
+      {activeView === "pipelines" ? (
+        <Pipelines pipelinesTitle={type} columns={pipelineColumns} pipelinesData={salesPipelineData} />
+      ) : (
+        <WorkOrders />
+      )}
     </div>
   );
 };

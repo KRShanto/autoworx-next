@@ -7,27 +7,13 @@ import FilterBySelection from "../../reporting/components/filter/FilterBySelecti
 import Filter from "./Filter";
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
+import { useServerGet } from "@/hooks/useServerGet";
+import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
 
 type Props = {};
 
-const WorkOrders = async (props: Props) => {
-  const companyId = await getCompanyId();
-  const invoices = await db.invoice.findMany({
-    where: {
-      companyId,
-    },
-    include: {
-      client: true,
-      vehicle: true,
-      invoiceItems: {
-        include: {
-          service: {
-            include: {},
-          },
-        },
-      },
-    },
-  });
+const WorkOrders =  (props: Props) => {
+  const {data: invoices,} = useServerGet(getWorkOrders);
 
   return (
     <div className="space-y-8">
@@ -63,7 +49,7 @@ const WorkOrders = async (props: Props) => {
           </thead>
 
           <tbody>
-            {invoices.map((invoice, index) => {
+            {invoices && invoices.map((invoice, index) => {
               const id = invoice.id;
               const client =
                 invoice.client?.firstName + " " + invoice.client?.lastName;

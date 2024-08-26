@@ -1,8 +1,9 @@
-import React from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+"use client"
+import React, { useState } from "react";
 import Header from "../components/Header";
 import WorkOrders from "../components/WorkOrders";
 import Pipelines from "../components/Pipelines";
+
 
 const completed = Array(5).fill({
   name: "Shanto",
@@ -24,12 +25,12 @@ const shopData = [
   { title: "Optional2", leads: optional2 },
 ];
 const shopColumn = [
-  { id: "1", name: "Pending" },
-  { id: "2", name: "Completed" },
-  { id: "3", name: "Cancelled" },
-  { id: "4", name: "Re-Dos" },
-  { id: "5", name: "Optional1" },
-  { id: "6", name: "Optional2" },
+  { id: "1", title: "Pending" },
+  { id: "2", title: "Completed" },
+  { id: "3", title: "Cancelled" },
+  { id: "4", title: "Re-Dos" },
+  { id: "5", title: "Optional1" },
+  { id: "6", title: "Optional2" },
 ];
 type Props = {
   searchParams?: { view?: string };
@@ -37,16 +38,26 @@ type Props = {
 
 const Page = (props: Props) => {
   const activeView = props.searchParams?.view || "workOrders";
+  const [pipelineColumns, setPipelineColumns] = useState(shopColumn);
+  const [shopPipelineData, setshopPipelineData] = useState(shopData);
+  const handleColumnsUpdate = ({ columns, updatedPipelineData }: { columns: { id: string; title: string }[], updatedPipelineData: any[] }) => {
+    setPipelineColumns(columns);
+    setshopPipelineData(updatedPipelineData);
+  };
   const type = "Shop Pipelines";
+
   return (
     <div className="space-y-8">
       <Header
         activeView={activeView}
         pipelinesTitle={type}
-        shopColumn={shopColumn}
+        columns={pipelineColumns}
+        onColumnsUpdate={handleColumnsUpdate}
+        pipelineData={shopPipelineData}
+
       />
       {activeView === "pipelines" ? (
-        <Pipelines pipelinesTitle={type} shopData={shopData} />
+        <Pipelines pipelinesTitle={type} pipelinesData={shopPipelineData} columns={pipelineColumns} />
       ) : (
         <WorkOrders />
       )}

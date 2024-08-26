@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { User } from "@prisma/client";
-import React, { SetStateAction, useState } from "react";
+import React, { SetStateAction, useEffect, useState } from "react";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { PiWechatLogoLight } from "react-icons/pi";
 import { CiCalendar } from "react-icons/ci";
@@ -60,24 +60,27 @@ interface Employee {
   firstName: string;
   lastName: string;
 }
+interface Lead {
+  name: string;
+  email: string;
+  phone: string;
+}
+interface PipelineData {
+  title: string;
+  leads:Lead[];
+}
 interface pipelinesProps {
   pipelinesTitle: string;
-  salesData?: {
-    title: string;
-    leads: { name: string; email: string; phone: string }[];
-  }[];
-  shopData?: {
-    title: string;
-    leads: { name: string; email: string; phone: string }[];
-  }[];
+  pipelinesData: PipelineData[];
+  columns?: {id:string,title:string}[];
 }
 
 const users: User[] = [];
 
 export default function Pipelines({
   pipelinesTitle: pipelineType,
-  salesData,
-  shopData,
+  pipelinesData,
+  columns,
 }: pipelinesProps) {
   const [selectedEmployees, setSelectedEmployees] = useState<{
     [key: string]: Employee | null;
@@ -104,8 +107,8 @@ export default function Pipelines({
   const [openServiceDropdown, setOpenServiceDropdown] = useState<{
     [key: string]: boolean;
   }>({});
-  const initialData = pipelineType === "Sales Pipelines" ? salesData : shopData;
-  const [pipelineData, setPipelineData] = useState(initialData || []);
+
+  const [pipelineData, setPipelineData] = useState(pipelinesData || []);
   const handleDropdownToggle = (categoryIndex: number, leadIndex: number) => {
     if (
       openDropdownIndex?.category === categoryIndex &&
@@ -233,31 +236,41 @@ export default function Pipelines({
     setPipelineData(updatedData);
   };
 
+  //filtering based on managed pipelines new data
+  useEffect(()=>{
+      setPipelineData(pipelinesData);
+  },[columns,pipelineData]);
+
+  const filteredPipelineData = pipelineData.filter((_, index) =>
+    columns?.some((column) => column.id === `${index+1}`)
+  );
+console.log("managed columns on pipeline",columns)
+console.log("managed data on pipeline",filteredPipelineData);
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <div className="h-full overflow-hidden">
         <div className="flex justify-between">
-          {pipelineData.map((item, categoryIndex) => (
+          {filteredPipelineData.map((item, categoryIndex) => (
             <Droppable droppableId={`${categoryIndex}`} key={categoryIndex}>
               {(provided) => (
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  className="w-[16%] rounded-md border"
+                  className="flex-1 w-full rounded-md border mx-2"
                   style={{
                     backgroundColor: "rgba(101, 113, 255, 0.15)",
                     padding: "0",
                   }}
                 >
                   <h2 className="rounded-lg bg-[#6571FF] px-4 py-3 text-center text-white">
-                    <p className="text-base font-bold">{item.title}</p>
+                    <p className="text-base font-bold">{columns?.[categoryIndex]?.title||""}</p>
                   </h2>
 
                   <ul
                     className="mt-3 flex flex-col gap-1 overflow-auto p-1"
                     style={{ maxHeight: "70vh" }}
                   >
-                    {item.leads.map((lead, leadIndex) => {
+                    {item.leads.map((lead,leadIndex) => {
                       const key = `${categoryIndex}-${leadIndex}`;
                       const selectedEmployee = selectedEmployees[key];
                       const isDropdownOpen =

@@ -1,34 +1,71 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ManagePipelines from "./ManagePipelines";
 import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   activeView: string;
-  // onToggleView: (view: string) => void;
-  pipelinesTitle:string;
-  [key:string]:any;
+  pipelinesTitle: string;
+  onColumnsUpdate: (data: {
+    columns: Column[];
+    updatedPipelineData: PipelineData[];
+  }) => void;
+  columns: Column[];
+  pipelineData: PipelineData[];
+
+  [key: string]: any;
+}
+interface Column {
+  id: string;
+  title: string;
+}
+interface Lead {
+  name: string;
+  email: string;
+  phone: string;
+}
+interface PipelineData {
+  title: string;
+  leads: Lead[];
 }
 
-
-
-export default function Header({ 
+export default function Header({
   activeView,
-  //  onToggleView ,
-   pipelinesTitle,
-   ...restProps
-
+  pipelinesTitle,
+  onColumnsUpdate,
+  columns,
+  pipelineData,
+  ...restProps
 }: HeaderProps) {
   const router = useRouter();
-  const{salesColumn,shopColumn}=restProps;
-  const initialColumns= pipelinesTitle==="Sales Pipelines"?salesColumn:shopColumn;
+  // const { salesData, shopData } = restProps;
 
-const [isPipelineManaged, setPipelineManaged] = useState(false);
-  const [columns, setColumns] = useState(initialColumns || []);
- const handleSaveColumns = (updatedColumns:{id:string,name:string}[]) => {
-    setColumns(updatedColumns);
+  const [isPipelineManaged, setPipelineManaged] = useState(false);
+  const [currentColumns, setCurrentColumns] = useState<Column[]>(columns);
+
+  const handleSaveColumns = (updatedColumns: Column[]) => {
+    setCurrentColumns(updatedColumns);
+
+    const updatedPipelineData = updatedColumns.map((col, index) => {
+      const existingData = pipelineData.find((data) => data.title === col.title);
+  
+      if (existingData) {
+        return existingData;
+      } else if (index > 0 && pipelineData[index - 1]) {
+        // Use the leads from the previous index if no existing data is found
+        return { title: col.title, leads: pipelineData[index - 1].leads };
+      } else {
+
+        return { title: col.title, leads: [] };
+      }
+    });
+    onColumnsUpdate({ columns: updatedColumns, updatedPipelineData });
   };
+
+  useEffect(() => {
+    setCurrentColumns(columns);
+  }, [columns]);
 
   const onToggleView = (view: string) => {
     router.push(`?view=${view}`);
@@ -56,7 +93,6 @@ const [isPipelineManaged, setPipelineManaged] = useState(false);
         </div>
       </div>
 
-    
       {activeView === "pipelines" && (
         <div>
           <button
@@ -72,7 +108,7 @@ const [isPipelineManaged, setPipelineManaged] = useState(false);
 
       {isPipelineManaged && (
         <ManagePipelines
-          columns={columns}
+          columns={currentColumns}
           onSave={handleSaveColumns}
           onClose={() => setPipelineManaged(false)}
         />
