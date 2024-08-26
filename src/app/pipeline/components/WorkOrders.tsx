@@ -10,6 +10,7 @@ import { db } from "@/lib/db";
 import { useServerGet } from "@/hooks/useServerGet";
 import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
 
+
 type Props = {};
 
 const WorkOrders =  (props: Props) => {
@@ -17,23 +18,7 @@ const WorkOrders =  (props: Props) => {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-x-8">
-          <div className="flex w-[500px] items-center gap-x-2 rounded-md border border-gray-300 px-4 py-1 text-gray-400">
-            <span className="">
-              <IoSearchOutline />
-            </span>
-            <input
-              name="search"
-              type="text"
-              className="w-full rounded-md px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Search"
-            />
-          </div>
-          {/* <DateRange onOk={(start, end) => {}} onCancel={() => {}} /> */}
-          <Filter />
-        </div>
-      </div>
+      <Filter/>
       <div>
         <table className="w-full shadow-md">
           <thead className="bg-white">
