@@ -55,18 +55,20 @@ export default function Day({
 
   rows.push(
     ...Array.from({ length: 24 }, (_, i) => {
-      if (i < 11) {
-        return `${i + 1} AM`; // 1 AM to 11 AM
-      } else if (i === 11) {
+      if (i === 0) {
+        return "12 AM";
+      } else if (i < 12) {
+        return `${i} AM`; // 1 AM to 11 AM
+      } else if (i === 12) {
         return "12 PM"; // Noon
-      } else if (i < 23) {
-        return `${i - 11} PM`; // 1 PM to 11 PM
+      } else if (i < 24) {
+        return `${i - 12} PM`; // 1 PM to 11 PM
       } else {
         return "12 AM"; // Midnight of the next day
       }
     }),
   );
-
+  console.log({ rows });
   const date = useDate();
   const parentRef = useRef<HTMLDivElement>(null);
   const [isRefAvailable, setIsRefAvailable] = useState<boolean>(false);
@@ -163,7 +165,6 @@ export default function Day({
           oldTask?.endTime as string,
           rows[rowIndex],
         );
-        console.log({ newStartTime, newEndTime });
         if (oldTask) {
           await updateTask({
             id: oldTask.id,
@@ -298,6 +299,7 @@ export default function Day({
         return (
           <DayTask
             key={event.id}
+            rowsLength={rows.length}
             totalTaskInRow={tasksInRow.length}
             calculateLeftPosition={calculateLeftPosition(
               taskIndex,

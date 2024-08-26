@@ -35,7 +35,7 @@ export default function DayRow({
       <div
         className={cn(
           "absolute -top-[37.5px] flex h-full w-[100px] items-center justify-center text-[19px]",
-          index === 0 && "-top-5 text-base",
+          index === 0 && "-top-6 text-base",
         )}
         style={{
           color:
@@ -44,7 +44,7 @@ export default function DayRow({
               : "#d1d1e0",
         }}
       >
-        {row}
+        {index === 0 ? "GMT+00" : row}
       </div>
       <button
         type="button"

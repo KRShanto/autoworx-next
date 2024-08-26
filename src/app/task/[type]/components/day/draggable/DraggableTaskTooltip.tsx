@@ -29,7 +29,7 @@ export default function DraggableDayTooltip({
 }) {
   const { open } = usePopupStore();
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: 'task',
+    type: "task",
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
@@ -39,14 +39,8 @@ export default function DraggableDayTooltip({
   };
 
   const { event, companyUsers } = updateTaskData;
-  const {
-    appointment,
-    customers,
-    employees,
-    vehicles,
-    templates,
-    settings,
-  } = updateAppointmentData;
+  const { appointment, customers, employees, vehicles, templates, settings } =
+    updateAppointmentData;
 
   return (
     <TooltipTrigger

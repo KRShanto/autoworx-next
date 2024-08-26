@@ -14,6 +14,7 @@ import {
   Vehicle,
 } from "@prisma/client";
 import { TASK_COLOR } from "@/lib/consts";
+import { useEffect, useState } from "react";
 
 type TProps = {
   event: any;
@@ -26,6 +27,7 @@ type TProps = {
   settings: CalendarSettings;
   templates: EmailTemplate[];
   totalTaskInRow: number;
+  rowsLength: number;
 };
 
 export default function DayTask({
@@ -39,12 +41,27 @@ export default function DayTask({
   templates,
   settings,
   totalTaskInRow,
+  rowsLength,
 }: TProps) {
   const { open } = usePopupStore();
+  const [height, setHeight] = useState(0);
   const is1300 = useMediaQuery({ query: "(max-width: 1300px)" });
-  const startRowTime = moment("01:00", "HH:mm");
+  const startRowTime = moment("00:00", "HH:mm");
   const startEventTime = moment(event.startTime, "HH:mm");
   const diffRowAndEventTime = startEventTime.diff(startRowTime, "minutes");
+
+  useEffect(() => {
+    // Calculate how many tasks are in the same row
+    const eventStartTime = moment(event.startTime, "HH:mm");
+    const eventEndTime = moment(event.endTime, "HH:mm");
+
+    const diffByMinutes = eventEndTime.diff(eventStartTime, "minutes");
+    let height = Math.round((diffByMinutes / 60) * 75); // 75 is the height of one task
+    if (event.rowStartIndex > event.rowEndIndex) {
+      height = Math.round((rowsLength - event.rowStartIndex) * 75);
+    }
+    setHeight(height);
+  }, [event]);
   // const top = `${event.rowStartIndex * 75}px`;
   const top = `${Math.round((diffRowAndEventTime / 60) * 75)}px`;
   // const height = `${(event.rowEndIndex - event.rowStartIndex + 1) * 55
@@ -57,13 +74,6 @@ export default function DayTask({
       TASK_COLOR[event.priority]
     : "rgb(255, 255, 255)";
 
-  // Calculate how many tasks are in the same row
-  const eventStartTime = moment(event.startTime, "HH:mm");
-  const eventEndTime = moment(event.endTime, "HH:mm");
-
-  const diffByMinutes = eventEndTime.diff(eventStartTime, "minutes");
-
-  const height = Math.round((diffByMinutes / 60) * 75); // 75 is the height of one task
   // If there are more than one task in the same row
   // then move the task right
   // If there are more than two tasks in the same row
@@ -88,6 +98,7 @@ export default function DayTask({
   return (
     <Tooltip key={event.id}>
       <ResizeTaskTooltip
+        rowsLength={rowsLength}
         task={event}
         height={height}
         style={{
@@ -100,7 +111,7 @@ export default function DayTask({
       >
         <DraggableTaskTooltip
           //@ts-ignore
-          className={`rounded-lg border-2 px-2 py-1 text-[17px] ${event.type === "appointment" ? "overflow-y-auto text-gray-600" : "text-white"} hover:z-20`}
+          className={`rounded-md px-2 py-1 text-[17px] ${event.type === "appointment" ? "overflow-y-auto text-gray-600" : "text-white"} border-2`}
           style={{
             height: `${height}px`,
             maxWidth: width,
