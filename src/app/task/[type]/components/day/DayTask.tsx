@@ -42,7 +42,11 @@ export default function DayTask({
 }: TProps) {
   const { open } = usePopupStore();
   const is1300 = useMediaQuery({ query: "(max-width: 1300px)" });
-  const top = `${event.rowStartIndex * 75}px`;
+  const startRowTime = moment("01:00", "HH:mm");
+  const startEventTime = moment(event.startTime, "HH:mm");
+  const diffRowAndEventTime = startEventTime.diff(startRowTime, "minutes");
+  // const top = `${event.rowStartIndex * 75}px`;
+  const top = `${Math.round((diffRowAndEventTime / 60) * 75)}px`;
   // const height = `${(event.rowEndIndex - event.rowStartIndex + 1) * 55
   //   }px`;
   const widthNumber = is1300 ? 300 : 300;
@@ -73,9 +77,9 @@ export default function DayTask({
   }
 
   // Define a function to truncate the task title based on the height
-  const truncateTitle = (title: string, maxLength: number) => {
-    return title.length > maxLength ? `${title.slice(0, maxLength)}...` : title;
-  };
+  //   const truncateTitle = (title: string, maxLength: number) => {
+  //     return title.length > maxLength ? `${title.slice(0, maxLength)}...` : title;
+  //   };
 
   // Define the maximum title length based on the height
   // const maxTitleLength =

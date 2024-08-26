@@ -130,6 +130,8 @@ export default function Day({
         }),
     [tasks, appointments, date],
   );
+
+  // drop event handler
   async function handleDrop(event: React.DragEvent, rowIndex: number) {
     const startTime = formatTime(rows[rowIndex]);
     const endTime = formatTime(rows[rowIndex + 1]);
@@ -278,7 +280,7 @@ export default function Day({
       ))}
 
       {/* Tasks */}
-      {events.map((event, index) => {
+      {events.map((event) => {
         const eventStartTime = moment(event.startTime, "HH:mm");
         const eventEndTime = moment(event.endTime, "HH:mm");
         const tasksInRow = sortedEvents.filter((task) => {

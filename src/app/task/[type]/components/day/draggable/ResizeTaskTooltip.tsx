@@ -21,16 +21,25 @@ export default function ResizeTaskTooltip({
 }: TProps) {
   const [boxHeight, setBoxHeight] = useState(0);
   const [hovered, setHovered] = useState(false);
+
+  const [newEndTime, setNewEndTime] = useState("");
+
   const handleResizeStart = () => {
+    setNewEndTime(task.endTime);
     setHovered(true);
   };
   const handleResize = (event: any, { size }: any) => {
+    const heightConvertedMinutes = Math.round((size.height / 75) * 60);
+    const newEndTime = moment(`2024-07-06T${task.startTime}:00`)
+      .add(heightConvertedMinutes, "minutes")
+      .format("HH:mm");
+    setNewEndTime(newEndTime);
     setBoxHeight(size.height);
   };
+
   const handleResizeStop = async (event: any, { size }: any) => {
     setHovered(false);
     const heightConvertedMinutes = Math.round((size.height / 75) * 60);
-    console.log({ heightConvertedMinutes, height: size.height });
     const newEndTime = moment(`2024-07-06T${task.startTime}:00`)
       .add(heightConvertedMinutes, "minutes")
       .format("HH:mm");
@@ -50,12 +59,20 @@ export default function ResizeTaskTooltip({
       onResizeStop={handleResizeStop}
       width={width || 300} // Fixed width, or you can allow resizing horizontally as well
       axis="y" // Only allow vertical resizing
-      minConstraints={[300, 75]} // Minimum width and height
+      minConstraints={[300, 32]} // Minimum width and height
       resizeHandles={["s"]} // Resize handle at the bottom ('s' for south)
       onResize={handleResize}
       // style={{ backgroundColor: "red" }}
       handle={
-        <div className="absolute bottom-0 h-1.5 w-full cursor-s-resize rounded-lg text-center hover:z-50" />
+        <div className="absolute bottom-0 h-1.5 w-full cursor-s-resize rounded-lg text-center hover:z-50">
+          {hovered && (
+            <div className="absolute bottom-0 left-1/2 flex min-w-40 max-w-44 -translate-x-[50%] items-center justify-center space-x-2 rounded-tl-md rounded-tr-md bg-stone-200 p-0.5 text-sm">
+              <span>{moment(task.startTime, "HH:mm").format("h:mm A")}</span>
+              <span>-</span>
+              <span>{moment(newEndTime, "HH:mm").format("h:mm A")}</span>
+            </div>
+          )}
+        </div>
       }
     >
       {children}

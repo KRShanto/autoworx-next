@@ -1,10 +1,6 @@
-
 import { cn } from "@/lib/cn";
 import { usePopupStore } from "@/stores/popup";
-import {
-  formatDate,
-  formatTime
-} from "@/utils/taskAndActivity";
+import { formatDate, formatTime } from "@/utils/taskAndActivity";
 import { CalendarSettings, User } from "@prisma/client";
 import { useState } from "react";
 
@@ -25,21 +21,21 @@ export default function DayRow({
   companyUsers,
   onDrop,
 }: TProps) {
-    const [draggedOverRow, setDraggedOverRow] = useState<number | null>(null);
-    
-    const { open } = usePopupStore();
-    
-    const rowTime = formatTime(row);
-    
+  const [draggedOverRow, setDraggedOverRow] = useState<number | null>(null);
+
+  const { open } = usePopupStore();
+
+  const rowTime = formatTime(row);
+
   const dateRangeforBgChanger =
-        rowTime >= settings?.dayStart && rowTime <= settings?.dayEnd;
-    
+    rowTime >= settings?.dayStart && rowTime <= settings?.dayEnd;
+
   return (
     <div key={index} className="relative">
       <div
         className={cn(
           "absolute -top-[37.5px] flex h-full w-[100px] items-center justify-center text-[19px]",
-          index === 0 && "-top-5",
+          index === 0 && "-top-5 text-base",
         )}
         style={{
           color:
