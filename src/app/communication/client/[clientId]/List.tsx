@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { getClients } from "../actions/actions";
 
 // TODO: use layout for this component
-export default function List({ id }: { id: number }) {
+export default function List({ id }: { id: string }) {
   const [clients, setClients] = useState<any[]>([]);
   useEffect(() => {
     getClients().then((data) => {

@@ -30,7 +30,7 @@ const navList = [
     subnav: [
       {
         title: "Client",
-        link: "/communication/client/1",
+        link: "/communication/client",
       },
       {
         title: "Internal",

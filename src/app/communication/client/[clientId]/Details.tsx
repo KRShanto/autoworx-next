@@ -1,5 +1,6 @@
 import { tempClients } from "@/lib/tempClients";
 import Image from "next/image";
+import { useState } from "react";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import {
   FaArrowLeft,
@@ -58,9 +59,10 @@ export default function Details({
   conversations,
   base64Data,
   setBase64Data,
+  vehicles,
 }: any) {
   const user = tempClients.find((user: any) => user.id == id);
-
+  const [selectedVehicleIndex, setSelectedVehicleIndex] = useState(0);
   return (
     <div className="app-shadow h-[83vh] w-[40%] rounded-lg bg-white">
       {/* Client Heading */}
@@ -88,12 +90,34 @@ export default function Details({
         <div className="mr-2 h-[90%] space-y-4 rounded bg-[#63a6ac] p-4 text-white">
           <div className="flex items-center justify-between gap-x-8">
             <div>
-              <span className="mr-4 font-semibold">Vehicle 1</span>
-              <span className="">Year Make Model</span>
+              <span className="mr-4 font-semibold">
+                Vehicle {selectedVehicleIndex + 1}
+              </span>
+              <span className="">
+                {vehicles[selectedVehicleIndex]?.year}{" "}
+                {vehicles[selectedVehicleIndex]?.make}{" "}
+                {vehicles[selectedVehicleIndex]?.model}
+              </span>
             </div>
             <div className="flex items-center gap-2">
-              <FaArrowLeft />
-              <FaArrowRight />
+              <FaArrowLeft
+                onClick={() => {
+                  if (selectedVehicleIndex > 0) {
+                    setSelectedVehicleIndex(selectedVehicleIndex - 1);
+                  } else {
+                    setSelectedVehicleIndex(vehicles.length - 1);
+                  }
+                }}
+              />
+              <FaArrowRight
+                onClick={() => {
+                  if (selectedVehicleIndex < vehicles.length - 1) {
+                    setSelectedVehicleIndex(selectedVehicleIndex + 1);
+                  } else {
+                    setSelectedVehicleIndex(0);
+                  }
+                }}
+              />
             </div>
           </div>
           <div className="">
