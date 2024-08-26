@@ -26,7 +26,8 @@ export default function ResizeTaskTooltip({
     height: height || 75,
   });
   const [hovered, setHovered] = useState(false);
-  console.log({ height }, "resize height");
+
+  const [isHideResizeHandler, setIsHideResizeHandler] = useState(false);
 
   const [newEndTime, setNewEndTime] = useState("");
 
@@ -41,6 +42,18 @@ export default function ResizeTaskTooltip({
       setSize((prev) => ({ ...prev, height }));
     }
   }, [height]);
+
+
+  useEffect(() => {
+    if (task) {
+      if (task.rowStartIndex > task.rowEndIndex) {
+        setIsHideResizeHandler(true);
+      } else {
+        setIsHideResizeHandler(false);
+      }
+    }
+  }, [task]);
+
   const handleResize = (event: any, { size }: any) => {
     const heightConvertedMinutes = Math.round((size.height / 75) * 60);
     const newEndTime = moment(`2024-07-06T${task.startTime}:00`)
@@ -55,16 +68,13 @@ export default function ResizeTaskTooltip({
     }
     setNewEndTime(newEndTime);
   };
+
   const handleResizeStop = async (event: any, { size }: any) => {
     setHovered(false);
     const heightConvertedMinutes = Math.round((size.height / 75) * 60);
     const newEndTime = moment(`2024-07-06T${task.startTime}:00`)
       .add(heightConvertedMinutes, "minutes")
       .format("HH:mm");
-    // const lastRowsTime = moment("23:00", "HH:mm");
-    // const comparisonTime = moment(newEndTime, "HH:mm");
-    // console.log({ isOverHeight });
-    // const updatedDate = {};
     if (isOverHeight) {
       const eventStartTime = moment(task.startTime, "HH:mm");
       const eventEndTime = moment(task.endTime, "HH:mm");
@@ -79,13 +89,8 @@ export default function ResizeTaskTooltip({
         endTime: newEndTime,
       });
     }
-    // if (isAfterElevenFiftyNinePM(newEndTime.toString())) {
-    // }
-    // if (lastRowsTime.isBefore(comparisonTime)) {
-    // } else {
-
-    // }
   };
+  
   return (
     <ResizableBox
       {...props}
@@ -95,20 +100,22 @@ export default function ResizeTaskTooltip({
       onResizeStop={handleResizeStop}
       width={size.width} // Fixed width, or you can allow resizing horizontally as well
       axis="y" // Only allow vertical resizing
-      minConstraints={[300, 32]} // Minimum width and height
+      minConstraints={[300, 38]} // Minimum width and height
       resizeHandles={["s"]} // Resize handle at the bottom ('s' for south)
       onResize={handleResize}
       // style={{ backgroundColor: "red" }}
       handle={
-        <div className="absolute bottom-0 h-1.5 w-full cursor-s-resize rounded-lg text-center hover:z-50">
-          {hovered && (
-            <div className="absolute bottom-0 left-1/2 flex min-w-40 max-w-44 -translate-x-[50%] items-center justify-center space-x-2 rounded-tl-md rounded-tr-md bg-stone-200 p-0.5 text-sm">
-              <span>{moment(task.startTime, "HH:mm").format("h:mm A")}</span>
-              <span>-</span>
-              <span>{moment(newEndTime, "HH:mm").format("h:mm A")}</span>
-            </div>
-          )}
-        </div>
+        !isHideResizeHandler ? (
+          <div className="absolute bottom-0 h-1.5 w-full cursor-s-resize rounded-lg text-center hover:z-50">
+            {hovered && (
+              <div className="absolute bottom-0 left-1/2 flex min-w-40 max-w-44 -translate-x-[50%] items-center justify-center space-x-2 rounded-tl-md rounded-tr-md bg-stone-200 p-0.5 text-sm">
+                <span>{moment(task.startTime, "HH:mm").format("h:mm A")}</span>
+                <span>-</span>
+                <span>{moment(newEndTime, "HH:mm").format("h:mm A")}</span>
+              </div>
+            )}
+          </div>
+        ) : null
       }
     >
       {children}
