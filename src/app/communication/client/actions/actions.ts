@@ -35,6 +35,5 @@ export async function getVehicles(clientId: string) {
   const vehicles = await db.vehicle.findMany({
     where: { clientId: parseInt(clientId) },
   });
-  console.log("🚀 ~ getVehicles ~ vehicles:", vehicles);
   return vehicles;
 }

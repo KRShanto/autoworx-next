@@ -1,4 +1,5 @@
 import { tempClients } from "@/lib/tempClients";
+import { Vehicle } from "@prisma/client";
 import Image from "next/image";
 import { useState } from "react";
 import { AiOutlineCloseCircle } from "react-icons/ai";
@@ -57,10 +58,12 @@ function downloadAttachment(
 export default function Details({
   id,
   conversations,
-  base64Data,
-  setBase64Data,
   vehicles,
-}: any) {
+}: {
+  id: string;
+  conversations: any[];
+  vehicles: Vehicle[];
+}) {
   const user = tempClients.find((user: any) => user.id == id);
   const [selectedVehicleIndex, setSelectedVehicleIndex] = useState(0);
   return (
@@ -87,7 +90,7 @@ export default function Details({
             </div>
           </div>
         </div>
-        <div className="mr-2 h-[90%] space-y-4 rounded bg-[#63a6ac] p-4 text-white">
+        <div className="mr-2 h-[90%] space-y-4 rounded bg-[#63a6ac] p-4 text-sm text-white">
           <div className="flex items-center justify-between gap-x-8">
             <div>
               <span className="mr-4 font-semibold">

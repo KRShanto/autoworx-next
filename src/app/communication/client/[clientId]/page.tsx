@@ -191,8 +191,7 @@ export default function Page({
           id={params.clientId}
           conversations={conversations}
           vehicles={vehicles}
-          base64Data={base64Data}
-          setBase64Data={setBase64Data}
+
         />
       </div>
     </div>

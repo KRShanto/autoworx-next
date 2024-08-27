@@ -36,7 +36,6 @@ const Page = async (props: Props) => {
     where: { companyId },
     include: { tag: true, source: true },
   });
-  console.log("🚀 ~ Page ~ clients:", clients);
 
   if (clients.length === 0) {
     return <div>No Clients</div>;
