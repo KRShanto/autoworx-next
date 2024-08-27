@@ -31,7 +31,7 @@ export async function dragTask(task: any): Promise<ServerAction> {
 }
 
 export async function updateTask(task: any): Promise<ServerAction> {
-  await db.task.update({
+  const updatedData = await db.task.update({
     where: {
       id: task.id,
     },
