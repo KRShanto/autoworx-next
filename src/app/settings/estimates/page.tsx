@@ -2,7 +2,7 @@ import { SlimInput } from "@/components/SlimInput";
 
 export default function EstimateAndInvoicePage() {
   return (
-    <div className="grid w-full grid-cols-2 items-start gap-4 p-5">
+    <div className="grid w-full grid-cols-2 items-start gap-4 px-5">
       <div className="space-y-4">
         {/* Currency & Tax */}
         <div>

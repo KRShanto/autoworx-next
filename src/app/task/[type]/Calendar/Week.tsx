@@ -24,7 +24,7 @@ import { useDrop } from "react-dnd";
 import { FaPen } from "react-icons/fa6";
 import { assignAppointmentDate } from "../../../../actions/appointment/assignAppointmentDate";
 import { updateTask } from "../../../../actions/task/dragTask";
-import DraggableTaskTooltip from "./draggable/DraggableTaskTooltip";
+import DraggableTaskTooltip from "../components/day/draggable/DraggableTaskTooltip";
 import {
   formatDate,
   formatTime,
