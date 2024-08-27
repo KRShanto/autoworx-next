@@ -178,7 +178,7 @@ const PDFComponent = ({
         <View style={styles.section}>
           <Text style={[styles.boldText, { fontSize: 20 }]}>Estimate</Text>
           <View style={styles.mainSection}>
-            <View style={styles.section}>
+            <View style={{marginTop:20}}>
               <Text style={[styles.boldText, { marginBottom: 2 }]}>
                 Estimate To:
               </Text>

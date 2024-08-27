@@ -12,7 +12,7 @@ function generateAuthURL() {
   const oauth2Client = new google.auth.OAuth2(
     process.env.GMAIL_CLIENT_ID,
     process.env.GMAIL_CLIENT_SECRET,
-    `${process.env.FRONTEND_URL}/communication/client/auth`,
+    `${process.env.NEXT_PUBLIC_APP_URL}communication/client/auth`,
   );
   const scopes = ["https://www.googleapis.com/auth/gmail.readonly"];
   const state = crypto.randomBytes(32).toString("hex");
