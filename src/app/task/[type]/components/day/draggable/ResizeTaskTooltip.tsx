@@ -43,7 +43,6 @@ export default function ResizeTaskTooltip({
     }
   }, [height]);
 
-
   useEffect(() => {
     if (task) {
       if (task.rowStartIndex > task.rowEndIndex) {
@@ -90,11 +89,11 @@ export default function ResizeTaskTooltip({
       });
     }
   };
-  
+
   return (
     <ResizableBox
       {...props}
-      className={cn(hovered && "z-50")}
+      className={cn("hover:z-10", hovered && "z-50")}
       height={size.height}
       onResizeStart={handleResizeStart}
       onResizeStop={handleResizeStop}

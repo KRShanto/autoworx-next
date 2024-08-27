@@ -290,7 +290,8 @@ export default function Day({
           if (
             event.rowStartIndex === task.rowStartIndex ||
             (eventStartTime.isBefore(taskEndTime) &&
-              eventEndTime.isAfter(taskStartTime))
+              eventEndTime.isAfter(taskStartTime)) ||
+            eventStartTime.isBefore(taskStartTime)
           ) {
             return true;
           }
