@@ -107,15 +107,15 @@ export default function DayTask({
           top,
           backgroundColor,
           borderRadius: "10px",
+          maxWidth: width,
+          minWidth: width,
         }}
       >
         <DraggableTaskTooltip
           //@ts-ignore
-          className={`rounded-md px-2 py-1 text-[17px] ${event.type === "appointment" ? "overflow-y-auto text-gray-600" : "text-white"} border-2`}
+          className={`rounded-md px-2 py-1 text-[17px] ${event.type === "appointment" ? "overflow-y-auto text-gray-600" : "text-white"} w-full border-2`}
           style={{
             height: `${height}px`,
-            maxWidth: width,
-            minWidth: width,
           }}
           task={event}
           updateTaskData={{ event, companyUsers }}

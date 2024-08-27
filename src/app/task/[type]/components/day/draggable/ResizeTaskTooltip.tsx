@@ -98,7 +98,7 @@ export default function ResizeTaskTooltip({
       height={size.height}
       onResizeStart={handleResizeStart}
       onResizeStop={handleResizeStop}
-      width={size.width} // Fixed width, or you can allow resizing horizontally as well
+      // width={'30%'} // Fixed width, or you can allow resizing horizontally as well
       axis="y" // Only allow vertical resizing
       minConstraints={[300, 38]} // Minimum width and height
       resizeHandles={["s"]} // Resize handle at the bottom ('s' for south)
