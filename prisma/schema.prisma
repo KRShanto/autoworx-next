@@ -775,6 +775,8 @@ enum DiscountType {
 model Lead {
   id          Int      @id @default(autoincrement())
   clientName  String   @map("client_name")
+  clientEmail String?  @map("client_email")
+  clientPhone String?  @map("client_phone")
   vehicleInfo String   @map("vehicle_info")
   services    String
   source      String

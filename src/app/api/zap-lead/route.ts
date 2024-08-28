@@ -7,10 +7,22 @@ export async function POST(request: NextRequest) {
     const email = request.nextUrl.searchParams.get("email");
     const password = request.nextUrl.searchParams.get("password");
     const clientName = request.nextUrl.searchParams.get("client_name") || "";
+    const clientEmail = request.nextUrl.searchParams.get("client_email") || "";
+    const clientPhone = request.nextUrl.searchParams.get("client_phone") || "";
     const vehicleInfo = request.nextUrl.searchParams.get("vehicle_info") || "";
     const services = request.nextUrl.searchParams.get("services") || "";
     const source = request.nextUrl.searchParams.get("source") || "";
     const comments = request.nextUrl.searchParams.get("comments") || "";
+
+    console.log("email", email);
+    console.log("password", password);
+    console.log("clientName", clientName);
+    console.log("clientEmail", clientEmail);
+    console.log("clientPhone", clientPhone);
+    console.log("vehicleInfo", vehicleInfo);
+    console.log("services", services);
+    console.log("source", source);
+    console.log("comments", comments);
 
     // check if email and password is provided
     if (!email || !password) {
