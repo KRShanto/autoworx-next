@@ -16,6 +16,8 @@ export default async function Page() {
         <thead>
           <tr>
             <th>Client Name</th>
+            <th>Client Email</th>
+            <th>Client Phone</th>
             <th>Vehicle Info</th>
             <th>Services</th>
             <th>Source</th>
@@ -26,6 +28,8 @@ export default async function Page() {
           {leads.map((lead) => (
             <tr key={lead.id}>
               <td>{lead.clientName}</td>
+              <td>{lead.clientEmail}</td>
+              <td>{lead.clientPhone}</td>
               <td>{lead.vehicleInfo}</td>
               <td>{lead.services}</td>
               <td>{lead.source}</td>
