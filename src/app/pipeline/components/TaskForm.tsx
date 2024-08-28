@@ -72,7 +72,7 @@ export default function TaskForm({
           Add Task
         </div>
         {/* Hover content */}
-        <div className="absolute -top-36 left-1/3 z-50 mt-1 hidden w-[100px] -translate-x-1/2 transform rounded-lg border border-[#66738C] bg-white p-2 group-hover:block">
+        <div className="absolute -top-32 left-1/3 z-50 mt-1 hidden w-[100px] -translate-x-1/2 transform rounded-lg border border-[#66738C] bg-white p-2 group-hover:block">
           <div className="mb-2 rounded-[3px] bg-[#6571FF] p-1 text-white">
             Task 1
           </div>

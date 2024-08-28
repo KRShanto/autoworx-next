@@ -2,35 +2,26 @@ import React from "react";
 import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 import { MdErrorOutline } from "react-icons/md";
 
-interface Service {
-  id: number;
-  name: string;
-  completed: boolean;
-}
 
 interface ServiceSelectorProps {
-  services: Service[];
-  selectedService: Service | null;
+  services: string[]; 
+  completedServices: string[]; 
+  incompleteServices: string[];
   isServiceDropdownOpen: boolean;
   handleServiceDropdownToggle: () => void;
-  handleServiceSelect: (service: Service) => void;
-  [key: string]: any;
+  type: string; 
 }
 
 function ServiceSelector({
   services,
-  selectedService,
+  completedServices,
+  incompleteServices,
   isServiceDropdownOpen,
   handleServiceDropdownToggle,
-  handleServiceSelect,
-  ...restProps
+  type,
 }: ServiceSelectorProps) {
-  
-  const completedServices = services.filter((service) => service.completed);
-  const incompleteServices = services.filter((service) => !service.completed);
-  const { type } = restProps;
   return (
-    <div className="relative mb-2" {...restProps}>
+    <div className="relative mb-2">
       <div className="flex gap-2">
         <div
           onClick={handleServiceDropdownToggle}
@@ -39,20 +30,16 @@ function ServiceSelector({
             visibility: isServiceDropdownOpen ? "hidden" : "visible",
           }}
         >
-          {selectedService ? (
-            <span className="text-[#6571FF]">{selectedService.name}</span>
-          ) : (
-            <span className="inline-flex w-full justify-between text-[#6571FF]">
-              <span className="text-left">
-                {services.length > 1
-                  ? `${services[0].name}...`
-                  : "Select a service"}
-              </span>
-              {services.length > 1 && (
-                <span className="text-right">+ {services.length - 1}</span>
-              )}
+          <span className="inline-flex w-full justify-between text-[#6571FF]">
+            <span className="text-left">
+              {services.length > 0
+                ? `${services[0]}${services.length > 1 ? '...' : ''}`
+                : "Select a service"}
             </span>
-          )}
+            {services.length > 1 && (
+              <span className="text-right">+ {services.length - 1}</span>
+            )}
+          </span>
         </div>
 
         {type === "Shop Pipelines" && (
@@ -83,15 +70,13 @@ function ServiceSelector({
                   Complete <IoIosCheckmarkCircleOutline />
                 </p>
               )}
-              {completedServices.map((service) => (
+              {completedServices.map((service, index) => (
                 <div
-                  key={service.id}
-                  onClick={() => handleServiceSelect(service)}
-                  className={`cursor-pointer px-2 py-1 text-sm hover:bg-gray-200 ${
-                    selectedService?.id === service.id ? "bg-white" : ""
-                  }`}
+                  key={index}
+                  onClick={handleServiceDropdownToggle}
+                  className="cursor-pointer px-2 py-1 text-sm hover:bg-gray-200"
                 >
-                  <span className="text-blue-600">{service.name}</span>
+                  <span className="text-blue-600">{service}</span>
                 </div>
               ))}
             </>
@@ -105,15 +90,13 @@ function ServiceSelector({
                   Incomplete <MdErrorOutline />
                 </p>
               )}
-              {incompleteServices.map((service) => (
+              {incompleteServices.map((service, index) => (
                 <div
-                  key={service.id}
-                  onClick={() => handleServiceSelect(service)}
-                  className={`cursor-pointer px-2 py-1 text-sm hover:bg-gray-200 ${
-                    selectedService?.id === service.id ? "bg-white" : ""
-                  }`}
+                  key={index}
+                  onClick={handleServiceDropdownToggle}
+                  className="cursor-pointer px-2 py-1 text-sm hover:bg-gray-200"
                 >
-                  <span className="text-blue-600">{service.name}</span>
+                  <span className="text-blue-600">{service}</span>
                 </div>
               ))}
             </>

@@ -1,3 +1,4 @@
+
 "use server"
 
 import { getCompanyId } from "@/lib/companyId";
@@ -16,7 +17,9 @@ export async function getWorkOrders() {
         invoiceItems: {
           include: {
             service: {
-              include: {},
+              include: {
+                Technician: true,
+              },
             },
           },
         },

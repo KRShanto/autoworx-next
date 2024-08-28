@@ -10,12 +10,14 @@ import {
 } from "react-icons/fa";
 import { PiDotFill } from "react-icons/pi";
 import Select from "./Select";
+import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
+import { useServerGet } from "@/hooks/useServerGet";
 
 const DropdownMenuDemo = () => {
   const [bookmarksChecked, setBookmarksChecked] = React.useState(true);
   const [urlsChecked, setUrlsChecked] = React.useState(false);
   const [person, setPerson] = React.useState("pedro");
-
+  const { data: invoices } = useServerGet(getWorkOrders);
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
@@ -51,23 +53,17 @@ const DropdownMenuDemo = () => {
                 },
               ]}
             />
+          
+            
             <Select
               label="Services"
-              items={[
-                {
-                  id: 1,
-                  value: "pending",
-                },
-                {
-                  id: 2,
-                  value: "delivered",
-                },
-                {
-                  id: 3,
-                  value: "paid",
-                },
-              ]}
-            />
+              items={invoices ? invoices.map((invoice) => ({
+                id: invoice.id,
+                value: invoice.invoiceItems.map((item) => item.service?.name).join(", "),
+              })): []}
+              />
+         
+         
           </div>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>

@@ -6,14 +6,15 @@ import { IoAddCircleOutline } from "react-icons/io5";
 import { PiWechatLogoLight } from "react-icons/pi";
 import { CiCalendar } from "react-icons/ci";
 import { EmployeeSelector } from "./EmployeeSelector";
-
 import Link from "next/link";
 import { Tag } from "@prisma/client";
 import { EmployeeTagSelector } from "./EmployeeTagSelector";
 import TaskForm from "./TaskForm";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ServiceSelector from "./ServiceSelector";
-
+import { useServerGet } from "@/hooks/useServerGet";
+import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
+import { Tooltip } from 'antd';
 //dummy services
 
 const services = [
@@ -82,6 +83,10 @@ export default function Pipelines({
   pipelinesData,
   columns,
 }: pipelinesProps) {
+
+  const { data: invoices } = useServerGet(getWorkOrders);
+
+
   const [selectedEmployees, setSelectedEmployees] = useState<{
     [key: string]: Employee | null;
   }>({});
@@ -244,8 +249,8 @@ export default function Pipelines({
   const filteredPipelineData = pipelineData.filter((_, index) =>
     columns?.some((column) => column.id === `${index+1}`)
   );
-console.log("managed columns on pipeline",columns)
-console.log("managed data on pipeline",filteredPipelineData);
+
+
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <div className="h-full overflow-hidden">
@@ -267,10 +272,10 @@ console.log("managed data on pipeline",filteredPipelineData);
                   </h2>
 
                   <ul
-                    className="mt-3 flex flex-col gap-1 overflow-auto p-1"
+                    className="mt-1 flex flex-col gap-1 overflow-auto p-1"
                     style={{ maxHeight: "70vh" }}
                   >
-                    {item.leads.map((lead,leadIndex) => {
+                    {invoices && invoices.map((invoice,leadIndex) => {
                       const key = `${categoryIndex}-${leadIndex}`;
                       const selectedEmployee = selectedEmployees[key];
                       const isDropdownOpen =
@@ -285,6 +290,36 @@ console.log("managed data on pipeline",filteredPipelineData);
                       const isServiceDropdownOpen =
                         openServiceDropdown[key] || false;
 
+                        // const status=invoice.;
+                      const id = invoice.id;
+                      const client = `${invoice.client?.firstName} ${invoice.client?.lastName}`;
+                      const vehicle = `${invoice.vehicle?.year} ${invoice.vehicle?.make} ${invoice.vehicle?.model}`;
+                      const serviceString = invoice.invoiceItems
+                            .map((item) => item.service?.name);
+                            
+                      
+                      const timeCreated = new Date(invoice.createdAt).toDateString();
+    
+                      const completedServices: string[] = [];
+                      const incompleteServices: string[] = [];
+                    
+                      invoice.invoiceItems.forEach((item) => {
+                        const technicians = item.service?.Technician || []; 
+                        
+                        //statuses of all technicians associated with this service
+                        const statuses = technicians.map((tech) => tech.status?.toLowerCase());
+                        
+                    
+                        // if all technicians' statuses are "complete"
+                        const isServiceComplete = statuses.every(status => status === "complete");
+                    
+                        if (isServiceComplete) {
+                          completedServices.push(item.service?.name??'');
+                        } else {
+                          incompleteServices.push(item.service?.name??'');
+                        }
+                      });
+                      
                       return (
                         <Draggable
                           key={leadIndex}
@@ -301,7 +336,7 @@ console.log("managed data on pipeline",filteredPipelineData);
                             >
                               <div className="flex items-center justify-between">
                                 <h3 className="font-inter overflow-auto pb-2 font-semibold text-black">
-                                  {lead.name}
+                                  {client}
                                 </h3>
                                 {!isDropdownOpen && (
                                   <div
@@ -403,13 +438,15 @@ console.log("managed data on pipeline",filteredPipelineData);
                               )}
                               <div>
                                 <p className="mb-2 overflow-auto text-xs">
-                                  Vehicle Year Make Model
+                                  {vehicle}
                                 </p>
                               </div>
                               {/* service code */}
                               <ServiceSelector
-                                services={services}
-                                selectedService={selectedService}
+                                services={serviceString.map((service) => service ?? '')}
+                                completedServices={completedServices}
+                                incompleteServices={incompleteServices}
+                                
                                 isServiceDropdownOpen={isServiceDropdownOpen}
                                 handleServiceDropdownToggle={() =>
                                   handleServiceDropdownToggle(
@@ -417,20 +454,17 @@ console.log("managed data on pipeline",filteredPipelineData);
                                     leadIndex,
                                   )
                                 }
-                                handleServiceSelect={(service) =>
-                                  handleServiceSelect(
-                                    categoryIndex,
-                                    leadIndex,
-                                    service,
-                                  )
-                                }
+                                
                                 type={pipelineType}
                               />
-                              <div>
+                              {pipelineType === "Sales Pipelines" &&
+
+                                <div>
                                 <p className="overflow-auto pb-2 text-xs">
                                   Lead Source
                                 </p>
                               </div>
+                              }
                               <div className="flex justify-between">
                                 <div className="flex items-center gap-2">
                                   <Link href="/" className="group relative">
@@ -439,7 +473,7 @@ console.log("managed data on pipeline",filteredPipelineData);
                                       Communications
                                     </span>
                                   </Link>
-                                  <Link href="/" className="group relative">
+                                  <Link href="/" className="group relative"  >
                                     <img
                                       src="/icons/invoice.png"
                                       alt=""
