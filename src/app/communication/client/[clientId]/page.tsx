@@ -2,7 +2,9 @@
 import Title from "@/components/Title";
 import { convert } from "html-to-text";
 import { Metadata } from "next";
+import { redirect, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { getVehicles } from "../actions/actions";
 import Details from "./Details";
 import List from "./List";
 import MessageBox from "./MessageBox";
@@ -129,34 +131,46 @@ function decodeEmails(message: EmailMessage): string {
 export default function Page({
   params,
 }: {
-  params: { email: string };
+  params: { clientId: string };
 }): JSX.Element {
   const [conversations, setConversations] = useState<DecodedEmail[]>([]);
+  const [vehicles, setVehicles] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [base64Data, setBase64Data] = useState("");
-  async function getEmails(email: string) {
-    setLoading(true);
-    const res = await fetch(
-      `/api/communication/client?email=${decodeURIComponent(email)}`,
-    );
+  const router = useRouter();
+  async function getEmails(clientId: string) {
+    try {
+      setLoading(true);
+      const res = await fetch(
+        `/api/communication/client?clientId=${decodeURIComponent(clientId)}`,
+      );
 
-    const data: EmailData[] = await res.json();
-    setLoading(false);
+      const data: EmailData[] = await res.json();
+      setLoading(false);
 
-    const emailsWithBody = data?.map((emailData) => {
-      let body = decodeEmails(emailData) || "";
-      return {
-        ...emailData,
-        body,
-      };
-    });
-
-    setConversations(emailsWithBody);
-    console.log(emailsWithBody, "conversations");
+      const emailsWithBody = data?.map((emailData) => {
+        let body = decodeEmails(emailData) || "";
+        return {
+          ...emailData,
+          body,
+        };
+      });
+      setConversations(emailsWithBody);
+    } catch (error) {
+      setLoading(false);
+      router.push("/communication/client");
+    }
   }
 
   useEffect(() => {
-    getEmails(params.email);
+    getEmails(params.clientId);
+    getVehicles(params.clientId)
+      .then((res) => {
+        setVehicles(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, [params]);
 
   return (
@@ -164,20 +178,20 @@ export default function Page({
       <Title>Communication Hub - Client</Title>
 
       <div className="mt-5 flex justify-around">
-        <List id={1} />
+        <List id={params.clientId} />
         <MessageBox
           conversations={conversations}
-          email={decodeURIComponent(params.email)}
+          email={decodeURIComponent(params.clientId)}
           loading={loading}
           base64Data={base64Data}
           setBase64Data={setBase64Data}
           setConversations={setConversations}
         />
         <Details
-          id={1}
+          id={params.clientId}
           conversations={conversations}
-          base64Data={base64Data}
-          setBase64Data={setBase64Data}
+          vehicles={vehicles}
+
         />
       </div>
     </div>

@@ -11,7 +11,7 @@ const days = [
 ];
 export default function CalendarPage() {
   return (
-    <div className="space-y-6 p-5">
+    <div className="space-y-6 px-5">
       {/* Calender Integration */}
       <div>
         <h2 className="mb-2 text-xl font-semibold">Calendar Integrations</h2>
