@@ -1,18 +1,19 @@
+import { SyncLists } from "@/components/SyncLists";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import Title from "@/components/Title";
 import { cn } from "@/lib/cn";
+import { db } from "@/lib/db";
+import { AuthSession } from "@/types/auth";
+import { InvoiceType } from "@prisma/client";
+import moment from "moment";
+import Link from "next/link";
 import React from "react";
 import { CiEdit } from "react-icons/ci";
 import { FaSearch } from "react-icons/fa";
-import Link from "next/link";
-import moment from "moment";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
-import { db } from "@/lib/db";
-import { InvoiceType } from "@prisma/client";
-import { Filter } from "./Filter";
-import { AuthSession } from "@/types/auth";
 import { auth } from "../auth";
-import { SyncLists } from "@/components/SyncLists";
+import CannedTable from "./CannedTable";
 import ConvertTo from "./ConvertTo";
+import { Filter } from "./Filter";
 import Header from "./Header";
 import Table from "./Table";
 
@@ -95,18 +96,23 @@ export default async function Page({
       <SyncLists statuses={statuses} />
       <Header />
 
-      <Tabs defaultValue="estimate" className="mt-5 grid-cols-1">
+      <Tabs defaultValue="a-estimate" className="mt-5 grid-cols-1">
         <TabsList>
-          <TabsTrigger value="invoice">Invoices</TabsTrigger>
-          <TabsTrigger value="estimate">Estimates</TabsTrigger>
+          <TabsTrigger value="a-estimate">Estimates</TabsTrigger>
+          <TabsTrigger value="b-invoice">Invoices</TabsTrigger>
+          <TabsTrigger value="c-canned">Canned</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="estimate">
+        <TabsContent value="a-estimate">
           <Table data={estimates} />
         </TabsContent>
 
-        <TabsContent value="invoice">
+        <TabsContent value="b-invoice">
           <Table data={invoices} />
+        </TabsContent>
+
+        <TabsContent value="c-canned">
+          <CannedTable />
         </TabsContent>
       </Tabs>
     </div>
