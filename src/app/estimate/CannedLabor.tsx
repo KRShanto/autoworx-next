@@ -4,7 +4,7 @@ import SelectCategory from "@/components/Lists/SelectCategory";
 import { cn } from "@/lib/cn";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { useListsStore } from "@/stores/lists";
-import { Category, Category, Vehicle } from "@prisma/client";
+import { Category, Vehicle } from "@prisma/client";
 import { setHours } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -74,7 +74,7 @@ export default function CannedLabor() {
   );
 }
 
-const Labor = ({ labor }) => {
+const Labor = ({ labor }: any) => {
   const [isEdit, setIsEdit] = useState(false);
   const [category, setCategory] = useState<Category | null>(null);
   const { categories } = useListsStore();
