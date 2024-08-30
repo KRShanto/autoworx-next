@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import WorkOrders from "../components/WorkOrders";
 import Pipelines from "../components/Pipelines";
+import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
 
 // Sample data
 const newLeads = [{ name: "Al Noman", email: "noman@me.com", phone: "123456" }];
@@ -26,50 +27,54 @@ const salesData = [
   { title: "Converted", leads: converted },
 ];
 
-
-
 type Props = {
   searchParams?: { view?: string };
 };
 
-interface Lead{
+interface Lead {
   name: string;
   email: string;
   phone: string;
 }
 
-interface PipelineData{
+interface PipelineData {
   title: string;
   leads: Lead[];
 }
 
-interface Column{
-  id: string;
+interface Column {
+  id: number;
   title: string;
+  type: string;
 }
 const Page = (props: Props) => {
- 
-  const activeView = props.searchParams?.view|| "workOrders";
+  const activeView = props.searchParams?.view || "workOrders";
+  const columnType = "sales";
 
-  const salesColumns=[
-    { id: "1", title: "New Leads" },
-    { id: "2", title: "Leads Generated" },
-    { id: "3", title: "Follow-up" },
-    { id: "4", title: "Estimates Created" },
-    { id: "5", title: "Archived" },
-    { id: "6", title: "Converted" },
-  ];
+  const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
+  const [salesPipelineData, setSalesPipelineData] =
+    useState<PipelineData[]>(salesData);
 
-  const [pipelineColumns, setPipelineColumns] = useState<Column[]>(salesColumns);
-  const [salesPipelineData, setSalesPipelineData] = useState<PipelineData[]>(salesData);
+  useEffect(() => {
+    const fetchShopColumns = async () => {
+      const columns = await getColumnsByType("sales");
+      setPipelineColumns(columns);
+    };
 
-  const handleColumnsUpdate = ({ columns, updatedPipelineData }: { columns: Column[], updatedPipelineData: PipelineData[] }) => {
+    fetchShopColumns();
+  }, []);
+  const handleColumnsUpdate = ({
+    columns,
+    updatedPipelineData,
+  }: {
+    columns: Column[];
+    updatedPipelineData: PipelineData[];
+  }) => {
     setPipelineColumns(columns);
     setSalesPipelineData(updatedPipelineData);
   };
   const type = "Sales Pipelines";
-  console.log("data on parent page after added or deleted managed pipeline",salesPipelineData);
-  console.log("columns updated after managed pipeline on parent page",pipelineColumns);
+
   return (
     <div className="space-y-8">
       <Header
@@ -78,10 +83,16 @@ const Page = (props: Props) => {
         columns={pipelineColumns}
         onColumnsUpdate={handleColumnsUpdate}
         pipelineData={salesPipelineData}
+        type={columnType}
       />
-      
+
       {activeView === "pipelines" ? (
-        <Pipelines pipelinesTitle={type} columns={pipelineColumns} pipelinesData={salesPipelineData} />
+        <Pipelines
+          pipelinesTitle={type}
+          columns={pipelineColumns}
+          pipelinesData={salesPipelineData}
+          type={columnType}
+        />
       ) : (
         <WorkOrders />
       )}

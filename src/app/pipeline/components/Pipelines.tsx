@@ -17,38 +17,7 @@ import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
 import { Tooltip } from 'antd';
 //dummy services
 
-const services = [
-  {
-    id: 1,
-    name: "Service 1",
-    completed: true,
-  },
-  {
-    id: 2,
-    name: "Service 2",
-    completed: true,
-  },
-  {
-    id: 3,
-    name: "Service 3",
-    completed: true,
-  },
-  {
-    id: 4,
-    name: "Service 4",
-    completed: false,
-  },
-  {
-    id: 5,
-    name: "Service 5",
-    completed: true,
-  },
-  {
-    id: 6,
-    name: "Service 6",
-    completed: false,
-  },
-];
+
 
 //interfaces
 interface Service {
@@ -73,7 +42,8 @@ interface PipelineData {
 interface pipelinesProps {
   pipelinesTitle: string;
   pipelinesData: PipelineData[];
-  columns?: {id:string,title:string}[];
+  columns?: {id:number,title:string,type:string}[];
+  type: string;
 }
 
 const users: User[] = [];
@@ -82,6 +52,7 @@ export default function Pipelines({
   pipelinesTitle: pipelineType,
   pipelinesData,
   columns,
+  type,
 }: pipelinesProps) {
 
   const { data: invoices } = useServerGet(getWorkOrders);
@@ -242,20 +213,33 @@ export default function Pipelines({
   };
 
   //filtering based on managed pipelines new data
-  useEffect(()=>{
-      setPipelineData(pipelinesData);
-  },[columns,pipelineData]);
+  useEffect(() => {
+    if (columns && columns.length > 0) {
+      // Filter columns based on the selected pipeline type
+      const filteredColumns = columns.filter(
+        (column) =>
+          column.type.toLowerCase() ===
+          type.toLowerCase() 
+      );
 
-  const filteredPipelineData = pipelineData.filter((_, index) =>
-    columns?.some((column) => column.id === `${index+1}`)
-  );
+      // Map over filtered columns to get corresponding pipeline data
+      const filteredData = filteredColumns.map((column) => ({
+        title: column.title,
+        leads:
+          pipelinesData.find((data) => data.title === column.title)?.leads ||
+          [],
+      }));
+
+      setPipelineData(filteredData);
+    }
+  }, [columns, pipelinesData, type]);
 
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <div className="h-full overflow-hidden">
         <div className="flex justify-between">
-          {filteredPipelineData.map((item, categoryIndex) => (
+          {pipelineData.map((item, categoryIndex) => (
             <Droppable droppableId={`${categoryIndex}`} key={categoryIndex}>
               {(provided) => (
                 <div
@@ -268,7 +252,7 @@ export default function Pipelines({
                   }}
                 >
                   <h2 className="rounded-lg bg-[#6571FF] px-4 py-3 text-center text-white">
-                    <p className="text-base font-bold">{columns?.[categoryIndex]?.title||""}</p>
+                    <p className="text-base font-bold">{item.title||""}</p>
                   </h2>
 
                   <ul

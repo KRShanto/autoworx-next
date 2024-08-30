@@ -5,14 +5,16 @@ import { IoReorderTwoSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 
 interface Column {
-  id: string;
+  id: number;
   title: string;
+  type: string;
 }
 
 interface ManagePipelinesModalProps {
   columns: Column[];
   onSave: (updatedColumns: Column[]) => void;
   onClose: () => void;
+  pipelineType: string;
 }
 
 const ItemType = "COLUMN";
@@ -84,6 +86,7 @@ export default function ManagePipelines({
   columns,
   onSave,
   onClose,
+  pipelineType,
 }: ManagePipelinesModalProps) {
   const [localColumns, setLocalColumns] = useState<Column[]>(columns);
 
@@ -106,15 +109,15 @@ export default function ManagePipelines({
     // Update IDs after deleting a column to maintain sequential order
     updatedColumns = updatedColumns.map((column, i) => ({
       ...column,
-      id: (i + 1).toString(),
+      id: (i + 1),
     }));
   
     setLocalColumns(updatedColumns);
   };
   
   const handleAddColumn = () => {
-    const newId = (localColumns.length + 1).toString(); // Assign new ID sequentially
-    const newColumn = { id: newId, title: "New Column" };
+    const newId = (localColumns.length + 1); // Assign new ID sequentially
+    const newColumn = { id: newId, title: "New Column" ,type:pipelineType};
   
     setLocalColumns([...localColumns, newColumn]);
   };

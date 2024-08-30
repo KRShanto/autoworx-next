@@ -1,9 +1,9 @@
-"use client"
-import React, { useState } from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import WorkOrders from "../components/WorkOrders";
 import Pipelines from "../components/Pipelines";
-
+import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
 
 const completed = Array(5).fill({
   name: "Shanto",
@@ -24,23 +24,38 @@ const shopData = [
   { title: "Optional1", leads: optional1 },
   { title: "Optional2", leads: optional2 },
 ];
-const shopColumn = [
-  { id: "1", title: "Pending" },
-  { id: "2", title: "Completed" },
-  { id: "3", title: "Cancelled" },
-  { id: "4", title: "Re-Dos" },
-  { id: "5", title: "Optional1" },
-  { id: "6", title: "Optional2" },
-];
+
 type Props = {
   searchParams?: { view?: string };
 };
 
+type Column = {
+  id: number;
+  title: string;
+  type: string;
+};
+
 const Page = (props: Props) => {
   const activeView = props.searchParams?.view || "workOrders";
-  const [pipelineColumns, setPipelineColumns] = useState(shopColumn);
+  const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
   const [shopPipelineData, setshopPipelineData] = useState(shopData);
-  const handleColumnsUpdate = ({ columns, updatedPipelineData }: { columns: { id: string; title: string }[], updatedPipelineData: any[] }) => {
+  const columnType = "shop";
+  useEffect(() => {
+    const fetchShopColumns = async () => {
+      const columns = await getColumnsByType("shop");
+      setPipelineColumns(columns);
+    };
+
+    fetchShopColumns();
+  }, []);
+  // console.log(JSON.stringify(pipelineColumns, null, 2));
+  const handleColumnsUpdate = async ({
+    columns,
+    updatedPipelineData,
+  }: {
+    columns: Column[];
+    updatedPipelineData: any[];
+  }) => {
     setPipelineColumns(columns);
     setshopPipelineData(updatedPipelineData);
   };
@@ -54,10 +69,15 @@ const Page = (props: Props) => {
         columns={pipelineColumns}
         onColumnsUpdate={handleColumnsUpdate}
         pipelineData={shopPipelineData}
-
+        type={columnType}
       />
       {activeView === "pipelines" ? (
-        <Pipelines pipelinesTitle={type} pipelinesData={shopPipelineData} columns={pipelineColumns} />
+        <Pipelines
+          pipelinesTitle={type}
+          pipelinesData={shopPipelineData}
+          columns={pipelineColumns}
+          type={columnType}
+        />
       ) : (
         <WorkOrders />
       )}

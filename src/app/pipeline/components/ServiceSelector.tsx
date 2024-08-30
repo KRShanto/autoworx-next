@@ -33,7 +33,7 @@ function ServiceSelector({
           <span className="inline-flex w-full justify-between text-[#6571FF]">
             <span className="text-left">
               {services.length > 0
-                ? `${services[0]}${services.length > 1 ? '...' : ''}`
+                ? `Service 1${services.length > 1 ? '...' : ''}`
                 : "Select a service"}
             </span>
             {services.length > 1 && (

@@ -769,3 +769,9 @@ enum DiscountType {
   Percentage
   Fixed
 }
+
+model Column {
+  id     Int     @id @default(autoincrement())
+  title  String
+  type   String  // "sales" or "shop"
+}

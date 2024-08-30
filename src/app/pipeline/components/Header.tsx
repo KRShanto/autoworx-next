@@ -13,12 +13,14 @@ interface HeaderProps {
   }) => void;
   columns: Column[];
   pipelineData: PipelineData[];
+  type: string;
 
   [key: string]: any;
 }
 interface Column {
-  id: string;
+  id: number;
   title: string;
+  type: string;
 }
 interface Lead {
   name: string;
@@ -36,6 +38,7 @@ export default function Header({
   onColumnsUpdate,
   columns,
   pipelineData,
+  type,
   ...restProps
 }: HeaderProps) {
   const router = useRouter();
@@ -111,6 +114,7 @@ export default function Header({
           columns={currentColumns}
           onSave={handleSaveColumns}
           onClose={() => setPipelineManaged(false)}
+          pipelineType={type}
         />
       )}
     </div>
