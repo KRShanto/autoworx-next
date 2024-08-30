@@ -1,40 +1,53 @@
-import formidable from "formidable";
+import { db } from "@/lib/db";
 import fs from "fs";
 import { google } from "googleapis";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { pipeline, Readable } from "stream";
 import { promisify } from "util";
+
 const pump = promisify(pipeline);
 
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const emailAddress = url.searchParams.get("email");
+    const ClientId = url.searchParams.get("clientId");
 
-    if (!emailAddress) {
+    if (!ClientId) {
       return new Response(
-        JSON.stringify({ error: "Email query parameter is required" }),
+        JSON.stringify({ error: "Client Id query parameter is required" }),
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
         },
       );
     }
+    const client = await db.client.findFirst({
+      where: { id: parseInt(ClientId) },
+    });
+
+    if (!client) {
+      return new Response(JSON.stringify({ error: "Client not found" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     const clientId = process.env.GMAIL_CLIENT_ID;
     const clientSecret = process.env.GMAIL_CLIENT_SECRET;
-    const refreshToken = process.env.GMAIL_REFRESH_TOKEN;
+    const refreshToken = cookies().get("gmail_refresh_token");
 
     const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret);
-    oAuth2Client.setCredentials({ refresh_token: refreshToken });
+    if (refreshToken)
+      oAuth2Client.setCredentials({ refresh_token: refreshToken.value });
 
     const gmail = google.gmail({ version: "v1", auth: oAuth2Client });
 
     // Fetch emails sent from or received by the provided email address
     const res = await gmail.users.messages.list({
       userId: "me",
-      q: `from:${emailAddress} OR to:${emailAddress}`,
+      q: `from:${client.email} OR to:${client.email}`,
       maxResults: 100,
     });
 
@@ -87,9 +100,10 @@ export async function GET(request: NextRequest) {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching emails:", error);
+    cookies().delete("gmail_refresh_token");
     return new Response(JSON.stringify({ error: "Failed to fetch emails" }), {
-      status: 500,
+      status: 400,
       headers: { "Content-Type": "application/json" },
     });
   }

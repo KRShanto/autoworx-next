@@ -3,7 +3,19 @@ import { db } from "@/lib/db";
 
 import { notFound } from "next/navigation";
 
+import {
+  Company,
+  Invoice,
+  InvoiceItem,
+  InvoicePhoto,
+  Labor,
+  Material,
+  Service,
+  Status,
+} from "@prisma/client";
+import { User } from "next-auth";
 import InvoiceComponent from "./InvoiceComponent";
+import PDFComponent from "./PDFComponent";
 
 export default async function ViewEstimate({
   params: { id },
@@ -43,12 +55,14 @@ export default async function ViewEstimate({
 
   return (
     <InterceptedDialog>
-      <InvoiceComponent
-        id={id}
-        invoice={invoice}
-        clientId={clientId}
-        vehicle={vehicle}
-      />
+      {invoice && (
+        <InvoiceComponent
+          id={id}
+          invoice={invoice}
+          clientId={clientId}
+          vehicle={vehicle}
+        />
+      )}
     </InterceptedDialog>
   );
 }

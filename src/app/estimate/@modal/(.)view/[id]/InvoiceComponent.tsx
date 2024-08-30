@@ -13,25 +13,30 @@ import {
   Invoice,
   InvoiceItem,
   InvoicePhoto,
+  Labor,
+  Material,
+  Service,
   Status,
   User,
   Vehicle,
 } from "@prisma/client";
 import { MdOutlineFileDownload } from "react-icons/md";
 
+import { sendInvoiceEmail } from "@/actions/estimate/invoice/sendInvoiceEmail";
+import { pdf, PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
 import path from "path";
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
+import { CiFileOn } from "react-icons/ci";
 import { FaPrint, FaRegFile, FaShare } from "react-icons/fa";
 import { FaRegShareFromSquare } from "react-icons/fa6";
 import { HiXMark } from "react-icons/hi2";
 import { useReactToPrint } from "react-to-print";
 import { InvoiceItems } from "./InvoiceItems";
-import { CiFileOn } from "react-icons/ci";
-import { sendInvoiceEmail } from "@/actions/estimate/invoice/sendInvoiceEmail";
+import PDFComponent from "./PDFComponent";
 
 type Props = {};
 
@@ -46,7 +51,12 @@ const InvoiceComponent = ({
   invoice: Invoice & {
     status: Status | null;
     company: Company;
-    invoiceItems: InvoiceItem[];
+    invoiceItems: (InvoiceItem & {
+      materials: Material[] | [];
+      service: Service | null;
+      invoice: Invoice | null;
+      labor: Labor | null;
+    })[];
     photos: InvoicePhoto[];
     user: User;
   };
@@ -57,8 +67,6 @@ const InvoiceComponent = ({
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
-
-  const handleDownload = () => {};
 
   const handleEmail = () => {
     sendInvoiceEmail({ invoiceId: invoice.id });
@@ -85,13 +93,30 @@ const InvoiceComponent = ({
                   Print
                 </button>
 
-                <button
+                <button className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white">
+                  <PDFDownloadLink
+                    document={
+                      <PDFComponent
+                        id={id}
+                        invoice={invoice}
+                        clientId={clientId}
+                        vehicle={vehicle}
+                      />
+                    }
+                    fileName="Invoice.pdf"
+                  >
+                    {({ blob, url, loading, error }) =>
+                      loading ? "Loading PDF..." : "PDF"
+                    }
+                  </PDFDownloadLink>
+                </button>
+                {/* <button
                   className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
                   onClick={handleDownload}
                 >
                   <FaRegFile />
                   PDF
-                </button>
+                </button> */}
 
                 <button
                   className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
@@ -226,6 +251,14 @@ const InvoiceComponent = ({
             </div>
             <p>Thank you for shopping with Autoworx</p>
           </div>
+          {/* <PDFViewer width="100%" height="600">
+            <PDFComponent
+              id={id}
+              invoice={invoice}
+              clientId={clientId}
+              vehicle={vehicle}
+            />
+          </PDFViewer> */}
           <div className="flex h-[90vh] w-[394px] shrink grow-0 flex-col gap-4 print:hidden">
             <div className="#shadow-lg grid flex-1 grid-cols-1 gap-4 overflow-y-auto border bg-background p-6">
               <h2 className="col-span-full text-3xl font-bold uppercase text-slate-500">
