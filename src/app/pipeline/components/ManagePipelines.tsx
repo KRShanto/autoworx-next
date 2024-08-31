@@ -3,6 +3,7 @@ import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { IoReorderTwoSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
+import { createColumn,updateColumn,deleteColumn } from "@/actions/pipelines/pipelinesColumn";
 
 interface Column {
   id: number;
@@ -97,27 +98,35 @@ export default function ManagePipelines({
     setLocalColumns(updatedColumns);
   };
 
-  const handleColumnChange = (index: number, newName: string) => {
+  const handleColumnChange = async (index: number, newName: string) => {
     const updatedColumns = [...localColumns];
-    updatedColumns[index].title = newName;
+    const columnToUpdate = updatedColumns[index];
+    columnToUpdate.title = newName;
     setLocalColumns(updatedColumns);
-  };
 
-  const handleDeleteColumn = (index: number) => {
+    // update column in the db
+    await updateColumn(columnToUpdate.id, newName, pipelineType);
+  };
+  const handleDeleteColumn = async (index: number) => {
+    const columnToDelete = localColumns[index];
+    await deleteColumn(columnToDelete.id); // Delete from database
+
     let updatedColumns = localColumns.filter((_, i) => i !== index);
-  
+
     // Update IDs after deleting a column to maintain sequential order
     updatedColumns = updatedColumns.map((column, i) => ({
       ...column,
-      id: (i + 1),
+      id: i + 1,
     }));
-  
+
     setLocalColumns(updatedColumns);
   };
   
-  const handleAddColumn = () => {
-    const newId = (localColumns.length + 1); // Assign new ID sequentially
-    const newColumn = { id: newId, title: "New Column" ,type:pipelineType};
+  const handleAddColumn = async() => {
+    const newColumn = await createColumn(
+      "New Column",
+      pipelineType
+    );
   
     setLocalColumns([...localColumns, newColumn]);
   };

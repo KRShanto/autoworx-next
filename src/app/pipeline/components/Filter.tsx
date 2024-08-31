@@ -4,9 +4,11 @@ import DateRange from "../../../components/DateRange";
 import { useEmployeeWorkFilterStore } from "@/stores/employeeWorkFilter";
 import Dropdown from "./Dropdown";
 import SearchTerms from "./SearchTerms";
-interface Props {}
+interface Props {
+  pipelineType: string;
+}
 
-export default function FilterComp() {
+export default function FilterComp({pipelineType}: Props) {
   const { setFilter } = useEmployeeWorkFilterStore();
 
   return (
@@ -22,7 +24,7 @@ export default function FilterComp() {
               />
             </div>
             <div className="relative">
-              <Dropdown />
+              <Dropdown pipelineType={pipelineType} />
             </div>
           </div>
         </div>

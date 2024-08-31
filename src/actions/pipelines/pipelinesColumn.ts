@@ -1,7 +1,7 @@
 "use server"
 import { db } from "@/lib/db";
 
-// Fetch all columns by type
+// fetch all columns by type
 export const getColumnsByType = async (type: string) => {
   return await db.column.findMany({
     where: { type },
@@ -18,7 +18,6 @@ export const createColumn = async (title: string, type: string) => {
   });
 };
 
-// Update a column by id
 export const updateColumn = async (id: number, title: string, type: string) => {
   return await db.column.update({
     where: { id },
@@ -26,7 +25,6 @@ export const updateColumn = async (id: number, title: string, type: string) => {
   });
 };
 
-// Delete a column by id
 export const deleteColumn = async (id: number) => {
   return await db.column.delete({
     where: { id },

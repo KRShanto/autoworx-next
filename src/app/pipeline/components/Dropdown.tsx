@@ -2,7 +2,7 @@
 
 import { CheckCircleOutlined } from "@ant-design/icons";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   FaChevronCircleDown,
   FaChevronDown,
@@ -12,12 +12,27 @@ import { PiDotFill } from "react-icons/pi";
 import Select from "./Select";
 import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
 import { useServerGet } from "@/hooks/useServerGet";
+import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
 
-const DropdownMenuDemo = () => {
+interface DropdownProps {
+  pipelineType: string;
+}
+const DropdownMenuDemo = ({pipelineType}: DropdownProps) => {
   const [bookmarksChecked, setBookmarksChecked] = React.useState(true);
   const [urlsChecked, setUrlsChecked] = React.useState(false);
   const [person, setPerson] = React.useState("pedro");
   const { data: invoices } = useServerGet(getWorkOrders);
+  const [columnStatus, setColumnStatus] = useState<{ id: number; title: string; type: string }[]>([]);
+
+  useEffect(() => {
+    const fetchShopColumns = async () => {
+      const columns = await getColumnsByType(pipelineType);
+      setColumnStatus(columns);
+    };
+    fetchShopColumns();
+  }, [pipelineType]);
+
+
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
@@ -38,20 +53,10 @@ const DropdownMenuDemo = () => {
           <div className="flex flex-col gap-y-2">
             <Select
               label="Status"
-              items={[
-                {
-                  id: 1,
-                  value: "Status 1",
-                },
-                {
-                  id: 2,
-                  value: "delivered",
-                },
-                {
-                  id: 3,
-                  value: "paid",
-                },
-              ]}
+              items={columnStatus.map((column) => ({
+                
+                value: column.title,
+              }))}
             />
           
             

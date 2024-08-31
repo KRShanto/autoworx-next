@@ -6,9 +6,11 @@ import { useServerGet } from "@/hooks/useServerGet";
 import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
 import { useEstimateFilterStore } from "@/stores/estimate-filter";
 
-type Props = {};
+type Props = {
+  type: string;
+};
 
-const WorkOrders = (props: Props) => {
+const WorkOrders = ({type}: Props) => {
   const { data: invoices } = useServerGet(getWorkOrders);
   const { search } = useEstimateFilterStore();
 
@@ -24,7 +26,7 @@ const WorkOrders = (props: Props) => {
   );
   return (
     <div className="space-y-8">
-      <Filter />
+      <Filter pipelineType={type} />
       <div>
         <table className="w-full shadow-md">
           <thead className="bg-white">

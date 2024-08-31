@@ -94,7 +94,7 @@ const Page = (props: Props) => {
           type={columnType}
         />
       ) : (
-        <WorkOrders />
+        <WorkOrders type={columnType} />
       )}
     </div>
   );
