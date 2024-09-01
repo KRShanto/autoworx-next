@@ -1,53 +1,21 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { User } from "@prisma/client";
-import React, { SetStateAction, useState } from "react";
+import React, { SetStateAction, useEffect, useState } from "react";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { PiWechatLogoLight } from "react-icons/pi";
 import { CiCalendar } from "react-icons/ci";
 import { EmployeeSelector } from "./EmployeeSelector";
-
 import Link from "next/link";
 import { Tag } from "@prisma/client";
 import { EmployeeTagSelector } from "./EmployeeTagSelector";
 import TaskForm from "./TaskForm";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ServiceSelector from "./ServiceSelector";
-
+import { useServerGet } from "@/hooks/useServerGet";
+import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
+import { Tooltip } from "antd";
 //dummy services
-
-const services = [
-  {
-    id: 1,
-    name: "Service 1",
-    completed: true,
-  },
-  {
-    id: 2,
-    name: "Service 2",
-    completed: true,
-  },
-  {
-    id: 3,
-    name: "Service 3",
-    completed: true,
-  },
-  {
-    id: 4,
-    name: "Service 4",
-    completed: false,
-  },
-  {
-    id: 5,
-    name: "Service 5",
-    completed: true,
-  },
-  {
-    id: 6,
-    name: "Service 6",
-    completed: false,
-  },
-];
 
 //interfaces
 interface Service {
@@ -60,25 +28,96 @@ interface Employee {
   firstName: string;
   lastName: string;
 }
+interface Lead {
+  name: string;
+  email: string;
+  phone: string;
+  vehicle: string;
+  services: {
+    completed: string[];
+    incomplete: string[];
+  };
+  createdAt: string;
+  workOrderStatus?: string;
+}
+
+interface PipelineData {
+  title: string;
+  leads: Lead[];
+}
 interface pipelinesProps {
   pipelinesTitle: string;
-  salesData?: {
-    title: string;
-    leads: { name: string; email: string; phone: string }[];
-  }[];
-  shopData?: {
-    title: string;
-    leads: { name: string; email: string; phone: string }[];
-  }[];
+  columns?: { id: number; title: string; type: string }[];
+  type: string;
 }
 
 const users: User[] = [];
 
 export default function Pipelines({
   pipelinesTitle: pipelineType,
-  salesData,
-  shopData,
+  columns,
+  type,
 }: pipelinesProps) {
+  const { data: invoices } = useServerGet(getWorkOrders);
+  const [pipelineData, setPipelineData] = useState<PipelineData[]>([]);
+  console.log("invoice out", invoices);
+  useEffect(() => {
+    if (invoices) {
+      // Transform the invoices into leads
+      const transformedLeads: Lead[] = invoices.map((invoice) => {
+        const client =
+          `${invoice.client?.firstName ?? ""} ${invoice.client?.lastName ?? ""}`.trim();
+        const vehicle =
+          `${invoice.vehicle?.year ?? ""} ${invoice.vehicle?.make ?? ""} ${invoice.vehicle?.model ?? ""}`.trim();
+        const workOrderStatus = invoice.workOrderStatus ?? "Pending"; // Default to Pending
+        const completedServices: string[] = [];
+        const incompleteServices: string[] = [];
+
+        invoice.invoiceItems.forEach((item) => {
+          const technicians = item.service?.Technician || [];
+          const statuses = technicians.map((tech) =>
+            tech.status?.toLowerCase(),
+          );
+          const isServiceComplete = statuses.every(
+            (status) => status === "complete",
+          );
+
+          if (isServiceComplete) {
+            completedServices.push(item.service?.name ?? "");
+          } else {
+            incompleteServices.push(item.service?.name ?? "");
+          }
+        });
+
+        return {
+          name: client,
+          email: invoice.client?.email ?? "",
+          phone: invoice.client?.mobile ?? "",
+          vehicle,
+          workOrderStatus,
+          services: {
+            completed: completedServices,
+            incomplete: incompleteServices,
+          },
+          createdAt: new Date(invoice.createdAt).toDateString(),
+        };
+      });
+
+      console.log("Transformed Leads:", transformedLeads);
+
+      const updatedPipelineData: PipelineData[] =
+        columns?.map((column) => ({
+          title: column.title,
+          leads: transformedLeads.filter(
+            (lead) => lead.workOrderStatus?.trim() === column.title.trim(),
+          ),
+        })) || [];
+
+      console.log("Updated Pipeline Data:", updatedPipelineData);
+      setPipelineData(updatedPipelineData);
+    }
+  }, [invoices, columns]);
+
   const [selectedEmployees, setSelectedEmployees] = useState<{
     [key: string]: Employee | null;
   }>({});
@@ -104,8 +143,7 @@ export default function Pipelines({
   const [openServiceDropdown, setOpenServiceDropdown] = useState<{
     [key: string]: boolean;
   }>({});
-  const initialData = pipelineType === "Sales Pipelines" ? salesData : shopData;
-  const [pipelineData, setPipelineData] = useState(initialData || []);
+
   const handleDropdownToggle = (categoryIndex: number, leadIndex: number) => {
     if (
       openDropdownIndex?.category === categoryIndex &&
@@ -243,18 +281,18 @@ export default function Pipelines({
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  className="w-[16%] rounded-md border"
+                  className="mx-2 w-full flex-1 rounded-md border"
                   style={{
                     backgroundColor: "rgba(101, 113, 255, 0.15)",
                     padding: "0",
                   }}
                 >
                   <h2 className="rounded-lg bg-[#6571FF] px-4 py-3 text-center text-white">
-                    <p className="text-base font-bold">{item.title}</p>
+                    <p className="text-base font-bold">{item.title || ""}</p>
                   </h2>
 
                   <ul
-                    className="mt-3 flex flex-col gap-1 overflow-auto p-1"
+                    className="mt-1 flex flex-col gap-1 overflow-auto p-1"
                     style={{ maxHeight: "70vh" }}
                   >
                     {item.leads.map((lead, leadIndex) => {
@@ -272,6 +310,7 @@ export default function Pipelines({
                       const isServiceDropdownOpen =
                         openServiceDropdown[key] || false;
 
+                      console.log("Lead", lead);
                       return (
                         <Draggable
                           key={leadIndex}
@@ -351,21 +390,18 @@ export default function Pipelines({
                                     </div>
                                   </span>
                                 ))}
-                                
-                                  <button
-                                    onClick={() =>
-                                      handleTagDropdownToggle(
-                                        categoryIndex,
-                                        leadIndex,
-                                      )
-                                    }
-                                    className="inline-flex h-[20px] items-center justify-center rounded bg-[#6571FF] px-1 py-1 text-xs font-semibold text-white"
-                                  >
-                                    + Add
-                                  </button>
 
-                                  
-                               
+                                <button
+                                  onClick={() =>
+                                    handleTagDropdownToggle(
+                                      categoryIndex,
+                                      leadIndex,
+                                    )
+                                  }
+                                  className="inline-flex h-[20px] items-center justify-center rounded bg-[#6571FF] px-1 py-1 text-xs font-semibold text-white"
+                                >
+                                  + Add
+                                </button>
                               </div>
                               {isTagDropdownOpen && (
                                 <div className="-left-100 absolute top-12 z-20">
@@ -390,13 +426,16 @@ export default function Pipelines({
                               )}
                               <div>
                                 <p className="mb-2 overflow-auto text-xs">
-                                  Vehicle Year Make Model
+                                  {lead.vehicle}
                                 </p>
                               </div>
                               {/* service code */}
                               <ServiceSelector
-                                services={services}
-                                selectedService={selectedService}
+                                services={lead.services.completed.concat(
+                                  lead.services.incomplete,
+                                )}
+                                completedServices={lead.services.completed}
+                                incompleteServices={lead.services.incomplete}
                                 isServiceDropdownOpen={isServiceDropdownOpen}
                                 handleServiceDropdownToggle={() =>
                                   handleServiceDropdownToggle(
@@ -404,20 +443,15 @@ export default function Pipelines({
                                     leadIndex,
                                   )
                                 }
-                                handleServiceSelect={(service) =>
-                                  handleServiceSelect(
-                                    categoryIndex,
-                                    leadIndex,
-                                    service,
-                                  )
-                                }
                                 type={pipelineType}
                               />
-                              <div>
-                                <p className="overflow-auto pb-2 text-xs">
-                                  Lead Source
-                                </p>
-                              </div>
+                              {pipelineType === "Sales Pipelines" && (
+                                <div>
+                                  <p className="overflow-auto pb-2 text-xs">
+                                    Lead Source
+                                  </p>
+                                </div>
+                              )}
                               <div className="flex justify-between">
                                 <div className="flex items-center gap-2">
                                   <Link href="/" className="group relative">
@@ -445,10 +479,8 @@ export default function Pipelines({
                                     </span>
                                   </Link>
                                 </div>
-                                <div className="relative group">
-
-                                <TaskForm companyUsers={users} />
-                                
+                                <div className="group relative">
+                                  <TaskForm companyUsers={users} />
                                 </div>
                               </div>
                             </li>
