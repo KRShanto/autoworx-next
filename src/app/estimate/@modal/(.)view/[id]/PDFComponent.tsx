@@ -129,20 +129,7 @@ Font.register({
   fontStyle: "italic",
 });
 
-// Register Poppins Black
-Font.register({
-  family: "Poppins",
-  src: "/fonts/Poppins-Black.ttf",
-  fontWeight: 900,
-});
 
-// Register Poppins Black Italic
-Font.register({
-  family: "Poppins",
-  src: "/fonts/Poppins-BlackItalic.ttf",
-  fontWeight: 900,
-  fontStyle: "italic",
-});
 // Create styles
 const styles = StyleSheet.create({
   regular: {
