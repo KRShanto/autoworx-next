@@ -8,11 +8,9 @@ interface HeaderProps {
   activeView: string;
   pipelinesTitle: string;
   onColumnsUpdate: (data: {
-    columns: Column[];
-    updatedPipelineData: PipelineData[];
+  columns: Column[];
   }) => void;
   columns: Column[];
-  pipelineData: PipelineData[];
   type: string;
 
   [key: string]: any;
@@ -37,34 +35,19 @@ export default function Header({
   pipelinesTitle,
   onColumnsUpdate,
   columns,
-  pipelineData,
   type,
   ...restProps
 }: HeaderProps) {
   const router = useRouter();
-  // const { salesData, shopData } = restProps;
 
   const [isPipelineManaged, setPipelineManaged] = useState(false);
   const [currentColumns, setCurrentColumns] = useState<Column[]>(columns);
 
   const handleSaveColumns = (updatedColumns: Column[]) => {
     setCurrentColumns(updatedColumns);
-
-    const updatedPipelineData = updatedColumns.map((col, index) => {
-      const existingData = pipelineData.find((data) => data.title === col.title);
-  
-      if (existingData) {
-        return existingData;
-      } else if (index > 0 && pipelineData[index - 1]) {
-        // Use the leads from the previous index if no existing data is found
-        return { title: col.title, leads: pipelineData[index - 1].leads };
-      } else {
-
-        return { title: col.title, leads: [] };
-      }
-    });
-    onColumnsUpdate({ columns: updatedColumns, updatedPipelineData });
+    onColumnsUpdate({ columns: updatedColumns });
   };
+
 
   useEffect(() => {
     setCurrentColumns(columns);

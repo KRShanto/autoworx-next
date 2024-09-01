@@ -109,7 +109,7 @@ export default function ManagePipelines({
   };
   const handleDeleteColumn = async (index: number) => {
     const columnToDelete = localColumns[index];
-    await deleteColumn(columnToDelete.id); // Delete from database
+    await deleteColumn(columnToDelete.id); 
 
     let updatedColumns = localColumns.filter((_, i) => i !== index);
 

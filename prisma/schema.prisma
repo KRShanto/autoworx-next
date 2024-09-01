@@ -227,6 +227,7 @@ model Invoice {
   vehicle                 Vehicle?                  @relation(fields: [vehicleId], references: [id])
   client                  Client?                   @relation(fields: [clientId], references: [id])
   technician              Technician[]
+  workOrderStatus         String?                   @default("Pending") @map("work_order_status")
 
   @@index([companyId], name: "fk_invoices_company")
 }

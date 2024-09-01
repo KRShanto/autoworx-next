@@ -14,10 +14,8 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ServiceSelector from "./ServiceSelector";
 import { useServerGet } from "@/hooks/useServerGet";
 import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
-import { Tooltip } from 'antd';
+import { Tooltip } from "antd";
 //dummy services
-
-
 
 //interfaces
 interface Service {
@@ -34,15 +32,22 @@ interface Lead {
   name: string;
   email: string;
   phone: string;
+  vehicle: string;
+  services: {
+    completed: string[];
+    incomplete: string[];
+  };
+  createdAt: string;
+  workOrderStatus?: string;
 }
+
 interface PipelineData {
   title: string;
-  leads:Lead[];
+  leads: Lead[];
 }
 interface pipelinesProps {
   pipelinesTitle: string;
-  pipelinesData: PipelineData[];
-  columns?: {id:number,title:string,type:string}[];
+  columns?: { id: number; title: string; type: string }[];
   type: string;
 }
 
@@ -50,13 +55,68 @@ const users: User[] = [];
 
 export default function Pipelines({
   pipelinesTitle: pipelineType,
-  pipelinesData,
   columns,
   type,
 }: pipelinesProps) {
-
   const { data: invoices } = useServerGet(getWorkOrders);
+  const [pipelineData, setPipelineData] = useState<PipelineData[]>([]);
+  console.log("invoice out", invoices);
+  useEffect(() => {
+    if (invoices) {
+      // Transform the invoices into leads
+      const transformedLeads: Lead[] = invoices.map((invoice) => {
+        const client =
+          `${invoice.client?.firstName ?? ""} ${invoice.client?.lastName ?? ""}`.trim();
+        const vehicle =
+          `${invoice.vehicle?.year ?? ""} ${invoice.vehicle?.make ?? ""} ${invoice.vehicle?.model ?? ""}`.trim();
+        const workOrderStatus = invoice.workOrderStatus ?? "Pending"; // Default to Pending
+        const completedServices: string[] = [];
+        const incompleteServices: string[] = [];
 
+        invoice.invoiceItems.forEach((item) => {
+          const technicians = item.service?.Technician || [];
+          const statuses = technicians.map((tech) =>
+            tech.status?.toLowerCase(),
+          );
+          const isServiceComplete = statuses.every(
+            (status) => status === "complete",
+          );
+
+          if (isServiceComplete) {
+            completedServices.push(item.service?.name ?? "");
+          } else {
+            incompleteServices.push(item.service?.name ?? "");
+          }
+        });
+
+        return {
+          name: client,
+          email: invoice.client?.email ?? "",
+          phone: invoice.client?.mobile ?? "",
+          vehicle,
+          workOrderStatus,
+          services: {
+            completed: completedServices,
+            incomplete: incompleteServices,
+          },
+          createdAt: new Date(invoice.createdAt).toDateString(),
+        };
+      });
+
+      console.log("Transformed Leads:", transformedLeads);
+
+      const updatedPipelineData: PipelineData[] =
+        columns?.map((column) => ({
+          title: column.title,
+          leads: transformedLeads.filter(
+            (lead) => lead.workOrderStatus?.trim() === column.title.trim(),
+          ),
+        })) || [];
+
+      console.log("Updated Pipeline Data:", updatedPipelineData);
+      setPipelineData(updatedPipelineData);
+    }
+  }, [invoices, columns]);
 
   const [selectedEmployees, setSelectedEmployees] = useState<{
     [key: string]: Employee | null;
@@ -84,7 +144,6 @@ export default function Pipelines({
     [key: string]: boolean;
   }>({});
 
-  const [pipelineData, setPipelineData] = useState(pipelinesData || []);
   const handleDropdownToggle = (categoryIndex: number, leadIndex: number) => {
     if (
       openDropdownIndex?.category === categoryIndex &&
@@ -212,29 +271,6 @@ export default function Pipelines({
     setPipelineData(updatedData);
   };
 
-  //filtering based on managed pipelines new data
-  useEffect(() => {
-    if (columns && columns.length > 0) {
-      // Filter columns based on the selected pipeline type
-      const filteredColumns = columns.filter(
-        (column) =>
-          column.type.toLowerCase() ===
-          type.toLowerCase() 
-      );
-
-      // Map over filtered columns to get corresponding pipeline data
-      const filteredData = filteredColumns.map((column) => ({
-        title: column.title,
-        leads:
-          pipelinesData.find((data) => data.title === column.title)?.leads ||
-          [],
-      }));
-
-      setPipelineData(filteredData);
-    }
-  }, [columns, pipelinesData, type]);
-
-
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <div className="h-full overflow-hidden">
@@ -245,21 +281,21 @@ export default function Pipelines({
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  className="flex-1 w-full rounded-md border mx-2"
+                  className="mx-2 w-full flex-1 rounded-md border"
                   style={{
                     backgroundColor: "rgba(101, 113, 255, 0.15)",
                     padding: "0",
                   }}
                 >
                   <h2 className="rounded-lg bg-[#6571FF] px-4 py-3 text-center text-white">
-                    <p className="text-base font-bold">{item.title||""}</p>
+                    <p className="text-base font-bold">{item.title || ""}</p>
                   </h2>
 
                   <ul
                     className="mt-1 flex flex-col gap-1 overflow-auto p-1"
                     style={{ maxHeight: "70vh" }}
                   >
-                    {invoices && invoices.map((invoice,leadIndex) => {
+                    {item.leads.map((lead, leadIndex) => {
                       const key = `${categoryIndex}-${leadIndex}`;
                       const selectedEmployee = selectedEmployees[key];
                       const isDropdownOpen =
@@ -274,36 +310,7 @@ export default function Pipelines({
                       const isServiceDropdownOpen =
                         openServiceDropdown[key] || false;
 
-                        // const status=invoice.;
-                      const id = invoice.id;
-                      const client = `${invoice.client?.firstName} ${invoice.client?.lastName}`;
-                      const vehicle = `${invoice.vehicle?.year} ${invoice.vehicle?.make} ${invoice.vehicle?.model}`;
-                      const serviceString = invoice.invoiceItems
-                            .map((item) => item.service?.name);
-                            
-                      
-                      const timeCreated = new Date(invoice.createdAt).toDateString();
-    
-                      const completedServices: string[] = [];
-                      const incompleteServices: string[] = [];
-                    
-                      invoice.invoiceItems.forEach((item) => {
-                        const technicians = item.service?.Technician || []; 
-                        
-                        //statuses of all technicians associated with this service
-                        const statuses = technicians.map((tech) => tech.status?.toLowerCase());
-                        
-                    
-                        // if all technicians' statuses are "complete"
-                        const isServiceComplete = statuses.every(status => status === "complete");
-                    
-                        if (isServiceComplete) {
-                          completedServices.push(item.service?.name??'');
-                        } else {
-                          incompleteServices.push(item.service?.name??'');
-                        }
-                      });
-                      
+                      console.log("Lead", lead);
                       return (
                         <Draggable
                           key={leadIndex}
@@ -320,7 +327,7 @@ export default function Pipelines({
                             >
                               <div className="flex items-center justify-between">
                                 <h3 className="font-inter overflow-auto pb-2 font-semibold text-black">
-                                  {client}
+                                  {lead.name}
                                 </h3>
                                 {!isDropdownOpen && (
                                   <div
@@ -383,21 +390,18 @@ export default function Pipelines({
                                     </div>
                                   </span>
                                 ))}
-                                
-                                  <button
-                                    onClick={() =>
-                                      handleTagDropdownToggle(
-                                        categoryIndex,
-                                        leadIndex,
-                                      )
-                                    }
-                                    className="inline-flex h-[20px] items-center justify-center rounded bg-[#6571FF] px-1 py-1 text-xs font-semibold text-white"
-                                  >
-                                    + Add
-                                  </button>
 
-                                  
-                               
+                                <button
+                                  onClick={() =>
+                                    handleTagDropdownToggle(
+                                      categoryIndex,
+                                      leadIndex,
+                                    )
+                                  }
+                                  className="inline-flex h-[20px] items-center justify-center rounded bg-[#6571FF] px-1 py-1 text-xs font-semibold text-white"
+                                >
+                                  + Add
+                                </button>
                               </div>
                               {isTagDropdownOpen && (
                                 <div className="-left-100 absolute top-12 z-20">
@@ -422,15 +426,16 @@ export default function Pipelines({
                               )}
                               <div>
                                 <p className="mb-2 overflow-auto text-xs">
-                                  {vehicle}
+                                  {lead.vehicle}
                                 </p>
                               </div>
                               {/* service code */}
                               <ServiceSelector
-                                services={serviceString.map((service) => service ?? '')}
-                                completedServices={completedServices}
-                                incompleteServices={incompleteServices}
-                                
+                                services={lead.services.completed.concat(
+                                  lead.services.incomplete,
+                                )}
+                                completedServices={lead.services.completed}
+                                incompleteServices={lead.services.incomplete}
                                 isServiceDropdownOpen={isServiceDropdownOpen}
                                 handleServiceDropdownToggle={() =>
                                   handleServiceDropdownToggle(
@@ -438,17 +443,15 @@ export default function Pipelines({
                                     leadIndex,
                                   )
                                 }
-                                
                                 type={pipelineType}
                               />
-                              {pipelineType === "Sales Pipelines" &&
-
+                              {pipelineType === "Sales Pipelines" && (
                                 <div>
-                                <p className="overflow-auto pb-2 text-xs">
-                                  Lead Source
-                                </p>
-                              </div>
-                              }
+                                  <p className="overflow-auto pb-2 text-xs">
+                                    Lead Source
+                                  </p>
+                                </div>
+                              )}
                               <div className="flex justify-between">
                                 <div className="flex items-center gap-2">
                                   <Link href="/" className="group relative">
@@ -457,7 +460,7 @@ export default function Pipelines({
                                       Communications
                                     </span>
                                   </Link>
-                                  <Link href="/" className="group relative"  >
+                                  <Link href="/" className="group relative">
                                     <img
                                       src="/icons/invoice.png"
                                       alt=""
@@ -476,10 +479,8 @@ export default function Pipelines({
                                     </span>
                                   </Link>
                                 </div>
-                                <div className="relative group">
-
-                                <TaskForm companyUsers={users} />
-                                
+                                <div className="group relative">
+                                  <TaskForm companyUsers={users} />
                                 </div>
                               </div>
                             </li>

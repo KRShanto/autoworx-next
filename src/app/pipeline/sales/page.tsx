@@ -63,15 +63,13 @@ const Page = (props: Props) => {
 
     fetchShopColumns();
   }, []);
-  const handleColumnsUpdate = ({
+  const handleColumnsUpdate = async ({
     columns,
-    updatedPipelineData,
   }: {
     columns: Column[];
-    updatedPipelineData: PipelineData[];
+    
   }) => {
     setPipelineColumns(columns);
-    setSalesPipelineData(updatedPipelineData);
   };
   const type = "Sales Pipelines";
 
@@ -90,7 +88,7 @@ const Page = (props: Props) => {
         <Pipelines
           pipelinesTitle={type}
           columns={pipelineColumns}
-          pipelinesData={salesPipelineData}
+          
           type={columnType}
         />
       ) : (
