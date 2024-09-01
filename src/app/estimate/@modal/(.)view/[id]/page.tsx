@@ -58,6 +58,7 @@ export default async function ViewEstimate({
       {invoice && (
         <InvoiceComponent
           id={id}
+          //@ts-ignore
           invoice={invoice}
           clientId={clientId}
           vehicle={vehicle}
