@@ -10,6 +10,5 @@ export async function getCompany() {
       id: companyId,
     },
   });
-
   return company;
 }

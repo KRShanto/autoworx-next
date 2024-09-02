@@ -23,7 +23,7 @@ model Company {
   city              String?
   state             String?
   zip               String?
-  image             String
+  image             String?
   createdAt         DateTime           @default(now()) @map("created_at")
   updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at")
   users             User[]
