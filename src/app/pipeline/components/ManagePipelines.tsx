@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { IoReorderTwoSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
-import { createColumn,updateColumn,deleteColumn } from "@/actions/pipelines/pipelinesColumn";
+import { createColumn,updateColumn } from "@/actions/pipelines/pipelinesColumn";
 
 interface Column {
-  id: number;
+  id: number|null;
   title: string;
   type: string;
 }
@@ -32,12 +32,14 @@ function ColumnItem({
   moveColumn,
   handleColumnChange,
   handleDeleteColumn,
+  inputRef,
 }: {
   column: Column;
   index: number;
   moveColumn: (dragIndex: number, hoverIndex: number) => void;
   handleColumnChange: (index: number, newName: string) => void;
   handleDeleteColumn: (index: number) => void;
+  inputRef: (el: HTMLInputElement) => void;
 }) {
   const [, drop] = useDrop({
     accept: ItemType,
@@ -70,6 +72,7 @@ function ColumnItem({
       <IoReorderTwoSharp className="mr-2 text-gray-600" size={20} />
       <input
         type="text"
+        ref={inputRef}
         value={column.title}
         onChange={(e) => handleColumnChange(index, e.target.value)}
         className="border border-gray-300 rounded-md p-1 flex-grow"
@@ -90,6 +93,14 @@ export default function ManagePipelines({
   pipelineType,
 }: ManagePipelinesModalProps) {
   const [localColumns, setLocalColumns] = useState<Column[]>(columns);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]); 
+  useEffect(() => {
+    if (localColumns.length > columns.length) {
+      // Check if a new column has been added
+      const newIndex = localColumns.length - 1;
+      inputRefs.current[newIndex]?.focus(); 
+    }
+  }, [localColumns, columns]);
 
   const moveColumn = (dragIndex: number, hoverIndex: number) => {
     const updatedColumns = [...localColumns];
@@ -98,39 +109,42 @@ export default function ManagePipelines({
     setLocalColumns(updatedColumns);
   };
 
-  const handleColumnChange = async (index: number, newName: string) => {
+  const handleColumnChange = (index: number, newName: string) => {
     const updatedColumns = [...localColumns];
-    const columnToUpdate = updatedColumns[index];
-    columnToUpdate.title = newName;
-    setLocalColumns(updatedColumns);
-
-    // update column in the db
-    await updateColumn(columnToUpdate.id, newName, pipelineType);
-  };
-  const handleDeleteColumn = async (index: number) => {
-    const columnToDelete = localColumns[index];
-    await deleteColumn(columnToDelete.id); 
-
-    let updatedColumns = localColumns.filter((_, i) => i !== index);
-
-    // Update IDs after deleting a column to maintain sequential order
-    updatedColumns = updatedColumns.map((column, i) => ({
-      ...column,
-      id: i + 1,
-    }));
-
+    updatedColumns[index].title = newName;
     setLocalColumns(updatedColumns);
   };
-  
-  const handleAddColumn = async() => {
-    const newColumn = await createColumn(
-      "New Column",
-      pipelineType
-    );
-  
+
+  const handleDeleteColumn = (index: number) => {
+    const updatedColumns = localColumns.filter((_, i) => i !== index);
+    setLocalColumns(updatedColumns);
+  };
+
+  const handleAddColumn = () => {
+    // Add a new column to the state with a temporary ID
+    const newColumn: Column = {
+      id: null, // null to indicate it's not saved to the backend yet
+      title: "New Column",
+      type: pipelineType,
+    };
     setLocalColumns([...localColumns, newColumn]);
   };
-  const handleSave = () => {
+
+  const handleSave = async () => {
+    // Handle saving new columns
+    const columnsToSave = localColumns.map(async (column) => {
+      if (column.id === null) {
+        // New column, create it
+        await createColumn(column.title, column.type);
+      } else {
+        // Existing column, update it
+        await updateColumn(column.id, column.title, pipelineType);
+      }
+    });
+
+    // Wait for all columns to be saved/updated
+    await Promise.all(columnsToSave);
+
     onSave(localColumns);
     onClose();
   };
@@ -149,6 +163,7 @@ export default function ManagePipelines({
                 moveColumn={moveColumn}
                 handleColumnChange={handleColumnChange}
                 handleDeleteColumn={handleDeleteColumn}
+                inputRef={(el) => (inputRefs.current[index] = el)}
               />
             ))}
             <button
