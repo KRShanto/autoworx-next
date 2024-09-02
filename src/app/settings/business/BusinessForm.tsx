@@ -74,12 +74,13 @@ export default function BusinessForm({ company }: TProps) {
         if (!uploadRes.ok) {
           setError("Failed to upload photos");
           console.error("Failed to upload photos");
-          return uploadRes.json();
+          setImageSrc(null);
         }
 
         const json = await uploadRes.json();
         image = json.data[0];
       }
+      
       const companyData = {
         name: businessSettings.legalBusinessName,
         businessId: businessSettings.businessRegistrationIDNumber,
