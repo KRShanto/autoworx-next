@@ -14,6 +14,16 @@ datasource db {
 model Company {
   id                Int                @id @default(autoincrement())
   name              String
+  businessId        String?            @map("business_id")
+  businessType      String?            @map("business_type")
+  phone             String?
+  industry          String?
+  website           String?
+  address           String?
+  city              String?
+  state             String?
+  zip               String?
+  image             String?
   createdAt         DateTime           @default(now()) @map("created_at")
   updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at")
   users             User[]
@@ -227,6 +237,7 @@ model Invoice {
   vehicle                 Vehicle?                  @relation(fields: [vehicleId], references: [id])
   client                  Client?                   @relation(fields: [clientId], references: [id])
   technician              Technician[]
+  workOrderStatus         String?                   @default("Pending") @map("work_order_status")
 
   @@index([companyId], name: "fk_invoices_company")
 }
@@ -768,4 +779,10 @@ model Coupon {
 enum DiscountType {
   Percentage
   Fixed
+}
+
+model Column {
+  id    Int    @id @default(autoincrement())
+  title String
+  type  String // "sales" or "shop"
 }

@@ -33,7 +33,7 @@ export function useInvoiceCreate(type: InvoiceType) {
   const pathaname = usePathname();
 
   async function handleSubmit(): Promise<ServerAction> {
-    const photoPaths = [];
+    let photoPaths = [];
     const clientId = client?.id;
     const vehicleId = vehicle?.id;
     const statusId = status?.id;
@@ -57,10 +57,15 @@ export function useInvoiceCreate(type: InvoiceType) {
       }
 
       const json = await res.json();
+      // if (json.status === "fail") {
+      //   console.error("Fail to upload photos");
+
+      //   return json
+      // }
+      console.log({ json });
       const data = json.data;
       photoPaths.push(...data);
     }
-
     let res;
     if (isEditPage) {
       res = await updateInvoice({

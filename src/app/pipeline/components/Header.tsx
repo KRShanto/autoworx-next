@@ -1,34 +1,57 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ManagePipelines from "./ManagePipelines";
 import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   activeView: string;
-  // onToggleView: (view: string) => void;
-  pipelinesTitle:string;
-  [key:string]:any;
+  pipelinesTitle: string;
+  onColumnsUpdate: (data: {
+  columns: Column[];
+  }) => void;
+  columns: Column[];
+  type: string;
+
+  [key: string]: any;
+}
+interface Column {
+  id: number;
+  title: string;
+  type: string;
+}
+interface Lead {
+  name: string;
+  email: string;
+  phone: string;
+}
+interface PipelineData {
+  title: string;
+  leads: Lead[];
 }
 
-
-
-export default function Header({ 
+export default function Header({
   activeView,
-  //  onToggleView ,
-   pipelinesTitle,
-   ...restProps
-
+  pipelinesTitle,
+  onColumnsUpdate,
+  columns,
+  type,
+  ...restProps
 }: HeaderProps) {
   const router = useRouter();
-  const{salesColumn,shopColumn}=restProps;
-  const initialColumns= pipelinesTitle==="Sales Pipelines"?salesColumn:shopColumn;
 
-const [isPipelineManaged, setPipelineManaged] = useState(false);
-  const [columns, setColumns] = useState(initialColumns || []);
- const handleSaveColumns = (updatedColumns:{id:string,name:string}[]) => {
-    setColumns(updatedColumns);
+  const [isPipelineManaged, setPipelineManaged] = useState(false);
+  const [currentColumns, setCurrentColumns] = useState<Column[]>(columns);
+
+  const handleSaveColumns = (updatedColumns: Column[]) => {
+    setCurrentColumns(updatedColumns);
+    onColumnsUpdate({ columns: updatedColumns });
   };
+
+
+  useEffect(() => {
+    setCurrentColumns(columns);
+  }, [columns]);
 
   const onToggleView = (view: string) => {
     router.push(`?view=${view}`);
@@ -56,7 +79,6 @@ const [isPipelineManaged, setPipelineManaged] = useState(false);
         </div>
       </div>
 
-    
       {activeView === "pipelines" && (
         <div>
           <button
@@ -72,9 +94,10 @@ const [isPipelineManaged, setPipelineManaged] = useState(false);
 
       {isPipelineManaged && (
         <ManagePipelines
-          columns={columns}
+          columns={currentColumns}
           onSave={handleSaveColumns}
           onClose={() => setPipelineManaged(false)}
+          pipelineType={type}
         />
       )}
     </div>

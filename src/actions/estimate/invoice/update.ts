@@ -5,6 +5,7 @@ import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { Labor, Material, Service, Tag } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 interface UpdateEstimateInput {
   id: string;
@@ -42,7 +43,27 @@ export async function updateInvoice(
   data: UpdateEstimateInput,
 ): Promise<ServerAction> {
   const companyId = await getCompanyId();
-
+  console.log({
+    id: data.id,
+    data: {
+      clientId: data.clientId,
+      vehicleId: data.vehicleId,
+      statusId: data.statusId,
+      subtotal: data.subtotal,
+      discount: data.discount,
+      tax: data.tax,
+      deposit: data.deposit,
+      depositNotes: data.depositNotes,
+      depositMethod: data.depositMethod,
+      grandTotal: data.grandTotal,
+      due: data.due,
+      internalNotes: data.internalNotes,
+      terms: data.terms,
+      policy: data.policy,
+      customerNotes: data.customerNotes,
+      customerComments: data.customerComments,
+    },
+  });
   // update invoice itself
   await db.invoice.update({
     where: {
@@ -78,7 +99,6 @@ export async function updateInvoice(
   // remove the files
   previousPhotos.forEach(async (photo) => {
     const photoPath = `images/uploads/${photo.photo}`;
-
     if (fs.existsSync(photoPath)) {
       fs.unlinkSync(photoPath);
     }
@@ -185,8 +205,10 @@ export async function updateInvoice(
       });
     }
   });
-
+  revalidatePath("/estimate");
   return {
     type: "success",
   };
+
+
 }

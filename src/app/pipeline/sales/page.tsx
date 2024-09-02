@@ -1,17 +1,13 @@
+"use client";
 
-
-import React from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import WorkOrders from "../components/WorkOrders";
 import Pipelines from "../components/Pipelines";
+import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
 
-type Props = {
-  searchParams?: { view?: string };
-};
-
+// Sample data
 const newLeads = [{ name: "Al Noman", email: "noman@me.com", phone: "123456" }];
-
 const leadsGenerated = Array(5).fill({
   name: "ali nur",
   email: "xyz@gmail.com",
@@ -31,27 +27,73 @@ const salesData = [
   { title: "Converted", leads: converted },
 ];
 
-const salesColumn=[
-  {id:"1",name:"New Leads"},
-  {id:"2",name:"Leads Generated"},
-  {id:"3",name:"Follow-up"},
-  {id:"4",name:"Estimates Created"},
-  {id:"5",name:"Archived"},
-  {id:"6",name:"Converted"},
-]
+type Props = {
+  searchParams?: { view?: string };
+};
+
+interface Lead {
+  name: string;
+  email: string;
+  phone: string;
+}
+
+interface PipelineData {
+  title: string;
+  leads: Lead[];
+}
+
+interface Column {
+  id: number;
+  title: string;
+  type: string;
+}
 const Page = (props: Props) => {
   const activeView = props.searchParams?.view || "workOrders";
+  const columnType = "sales";
 
-  
+  const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
+  const [salesPipelineData, setSalesPipelineData] =
+    useState<PipelineData[]>(salesData);
+
+  useEffect(() => {
+    const fetchShopColumns = async () => {
+      const columns = await getColumnsByType("sales");
+      setPipelineColumns(columns);
+    };
+
+    fetchShopColumns();
+  }, []);
+  const handleColumnsUpdate = async ({
+    columns,
+  }: {
+    columns: Column[];
+    
+  }) => {
+    setPipelineColumns(columns);
+  };
   const type = "Sales Pipelines";
+
   return (
     <div className="space-y-8">
       <Header
-        
         activeView={activeView}
-        pipelinesTitle={type} salesColumn={salesColumn }
+        pipelinesTitle={type}
+        columns={pipelineColumns}
+        onColumnsUpdate={handleColumnsUpdate}
+        pipelineData={salesPipelineData}
+        type={columnType}
       />
-      {activeView === "pipelines" ? <Pipelines pipelinesTitle={type} salesData={salesData }/> : <WorkOrders />}
+
+      {activeView === "pipelines" ? (
+        <Pipelines
+          pipelinesTitle={type}
+          columns={pipelineColumns}
+          
+          type={columnType}
+        />
+      ) : (
+        <WorkOrders type={columnType} />
+      )}
     </div>
   );
 };
