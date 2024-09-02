@@ -4,9 +4,7 @@ import Image from "next/image";
 import React, {
   ChangeEvent,
   SetStateAction,
-  useEffect,
   useRef,
-  useState,
 } from "react";
 
 type TProps = {
@@ -55,6 +53,7 @@ export default function ProfilePicture({
         />
         <div>
           <input
+            accept="image/*"
             hidden
             onChange={handleFileChange}
             ref={fileInputRef}
