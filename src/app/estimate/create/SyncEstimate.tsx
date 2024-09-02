@@ -5,7 +5,7 @@ import { FullPayment } from "@/types/db";
 import { Invoice, InvoicePhoto, Task } from "@prisma/client";
 import { useEffect } from "react";
 
-async function fetchImageAsFile(url: string, filename: string): Promise<File> {
+export async function fetchImageAsFile(url: string, filename: string): Promise<File> {
   const response = await fetch(url);
   const blob = await response.blob();
   return new File([blob], filename, { type: blob.type });
