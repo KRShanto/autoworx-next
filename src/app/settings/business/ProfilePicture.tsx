@@ -6,10 +6,16 @@ import React, { SetStateAction, useEffect, useRef, useState } from "react";
 type TProps = {
   imageSrc: File | null;
   setImageSrc: React.Dispatch<SetStateAction<File | null>>;
+  setError?: React.Dispatch<SetStateAction<string | null>>;
 };
 
-export default function ProfilePicture({ imageSrc, setImageSrc }: TProps) {
+export default function ProfilePicture({
+  imageSrc,
+  setImageSrc,
+  setError,
+}: TProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const handleProfilePictureChange = (
     e: React.MouseEvent<HTMLImageElement>,
   ) => {
@@ -21,6 +27,12 @@ export default function ProfilePicture({ imageSrc, setImageSrc }: TProps) {
       const input = event?.target as HTMLInputElement;
       const file = input?.files?.[0];
       if (file) {
+        const imageSizeByMB = (file.size / 1024 / 1024).toFixed(1); // convert to mb
+        if (Number(imageSizeByMB) > 2.5) {
+          setError && setError("Image size should not exceed 2.5MB.");
+          return;
+        }
+        setError && setError(null);
         setImageSrc(file);
       }
     };

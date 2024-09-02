@@ -12,7 +12,9 @@ type TProps = {
 
 export default function BusinessForm({ company }: TProps) {
   const [imageSrc, setImageSrc] = useState<File | null>(null);
+
   const [error, setError] = useState<string | null>(null);
+
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -26,6 +28,7 @@ export default function BusinessForm({ company }: TProps) {
     };
     photoFiles();
   }, [company.image]);
+
   const [businessSettings, setBusinessSettings] = useState({
     legalBusinessName: company.name || "",
     businessRegistrationIDNumber: company.businessId || "",
@@ -38,6 +41,7 @@ export default function BusinessForm({ company }: TProps) {
     state: company.state || "",
     zip: company.zip || "",
   });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const name = e.target.name;
@@ -45,11 +49,22 @@ export default function BusinessForm({ company }: TProps) {
       setBusinessSettings({ ...businessSettings, [name]: value });
     }
   };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       let image = null;
       if (imageSrc) {
+        if (company?.image) {
+          const response = await fetch(`/api/upload`, {
+            method: "DELETE",
+            body: JSON.stringify({ filePath: company.image }),
+          });
+          const json = await response.json();
+          if (json.status === "success") {
+            console.log("Deleted old image");
+          }
+        }
         const formData = new FormData();
         formData.append("photos", imageSrc);
         const uploadRes = await fetch("/api/upload", {
@@ -78,7 +93,6 @@ export default function BusinessForm({ company }: TProps) {
         zip: businessSettings.zip,
         image,
       };
-      console.log(companyData);
       const response = await updateCompany(company?.id, companyData);
       if (response.type === "success") {
         setError("");
@@ -92,7 +106,11 @@ export default function BusinessForm({ company }: TProps) {
   return (
     <>
       {error && <p className="text-center text-sm text-red-500">{error}</p>}
-      <ProfilePicture imageSrc={imageSrc} setImageSrc={setImageSrc} />
+      <ProfilePicture
+        imageSrc={imageSrc}
+        setError={setError}
+        setImageSrc={setImageSrc}
+      />
       <form
         onSubmit={(e) => startTransition(() => handleSubmit(e))}
         className="space-y-4"
