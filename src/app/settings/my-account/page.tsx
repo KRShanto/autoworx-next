@@ -1,10 +1,92 @@
+"use client";
+import {
+  changePassword,
+  editMyAccountInfo,
+  getMyAccountInfo,
+} from "@/actions/settings/myAccount";
 import { SlimInput } from "@/components/SlimInput";
+import { User } from "@prisma/client";
 import Image from "next/image";
-import React from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 type Props = {};
 
-const page = (props: Props) => {
+const Page = (props: Props) => {
+  const [profilePic, setProfilePic] = useState<File | null>(null);
+  const profilePicRef = useRef<HTMLInputElement>(null);
+  const [userInfo, setUserInfo] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    image: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zip: "",
+  });
+
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmNewPw, setConfirmNewPw] = useState("");
+
+  useEffect(() => {
+    getMyAccountInfo().then((res) => {
+      if (!res.success) return;
+      const {
+        firstName,
+        lastName,
+        email,
+        image,
+        phone,
+        address,
+        city,
+        state,
+        zip,
+      } = res.data as User;
+      setUserInfo({
+        firstName,
+        lastName: lastName || "",
+        email,
+        image,
+        phone: phone || "",
+        address: address || "",
+        city: city || "",
+        state: state || "",
+        zip: zip || "",
+      });
+    });
+  }, []);
+
+  const uploadProfilePic = useCallback(
+    async function () {
+      if (profilePic) {
+        const formData = new FormData();
+        formData.append("photos", profilePic);
+
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) {
+          return;
+        }
+
+        const json = await res.json();
+        setUserInfo({
+          ...userInfo,
+          image: json.data[0],
+        });
+      }
+    },
+    [profilePic],
+  );
+
+  useEffect(() => {
+    uploadProfilePic();
+  }, [profilePic]);
+
   return (
     <div className="h-full w-[80%] overflow-y-auto p-8">
       <div className="grid grid-cols-2 gap-x-8">
@@ -13,9 +95,35 @@ const page = (props: Props) => {
           <h3 className="my-4 text-lg font-bold">Account Details</h3>
           <div className="space-y-8 rounded-md p-8 shadow-md">
             {/* profile picture */}
+            <input
+              ref={profilePicRef}
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setProfilePic(file);
+                }
+              }}
+            />
             <div className="flex items-center gap-x-8">
-              <div className="relative mr-4 flex h-[150px] w-[150px] items-center justify-center rounded-full bg-violet-400/20">
-                <Image src="/icons/avatar.png" alt="" width={80} height={80} />
+              <div
+                onClick={() => {
+                  profilePicRef.current?.click();
+                }}
+                className="relative mr-4 flex h-[150px] w-[150px] cursor-pointer items-center justify-center rounded-full bg-violet-400/20"
+              >
+                <Image
+                  src={
+                    profilePic
+                      ? URL.createObjectURL(profilePic)
+                      : `/api/images/${userInfo?.image}`
+                  }
+                  alt=""
+                  width={80}
+                  height={80}
+                />
                 <Image
                   src="/icons/up arrow.png"
                   alt=""
@@ -34,25 +142,103 @@ const page = (props: Props) => {
             <div className="space-y-4">
               {/* name */}
               <div className="grid grid-cols-2 gap-x-8">
-                <SlimInput name="firstName" />
-                <SlimInput name="lastName" />
+                <SlimInput
+                  name="firstName"
+                  value={userInfo?.firstName}
+                  onChange={(e) => {
+                    setUserInfo({
+                      ...userInfo,
+                      [e.target.name]: e.target.value,
+                    });
+                  }}
+                />
+                <SlimInput
+                  name="lastName"
+                  value={userInfo?.lastName}
+                  onChange={(e) => {
+                    setUserInfo({
+                      ...userInfo,
+                      [e.target.name]: e.target.value,
+                    });
+                  }}
+                />
               </div>
               {/* email and phone number */}
               <div className="grid grid-cols-2 gap-x-8">
-                <SlimInput name="email" />
-                <SlimInput name="mobileNumber" type="number" />
+                <SlimInput
+                  name="email"
+                  value={userInfo?.email}
+                  onChange={(e) => {
+                    setUserInfo({
+                      ...userInfo,
+                      [e.target.name]: e.target.value,
+                    });
+                  }}
+                />
+                <SlimInput
+                  name="phone"
+                  type="number"
+                  value={userInfo?.phone}
+                  onChange={(e) => {
+                    setUserInfo({
+                      ...userInfo,
+                      [e.target.name]: e.target.value,
+                    });
+                  }}
+                />
               </div>
               {/* address */}
               <div className="grid grid-cols-1">
-                <SlimInput name="address" />
+                <SlimInput
+                  name="address"
+                  value={userInfo?.address}
+                  onChange={(e) => {
+                    setUserInfo({
+                      ...userInfo,
+                      [e.target.name]: e.target.value,
+                    });
+                  }}
+                />
               </div>
               <div className="grid grid-cols-3 gap-x-8">
-                <SlimInput name="city" />
-                <SlimInput name="state" />
-                <SlimInput name="zip" />
+                <SlimInput
+                  name="city"
+                  value={userInfo?.city}
+                  onChange={(e) => {
+                    setUserInfo({
+                      ...userInfo,
+                      [e.target.name]: e.target.value,
+                    });
+                  }}
+                />
+                <SlimInput
+                  name="state"
+                  value={userInfo?.state}
+                  onChange={(e) => {
+                    setUserInfo({
+                      ...userInfo,
+                      [e.target.name]: e.target.value,
+                    });
+                  }}
+                />
+                <SlimInput
+                  name="zip"
+                  value={userInfo?.zip}
+                  onChange={(e) => {
+                    setUserInfo({
+                      ...userInfo,
+                      [e.target.name]: e.target.value,
+                    });
+                  }}
+                />
               </div>
               <div className="text-right">
-                <button className="ml-auto mt-4 rounded-md bg-[#6571FF] px-4 py-1 text-white">
+                <button
+                  onClick={() => {
+                    editMyAccountInfo(userInfo);
+                  }}
+                  className="ml-auto mt-4 rounded-md bg-[#6571FF] px-4 py-1 text-white"
+                >
                   Save
                 </button>
               </div>
@@ -64,11 +250,40 @@ const page = (props: Props) => {
           <h3 className="my-4 text-lg font-bold">New Password</h3>
 
           <div className="space-y-4 rounded-md p-8 shadow-md">
-            <SlimInput name="currentPassword" type="password" />
-            <SlimInput name="newPassword" type="password" />
-            <SlimInput name="confirmNewPassword" type="password" />
+            <SlimInput
+              name="currentPassword"
+              type="password"
+              value={currentPw}
+              onChange={(e) => setCurrentPw(e.target.value)}
+            />
+            <SlimInput
+              name="newPassword"
+              type="password"
+              value={newPw}
+              onChange={(e) => setNewPw(e.target.value)}
+            />
+            <SlimInput
+              name="confirmNewPassword"
+              type="password"
+              value={confirmNewPw}
+              onChange={(e) => setConfirmNewPw(e.target.value)}
+            />
             <div className="mt-4 text-right">
-              <button className="ml-auto mt-4 rounded-md bg-[#6571FF] px-4 py-1 text-white">
+              <button
+                onClick={async () => {
+                  let res = await changePassword(
+                    currentPw,
+                    newPw,
+                    confirmNewPw,
+                  );
+                  if (res?.success) {
+                    setCurrentPw("");
+                    setNewPw("");
+                    setConfirmNewPw("");
+                  }
+                }}
+                className="ml-auto mt-4 rounded-md bg-[#6571FF] px-4 py-1 text-white"
+              >
                 Change Password
               </button>
             </div>
@@ -79,4 +294,4 @@ const page = (props: Props) => {
   );
 };
 
-export default page;
+export default Page;
