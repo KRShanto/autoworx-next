@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Container from "./Container";
 
 const BusinessPage = async () => {
@@ -7,7 +8,9 @@ const BusinessPage = async () => {
         {/* account detail */}
         <div className="#w-1/2">
           <h3 className="my-4 text-lg font-bold">Account Details</h3>
-          <Container />
+          <Suspense fallback={<p>Loading...</p>}>
+            <Container />
+          </Suspense>
         </div>
       </div>
     </div>

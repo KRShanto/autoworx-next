@@ -1,36 +1,44 @@
 "use client";
 import { cn } from "@/lib/cn";
 import Image from "next/image";
-import React, { SetStateAction, useEffect, useRef, useState } from "react";
+import React, {
+  ChangeEvent,
+  SetStateAction,
+  useRef,
+} from "react";
 
 type TProps = {
   imageSrc: File | null;
   setImageSrc: React.Dispatch<SetStateAction<File | null>>;
+  setError?: React.Dispatch<SetStateAction<string | null>>;
 };
 
-export default function ProfilePicture({ imageSrc, setImageSrc }: TProps) {
+export default function ProfilePicture({
+  imageSrc,
+  setImageSrc,
+  setError,
+}: TProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const handleProfilePictureChange = (
     e: React.MouseEvent<HTMLImageElement>,
   ) => {
     fileInputRef.current?.click();
   };
 
-  useEffect(() => {
-    const handleFileChange = function (event: Event) {
-      const input = event?.target as HTMLInputElement;
-      const file = input?.files?.[0];
-      if (file) {
-        setImageSrc(file);
+  const handleFileChange = function (event: ChangeEvent<HTMLInputElement>) {
+    const input = event?.target as HTMLInputElement;
+    const file = input?.files?.[0];
+    if (file) {
+      const imageSizeByMB = (file.size / 1024 / 1024).toFixed(1); // convert to mb
+      if (Number(imageSizeByMB) > 2.5) {
+        setError && setError("Image size should not exceed 2.5MB.");
+        return;
       }
-    };
-    if (fileInputRef.current) {
-      fileInputRef.current.onchange = handleFileChange;
+      setError && setError(null);
+      setImageSrc(file);
     }
-    return () => {
-      fileInputRef.current?.removeEventListener("onchange", handleFileChange);
-    };
-  }, []);
+  };
   return (
     <div className="flex items-center gap-x-8">
       <div className="relative mr-4 flex h-[150px] w-[150px] items-center justify-center rounded-full bg-violet-400/20">
@@ -44,7 +52,15 @@ export default function ProfilePicture({ imageSrc, setImageSrc }: TProps) {
           height={80}
         />
         <div>
-          <input hidden ref={fileInputRef} type="file" name="" id="" />
+          <input
+            accept="image/*"
+            hidden
+            onChange={handleFileChange}
+            ref={fileInputRef}
+            type="file"
+            name=""
+            id=""
+          />
           <Image
             onClick={handleProfilePictureChange}
             src="/icons/upArrow.png"
