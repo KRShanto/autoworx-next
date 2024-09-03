@@ -12,42 +12,63 @@ datasource db {
 // For now, every user has to create their own company when registering.
 // In the future, we can add a feature to join a company.
 model Company {
-  id                Int                @id @default(autoincrement())
-  name              String
-  businessId        String?            @map("business_id")
-  businessType      String?            @map("business_type")
-  phone             String?
-  industry          String?
-  website           String?
-  address           String?
-  city              String?
-  state             String?
-  zip               String?
-  image             String?
-  createdAt         DateTime           @default(now()) @map("created_at")
-  updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at")
-  users             User[]
-  tasks             Task[]
-  clients           Client[]
-  services          Service[]
-  vehicles          Vehicle[]
-  invoices          Invoice[]
-  calendarSettings  CalendarSettings[]
-  appointments      Appointment[]
-  emailTemplates    EmailTemplate[]
-  materials         Material[]
-  vendors           Vendor[]
-  labors            Labor[]
-  tags              Tag[]
-  categories        Category[]
-  statuses          Status[]
-  paymentMethods    PaymentMethod[]
-  inventoryProducts InventoryProduct[]
-  VehicleColor      VehicleColor[]
-  Source            Source[]
-  Payment           Payment[]
-  Coupon            Coupon[]
-  Technician        Technician[]
+  id                   Int                    @id @default(autoincrement())
+  name                 String
+  businessId           String?                @map("business_id")
+  businessType         String?                @map("business_type")
+  phone                String?
+  industry             String?
+  website              String?
+  address              String?
+  city                 String?
+  state                String?
+  zip                  String?
+  image                String?
+  businessVisibility   Boolean?               @default(false) @map("business_visibility")
+  phoneVisibility      Boolean?               @default(false) @map("phone_visibility")
+  addressVisibility    Boolean?               @default(false) @map("address_visibility")
+  tax                  Decimal?               @default(0)
+  currency             String?                @default("USD")
+  terms                String?
+  policy               String?
+  createdAt            DateTime               @default(now()) @map("created_at")
+  updatedAt            DateTime               @default(now()) @updatedAt @map("updated_at")
+  users                User[]
+  tasks                Task[]
+  clients              Client[]
+  services             Service[]
+  vehicles             Vehicle[]
+  invoices             Invoice[]
+  calendarSettings     CalendarSettings[]
+  appointments         Appointment[]
+  emailTemplates       EmailTemplate[]
+  materials            Material[]
+  vendors              Vendor[]
+  labors               Labor[]
+  tags                 Tag[]
+  categories           Category[]
+  statuses             Status[]
+  paymentMethods       PaymentMethod[]
+  inventoryProducts    InventoryProduct[]
+  VehicleColor         VehicleColor[]
+  Source               Source[]
+  Payment              Payment[]
+  Coupon               Coupon[]
+  Technician           Technician[]
+  companyJoinsAsOne    CompanyJoin[]          @relation("CompanyOne")
+  companyJoinsAsTwo    CompanyJoin[]          @relation("CompanyTwo")
+  companyEmailTemplate CompanyEmailTemplate[]
+}
+
+// create model that will handle multiple companies join and collaboration
+model CompanyJoin {
+  id           Int      @id @default(autoincrement())
+  companyOneId Int
+  companyTwoId Int
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+  companyOne   Company  @relation(fields: [companyOneId], references: [id], onDelete: Cascade, name: "CompanyOne")
+  companyTwo   Company  @relation(fields: [companyTwoId], references: [id], onDelete: Cascade, name: "CompanyTwo")
 }
 
 // User model.
@@ -785,4 +806,15 @@ model Column {
   id    Int    @id @default(autoincrement())
   title String
   type  String // "sales" or "shop"
+}
+
+// TODO: this might need to be renamed
+model CompanyEmailTemplate {
+  id        Int      @id @default(autoincrement())
+  subject   String
+  message   String?  @db.Text
+  companyId Int      @map("company_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
