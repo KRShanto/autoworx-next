@@ -3,7 +3,7 @@ import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { IoReorderTwoSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
-import { createColumn,updateColumn } from "@/actions/pipelines/pipelinesColumn";
+import { createColumn,deleteColumn,updateColumn } from "@/actions/pipelines/pipelinesColumn";
 
 interface Column {
   id: number|null;
@@ -115,15 +115,21 @@ export default function ManagePipelines({
     setLocalColumns(updatedColumns);
   };
 
-  const handleDeleteColumn = (index: number) => {
+  const handleDeleteColumn = async(index: number) => {
+    const columnToDelete = localColumns[index];
+
+    if (columnToDelete.id !== null) {
+      // If the column has an ID, delete it from the database
+      await deleteColumn(columnToDelete.id);
+    }
+  
     const updatedColumns = localColumns.filter((_, i) => i !== index);
     setLocalColumns(updatedColumns);
   };
 
   const handleAddColumn = () => {
-    // Add a new column to the state with a temporary ID
     const newColumn: Column = {
-      id: null, // null to indicate it's not saved to the backend yet
+      id: null,
       title: "New Column",
       type: pipelineType,
     };
@@ -131,13 +137,12 @@ export default function ManagePipelines({
   };
 
   const handleSave = async () => {
-    // Handle saving new columns
     const columnsToSave = localColumns.map(async (column) => {
       if (column.id === null) {
-        // New column, create it
-        await createColumn(column.title, column.type);
+        const newColumn = await createColumn(column.title, column.type);
+        column.id = newColumn.id; 
       } else {
-        // Existing column, update it
+    
         await updateColumn(column.id, column.title, pipelineType);
       }
     });
@@ -148,6 +153,7 @@ export default function ManagePipelines({
     onSave(localColumns);
     onClose();
   };
+
 
   return (
     <DndProvider backend={HTML5Backend}>

@@ -773,6 +773,6 @@ enum DiscountType {
 
 model Column {
   id     Int     @id @default(autoincrement())
-  title  String
+  title  String  
   type   String  // "sales" or "shop"
 }

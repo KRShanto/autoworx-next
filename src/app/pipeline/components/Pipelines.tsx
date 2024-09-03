@@ -15,6 +15,7 @@ import ServiceSelector from "./ServiceSelector";
 import { useServerGet } from "@/hooks/useServerGet";
 import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
 import { Tooltip } from "antd";
+import { updateInvoiceStatus } from "@/actions/estimate/invoice/updateInvoiceStatus";
 //dummy services
 
 //interfaces
@@ -29,6 +30,7 @@ interface Employee {
   lastName: string;
 }
 interface Lead {
+  invoiceId:string;
   name: string;
   email: string;
   phone: string;
@@ -65,6 +67,7 @@ export default function Pipelines({
     if (invoices) {
       // Transform the invoices into leads
       const transformedLeads: Lead[] = invoices.map((invoice) => {
+        const invoiceId= invoice.id;
         const client =
           `${invoice.client?.firstName ?? ""} ${invoice.client?.lastName ?? ""}`.trim();
         const vehicle =
@@ -90,6 +93,7 @@ export default function Pipelines({
         });
 
         return {
+          invoiceId,
           name: client,
           email: invoice.client?.email ?? "",
           phone: invoice.client?.mobile ?? "",
@@ -245,7 +249,7 @@ export default function Pipelines({
     }));
   };
 
-  const handleDragEnd = (result: any) => {
+  const handleDragEnd = async(result: any) => {
     const { destination, source } = result;
 
     if (!destination) return;
@@ -269,6 +273,22 @@ export default function Pipelines({
     });
 
     setPipelineData(updatedData);
+
+     // Update the workOrderStatus in the database
+  const invoiceId = removed.invoiceId; // Ensure you have access to the invoiceId in the lead object
+  const newStatus = destinationColumn.title;
+
+  try {
+    const response = await updateInvoiceStatus(invoiceId, newStatus);
+    if (response.type === "success") {
+      console.log("Invoice status updated successfully");
+    } else {
+      console.error("Failed to update invoice status:", response.message);
+    }
+  } catch (error) {
+    console.error("Error updating invoice status:", error);
+  }
+
   };
 
   return (

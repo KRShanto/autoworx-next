@@ -54,21 +54,26 @@ const DropdownMenuDemo = ({pipelineType}: DropdownProps) => {
             <Select
               label="Status"
               items={columnStatus.map((column) => ({
-                
+                id: column.id,
                 value: column.title,
+                label: column.title,
               }))}
             />
-          
-            
+
             <Select
               label="Services"
-              items={invoices ? invoices.map((invoice) => ({
-                id: invoice.id,
-                value: invoice.invoiceItems.map((item) => item.service?.name).join(", "),
-              })): []}
-              />
-         
-         
+              items={
+                invoices
+                  ? invoices.flatMap((invoice) =>
+                      invoice.invoiceItems.map((item) => ({
+                        id: `${invoice.id}-${item.id}`,
+                        value: `${item.service?.name} (${invoice.id}-${item.id})`, // unique value
+                        label: item.service?.name || "",
+                      })),
+                    )
+                  : []
+              }
+            />
           </div>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
