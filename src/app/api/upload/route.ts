@@ -27,7 +27,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       const writeStream = fs.createWriteStream(filePath);
       // Pipe the file stream to the write stream
       await pump(photo.stream() as any, writeStream);
-      console.log({ fileName });
     }
 
     return NextResponse.json({ status: "success", data: fileNames });

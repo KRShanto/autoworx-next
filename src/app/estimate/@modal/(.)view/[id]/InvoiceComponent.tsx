@@ -106,7 +106,14 @@ const InvoiceComponent = ({
                     fileName="Invoice.pdf"
                   >
                     {({ blob, url, loading, error }) =>
-                      loading ? "Loading PDF..." : "PDF"
+                      loading ? (
+                        "Loading PDF..."
+                      ) : (
+                        <span className="flex items-center gap-x-2">
+                          <FaRegFile />
+                          <span>PDF</span>
+                        </span>
+                      )
                     }
                   </PDFDownloadLink>
                 </button>
@@ -114,8 +121,7 @@ const InvoiceComponent = ({
                   className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
                   onClick={handleDownload}
                 >
-                  <FaRegFile />
-                  PDF
+
                 </button> */}
 
                 <button
@@ -251,15 +257,15 @@ const InvoiceComponent = ({
             </div>
             <p>Thank you for shopping with Autoworx</p>
           </div>
-          {/* <PDFViewer width="100%" height="600">
+          <PDFViewer width="100%" height="600">
             <PDFComponent
               id={id}
               invoice={invoice}
               clientId={clientId}
               vehicle={vehicle}
             />
-          </PDFViewer> */}
-          <div className="flex h-[90vh] w-[394px] shrink grow-0 flex-col gap-4 print:hidden">
+          </PDFViewer>
+          {/* <div className="flex h-[90vh] w-[394px] shrink grow-0 flex-col gap-4 print:hidden">
             <div className="#shadow-lg grid flex-1 grid-cols-1 gap-4 overflow-y-auto border bg-background p-6">
               <h2 className="col-span-full text-3xl font-bold uppercase text-slate-500">
                 Attachments
@@ -286,7 +292,7 @@ const InvoiceComponent = ({
               Share Invoice
               <FaRegShareFromSquare />
             </button>
-          </div>
+          </div> */}
         </DialogContentBlank>
       </DialogPortal>
     </div>
