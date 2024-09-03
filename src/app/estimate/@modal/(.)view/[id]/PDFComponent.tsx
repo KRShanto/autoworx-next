@@ -13,6 +13,7 @@ import {
 } from "@prisma/client";
 import {
   Document,
+  Font,
   Image,
   Page,
   PDFViewer,
@@ -23,9 +24,139 @@ import {
 import moment from "moment";
 import React from "react";
 import { InvoiceItems } from "./InvoiceItems";
+// Register Poppins Regular
+Font.register({
+  family: "Poppins",
+  src: "/fonts/Poppins-Regular.ttf",
+  fontWeight: "normal",
+});
+
+// Register Poppins Italic
+Font.register({
+  family: "Poppins",
+  src: "/fonts/Poppins-Italic.ttf",
+  fontWeight: "normal",
+  fontStyle: "italic",
+});
+
+// Register Poppins Thin
+Font.register({
+  family: "Poppins",
+  src: "/fonts/Poppins-Thin.ttf",
+  fontWeight: 100,
+});
+
+// Register Poppins Thin Italic
+Font.register({
+  family: "Poppins",
+  src: "/fonts/Poppins-ThinItalic.ttf",
+  fontWeight: 100,
+  fontStyle: "italic",
+});
+
+// Register Poppins Light
+Font.register({
+  family: "Poppins",
+  src: "/fonts/Poppins-Light.ttf",
+  fontWeight: 300,
+});
+
+// Register Poppins Light Italic
+Font.register({
+  family: "Poppins",
+  src: "/fonts/Poppins-LightItalic.ttf",
+  fontWeight: 300,
+  fontStyle: "italic",
+});
+
+// Register Poppins Medium
+Font.register({
+  family: "Poppins",
+  src: "/fonts/Poppins-Medium.ttf",
+  fontWeight: 500,
+});
+
+// Register Poppins Medium Italic
+Font.register({
+  family: "Poppins",
+  src: "/fonts/Poppins-MediumItalic.ttf",
+  fontWeight: 500,
+  fontStyle: "italic",
+});
+
+// Register Poppins SemiBold
+Font.register({
+  family: "Poppins",
+  src: "/fonts/Poppins-SemiBold.ttf",
+  fontWeight: 600,
+});
+
+// Register Poppins SemiBold Italic
+Font.register({
+  family: "Poppins",
+  src: "/fonts/Poppins-SemiBoldItalic.ttf",
+  fontWeight: 600,
+  fontStyle: "italic",
+});
+
+// Register Poppins Bold
+Font.register({
+  family: "Poppins",
+  src: "/fonts/Poppins-Bold.ttf",
+  fontWeight: "bold",
+});
+
+// Register Poppins Bold Italic
+Font.register({
+  family: "Poppins",
+  src: "/fonts/Poppins-BoldItalic.ttf",
+  fontWeight: "bold",
+  fontStyle: "italic",
+});
+
+// Register Poppins ExtraBold
+Font.register({
+  family: "Poppins",
+  src: "/fonts/Poppins-ExtraBold.ttf",
+  fontWeight: 800,
+});
+
+// Register Poppins ExtraBold Italic
+Font.register({
+  family: "Poppins",
+  src: "/fonts/Poppins-ExtraBoldItalic.ttf",
+  fontWeight: 800,
+  fontStyle: "italic",
+});
+
 
 // Create styles
 const styles = StyleSheet.create({
+  regular: {
+    fontFamily: "Poppins",
+  },
+  italic: {
+    fontFamily: "Poppins",
+    fontStyle: "italic",
+  },
+  bold: {
+    fontFamily: "Poppins",
+    fontWeight: "bold",
+  },
+  boldItalic: {
+    fontFamily: "Poppins",
+    fontWeight: "bold",
+    fontStyle: "italic",
+  },
+  extraBold: {
+    fontFamily: "Poppins",
+    fontWeight: 800,
+  },
+  lightItalic: {
+    fontFamily: "Poppins",
+    fontWeight: 300,
+    fontStyle: "italic",
+  },
   page: {
     padding: 20,
   },
@@ -47,8 +178,8 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   section: {
-    margin: 10,
-    padding: 10,
+    // margin: 10,
+    // padding: 10,
   },
   header: {
     flexDirection: "row",
@@ -67,7 +198,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   totalContainer: {
-    marginTop: 20,
+    // marginTop: 20,
   },
   total: {
     flexDirection: "row",
@@ -154,7 +285,10 @@ const PDFComponent = ({
 }) => {
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
+      <Page
+        size="A4"
+        style={[styles.page, styles.regular, { color: "#64748b" }]}
+      >
         <View style={styles.header}>
           <View style={styles.logo}>
             <Image
@@ -175,10 +309,10 @@ const PDFComponent = ({
           </View>
         </View>
 
-        <View style={styles.section}>
+        <View style={[styles.section, { marginBottom: 20, marginTop: 20 }]}>
           <Text style={[styles.boldText, { fontSize: 20 }]}>Estimate</Text>
-          <View style={styles.mainSection}>
-            <View style={{marginTop:20}}>
+          <View style={[styles.mainSection, { marginTop: 20 }]}>
+            <View style={{}}>
               <Text style={[styles.boldText, { marginBottom: 2 }]}>
                 Estimate To:
               </Text>
@@ -242,7 +376,7 @@ const PDFComponent = ({
           <Text>{invoice.policy}</Text>
         </View>
 
-        <Text style={{ textAlign: "center", marginTop: 10 }}>
+        <Text style={{ textAlign: "center", marginTop: 30 }}>
           Thank you for shopping with Autoworx
         </Text>
       </Page>
