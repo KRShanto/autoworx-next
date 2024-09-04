@@ -1,10 +1,15 @@
 "use client";
+import {
+  connectWithCompany,
+  getAllCompany,
+} from "@/actions/settings/myNetwork";
 import SliderRange from "@/app/employee/components/SliderRange";
 import { SlimInput } from "@/components/SlimInput";
 import { Switch } from "@/components/Switch";
+import { Company } from "@prisma/client";
 import { Range } from "@radix-ui/react-slider";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 
 type Props = {};
@@ -41,30 +46,60 @@ const Page = (props: Props) => {
   const [phoneVisibility, setPhoneVisibility] = useState(true);
   const [businessAddressVisibility, setBusinessAddressVisibility] =
     useState(true);
+  const [unconnectedCompanies, setUnconnectedCompanies] = useState<
+    Company[] | []
+  >([]);
+  const [connectedCompanies, setConnectedCompanies] = useState<Company[] | []>(
+    [],
+  );
+  const handleConnectWithCompany = async (companyId: number) => {
+    const result = await connectWithCompany(companyId);
+    if (result.success) {
+      setUnconnectedCompanies((prevUnconnected) =>
+        prevUnconnected.filter((company) => company.id !== companyId),
+      );
+      setConnectedCompanies((prevConnected) => [
+        ...prevConnected,
+        ...unconnectedCompanies.filter((company) => company.id === companyId),
+      ]);
+    } else {
+      console.log("Failed to connect with the company:", result.message);
+    }
+  };
+  useEffect(() => {
+    getAllCompany().then((res) => {
+      if (res?.data) {
+        setUnconnectedCompanies(res.data.unconnectedCompanies);
+        setConnectedCompanies(res.data.connectedCompanies);
+      }
+      console.log("companies", res);
+    });
+  }, []);
+
   return (
     <div className="h-full w-[80%] overflow-y-auto p-8">
       <div className="grid grid-cols-2 gap-x-8">
         <div className="#w-1/2">
           <h3 className="my-4 text-lg font-bold">Collaborations</h3>
           <div className="space-y-8 rounded-md p-8 shadow-md">
-            {collaborations.map((collaboration, index) => (
+            {connectedCompanies.map((company, index) => (
               <div
                 key={index}
                 className="flex items-center rounded border border-gray-200 px-8 py-4 hover:border-gray-300"
               >
                 <Image
-                  src={collaboration.logo}
-                  alt={collaboration.name}
+                  src="/icons/business.png"
+                  alt={company.name}
                   width={40}
                   height={40}
                 />
                 <div className="ml-4 flex w-full items-center justify-between gap-x-12">
                   <div>
-                    <p className="text-lg font-medium">{collaboration.name}</p>
-                    <p className="text-sm">{collaboration.website}</p>
-                    <p className="text-sm">{collaboration.specialization}</p>
-                    <p className="text-sm">{collaboration.phone}</p>
-                    <p className="text-sm">{collaboration.address}</p>
+                    <p className="text-lg font-medium">{company.name}</p>
+                    <p className="text-sm">www.business.com</p>
+                    <p className="text-sm">Business Specialization</p>
+                    <p className="text-sm">0123456789</p>
+                    <p className="text-sm">123 Main Street, Anytown, USA</p>
                   </div>
                   <div className="text-sm italic">
                     <p>Collaborating since</p>
@@ -111,11 +146,11 @@ const Page = (props: Props) => {
               </div>
               <div className="">
                 <p>Company Range Visibility</p>
-                <p className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
                   <span>12 miles</span>
                   <SliderRange value={[1, 3000]} onChange={() => {}} />
                   <span>67 miles</span>
-                </p>
+                </div>
               </div>
             </div>
             {/* possible collaborations nearby */}
@@ -136,32 +171,34 @@ const Page = (props: Props) => {
                 />
               </div>
               <div className="space-y-8 rounded-md p-8 shadow-md">
-                {collaborations.map((collaboration, index) => (
+                {unconnectedCompanies.map((company, index) => (
                   <div
                     key={index}
                     className="flex items-center rounded border border-gray-200 px-8 py-4 hover:border-gray-300"
                   >
                     <Image
-                      src={collaboration.logo}
-                      alt={collaboration.name}
+                      src="/icons/business.png"
+                      alt={company.name}
                       width={40}
                       height={40}
                     />
                     <div className="ml-4 flex w-full items-center justify-between gap-x-12">
                       <div>
-                        <p className="text-lg font-medium">
-                          {collaboration.name}
-                        </p>
-                        <p className="text-sm">{collaboration.website}</p>
-                        <p className="text-sm">
-                          {collaboration.specialization}
-                        </p>
-                        <p className="text-sm">{collaboration.phone}</p>
-                        <p className="text-sm">{collaboration.address}</p>
+                        <p className="text-lg font-medium">{company.name}</p>
+                        <p className="text-sm">www.business.com</p>
+                        <p className="text-sm">Business Specialization</p>
+                        <p className="text-sm">0123456789</p>
+                        <p className="text-sm">123 Main Street, Anytown, USA</p>
                       </div>
-                      <div className="text-sm italic">
-                        <p>Collaborating since</p>
-                        <p>January 1, 2024</p>
+                      <div className="">
+                        <button
+                          onClick={() => {
+                            handleConnectWithCompany(company.id);
+                          }}
+                          className="rounded-md bg-[#6571FF] px-4 py-2 text-white"
+                        >
+                          Send Request
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -176,9 +213,3 @@ const Page = (props: Props) => {
 };
 
 export default Page;
-
-{
-  /* <button className="ml-auto mt-4 rounded-md bg-[#6571FF] px-4 py-1 text-white">
-Change Password
-</button> */
-}
