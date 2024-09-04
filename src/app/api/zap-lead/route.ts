@@ -6,23 +6,38 @@ export async function POST(request: NextRequest) {
   try {
     const email = request.nextUrl.searchParams.get("email");
     const password = request.nextUrl.searchParams.get("password");
-    const clientName = request.nextUrl.searchParams.get("client_name") || "";
-    const clientEmail = request.nextUrl.searchParams.get("client_email") || "";
-    const clientPhone = request.nextUrl.searchParams.get("client_phone") || "";
-    const vehicleInfo = request.nextUrl.searchParams.get("vehicle_info") || "";
-    const services = request.nextUrl.searchParams.get("services") || "";
-    const source = request.nextUrl.searchParams.get("source") || "";
-    const comments = request.nextUrl.searchParams.get("comments") || "";
+    // const clientName = request.nextUrl.searchParams.get("client_name") || "";
+    // const clientEmail = request.nextUrl.searchParams.get("client_email") || "";
+    // const clientPhone = request.nextUrl.searchParams.get("client_phone") || "";
+    // const vehicleInfo = request.nextUrl.searchParams.get("vehicle_info") || "";
+    // const services = request.nextUrl.searchParams.get("services") || "";
+    // const source = request.nextUrl.searchParams.get("source") || "";
+    // const comments = request.nextUrl.searchParams.get("comments") || "";
+
+    const clientFirstName =
+      request.nextUrl.searchParams.get("first_name") || "";
+    const clientLastName = request.nextUrl.searchParams.get("last_name") || "";
+    const clientEmail = request.nextUrl.searchParams.get("email") || "";
+    const clientPhone = request.nextUrl.searchParams.get("phone") || "";
+    const clientCountry =
+      request.nextUrl.searchParams.get("customer_country") || "";
+    const oppurtunity =
+      request.nextUrl.searchParams.get("oppurtunity_source") || "";
+    // now extract the source, services and vehicle info from opportunity
+    // the format is this: (source) service | vehicle
+    const source = oppurtunity.split(")")[0].replace("(", "").trim();
+    const services = oppurtunity.split(")")[1].split("|")[0].trim();
+    const vehicleInfo = oppurtunity.split(")")[1].split("|")[1].trim();
 
     console.log("email", email);
     console.log("password", password);
-    console.log("clientName", clientName);
+    console.log("clientName", clientFirstName + " " + clientLastName);
     console.log("clientEmail", clientEmail);
     console.log("clientPhone", clientPhone);
     console.log("vehicleInfo", vehicleInfo);
     console.log("services", services);
     console.log("source", source);
-    console.log("comments", comments);
+    console.log("oppurtunity", oppurtunity);
 
     // check if email and password is provided
     if (!email || !password) {
@@ -48,18 +63,17 @@ export async function POST(request: NextRequest) {
     }
 
     // check if the required fields are provided
-    if (!clientName || !vehicleInfo || !services || !source) {
+    if (!clientFirstName || !vehicleInfo || !services || !source) {
       return Response.json({ error: "Invalid input" }, { status: 400 });
     }
 
     // Save the leads
     const newLead = await db.lead.create({
       data: {
-        clientName,
+        clientName: clientFirstName + " " + clientLastName,
         vehicleInfo,
         services,
         source,
-        comments,
         userId: user.id,
         companyId: user.companyId,
       },
