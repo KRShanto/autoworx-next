@@ -11,7 +11,6 @@ export default function EstimateAndInvoicePage() {
   const [currencies, setCurrencies] = useState<{ value: string }[]>([]);
 
   useEffect(() => {
-    // Fetch currency data from API
     fetch(
       "https://gist.githubusercontent.com/manishtiwari25/d3984385b1cb200b98bcde6902671599/raw/9f4441f9955c97996461ff58aca6715cfa0da597/world_currency_symbols.json",
     )
@@ -22,17 +21,19 @@ export default function EstimateAndInvoicePage() {
         return response.json();
       })
       .then((data: CurrencyData[]) => {
-        // Filter out entries with empty code and remove duplicates
         const uniqueCurrencies = Array.from(
           new Set(
             data
-              .filter((currency) => currency.Code && currency.Code.trim() !== "")
-              .map((currency) => currency.Code)
-          )
+              .filter(
+                (currency) => currency.Code && currency.Code.trim() !== "",
+              )
+              .map((currency) => currency.Code),
+          ),
         ).map((code) => ({
           value: code,
+          label: code,
         }));
-  
+
         setCurrencies(uniqueCurrencies);
       })
       .catch((error) => {
@@ -59,14 +60,18 @@ export default function EstimateAndInvoicePage() {
               />
               <div className="flex flex-col items-start">
                 <div className="mb-1 px-2 font-medium">Currency</div>
-                <Space wrap>
-                  <Select
-                    defaultValue="USD"
-                    className="h-[32px] w-[320px]"
-                    onChange={handleChange}
-                    options={currencies}
-                  />
-                </Space>
+                <Select
+                  showSearch
+                  defaultValue="USD"
+                  className="w-[320px] h-[30px]"
+                  filterOption={(input, option) =>
+                    (option?.value ?? " ")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                  onChange={handleChange}
+                  options={currencies}
+                />
               </div>
             </div>
             <div className="flex justify-end">
