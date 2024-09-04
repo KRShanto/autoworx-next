@@ -26,6 +26,9 @@ export async function POST(request: NextRequest) {
 
     // take data from the body
     const body = await request.json();
+
+    console.log("Body: ", body);
+
     const clientFirstName = body.first_name;
     const clientLastName = body.last_name;
     const clientEmail = body.email;
