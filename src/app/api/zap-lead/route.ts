@@ -37,10 +37,10 @@ export async function POST(request: NextRequest) {
     const oppurtunity = body.oppurtunity_source;
 
     // now extract the source, services and vehicle info from opportunity
-    // the format is this: (source) service | vehicle
+    // the format is this: (source) vehicle | service
     const source = oppurtunity.split(")")[0].replace("(", "").trim();
-    const services = oppurtunity.split(")")[1].split("|")[0].trim();
-    const vehicleInfo = oppurtunity.split(")")[1].split("|")[1].trim();
+    const vehicleInfo = oppurtunity.split(")")[1].split("|")[0].trim();
+    const services = oppurtunity.split(")")[1].split("|")[1].trim();
 
     console.log("email", email);
     console.log("password", password);
