@@ -14,15 +14,25 @@ export async function POST(request: NextRequest) {
     // const source = request.nextUrl.searchParams.get("source") || "";
     // const comments = request.nextUrl.searchParams.get("comments") || "";
 
-    const clientFirstName =
-      request.nextUrl.searchParams.get("first_name") || "";
-    const clientLastName = request.nextUrl.searchParams.get("last_name") || "";
-    const clientEmail = request.nextUrl.searchParams.get("email") || "";
-    const clientPhone = request.nextUrl.searchParams.get("phone") || "";
-    const clientCountry =
-      request.nextUrl.searchParams.get("customer_country") || "";
-    const oppurtunity =
-      request.nextUrl.searchParams.get("oppurtunity_source") || "";
+    // const clientFirstName =
+    //   request.nextUrl.searchParams.get("first_name") || "";
+    // const clientLastName = request.nextUrl.searchParams.get("last_name") || "";
+    // const clientEmail = request.nextUrl.searchParams.get("email") || "";
+    // const clientPhone = request.nextUrl.searchParams.get("phone") || "";
+    // const clientCountry =
+    //   request.nextUrl.searchParams.get("customer_country") || "";
+    // const oppurtunity =
+    //   request.nextUrl.searchParams.get("oppurtunity_source") || "";
+
+    // take data from the body
+    const body = await request.json();
+    const clientFirstName = body.first_name;
+    const clientLastName = body.last_name;
+    const clientEmail = body.email;
+    const clientPhone = body.phone;
+    const customerCountry = body.customer_country;
+    const oppurtunity = body.opportunity_source;
+
     // now extract the source, services and vehicle info from opportunity
     // the format is this: (source) service | vehicle
     const source = oppurtunity.split(")")[0].replace("(", "").trim();
