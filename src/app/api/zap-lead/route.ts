@@ -109,9 +109,13 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error: any) {
+    console.log("Server Error: ", error);
+
     // check if this is json parse error
     if (error instanceof SyntaxError) {
       return Response.json({ error: "Invalid input" }, { status: 400 });
+    } else {
+      return Response.json({ error: error.message }, { status: 500 });
     }
   }
 }
