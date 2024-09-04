@@ -96,11 +96,18 @@ export async function POST(request: NextRequest) {
     return Response.json(
       [
         {
+          // id: newLead.id,
+          // clientName: newLead.clientName,
+          // vehicleInfo: newLead.vehicleInfo,
+          // services: newLead.services,
+          // source: newLead.source,
           id: newLead.id,
-          clientName: newLead.clientName,
-          vehicleInfo: newLead.vehicleInfo,
-          services: newLead.services,
-          source: newLead.source,
+          first_name: clientFirstName,
+          last_name: clientLastName,
+          email: clientEmail,
+          phone: clientPhone,
+          customer_country: customerCountry,
+          oppurtunity_source: oppurtunity,
         },
       ],
       { status: 201 },
