@@ -2,6 +2,7 @@
 import { SlimInput } from "@/components/SlimInput";
 import { Select, Space } from "antd";
 import { useEffect, useState } from "react";
+import EmailTemplates from "./EmailTemplates";
 
 interface CurrencyData {
   Code: string;
@@ -63,7 +64,7 @@ export default function EstimateAndInvoicePage() {
                 <Select
                   showSearch
                   defaultValue="USD"
-                  className="w-[320px] h-[30px]"
+                  className="h-[30px] w-[320px]"
                   filterOption={(input, option) =>
                     (option?.value ?? " ")
                       .toLowerCase()
@@ -123,36 +124,10 @@ export default function EstimateAndInvoicePage() {
           </div>
         </div>
       </div>
-      <div className="space-y-4">
-        {/* Custom Message for Sharing Estimate/Invoice */}
-        <div>
-          <h2 className="mb-2 text-xl font-semibold">
-            Custom Message for Sharing Estimate/Invoice
-          </h2>
-          <div className="space-y-3 rounded-sm border bg-white p-5">
-            <div className="grid grid-cols-1 items-start space-x-3">
-              <label className="block">
-                <div className="mb-1 px-2 font-medium">
-                  The following message will be sent to the recipient when
-                  sharing an Invoice/Estimate
-                </div>
-                <textarea
-                  value='"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-'
-                  className="h-32 w-full resize-none rounded-sm border border-primary-foreground bg-white px-2 py-0.5 text-sm leading-6 outline-none"
-                />
-              </label>
-            </div>
-            <div className="flex justify-end">
-              <button
-                type="button"
-                className="rounded-md bg-[#6571FF] px-10 py-1.5 text-white"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
+
+      {/* Email templates section */}
+      <div className="space-y-4 w-full">
+        <EmailTemplates />
       </div>
     </div>
   );
