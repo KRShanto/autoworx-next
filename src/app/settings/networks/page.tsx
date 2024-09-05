@@ -81,7 +81,10 @@ const Page = (props: Props) => {
       <div className="grid grid-cols-2 gap-x-8">
         <div className="#w-1/2">
           <h3 className="my-4 text-lg font-bold">Collaborations</h3>
-          <div className="space-y-8 rounded-md p-8 shadow-md">
+          <div className="space-y-8 overflow-y-auto rounded-md p-8 shadow-md">
+          {connectedCompanies.length == 0 && (
+                  <p className="text-center text-sm">No companies found</p>
+                )}
             {connectedCompanies.map((company, index) => (
               <div
                 key={index}
@@ -170,7 +173,10 @@ const Page = (props: Props) => {
                   onChange={() => {}}
                 />
               </div>
-              <div className="space-y-8 rounded-md p-8 shadow-md">
+              <div className="space-y-8 overflow-y-auto rounded-md p-8 shadow-md">
+                {unconnectedCompanies.length == 0 && (
+                  <p className="text-center text-sm">No companies found</p>
+                )}
                 {unconnectedCompanies.map((company, index) => (
                   <div
                     key={index}
