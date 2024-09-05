@@ -1,3 +1,4 @@
+"use server";
 import { TNotification } from "@/types/notification";
 import { db } from "@/lib/db";
 export const updateNotification = async (

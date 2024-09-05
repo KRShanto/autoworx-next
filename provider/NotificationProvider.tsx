@@ -8,11 +8,6 @@ type TProps = {
   children: React.ReactNode;
 };
 
-type TNotificationState = {
-  notification: any;
-  setNotificationState: React.Dispatch<React.SetStateAction<any>>;
-};
-
 export default function NotificationProvider({
   notification,
   children,
@@ -24,10 +19,7 @@ export default function NotificationProvider({
       return { ...acc, [cur]: false };
     }, {}),
   );
-  console.log(openService);
-  useEffect(() => {
-    console.log("updated notification state: ", notificationState);
-  }, [notificationState]);
+
   return (
     <NotificationContext.Provider
       value={{
