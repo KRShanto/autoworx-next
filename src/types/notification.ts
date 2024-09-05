@@ -1,4 +1,15 @@
-type TSwitchValue = {
+export type TOpenService = {
+  payments: boolean;
+  inventory: boolean;
+  workForce: boolean;
+  communications: boolean;
+  calendarAndTasks: boolean;
+  operationPipeline: boolean;
+  estimateAndInvoices: boolean;
+  LeadsGeneratedAndSalesPipeline: boolean;
+};
+
+export type TSwitchValue = {
   email: boolean;
   push: boolean;
   silence: boolean;

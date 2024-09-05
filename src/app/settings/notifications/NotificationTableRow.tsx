@@ -9,7 +9,7 @@ import MySwitch from "./MySwitch";
 type TProps = {
   serviceKey: string;
   featureKey: string;
-  featureItem: Record<string, unknown>;
+  featureItem: Record<string, unknown> | undefined;
 };
 export default function NotificationTableRow({
   featureItem,
@@ -17,11 +17,10 @@ export default function NotificationTableRow({
   featureKey,
 }: TProps) {
   const featureTitle = getTextSpace(featureKey);
-  const switchesBtnKeys = Object.keys(featureItem);
+  const switchesBtnKeys = featureItem && Object.keys(featureItem);
   //@ts-ignore
   const { notificationState, setNotificationState } = useNotification();
   const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
 
   const handleChecked = async (value: boolean, switchKey: string) => {
     try {
@@ -50,17 +49,20 @@ export default function NotificationTableRow({
       setError(err.message);
     }
   };
+
+  console.log({ error });
   return (
     <tr className="">
       <td className="capitalize">{featureTitle}</td>
-      {switchesBtnKeys.map((switchKey) => (
-        <td key={switchKey}>
-          <MySwitch
-            checked={featureItem[switchKey] as boolean}
-            onChecked={(value) => handleChecked(value, switchKey)}
-          />
-        </td>
-      ))}
+      {featureItem &&
+        switchesBtnKeys?.map((switchKey) => (
+          <td key={switchKey}>
+            <MySwitch
+              checked={featureItem[switchKey] as boolean}
+              onChecked={(value) => handleChecked(value, switchKey)}
+            />
+          </td>
+        ))}
     </tr>
   );
 }

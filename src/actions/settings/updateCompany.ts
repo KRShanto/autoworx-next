@@ -1,7 +1,6 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { Company } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 type TCompanyData = {
@@ -12,10 +11,10 @@ type TCompanyData = {
   industry: string | null;
   website: string | null;
   address: string | null;
-  city: string;
-  state: string;
-  zip: string;
-  image?: string;
+  city: string | null;
+  state: string | null;
+  zip: string | null;
+  image?: string | null;
 };
 
 export const updateCompany = async (

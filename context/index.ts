@@ -1,8 +1,10 @@
 "use client";
+
+import { TNotification, TOpenService } from "@/types/notification";
 import { createContext } from "react";
 export const NotificationContext = createContext<{
-  notificationState: any;
-  setNotificationState: React.Dispatch<React.SetStateAction<any>>;
-  openService: any;
-  setOpenService: React.Dispatch<React.SetStateAction<any>>;
+  notificationState: TNotification;
+  setNotificationState: React.Dispatch<React.SetStateAction<TNotification>>;
+  openService: TOpenService;
+  setOpenService: React.Dispatch<React.SetStateAction<TOpenService>>;
 } | null>(null);

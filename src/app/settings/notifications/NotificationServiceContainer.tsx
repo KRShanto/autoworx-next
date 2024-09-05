@@ -4,33 +4,42 @@ import { IoIosArrowDown } from "react-icons/io";
 import { getTextSpace } from "@/lib/getTextSpace";
 import NotificationTableRow from "./NotificationTableRow";
 import useNotification from "@/hooks/useNotification";
+import {
+  TNotification,
+  TOpenService,
+  TSwitchValue,
+} from "@/types/notification";
 
 type Props = {
   serviceKey: string;
 };
 
 const NotificationServiceContainer = ({ serviceKey }: Props) => {
-  //@ts-ignore
-  const { openService, setOpenService, notificationState } = useNotification();
+  const { openService, setOpenService, notificationState } =
+    useNotification() || {};
   const serviceTitle = getTextSpace(serviceKey);
-  const featureItems: any = notificationState[serviceKey];
-  const featuresKeys = Object.keys(featureItems || ({} as Object));
+  const featureItems =
+    notificationState && notificationState[serviceKey as keyof TNotification];
+  const featuresKeys = featureItems && Object.keys(featureItems);
 
   const handleServiceToggle = () => {
-    const closeService = Object.keys(notificationState).reduce(
+    const closeService = Object.keys(notificationState!).reduce(
       (acc: any, cur: any) => {
         if (cur === serviceKey) {
-          return { ...acc, [cur]: !openService[serviceKey] };
+          return {
+            ...acc,
+            [cur]: !openService?.[serviceKey as keyof TNotification],
+          };
         } else {
           return { ...acc, [cur]: false };
         }
       },
       {},
     );
-    setOpenService(closeService);
+    setOpenService && setOpenService(closeService);
   };
   return (
-    <div>
+    <div className="w-2/4">
       <div
         className="flex w-full cursor-pointer items-center justify-between border p-8 font-semibold"
         onClick={handleServiceToggle}
@@ -40,7 +49,7 @@ const NotificationServiceContainer = ({ serviceKey }: Props) => {
           <IoIosArrowDown />
         </button>
       </div>
-      {openService[serviceKey] && (
+      {openService?.[serviceKey as keyof TOpenService] && (
         <div className="w-full border p-8">
           <table className="w-full border-separate border-spacing-2">
             <thead>
@@ -52,14 +61,17 @@ const NotificationServiceContainer = ({ serviceKey }: Props) => {
               </tr>
             </thead>
             <tbody>
-              {featuresKeys.map((featureKey) => (
-                <NotificationTableRow
-                  key={featureKey}
-                  serviceKey={serviceKey}
-                  featureKey={featureKey}
-                  featureItem={featureItems[featureKey]}
-                />
-              ))}
+              {featuresKeys &&
+                featuresKeys?.map((featureKey) => (
+                  <NotificationTableRow
+                    key={featureKey}
+                    serviceKey={serviceKey}
+                    featureKey={featureKey}
+                    featureItem={
+                      featureItems[featureKey as keyof typeof featureItems]
+                    }
+                  />
+                ))}
             </tbody>
           </table>
         </div>

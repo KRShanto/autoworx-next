@@ -26,29 +26,25 @@ const NotificationSettingPage = async () => {
         Toggle between email, push and silenced notifications for the following
       </h3>
       <NotificationProvider notification={findNotification.notifications}>
-        <div className="grid grid-cols-2 gap-x-8">
+        <div className="flex grid-cols-2 gap-x-8">
           {/* account detail */}
-          <div className="#w-1/2">
-            <div className="space-y-4 rounded-md p-8">
-              <NotificationServiceContainer
-                serviceKey={"LeadsGeneratedAndSalesPipeline"}
-              />
-              <NotificationServiceContainer serviceKey={"operationPipeline"} />
-              <NotificationServiceContainer serviceKey={"calendarAndTasks"} />
-              <NotificationServiceContainer
-                serviceKey={"estimateAndInvoices"}
-              />
-            </div>
-          </div>
+          <NotificationServiceContainer
+            serviceKey={"LeadsGeneratedAndSalesPipeline"}
+          />
+          <NotificationServiceContainer serviceKey={"operationPipeline"} />
+          <NotificationServiceContainer serviceKey={"calendarAndTasks"} />
+          <NotificationServiceContainer serviceKey={"estimateAndInvoices"} />
+          <NotificationServiceContainer serviceKey="payments" />
+          <NotificationServiceContainer serviceKey="communications" />
+          <NotificationServiceContainer serviceKey="inventory" />
+          <NotificationServiceContainer serviceKey="workForce" />
+          {/* <div className="#w-1/2">
+            <div className="space-y-4 rounded-md p-8"></div>
+          </div> */}
           {/* new password */}
-          <div className="#w-1/2">
-            <div className="space-y-4 rounded-md p-8">
-              <NotificationServiceContainer serviceKey="payments" />
-              <NotificationServiceContainer serviceKey="communications" />
-              <NotificationServiceContainer serviceKey="inventory" />
-              <NotificationServiceContainer serviceKey="workForce" />
-            </div>
-          </div>
+          {/* <div className="#w-1/2">
+            <div className="space-y-4 rounded-md p-8"></div>
+          </div> */}
         </div>
       </NotificationProvider>
     </div>

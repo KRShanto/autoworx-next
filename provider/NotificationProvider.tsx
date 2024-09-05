@@ -13,7 +13,9 @@ export default function NotificationProvider({
   children,
 }: TProps) {
   const [notificationState, setNotificationState] = useState(notification);
+  
   const serviceKeys = Object.keys(notification);
+
   const [openService, setOpenService] = useState(
     serviceKeys.reduce((acc: any, cur: any) => {
       return { ...acc, [cur]: false };
