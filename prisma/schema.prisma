@@ -60,6 +60,13 @@ model Company {
   companyEmailTemplate CompanyEmailTemplate[]
 }
 
+model NotificationSettings {
+  id        String   @id @default(uuid())
+  notifications Json     // JSON field to store notification settings
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 // create model that will handle multiple companies join and collaboration
 model CompanyJoin {
   id           Int      @id @default(autoincrement())
