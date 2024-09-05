@@ -39,7 +39,7 @@ const NotificationServiceContainer = ({ serviceKey }: Props) => {
     setOpenService && setOpenService(closeService);
   };
   return (
-    <div className="w-2/4">
+    <div className="flex-1">
       <div
         className="flex w-full cursor-pointer items-center justify-between border p-8 font-semibold"
         onClick={handleServiceToggle}
