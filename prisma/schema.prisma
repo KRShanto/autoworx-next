@@ -60,9 +60,12 @@ model Company {
   companyEmailTemplate CompanyEmailTemplate[]
 }
 
+
+// notification settings model
 model NotificationSettings {
-  id        String   @id @default(uuid())
-  notifications Json     // JSON field to store notification settings
+  id        Int   @id @default(autoincrement())
+  type  String  @default("notification") @unique
+  notifications Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

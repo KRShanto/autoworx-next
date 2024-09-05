@@ -1,4 +1,5 @@
-const notification = {
+import { TNotification } from "@/types/notification";
+const notification: TNotification = {
   LeadsGeneratedAndSalesPipeline: {
     leadsGenerated: {
       email: false,
