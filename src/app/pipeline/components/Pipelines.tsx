@@ -47,11 +47,17 @@ interface PipelineData {
   title: string;
   leads: Lead[];
 }
+type Column = {
+  id: number|null;
+  title: string;
+  type: string;
+};
 interface pipelinesProps {
   pipelinesTitle: string;
-  columns?: { id: number; title: string; type: string }[];
+  columns?: Column[];
   type: string;
 }
+
 
 const users: User[] = [];
 
