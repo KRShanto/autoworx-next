@@ -16,19 +16,11 @@ interface HeaderProps {
   [key: string]: any;
 }
 interface Column {
-  id: number;
+  id: number|null;
   title: string;
   type: string;
 }
-interface Lead {
-  name: string;
-  email: string;
-  phone: string;
-}
-interface PipelineData {
-  title: string;
-  leads: Lead[];
-}
+
 
 export default function Header({
   activeView,

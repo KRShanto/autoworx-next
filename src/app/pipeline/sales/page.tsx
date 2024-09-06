@@ -43,7 +43,7 @@ interface PipelineData {
 }
 
 interface Column {
-  id: number;
+  id: number|null;
   title: string;
   type: string;
 }
