@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
 import Layout from "@/components/Layout";
+import { TooltipProvider } from "@/components/Tooltip";
+import type { Metadata } from "next";
+import { SessionProvider } from "next-auth/react";
+import { Inter } from "next/font/google";
 import TopLoader from "../components/TopLoader";
 import { auth } from "./auth";
-import { TooltipProvider } from "@/components/Tooltip";
-import { SessionProvider } from "next-auth/react";
+import "./globals.css";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,6 +28,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <TopLoader />
+        <Toaster position="top-right" reverseOrder={false} />
         <SessionProvider session={session}>
           <TooltipProvider delayDuration={150}>
             <Layout session={session}>{children}</Layout>
