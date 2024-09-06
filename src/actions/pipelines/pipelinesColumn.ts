@@ -25,8 +25,9 @@ export const updateColumn = async (id: number, title: string, type: string) => {
   });
 };
 
+
 export const deleteColumn = async (id: number) => {
   return await db.column.delete({
     where: { id },
   });
-};
+}

@@ -45,7 +45,7 @@ export default function BusinessForm({ company }: TProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const name = e.target.name;
-    if (value && name) {
+    if (name) {
       setBusinessSettings({ ...businessSettings, [name]: value });
     }
   };
@@ -80,7 +80,7 @@ export default function BusinessForm({ company }: TProps) {
         const json = await uploadRes.json();
         image = json.data[0];
       }
-      
+
       const companyData = {
         name: businessSettings.legalBusinessName,
         businessId: businessSettings.businessRegistrationIDNumber,
@@ -125,6 +125,7 @@ export default function BusinessForm({ company }: TProps) {
             name="legalBusinessName"
           />
           <SlimInput
+            required={false}
             value={businessSettings.businessRegistrationIDNumber}
             onChange={handleChange}
             label="Business Registration ID Number*"
@@ -134,12 +135,14 @@ export default function BusinessForm({ company }: TProps) {
         {/* businessType and phone number */}
         <div className="grid grid-cols-2 gap-x-8">
           <SlimInput
+            required={false}
             value={businessSettings.businessType}
             onChange={handleChange}
             label="Business Type*"
             name="businessType"
           />
           <SlimInput
+            required={false}
             value={businessSettings.businessPhone}
             onChange={handleChange}
             label="Business Phone*"
@@ -150,12 +153,14 @@ export default function BusinessForm({ company }: TProps) {
         {/* industry and website */}
         <div className="grid grid-cols-2 gap-x-8">
           <SlimInput
+            required={false}
             value={businessSettings.industrySpecialization}
             onChange={handleChange}
             label="Industry/Specialization"
             name="industrySpecialization"
           />
           <SlimInput
+            required={false}
             value={businessSettings.businessWebsite}
             onChange={handleChange}
             label="Business Website"
@@ -164,6 +169,7 @@ export default function BusinessForm({ company }: TProps) {
         </div>
         <div className="grid grid-cols-1">
           <SlimInput
+            required={false}
             value={businessSettings.companyAddress}
             onChange={handleChange}
             label="Company Address*"
@@ -172,18 +178,21 @@ export default function BusinessForm({ company }: TProps) {
         </div>
         <div className="grid grid-cols-3 gap-x-8">
           <SlimInput
+            required={false}
             value={businessSettings.city}
             onChange={handleChange}
             label="City*"
             name="city"
           />
           <SlimInput
+            required={false}
             value={businessSettings.state}
             onChange={handleChange}
             label="State*"
             name="state"
           />
           <SlimInput
+            required={false}
             value={businessSettings.zip}
             onChange={handleChange}
             label="Zip*"

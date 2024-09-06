@@ -37,9 +37,9 @@ const SelectComponent = ({ label, items }: SelectProps) => (
                 {label}
               </Select.Label> */}
 
-              {items.map((item, index) => (
-                <SelectItem key={index} value={item.value}>
-                  {item.value}
+              {items.map((item) => (
+                <SelectItem key={item.id} value={item.value}>
+                  {item.label}
                 </SelectItem>
               ))}
             </Select.Group>

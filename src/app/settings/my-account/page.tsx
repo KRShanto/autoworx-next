@@ -5,6 +5,7 @@ import {
   getMyAccountInfo,
 } from "@/actions/settings/myAccount";
 import { SlimInput } from "@/components/SlimInput";
+import { errorToast, successToast } from "@/lib/toast";
 import { User } from "@prisma/client";
 import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -84,7 +85,7 @@ const Page = (props: Props) => {
   );
 
   useEffect(() => {
-    uploadProfilePic();
+    if (profilePic) uploadProfilePic();
   }, [profilePic]);
 
   return (
@@ -234,8 +235,11 @@ const Page = (props: Props) => {
               </div>
               <div className="text-right">
                 <button
-                  onClick={() => {
-                    editMyAccountInfo(userInfo);
+                  onClick={async () => {
+                    let result = await editMyAccountInfo(userInfo);
+                    if (result?.success) {
+                      successToast("Account details updated successfully");
+                    }
                   }}
                   className="ml-auto mt-4 rounded-md bg-[#6571FF] px-4 py-1 text-white"
                 >
@@ -276,10 +280,15 @@ const Page = (props: Props) => {
                     newPw,
                     confirmNewPw,
                   );
+                  if (newPw !== confirmNewPw) {
+                    errorToast("Passwords do not match");
+                    return;
+                  }
                   if (res?.success) {
                     setCurrentPw("");
                     setNewPw("");
                     setConfirmNewPw("");
+                    successToast("Password changed successfully");
                   }
                 }}
                 className="ml-auto mt-4 rounded-md bg-[#6571FF] px-4 py-1 text-white"
