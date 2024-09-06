@@ -26,7 +26,7 @@ export default async function Sidebar({ productId }: { productId: number }) {
 
   const imgUrl = product
     ? await QRCode.toDataURL(
-        `${process.env.NEXT_PUBLIC_APP_URL}inventory/use/${product.id}`,
+        `${process.env.NEXT_PUBLIC_APP_URL}/inventory/use/${product.id}`,
       )
     : null;
 
