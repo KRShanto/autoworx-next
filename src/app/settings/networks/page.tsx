@@ -2,10 +2,14 @@
 import {
   connectWithCompany,
   getAllCompany,
+  toggleAddressVisibility,
+  toggleBusinessVisibility,
+  togglePhoneVisibility,
 } from "@/actions/settings/myNetwork";
 import SliderRange from "@/app/employee/components/SliderRange";
 import { SlimInput } from "@/components/SlimInput";
 import { Switch } from "@/components/Switch";
+import { errorToast, successToast } from "@/lib/toast";
 import { Company } from "@prisma/client";
 import { Range } from "@radix-ui/react-slider";
 import Image from "next/image";
@@ -52,7 +56,12 @@ const Page = (props: Props) => {
   const [connectedCompanies, setConnectedCompanies] = useState<Company[] | []>(
     [],
   );
-  const handleConnectWithCompany = async (companyId: number) => {
+  const [currentCompany, setCurrentCompany] = useState<Company | null>(null);
+
+  const handleConnectWithCompany = async (
+    companyId: number,
+    companyName: string,
+  ) => {
     const result = await connectWithCompany(companyId);
     if (result.success) {
       setUnconnectedCompanies((prevUnconnected) =>
@@ -62,7 +71,10 @@ const Page = (props: Props) => {
         ...prevConnected,
         ...unconnectedCompanies.filter((company) => company.id === companyId),
       ]);
+      successToast(`Connected with ${companyName}`);
     } else {
+      errorToast(`Failed to connect with ${companyName}`);
+
       console.log("Failed to connect with the company:", result.message);
     }
   };
@@ -71,10 +83,18 @@ const Page = (props: Props) => {
       if (res?.data) {
         setUnconnectedCompanies(res.data.unconnectedCompanies);
         setConnectedCompanies(res.data.connectedCompanies);
+        setCurrentCompany(res.data.currentCompany);
       }
-      console.log("companies", res);
     });
   }, []);
+
+  useEffect(() => {
+    if (currentCompany) {
+      setBusinessVisibility(!!currentCompany?.businessVisibility);
+      setPhoneVisibility(!!currentCompany?.phoneVisibility);
+      setBusinessAddressVisibility(!!currentCompany?.addressVisibility);
+    }
+  }, [currentCompany]);
 
   return (
     <div className="h-full w-[80%] overflow-y-auto p-8">
@@ -82,9 +102,9 @@ const Page = (props: Props) => {
         <div className="#w-1/2">
           <h3 className="my-4 text-lg font-bold">Collaborations</h3>
           <div className="space-y-8 overflow-y-auto rounded-md p-8 shadow-md">
-          {connectedCompanies.length == 0 && (
-                  <p className="text-center text-sm">No companies found</p>
-                )}
+            {connectedCompanies.length == 0 && (
+              <p className="text-center text-sm">No companies found</p>
+            )}
             {connectedCompanies.map((company, index) => (
               <div
                 key={index}
@@ -125,7 +145,17 @@ const Page = (props: Props) => {
                 <span>
                   <Switch
                     checked={businessVisibility}
-                    setChecked={setBusinessVisibility}
+                    setChecked={async (value) => {
+                      let res = await toggleBusinessVisibility();
+                      if (res?.success) {
+                        setBusinessVisibility(value);
+                        successToast(
+                          "Business visibility updated successfully",
+                        );
+                      } else {
+                        errorToast("Failed to update business visibility");
+                      }
+                    }}
                   />
                 </span>
               </div>
@@ -134,7 +164,19 @@ const Page = (props: Props) => {
                 <span>
                   <Switch
                     checked={phoneVisibility}
-                    setChecked={setPhoneVisibility}
+                    setChecked={async (value) => {
+                      let res = await togglePhoneVisibility();
+                      if (res?.success) {
+                        setPhoneVisibility(value);
+                        successToast(
+                          "Business phone visibility updated successfully",
+                        );
+                      } else {
+                        errorToast(
+                          "Failed to update Business phone visibility",
+                        );
+                      }
+                    }}
                   />
                 </span>
               </div>
@@ -143,7 +185,19 @@ const Page = (props: Props) => {
                 <span>
                   <Switch
                     checked={businessAddressVisibility}
-                    setChecked={setBusinessAddressVisibility}
+                    setChecked={async (value) => {
+                      let res = await toggleAddressVisibility();
+                      if (res?.success) {
+                        setBusinessAddressVisibility(value);
+                        successToast(
+                          "Business address visibility updated successfully",
+                        );
+                      } else {
+                        errorToast(
+                          "Failed to update business address visibility",
+                        );
+                      }
+                    }}
                   />
                 </span>
               </div>
@@ -199,7 +253,7 @@ const Page = (props: Props) => {
                       <div className="">
                         <button
                           onClick={() => {
-                            handleConnectWithCompany(company.id);
+                            handleConnectWithCompany(company.id, company.name);
                           }}
                           className="rounded-md bg-[#6571FF] px-4 py-2 text-white"
                         >
