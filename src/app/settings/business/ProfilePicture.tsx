@@ -1,11 +1,7 @@
 "use client";
 import { cn } from "@/lib/cn";
 import Image from "next/image";
-import React, {
-  ChangeEvent,
-  SetStateAction,
-  useRef,
-} from "react";
+import React, { ChangeEvent, SetStateAction, useRef } from "react";
 
 type TProps = {
   imageSrc: File | null;
@@ -41,7 +37,10 @@ export default function ProfilePicture({
   };
   return (
     <div className="flex items-center gap-x-8">
-      <div className="relative mr-4 flex h-[150px] w-[150px] items-center justify-center rounded-full bg-violet-400/20">
+      <div
+        onClick={handleProfilePictureChange}
+        className="relative mr-4 flex h-[150px] w-[150px] cursor-pointer items-center justify-center rounded-full bg-violet-400/20"
+      >
         <Image
           className={cn(imageSrc ? "w-fit rounded-full" : "")}
           src={
@@ -62,7 +61,6 @@ export default function ProfilePicture({
             id=""
           />
           <Image
-            onClick={handleProfilePictureChange}
             src="/icons/upArrow.png"
             alt=""
             className="absolute bottom-2 right-2 cursor-pointer"
