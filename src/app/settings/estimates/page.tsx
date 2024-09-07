@@ -1,8 +1,10 @@
 "use client";
 import { SlimInput } from "@/components/SlimInput";
-import { Select, Space } from "antd";
+import { Select} from "antd";
 import { useEffect, useState } from "react";
 import EmailTemplates from "./EmailTemplates";
+import{updateTaxTerms} from "@/actions/settings/emailTemplates"
+import { Prisma } from "@prisma/client";
 
 interface CurrencyData {
   Code: string;
@@ -10,20 +12,22 @@ interface CurrencyData {
 
 export default function EstimateAndInvoicePage() {
   const [currencies, setCurrencies] = useState<{ value: string }[]>([]);
-  const [selectedCurrency, setSelectedCurrency] = useState<string>("USD");
+  const [currency, setCurrency] = useState<string>("USD");
 
   const handleSubmitUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget as HTMLFormElement);
 
-    const tax = formData.get("taxAmount");
-    const terms = formData.get("terms");
-    const policy = formData.get("policy");
+    const tax = formData.get("taxAmount") as string;
+    const terms = formData.get("terms") as string;
+    const policy = formData.get("policy") as string;
 
-    console.log("Form data1", tax);
-    console.log("Form data1", selectedCurrency);
-    console.log("Form data1", terms);
-    console.log("Form data1", policy);
+    await updateTaxTerms({
+      tax: new Prisma.Decimal(tax),
+      terms,
+      policy,
+      currency,
+    })
     // console.log("Form data",formData);
   };
 
@@ -59,7 +63,7 @@ export default function EstimateAndInvoicePage() {
   }, []);
 
   const handleChange = (value: string) => {
-    setSelectedCurrency(value);
+    setCurrency(value);
   };
 
   return (

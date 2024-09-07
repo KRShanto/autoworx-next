@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import { z } from "zod";
 import { getCompanyId } from "@/lib/companyId";
-import { CompanyEmailTemplate } from "@prisma/client";
+import { CompanyEmailTemplate,Prisma } from "@prisma/client";
 
 
 
@@ -112,3 +112,47 @@ export const updateEmailTemplate = async (
 //     throw error;
 //   }
 // };
+//update the tax,terms and policy
+
+const companyUpdatesTSchema=z.object({
+  tax: z.string().transform((val) => {
+    return new Prisma.Decimal(val);
+  }),
+  currency:z.string().min(1,"Currency is required"),
+  terms: z.string().min(1, "Terms is required").optional(),
+  policy: z.string().min(1, "Policy is required").optional(),
+
+
+})
+
+export const updateTaxTerms=async(data:z.infer<typeof companyUpdatesTSchema>)=>{
+
+  const dataValidation=companyUpdatesTSchema.safeParse(data);
+
+  if(!dataValidation.success)
+  {
+    console.log("Update tax policy error",dataValidation.error)
+  }
+
+ const validatedData = dataValidation.data;
+
+ try {
+  const companyId = await getCompanyId(); 
+  const updatedCompany = await db.company.update({
+    where: { id: companyId },
+    data: {
+      tax: validatedData?.tax,
+      currency: validatedData?.currency,
+      terms: validatedData?.terms,
+      policy: validatedData?.policy,
+    },
+  });
+
+} catch (error) {
+  console.error("Error updating company:", error);
+}
+
+
+   
+
+}
