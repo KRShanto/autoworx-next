@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { tempCompanies } from "@/lib/tempCompanies";
 import Image from "next/image";
+import { Company, User } from "@prisma/client";
 
 export default function List({
   setSelectedUsersList,
+  companies,
 }: {
   setSelectedUsersList: React.Dispatch<React.SetStateAction<any[]>>;
+  companies: (Company & { users: User[] })[];
 }) {
   const [selectedCompany, setSelectedCompany] = useState<any>(null); // TODO: type this
 
@@ -31,16 +34,16 @@ export default function List({
 
       {/* List */}
       <div className="mt-2 flex h-[88%] flex-col gap-1 overflow-y-auto max-[2127px]:h-[80%]">
-        {tempCompanies.map((company) => {
+        {companies.map((company) => {
           if (selectedCompany && selectedCompany.id === company.id) {
             return (
               <div key={company.id} className="rounded-lg bg-[#006D77] p-2">
                 <button
-                  className="flex w-full items-center justify-center gap-1"
+                  className="flex h-[78px] w-full items-center justify-start gap-1"
                   onClick={() => setSelectedCompany(null)}
                 >
                   <Image
-                    src={company.image}
+                    src={`/api/images/${company.image!}`}
                     alt={company.name}
                     width={50}
                     height={50}
@@ -53,7 +56,7 @@ export default function List({
                 </button>
 
                 <div className="flex flex-col items-center gap-1">
-                  {company.users.map((user: any) => {
+                  {company.users.map((user: User) => {
                     return (
                       <button
                         key={user.id}
@@ -69,15 +72,19 @@ export default function List({
                         }}
                       >
                         <Image
-                          src={user.image}
-                          alt={user.name}
+                          src={
+                            user.image?.includes("default.png")
+                              ? user.image
+                              : `/api/images/${user.image!}`
+                          }
+                          alt={user.firstName}
                           width={50}
                           height={50}
                           className="rounded-full max-[1400px]:h-[40px] max-[1400px]:w-[40px]"
                         />
                         <div className="flex flex-col">
                           <p className="text-[12px] font-bold text-[#797979]">
-                            {user.name}
+                            {user.firstName} {user.lastName}
                           </p>
                         </div>
                       </button>
@@ -95,7 +102,7 @@ export default function List({
               onClick={() => setSelectedCompany(company)}
             >
               <Image
-                src={company.image}
+                src={`/api/images/${company.image!}`}
                 alt={company.name}
                 width={50}
                 height={50}
