@@ -1,97 +1,157 @@
+"use client";
 import { SlimInput } from "@/components/SlimInput";
+import { Select} from "antd";
+import { useEffect, useState } from "react";
+import EmailTemplates from "./EmailTemplates";
+import{updateTaxTerms} from "@/actions/settings/emailTemplates"
+import { Prisma } from "@prisma/client";
+
+interface CurrencyData {
+  Code: string;
+}
 
 export default function EstimateAndInvoicePage() {
+  const [currencies, setCurrencies] = useState<{ value: string }[]>([]);
+  const [currency, setCurrency] = useState<string>("USD");
+
+  const handleSubmitUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+
+    const tax = formData.get("taxAmount") as string;
+    const terms = formData.get("terms") as string;
+    const policy = formData.get("policy") as string;
+
+    await updateTaxTerms({
+      tax: new Prisma.Decimal(tax),
+      terms,
+      policy,
+      currency,
+    })
+    // console.log("Form data",formData);
+  };
+
+  useEffect(() => {
+    fetch(
+      "https://gist.githubusercontent.com/manishtiwari25/d3984385b1cb200b98bcde6902671599/raw/9f4441f9955c97996461ff58aca6715cfa0da597/world_currency_symbols.json",
+    )
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data: CurrencyData[]) => {
+        const uniqueCurrencies = Array.from(
+          new Set(
+            data
+              .filter(
+                (currency) => currency.Code && currency.Code.trim() !== "",
+              )
+              .map((currency) => currency.Code),
+          ),
+        ).map((code) => ({
+          value: code,
+          label: code,
+        }));
+
+        setCurrencies(uniqueCurrencies);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+  const handleChange = (value: string) => {
+    setCurrency(value);
+  };
+
   return (
-    <div className="grid w-full grid-cols-2 items-start gap-4 px-5">
-      <div className="space-y-4">
-        {/* Currency & Tax */}
-        <div>
-          <h2 className="mb-2 text-xl font-semibold">Currency & Tax</h2>
-          <div className="space-y-3 rounded-sm border p-5">
-            <div className="grid grid-cols-2 items-start space-x-3">
-              <SlimInput name="taxAmount" label="Tax Amount" />
-              <SlimInput name="currency" />
-            </div>
-            <div className="flex justify-end">
-              <button
-                type="button"
-                className="rounded-md bg-[#6571FF] px-10 py-1.5 text-white"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-        {/* Terms & Conditions */}
-        <div>
-          <h2 className="mb-2 text-xl font-semibold">Terms & Conditions</h2>
-          <div className="space-y-3 rounded-sm border p-5">
-            <div className="grid grid-cols-2 items-start space-x-3">
-              <label className="block">
-                <div className="mb-1 px-2 font-medium">Terms & Conditions</div>
-                <textarea
-                  value='"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-'
-                  className="h-60 w-full resize-none rounded-sm border border-primary-foreground bg-white px-2 py-0.5 text-sm leading-6 outline-none"
+    <form onSubmit={handleSubmitUpdate}>
+      <div className="grid w-full grid-cols-2 items-start gap-4 px-5">
+        <div className="space-y-4">
+          {/* Currency & Tax */}
+          <div>
+            <h2 className="mb-2 text-xl font-semibold">Currency & Tax</h2>
+            <div className="space-y-3 rounded-sm border bg-white p-5">
+              <div className="flex items-center justify-evenly gap-2">
+                <SlimInput
+                  name="taxAmount"
+                  label="Tax Amount"
+                  className="w-[320px]"
                 />
-              </label>
-              <label className="block">
-                <div className="mb-1 px-2 font-medium">Policy</div>
-                <textarea
-                  value="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur"
-                  className="h-60 w-full resize-none rounded-sm border border-primary-foreground bg-white px-2 py-0.5 text-sm leading-6 outline-none"
-                />
-              </label>
-            </div>
-            <div className="flex justify-end">
-              <button
-                type="button"
-                className="rounded-md bg-[#6571FF] px-10 py-1.5 text-white"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-        {/* Authorization */}
-        <div>
-          <h2 className="mb-2 text-xl font-semibold">Authorization</h2>
-          <div className="space-y-3 rounded-sm border p-5">
-            {/* TODO: future added */}
-          </div>
-        </div>
-      </div>
-      <div className="space-y-4">
-        {/* Custom Message for Sharing Estimate/Invoice */}
-        <div>
-          <h2 className="mb-2 text-xl font-semibold">
-            Custom Message for Sharing Estimate/Invoice
-          </h2>
-          <div className="space-y-3 rounded-sm border p-5">
-            <div className="grid grid-cols-1 items-start space-x-3">
-              <label className="block">
-                <div className="mb-1 px-2 font-medium">
-                  The following message will be sent to the recipient when
-                  sharing an Invoice/Estimate
+                <div className="flex flex-col items-start">
+                  <div className="mb-1 px-2 font-medium">Currency</div>
+                  <Select
+                    showSearch
+                    defaultValue="USD"
+                    className="h-[30px] w-[320px]"
+                    filterOption={(input, option) =>
+                      (option?.value ?? " ")
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
+                    onChange={handleChange}
+                    options={currencies}
+                  />
                 </div>
-                <textarea
-                  value='"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-'
-                  className="h-32 w-full resize-none rounded-sm border border-primary-foreground bg-white px-2 py-0.5 text-sm leading-6 outline-none"
-                />
-              </label>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="rounded-md bg-[#6571FF] px-10 py-1.5 text-white"
+                >
+                  Save
+                </button>
+              </div>
             </div>
-            <div className="flex justify-end">
-              <button
-                type="button"
-                className="rounded-md bg-[#6571FF] px-10 py-1.5 text-white"
-              >
-                Save
-              </button>
+          </div>
+          {/* Terms & Conditions */}
+          <div>
+            <h2 className="mb-2 text-xl font-semibold">Terms & Conditions</h2>
+            <div className="space-y-3 rounded-sm border bg-white p-5">
+              <div className="grid grid-cols-2 items-start space-x-3">
+                <label className="block">
+                  <div className="mb-1 px-2 font-medium">
+                    Terms & Conditions
+                  </div>
+                  <textarea
+                    className="h-60 w-full resize-none rounded-sm border border-primary-foreground bg-white px-2 py-0.5 text-sm leading-6 outline-none"
+                    name="terms"
+                  />
+                </label>
+                <label className="block">
+                  <div className="mb-1 px-2 font-medium">Policy</div>
+                  <textarea
+                    className="h-60 w-full resize-none rounded-sm border border-primary-foreground bg-white px-2 py-0.5 text-sm leading-6 outline-none"
+                    name="policy"
+                  />
+                </label>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="rounded-md bg-[#6571FF] px-10 py-1.5 text-white"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+          {/* Authorization */}
+          <div>
+            <h2 className="mb-2 text-xl font-semibold">Authorization</h2>
+            <div className="space-y-3 rounded-sm border bg-white p-5">
+              {/* TODO: future added */}
             </div>
           </div>
         </div>
+
+        {/* Email templates section */}
+        <div className="w-full space-y-4">
+          <EmailTemplates />
+        </div>
       </div>
-    </div>
+    </form>
   );
 }
