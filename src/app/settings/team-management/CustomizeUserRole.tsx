@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Switch, Checkbox } from "antd";
+import {Role,EmployeeType} from "@prisma/client"
 
 interface Module {
   name: string;
@@ -10,14 +11,18 @@ interface Module {
 interface CustomizeUserRolesProps {
   user: {
     id: number;
-    name: string;
-    role: string;
-    avatarUrl: string;
+    firstName: string;
+    lastName: string | null;
+    role: Role;
+    image: string;
+    employeeType: EmployeeType;
   };
   onBack: () => void;
 }
 
 const CustomizeUserRole = ({ user, onBack }: CustomizeUserRolesProps) => {
+ 
+
   const [modules, setModules] = useState<Module[]>([
     { name: "Dashboard", access: false },
     { name: "Communications Hub: Internal", access: false },
@@ -37,6 +42,7 @@ const CustomizeUserRole = ({ user, onBack }: CustomizeUserRolesProps) => {
       return newModules;
     });
   };
+  const name = `${user.firstName} ${user.lastName}`;
 
   return (
     <div className="">
@@ -48,8 +54,8 @@ const CustomizeUserRole = ({ user, onBack }: CustomizeUserRolesProps) => {
       <div className="ml-1 mr-4 flex h-[100px] w-[98%] items-center border-l border-r border-t border-black pl-2">
         <div className="w- overflow-hidden rounded-full">
           <Image
-            src={user.avatarUrl}
-            alt={user.name}
+            src={user.image}
+            alt={name}
             width={40}
             height={40}
             className="object-cover"
@@ -58,11 +64,11 @@ const CustomizeUserRole = ({ user, onBack }: CustomizeUserRolesProps) => {
           />
         </div>
         <div className="ml-3">
-          <h3 className="text-lg font-medium">{user.name}</h3>
-          <p className="text-sm text-gray-500">{user.role}</p>
+          <h3 className="text-lg font-medium">{name}</h3>
+          <p className="text-sm text-gray-500">{user.employeeType}</p>
         </div>
       </div>
-      <table className="ml-1 mr-4 w-[98%] border border-t-0 border-black p-8 mb-2">
+      <table className="mb-2 ml-1 mr-4 w-[98%] border border-t-0 border-black p-8">
         <thead>
           <tr className="border-b-2 border-black">
             <th className="px-4 text-left">Modules</th>
@@ -74,7 +80,8 @@ const CustomizeUserRole = ({ user, onBack }: CustomizeUserRolesProps) => {
             <tr key={index} className="p-4">
               <td className="px-4 py-2">{module.name}</td>
               <td className="px-4 py-2.5 text-left">
-                <Switch defaultChecked={false} className="shadow-md" />{module.access?<Checkbox className="relative ml-2" />:null}
+                <Switch defaultChecked={false} className="shadow-md" />
+                {module.access ? <Checkbox className="relative ml-2" /> : null}
               </td>
             </tr>
           ))}

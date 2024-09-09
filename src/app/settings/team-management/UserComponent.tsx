@@ -4,14 +4,16 @@ import Search from "@/app/employee/components/Search";
 import { BiSolidEditAlt } from "react-icons/bi";
 import Image from "next/image";
 import CustomizeUserRole from "./CustomizeUserRole";
-
-type UserRole = "Sales" | "Technician" | "Manager";
+import { EmployeeType, Role } from "@prisma/client";
+import { teamManagementUser } from "@/actions/settings/teamManagement";
 
 interface User {
   id: number;
-  name: string;
-  role: UserRole;
-  avatarUrl: string;
+  firstName: string;
+  lastName: string | null;
+  role: Role;
+  image: string;
+  employeeType: EmployeeType;
 }
 
 const UserList: React.FC = () => {
@@ -19,26 +21,19 @@ const UserList: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [openEdit, setOpenEdit] = useState<boolean>(true);
 
-  const dummyData: User[] = [
-    {
-      id: 1,
-      name: "John Doe",
-      role: "Sales",
-      avatarUrl: "https://via.placeholder.com/40",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      role: "Technician",
-      avatarUrl: "https://via.placeholder.com/40",
-    },
-    {
-      id: 3,
-      name: "Alice Johnson",
-      role: "Manager",
-      avatarUrl: "https://via.placeholder.com/40",
-    },
-  ];
+  useEffect(() => {
+    const usersFetchFunction = async () => {
+      try {
+        const fetchedUsers = await teamManagementUser();
+        const filteredUsers = fetchedUsers.filter(user => user.employeeType !== EmployeeType.Admin);
+        setUsers(filteredUsers);
+      } catch (error: any) {
+        console.log(error);
+      }
+    };
+
+    usersFetchFunction();
+  }, []);
 
   const handleEditClick = (user: User) => {
     setSelectedUser(user);
@@ -67,34 +62,37 @@ const UserList: React.FC = () => {
               <Search />
             </div>
             <ul>
-              {dummyData.map((user) => (
-                <li
-                  key={user.id}
-                  className="mb-2 flex items-center rounded-md border border-[#66738C] p-2"
-                >
-                  <div className="h-10 w-10 overflow-hidden rounded-full">
-                    <Image
-                      src={user.avatarUrl}
-                      alt={user.name}
-                      width={40}
-                      height={40}
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="ml-3 flex-1">
-                    <h4 className="text-md font-semibold">{user.name}</h4>
-                    <p className="text-sm text-gray-500">{user.role}</p>
-                  </div>
-                  <div>
-                    <button
-                      onClick={() => handleEditClick(user)}
-                      className="text-blue-800 hover:underline"
-                    >
-                      <BiSolidEditAlt />
-                    </button>
-                  </div>
-                </li>
-              ))}
+              {users.map((user) => {
+                const name = `${user.firstName} ${user.lastName}`;
+                return (
+                  <li
+                    key={user.id}
+                    className="mb-2 flex items-center rounded-md border border-[#66738C] p-2"
+                  >
+                    <div className="h-10 w-10 overflow-hidden rounded-full">
+                      <Image
+                        src={user.image}
+                        alt={name}
+                        width={40}
+                        height={40}
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="ml-3 flex-1">
+                      <h4 className="text-md font-semibold">{name}</h4>
+                      <p className="text-sm text-gray-500">{user.employeeType}</p>
+                    </div>
+                    <div>
+                      <button
+                        onClick={() => handleEditClick(user)}
+                        className="text-blue-800 hover:underline"
+                      >
+                        <BiSolidEditAlt />
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </>
         )}
