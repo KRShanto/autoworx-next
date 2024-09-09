@@ -22,11 +22,13 @@ export default function MessageBox({
   fromGroup,
   group,
   setGroupsList,
+  companyName,
 }: {
   user?: User; // TODO: type this
   setUsersList?: React.Dispatch<React.SetStateAction<any[]>>;
   setGroupsList?: React.Dispatch<React.SetStateAction<any[]>>;
   messages: Message[];
+  companyName?: string | null;
   totalMessageBox: number;
   setMessages: React.Dispatch<React.SetStateAction<any[]>>;
   fromGroup?: boolean;
@@ -165,8 +167,11 @@ export default function MessageBox({
             <Avatar photo={user?.image} width={50} height={50} />
           )}
           <div className="flex flex-col">
-            <p className="text-[20px] font-bold">
+            <p className="flex flex-col text-[20px] font-bold">
               {fromGroup ? group?.name : `${user?.firstName} ${user?.lastName}`}
+              {companyName && (
+                <span className="text-sm font-light">{companyName}</span>
+              )}
             </p>
           </div>
           {fromGroup && (

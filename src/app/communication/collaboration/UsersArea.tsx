@@ -13,7 +13,9 @@ export default function UsersArea({
   setSelectedUsersList,
   totalMessageBoxLength,
   previousMessages,
+  companyName,
 }: {
+  companyName: string | null;
   previousMessages: Message[];
   currentUser: NextAuthUser;
   selectedUsersList: any[];
@@ -88,10 +90,12 @@ export default function UsersArea({
       {selectedUsersList.map((user) => {
         const findMessages =
           messages.find((m) => m.user === user.id)?.messages || [];
+        console.log({ user });
         return (
           <MessageBox
             key={user.id}
             user={user}
+            companyName={companyName}
             setUsersList={setSelectedUsersList}
             messages={[...findMessages]}
             setMessages={setMessages}

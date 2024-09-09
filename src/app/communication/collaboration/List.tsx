@@ -5,9 +5,11 @@ import { Company, User } from "@prisma/client";
 
 export default function List({
   setSelectedUsersList,
+  setCompanyName,
   companies,
 }: {
   setSelectedUsersList: React.Dispatch<React.SetStateAction<any[]>>;
+  setCompanyName: React.Dispatch<React.SetStateAction<string | null>>;
   companies: (Company & { users: User[] })[];
 }) {
   const [selectedCompany, setSelectedCompany] = useState<any>(null); // TODO: type this
@@ -62,6 +64,7 @@ export default function List({
                         key={user.id}
                         className="flex w-full items-center gap-2 rounded-md bg-[#F2F2F2] p-1"
                         onClick={() => {
+                          setCompanyName(company.name);
                           // add this user to the list (if not already in it)
                           setSelectedUsersList((usersList) => {
                             if (usersList.find((u) => u.id === user.id)) {

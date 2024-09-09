@@ -16,11 +16,16 @@ export default function Collaboration({
   messages: DbMessage[];
 }) {
   const [selectedUsersList, setSelectedUsersList] = useState<any[]>([]);
-
+  const [companyName, setCompanyName] = useState<string | null>(null);
   return (
     <div className="mt-5 flex gap-5">
-      <List companies={companies} setSelectedUsersList={setSelectedUsersList} />
+      <List
+        companies={companies}
+        setSelectedUsersList={setSelectedUsersList}
+        setCompanyName={setCompanyName}
+      />
       <UsersArea
+        companyName={companyName}
         previousMessages={messages}
         currentUser={currentUser}
         totalMessageBoxLength={selectedUsersList.length}
