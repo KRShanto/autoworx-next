@@ -162,7 +162,10 @@ export default function SearchCollaborationModal({
             Cancel
           </DialogClose>
           <button
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              setOpen(false)
+              setOpenUserList(false)
+            }}
             className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
           >
             Done

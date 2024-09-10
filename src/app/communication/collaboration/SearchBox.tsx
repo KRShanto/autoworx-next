@@ -1,7 +1,7 @@
 import { searchCompanyQuery } from "@/actions/communication/collaboration/searchQuery";
 import { errorToast } from "@/lib/toast";
 import { Company, User } from "@prisma/client";
-import React, { SetStateAction, useEffect, useState } from "react";
+import React, { SetStateAction, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { RiArrowUpSLine } from "react-icons/ri";
 
@@ -28,7 +28,7 @@ const SearchBox = React.forwardRef(function SearchBox(
   const handleSubmit = async (event?: React.FormEvent<HTMLFormElement>) => {
     event && event.preventDefault();
     try {
-      const response = await searchCompanyQuery(searchText);
+      const response = await searchCompanyQuery(searchText.trim());
       if (response.success) {
         const updateCompanyAdmins = response.data
           .map((company) => {
@@ -54,6 +54,7 @@ const SearchBox = React.forwardRef(function SearchBox(
         value={searchText}
         onChange={(e) => {
           if (e.target.value === "") {
+            console.log(e.target.value);
             handleSubmit();
           }
           setSearchText(e.target.value);
