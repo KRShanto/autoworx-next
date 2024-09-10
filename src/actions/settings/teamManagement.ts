@@ -36,3 +36,25 @@ export const teamManagementUser = async (): Promise<{
     throw error;
   }
 };
+
+export const getPermissionsForRole = async () => {
+  try {
+    const companyId = await getCompanyId();
+    const [managerPermissions, salesPermissions, technicianPermissions, otherPermissions] = await Promise.all([
+      db.permissionForManager.findFirst({ where: { companyId } }),
+      db.permissionForSales.findFirst({ where: { companyId } }),
+      db.permissionForTechnician.findFirst({ where: { companyId } }),
+      db.permissionForOther.findFirst({ where: { companyId } }),
+    ]);
+
+    return {
+      managerPermissions,
+      salesPermissions,
+      technicianPermissions,
+      otherPermissions,
+    };
+  } catch (error) {
+    console.log("Error fetching permissions", error);
+    throw error;
+  }
+};
