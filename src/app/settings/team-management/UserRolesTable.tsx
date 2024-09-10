@@ -4,10 +4,14 @@ import { Switch, Checkbox } from "antd";
 import {
   teamManagementUser,
   getPermissionsForRole,
+  updatePermissionForRole
 } from "@/actions/settings/teamManagement";
-import { PermissionForManager,PermissionForSales,PermissionForTechnician,PermissionForOther } from "@prisma/client";
-
-
+import {
+  PermissionForManager,
+  PermissionForSales,
+  PermissionForTechnician,
+  PermissionForOther,
+} from "@prisma/client";
 
 interface PermissionWithIndexSignature {
   [key: string]: boolean;
@@ -26,7 +30,10 @@ export default function UserRolesTable() {
   const modules = [
     { label: "Communications Hub: Internal", key: "communicationHubInternal" },
     { label: "Communications Hub: Clients", key: "communicationHubClients" },
-    { label: "Communications Hub: Collaboration", key: "communicationHubCollaboration" },
+    {
+      label: "Communications Hub: Collaboration",
+      key: "communicationHubCollaboration",
+    },
     { label: "Estimates & Invoices", key: "estimatesInvoices" },
     { label: "Calendar & Task", key: "calendarTask" },
     { label: "Payments", key: "payments" },
@@ -44,7 +51,7 @@ export default function UserRolesTable() {
   useEffect(() => {
     const fetchPermissions = async () => {
       try {
-        const data = await getPermissionsForRole() as Permissions;
+        const data = (await getPermissionsForRole()) as Permissions;
 
         if (data) {
           setPermissions(data);
@@ -57,7 +64,33 @@ export default function UserRolesTable() {
     fetchPermissions();
   }, []);
 
-  const getPermissionForRole = (role: string, moduleKey: string): boolean | null => {
+  const handleToggle = async (
+    role: string,
+    moduleKey: string,
+    value: boolean,
+  ) => {
+    if (!permissions) return;
+
+    try {
+      const updatedPermissions = { ...permissions };
+
+      const roleKey =
+        `${role.toLowerCase()}Permissions` as keyof typeof permissions;
+
+      if (updatedPermissions[roleKey]) {
+        updatedPermissions[roleKey]![moduleKey] = value;
+        setPermissions(updatedPermissions);
+        await updatePermissionForRole({role, moduleKey, value})
+      }
+    } catch (error) {
+      console.log("Error updating permission:", error);
+    }
+  };
+
+  const getPermissionForRole = (
+    role: string,
+    moduleKey: string,
+  ): boolean | null => {
     if (!permissions) return null;
 
     switch (role) {
@@ -97,7 +130,7 @@ export default function UserRolesTable() {
             </tr>
           </thead>
           <tbody>
-            {modules.map((module,index) => (
+            {modules.map((module, index) => (
               <tr key={index}>
                 <td className="py-2 text-left">{module.label}</td>
                 {roles.map((role) => (
@@ -105,8 +138,13 @@ export default function UserRolesTable() {
                     {getPermissionForRole(role, module.key) !== null ? (
                       <div className="flex items-center justify-center">
                         <Switch
-                          checked={getPermissionForRole(role, module.key)??false}
+                          checked={
+                            getPermissionForRole(role, module.key) ?? false
+                          }
                           className="max-w-2 shadow-md"
+                          onChange={(checked) =>
+                            handleToggle(role, module.key, checked)
+                          }
                         />
                         {/* Assuming viewOnly needs to be handled differently */}
                         {true && (
