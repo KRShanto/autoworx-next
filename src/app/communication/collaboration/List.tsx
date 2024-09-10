@@ -1,37 +1,41 @@
 import React, { useState } from "react";
-import { tempCompanies } from "@/lib/tempCompanies";
 import Image from "next/image";
 import { Company, User } from "@prisma/client";
+import SearchCollaborationModal from "./SearchCollaborationModal";
 
 export default function List({
+  companyAdmins,
   setSelectedUsersList,
   setCompanyName,
   companies,
+  setCompanyAdmins,
 }: {
+  companyAdmins: Partial<User>[];
+  setCompanyAdmins: React.Dispatch<React.SetStateAction<Partial<User>[]>>;
   setSelectedUsersList: React.Dispatch<React.SetStateAction<any[]>>;
   setCompanyName: React.Dispatch<React.SetStateAction<string | null>>;
   companies: (Company & { users: User[] })[];
 }) {
   const [selectedCompany, setSelectedCompany] = useState<any>(null); // TODO: type this
-
   return (
     <div className="app-shadow h-[83vh] w-[23%] rounded-lg bg-white p-3">
       {/* Header */}
-      <h2 className="text-[14px] text-[#797979]">User List</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-[14px] text-[#797979]">User List</h2>
+        <SearchCollaborationModal
+          companies={companies}
+          setCompanyAdmins={setCompanyAdmins}
+          companyAdmins={companyAdmins}
+        />
+      </div>
 
       {/* Search */}
       <form>
         <input
           type="text"
           placeholder="Search here..."
-          className="my-3 mr-2 rounded-md border-none p-2 text-[12px] text-[#797979] max-[1822px]:w-full"
+          className="my-3 mr-2 w-full rounded-md border-none p-2 text-[12px] text-[#797979] max-[1822px]:w-full"
         />
-        <button
-          type="submit"
-          className="h-[26px] w-[62px] rounded-md bg-[#797979] text-[12px] text-white"
-        >
-          Filter
-        </button>
       </form>
 
       {/* List */}
@@ -45,7 +49,11 @@ export default function List({
                   onClick={() => setSelectedCompany(null)}
                 >
                   <Image
-                    src={`/api/images/${company.image!}`}
+                    src={
+                      company.image
+                        ? `/api/images/${company.image!}`
+                        : "/icons/business.png"
+                    }
                     alt={company.name}
                     width={50}
                     height={50}
@@ -62,7 +70,7 @@ export default function List({
                     return (
                       <button
                         key={user.id}
-                        className="flex w-full items-center gap-2 rounded-md bg-[#F2F2F2] p-1"
+                        className="flex min-h-[61px] w-full items-center gap-2 rounded-md bg-[#F2F2F2] p-1"
                         onClick={() => {
                           setCompanyName(company.name);
                           // add this user to the list (if not already in it)
@@ -105,7 +113,11 @@ export default function List({
               onClick={() => setSelectedCompany(company)}
             >
               <Image
-                src={`/api/images/${company.image!}`}
+                src={
+                  company.image
+                    ? `/api/images/${company.image!}`
+                    : "/icons/business.png"
+                }
                 alt={company.name}
                 width={50}
                 height={50}

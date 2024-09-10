@@ -52,10 +52,44 @@ export default async function CollaborationPage() {
       ],
     },
   });
+
+  const companyWithAdmin = await db.company.findMany({
+    where: {
+      NOT: { id: userCompanyId },
+    },
+    select: {
+      id: true,
+      name: true,
+      users: {
+        where: { role: "admin" },
+        select: {
+          firstName: true,
+          lastName: true,
+          companyId: true,
+          email: true,
+          role: true,
+          image: true,
+        },
+      },
+    },
+  });
+
+  const filteredCompanyWithAdmin = companyWithAdmin
+    .map((company) => {
+      return company.users.map((user) => {
+        return {
+          ...user,
+          companyName: company.name,
+          isConnected: oppositeCompanies.some((c) => c.id === user.companyId),
+        };
+      });
+    })
+    .flat();
   return (
     <div>
       <Title>Communication Hub - Collaboration</Title>
       <Collaboration
+        companyWithAdmin={filteredCompanyWithAdmin}
         companies={oppositeCompanies}
         currentUser={session?.user}
         messages={messages}
