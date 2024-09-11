@@ -3,7 +3,12 @@
 import { useState } from "react";
 import List from "./List";
 import UsersArea from "./UsersArea";
-import { Company, User, Message as DbMessage } from "@prisma/client";
+import {
+  Company,
+  User,
+  Message as DbMessage,
+  Attachment,
+} from "@prisma/client";
 import { User as NextAuthUser } from "next-auth";
 
 export default function Collaboration({
@@ -15,7 +20,7 @@ export default function Collaboration({
   companyWithAdmin: Partial<User>[];
   companies: (Company & { users: User[] })[];
   currentUser: NextAuthUser;
-  messages: DbMessage[];
+  messages: (DbMessage & { attachment: Attachment | null })[];
 }) {
   const [selectedUsersList, setSelectedUsersList] = useState<User[]>([]);
   const [companyName, setCompanyName] = useState<string | null>(null);

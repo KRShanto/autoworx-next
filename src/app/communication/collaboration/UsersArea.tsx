@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 import MessageBox from "../internal/MessageBox";
 import { pusher } from "@/lib/pusher/client";
 import { MessageQue } from "../internal/UsersArea";
-import { Message } from "@prisma/client";
+import { Attachment, Message } from "@prisma/client";
 import { User as NextAuthUser } from "next-auth";
 
 export default function UsersArea({
@@ -16,13 +16,15 @@ export default function UsersArea({
   companyName,
 }: {
   companyName: string | null;
-  previousMessages: Message[];
+  previousMessages: (Message & { attachment: Attachment | null })[];
   currentUser: NextAuthUser;
   selectedUsersList: any[];
   setSelectedUsersList: React.Dispatch<React.SetStateAction<any[]>>;
   totalMessageBoxLength: number;
 }) {
   const [messages, setMessages] = useState<MessageQue[]>([]);
+
+  console.log(messages);
 
   // for normal messages
   useEffect(() => {
@@ -39,6 +41,7 @@ export default function UsersArea({
             message: m.message,
             // @ts-ignore
             sender: m.from === currentUser.id ? "USER" : "CLIENT",
+            attachment: m.attachment,
           };
         }),
       });
@@ -53,7 +56,15 @@ export default function UsersArea({
       .subscribe(`user-${currentUser.id}`)
       .bind(
         "message",
-        ({ from, message }: { from: number; message: string }) => {
+        ({
+          from,
+          message,
+          attachment,
+        }: {
+          from: number;
+          message: string;
+          attachment: Partial<Attachment>;
+        }) => {
           console.log("Received message", { from, message });
           const user = selectedUsersList.find((u) => {
             return u.id === from;
@@ -65,11 +76,17 @@ export default function UsersArea({
           const newMessages = [...messages];
           const userMessages = newMessages.find((m) => m.user === from);
           if (userMessages) {
-            userMessages.messages.push({ message, sender: "CLIENT" });
+            userMessages.messages.push({
+              message,
+              sender: "CLIENT",
+              // @ts-ignore
+              attachment: attachment,
+            });
           } else {
             newMessages.push({
               user: from,
-              messages: [{ message, sender: "CLIENT" }],
+              // @ts-ignore
+              messages: [{ message, sender: "CLIENT", attachment: attachment }],
             });
           }
           setMessages(newMessages);

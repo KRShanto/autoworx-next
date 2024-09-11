@@ -51,7 +51,12 @@ export default async function CollaborationPage() {
         },
       ],
     },
+    include: {
+      attachment: true,
+    },
   });
+
+  console.log({ messages: messages[messages.length - 1].attachment });
 
   const companyWithAdmin = await db.company.findMany({
     where: {

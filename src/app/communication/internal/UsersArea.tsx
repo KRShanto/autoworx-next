@@ -2,13 +2,13 @@ import React, { ReactNode, useEffect, useRef, useState } from "react";
 import MessageBox from "./MessageBox";
 import { User } from "next-auth";
 import { pusher } from "@/lib/pusher/client";
-import { Message as DbMessage, Group } from "@prisma/client";
+import { Attachment, Message as DbMessage, Group } from "@prisma/client";
 import { cn } from "@/lib/cn";
 import GroupMessageBox from "./GroupMessageBox";
 
 export interface MessageQue {
   user: number;
-  messages: Message[];
+  messages: (Message & { attachment: Attachment | null })[];
 }
 
 export interface TGroupMessage {
@@ -20,6 +20,7 @@ export interface Message {
   userId?: number;
   message: string;
   sender: "CLIENT" | "USER";
+  attachment: Attachment | null;
 }
 
 export default function UsersArea({
@@ -34,7 +35,7 @@ export default function UsersArea({
   usersList: any[];
   setUsersList: React.Dispatch<React.SetStateAction<any[]>>;
   setGroupsList: React.Dispatch<React.SetStateAction<any[]>>;
-  previousMessages: DbMessage[];
+  previousMessages: (DbMessage & { attachment: Attachment | null })[];
   groupsList: any;
 }) {
   const [messages, setMessages] = useState<MessageQue[]>([]);
@@ -54,6 +55,7 @@ export default function UsersArea({
             message: m.message,
             // @ts-ignore
             sender: m.from === currentUser.id ? "USER" : "CLIENT",
+            attachment: m.attachment,
           };
         }),
       });
@@ -68,7 +70,15 @@ export default function UsersArea({
       .subscribe(`user-${currentUser.id}`)
       .bind(
         "message",
-        ({ from, message }: { from: number; message: string }) => {
+        ({
+          from,
+          message,
+          attachment,
+        }: {
+          from: number;
+          message: string;
+          attachment: Attachment | null;
+        }) => {
           console.log("Received message", { from, message });
           const user = usersList.find((u) => {
             return u.id === from;
@@ -80,11 +90,15 @@ export default function UsersArea({
           const newMessages = [...messages];
           const userMessages = newMessages.find((m) => m.user === from);
           if (userMessages) {
-            userMessages.messages.push({ message, sender: "CLIENT" });
+            userMessages.messages.push({
+              message,
+              sender: "CLIENT",
+              attachment: attachment,
+            });
           } else {
             newMessages.push({
               user: from,
-              messages: [{ message, sender: "CLIENT" }],
+              messages: [{ message, sender: "CLIENT", attachment: attachment }],
             });
           }
           setMessages(newMessages);
