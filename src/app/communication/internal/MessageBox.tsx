@@ -316,7 +316,14 @@ export default function MessageBox({
                     </p>
                   )}
                   {message.attachment && (
-                    <div className="flex flex-row-reverse items-center justify-center">
+                    <div
+                      className={cn(
+                        "flex items-center justify-center",
+                        message.sender === "CLIENT"
+                          ? "flex-row"
+                          : "flex-row-reverse",
+                      )}
+                    >
                       {message.attachment.fileType.includes("image") ? (
                         <Image
                           src={`/api/images/${message.attachment.fileUrl}`}
@@ -332,11 +339,16 @@ export default function MessageBox({
                         </div>
                       )}
                       <button
-                        onClick={() => handleDownload(message?.attachment?.fileUrl!)}
+                        onClick={() =>
+                          handleDownload(message?.attachment?.fileUrl!)
+                        }
                       >
                         <IoCloudDownloadOutline
                           size={30}
-                          className="mr-6 cursor-pointer"
+                          className={cn(
+                            "cursor-pointer",
+                            message.sender === "CLIENT" ? "ml-6" : "mr-6",
+                          )}
                         />
                       </button>
                     </div>
