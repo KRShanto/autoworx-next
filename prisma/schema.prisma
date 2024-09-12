@@ -58,16 +58,18 @@ model Company {
   companyJoinsAsOne    CompanyJoin[]          @relation("CompanyOne")
   companyJoinsAsTwo    CompanyJoin[]          @relation("CompanyTwo")
   companyEmailTemplate CompanyEmailTemplate[]
-}
 
+  companyLatitude  Float?
+  companyLongitude Float?
+}
 
 // notification settings model
 model NotificationSettings {
-  id        Int   @id @default(autoincrement())
-  type  String  @default("notification") @unique
+  id            Int      @id @default(autoincrement())
+  type          String   @unique @default("notification")
   notifications Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 // create model that will handle multiple companies join and collaboration
@@ -839,5 +841,6 @@ model CompanyEmailTemplate {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-   @@map("companyEmailTemplate")
+
+  @@map("companyEmailTemplate")
 }
