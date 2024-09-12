@@ -97,12 +97,49 @@ export const updatePermissionForRole = async ({
             where: { id: managerPermission.id },
             data: { [moduleKey]: value },
           });
-        } else {
-          await db.permissionForManager.create({
-            data: {
-              companyId,
-            },
+        } else{
+          throw new Error("Cant update the permission for this role");
+        }
+        break;
+      
+     
+      case "Sales":
+        const salesPermission = await db.permissionForSales.findFirst({
+          where: { companyId },
+        });
+        if (salesPermission) {
+          await db.permissionForManager.update({
+            where: { id: salesPermission.id },
+            data: { [moduleKey]: value },
           });
+        } else{
+          throw new Error("Cant update the permission for this role");
+        }
+        break;
+      case "Technician":
+        const technicianPermission = await db.permissionForTechnician.findFirst({
+          where: { companyId },
+        });
+        if (technicianPermission) {
+          await db.permissionForManager.update({
+            where: { id: technicianPermission.id },
+            data: { [moduleKey]: value },
+          });
+        }else{
+          throw new Error("Cant update the permission for this role");
+        }
+        break;
+      case "Other":
+        const otherPermission = await db.permissionForOther.findFirst({
+          where: { companyId },
+        });
+        if (otherPermission) {
+          await db.permissionForManager.update({
+            where: { id: otherPermission.id },
+            data: { [moduleKey]: value },
+          });
+        } else{
+          throw new Error("Cant update the permission for this role");
         }
         break;
 

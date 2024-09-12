@@ -6,12 +6,7 @@ import {
   getPermissionsForRole,
   updatePermissionForRole
 } from "@/actions/settings/teamManagement";
-import {
-  PermissionForManager,
-  PermissionForSales,
-  PermissionForTechnician,
-  PermissionForOther,
-} from "@prisma/client";
+
 
 interface PermissionWithIndexSignature {
   [key: string]: boolean;
@@ -26,6 +21,7 @@ interface Permissions {
 
 export default function UserRolesTable() {
   const [permissions, setPermissions] = useState<Permissions | null>(null);
+  
 
   const modules = [
     { label: "Communications Hub: Internal", key: "communicationHubInternal" },
@@ -52,9 +48,11 @@ export default function UserRolesTable() {
     const fetchPermissions = async () => {
       try {
         const data = (await getPermissionsForRole()) as Permissions;
+        console.log(data);
 
         if (data) {
           setPermissions(data);
+        
         }
       } catch (error) {
         console.log("Error fetching permissions", error);
@@ -87,6 +85,8 @@ export default function UserRolesTable() {
     }
   };
 
+ 
+
   const getPermissionForRole = (
     role: string,
     moduleKey: string,
@@ -95,14 +95,14 @@ export default function UserRolesTable() {
 
     switch (role) {
       case "Manager":
-        return permissions.managerPermissions?.[moduleKey] ?? false;
+        return permissions.managerPermissions?.[moduleKey] ?? null;
 
       case "Sales":
-        return permissions.salesPermissions?.[moduleKey] ?? false;
+        return permissions.salesPermissions?.[moduleKey] ?? null;
       case "Technician":
-        return permissions.technicianPermissions?.[moduleKey] ?? false;
+        return permissions.technicianPermissions?.[moduleKey] ?? null;
       case "Other":
-        return permissions.otherPermissions?.[moduleKey] ?? false;
+        return permissions.otherPermissions?.[moduleKey] ?? null;
       default:
         return null;
     }
@@ -147,7 +147,7 @@ export default function UserRolesTable() {
                           }
                         />
                         {/* Assuming viewOnly needs to be handled differently */}
-                        {true && (
+                        {false && (
                           <div className="group">
                             <Checkbox className="relative left-12" />
                             <div className="fixed z-50 hidden -translate-y-14 rounded-lg border bg-[#66738C] p-1 text-sm text-white group-hover:block">
