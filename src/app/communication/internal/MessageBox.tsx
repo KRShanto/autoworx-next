@@ -2,16 +2,19 @@ import { FaTimes } from "react-icons/fa";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import Image from "next/image";
-import { Message, MessageQue, TGroupMessage } from "./UsersArea";
+import { Message } from "./UsersArea";
 import { FiMessageCircle } from "react-icons/fi";
 import { IoMdSend, IoMdSettings } from "react-icons/io";
 import { TiDeleteOutline } from "react-icons/ti";
 import { MdModeEdit } from "react-icons/md";
 import { sendType } from "@/types/Chat";
-import { Group, User } from "@prisma/client";
+import { Attachment, Group, User } from "@prisma/client";
 import { deleteUserFromGroup } from "@/actions/communication/internal/deleteUserFromGroup";
 import { useSession } from "next-auth/react";
 import Avatar from "@/components/Avatar";
+import Link from "next/link";
+
+import { IoCloudDownloadOutline } from "react-icons/io5";
 
 export default function MessageBox({
   user,
@@ -22,20 +25,24 @@ export default function MessageBox({
   fromGroup,
   group,
   setGroupsList,
+  companyName,
 }: {
   user?: User; // TODO: type this
   setUsersList?: React.Dispatch<React.SetStateAction<any[]>>;
   setGroupsList?: React.Dispatch<React.SetStateAction<any[]>>;
-  messages: Message[];
+  messages: (Message & { attachment: Attachment | null })[];
+  companyName?: string | null;
   totalMessageBox: number;
   setMessages: React.Dispatch<React.SetStateAction<any[]>>;
   fromGroup?: boolean;
   group?: Group & { users: User[] };
 }) {
+  const attachmentRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState("");
   const messageBoxRef = useRef<HTMLDivElement>(null);
   const [openSettings, setOpenSettings] = useState(false);
   const { data: session } = useSession();
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (messageBoxRef.current) {
@@ -47,7 +54,26 @@ export default function MessageBox({
   async function handleSubmit(e: any) {
     e.preventDefault();
 
-    if (!message) return;
+    if (!message && !attachmentFile) return;
+
+    let attachmentFileUrl = null;
+
+    if (attachmentFile) {
+      const formData = new FormData();
+      formData.append("photos", attachmentFile);
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!uploadRes.ok) {
+        // setError("Failed to upload photos");
+        console.error("Failed to upload photos");
+        // setImageSrc(null);
+      }
+
+      const json = await uploadRes.json();
+      attachmentFileUrl = json.data[0];
+    }
 
     const res = await fetch("/api/pusher", {
       method: "POST",
@@ -58,6 +84,14 @@ export default function MessageBox({
         to: fromGroup ? group?.id : user?.id,
         type: fromGroup ? sendType.Group : sendType.User,
         message,
+        attachmentFile: attachmentFile
+          ? {
+              fileName: attachmentFile?.name,
+              fileType: attachmentFile?.type,
+              fileUrl: attachmentFileUrl,
+              fileSize: attachmentFile?.size,
+            }
+          : null,
       }),
     });
 
@@ -68,6 +102,7 @@ export default function MessageBox({
         // userId: parseInt(session?.user?.id!),
         message,
         sender: "USER",
+        attachment: json.attachment,
       };
       if (fromGroup) {
         setMessages((messages) => [...messages, newMessage]);
@@ -80,15 +115,13 @@ export default function MessageBox({
                 messages: [...m.messages, newMessage],
               };
             }
-
             return m;
           });
-
           return newMessages;
         });
       }
-
       setMessage("");
+      setAttachmentFile(null);
     }
   }
 
@@ -122,6 +155,23 @@ export default function MessageBox({
           );
       }
     }
+  };
+
+  const handleAttachment = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event?.target?.files?.[0];
+    setAttachmentFile(file!);
+  };
+
+  const handleDownload = async (fileUrl: string | null) => {
+    const response = await fetch(`/api/download/${fileUrl}`);
+    const responseBlob = await response.blob();
+    const blobURL = URL.createObjectURL(responseBlob);
+    const link = document.createElement("a");
+    link.href = blobURL;
+    link.setAttribute("download", fileUrl?.split("/").pop()!);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   };
   return (
     <div
@@ -165,8 +215,11 @@ export default function MessageBox({
             <Avatar photo={user?.image} width={50} height={50} />
           )}
           <div className="flex flex-col">
-            <p className="text-[20px] font-bold">
+            <p className="flex flex-col text-[20px] font-bold">
               {fromGroup ? group?.name : `${user?.firstName} ${user?.lastName}`}
+              {companyName && (
+                <span className="text-sm font-light">{companyName}</span>
+              )}
             </p>
           </div>
           {fromGroup && (
@@ -244,32 +297,119 @@ export default function MessageBox({
                     </p>
                   </div>
                 )}
-                <p
+                <div
                   className={cn(
-                    "max-w-[220px] rounded-xl p-2 text-base",
-                    message.sender === "CLIENT"
-                      ? "bg-[#D9D9D9] text-slate-800"
-                      : "bg-[#006D77] text-white",
+                    "flex flex-col space-y-3",
+                    message.sender === "CLIENT" ? "items-start" : "items-end",
                   )}
                 >
-                  {message.message}
-                </p>
+                  {message.message && (
+                    <p
+                      className={cn(
+                        "max-w-[220px] rounded-xl p-2 text-base",
+                        message.sender === "CLIENT"
+                          ? "bg-[#D9D9D9] text-slate-800"
+                          : "bg-[#006D77] text-white",
+                      )}
+                    >
+                      {message.message}
+                    </p>
+                  )}
+                  {message.attachment && (
+                    <div
+                      className={cn(
+                        "flex items-center justify-center",
+                        message.sender === "CLIENT"
+                          ? "flex-row"
+                          : "flex-row-reverse",
+                      )}
+                    >
+                      {message.attachment.fileType.includes("image") ? (
+                        <Image
+                          src={`/api/images/${message.attachment.fileUrl}`}
+                          alt=""
+                          className="rounded-sm"
+                          width={300}
+                          height={300}
+                        />
+                      ) : (
+                        <div className="min-h-16 space-y-1 rounded-md bg-[#006D77] px-5 py-2 text-white">
+                          <p>{message.attachment.fileName}</p>
+                          <p>file size: {message.attachment.fileSize}</p>
+                        </div>
+                      )}
+                      <button
+                        onClick={() =>
+                          handleDownload(message?.attachment?.fileUrl!)
+                        }
+                      >
+                        <IoCloudDownloadOutline
+                          size={30}
+                          className={cn(
+                            "cursor-pointer",
+                            message.sender === "CLIENT" ? "ml-6" : "mr-6",
+                          )}
+                        />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           );
         })}
       </div>
-
+      {/* attachments */}
+      {attachmentFile && (
+        <div className="h-32 bg-[#D9D9D9]">
+          <div className="p-4">
+            <div className="relative w-fit">
+              <TiDeleteOutline
+                onClick={() => setAttachmentFile(null)}
+                className="absolute -right-2 -top-2 cursor-pointer rounded-full bg-white"
+                size={20}
+              />
+              {attachmentFile.type.includes("image") ? (
+                <Image
+                  src={URL.createObjectURL(attachmentFile)}
+                  alt=""
+                  className="rounded-sm"
+                  width={100}
+                  height={100}
+                />
+              ) : (
+                <div className="space-y-1 rounded-md bg-[#006D77] px-5 py-2 text-white">
+                  <p>{attachmentFile.name}</p>
+                  <p>
+                    file size:{" "}
+                    {(attachmentFile.size / 1024 / 1024).toPrecision(2)} MB
+                  </p>
+                </div>
+              )}
+            </div>
+            <p className="text-sm">{attachmentFile.name}</p>
+          </div>
+        </div>
+      )}
       {/* Input */}
       <form
         className="flex h-[8%] items-center gap-2 bg-[#D9D9D9] p-2"
         onSubmit={handleSubmit}
       >
         <Image
+          onClick={() => attachmentRef.current?.click()}
+          className="cursor-pointer"
           src="/icons/Attachment.svg"
           width={24}
           height={24}
           alt="attachment"
+        />
+        <input
+          accept="*"
+          ref={attachmentRef}
+          onChange={handleAttachment}
+          hidden
+          type="file"
         />
         <input
           type="text"
@@ -278,7 +418,7 @@ export default function MessageBox({
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <button className="">
+        <button className="" type="submit">
           {/* <Image src="/icons/Send.svg" width={20} height={20} alt="send" /> */}
           <IoMdSend className="size-6 text-[#006D77]" />
         </button>

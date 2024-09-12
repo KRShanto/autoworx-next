@@ -58,16 +58,18 @@ model Company {
   companyJoinsAsOne    CompanyJoin[]          @relation("CompanyOne")
   companyJoinsAsTwo    CompanyJoin[]          @relation("CompanyTwo")
   companyEmailTemplate CompanyEmailTemplate[]
-}
 
+  companyLatitude  Float?
+  companyLongitude Float?
+}
 
 // notification settings model
 model NotificationSettings {
-  id        Int   @id @default(autoincrement())
-  type  String  @default("notification") @unique
+  id            Int      @id @default(autoincrement())
+  type          String   @unique @default("notification")
   notifications Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 // create model that will handle multiple companies join and collaboration
@@ -775,10 +777,22 @@ model Message {
   groupId   Int?     @map("group_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-
+  attachment Attachment?
   @@index([to], name: "fk_messages_to")
   @@index([from], name: "fk_messages_from")
   @@index([groupId], name: "fk_messages_group")
+}
+
+model Attachment {
+  id        Int      @id @default(autoincrement())
+  fileName  String   // File name (e.g., 'image.png')
+  fileType  String   // File type (e.g., 'image/png', 'application/pdf')
+  fileUrl   String   // File storage path or URL
+  fileSize String
+  messageId Int      @unique // Foreign key to Message model, enforces one-to-one relationship
+  message   Message  @relation(fields: [messageId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 }
 
 model Group {
@@ -827,5 +841,6 @@ model CompanyEmailTemplate {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-   @@map("companyEmailTemplate")
+
+  @@map("companyEmailTemplate")
 }
