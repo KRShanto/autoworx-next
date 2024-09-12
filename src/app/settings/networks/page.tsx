@@ -8,18 +8,22 @@ import {
   toggleBusinessVisibility,
   togglePhoneVisibility,
 } from "@/actions/settings/myNetwork";
-import SliderRange from "@/app/employee/components/SliderRange";
-import { SlimInput } from "@/components/SlimInput";
 import { Switch } from "@/components/Switch";
 import { errorToast, successToast } from "@/lib/toast";
 import Slider from "@mui/material/Slider";
 import { Company } from "@prisma/client";
-import { Range } from "@radix-ui/react-slider";
 import debounce from "lodash.debounce";
 import Image from "next/image";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
-
+function formatDate(date: Date) {
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+  return new Intl.DateTimeFormat("en-US", options).format(date);
+}
 type Props = {};
 
 const Page = (props: Props) => {
@@ -32,10 +36,17 @@ const Page = (props: Props) => {
     Company[] | []
   >([]);
 
+  const [nearbyCompaniesSearch, setNearbyCompaniesSearch] =
+    useState<string>("");
+
   const [connectedCompanies, setConnectedCompanies] = useState<Company[] | []>(
     [],
   );
+  const [collaborationDates, setCollaborationDates] = useState<Date[] | []>([]);
   const [nearbyCompanies, setNearbyCompanies] = useState<Company[] | []>([]);
+  const [searchedNearbyCompanies, setSearchedNearbyCompanies] = useState<
+    Company[] | []
+  >([]);
   const [currentCompany, setCurrentCompany] = useState<Company | null>(null);
   const [location, setLocation] = useState<{
     latitude: number | null;
@@ -87,6 +98,7 @@ const Page = (props: Props) => {
       if (res?.data) {
         setUnconnectedCompanies(res.data.unconnectedCompanies);
         setConnectedCompanies(res.data.connectedCompanies);
+        setCollaborationDates(res.data.collaborationDates);
         setCurrentCompany(res.data.currentCompany);
       }
     });
@@ -108,6 +120,19 @@ const Page = (props: Props) => {
   useEffect(() => {
     debouncedSetRange([nearByCompanyRange[0], nearByCompanyRange[1]]);
   }, [nearByCompanyRange]);
+
+  useEffect(() => {
+    if (nearbyCompaniesSearch.length > 0) {
+      const filteredNearbyCompanies = nearbyCompanies.filter((company) =>
+        company.name
+          .toLowerCase()
+          .includes(nearbyCompaniesSearch.toLowerCase()),
+      );
+      setSearchedNearbyCompanies(filteredNearbyCompanies);
+    } else {
+      setSearchedNearbyCompanies(nearbyCompanies);
+    }
+  }, [nearbyCompaniesSearch, nearbyCompanies]);
 
   useEffect(() => {
     if (location.latitude && location.longitude) {
@@ -152,14 +177,19 @@ const Page = (props: Props) => {
                 <div className="ml-4 flex w-full items-center justify-between gap-x-12">
                   <div>
                     <p className="text-lg font-medium">{company.name}</p>
-                    <p className="text-sm">www.business.com</p>
-                    <p className="text-sm">Business Specialization</p>
-                    <p className="text-sm">0123456789</p>
-                    <p className="text-sm">123 Main Street, Anytown, USA</p>
+                    {company.website && (
+                      <p className="text-sm">{company.website}</p>
+                    )}
+                    {company.phone && (
+                      <p className="text-sm">{company.phone}</p>
+                    )}
+                    {company.address && (
+                      <p className="text-sm">{company.address}</p>
+                    )}
                   </div>
                   <div className="text-sm italic">
                     <p>Collaborating since</p>
-                    <p>January 1, 2024</p>
+                    <p>{formatDate(collaborationDates[index])}</p>
                   </div>
                 </div>
               </div>
@@ -323,45 +353,12 @@ const Page = (props: Props) => {
                 type="text"
                 className="h-full w-full rounded-md border border-slate-400 pl-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Search"
-                onChange={() => {}}
+                value={nearbyCompaniesSearch}
+                onChange={(e) => setNearbyCompaniesSearch(e.target.value)}
               />
             </div>
             <div className="space-y-8 overflow-y-auto rounded-md p-8 shadow-md">
-              {/* {unconnectedCompanies.length == 0 && (
-                <p className="text-center text-sm">No companies found</p>
-              )}
-              {unconnectedCompanies.map((company, index) => (
-                <div
-                  key={index}
-                  className="flex items-center rounded border border-gray-200 px-8 py-4 hover:border-gray-300"
-                >
-                  <Image
-                    src="/icons/business.png"
-                    alt={company.name}
-                    width={40}
-                    height={40}
-                  />
-                  <div className="ml-4 flex w-full items-center justify-between gap-x-12">
-                    <div>
-                      <p className="text-lg font-medium">{company.name}</p>
-                      <p className="text-sm">www.business.com</p>
-                      <p className="text-sm">Business Specialization</p>
-                      <p className="text-sm">0123456789</p>
-                      <p className="text-sm">123 Main Street, Anytown, USA</p>
-                    </div>
-                    <div className="">
-                      <button
-                        onClick={() => {
-                          handleConnectWithCompany(company.id, company.name);
-                        }}
-                        className="rounded-md bg-[#6571FF] px-4 py-2 text-white"
-                      >
-                        Send Request
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))} */}
+
               {!locationAllow && (
                 <p className="text-center text-sm">
                   Allow location to find nearby companies
@@ -370,7 +367,7 @@ const Page = (props: Props) => {
               {locationAllow && nearbyCompanies.length == 0 && (
                 <p className="text-center text-sm">No companies found</p>
               )}
-              {nearbyCompanies.map((company, index) => (
+              {searchedNearbyCompanies.map((company, index) => (
                 <div
                   key={index}
                   className="flex items-center rounded border border-gray-200 px-8 py-4 hover:border-gray-300"
@@ -384,10 +381,15 @@ const Page = (props: Props) => {
                   <div className="ml-4 flex w-full items-center justify-between gap-x-12">
                     <div>
                       <p className="text-lg font-medium">{company.name}</p>
-                      <p className="text-sm">www.business.com</p>
-                      <p className="text-sm">Business Specialization</p>
-                      <p className="text-sm">0123456789</p>
-                      <p className="text-sm">123 Main Street, Anytown, USA</p>
+                      {company.website && (
+                        <p className="text-sm">{company.website}</p>
+                      )}
+                      {company.phone && (
+                        <p className="text-sm">{company.phone}</p>
+                      )}
+                      {company.address && (
+                        <p className="text-sm">{company.address}</p>
+                      )}
                     </div>
                     <div className="">
                       <button

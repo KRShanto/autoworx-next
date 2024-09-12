@@ -15,6 +15,7 @@ export async function getAllCompany(): Promise<{
     connectedCompanies: Company[] | [];
     unconnectedCompanies: Company[] | [];
     currentCompany: Company | null;
+    collaborationDates: Date[] | [];
   };
 }> {
   try {
@@ -33,8 +34,13 @@ export async function getAllCompany(): Promise<{
       select: {
         companyOneId: true,
         companyTwoId: true,
+        createdAt: true,
       },
     });
+
+    const collaborationDates = connectedCompanyIds.map(
+      (join) => join.createdAt,
+    );
 
     const connectedIds = connectedCompanyIds.flatMap((join) =>
       [join.companyOneId, join.companyTwoId].filter(
@@ -61,7 +67,12 @@ export async function getAllCompany(): Promise<{
 
     return {
       success: true,
-      data: { connectedCompanies, unconnectedCompanies, currentCompany },
+      data: {
+        connectedCompanies,
+        collaborationDates,
+        unconnectedCompanies,
+        currentCompany,
+      },
     };
   } catch (error) {
     console.log(error);
