@@ -38,6 +38,9 @@ export default async function InternalPage() {
         },
       ],
     },
+    include: {
+      attachment: true
+    }
   });
   return (
     <div className="mt-5 flex gap-5">

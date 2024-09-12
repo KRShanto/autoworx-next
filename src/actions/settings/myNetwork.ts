@@ -71,7 +71,10 @@ export async function getAllCompany(): Promise<{
   }
 }
 
-export async function connectWithCompany(targetCompanyId: number): Promise<{
+export async function connectWithCompany(
+  targetCompanyId: number,
+  revalidatePathName?: string | undefined,
+): Promise<{
   success: boolean;
   message: string;
 }> {
@@ -102,13 +105,12 @@ export async function connectWithCompany(targetCompanyId: number): Promise<{
         companyTwoId: targetCompanyId,
       },
     });
-
+    revalidatePathName && revalidatePath(revalidatePathName);
     return {
       success: true,
       message: "Successfully connected with the company.",
     };
   } catch (error) {
-    console.log(error);
     return {
       success: false,
       message: "Failed to connect with the company.",

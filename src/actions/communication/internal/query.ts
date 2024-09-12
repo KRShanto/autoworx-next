@@ -7,6 +7,9 @@ export const getGroupMessagesById = async (id: number) => {
     where: {
       groupId: id,
     },
+    include: {
+      attachment: true,
+    },
   });
   return groupMessage;
 };
