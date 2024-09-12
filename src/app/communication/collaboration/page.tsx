@@ -56,8 +56,6 @@ export default async function CollaborationPage() {
     },
   });
 
-  console.log({ messages: messages[messages.length - 1].attachment });
-
   const companyWithAdmin = await db.company.findMany({
     where: {
       NOT: { id: userCompanyId },

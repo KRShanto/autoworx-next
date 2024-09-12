@@ -3,7 +3,7 @@ import MessageBox from "./MessageBox";
 import { getGroupMessagesById } from "@/actions/communication/internal/query";
 import { useSession } from "next-auth/react";
 import { pusher } from "@/lib/pusher/client";
-import { Group, User } from "@prisma/client";
+import { Attachment, Group, User } from "@prisma/client";
 
 type TProps = {
   setGroupsList: React.Dispatch<
@@ -29,6 +29,7 @@ export default function GroupMessageBox({
             userId: m.from,
             message: m.message,
             sender: m.from === parseInt(session?.user?.id!) ? "USER" : "CLIENT",
+            attachment: m.attachment,
           };
         }),
       );
@@ -42,12 +43,21 @@ export default function GroupMessageBox({
       .subscribe(`group-${group.id}`)
       .bind(
         "message",
-        ({ from, message }: { from: number; message: string }) => {
+        ({
+          from,
+          message,
+          attachment,
+        }: {
+          from: number;
+          message: string;
+          attachment: Attachment | null;
+        }) => {
           if (from !== parseInt(session?.user?.id!)) {
             const newMessage = {
               userId: from,
               message: message,
               sender: "CLIENT",
+              attachment,
             };
             setGroupMessages((prevGroupMessages) => [
               ...prevGroupMessages,

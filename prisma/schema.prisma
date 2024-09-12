@@ -786,6 +786,7 @@ model Attachment {
   fileName  String   // File name (e.g., 'image.png')
   fileType  String   // File type (e.g., 'image/png', 'application/pdf')
   fileUrl   String   // File storage path or URL
+  fileSize String
   messageId Int      @unique // Foreign key to Message model, enforces one-to-one relationship
   message   Message  @relation(fields: [messageId], references: [id])
   createdAt DateTime @default(now())

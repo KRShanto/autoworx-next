@@ -12,6 +12,9 @@ import { Attachment, Group, User } from "@prisma/client";
 import { deleteUserFromGroup } from "@/actions/communication/internal/deleteUserFromGroup";
 import { useSession } from "next-auth/react";
 import Avatar from "@/components/Avatar";
+import Link from "next/link";
+
+import { IoCloudDownloadOutline } from "react-icons/io5";
 
 export default function MessageBox({
   user,
@@ -83,9 +86,10 @@ export default function MessageBox({
         message,
         attachmentFile: attachmentFile
           ? {
-              name: attachmentFile?.name,
-              type: attachmentFile?.type,
-              url: attachmentFileUrl,
+              fileName: attachmentFile?.name,
+              fileType: attachmentFile?.type,
+              fileUrl: attachmentFileUrl,
+              fileSize: attachmentFile?.size,
             }
           : null,
       }),
@@ -157,7 +161,18 @@ export default function MessageBox({
     const file = event?.target?.files?.[0];
     setAttachmentFile(file!);
   };
-  console.log({ attachmentFile });
+
+  const handleDownload = async (fileUrl: string | null) => {
+    const response = await fetch(`/api/download/${fileUrl}`);
+    const responseBlob = await response.blob();
+    const blobURL = URL.createObjectURL(responseBlob);
+    const link = document.createElement("a");
+    link.href = blobURL;
+    link.setAttribute("download", fileUrl?.split("/").pop()!);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
   return (
     <div
       className={cn(
@@ -282,21 +297,51 @@ export default function MessageBox({
                     </p>
                   </div>
                 )}
-                {message.attachment && (
-                  <div>
-                    <h1>Attachment Added</h1>
-                  </div>
-                )}
-                <p
+                <div
                   className={cn(
-                    "max-w-[220px] rounded-xl p-2 text-base",
-                    message.sender === "CLIENT"
-                      ? "bg-[#D9D9D9] text-slate-800"
-                      : "bg-[#006D77] text-white",
+                    "flex flex-col space-y-3",
+                    message.sender === "CLIENT" ? "items-start" : "items-end",
                   )}
                 >
-                  {message.message}
-                </p>
+                  {message.message && (
+                    <p
+                      className={cn(
+                        "max-w-[220px] rounded-xl p-2 text-base",
+                        message.sender === "CLIENT"
+                          ? "bg-[#D9D9D9] text-slate-800"
+                          : "bg-[#006D77] text-white",
+                      )}
+                    >
+                      {message.message}
+                    </p>
+                  )}
+                  {message.attachment && (
+                    <div className="flex flex-row-reverse items-center justify-center">
+                      {message.attachment.fileType.includes("image") ? (
+                        <Image
+                          src={`/api/images/${message.attachment.fileUrl}`}
+                          alt=""
+                          className="rounded-sm"
+                          width={300}
+                          height={300}
+                        />
+                      ) : (
+                        <div className="min-h-16 space-y-1 rounded-md bg-[#006D77] px-5 py-2 text-white">
+                          <p>{message.attachment.fileName}</p>
+                          <p>file size: {message.attachment.fileSize}</p>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => handleDownload(message?.attachment?.fileUrl!)}
+                      >
+                        <IoCloudDownloadOutline
+                          size={30}
+                          className="mr-6 cursor-pointer"
+                        />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           );

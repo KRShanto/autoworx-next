@@ -79,7 +79,6 @@ export default function UsersArea({
           message: string;
           attachment: Attachment | null;
         }) => {
-          console.log("Received message", { from, message });
           const user = usersList.find((u) => {
             return u.id === from;
           });
