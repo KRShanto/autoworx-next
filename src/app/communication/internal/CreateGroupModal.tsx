@@ -6,7 +6,7 @@ import {
   DialogTrigger,
 } from "@/components/Dialog";
 import { SlimInput } from "@/components/SlimInput";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MdGroupAdd } from "react-icons/md";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 import { CiSearch } from "react-icons/ci";
@@ -26,6 +26,8 @@ type TContactListUser = {
 };
 
 export default function CreateGroupModal({ users }: TProps) {
+  const [groupUsers, setGroupUsers] = useState(users);
+
   const { data: session }: { data: any } = useSession();
 
   const [open, setOpen] = useState(false);
@@ -38,7 +40,25 @@ export default function CreateGroupModal({ users }: TProps) {
 
   const [contactList, setContactList] = useState<Array<TContactListUser>>([]);
 
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (inputRef?.current) {
+      inputRef.current.focus();
+    }
+  }, [openUserList]);
+
+  useEffect(() => {
+    if (!open) {
+      setContactList([]);
+      setGroupName("");
+      setGroupUsers(users);
+      setOpenUserList(false);
+      setError(null);
+    }
+  }, [open]);
 
   // add user in contact list
   const handleAddContactList = (user: User) => {
@@ -46,16 +66,20 @@ export default function CreateGroupModal({ users }: TProps) {
       id: user.id,
       name: user.firstName + " " + user.lastName,
     };
-    if (contactList.some((prevUser) => prevUser.id === user.id)) {
-      setError("User already exists in contact list.");
-      return;
-    }
-    setError("");
+    setGroupUsers((prevContact) =>
+      prevContact.filter((prevUser) => prevUser.id !== user.id),
+    );
+
+    setError(null);
     setContactList((prev) => [...prev, modifyUser]);
     setOpenUserList(false);
   };
 
   const handleDeleteFromContactList = (user: TContactListUser) => {
+    setGroupUsers((prevUser) => [
+      ...prevUser,
+      users.find((u) => u.id === user.id)!,
+    ]);
     setContactList((prev) =>
       prev.filter((prevUser) => prevUser.id !== user.id),
     );
@@ -110,6 +134,7 @@ export default function CreateGroupModal({ users }: TProps) {
                 {/* Search box */}
                 <div className="relative">
                   <input
+                    ref={inputRef}
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
                     type="text"
@@ -123,7 +148,7 @@ export default function CreateGroupModal({ users }: TProps) {
                 </div>
                 {/* user list */}
                 <div className="flex h-72 flex-col items-start space-y-2 overflow-y-auto p-1">
-                  {users
+                  {groupUsers
                     .filter(
                       (user) =>
                         user.firstName
@@ -162,6 +187,7 @@ export default function CreateGroupModal({ users }: TProps) {
                 name="ContactList"
                 type="text"
                 readOnly
+                onClick={() => setOpenUserList((prev) => !prev)}
               />
               <RiArrowDownSLine
                 onClick={() => setOpenUserList((prev) => !prev)}
