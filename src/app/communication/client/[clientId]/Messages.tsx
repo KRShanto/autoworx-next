@@ -149,7 +149,6 @@ export default function Messages({
     }
   };
 
-
   useEffect(() => {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight + 100;
@@ -158,17 +157,17 @@ export default function Messages({
 
   return (
     <div className="mb-2 h-[75%] 2xl:h-[85%]">
-      <div ref={containerRef} className="h-[95%] overflow-y-scroll">
+      <div ref={containerRef} className="h-[95%] w-full overflow-y-scroll">
         {conversations
           .filter((convo: any) => convo.body)
           .map((message: any, index: number) => (
             <div
               key={index}
-              className={`flex items-center p-1 ${
+              className={`flex w-full items-center p-1 ${
                 message.labelIds[0] !== "SENT" ? "justify-start" : "justify-end"
               }`}
             >
-              <div className="flex items-start gap-2 p-1">
+              <div className="flex w-full items-start gap-2 p-1">
                 {message.labelIds[0] !== "SENT" && (
                   <Image
                     src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNL_ZnOTpXSvhf1UaK7beHey2BX42U6solRA&s"
@@ -181,10 +180,10 @@ export default function Messages({
 
                 <p
                   className={cn(
-                    "#max-w-[220px] break-words rounded-xl p-2 text-[14px]",
+                    "#max-w-[220px] max-w-[90%] break-words rounded-xl p-2 text-[14px]",
                     message.labelIds[0] !== "SENT"
                       ? "bg-[#D9D9D9] text-slate-800"
-                      : "bg-[#006D77] text-white",
+                      : "ml-auto bg-[#006D77] text-white",
                     // conversations[index - 1]?.labelIds[0] !== "SENT" &&
                     //   "ml-[58px]",
                   )}
@@ -197,7 +196,7 @@ export default function Messages({
       </div>
 
       {loading && conversations.length === 0 && (
-        <div className="flex w-full items-center justify-center ">
+        <div className="flex w-full items-center justify-center">
           Loading...
         </div>
       )}
