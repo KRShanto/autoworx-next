@@ -6,7 +6,7 @@ import {
   DialogTrigger,
 } from "@/components/Dialog";
 import { SlimInput } from "@/components/SlimInput";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MdGroupAdd } from "react-icons/md";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 import { CiSearch } from "react-icons/ci";
@@ -15,6 +15,8 @@ import { User } from "@prisma/client";
 import { createGroup } from "@/actions/communication/internal/creategroup";
 import { useSession } from "next-auth/react";
 import Avatar from "@/components/Avatar";
+import { useDebounce } from "@/hooks/useDebounce";
+import { searchUsers } from "@/actions/communication/internal/searchUser";
 
 type TProps = {
   users: User[];
@@ -33,8 +35,6 @@ export default function CreateGroupModal({ users }: TProps) {
   const [open, setOpen] = useState(false);
 
   const [openUserList, setOpenUserList] = useState(false);
-
-  const [searchText, setSearchText] = useState("");
 
   const [groupName, setGroupName] = useState("");
 
@@ -59,6 +59,29 @@ export default function CreateGroupModal({ users }: TProps) {
       setError(null);
     }
   }, [open]);
+
+  const getFindUsers = async (searchTerm?: string) => {
+    const searchUsersResult = await searchUsers(
+      searchTerm || "",
+      contactList.map((user) => ({
+        id: user.id,
+      })),
+    );
+    if (searchUsersResult.success) {
+      setGroupUsers(searchUsersResult.data);
+    } else {
+      setGroupUsers(users);
+    }
+  };
+
+  // search user handler
+  const handleSearch = useDebounce(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const searchTerm = event.target.value;
+      getFindUsers(searchTerm);
+    },
+    500,
+  );
 
   // add user in contact list
   const handleAddContactList = (user: User) => {
@@ -135,8 +158,7 @@ export default function CreateGroupModal({ users }: TProps) {
                 <div className="relative">
                   <input
                     ref={inputRef}
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
+                    onChange={handleSearch}
                     type="text"
                     className="w-full rounded-sm border border-primary-foreground bg-white py-0.5 pl-7 leading-6 outline-none"
                   />
@@ -148,17 +170,8 @@ export default function CreateGroupModal({ users }: TProps) {
                 </div>
                 {/* user list */}
                 <div className="flex h-72 flex-col items-start space-y-2 overflow-y-auto p-1">
-                  {groupUsers
-                    .filter(
-                      (user) =>
-                        user.firstName
-                          .toLowerCase()
-                          .includes(searchText.toLowerCase()) ||
-                        user.lastName
-                          ?.toLowerCase()
-                          ?.includes(searchText.toLowerCase()),
-                    )
-                    .map((user) => (
+                  {groupUsers.length > 0 ? (
+                    groupUsers.map((user) => (
                       <div
                         key={user.id}
                         className="flex cursor-pointer items-center space-x-2 p-1"
@@ -176,7 +189,12 @@ export default function CreateGroupModal({ users }: TProps) {
                           </div>
                         </div>
                       </div>
-                    ))}
+                    ))
+                  ) : (
+                    <p className="w-full text-center text-red-300">
+                      No user found
+                    </p>
+                  )}
                 </div>
               </div>
             </>
@@ -187,10 +205,16 @@ export default function CreateGroupModal({ users }: TProps) {
                 name="ContactList"
                 type="text"
                 readOnly
-                onClick={() => setOpenUserList((prev) => !prev)}
+                onClick={() => {
+                  setOpenUserList((prev) => !prev);
+                  getFindUsers();
+                }}
               />
               <RiArrowDownSLine
-                onClick={() => setOpenUserList((prev) => !prev)}
+                onClick={() => {
+                  setOpenUserList((prev) => !prev);
+                  getFindUsers();
+                }}
                 className="absolute right-1 top-[32px] size-6 cursor-pointer"
               />
               {/* added user in group */}
