@@ -1,5 +1,5 @@
 import { FaTimes } from "react-icons/fa";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { cn } from "@/lib/cn";
 import Image from "next/image";
 import { Message } from "./UsersArea";
@@ -12,7 +12,6 @@ import { Attachment, Group, User } from "@prisma/client";
 import { deleteUserFromGroup } from "@/actions/communication/internal/deleteUserFromGroup";
 import { useSession } from "next-auth/react";
 import Avatar from "@/components/Avatar";
-import Link from "next/link";
 
 import { IoCloudDownloadOutline } from "react-icons/io5";
 
@@ -26,10 +25,12 @@ export default function MessageBox({
   group,
   setGroupsList,
   companyName,
+  setPrevMessageStore,
 }: {
   user?: User; // TODO: type this
   setUsersList?: React.Dispatch<React.SetStateAction<any[]>>;
   setGroupsList?: React.Dispatch<React.SetStateAction<any[]>>;
+  setPrevMessageStore: React.Dispatch<React.SetStateAction<any[]>>;
   messages: (Message & { attachment: Attachment | null })[];
   companyName?: string | null;
   totalMessageBox: number;
@@ -38,6 +39,7 @@ export default function MessageBox({
   group?: Group & { users: User[] };
 }) {
   const attachmentRef = useRef<HTMLInputElement>(null);
+  const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState("");
   const messageBoxRef = useRef<HTMLDivElement>(null);
   const [openSettings, setOpenSettings] = useState(false);
@@ -104,6 +106,10 @@ export default function MessageBox({
         sender: "USER",
         attachment: json.attachment,
       };
+      setPrevMessageStore((prevMessage) => [
+        ...prevMessage,
+        { ...json.newMessage, attachment: json.attachment },
+      ]);
       if (fromGroup) {
         setMessages((messages) => [...messages, newMessage]);
       } else {
@@ -394,7 +400,7 @@ export default function MessageBox({
       {/* Input */}
       <form
         className="flex h-[8%] items-center gap-2 bg-[#D9D9D9] p-2"
-        onSubmit={handleSubmit}
+        onSubmit={(e) => startTransition(() => handleSubmit(e))}
       >
         <Image
           onClick={() => attachmentRef.current?.click()}
@@ -418,7 +424,7 @@ export default function MessageBox({
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <button className="" type="submit">
+        <button disabled={pending} className="" type="submit">
           {/* <Image src="/icons/Send.svg" width={20} height={20} alt="send" /> */}
           <IoMdSend className="size-6 text-[#006D77]" />
         </button>

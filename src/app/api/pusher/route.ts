@@ -76,11 +76,14 @@ export async function POST(req: Request, res: Response) {
       });
     }
 
-    revalidatePath("/communication/internal");
-
     // send json
     return new Response(
-      JSON.stringify({ success: true, message: "Message sent", attachment }),
+      JSON.stringify({
+        success: true,
+        message: "Message sent",
+        attachment,
+        newMessage: createdMessage,
+      }),
     );
   } catch (e) {
     console.error(e);

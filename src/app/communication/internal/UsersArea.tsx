@@ -1,8 +1,8 @@
-import React, { ReactNode, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import MessageBox from "./MessageBox";
 import { User } from "next-auth";
 import { pusher } from "@/lib/pusher/client";
-import { Attachment, Message as DbMessage, Group } from "@prisma/client";
+import { Attachment, Message as DbMessage } from "@prisma/client";
 import { cn } from "@/lib/cn";
 import GroupMessageBox from "./GroupMessageBox";
 
@@ -38,13 +38,14 @@ export default function UsersArea({
   previousMessages: (DbMessage & { attachment: Attachment | null })[];
   groupsList: any;
 }) {
+  const [prevMessageStore, setPrevMessageStore] = useState(previousMessages);
   const [messages, setMessages] = useState<MessageQue[]>([]);
 
   // for normal messages
   useEffect(() => {
     const messages: MessageQue[] = [];
     for (const user of usersList) {
-      const userMessages = previousMessages.filter(
+      const userMessages = prevMessageStore.filter(
         (m) => m.from === user.id || m.to === user.id,
       );
 
@@ -60,9 +61,8 @@ export default function UsersArea({
         }),
       });
     }
-
     setMessages(messages);
-  }, [usersList, previousMessages, currentUser]);
+  }, [usersList, prevMessageStore, currentUser]);
 
   // for user real-time messages
   useEffect(() => {
@@ -123,6 +123,7 @@ export default function UsersArea({
         return (
           <MessageBox
             key={user.id}
+            setPrevMessageStore={setPrevMessageStore}
             user={user}
             setUsersList={setUsersList}
             messages={[...findMessages]}
