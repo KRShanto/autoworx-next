@@ -63,7 +63,7 @@ model Company {
   permissionForSales      PermissionForSales[]
   permissionForTechnician PermissionForTechnician[]
   permissionForOther      PermissionForOther[]
-  permissionViewOnly      PermissionViewOnly[]
+  // permissionViewOnly      PermissionViewOnly[]
 }
 
 // notification settings model
@@ -871,6 +871,11 @@ model PermissionForSales {
   payments                      Boolean @default(false)
   salesPipeline                 Boolean @default(true) @map("sales_pipeline")
 
+  //view only
+  workforceManagementViewOnly Boolean @default(true) @map("workforce_management")
+  reportingViewOnly           Boolean @default(true)
+  inventoryViewOnly           Boolean @default(true)
+
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
@@ -880,6 +885,10 @@ model PermissionForTechnician {
   communicationHubInternal Boolean @default(true) @map("communication_hub_internal")
   calendarTask             Boolean @default(true) @map("calendar_task")
   shopPipeline             Boolean @default(true) @map("shop_pipeline")
+
+  //view only
+  workforceManagementViewOnly Boolean @default(true) @map("workforce_management")
+  reportingViewOnly          Boolean @default(true)
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
@@ -898,7 +907,7 @@ model PermissionForOther {
   inventory                     Boolean @default(false)
   integrations                  Boolean @default(false)
   salesPipeline                 Boolean @default(false) @map("sales_pipeline")
-  shopPipeline                  Boolean @default(true) @map("shop_pipeline")
+  shopPipeline                  Boolean @default(false) @map("shop_pipeline")
   businessSettings              Boolean @default(false) @map("business_settings")
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -922,16 +931,6 @@ model Permission {
   accountSettings               Boolean @default(false) @map("account_settings")
   businessSettings              Boolean @default(false) @map("business_settings")
 
-  user    User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  company Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
-}
-
-model PermissionViewOnly {
-  id                  Int     @id @default(autoincrement())
-  companyId           Int     @map("company_id")
-  workforceManagement Boolean @default(true) @map("workforce_management")
-  reporting           Boolean @default(true)
-  inventory           Boolean @default(false)
-
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }

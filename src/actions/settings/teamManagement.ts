@@ -75,18 +75,23 @@ interface userRolePermission {
   role: string;
   moduleKey: string;
   value: boolean;
+  isViewOnly?:boolean;
+  
 }
 
 export const updatePermissionForRole = async ({
   role,
   moduleKey,
   value,
+  isViewOnly
 }: userRolePermission) => {
-  if (!role || !moduleKey || typeof value != "boolean")
+  if (!role || !moduleKey || typeof value !== "boolean")
     throw new Error("Invalid arguments for permission update");
 
   try {
     const companyId = await getCompanyId();
+    const moduleField = isViewOnly ? `${moduleKey}ViewOnly` : moduleKey;
+
     switch (role) {
       case "Manager":
         const managerPermission = await db.permissionForManager.findFirst({
@@ -95,58 +100,62 @@ export const updatePermissionForRole = async ({
         if (managerPermission) {
           await db.permissionForManager.update({
             where: { id: managerPermission.id },
-            data: { [moduleKey]: value },
+            data: { [moduleField]: value },
           });
-        } else{
-          throw new Error("Cant update the permission for this role");
+        } else {
+          throw new Error("Can't update the permission for this role");
         }
         break;
-      
-     
+
       case "Sales":
         const salesPermission = await db.permissionForSales.findFirst({
           where: { companyId },
         });
         if (salesPermission) {
-          await db.permissionForManager.update({
+          await db.permissionForSales.update({
             where: { id: salesPermission.id },
-            data: { [moduleKey]: value },
+            data: { [moduleField]: value },
           });
-        } else{
-          throw new Error("Cant update the permission for this role");
+        } else {
+          throw new Error("Can't update the permission for this role");
         }
         break;
+
       case "Technician":
         const technicianPermission = await db.permissionForTechnician.findFirst({
           where: { companyId },
         });
         if (technicianPermission) {
-          await db.permissionForManager.update({
+          await db.permissionForTechnician.update({
             where: { id: technicianPermission.id },
-            data: { [moduleKey]: value },
+            data: { [moduleField]: value },
           });
-        }else{
-          throw new Error("Cant update the permission for this role");
+        } else {
+          throw new Error("Can't update the permission for this role");
         }
         break;
+
       case "Other":
         const otherPermission = await db.permissionForOther.findFirst({
           where: { companyId },
         });
         if (otherPermission) {
-          await db.permissionForManager.update({
+          await db.permissionForOther.update({
             where: { id: otherPermission.id },
-            data: { [moduleKey]: value },
+            data: { [moduleField]: value },
           });
-        } else{
-          throw new Error("Cant update the permission for this role");
+        } else {
+          throw new Error("Can't update the permission for this role");
         }
         break;
 
       default:
-        console.log("Role not found: " + role);
+        throw new Error("Role not found: " + role);
     }
   } catch (error) {
-    throw new Error("Error for permission update");
+    console.error("Error updating permission:", error);
+    throw new Error("Error updating permission");
   }
 };
+
+

@@ -1,12 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Switch, Checkbox } from "antd";
+import { permissionModule } from "@/lib/permissionModule";
 import {
-  teamManagementUser,
   getPermissionsForRole,
-  updatePermissionForRole
+  updatePermissionForRole,
 } from "@/actions/settings/teamManagement";
-
 
 interface PermissionWithIndexSignature {
   [key: string]: boolean;
@@ -21,26 +20,6 @@ interface Permissions {
 
 export default function UserRolesTable() {
   const [permissions, setPermissions] = useState<Permissions | null>(null);
-  
-
-  const modules = [
-    { label: "Communications Hub: Internal", key: "communicationHubInternal" },
-    { label: "Communications Hub: Clients", key: "communicationHubClients" },
-    {
-      label: "Communications Hub: Collaboration",
-      key: "communicationHubCollaboration",
-    },
-    { label: "Estimates & Invoices", key: "estimatesInvoices" },
-    { label: "Calendar & Task", key: "calendarTask" },
-    { label: "Payments", key: "payments" },
-    { label: "Workforce Management", key: "workforceManagement" },
-    { label: "Reporting & Analytics", key: "reporting" },
-    { label: "Inventory", key: "inventory" },
-    { label: "Integrations", key: "integrations" },
-    { label: "Sales Pipeline", key: "salesPipeline" },
-    { label: "Shop Pipeline", key: "shopPipeline" },
-    { label: "Business Settings", key: "businessSettings" },
-  ];
 
   const roles = ["Manager", "Sales", "Technician", "Other"];
 
@@ -48,11 +27,10 @@ export default function UserRolesTable() {
     const fetchPermissions = async () => {
       try {
         const data = (await getPermissionsForRole()) as Permissions;
-        console.log(data);
+        console.log("Fetched Permissions:", data); // Check the structure here
 
         if (data) {
           setPermissions(data);
-        
         }
       } catch (error) {
         console.log("Error fetching permissions", error);
@@ -62,30 +40,30 @@ export default function UserRolesTable() {
     fetchPermissions();
   }, []);
 
+  // Handle toggle for both switch (permission) and checkbox (viewOnly)
   const handleToggle = async (
     role: string,
     moduleKey: string,
     value: boolean,
+    isViewOnly = false,
   ) => {
     if (!permissions) return;
 
     try {
       const updatedPermissions = { ...permissions };
-
       const roleKey =
         `${role.toLowerCase()}Permissions` as keyof typeof permissions;
+      const fieldKey = isViewOnly ? `${moduleKey}ViewOnly` : moduleKey;
 
       if (updatedPermissions[roleKey]) {
-        updatedPermissions[roleKey]![moduleKey] = value;
-        setPermissions(updatedPermissions);
-        await updatePermissionForRole({role, moduleKey, value})
+        updatedPermissions[roleKey]![fieldKey] = value; // Update locally
+        setPermissions(updatedPermissions); // Update the component state
+        await updatePermissionForRole({ role, moduleKey, value, isViewOnly }); // Update the database
       }
     } catch (error) {
       console.log("Error updating permission:", error);
     }
   };
-
- 
 
   const getPermissionForRole = (
     role: string,
@@ -107,6 +85,26 @@ export default function UserRolesTable() {
         return null;
     }
   };
+
+  const isViewOnlyForRole = (role: string, moduleKey: string): boolean => {
+    if (!permissions) return false;
+
+    const viewOnlyKey = `${moduleKey}ViewOnly`;
+
+    switch (role) {
+      case "Manager":
+        return permissions.managerPermissions?.[viewOnlyKey] ?? false;
+      case "Sales":
+        return permissions.salesPermissions?.[viewOnlyKey] ?? false;
+      case "Technician":
+        return permissions.technicianPermissions?.[viewOnlyKey] ?? false;
+      case "Other":
+        return permissions.otherPermissions?.[viewOnlyKey] ?? false;
+      default:
+        return false;
+    }
+  };
+
   return (
     <div className="relative w-full">
       <div className="mb-2 mt-2">
@@ -130,35 +128,57 @@ export default function UserRolesTable() {
             </tr>
           </thead>
           <tbody>
-            {modules.map((module, index) => (
+            {permissionModule.map((module, index) => (
               <tr key={index}>
                 <td className="py-2 text-left">{module.label}</td>
-                {roles.map((role) => (
-                  <td key={role} className="px-12 py-3 text-center">
-                    {getPermissionForRole(role, module.key) !== null ? (
-                      <div className="flex items-center justify-center">
-                        <Switch
-                          checked={
-                            getPermissionForRole(role, module.key) ?? false
-                          }
-                          className="max-w-2 shadow-md"
-                          onChange={(checked) =>
-                            handleToggle(role, module.key, checked)
-                          }
-                        />
-                        {/* Assuming viewOnly needs to be handled differently */}
-                        {false && (
+                {roles.map((role) => {
+                  const permission = getPermissionForRole(role, module.key);
+                  const isViewOnly = isViewOnlyForRole(role, module.key);
+                  const canViewOnly =
+                    (role === "Sales" &&
+                      module.key === "workforceManagement") ||
+                    (role === "Sales" && module.key === "reporting") ||
+                    (role === "Sales" && module.key === "inventory") ||
+                    (role === "Technician" &&
+                      module.key === "workforceManagement") ||
+                    (role === "Technician" && module.key === "reporting");
+
+                  return (
+                    <td key={role} className="px-12 py-3 text-center">
+                      {permission !== null ? (
+                        <div className="flex items-center justify-center">
+                          <Switch
+                            checked={permission}
+                            className="max-w-2 shadow-md"
+                            onChange={(checked) =>
+                              handleToggle(role, module.key, checked)
+                            }
+                          />
+                        </div>
+                      ) : null}
+
+                      {canViewOnly && (
                           <div className="group">
-                            <Checkbox className="relative left-12" />
+                            <Checkbox
+                              className="relative left-0"
+                              checked={isViewOnly}
+                              onChange={(e) =>
+                                handleToggle(
+                                  role,
+                                  module.key,
+                                  e.target.checked,
+                                  true,
+                                )
+                              }
+                            />
                             <div className="fixed z-50 hidden -translate-y-14 rounded-lg border bg-[#66738C] p-1 text-sm text-white group-hover:block">
                               View Only
                             </div>
                           </div>
                         )}
-                      </div>
-                    ) : null}
-                  </td>
-                ))}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>

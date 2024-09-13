@@ -5,7 +5,7 @@ import {Role,EmployeeType} from "@prisma/client"
 
 interface Module {
   name: string;
-  access: boolean;
+ 
 }
 
 interface CustomizeUserRolesProps {
@@ -24,24 +24,18 @@ const CustomizeUserRole = ({ user, onBack }: CustomizeUserRolesProps) => {
  
 
   const [modules, setModules] = useState<Module[]>([
-    { name: "Dashboard", access: false },
-    { name: "Communications Hub: Internal", access: false },
-    { name: "Communications Hub: Clients", access: false },
-    { name: "Communications Hub: Collaboration", access: false },
-    { name: "Estimates & Invoices", access: false },
-    { name: "Calendar & Task", access: false },
-    { name: "Reporting & Analytics", access: true },
-    { name: "Inventory", access: true },
-    { name: "Settings", access: false },
+    { name: "Dashboard", },
+    { name: "Communications Hub: Internal" },
+    { name: "Communications Hub: Clients" },
+    { name: "Communications Hub: Collaboration" },
+    { name: "Estimates & Invoices",  },
+    { name: "Calendar & Task"},
+    { name: "Reporting & Analytics" },
+    { name: "Inventory" },
+    { name: "Settings"},
   ]);
 
-  const handleToggleAccess = (index: number) => {
-    setModules((prevModules) => {
-      const newModules = [...prevModules];
-      newModules[index].access = !newModules[index].access;
-      return newModules;
-    });
-  };
+ 
   const name = `${user.firstName} ${user.lastName}`;
 
   return (
@@ -81,7 +75,7 @@ const CustomizeUserRole = ({ user, onBack }: CustomizeUserRolesProps) => {
               <td className="px-4 py-2">{module.name}</td>
               <td className="px-4 py-2.5 text-left">
                 <Switch defaultChecked={false} className="shadow-md" />
-                {module.access ? <Checkbox className="relative ml-2" /> : null}
+               
               </td>
             </tr>
           ))}
