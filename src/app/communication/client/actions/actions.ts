@@ -19,7 +19,7 @@ export async function getToken(code: string) {
       });
     }
   } catch (error) {}
-  redirect("/communication/client");
+  redirect("/settings/communications");
 }
 
 export async function getClients() {

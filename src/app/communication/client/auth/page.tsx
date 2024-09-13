@@ -10,7 +10,7 @@ const Page = () => {
     if (code) getToken(code);
   }, []);
 
-  return <div></div>;
+  return <div>Connecting with Google...</div>;
 };
 
 export default Page;

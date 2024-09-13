@@ -1,13 +1,8 @@
-import { getCompanyId } from "@/lib/companyId";
-import { db } from "@/lib/db";
 import crypto from "crypto";
 import { google } from "googleapis";
 import { cookies } from "next/headers";
+import Link from "next/link";
 
-import { redirect } from "next/navigation";
-import React from "react";
-
-type Props = {};
 function generateAuthURL() {
   const oauth2Client = new google.auth.OAuth2(
     process.env.GMAIL_CLIENT_ID,
@@ -25,23 +20,30 @@ function generateAuthURL() {
   return authorizationUrl;
 }
 
-const Page = async (props: Props) => {
+type Props = {};
+
+const ConnectGoogle = (props: Props) => {
   const cookieStore = cookies();
   const hasCookie = cookieStore.has("gmail_refresh_token");
   if (!hasCookie) {
-    redirect("/settings/communications");
-  }
-  const companyId = await getCompanyId();
-  const clients = await db.client.findMany({
-    where: { companyId },
-    include: { tag: true, source: true },
-  });
-
-  if (clients.length === 0) {
-    return <div>No Clients</div>;
+    // redirect(generateAuthURL());
+    return (
+      <Link
+        href={generateAuthURL()}
+        className="rounded-md bg-[#6571FF] px-10 py-1.5 text-white"
+      >
+        Connect with Google
+      </Link>
+    );
   } else {
-    redirect(`/communication/client/${clients[0].id}`);
+    return (
+      <div>
+        <span className="rounded-md bg-[#6571FF] px-10 py-1.5 text-white">
+          Connected with Google
+        </span>
+      </div>
+    );
   }
 };
 
-export default Page;
+export default ConnectGoogle;
