@@ -1,7 +1,10 @@
 import { Group, User } from "@prisma/client";
 import CreateGroupModal from "./CreateGroupModal";
 import Avatar from "@/components/Avatar";
-
+import { useDebounce } from "@/hooks/useDebounce";
+import { searchUsers } from "@/actions/communication/internal/searchUser";
+import { useState } from "react";
+import { searchGroups } from "@/actions/communication/internal/searchGroup";
 export default function List({
   users,
   setUsersList,
@@ -15,6 +18,22 @@ export default function List({
   >;
   groups: (Group & { users: User[] })[] | [];
 }) {
+  const [usersStore, setUsersStore] = useState(users);
+  const [groupsStore, setGroupsStore] = useState(groups);
+  const handleSearch = useDebounce(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const searchTerm = event.target.value;
+      const searchUsersResult = await searchUsers(searchTerm);
+      const searchGroupsResult = await searchGroups(searchTerm);
+      if (searchUsersResult.success || searchGroupsResult.success) {
+        const foundedUsers = searchUsersResult.data;
+        const foundedGroups = searchGroupsResult.data;
+        setUsersStore(foundedUsers);
+        setGroupsStore(foundedGroups);
+      }
+    },
+    500,
+  );
   return (
     <div className="app-shadow w-[20%] rounded-lg bg-white p-3">
       {/* Header */}
@@ -23,22 +42,18 @@ export default function List({
         <CreateGroupModal users={users} />
       </div>
       {/* Search */}
-      <form>
+      <div>
         <input
+          onChange={handleSearch}
           type="text"
           placeholder="Search here..."
-          className="my-3 mr-2 rounded-md border-none p-2 text-[12px] text-[#797979] max-[1822px]:w-full"
+          className="my-3 mr-2 w-full rounded-md border-2 border-[#006D77] p-2 text-[12px] text-[#797979] focus:outline-none max-[1822px]:w-full"
         />
-        <button
-          type="submit"
-          className="h-[26px] w-[62px] rounded-md bg-[#797979] text-[12px] text-white"
-        >
-          Filter
-        </button>
-      </form>
+      </div>
+
       <div className="mt-2 flex h-[88%] flex-col gap-2 overflow-y-auto max-[2127px]:h-[80%]">
         {/* Group list */}
-        {groups.map((group) => {
+        {groupsStore.map((group) => {
           return (
             <button
               key={group.id}
@@ -54,7 +69,7 @@ export default function List({
                 });
               }}
             >
-              <div className="grid grid-cols-2">
+              <div className="grid grid-cols-2 items-center">
                 {group.users.slice(0, 4).map((user) => {
                   return (
                     <Avatar
@@ -75,7 +90,7 @@ export default function List({
           );
         })}
         {/* List */}
-        {users.map((user) => {
+        {usersStore.map((user) => {
           return (
             <button
               key={user.id}
