@@ -3,7 +3,7 @@ import CreateGroupModal from "./CreateGroupModal";
 import Avatar from "@/components/Avatar";
 import { useDebounce } from "@/hooks/useDebounce";
 import { searchUsers } from "@/actions/communication/internal/searchUser";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { searchGroups } from "@/actions/communication/internal/searchGroup";
 export default function List({
   users,
@@ -20,6 +20,11 @@ export default function List({
 }) {
   const [usersStore, setUsersStore] = useState(users);
   const [groupsStore, setGroupsStore] = useState(groups);
+
+  useEffect(() => {
+    setGroupsStore(groups);
+  }, [groups]);
+
   const handleSearch = useDebounce(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
       const searchTerm = event.target.value;

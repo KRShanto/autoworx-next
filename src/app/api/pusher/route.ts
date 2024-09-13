@@ -1,6 +1,5 @@
 import { getPusherInstance } from "@/lib/pusher/server";
 import { AuthSession } from "@/types/auth";
-import { nanoid } from "nanoid";
 import { db } from "@/lib/db";
 import { auth } from "@/app/auth";
 import { revalidatePath } from "next/cache";
@@ -75,7 +74,7 @@ export async function POST(req: Request, res: Response) {
         },
       });
     }
-
+    revalidatePath("/communication/internal");
     // send json
     return new Response(
       JSON.stringify({

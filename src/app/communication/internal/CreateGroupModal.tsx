@@ -11,7 +11,7 @@ import { MdGroupAdd } from "react-icons/md";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 import { CiSearch } from "react-icons/ci";
 import { TiDeleteOutline } from "react-icons/ti";
-import { User } from "@prisma/client";
+import { Group, User } from "@prisma/client";
 import { createGroup } from "@/actions/communication/internal/creategroup";
 import { useSession } from "next-auth/react";
 import Avatar from "@/components/Avatar";
@@ -108,16 +108,16 @@ export default function CreateGroupModal({ users }: TProps) {
     );
   };
 
-  async function handleCreateGroup() {
+  const handleCreateGroup = async () => {
     if (contactList.length >= 2) {
       const usersInGroup = contactList.map((user) => ({
         id: user.id,
       }));
-      const group = await createGroup({
+      const response = await createGroup({
         name: groupName,
         users: [{ id: session?.user.id }, ...usersInGroup],
       });
-      if (group.status === 200) {
+      if (response.status === 200) {
         setOpen(false);
         setError("");
         setGroupName("");
@@ -128,7 +128,7 @@ export default function CreateGroupModal({ users }: TProps) {
     } else {
       setError("At least 2 users are required to create a group.");
     }
-  }
+  };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
