@@ -11,11 +11,9 @@ import { MdGroupAdd } from "react-icons/md";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 import { CiSearch } from "react-icons/ci";
 import { TiDeleteOutline } from "react-icons/ti";
-import Image from "next/image";
 import { User } from "@prisma/client";
 import { createGroup } from "@/actions/communication/internal/creategroup";
-import { getSession, useSession } from "next-auth/react";
-import { Session } from "next-auth";
+import { useSession } from "next-auth/react";
 import Avatar from "@/components/Avatar";
 
 type TProps = {
