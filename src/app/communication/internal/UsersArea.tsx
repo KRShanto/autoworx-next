@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import MessageBox from "./MessageBox";
+import MessageBox from "../MessageBox";
 import { User } from "next-auth";
 import { pusher } from "@/lib/pusher/client";
 import { Attachment, Message as DbMessage } from "@prisma/client";

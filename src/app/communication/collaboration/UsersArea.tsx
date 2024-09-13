@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 // import MessageBox from "./MessageBox";
 import { cn } from "@/lib/cn";
-import MessageBox from "../internal/MessageBox";
+import MessageBox from "../MessageBox";
 import { pusher } from "@/lib/pusher/client";
 import { MessageQue } from "../internal/UsersArea";
 import { Attachment, Message } from "@prisma/client";
