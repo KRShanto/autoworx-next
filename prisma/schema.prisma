@@ -12,52 +12,57 @@ datasource db {
 // For now, every user has to create their own company when registering.
 // In the future, we can add a feature to join a company.
 model Company {
-  id                   Int                    @id @default(autoincrement())
-  name                 String
-  businessId           String?                @map("business_id")
-  businessType         String?                @map("business_type")
-  phone                String?
-  industry             String?
-  website              String?
-  address              String?
-  city                 String?
-  state                String?
-  zip                  String?
-  image                String?
-  businessVisibility   Boolean?               @default(false) @map("business_visibility")
-  phoneVisibility      Boolean?               @default(false) @map("phone_visibility")
-  addressVisibility    Boolean?               @default(false) @map("address_visibility")
-  tax                  Decimal?               @default(0)
-  currency             String?                @default("USD")
-  terms                String?
-  policy               String?
-  createdAt            DateTime               @default(now()) @map("created_at")
-  updatedAt            DateTime               @default(now()) @updatedAt @map("updated_at")
-  users                User[]
-  tasks                Task[]
-  clients              Client[]
-  services             Service[]
-  vehicles             Vehicle[]
-  invoices             Invoice[]
-  calendarSettings     CalendarSettings[]
-  appointments         Appointment[]
-  emailTemplates       EmailTemplate[]
-  materials            Material[]
-  vendors              Vendor[]
-  labors               Labor[]
-  tags                 Tag[]
-  categories           Category[]
-  statuses             Status[]
-  paymentMethods       PaymentMethod[]
-  inventoryProducts    InventoryProduct[]
-  VehicleColor         VehicleColor[]
-  Source               Source[]
-  Payment              Payment[]
-  Coupon               Coupon[]
-  Technician           Technician[]
-  companyJoinsAsOne    CompanyJoin[]          @relation("CompanyOne")
-  companyJoinsAsTwo    CompanyJoin[]          @relation("CompanyTwo")
-  companyEmailTemplate CompanyEmailTemplate[]
+  id                      Int                       @id @default(autoincrement())
+  name                    String
+  businessId              String?                   @map("business_id")
+  businessType            String?                   @map("business_type")
+  phone                   String?
+  industry                String?
+  website                 String?
+  address                 String?
+  city                    String?
+  state                   String?
+  zip                     String?
+  image                   String?
+  businessVisibility      Boolean?                  @default(false) @map("business_visibility")
+  phoneVisibility         Boolean?                  @default(false) @map("phone_visibility")
+  addressVisibility       Boolean?                  @default(false) @map("address_visibility")
+  tax                     Decimal?                  @default(0)
+  currency                String?                   @default("USD")
+  terms                   String?
+  policy                  String?
+  createdAt               DateTime                  @default(now()) @map("created_at")
+  updatedAt               DateTime                  @default(now()) @updatedAt @map("updated_at")
+  users                   User[]
+  tasks                   Task[]
+  clients                 Client[]
+  services                Service[]
+  vehicles                Vehicle[]
+  invoices                Invoice[]
+  calendarSettings        CalendarSettings[]
+  appointments            Appointment[]
+  emailTemplates          EmailTemplate[]
+  materials               Material[]
+  vendors                 Vendor[]
+  labors                  Labor[]
+  tags                    Tag[]
+  categories              Category[]
+  statuses                Status[]
+  paymentMethods          PaymentMethod[]
+  inventoryProducts       InventoryProduct[]
+  VehicleColor            VehicleColor[]
+  Source                  Source[]
+  Payment                 Payment[]
+  Coupon                  Coupon[]
+  Technician              Technician[]
+  companyJoinsAsOne       CompanyJoin[]             @relation("CompanyOne")
+  companyJoinsAsTwo       CompanyJoin[]             @relation("CompanyTwo")
+  companyEmailTemplate    CompanyEmailTemplate[]
+  permissionForManager    PermissionForManager[]
+  permissionForSales      PermissionForSales[]
+  permissionForTechnician PermissionForTechnician[]
+  permissionForOther      PermissionForOther[]
+  permissions             Permission[]
 
   companyLatitude  Float?
   companyLongitude Float?
@@ -105,7 +110,7 @@ model User {
   companyName      String?           @map("company_name")
   commission       Decimal?          @default(0)
   role             Role              @default(admin)
-  employeeType     EmployeeType      @default(Sales)
+  employeeType     EmployeeType      @default(Admin)
   joinDate         DateTime?         @map("join_date")
   companyId        Int               @map("company_id")
   createdAt        DateTime          @default(now()) @map("created_at")
@@ -119,6 +124,7 @@ model User {
   appointmentUsers AppointmentUser[]
   invoices         Invoice[]
   Technician       Technician[]
+  permissions      Permission[]
 
   @@index([companyId], name: "fk_users_company")
 }
@@ -135,8 +141,11 @@ enum Role {
 }
 
 enum EmployeeType {
+  Admin
+  Manager
   Sales
   Technician
+  Other
 }
 
 // OAuth token for user.
@@ -770,14 +779,15 @@ enum InventoryProductType {
 
 // Message for chat.
 model Message {
-  id        Int      @id @default(autoincrement())
-  to        Int?
-  message   String
-  from      Int
-  groupId   Int?     @map("group_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  id         Int         @id @default(autoincrement())
+  to         Int?
+  message    String
+  from       Int
+  groupId    Int?        @map("group_id")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
   attachment Attachment?
+
   @@index([to], name: "fk_messages_to")
   @@index([from], name: "fk_messages_from")
   @@index([groupId], name: "fk_messages_group")
@@ -785,10 +795,10 @@ model Message {
 
 model Attachment {
   id        Int      @id @default(autoincrement())
-  fileName  String   // File name (e.g., 'image.png')
-  fileType  String   // File type (e.g., 'image/png', 'application/pdf')
-  fileUrl   String   // File storage path or URL
-  fileSize String
+  fileName  String // File name (e.g., 'image.png')
+  fileType  String // File type (e.g., 'image/png', 'application/pdf')
+  fileUrl   String // File storage path or URL
+  fileSize  String
   messageId Int      @unique // Foreign key to Message model, enforces one-to-one relationship
   message   Message  @relation(fields: [messageId], references: [id])
   createdAt DateTime @default(now())
@@ -843,4 +853,99 @@ model CompanyEmailTemplate {
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@map("companyEmailTemplate")
+}
+
+model PermissionForManager {
+  id                            Int     @id @default(autoincrement())
+  companyId                     Int     @map("company_id")
+  communicationHubInternal      Boolean @default(true) @map("communication_hub_internal")
+  communicationHubClients       Boolean @default(true) @map("communication_hub_clients")
+  communicationHubCollaboration Boolean @default(true) @map("communication_hub_collaboration")
+  estimatesInvoices             Boolean @default(true) @map("estimates_invoices")
+  calendarTask                  Boolean @default(true) @map("calendar_task")
+  payments                      Boolean @default(true)
+  workforceManagement           Boolean @default(true) @map("workforce_management")
+  reporting                     Boolean @default(true)
+  inventory                     Boolean @default(true)
+  integrations                  Boolean @default(false)
+  salesPipeline                 Boolean @default(true) @map("sales_pipeline")
+  shopPipeline                  Boolean @default(true) @map("shop_pipeline")
+  businessSettings              Boolean @default(false) @map("business_settings")
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model PermissionForSales {
+  id                            Int     @id @default(autoincrement())
+  companyId                     Int     @map("company_id")
+  communicationHubInternal      Boolean @default(true) @map("communication_hub_internal")
+  communicationHubClients       Boolean @default(true) @map("communication_hub_clients")
+  communicationHubCollaboration Boolean @default(true) @map("communication_hub_collaboration")
+  estimatesInvoices             Boolean @default(true) @map("estimates_invoices")
+  calendarTask                  Boolean @default(true) @map("calendar_task")
+  payments                      Boolean @default(false)
+  salesPipeline                 Boolean @default(true) @map("sales_pipeline")
+
+  //view only
+  workforceManagementViewOnly Boolean @default(true) @map("workforce_management")
+  reportingViewOnly           Boolean @default(true)
+  inventoryViewOnly           Boolean @default(true)
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model PermissionForTechnician {
+  id                       Int     @id @default(autoincrement())
+  companyId                Int     @map("company_id")
+  communicationHubInternal Boolean @default(true) @map("communication_hub_internal")
+  calendarTask             Boolean @default(true) @map("calendar_task")
+  shopPipeline             Boolean @default(true) @map("shop_pipeline")
+
+  //view only
+  workforceManagementViewOnly Boolean @default(true) @map("workforce_management")
+  reportingViewOnly           Boolean @default(true)
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model PermissionForOther {
+  id                            Int     @id @default(autoincrement())
+  companyId                     Int     @map("company_id")
+  communicationHubInternal      Boolean @default(false) @map("communication_hub_internal")
+  communicationHubClients       Boolean @default(false) @map("communication_hub_clients")
+  communicationHubCollaboration Boolean @default(false) @map("communication_hub_collaboration")
+  estimatesInvoices             Boolean @default(false) @map("estimates_invoices")
+  calendarTask                  Boolean @default(false) @map("calendar_task")
+  payments                      Boolean @default(false)
+  workforceManagement           Boolean @default(false) @map("workforce_management")
+  reporting                     Boolean @default(false)
+  inventory                     Boolean @default(false)
+  integrations                  Boolean @default(false)
+  salesPipeline                 Boolean @default(false) @map("sales_pipeline")
+  shopPipeline                  Boolean @default(false) @map("shop_pipeline")
+  businessSettings              Boolean @default(false) @map("business_settings")
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model Permission {
+  id                            Int     @id @default(autoincrement())
+  userId                        Int     @map("user_id")
+  companyId                     Int     @map("company_id")
+  communicationHubInternal      Boolean @default(false) @map("communication_hub_internal")
+  communicationHubClients       Boolean @default(false) @map("communication_hub_clients")
+  communicationHubCollaboration Boolean @default(false) @map("communication_hub_collaboration")
+  estimate                      Boolean @default(false)
+  calendar                      Boolean @default(false)
+  reporting                     Boolean @default(false)
+  payments                      Boolean @default(false)
+  workforceManagement           Boolean @default(false) @map("workforce_management")
+  inventory                     Boolean @default(false)
+  integrations                  Boolean @default(false)
+  salesPipeline                 Boolean @default(false) @map("sales_pipeline")
+  accountSettings               Boolean @default(false) @map("account_settings")
+  businessSettings              Boolean @default(false) @map("business_settings")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
