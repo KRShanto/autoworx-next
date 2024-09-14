@@ -27,22 +27,7 @@ const CuponComponet = ({ coupons, setCoupons }: CouponTableProps) => {
       <div className="flex h-[65vh] w-[75vw] flex-col rounded-lg border bg-white p-4 shadow-lg">
         {/* Button Bar */}
 
-        <div className="flex justify-between">
-          <div className="mb-4 flex gap-2">
-            <button className="rounded-lg border-2 border-[#6571FF] px-4 py-2 text-blue-600 hover:bg-blue-100">
-              All
-            </button>
-            <button className="rounded-lg border-2 border-[#6571FF] px-4 py-2 text-blue-600 hover:bg-blue-100">
-              Active
-            </button>
-            <button className="rounded-lg border-2 border-[#6571FF] px-4 py-2 text-blue-600 hover:bg-blue-100">
-              Scheduled
-            </button>
-            <button className="rounded-lg border-2 border-[#6571FF] px-4 py-2 text-blue-600 hover:bg-blue-100">
-              Expired
-            </button>
-          </div>
-
+        <div className="mb-3 flex justify-end">
           <div>
             <NewCoupon setCoupons={setCoupons} />
           </div>

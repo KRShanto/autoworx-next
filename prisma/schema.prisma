@@ -822,12 +822,17 @@ model Coupon {
   endDate      DateTime
   discount     Decimal
   discountType DiscountType
-  status       String
+  status       CouponStatus
   redemptions  Int
   companyId    Int          @map("company_id")
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @default(now()) @updatedAt @map("updated_at")
   company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+enum CouponStatus {
+  Active
+  Expired
 }
 
 enum DiscountType {
