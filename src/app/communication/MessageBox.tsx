@@ -14,6 +14,8 @@ import { useSession } from "next-auth/react";
 import Avatar from "@/components/Avatar";
 import Message from "./Message";
 import toast from "react-hot-toast";
+import { usePathname } from "next/navigation";
+import EstimateModal from "./collaboration/EstimateModal";
 // import Message from "./Message";
 
 export default function MessageBox({
@@ -46,6 +48,12 @@ export default function MessageBox({
   const [openSettings, setOpenSettings] = useState(false);
   const { data: session } = useSession();
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [showAttachment, setShowAttachment] = useState(false);
+  const pathname = usePathname();
+
+  const isEstimateAttachmentShow = pathname.includes(
+    "/communication/collaboration",
+  );
 
   useEffect(() => {
     if (messageBoxRef.current) {
@@ -173,6 +181,7 @@ export default function MessageBox({
   const handleAttachment = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event?.target?.files?.[0];
     setAttachmentFile(file!);
+    setShowAttachment(false);
   };
 
   const handleDownload = async (fileUrl: string | null) => {
@@ -336,11 +345,28 @@ export default function MessageBox({
 
       {/* Input */}
       <form
-        className="flex h-[8%] items-center gap-2 bg-[#D9D9D9] p-2"
+        className="relative flex h-[8%] items-center gap-2 bg-[#D9D9D9] p-2"
         onSubmit={(e) => startTransition(() => handleSubmit(e))}
       >
+        {/* attachment or estimate dropdown */}
+        {showAttachment && (
+          <div
+            className={cn(
+              "absolute -top-[55px] space-y-1",
+              isEstimateAttachmentShow ? "-top-[55px]" : "-top-[27px]",
+            )}
+          >
+            <p
+              onClick={() => attachmentRef.current?.click()}
+              className="cursor-pointer text-nowrap rounded-md border border-[#006D77] bg-white px-2 text-sm text-[#006D77] hover:bg-[#006D77] hover:text-white"
+            >
+              Attach Document/Media
+            </p>
+            {isEstimateAttachmentShow && <EstimateModal />}
+          </div>
+        )}
         <Image
-          onClick={() => attachmentRef.current?.click()}
+          onClick={() => setShowAttachment(!showAttachment)}
           className="cursor-pointer"
           src="/icons/Attachment.svg"
           width={24}
