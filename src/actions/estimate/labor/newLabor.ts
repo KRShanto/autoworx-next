@@ -5,6 +5,7 @@ import { auth } from "@/app/auth";
 import { AuthSession } from "@/types/auth";
 import { ServerAction } from "@/types/action";
 import { Tag } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 export async function newLabor({
   name,
@@ -63,6 +64,8 @@ export async function newLabor({
       tag: true,
     },
   });
+
+  revalidatePath("/estimate");
 
   return {
     type: "success",

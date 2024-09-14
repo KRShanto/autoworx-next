@@ -54,7 +54,7 @@ export default function NewLabor({
   useEffect(() => {
     setTagsOpen(false);
   }, [categoryOpen]);
-  
+
   useEffect(() => {
     setCategoryOpen(false);
   }, [tagsOpen]);
@@ -119,6 +119,7 @@ export default function NewLabor({
       });
 
       close();
+      setOpen(false);
     }
   }
 

@@ -89,18 +89,27 @@ export default async function Page({
   );
   const statuses = await db.status.findMany({ where: { companyId } });
 
+  const labors = await db.labor.findMany({
+    where: { companyId },
+    include: { category: true },
+  });
+  const categories = await db.category.findMany({ where: { companyId } });
+  const tags = await db.tag.findMany({ where: { companyId } });
+
   return (
     <div>
       <Title>Estimates</Title>
 
-      <SyncLists statuses={statuses} />
+      {/* TODO: find a better way. fetch these values from client side in where they are actually needed */}
+      <SyncLists categories={categories} tags={tags} statuses={statuses} />
+
       <Header />
 
       <Tabs defaultValue="a-estimate" className="mt-5 grid-cols-1">
         <TabsList>
-          <TabsTrigger value="a-estimate">Estimates</TabsTrigger>
-          <TabsTrigger value="b-invoice">Invoices</TabsTrigger>
           <TabsTrigger value="c-canned">Canned</TabsTrigger>
+          <TabsTrigger value="b-invoice">Invoices</TabsTrigger>
+          <TabsTrigger value="a-estimate">Estimates</TabsTrigger>
         </TabsList>
 
         <TabsContent value="a-estimate">
@@ -112,7 +121,7 @@ export default async function Page({
         </TabsContent>
 
         <TabsContent value="c-canned">
-          <CannedTable />
+          <CannedTable labors={labors} />
         </TabsContent>
       </Tabs>
     </div>

@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { Tag } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 export async function updateLabor({
   id,
@@ -67,6 +68,8 @@ export async function updateLabor({
       tag: true,
     },
   });
+
+  revalidatePath("/estimate");
 
   return {
     type: "success",
