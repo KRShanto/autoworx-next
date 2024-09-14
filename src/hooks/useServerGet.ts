@@ -6,7 +6,10 @@ type UseServerGetResult<T> = {
   error: Error | null;
 };
 
-export function useServerGet<T>(fn: () => Promise<T>): UseServerGetResult<T> {
+export function useServerGet<T>(
+  fn: (...args: any) => Promise<T>,
+  ...args: any[]
+): UseServerGetResult<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
@@ -17,7 +20,7 @@ export function useServerGet<T>(fn: () => Promise<T>): UseServerGetResult<T> {
 
     const fetchData = async () => {
       try {
-        const result = await fn();
+        const result = await fn(...args); // Spread the args here
         if (isMounted) {
           setData(result);
         }
@@ -37,7 +40,7 @@ export function useServerGet<T>(fn: () => Promise<T>): UseServerGetResult<T> {
     return () => {
       isMounted = false;
     };
-  }, [fn]);
+  }, [fn, ...args]); // Add `args` to the dependency array
 
   return { data, loading, error };
 }
