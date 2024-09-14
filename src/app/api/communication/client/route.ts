@@ -137,7 +137,17 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const text = formData.get("text") as string | null;
     let filePath;
 
-    console.log("Form data:", { file, recipient, subject, text });
+    if (!recipient) throw new Error("Recipient not provided");
+
+    const client = await db.client.findFirst({
+      where: { id: parseInt(recipient) },
+    });
+
+    if (!client) {
+      throw new Error("Client not found");
+    }
+
+    // console.log("Form data:", { file, client.email, subject, text });
 
     if (!recipient || !subject || !text) {
       return NextResponse.json(
@@ -169,7 +179,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Send the email with the file attachment
     const mailOptions = {
       from: process.env.GMAIL_USER as string,
-      to: recipient,
+      to: client.email,
       subject: subject,
       text: text,
       attachments: file

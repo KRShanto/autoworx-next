@@ -57,7 +57,7 @@ import { useEffect, useRef, useState } from "react";
 // ];
 export default function Messages({
   conversations,
-  email,
+  clientId,
   loading,
   base64Data,
   setBase64Data,
@@ -101,8 +101,8 @@ export default function Messages({
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("recipient", email);
-    formData.append("subject", "test");
+    formData.append("recipient", clientId);
+    formData.append("subject", "Test Subject");
     formData.append("text", messageInput);
 
     let base64FileData = "";

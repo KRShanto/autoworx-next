@@ -8,7 +8,7 @@ import Messages from "./Messages";
 
 export default function MessageBox({
   conversations,
-  email,
+  clientId,
   loading,
   base64Data,
   setBase64Data,
@@ -80,7 +80,7 @@ export default function MessageBox({
 
       {selected === "MESSAGES" && (
         <Messages
-          email={email}
+          clientId={clientId}
           conversations={conversations}
           loading={loading}
           setConversations={setConversations}
