@@ -72,7 +72,7 @@ export default function Pipelines({
   });
   const [pipelineData, setPipelineData] = useState<PipelineData[]>([]);
 
-  console.log("invoice out", invoices);
+  // console.log("invoice out", invoices);
 
   useEffect(() => {
     if (invoices) {
@@ -342,7 +342,7 @@ export default function Pipelines({
                       const isServiceDropdownOpen =
                         openServiceDropdown[key] || false;
 
-                      console.log("Lead", lead);
+                      // console.log("Lead", lead);
                       return (
                         <Draggable
                           key={leadIndex}
