@@ -15,7 +15,7 @@ import Avatar from "@/components/Avatar";
 import Message from "./Message";
 import toast from "react-hot-toast";
 import { usePathname } from "next/navigation";
-import EstimateModal from "./collaboration/EstimateModal";
+import InvoiceEstimateModal from "./collaboration/InvoiceEstimateModal";
 // import Message from "./Message";
 
 export default function MessageBox({
@@ -214,7 +214,7 @@ export default function MessageBox({
       </div>
 
       {/* Chat Header */}
-      <div className="flex h-[10%] items-center justify-between gap-2 rounded-sm bg-[#006D77] p-6 text-white">
+      <div className="flex items-center justify-between gap-2 rounded-sm bg-[#006D77] p-3 text-white">
         <div className="flex items-center gap-1">
           {fromGroup ? (
             <div className="flex items-center">
@@ -362,7 +362,7 @@ export default function MessageBox({
             >
               Attach Document/Media
             </p>
-            {isEstimateAttachmentShow && <EstimateModal />}
+            {isEstimateAttachmentShow && <InvoiceEstimateModal />}
           </div>
         )}
         <Image
