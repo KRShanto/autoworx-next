@@ -5,6 +5,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { searchUsers } from "@/actions/communication/internal/searchUser";
 import { useEffect, useState } from "react";
 import { searchGroups } from "@/actions/communication/internal/searchGroup";
+import { cn } from "@/lib/cn";
 export default function List({
   users,
   setUsersList,
@@ -74,13 +75,18 @@ export default function List({
                 });
               }}
             >
-              <div className="grid grid-cols-2 items-center">
+              <div
+                className={cn(
+                  "grid items-center",
+                  group.users.length === 1 ? "grid-cols-1" : "grid-cols-2",
+                )}
+              >
                 {group.users.slice(0, 4).map((user) => {
                   return (
                     <Avatar
                       photo={user.image}
-                      width={60}
-                      height={60}
+                      width={40}
+                      height={40}
                       key={user.id}
                     />
                   );

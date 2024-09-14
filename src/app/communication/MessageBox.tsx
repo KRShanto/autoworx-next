@@ -13,6 +13,7 @@ import { deleteUserFromGroup } from "@/actions/communication/internal/deleteUser
 import { useSession } from "next-auth/react";
 import Avatar from "@/components/Avatar";
 import Message from "./Message";
+import toast from "react-hot-toast";
 // import Message from "./Message";
 
 export default function MessageBox({
@@ -55,80 +56,85 @@ export default function MessageBox({
 
   async function handleSubmit(e: any) {
     e.preventDefault();
+    try {
+      if (!message && !attachmentFile) return;
 
-    if (!message && !attachmentFile) return;
+      let attachmentFileUrl = null;
 
-    let attachmentFileUrl = null;
-
-    if (attachmentFile) {
-      const formData = new FormData();
-      formData.append("photos", attachmentFile);
-      const uploadRes = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      if (!uploadRes.ok) {
-        // setError("Failed to upload photos");
-        console.error("Failed to upload photos");
-        // setImageSrc(null);
-      }
-
-      const json = await uploadRes.json();
-      attachmentFileUrl = json.data[0];
-    }
-
-    const res = await fetch("/api/pusher", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        to: fromGroup ? group?.id : user?.id,
-        type: fromGroup ? sendType.Group : sendType.User,
-        message,
-        attachmentFile: attachmentFile
-          ? {
-              fileName: attachmentFile?.name,
-              fileType: attachmentFile?.type,
-              fileUrl: attachmentFileUrl,
-              fileSize: attachmentFile?.size,
-            }
-          : null,
-      }),
-    });
-
-    const json = await res.json();
-
-    if (json.success) {
-      const newMessage: TMessage = {
-        // userId: parseInt(session?.user?.id!),
-        message,
-        sender: "USER",
-        attachment: json.attachment,
-      };
-      setPrevMessageStore &&
-        setPrevMessageStore((prevMessage) => [
-          ...prevMessage,
-          { ...json.newMessage, attachment: json.attachment },
-        ]);
-      if (fromGroup) {
-        setMessages((messages) => [...messages, newMessage]);
-      } else {
-        setMessages((messages) => {
-          const newMessages = messages.map((m) => {
-            if (m.user === user?.id) {
-              return {
-                user: user?.id,
-                messages: [...m.messages, newMessage],
-              };
-            }
-            return m;
-          });
-          return newMessages;
+      if (attachmentFile) {
+        const formData = new FormData();
+        formData.append("photos", attachmentFile);
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
         });
+        if (!uploadRes.ok) {
+          // setError("Failed to upload photos");
+          console.error("Failed to upload photos");
+          // setImageSrc(null);
+        }
+
+        const json = await uploadRes.json();
+        attachmentFileUrl = json.data[0];
       }
-      setMessage("");
-      setAttachmentFile(null);
+
+      const res = await fetch("/api/pusher", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: fromGroup ? group?.id : user?.id,
+          type: fromGroup ? sendType.Group : sendType.User,
+          message,
+          attachmentFile: attachmentFile
+            ? {
+                fileName: attachmentFile?.name,
+                fileType: attachmentFile?.type,
+                fileUrl: attachmentFileUrl,
+                fileSize: attachmentFile?.size,
+              }
+            : null,
+        }),
+      });
+
+      const json = await res.json();
+
+      if (json.success) {
+        const newMessage: TMessage = {
+          // userId: parseInt(session?.user?.id!),
+          message,
+          sender: "USER",
+          attachment: json.attachment,
+        };
+        setPrevMessageStore &&
+          setPrevMessageStore((prevMessage) => [
+            ...prevMessage,
+            { ...json.newMessage, attachment: json.attachment },
+          ]);
+        if (fromGroup) {
+          setMessages((messages) => [...messages, newMessage]);
+        } else {
+          setMessages((messages) => {
+            const newMessages = messages.map((m) => {
+              if (m.user === user?.id) {
+                return {
+                  user: user?.id,
+                  messages: [...m.messages, newMessage],
+                };
+              }
+              return m;
+            });
+            return newMessages;
+          });
+        }
+        setMessage("");
+        setAttachmentFile(null);
+      } else {
+        toast.error(json.message);
+      }
+    } catch (err: any) {
+      console.log(err.message);
     }
   }
 
@@ -202,7 +208,7 @@ export default function MessageBox({
       <div className="flex h-[10%] items-center justify-between gap-2 rounded-sm bg-[#006D77] p-6 text-white">
         <div className="flex items-center gap-1">
           {fromGroup ? (
-            <div className="flex">
+            <div className="flex items-center">
               {group?.users
                 .slice(0, 4)
                 .map((groupUser: any, index: number) => (
@@ -213,7 +219,7 @@ export default function MessageBox({
                     height={50}
                     className={cn(
                       "rounded-full",
-                      index === 0 ? "ml-0" : "-ml-9",
+                      index === 0 ? "ml-0" : "-ml-8",
                     )}
                   />
                 ))}
