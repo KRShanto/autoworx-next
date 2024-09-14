@@ -30,7 +30,7 @@ interface Employee {
   lastName: string;
 }
 interface Lead {
-  invoiceId:string;
+  invoiceId: string;
   name: string;
   email: string;
   phone: string;
@@ -41,6 +41,7 @@ interface Lead {
   };
   createdAt: string;
   workOrderStatus?: string;
+  tags: Tag[];
 }
 
 interface PipelineData {
@@ -48,7 +49,7 @@ interface PipelineData {
   leads: Lead[];
 }
 type Column = {
-  id: number|null;
+  id: number | null;
   title: string;
   type: string;
 };
@@ -57,7 +58,6 @@ interface pipelinesProps {
   columns?: Column[];
   type: string;
 }
-
 
 const users: User[] = [];
 
@@ -73,7 +73,7 @@ export default function Pipelines({
     if (invoices) {
       // Transform the invoices into leads
       const transformedLeads: Lead[] = invoices.map((invoice) => {
-        const invoiceId= invoice.id;
+        const invoiceId = invoice.id;
         const client =
           `${invoice.client?.firstName ?? ""} ${invoice.client?.lastName ?? ""}`.trim();
         const vehicle =
@@ -109,6 +109,7 @@ export default function Pipelines({
             completed: completedServices,
             incomplete: incompleteServices,
           },
+          tags: invoice.tags.map((tag) => tag.tag),
           createdAt: new Date(invoice.createdAt).toDateString(),
         };
       });
@@ -255,7 +256,7 @@ export default function Pipelines({
     }));
   };
 
-  const handleDragEnd = async(result: any) => {
+  const handleDragEnd = async (result: any) => {
     const { destination, source } = result;
 
     if (!destination) return;
@@ -280,21 +281,20 @@ export default function Pipelines({
 
     setPipelineData(updatedData);
 
-     // Update the workOrderStatus in the database
-  const invoiceId = removed.invoiceId; // Ensure you have access to the invoiceId in the lead object
-  const newStatus = destinationColumn.title;
+    // Update the workOrderStatus in the database
+    const invoiceId = removed.invoiceId; // Ensure you have access to the invoiceId in the lead object
+    const newStatus = destinationColumn.title;
 
-  try {
-    const response = await updateInvoiceStatus(invoiceId, newStatus);
-    if (response.type === "success") {
-      console.log("Invoice status updated successfully");
-    } else {
-      console.error("Failed to update invoice status:", response.message);
+    try {
+      const response = await updateInvoiceStatus(invoiceId, newStatus);
+      if (response.type === "success") {
+        console.log("Invoice status updated successfully");
+      } else {
+        console.error("Failed to update invoice status:", response.message);
+      }
+    } catch (error) {
+      console.error("Error updating invoice status:", error);
     }
-  } catch (error) {
-    console.error("Error updating invoice status:", error);
-  }
-
   };
 
   return (
@@ -393,12 +393,13 @@ export default function Pipelines({
                               </div>
 
                               <div className="mb-1 flex items-center">
-                                {tagsForLead.slice(0, 2).map((tag) => (
+                                {lead.tags?.map((tag) => (
                                   <span
                                     key={tag.id}
-                                    className="mr-2 inline-flex h-[20px] items-center rounded bg-gray-300 px-1 py-1 text-xs font-semibold text-white"
+                                    className="mr-2 inline-flex h-[20px] items-center rounded bg-gray-300 px-1 py-1 text-xs font-semibold text-black"
                                     style={{
                                       backgroundColor: tag?.bgColor,
+                                      color: tag?.textColor,
                                     }}
                                   >
                                     {tag.name}

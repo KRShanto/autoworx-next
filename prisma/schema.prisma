@@ -280,8 +280,22 @@ model Invoice {
   client                  Client?                   @relation(fields: [clientId], references: [id])
   technician              Technician[]
   workOrderStatus         String?                   @default("Pending") @map("work_order_status")
+  tags                    InvoiceTags[]
 
   @@index([companyId], name: "fk_invoices_company")
+}
+
+model InvoiceTags {
+  id        Int      @id @default(autoincrement())
+  invoiceId String   @map("invoice_id")
+  tagId     Int      @map("tag_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId], name: "fk_invoice_tags_invoice")
+  @@index([tagId], name: "fk_invoice_tags_tag")
 }
 
 enum InvoiceType {
@@ -445,10 +459,11 @@ model Tag {
   companyId Int      @map("company_id")
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  items     ItemTag[]
-  materials MaterialTag[]
-  labors    LaborTag[]
-  Client    Client[]
+  items       ItemTag[]
+  materials   MaterialTag[]
+  labors      LaborTag[]
+  Client      Client[]
+  InvoiceTags InvoiceTags[]
 }
 
 // Many to many relation between Item and Tag.
