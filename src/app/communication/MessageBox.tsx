@@ -1,8 +1,8 @@
 import { FaTimes } from "react-icons/fa";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { cn } from "@/lib/cn";
 import Image from "next/image";
-import { Message } from "./UsersArea";
+import { Message as TMessage } from "./internal/UsersArea";
 import { FiMessageCircle } from "react-icons/fi";
 import { IoMdSend, IoMdSettings } from "react-icons/io";
 import { TiDeleteOutline } from "react-icons/ti";
@@ -12,9 +12,8 @@ import { Attachment, Group, User } from "@prisma/client";
 import { deleteUserFromGroup } from "@/actions/communication/internal/deleteUserFromGroup";
 import { useSession } from "next-auth/react";
 import Avatar from "@/components/Avatar";
-import Link from "next/link";
-
-import { IoCloudDownloadOutline } from "react-icons/io5";
+import Message from "./Message";
+// import Message from "./Message";
 
 export default function MessageBox({
   user,
@@ -26,11 +25,13 @@ export default function MessageBox({
   group,
   setGroupsList,
   companyName,
+  setPrevMessageStore,
 }: {
   user?: User; // TODO: type this
   setUsersList?: React.Dispatch<React.SetStateAction<any[]>>;
   setGroupsList?: React.Dispatch<React.SetStateAction<any[]>>;
-  messages: (Message & { attachment: Attachment | null })[];
+  setPrevMessageStore?: React.Dispatch<React.SetStateAction<any[]>>;
+  messages: (TMessage & { attachment: Attachment | null })[];
   companyName?: string | null;
   totalMessageBox: number;
   setMessages: React.Dispatch<React.SetStateAction<any[]>>;
@@ -38,6 +39,7 @@ export default function MessageBox({
   group?: Group & { users: User[] };
 }) {
   const attachmentRef = useRef<HTMLInputElement>(null);
+  const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState("");
   const messageBoxRef = useRef<HTMLDivElement>(null);
   const [openSettings, setOpenSettings] = useState(false);
@@ -98,12 +100,17 @@ export default function MessageBox({
     const json = await res.json();
 
     if (json.success) {
-      const newMessage: Message = {
+      const newMessage: TMessage = {
         // userId: parseInt(session?.user?.id!),
         message,
         sender: "USER",
         attachment: json.attachment,
       };
+      setPrevMessageStore &&
+        setPrevMessageStore((prevMessage) => [
+          ...prevMessage,
+          { ...json.newMessage, attachment: json.attachment },
+        ]);
       if (fromGroup) {
         setMessages((messages) => [...messages, newMessage]);
       } else {
@@ -277,88 +284,17 @@ export default function MessageBox({
         className="h-[82%] overflow-y-scroll"
         ref={messageBoxRef}
       >
-        {messages.map((message: Message, index: number) => {
-          const findUser = fromGroup
-            ? group?.users.find((user: User) => user.id === message.userId)
-            : user;
+        {messages.map((message: TMessage, index: number) => {
           return (
-            <div
+            <Message
               key={index}
-              className={`flex items-center p-1 ${
-                message.sender === "CLIENT" ? "justify-start" : "justify-end"
-              }`}
-            >
-              <div className="flex items-start gap-2 p-1">
-                {message.sender === "CLIENT" && (
-                  <div>
-                    <Avatar photo={findUser?.image} width={40} height={40} />
-                    <p className="text-center text-[10px]">
-                      {findUser?.firstName}
-                    </p>
-                  </div>
-                )}
-                <div
-                  className={cn(
-                    "flex flex-col space-y-3",
-                    message.sender === "CLIENT" ? "items-start" : "items-end",
-                  )}
-                >
-                  {message.message && (
-                    <p
-                      className={cn(
-                        "max-w-[220px] rounded-xl p-2 text-base",
-                        message.sender === "CLIENT"
-                          ? "bg-[#D9D9D9] text-slate-800"
-                          : "bg-[#006D77] text-white",
-                      )}
-                    >
-                      {message.message}
-                    </p>
-                  )}
-                  {message.attachment && (
-                    <div
-                      className={cn(
-                        "flex items-center justify-center",
-                        message.sender === "CLIENT"
-                          ? "flex-row"
-                          : "flex-row-reverse",
-                      )}
-                    >
-                      {message.attachment.fileType.includes("image") ? (
-                        <Image
-                          src={`/api/images/${message.attachment.fileUrl}`}
-                          alt=""
-                          className="rounded-sm"
-                          width={300}
-                          height={300}
-                        />
-                      ) : (
-                        <div className="min-h-16 space-y-1 rounded-md bg-[#006D77] px-5 py-2 text-white">
-                          <p>{message.attachment.fileName}</p>
-                          <p>file size: {message.attachment.fileSize}</p>
-                        </div>
-                      )}
-                      <button
-                        onClick={() =>
-                          handleDownload(message?.attachment?.fileUrl!)
-                        }
-                      >
-                        <IoCloudDownloadOutline
-                          size={30}
-                          className={cn(
-                            "cursor-pointer",
-                            message.sender === "CLIENT" ? "ml-6" : "mr-6",
-                          )}
-                        />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+              message={message}
+              onDownload={handleDownload}
+            />
           );
         })}
       </div>
+
       {/* attachments */}
       {attachmentFile && (
         <div className="h-32 bg-[#D9D9D9]">
@@ -391,10 +327,11 @@ export default function MessageBox({
           </div>
         </div>
       )}
+
       {/* Input */}
       <form
         className="flex h-[8%] items-center gap-2 bg-[#D9D9D9] p-2"
-        onSubmit={handleSubmit}
+        onSubmit={(e) => startTransition(() => handleSubmit(e))}
       >
         <Image
           onClick={() => attachmentRef.current?.click()}
@@ -418,7 +355,7 @@ export default function MessageBox({
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <button className="" type="submit">
+        <button disabled={pending} className="" type="submit">
           {/* <Image src="/icons/Send.svg" width={20} height={20} alt="send" /> */}
           <IoMdSend className="size-6 text-[#006D77]" />
         </button>
