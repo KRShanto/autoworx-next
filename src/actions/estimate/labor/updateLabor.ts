@@ -14,7 +14,6 @@ export async function updateLabor({
   hours,
   charge,
   discount,
-  addToCannedLabor = true,
 }: {
   id: number;
   name: string;
@@ -24,7 +23,6 @@ export async function updateLabor({
   hours?: number;
   charge?: number;
   discount?: number;
-  addToCannedLabor?: boolean;
 }): Promise<ServerAction> {
   const updatedLabor = await db.labor.update({
     where: { id },
@@ -35,7 +33,6 @@ export async function updateLabor({
       hours,
       charge,
       discount,
-      addToCannedLabor,
     },
   });
 

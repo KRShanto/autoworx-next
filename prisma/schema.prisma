@@ -414,21 +414,20 @@ model Vendor {
 // Labor itself is an independant model, So one labor can be in multiple invoices.
 // And if you want to fetch labors for a customer, you need to fetch all invoices and then all invoice items and then you'll get labors.
 model Labor {
-  id               Int           @id @default(autoincrement())
-  name             String
-  categoryId       Int?          @map("category_id")
-  notes            String?
-  hours            Int?
-  charge           Decimal? // per hour
-  discount         Decimal?
-  addToCannedLabor Boolean?      @map("add_to_canned_labor")
-  companyId        Int           @map("company_id")
-  createdAt        DateTime      @default(now()) @map("created_at")
-  updatedAt        DateTime      @default(now()) @updatedAt @map("updated_at")
-  company          Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  category         Category?     @relation(fields: [categoryId], references: [id])
-  invoiceItems     InvoiceItem[]
-  tags             LaborTag[]
+  id           Int           @id @default(autoincrement())
+  name         String
+  categoryId   Int?          @map("category_id")
+  notes        String?
+  hours        Int?
+  charge       Decimal? // per hour
+  discount     Decimal?
+  companyId    Int           @map("company_id")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category     Category?     @relation(fields: [categoryId], references: [id])
+  invoiceItems InvoiceItem[]
+  tags         LaborTag[]
 }
 
 // Tag for a invoice.

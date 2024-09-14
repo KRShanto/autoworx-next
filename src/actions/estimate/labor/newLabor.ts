@@ -15,7 +15,6 @@ export async function newLabor({
   hours,
   charge,
   discount,
-  addToCannedLabor = true,
 }: {
   name: string;
   categoryId?: number;
@@ -24,7 +23,6 @@ export async function newLabor({
   hours?: number;
   charge?: number;
   discount?: number;
-  addToCannedLabor?: boolean;
 }): Promise<ServerAction> {
   const session = (await auth()) as AuthSession;
   const companyId = session?.user?.companyId;
@@ -37,7 +35,6 @@ export async function newLabor({
       hours,
       charge,
       discount,
-      addToCannedLabor,
       companyId,
     },
   });
