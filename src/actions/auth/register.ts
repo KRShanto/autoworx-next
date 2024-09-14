@@ -72,6 +72,9 @@ export async function register({
         name: company,
       },
     });
+  
+
+
 
     await db.user.create({
       data: {
@@ -83,6 +86,29 @@ export async function register({
         companyId: newCompany.id,
       },
     });
+   //creating default permissions for the company users
+   await Promise.all([
+    //creating default permission for manager
+    db.permissionForManager.create({
+      data:{companyId:newCompany.id},
+    }),
+
+    db.permissionForSales.create({
+
+      data:{companyId:newCompany.id},
+    }),
+    db.permissionForTechnician.create({
+
+      data:{companyId:newCompany.id},
+    }),
+    db.permissionForOther.create({
+
+      data:{companyId:newCompany.id},
+    }),
+   
+
+  ])
+     
 
     return { success: true };
   } catch (error: any) {

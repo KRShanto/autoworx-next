@@ -4,39 +4,22 @@ import SelectCategory from "@/components/Lists/SelectCategory";
 import { cn } from "@/lib/cn";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { useListsStore } from "@/stores/lists";
-import { Category, Vehicle } from "@prisma/client";
+import { Category, Labor, Vehicle } from "@prisma/client";
 import { setHours } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { RiEditFill } from "react-icons/ri";
 import NewLabor from "./NewLabor";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { updateLabor } from "@/actions/estimate/labor/updateLabor";
+import { deleteLabor } from "@/actions/estimate/labor/deleteLabor";
 
-const labors = [
-  {
-    id: 1,
-    name: "John Doe",
-    category: "Category 1",
-    $perHour: 4567,
-  },
-  {
-    id: 2,
-    name: "John Doe",
-    category: "Category 1",
-    $perHour: 4567,
-  },
-  {
-    id: 3,
-    name: "John Doe",
-    category: "Category 1",
-    $perHour: 4567,
-  },
-];
-
-export default function CannedLabor() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
+export default function CannedLabor({
+  labors,
+}: {
+  labors: (Labor & { category: Category })[];
+}) {
   return (
     <div className="h-full w-full space-y-2 px-4">
       <div className="flex items-center justify-between">
@@ -65,7 +48,7 @@ export default function CannedLabor() {
 
           <tbody className="border border-gray-200">
             {labors.map((labor) => (
-              <Labor key={labor.id} labor={labor} />
+              <LaborComponent key={labor.id} labor={labor} />
             ))}
           </tbody>
         </table>
@@ -74,13 +57,18 @@ export default function CannedLabor() {
   );
 }
 
-const Labor = ({ labor }: any) => {
+const LaborComponent = ({
+  labor,
+}: {
+  labor: Labor & { category?: Category };
+}) => {
   const [isEdit, setIsEdit] = useState(false);
   const [category, setCategory] = useState<Category | null>(null);
   const { categories } = useListsStore();
   const { currentSelectedCategoryId } = useEstimateCreateStore();
   const [categoryOpen, setCategoryOpen] = useState(false);
-  const [hours, setHours] = useState<number>();
+  const [hours, setHours] = useState<number>(Number(labor.charge));
+  const [name, setName] = useState<string>(labor.name);
 
   useEffect(() => {
     if (currentSelectedCategoryId) {
@@ -89,17 +77,21 @@ const Labor = ({ labor }: any) => {
       );
     }
   }, [currentSelectedCategoryId]);
-  // if (!isEdit) {
+
+  const handleEdit = async () => {
+    const res = await updateLabor({
+      id: labor.id,
+      name,
+      charge: hours,
+      categoryId: category?.id,
+    });
+
+    setIsEdit(false);
+    console.log("Edit");
+  };
+
   return (
-    <tr
-      className={cn(
-        "cursor-pointer rounded-md py-3",
-        // index % 2 === 0 ? "bg-white" : "bg-[#EEF4FF]",
-        // vehicleId &&
-        //   vehicleId === vehicle?.id &&
-        //   "border-2 border-[#6571FF]",
-      )}
-    >
+    <tr className={cn("cursor-pointer rounded-md py-3")}>
       <td className="text-nowrap px-4 py-1 text-left 2xl:px-10">
         {!isEdit ? (
           <span className="px-4">{labor.name}</span>
@@ -107,8 +99,8 @@ const Labor = ({ labor }: any) => {
           <input
             type="text"
             id="name"
-            value={labor.name}
-            onChange={(e) => {}}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             className="#text-xs max-w-[150px] rounded-md border-2 border-slate-400 p-1 px-4"
             placeholder="Labor Name"
           />
@@ -116,7 +108,7 @@ const Labor = ({ labor }: any) => {
       </td>
       <td className="text-nowrap px-4 py-1 text-left 2xl:px-10">
         {!isEdit ? (
-          <span className="px-4">{labor.category}</span>
+          <span className="px-4">{labor.category?.name}</span>
         ) : (
           <SelectCategory
             onCategoryChange={setCategory}
@@ -129,7 +121,7 @@ const Labor = ({ labor }: any) => {
       </td>
       <td className="px-4 py-1 text-left align-middle 2xl:px-10">
         {!isEdit ? (
-          <span className="px-4">{`$${labor.$perHour}`}</span>
+          <span className="px-4">{`$${labor.charge}`}</span>
         ) : (
           <div>
             <input
@@ -144,70 +136,22 @@ const Labor = ({ labor }: any) => {
         )}
       </td>
       <td className="px-4 py-1 text-left 2xl:px-10">
+        {isEdit && (
+          <button onClick={() => handleEdit()} className="mr-4 text-green-500">
+            <IoMdCheckmarkCircleOutline />
+          </button>
+        )}
+
         <button
           onClick={() => setIsEdit(!isEdit)}
           className="mr-4 text-[#6571FF]"
         >
           <RiEditFill />
         </button>
-        <button className="text-red-400">
+        <button className="text-red-400" onClick={() => deleteLabor(labor.id)}>
           <FaTimes />
         </button>
       </td>
     </tr>
   );
-  // }
-
-  // else {
-  //   return (
-  //     <tr
-  //       className={cn(
-  //         "cursor-pointer",
-  //         // index % 2 === 0 ? "bg-white" : "bg-[#EEF4FF]",
-  //         // vehicleId &&
-  //         //   vehicleId === vehicle?.id &&
-  //         //   "border-2 border-[#6571FF]",
-  //       )}
-  //     >
-  //       <td className="mx-10 text-nowrap text-left">
-  //         <input
-  //           type="text"
-  //           id="name"
-  //           value={labor.name}
-  //           onChange={(e) => {}}
-  //           className="#text-xs w-full rounded-md border-2 border-slate-400 p-1 px-4"
-  //           placeholder="Labor Name"
-  //         />
-  //       </td>
-  //       <td className="mx-10 text-nowrap text-left">
-  //         <SelectCategory
-  //           onCategoryChange={setCategory}
-  //           labelPosition="none"
-  //           categoryData={category}
-  //           categoryOpen={categoryOpen}
-  //           setCategoryOpen={setCategoryOpen}
-  //         />
-  //       </td>
-  //       <td className="mx-10 text-left">
-  //         {" "}
-  //         <input
-  //           type="number"
-  //           id="hours"
-  //           value={hours}
-  //           onChange={(e) => setHours(parseInt(e.target.value))}
-  //           className="#text-xs w-full rounded-md border-2 border-slate-400 p-1 px-4"
-  //           placeholder="No. of Hours"
-  //         />
-  //       </td>
-  //       <td className="flex items-center gap-x-4 text-left align-middle">
-  //         <button onClick={() => setIsEdit(!isEdit)} className="text-[#6571FF]">
-  //           <RiEditFill />
-  //         </button>
-  //         <button className="text-red-400">
-  //           <FaTimes />
-  //         </button>
-  //       </td>
-  //     </tr>
-  //   );
-  // }
 };

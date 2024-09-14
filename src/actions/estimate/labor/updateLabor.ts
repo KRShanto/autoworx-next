@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { Tag } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 export async function updateLabor({
   id,
@@ -13,7 +14,6 @@ export async function updateLabor({
   hours,
   charge,
   discount,
-  addToCannedLabor = true,
 }: {
   id: number;
   name: string;
@@ -23,7 +23,6 @@ export async function updateLabor({
   hours?: number;
   charge?: number;
   discount?: number;
-  addToCannedLabor?: boolean;
 }): Promise<ServerAction> {
   const updatedLabor = await db.labor.update({
     where: { id },
@@ -34,7 +33,6 @@ export async function updateLabor({
       hours,
       charge,
       discount,
-      addToCannedLabor,
     },
   });
 
@@ -67,6 +65,8 @@ export async function updateLabor({
       tag: true,
     },
   });
+
+  revalidatePath("/estimate");
 
   return {
     type: "success",

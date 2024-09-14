@@ -193,6 +193,7 @@ export default function AddNewEmployee({
                 rootClassName="grow"
                 type="date"
                 required={false}
+                defaultValue={new Date().toISOString().split("T")[0]}
               />
             </div>
           </div>

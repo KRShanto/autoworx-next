@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import MessageBox from "./MessageBox";
+import MessageBox from "../MessageBox";
 import { getGroupMessagesById } from "@/actions/communication/internal/query";
 import { useSession } from "next-auth/react";
 import { pusher } from "@/lib/pusher/client";
@@ -36,6 +36,8 @@ export default function GroupMessageBox({
     };
     fetchGroupMessages();
   }, []);
+
+  console.log({ groupMessages });
 
   // for group real-time messages
   useEffect(() => {

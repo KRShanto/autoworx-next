@@ -43,8 +43,15 @@ export default function SearchCollaborationModal({
 
   const [openUserList, setOpenUserList] = useState(false);
 
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!open) {
+      setOpenUserList(false);
+      setError(null);
+    }
+  }, [open]);
 
   useEffect(() => {
     if (inputRef?.current) {
@@ -163,8 +170,8 @@ export default function SearchCollaborationModal({
           </DialogClose>
           <button
             onClick={() => {
-              setOpen(false)
-              setOpenUserList(false)
+              setOpen(false);
+              setOpenUserList(false);
             }}
             className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
           >

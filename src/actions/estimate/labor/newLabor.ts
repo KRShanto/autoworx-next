@@ -5,6 +5,7 @@ import { auth } from "@/app/auth";
 import { AuthSession } from "@/types/auth";
 import { ServerAction } from "@/types/action";
 import { Tag } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 export async function newLabor({
   name,
@@ -14,7 +15,6 @@ export async function newLabor({
   hours,
   charge,
   discount,
-  addToCannedLabor = true,
 }: {
   name: string;
   categoryId?: number;
@@ -23,7 +23,6 @@ export async function newLabor({
   hours?: number;
   charge?: number;
   discount?: number;
-  addToCannedLabor?: boolean;
 }): Promise<ServerAction> {
   const session = (await auth()) as AuthSession;
   const companyId = session?.user?.companyId;
@@ -36,7 +35,6 @@ export async function newLabor({
       hours,
       charge,
       discount,
-      addToCannedLabor,
       companyId,
     },
   });
@@ -63,6 +61,8 @@ export async function newLabor({
       tag: true,
     },
   });
+
+  revalidatePath("/estimate");
 
   return {
     type: "success",
