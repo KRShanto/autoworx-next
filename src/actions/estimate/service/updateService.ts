@@ -2,6 +2,7 @@
 
 import { ServerAction } from "@/types/action";
 import { db } from "@/lib/db";
+import { revalidatePath } from "next/cache";
 
 export async function updateService({
   id,
@@ -22,6 +23,8 @@ export async function updateService({
       description,
     },
   });
+
+  revalidatePath("/estimate");
 
   return {
     type: "success",

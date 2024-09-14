@@ -95,6 +95,10 @@ export default async function Page({
   });
   const categories = await db.category.findMany({ where: { companyId } });
   const tags = await db.tag.findMany({ where: { companyId } });
+  const services = await db.service.findMany({
+    where: { companyId },
+    include: { category: true },
+  });
 
   return (
     <div>
@@ -121,7 +125,7 @@ export default async function Page({
         </TabsContent>
 
         <TabsContent value="c-canned">
-          <CannedTable labors={labors} />
+          <CannedTable labors={labors} services={services} />
         </TabsContent>
       </Tabs>
     </div>

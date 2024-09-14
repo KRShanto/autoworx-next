@@ -1,11 +1,11 @@
 import React from "react";
 import CannedLabor from "./CannedLabor";
 import CannedServices from "./CannedServices";
-import { Category, Labor } from "@prisma/client";
+import { Category, Labor, Service } from "@prisma/client";
 
 type Props = {
   labors: (Labor & { category: Category })[];
-  services: any;
+  services: (Service & { category: Category })[];
 };
 
 const CannedTable = (props: Props) => {
@@ -17,7 +17,7 @@ const CannedTable = (props: Props) => {
       </div>
       {/* canned services */}
       <div className="w-1/2">
-        <CannedServices />
+        <CannedServices services={props.services} />
       </div>
     </div>
   );
