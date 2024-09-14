@@ -125,7 +125,7 @@ export default async function Page({
         </TabsContent>
 
         <TabsContent value="c-canned">
-          <CannedTable labors={labors} services={services} />
+          <CannedTable labors={labors as any} services={services as any} />
         </TabsContent>
       </Tabs>
     </div>
