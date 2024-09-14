@@ -209,6 +209,7 @@ export default function CreateGroupModal({ users }: TProps) {
                   setOpenUserList((prev) => !prev);
                   getFindUsers();
                 }}
+                className="cursor-pointer"
               />
               <RiArrowDownSLine
                 onClick={() => {
