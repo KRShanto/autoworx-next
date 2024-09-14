@@ -57,5 +57,6 @@ export async function createTask(task: TaskType): Promise<ServerAction> {
 
   return {
     type: "success",
+    data: newTask,
   };
 }

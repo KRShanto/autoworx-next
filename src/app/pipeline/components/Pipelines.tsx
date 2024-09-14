@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { User } from "@prisma/client";
+import { Task, User } from "@prisma/client";
 import React, { SetStateAction, useEffect, useState } from "react";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { PiWechatLogoLight } from "react-icons/pi";
@@ -42,6 +42,7 @@ interface Lead {
   createdAt: string;
   workOrderStatus?: string;
   tags: Tag[];
+  tasks?: Task[];
 }
 
 interface PipelineData {
@@ -110,6 +111,7 @@ export default function Pipelines({
             incomplete: incompleteServices,
           },
           tags: invoice.tags.map((tag) => tag.tag),
+          tasks: invoice.tasks,
           createdAt: new Date(invoice.createdAt).toDateString(),
         };
       });
@@ -507,7 +509,11 @@ export default function Pipelines({
                                   </Link>
                                 </div>
                                 <div className="group relative">
-                                  <TaskForm companyUsers={users} />
+                                  <TaskForm
+                                    companyUsers={users}
+                                    invoiceId={lead.invoiceId}
+                                    previousTasks={lead.tasks || []}
+                                  />
                                 </div>
                               </div>
                             </li>

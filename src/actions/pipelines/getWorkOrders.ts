@@ -27,6 +27,7 @@ export async function getWorkOrders() {
           tag: true,
         },
       },
+      tasks: true,
     },
   });
 

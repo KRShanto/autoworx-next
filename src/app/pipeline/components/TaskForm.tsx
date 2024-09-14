@@ -1,6 +1,6 @@
 "use client";
 
-import { Priority, User } from "@prisma/client";
+import { Priority, Task, User } from "@prisma/client";
 import { useState } from "react";
 import {
   Dialog,
@@ -16,13 +16,18 @@ import Image from "next/image";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { TimePicker } from "antd";
 import Avatar from "@/components/Avatar";
+import { createTask } from "@/actions/task/createTask";
 
 export default function TaskForm({
   companyUsers,
   onlyOneUser = false,
+  invoiceId,
+  previousTasks,
 }: {
   companyUsers: User[];
   onlyOneUser?: boolean;
+  invoiceId: string;
+  previousTasks: Task[];
 }) {
   const [open, setOpen] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
@@ -31,8 +36,9 @@ export default function TaskForm({
   const [assignedUsers, setAssignedUsers] = useState<number[]>([]);
   const [priority, setPriority] = useState<Priority>("Low");
   const [time, setTime] = useState<{ startTime: string; endTime: string }>();
+  const [tasks, setTasks] = useState<Task[]>(previousTasks);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     console.log({
       title,
       description,
@@ -41,6 +47,22 @@ export default function TaskForm({
       startTime: time?.startTime,
       endTime: time?.endTime,
     });
+
+    // save task
+    const res = await createTask({
+      title,
+      description,
+      assignedUsers,
+      priority,
+      startTime: time?.startTime,
+      endTime: time?.endTime,
+      invoiceId,
+    });
+
+    if (res.type === "success") {
+      // update tasks
+      setTasks([...tasks, res.data]);
+    }
 
     // reset form
     setTitle("");
@@ -72,17 +94,26 @@ export default function TaskForm({
           Add Task
         </div>
         {/* Hover content */}
-        <div className="absolute -top-32 left-1/3 z-50 mt-1 hidden w-[100px] -translate-x-1/2 transform rounded-lg border border-[#66738C] bg-white p-2 group-hover:block">
-          <div className="mb-2 rounded-[3px] bg-[#6571FF] p-1 text-white">
-            Task 1
+        {tasks.length > 0 && (
+          <div className="absolute -top-32 left-1/3 z-50 mt-1 hidden w-[100px] -translate-x-1/2 transform rounded-lg border border-[#66738C] bg-white p-2 group-hover:block">
+            {tasks.map((task) => (
+              <div
+                key={task.id}
+                className="mb-2 rounded-[3px] p-1 text-white"
+                style={{
+                  backgroundColor:
+                    task.priority === "Low"
+                      ? "#6571FF"
+                      : task.priority === "Medium"
+                        ? "#25AADD"
+                        : "#006D77",
+                }}
+              >
+                {task.title}
+              </div>
+            ))}
           </div>
-          <div className="mb-2 rounded-[3px] bg-[#25AADD] p-1 text-white">
-            Task 2
-          </div>
-          <div className="rounded-[3px] bg-[#006D77] p-1 text-white">
-            Task 3
-          </div>
-        </div>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
