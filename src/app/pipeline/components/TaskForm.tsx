@@ -24,7 +24,7 @@ export default function TaskForm({
   invoiceId,
   previousTasks,
 }: {
-  companyUsers: User[];
+  companyUsers: User[] | null;
   onlyOneUser?: boolean;
   invoiceId: string;
   previousTasks: Task[];
@@ -171,34 +171,35 @@ export default function TaskForm({
 
             {!onlyOneUser && showUsers && (
               <div className="mt-2 flex h-40 flex-col gap-2 overflow-y-auto p-2 font-bold">
-                {companyUsers.map((user) => (
-                  <label
-                    htmlFor={user.id.toString()}
-                    key={user.id}
-                    className="flex items-center gap-2"
-                  >
-                    <input
-                      type="checkbox"
-                      name="assigned_users"
-                      id={user.id.toString()}
-                      value={user.id}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setAssignedUsers([...assignedUsers, user.id]);
-                        } else {
-                          setAssignedUsers(
-                            assignedUsers.filter((id) => id !== user.id),
-                          );
-                        }
-                      }}
-                    />
+                {companyUsers &&
+                  companyUsers.map((user) => (
+                    <label
+                      htmlFor={user.id.toString()}
+                      key={user.id}
+                      className="flex items-center gap-2"
+                    >
+                      <input
+                        type="checkbox"
+                        name="assigned_users"
+                        id={user.id.toString()}
+                        value={user.id}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setAssignedUsers([...assignedUsers, user.id]);
+                          } else {
+                            setAssignedUsers(
+                              assignedUsers.filter((id) => id !== user.id),
+                            );
+                          }
+                        }}
+                      />
 
-                    <Avatar photo={user.image} width={40} height={40} />
-                    <span>
-                      {user?.firstName} {user?.lastName}
-                    </span>
-                  </label>
-                ))}
+                      <Avatar photo={user.image} width={40} height={40} />
+                      <span>
+                        {user?.firstName} {user?.lastName}
+                      </span>
+                    </label>
+                  ))}
               </div>
             )}
           </div>

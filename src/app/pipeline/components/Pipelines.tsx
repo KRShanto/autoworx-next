@@ -16,6 +16,7 @@ import { useServerGet } from "@/hooks/useServerGet";
 import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
 import { Tooltip } from "antd";
 import { updateInvoiceStatus } from "@/actions/estimate/invoice/updateInvoiceStatus";
+import { getEmployees } from "@/actions/employee/get";
 //dummy services
 
 //interfaces
@@ -54,22 +55,25 @@ type Column = {
   title: string;
   type: string;
 };
-interface pipelinesProps {
+interface PipelinesProps {
   pipelinesTitle: string;
   columns?: Column[];
   type: string;
 }
 
-const users: User[] = [];
-
 export default function Pipelines({
   pipelinesTitle: pipelineType,
   columns,
   type,
-}: pipelinesProps) {
+}: PipelinesProps) {
   const { data: invoices } = useServerGet(getWorkOrders);
+  const { data: companyUsers } = useServerGet(getEmployees, {
+    excludeCurrentUser: true,
+  });
   const [pipelineData, setPipelineData] = useState<PipelineData[]>([]);
+
   console.log("invoice out", invoices);
+
   useEffect(() => {
     if (invoices) {
       // Transform the invoices into leads
@@ -510,7 +514,7 @@ export default function Pipelines({
                                 </div>
                                 <div className="group relative">
                                   <TaskForm
-                                    companyUsers={users}
+                                    companyUsers={companyUsers}
                                     invoiceId={lead.invoiceId}
                                     previousTasks={lead.tasks || []}
                                   />

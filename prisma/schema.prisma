@@ -122,9 +122,10 @@ model User {
   taskUsers        TaskUser[]
   appointments     Appointment[]
   appointmentUsers AppointmentUser[]
-  invoices         Invoice[]
+  invoices         Invoice[]         @relation("user")
   Technician       Technician[]
   permissions      Permission[]
+  assignedInvoices Invoice[]         @relation("assignedTo")
 
   @@index([companyId], name: "fk_users_company")
 }
@@ -266,14 +267,15 @@ model Invoice {
   customerNotes           String?
   customerComments        String?
   companyId               Int                       @map("company_id")
-  userId                  Int                       @map("user_id")
+  userId                  Int?                      @map("user_id")
+  assignedToId            Int?                      @map("assigned_to")
   company                 Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   invoiceItems            InvoiceItem[]
   photos                  InvoicePhoto[]
   tasks                   Task[]
   status                  Status?                   @relation(fields: [statusId], references: [id])
   payments                Payment[]
-  user                    User                      @relation(fields: [userId], references: [id])
+  user                    User?                     @relation(name: "user", fields: [userId], references: [id], onDelete: SetNull)
   Material                Material[]
   InventoryProductHistory InventoryProductHistory[]
   vehicle                 Vehicle?                  @relation(fields: [vehicleId], references: [id])
@@ -281,6 +283,7 @@ model Invoice {
   technician              Technician[]
   workOrderStatus         String?                   @default("Pending") @map("work_order_status")
   tags                    InvoiceTags[]
+  assignedTo              User?                     @relation(name: "assignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
 
   @@index([companyId], name: "fk_invoices_company")
 }
