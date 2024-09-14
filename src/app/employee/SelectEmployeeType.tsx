@@ -1,10 +1,14 @@
 import Selector from "@/components/Selector";
 import { cn } from "@/lib/cn";
+import { EmployeeType } from "@prisma/client";
 import { useEffect, useState } from "react";
 
-export type IEmployeeType = "Sales" | "Technician";
-
-const employeeTypes: IEmployeeType[] = ["Sales", "Technician"];
+const employeeTypes: EmployeeType[] = [
+  "Sales",
+  "Technician",
+  "Manager",
+  "Other",
+];
 
 export default function SelectEmployeeType({
   labelPosition = "top",
@@ -15,9 +19,9 @@ export default function SelectEmployeeType({
   labelPosition?: "top" | "left" | "none";
   employeeTypeOpen: boolean;
   setEmployeeTypeOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  defaultType?: IEmployeeType;
+  defaultType?: EmployeeType;
 }) {
-  const [employeeType, setEmployeeType] = useState<IEmployeeType | null>(
+  const [employeeType, setEmployeeType] = useState<EmployeeType | null>(
     defaultType || null,
   );
 
@@ -39,7 +43,7 @@ export default function SelectEmployeeType({
         label={() => (employeeType ? employeeType : "Type")}
         newButton={<div className="flex gap-2"></div>}
         items={employeeTypes}
-        displayList={(employeeType: IEmployeeType) => <p>{employeeType}</p>}
+        displayList={(employeeType: EmployeeType) => <p>{employeeType}</p>}
         onSearch={(search: string) =>
           employeeTypes.filter((type) =>
             type.toLowerCase().includes(search.toLowerCase()),

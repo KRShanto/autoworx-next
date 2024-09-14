@@ -1,9 +1,12 @@
 "use client";
 
 import { useEstimateCreateStore } from "@/stores/estimate-create";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import DepositCreate from "./DepositCreate";
 import MakePayment from "./MakePayment";
+import { errorToast, successToast } from "@/lib/toast";
+import { checkCouponCode } from "@/actions/coupon/checkCouponCode";
+import { RotatingLines } from "react-loader-spinner";
 
 export function BillSummary() {
   const {
@@ -27,6 +30,8 @@ export function BillSummary() {
     setDepositMethod,
     setDepositNotes,
   } = useEstimateCreateStore();
+  const [coupon, setCoupon] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
 
   useEffect(() => {
     let newServicesTotal = 0;
@@ -89,6 +94,21 @@ export function BillSummary() {
     setDue(newDue);
   }, [grandTotal, deposit]);
 
+  async function checkCoupon() {
+    if (!coupon) return;
+
+    setCouponLoading(true);
+    const res = await checkCouponCode(coupon);
+
+    if (res.type === "success") {
+      successToast("Coupon applied successfully");
+    } else {
+      errorToast(res.message!);
+    }
+
+    setCouponLoading(false);
+  }
+
   return (
     <>
       <div className="space-y-2 p-2">
@@ -134,6 +154,27 @@ export function BillSummary() {
         <dl className="flex justify-between">
           <dt>Grand Total</dt> <dd>${grandTotal}</dd>
         </dl>
+        <div className="flex justify-between rounded-md border p-1">
+          <input
+            type="text"
+            placeholder="Add Coupon"
+            className="w-full bg-transparent p-2 focus:outline-none"
+            value={coupon}
+            onChange={(e) => setCoupon(e.target.value)}
+          />
+          {couponLoading ? (
+            <>
+              <RotatingLines width="24" strokeColor="#fff" />
+            </>
+          ) : (
+            <button
+              className="rounded-md p-2 transition-colors hover:bg-white/20"
+              onClick={checkCoupon}
+            >
+              Apply
+            </button>
+          )}
+        </div>
         <MakePayment />
       </div>
     </>

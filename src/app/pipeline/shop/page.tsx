@@ -5,15 +5,12 @@ import WorkOrders from "../components/WorkOrders";
 import Pipelines from "../components/Pipelines";
 import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
 
-
-
-
 type Props = {
   searchParams?: { view?: string };
 };
 
 type Column = {
-  id: number|null;
+  id: number | null;
   title: string;
   type: string;
 };
@@ -24,24 +21,16 @@ const Page = (props: Props) => {
 
   const columnType = "shop";
 
-  
   useEffect(() => {
-    
     const fetchShopColumns = async () => {
       const columns = await getColumnsByType("shop");
       setPipelineColumns(columns);
-      
     };
 
     fetchShopColumns();
   }, []);
   // console.log(JSON.stringify(pipelineColumns, null, 2));
-  const handleColumnsUpdate = async ({
-    columns,
-  }: {
-    columns: Column[];
-    
-  }) => {
+  const handleColumnsUpdate = async ({ columns }: { columns: Column[] }) => {
     setPipelineColumns(columns);
   };
   const type = "Shop Pipelines";

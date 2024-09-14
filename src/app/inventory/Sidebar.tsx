@@ -35,7 +35,8 @@ export default async function Sidebar({ productId }: { productId: number }) {
     select: { id: true },
   });
 
-  const isWarningForQuantity = product && product.quantity! < 50;
+  const isWarningForQuantity =
+    product && (product.quantity || 0) <= (product.lowInventoryAlert || 1);
 
   return (
     <div className="mt-12 flex h-[88.5%] w-1/2 flex-col">

@@ -4,6 +4,7 @@ import { ServerAction } from "@/types/action";
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { AuthSession } from "@/types/auth";
+import { revalidatePath } from "next/cache";
 
 export default async function newService({
   name,
@@ -25,6 +26,8 @@ export default async function newService({
       description,
     },
   });
+
+  revalidatePath("/estimate");
 
   return {
     type: "success",
