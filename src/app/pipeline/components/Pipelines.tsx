@@ -44,17 +44,20 @@ interface Lead {
   workOrderStatus?: string;
   tags: Tag[];
   tasks?: Task[];
+  assignedTo: User | null;
 }
 
 interface PipelineData {
   title: string;
   leads: Lead[];
 }
+
 type Column = {
   id: number | null;
   title: string;
   type: string;
 };
+
 interface PipelinesProps {
   pipelinesTitle: string;
   columns?: Column[];
@@ -116,6 +119,7 @@ export default function Pipelines({
           },
           tags: invoice.tags.map((tag) => tag.tag),
           tasks: invoice.tasks,
+          assignedTo: invoice.assignedTo,
           createdAt: new Date(invoice.createdAt).toDateString(),
         };
       });
