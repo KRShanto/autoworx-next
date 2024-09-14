@@ -2,6 +2,7 @@
 import { db } from "@/lib/db";
 import { defaultSalesColumn, defaultShopColumn } from "@/lib/defaultColumns";
 
+// TODO: insert columns when creating a new company
 const insertDefaultColumns = async (type: string) => {
   const defaultColumns =
     type === "sales" ? defaultSalesColumn : defaultShopColumn;
