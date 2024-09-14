@@ -78,6 +78,7 @@ export default function NewService({
       });
 
       close();
+      setOpen(false);
     }
   }
 

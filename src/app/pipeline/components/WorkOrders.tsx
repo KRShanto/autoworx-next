@@ -10,7 +10,7 @@ type Props = {
   type: string;
 };
 
-const WorkOrders = ({type}: Props) => {
+const WorkOrders = ({ type }: Props) => {
   const { data: invoices } = useServerGet(getWorkOrders);
   const { search } = useEstimateFilterStore();
 
@@ -112,7 +112,9 @@ const WorkOrders = ({type}: Props) => {
                       <Link
                         href={`/estimate/workorder/${id}`}
                         className="block h-full w-full"
-                      ></Link>
+                      >
+                        {invoice.workOrderStatus}
+                      </Link>
                     </td>
                   </tr>
                 );

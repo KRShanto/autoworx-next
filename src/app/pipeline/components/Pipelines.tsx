@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { User } from "@prisma/client";
+import { Task, User } from "@prisma/client";
 import React, { SetStateAction, useEffect, useState } from "react";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { PiWechatLogoLight } from "react-icons/pi";
@@ -16,6 +16,7 @@ import { useServerGet } from "@/hooks/useServerGet";
 import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
 import { Tooltip } from "antd";
 import { updateInvoiceStatus } from "@/actions/estimate/invoice/updateInvoiceStatus";
+import { getEmployees } from "@/actions/employee/get";
 //dummy services
 
 //interfaces
@@ -30,7 +31,7 @@ interface Employee {
   lastName: string;
 }
 interface Lead {
-  invoiceId:string;
+  invoiceId: string;
   name: string;
   email: string;
   phone: string;
@@ -41,6 +42,8 @@ interface Lead {
   };
   createdAt: string;
   workOrderStatus?: string;
+  tags: Tag[];
+  tasks?: Task[];
 }
 
 interface PipelineData {
@@ -48,32 +51,34 @@ interface PipelineData {
   leads: Lead[];
 }
 type Column = {
-  id: number|null;
+  id: number | null;
   title: string;
   type: string;
 };
-interface pipelinesProps {
+interface PipelinesProps {
   pipelinesTitle: string;
   columns?: Column[];
   type: string;
 }
 
-
-const users: User[] = [];
-
 export default function Pipelines({
   pipelinesTitle: pipelineType,
   columns,
   type,
-}: pipelinesProps) {
+}: PipelinesProps) {
   const { data: invoices } = useServerGet(getWorkOrders);
+  const { data: companyUsers } = useServerGet(getEmployees, {
+    excludeCurrentUser: true,
+  });
   const [pipelineData, setPipelineData] = useState<PipelineData[]>([]);
+
   console.log("invoice out", invoices);
+
   useEffect(() => {
     if (invoices) {
       // Transform the invoices into leads
       const transformedLeads: Lead[] = invoices.map((invoice) => {
-        const invoiceId= invoice.id;
+        const invoiceId = invoice.id;
         const client =
           `${invoice.client?.firstName ?? ""} ${invoice.client?.lastName ?? ""}`.trim();
         const vehicle =
@@ -109,6 +114,8 @@ export default function Pipelines({
             completed: completedServices,
             incomplete: incompleteServices,
           },
+          tags: invoice.tags.map((tag) => tag.tag),
+          tasks: invoice.tasks,
           createdAt: new Date(invoice.createdAt).toDateString(),
         };
       });
@@ -255,7 +262,7 @@ export default function Pipelines({
     }));
   };
 
-  const handleDragEnd = async(result: any) => {
+  const handleDragEnd = async (result: any) => {
     const { destination, source } = result;
 
     if (!destination) return;
@@ -280,21 +287,20 @@ export default function Pipelines({
 
     setPipelineData(updatedData);
 
-     // Update the workOrderStatus in the database
-  const invoiceId = removed.invoiceId; // Ensure you have access to the invoiceId in the lead object
-  const newStatus = destinationColumn.title;
+    // Update the workOrderStatus in the database
+    const invoiceId = removed.invoiceId; // Ensure you have access to the invoiceId in the lead object
+    const newStatus = destinationColumn.title;
 
-  try {
-    const response = await updateInvoiceStatus(invoiceId, newStatus);
-    if (response.type === "success") {
-      console.log("Invoice status updated successfully");
-    } else {
-      console.error("Failed to update invoice status:", response.message);
+    try {
+      const response = await updateInvoiceStatus(invoiceId, newStatus);
+      if (response.type === "success") {
+        console.log("Invoice status updated successfully");
+      } else {
+        console.error("Failed to update invoice status:", response.message);
+      }
+    } catch (error) {
+      console.error("Error updating invoice status:", error);
     }
-  } catch (error) {
-    console.error("Error updating invoice status:", error);
-  }
-
   };
 
   return (
@@ -393,12 +399,13 @@ export default function Pipelines({
                               </div>
 
                               <div className="mb-1 flex items-center">
-                                {tagsForLead.slice(0, 2).map((tag) => (
+                                {lead.tags?.map((tag) => (
                                   <span
                                     key={tag.id}
-                                    className="mr-2 inline-flex h-[20px] items-center rounded bg-gray-300 px-1 py-1 text-xs font-semibold text-white"
+                                    className="mr-2 inline-flex h-[20px] items-center rounded bg-gray-300 px-1 py-1 text-xs font-semibold text-black"
                                     style={{
                                       backgroundColor: tag?.bgColor,
+                                      color: tag?.textColor,
                                     }}
                                   >
                                     {tag.name}
@@ -506,7 +513,11 @@ export default function Pipelines({
                                   </Link>
                                 </div>
                                 <div className="group relative">
-                                  <TaskForm companyUsers={users} />
+                                  <TaskForm
+                                    companyUsers={companyUsers}
+                                    invoiceId={lead.invoiceId}
+                                    previousTasks={lead.tasks || []}
+                                  />
                                 </div>
                               </div>
                             </li>

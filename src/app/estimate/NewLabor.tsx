@@ -35,7 +35,6 @@ export default function NewLabor({
   const [hours, setHours] = useState<number>();
   const [charge, setCharge] = useState<number>();
   const [discount, setDiscount] = useState<number>();
-  const [addToCannedLabor, setAddToCannedLabor] = useState<boolean>(false);
 
   const { close, data } = useEstimatePopupStore();
   const itemId = data?.itemId;
@@ -54,7 +53,7 @@ export default function NewLabor({
   useEffect(() => {
     setTagsOpen(false);
   }, [categoryOpen]);
-  
+
   useEffect(() => {
     setCategoryOpen(false);
   }, [tagsOpen]);
@@ -68,7 +67,6 @@ export default function NewLabor({
       setHours(data.labor.hours);
       setCharge(data.labor.charge);
       setDiscount(data.labor.discount);
-      setAddToCannedLabor(data.labor.addToCannedLabor);
     } else {
       setName("");
       setCategory(null);
@@ -77,7 +75,6 @@ export default function NewLabor({
       setHours(undefined);
       setCharge(undefined);
       setDiscount(undefined);
-      setAddToCannedLabor(false);
     }
   }, [data]);
 
@@ -95,7 +92,6 @@ export default function NewLabor({
       hours: hours || 1,
       charge: charge || 0,
       discount: discount || 0,
-      addToCannedLabor,
     });
 
     if (res.type === "success") {
@@ -119,6 +115,7 @@ export default function NewLabor({
       });
 
       close();
+      setOpen(false);
     }
   }
 
@@ -144,7 +141,6 @@ export default function NewLabor({
               hours,
               charge,
               discount,
-              addToCannedLabor,
             },
           };
         }

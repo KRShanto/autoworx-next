@@ -122,9 +122,10 @@ model User {
   taskUsers        TaskUser[]
   appointments     Appointment[]
   appointmentUsers AppointmentUser[]
-  invoices         Invoice[]
+  invoices         Invoice[]         @relation("user")
   Technician       Technician[]
   permissions      Permission[]
+  assignedInvoices Invoice[]         @relation("assignedTo")
 
   @@index([companyId], name: "fk_users_company")
 }
@@ -266,22 +267,38 @@ model Invoice {
   customerNotes           String?
   customerComments        String?
   companyId               Int                       @map("company_id")
-  userId                  Int                       @map("user_id")
+  userId                  Int?                      @map("user_id")
+  assignedToId            Int?                      @map("assigned_to")
   company                 Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   invoiceItems            InvoiceItem[]
   photos                  InvoicePhoto[]
   tasks                   Task[]
   status                  Status?                   @relation(fields: [statusId], references: [id])
   payments                Payment[]
-  user                    User                      @relation(fields: [userId], references: [id])
+  user                    User?                     @relation(name: "user", fields: [userId], references: [id], onDelete: SetNull)
   Material                Material[]
   InventoryProductHistory InventoryProductHistory[]
   vehicle                 Vehicle?                  @relation(fields: [vehicleId], references: [id])
   client                  Client?                   @relation(fields: [clientId], references: [id])
   technician              Technician[]
   workOrderStatus         String?                   @default("Pending") @map("work_order_status")
+  tags                    InvoiceTags[]
+  assignedTo              User?                     @relation(name: "assignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
 
   @@index([companyId], name: "fk_invoices_company")
+}
+
+model InvoiceTags {
+  id        Int      @id @default(autoincrement())
+  invoiceId String   @map("invoice_id")
+  tagId     Int      @map("tag_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId], name: "fk_invoice_tags_invoice")
+  @@index([tagId], name: "fk_invoice_tags_tag")
 }
 
 enum InvoiceType {
@@ -414,21 +431,20 @@ model Vendor {
 // Labor itself is an independant model, So one labor can be in multiple invoices.
 // And if you want to fetch labors for a customer, you need to fetch all invoices and then all invoice items and then you'll get labors.
 model Labor {
-  id               Int           @id @default(autoincrement())
-  name             String
-  categoryId       Int?          @map("category_id")
-  notes            String?
-  hours            Int?
-  charge           Decimal? // per hour
-  discount         Decimal?
-  addToCannedLabor Boolean?      @map("add_to_canned_labor")
-  companyId        Int           @map("company_id")
-  createdAt        DateTime      @default(now()) @map("created_at")
-  updatedAt        DateTime      @default(now()) @updatedAt @map("updated_at")
-  company          Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  category         Category?     @relation(fields: [categoryId], references: [id])
-  invoiceItems     InvoiceItem[]
-  tags             LaborTag[]
+  id           Int           @id @default(autoincrement())
+  name         String
+  categoryId   Int?          @map("category_id")
+  notes        String?
+  hours        Int?
+  charge       Decimal? // per hour
+  discount     Decimal?
+  companyId    Int           @map("company_id")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category     Category?     @relation(fields: [categoryId], references: [id])
+  invoiceItems InvoiceItem[]
+  tags         LaborTag[]
 }
 
 // Tag for a invoice.
@@ -446,10 +462,11 @@ model Tag {
   companyId Int      @map("company_id")
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  items     ItemTag[]
-  materials MaterialTag[]
-  labors    LaborTag[]
-  Client    Client[]
+  items       ItemTag[]
+  materials   MaterialTag[]
+  labors      LaborTag[]
+  Client      Client[]
+  InvoiceTags InvoiceTags[]
 }
 
 // Many to many relation between Item and Tag.
@@ -823,12 +840,17 @@ model Coupon {
   endDate      DateTime
   discount     Decimal
   discountType DiscountType
-  status       String
+  status       CouponStatus
   redemptions  Int
   companyId    Int          @map("company_id")
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @default(now()) @updatedAt @map("updated_at")
   company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+enum CouponStatus {
+  Active
+  Expired
 }
 
 enum DiscountType {
