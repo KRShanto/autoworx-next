@@ -14,7 +14,7 @@ import { useRef, useState } from "react";
 import { RiEditFill } from "react-icons/ri";
 import { RxAvatar } from "react-icons/rx";
 
-import SelectEmployeeType, { IEmployeeType } from "./SelectEmployeeType";
+import SelectEmployeeType from "./SelectEmployeeType";
 import { EmployeeType, User } from "@prisma/client";
 import moment from "moment";
 import { useServerGet } from "@/hooks/useServerGet";
@@ -226,7 +226,7 @@ export default function EditEmployee({ employee }: { employee: User }) {
               <SelectEmployeeType
                 employeeTypeOpen={employeeTypeOpen}
                 setEmployeeTypeOpen={setEmployeeTypeOpen}
-                defaultType={employee.employeeType as IEmployeeType|undefined}
+                defaultType={employee.employeeType as EmployeeType | undefined}
               />
               <SlimInput
                 name="date"

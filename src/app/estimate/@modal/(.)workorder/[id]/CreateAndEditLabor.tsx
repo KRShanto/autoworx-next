@@ -58,7 +58,7 @@ export default function CreateAndEditLabor({
 
   useEffect(() => {
     const fetchEmployees = async () => {
-      const employees = await getEmployees();
+      const employees = await getEmployees({});
       setEmployeeList(employees);
     };
     fetchEmployees();
