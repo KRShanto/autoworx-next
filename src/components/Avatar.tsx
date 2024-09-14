@@ -16,7 +16,11 @@ export default function Avatar({
   return (
     <Image
       src={
-        photo?.includes("/images/default.png") ? photo : `/api/images/${photo}`
+        !photo
+          ? "/images/default.png"
+          : photo.includes("/images/default.png")
+            ? "/images/default.png"
+            : `/api/images/${photo}`
       }
       alt="User Image"
       width={width}

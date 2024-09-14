@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 // import MessageBox from "./MessageBox";
 import { cn } from "@/lib/cn";
-import MessageBox from "../internal/MessageBox";
+import MessageBox from "../MessageBox";
 import { pusher } from "@/lib/pusher/client";
 import { MessageQue } from "../internal/UsersArea";
 import { Attachment, Message } from "@prisma/client";
@@ -23,14 +23,13 @@ export default function UsersArea({
   totalMessageBoxLength: number;
 }) {
   const [messages, setMessages] = useState<MessageQue[]>([]);
-
-  console.log(messages);
+  const [prevMessageStore, setPrevMessageStore] = useState(previousMessages);
 
   // for normal messages
   useEffect(() => {
     const messages: MessageQue[] = [];
     for (const user of selectedUsersList) {
-      const userMessages = previousMessages.filter(
+      const userMessages = prevMessageStore.filter(
         (m) => m.from === user.id || m.to === user.id,
       );
 
@@ -48,7 +47,7 @@ export default function UsersArea({
     }
 
     setMessages(messages);
-  }, [selectedUsersList, previousMessages, currentUser]);
+  }, [selectedUsersList, prevMessageStore, currentUser]);
 
   // for user real-time messages
   useEffect(() => {
@@ -111,6 +110,7 @@ export default function UsersArea({
         return (
           <MessageBox
             key={user.id}
+            setPrevMessageStore={setPrevMessageStore}
             user={user}
             companyName={companyName}
             setUsersList={setSelectedUsersList}
