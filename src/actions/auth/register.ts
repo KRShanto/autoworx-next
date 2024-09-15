@@ -72,9 +72,6 @@ export async function register({
         name: company,
       },
     });
-  
-
-
 
     await db.user.create({
       data: {
@@ -86,29 +83,42 @@ export async function register({
         companyId: newCompany.id,
       },
     });
-   //creating default permissions for the company users
-   await Promise.all([
-    //creating default permission for manager
-    db.permissionForManager.create({
-      data:{companyId:newCompany.id},
-    }),
+    //creating default permissions for the company users
+    await Promise.all([
+      // create default permission for manager
+      db.permissionForManager.create({
+        data: { companyId: newCompany.id },
+      }),
 
-    db.permissionForSales.create({
+      // create default permission for sales
+      db.permissionForSales.create({
+        data: { companyId: newCompany.id },
+      }),
 
-      data:{companyId:newCompany.id},
-    }),
-    db.permissionForTechnician.create({
+      // create default permission for technician
+      db.permissionForTechnician.create({
+        data: { companyId: newCompany.id },
+      }),
 
-      data:{companyId:newCompany.id},
-    }),
-    db.permissionForOther.create({
+      // create default permission for other
+      db.permissionForOther.create({
+        data: { companyId: newCompany.id },
+      }),
+    ]);
 
-      data:{companyId:newCompany.id},
-    }),
-   
+    // Create default calendar settings
+    await db.calendarSettings.create({
+      data: {
+        companyId: newCompany.id,
+        weekStart: "Sunday",
+        dayStart: "10:00",
+        dayEnd: "18:00",
+        weekend1: "Saturday",
+        weekend2: "Sunday",
+      },
+    });
 
-  ])
-     
+    // TODO: Create default email template
 
     return { success: true };
   } catch (error: any) {
