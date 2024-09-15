@@ -1,37 +1,36 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Input } from "antd";
-import { getOrCreateEmailTemplate,updateEmailTemplate } from "@/actions/settings/emailTemplates";
+import {
+  getOrCreateEmailTemplate,
+  updateEmailTemplate,
+} from "@/actions/settings/emailTemplates";
 import { CompanyEmailTemplate } from "@prisma/client";
 
-interface EmailTemplate{
-    subject: string;
-    message: string;
-    companyId: number;
-  
+interface EmailTemplate {
+  subject: string;
+  message: string;
+  companyId: number;
 }
 export default function EstimateAndInvoicePage() {
-  const [emailTemplate, setEmailTemplate] = useState<CompanyEmailTemplate | null>(null);
+  const [emailTemplate, setEmailTemplate] =
+    useState<CompanyEmailTemplate | null>(null);
   const [newSubject, setNewSubject] = useState<string>("");
   const [newMessage, setNewMessage] = useState<string>("");
 
-
-  useEffect(()=>{
-    const fetchEmail=async ()=>{
-
+  useEffect(() => {
+    const fetchEmail = async () => {
       const template = await getOrCreateEmailTemplate();
       setEmailTemplate(template);
       setNewSubject(template.subject);
-      setNewMessage(template.message??"");
-
-    }
+      setNewMessage(template.message ?? "");
+    };
 
     fetchEmail();
+  }, []);
 
-
-  },[])
   const handleUpdate = async () => {
-    if (newSubject.trim() && newMessage.trim()&& emailTemplate) {
+    if (newSubject.trim() && newMessage.trim() && emailTemplate) {
       const updatedTemplate = await updateEmailTemplate(emailTemplate.id, {
         subject: newSubject,
         message: newMessage,
