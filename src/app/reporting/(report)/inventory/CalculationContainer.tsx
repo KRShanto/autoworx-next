@@ -1,6 +1,7 @@
 import React from "react";
 import Calculation from "../../components/Calculation";
 import { db } from "@/lib/db";
+import { InventoryProduct } from "@prisma/client";
 
 export default async function CalculationContainer() {
   const suppliesPromise = db.inventoryProduct.findMany({
@@ -9,6 +10,7 @@ export default async function CalculationContainer() {
     },
     select: {
       price: true,
+      quantity: true,
     },
   });
   const productsPromise = db.inventoryProduct.findMany({
@@ -17,6 +19,7 @@ export default async function CalculationContainer() {
     },
     select: {
       price: true,
+      quantity: true,
     },
   });
   const [totalSupplies, totalProducts] = await Promise.all([
@@ -25,12 +28,12 @@ export default async function CalculationContainer() {
   ]);
 
   const totalSuppliesPrice = totalSupplies.reduce(
-    (acc, supply) => acc + Number(supply.price!),
+    (acc, supply) => acc + Number(supply.price!) * supply.quantity! || 0,
     0,
   );
 
   const totalProductPrice = totalProducts.reduce(
-    (acc, supply) => acc + Number(supply.price!),
+    (acc, product) => acc + Number(product.price!) * product?.quantity! || 0,
     0,
   );
   return (
