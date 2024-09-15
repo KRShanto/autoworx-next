@@ -109,7 +109,7 @@ export default async function WorkOrderPage({
         <div>
           <p className="font-bold text-slate-500">{invoice.company.name}</p>
           <p>
-            {invoice.user.firstName} {invoice.user.lastName}
+            {invoice.user?.firstName} {invoice.user?.lastName}
           </p>
         </div>
       </DialogContent>
