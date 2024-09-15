@@ -4,6 +4,7 @@ import { google } from "googleapis";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import path from "path";
 import { pipeline, Readable } from "stream";
 import { promisify } from "util";
 
@@ -127,17 +128,64 @@ function webStreamToNodeStream(
   });
 }
 
+// Helper function to create the email content (with attachment if needed)
+function makeEmail({ to, from, subject, text, file }: any) {
+  let message = [
+    `From: ${from}`,
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    "MIME-Version: 1.0",
+    'Content-Type: multipart/mixed; boundary="boundary"',
+    "",
+    "--boundary",
+    'Content-Type: text/plain; charset="UTF-8"',
+    "",
+    text,
+  ];
+
+  if (file) {
+    const attachmentContent = fs.readFileSync(file.path).toString("base64");
+    message = [
+      ...message,
+      "",
+      "--boundary",
+      `Content-Type: ${file.type}; name="${file.name}"`,
+      "Content-Transfer-Encoding: base64",
+      `Content-Disposition: attachment; filename="${file.name}"`,
+      "",
+      attachmentContent,
+    ];
+  }
+
+  message.push("--boundary--");
+
+  return Buffer.from(message.join("\n"))
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     // Parse the incoming form data
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
     const recipient = formData.get("recipient") as string | null;
-    const subject = formData.get("subject") as string | null;
+    const subject = "Autoworx";
+    // const subject = formData.get("subject") as string | null;
     const text = formData.get("text") as string | null;
     let filePath;
 
-    console.log("Form data:", { file, recipient, subject, text });
+    if (!recipient) throw new Error("Recipient not provided");
+
+    const client = await db.client.findFirst({
+      where: { id: parseInt(recipient) },
+    });
+
+    if (!client) {
+      throw new Error("Client not found");
+    }
 
     if (!recipient || !subject || !text) {
       return NextResponse.json(
@@ -146,48 +194,57 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       );
     }
 
+    // Handle file if exists
     if (file) {
-      // Convert Web Stream to Node.js Readable stream
       const nodeStream = webStreamToNodeStream(file.stream());
-
-      // Save the file to the server temporarily
-      filePath = `./public/uploads/${file.name}`;
+      filePath = path.join("./public/uploads", file.name);
       await pump(nodeStream, fs.createWriteStream(filePath));
     }
 
-    // Nodemailer transporter with OAuth2
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: {
-        user: process.env.GMAIL_USER as string,
-        pass: process.env.GMAIL_PASS as string,
+    // Load OAuth2 credentials and token
+    const oAuth2Client = new google.auth.OAuth2(
+      process.env.GMAIL_CLIENT_ID,
+      process.env.GMAIL_CLIENT_SECRET,
+      `${process.env.NEXT_PUBLIC_APP_URL}communication/client/auth`,
+    );
+    let refreshToken = (cookies().get("gmail_refresh_token")?.value ||
+      "") as string;
+    if (!refreshToken) {
+      throw new Error("No refresh token found");
+    }
+
+    // Set credentials (this assumes you already have a valid token)
+    oAuth2Client.setCredentials({
+      refresh_token: refreshToken,
+    });
+
+    const gmail = google.gmail({ version: "v1", auth: oAuth2Client });
+
+    // Create the email content
+    const rawMessage = makeEmail({
+      to: client.email,
+      from: process.env.GMAIL_USER as string,
+      subject: subject,
+      text: text,
+      file: file
+        ? {
+            name: file.name,
+            path: filePath,
+            type: file.type,
+          }
+        : null,
+    });
+
+    // Send the email using Gmail API
+    const result = await gmail.users.messages.send({
+      userId: "me",
+      requestBody: {
+        raw: rawMessage,
       },
     });
 
-    // Send the email with the file attachment
-    const mailOptions = {
-      from: process.env.GMAIL_USER as string,
-      to: recipient,
-      subject: subject,
-      text: text,
-      attachments: file
-        ? [
-            {
-              filename: file.name,
-              path: filePath, // Attach the file using the path where it was saved
-            },
-          ]
-        : [],
-    };
-
-    const result = await transporter.sendMail(mailOptions);
-
-    console.log("Email sent:", result);
-
-    // Remove the file from the server after sending the email
-    filePath && fs.unlinkSync(filePath);
+    // Clean up the file after sending
+    if (filePath) fs.unlinkSync(filePath);
 
     return NextResponse.json({ success: true, result });
   } catch (error: unknown) {

@@ -146,6 +146,7 @@ export default function Page({
       );
 
       const data: EmailData[] = await res.json();
+      console.log("🚀 ~ getEmails ~ data:", data);
       setLoading(false);
 
       const emailsWithBody = data?.map((emailData) => {
@@ -155,6 +156,8 @@ export default function Page({
           body,
         };
       });
+      console.log("🚀 ~ emailsWithBody ~ emailsWithBody:", emailsWithBody)
+
       setConversations(emailsWithBody);
     } catch (error) {
       setLoading(false);
@@ -181,7 +184,7 @@ export default function Page({
         <List id={params.clientId} />
         <MessageBox
           conversations={conversations}
-          email={decodeURIComponent(params.clientId)}
+          clientId={params.clientId}
           loading={loading}
           base64Data={base64Data}
           setBase64Data={setBase64Data}
@@ -191,7 +194,6 @@ export default function Page({
           id={params.clientId}
           conversations={conversations}
           vehicles={vehicles}
-
         />
       </div>
     </div>

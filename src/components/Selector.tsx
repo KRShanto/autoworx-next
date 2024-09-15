@@ -130,7 +130,7 @@ export default function Selector<T>({
           className="z-50 w-full rounded-lg border-2 border-slate-400 bg-white"
           style={{
             minWidth: "var(--radix-popper-anchor-width)",
-            maxWidth: "var(--radix-popper-anchor-width)",
+            // maxWidth: "var(--radix-popper-anchor-width)",
           }}
         >
           {/* Search input */}
@@ -171,7 +171,6 @@ export default function Selector<T>({
                 return (
                   <div
                     key={index}
-                  
                     className={cn(
                       "w-full p-1 px-2 text-left hover:bg-gray-100",
                       border &&
