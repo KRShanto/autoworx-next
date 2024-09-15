@@ -179,7 +179,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Send the email with the file attachment
     const mailOptions = {
       from: process.env.GMAIL_USER as string,
-      to: client.email,
+      to: client.email as string,
       subject: subject,
       text: text,
       attachments: file
