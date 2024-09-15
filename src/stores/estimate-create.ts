@@ -1,5 +1,5 @@
 import { FullPayment } from "@/types/db";
-import { Labor, Material, Service, Tag, Task } from "@prisma/client";
+import { Coupon, Labor, Material, Service, Tag, Task } from "@prisma/client";
 import { create } from "zustand";
 
 export interface Item {
@@ -30,6 +30,7 @@ interface EstimateCreateStore {
   items: Item[];
   payment: FullPayment;
   currentSelectedCategoryId: number | null;
+  coupon: Coupon | null;
 
   setInvoiceId: (invoiceId: string) => void;
 
@@ -47,6 +48,7 @@ interface EstimateCreateStore {
   setPolicy: (policy: string) => void;
   setCustomerNotes: (customerNotes: string) => void;
   setCustomerComments: (customerComments: string) => void;
+  setCoupon: (coupon: Coupon) => void;
 
   setPhotos: (photos: File[]) => void;
   addPhoto: (photo: string) => void;
@@ -94,6 +96,8 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
   payment: null,
   currentSelectedCategoryId: null,
 
+  coupon: null,
+
   setInvoiceId: (invoiceId: string) => set({ invoiceId }),
 
   setSubtotal: (subtotal: number) => set({ subtotal }),
@@ -110,6 +114,8 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
   setPolicy: (policy: string) => set({ policy }),
   setCustomerNotes: (customerNotes: string) => set({ customerNotes }),
   setCustomerComments: (customerComments: string) => set({ customerComments }),
+
+  setCoupon: (coupon: Coupon) => set({ coupon }),
 
   setPhotos: (photos: File[]) => set({ photos }),
   addPhoto: (photo: string) =>
