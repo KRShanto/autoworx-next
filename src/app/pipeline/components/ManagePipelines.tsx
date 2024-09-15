@@ -3,12 +3,13 @@ import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { IoReorderTwoSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
-import { createColumn,deleteColumn,updateColumn } from "@/actions/pipelines/pipelinesColumn";
+import { createColumn, deleteColumn, updateColumn, updateColumnOrder } from "@/actions/pipelines/pipelinesColumn";
 
 interface Column {
-  id: number|null;
+  id: number | null;
   title: string;
   type: string;
+  order: number;  // Make sure 'order' is required here
 }
 
 interface ManagePipelinesModalProps {
@@ -86,6 +87,7 @@ function ColumnItem({
     </div>
   );
 }
+
 export default function ManagePipelines({
   columns,
   onSave,
@@ -93,12 +95,12 @@ export default function ManagePipelines({
   pipelineType,
 }: ManagePipelinesModalProps) {
   const [localColumns, setLocalColumns] = useState<Column[]>(columns);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]); 
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
   useEffect(() => {
     if (localColumns.length > columns.length) {
-      // Check if a new column has been added
       const newIndex = localColumns.length - 1;
-      inputRefs.current[newIndex]?.focus(); 
+      inputRefs.current[newIndex]?.focus();
     }
   }, [localColumns, columns]);
 
@@ -107,6 +109,8 @@ export default function ManagePipelines({
     const [draggedColumn] = updatedColumns.splice(dragIndex, 1);
     updatedColumns.splice(hoverIndex, 0, draggedColumn);
     setLocalColumns(updatedColumns);
+
+    saveColumnsOrderToBackend(updatedColumns);
   };
 
   const handleColumnChange = (index: number, newName: string) => {
@@ -115,35 +119,36 @@ export default function ManagePipelines({
     setLocalColumns(updatedColumns);
   };
 
-  const handleDeleteColumn = async(index: number) => {
+  const handleDeleteColumn = async (index: number) => {
     const columnToDelete = localColumns[index];
 
     if (columnToDelete.id !== null) {
-      // If the column has an ID, delete it from the database
       await deleteColumn(columnToDelete.id);
     }
-  
+
     const updatedColumns = localColumns.filter((_, i) => i !== index);
     setLocalColumns(updatedColumns);
   };
 
   const handleAddColumn = () => {
+    const newOrder = localColumns.length; // Assign the new order as the length of the array
     const newColumn: Column = {
       id: null,
       title: "New Column",
       type: pipelineType,
+      order: newOrder, // New column gets the next available order
     };
     setLocalColumns([...localColumns, newColumn]);
   };
 
   const handleSave = async () => {
-    const columnsToSave = localColumns.map(async (column) => {
+    const columnsToSave = localColumns.map(async (column, index) => {
+      column.order = index; // Ensure the correct order is saved
       if (column.id === null) {
         const newColumn = await createColumn(column.title, column.type);
-        column.id = newColumn.id; 
+        column.id = newColumn.id;
       } else {
-    
-        await updateColumn(column.id, column.title, pipelineType);
+        await updateColumn(column.id, column.title, pipelineType, column.order);
       }
     });
 
@@ -154,6 +159,19 @@ export default function ManagePipelines({
     onClose();
   };
 
+  const saveColumnsOrderToBackend = async (updatedColumns: Column[]) => {
+    const reorderedColumns = updatedColumns
+      .filter((column) => column.id !== null)
+      .map((column, index) => ({
+        id: column.id!,
+        order: index, // Save the index as the new order
+      }));
+    try {
+      await updateColumnOrder(reorderedColumns); // API to save column order
+    } catch (error) {
+      console.error("Error saving column order:", error);
+    }
+  };
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -163,7 +181,7 @@ export default function ManagePipelines({
           <div className="flex flex-col justify-center items-center">
             {localColumns.map((column, index) => (
               <ColumnItem
-                key={column.id}
+                key={column.id || `new-${index}`} // Fallback key for new columns
                 index={index}
                 column={column}
                 moveColumn={moveColumn}

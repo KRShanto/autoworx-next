@@ -1,6 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { Task, User } from "@prisma/client";
+import {
+  Client,
+  Invoice,
+  InvoiceItem,
+  Prisma,
+  Task,
+  Technician,
+  User,
+  Vehicle,
+} from "@prisma/client";
 import React, { SetStateAction, useEffect, useState } from "react";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { PiWechatLogoLight } from "react-icons/pi";
@@ -12,7 +21,6 @@ import { EmployeeTagSelector } from "./EmployeeTagSelector";
 import TaskForm from "./TaskForm";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ServiceSelector from "./ServiceSelector";
-import { useServerGet } from "@/hooks/useServerGet";
 import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
 import { Tooltip } from "antd";
 import { updateInvoiceStatus } from "@/actions/estimate/invoice/updateInvoiceStatus";
@@ -63,30 +71,57 @@ interface PipelinesProps {
   columns?: Column[];
   type: string;
 }
-
+type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
+  include: {
+    client: true;
+    vehicle: true;
+    invoiceItems: {
+      include: {
+        service: {
+          include: {
+            Technician: true;
+          };
+        };
+      };
+    };
+    tags: {
+      select: {
+        tag: true;
+      };
+    };
+    tasks: true;
+    assignedTo: true;
+  };
+}>;
 export default function Pipelines({
   pipelinesTitle: pipelineType,
   columns,
   type,
 }: PipelinesProps) {
-  const { data: invoices } = useServerGet(getWorkOrders);
-  const { data: companyUsers } = useServerGet(getEmployees, {
-    excludeCurrentUser: true,
-  });
   const [pipelineData, setPipelineData] = useState<PipelineData[]>([]);
+  const [invoices, setInvoices] = useState<InvoiceWithRelations[]>([]);
 
-  // console.log("invoice out", invoices);
+  const [companyUsers, setCompanyUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    if (invoices) {
-      // Transform the invoices into leads
+    const fetchData = async () => {
+      try {
+        const fetchedInvoices = await getWorkOrders();
+        setInvoices(fetchedInvoices);
+        const fetchedCompanyUsers = await getEmployees({
+          excludeCurrentUser: true,
+        });
+        setCompanyUsers(fetchedCompanyUsers);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (invoices && columns) {
       const transformedLeads: Lead[] = invoices.map((invoice) => {
-        const invoiceId = invoice.id;
-        const client =
-          `${invoice.client?.firstName ?? ""} ${invoice.client?.lastName ?? ""}`.trim();
-        const vehicle =
-          `${invoice.vehicle?.year ?? ""} ${invoice.vehicle?.make ?? ""} ${invoice.vehicle?.model ?? ""}`.trim();
-        const workOrderStatus = invoice.workOrderStatus ?? "Pending"; // Default to Pending
         const completedServices: string[] = [];
         const incompleteServices: string[] = [];
 
@@ -107,12 +142,13 @@ export default function Pipelines({
         });
 
         return {
-          invoiceId,
-          name: client,
+          invoiceId: invoice.id,
+          name: `${invoice.client?.firstName ?? ""} ${invoice.client?.lastName ?? ""}`.trim(),
           email: invoice.client?.email ?? "",
           phone: invoice.client?.mobile ?? "",
-          vehicle,
-          workOrderStatus,
+          vehicle:
+            `${invoice.vehicle?.year ?? ""} ${invoice.vehicle?.make ?? ""} ${invoice.vehicle?.model ?? ""}`.trim(),
+          workOrderStatus: invoice.workOrderStatus ?? "Pending",
           services: {
             completed: completedServices,
             incomplete: incompleteServices,
@@ -124,17 +160,13 @@ export default function Pipelines({
         };
       });
 
-      console.log("Transformed Leads:", transformedLeads);
+      const updatedPipelineData = columns.map((column) => ({
+        title: column.title,
+        leads: transformedLeads.filter(
+          (lead) => lead.workOrderStatus?.trim() === column.title.trim(),
+        ),
+      }));
 
-      const updatedPipelineData: PipelineData[] =
-        columns?.map((column) => ({
-          title: column.title,
-          leads: transformedLeads.filter(
-            (lead) => lead.workOrderStatus?.trim() === column.title.trim(),
-          ),
-        })) || [];
-
-      console.log("Updated Pipeline Data:", updatedPipelineData);
       setPipelineData(updatedPipelineData);
     }
   }, [invoices, columns]);
@@ -158,9 +190,7 @@ export default function Pipelines({
   const [selectedServices, setSelectedServices] = useState<{
     [key: string]: Service | null;
   }>({});
-  const [showAllServices, setShowAllServices] = useState<{
-    [key: string]: boolean;
-  }>({});
+
   const [openServiceDropdown, setOpenServiceDropdown] = useState<{
     [key: string]: boolean;
   }>({});
@@ -235,26 +265,6 @@ export default function Pipelines({
 
   //service
 
-  const handleServiceSelect = (
-    categoryIndex: number,
-    leadIndex: number,
-    service: Service,
-  ) => {
-    const key = `${categoryIndex}-${leadIndex}`;
-    setSelectedServices((prevState) => ({
-      ...prevState,
-      [key]: service,
-    }));
-    setShowAllServices((prevState) => ({
-      ...prevState,
-      [key]: false,
-    }));
-    setOpenServiceDropdown((prevState) => ({
-      ...prevState,
-      [key]: false, // Close dropdown after selection
-    }));
-  };
-
   const handleServiceDropdownToggle = (
     categoryIndex: number,
     leadIndex: number,
@@ -271,6 +281,38 @@ export default function Pipelines({
 
     if (!destination) return;
 
+    // If the item is dropped in the same position, do nothing
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    // Handle drag-and-drop within the same column
+    if (destination.droppableId === source.droppableId) {
+      const columnIndex = parseInt(source.droppableId);
+      const columnItems = [...pipelineData[columnIndex].leads];
+
+      // Remove the item from the source index
+      const [removed] = columnItems.splice(source.index, 1);
+
+      // Re-insert the item at the destination index
+      columnItems.splice(destination.index, 0, removed);
+
+      // Update the state with the reordered column items
+      const updatedData = pipelineData.map((column, index) => {
+        if (index === columnIndex) {
+          return { ...column, leads: columnItems };
+        }
+        return column;
+      });
+
+      setPipelineData(updatedData);
+      return;
+    }
+
+    // Handle drag-and-drop between different columns
     const sourceColumn = pipelineData[source.droppableId];
     const destinationColumn = pipelineData[destination.droppableId];
 
@@ -291,14 +333,12 @@ export default function Pipelines({
 
     setPipelineData(updatedData);
 
-    // Update the workOrderStatus in the database
-    const invoiceId = removed.invoiceId; // Ensure you have access to the invoiceId in the lead object
+    const invoiceId = removed.invoiceId;
     const newStatus = destinationColumn.title;
 
     try {
       const response = await updateInvoiceStatus(invoiceId, newStatus);
       if (response.type === "success") {
-        console.log("Invoice status updated successfully");
       } else {
         console.error("Failed to update invoice status:", response.message);
       }
@@ -312,7 +352,10 @@ export default function Pipelines({
       <div className="h-full overflow-hidden">
         <div className="flex justify-between">
           {pipelineData.map((item, categoryIndex) => (
-            <Droppable droppableId={`${categoryIndex}`} key={categoryIndex}>
+            <Droppable
+              droppableId={`${categoryIndex}`}
+              key={categoryIndex.toString()}
+            >
               {(provided) => (
                 <div
                   {...provided.droppableProps}
@@ -349,7 +392,7 @@ export default function Pipelines({
                       // console.log("Lead", lead);
                       return (
                         <Draggable
-                          key={leadIndex}
+                          key={lead.invoiceId}
                           draggableId={`${categoryIndex}-${leadIndex}`}
                           index={leadIndex}
                         >
@@ -358,8 +401,8 @@ export default function Pipelines({
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
                               ref={provided.innerRef}
-                              key={leadIndex}
-                              className="relative mx-1 my-1 rounded-xl border bg-white p-1"
+                              key={lead.invoiceId}
+                              className="relative mx-1 my-1 rounded-xl border bg-white p-1 overflow-hidden"
                             >
                               <div className="flex items-center justify-between">
                                 <h3 className="font-inter overflow-auto pb-2 font-semibold text-black">
@@ -493,7 +536,7 @@ export default function Pipelines({
                                 <div className="flex items-center gap-2">
                                   <Link href="/" className="group relative">
                                     <PiWechatLogoLight size={18} />
-                                    <span className="absolute bottom-full left-1/2 mb-2 -translate-x-1/4 transform rounded bg-[#66738C] px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                    <span className="invisible absolute bottom-full left-14 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
                                       Communications
                                     </span>
                                   </Link>
@@ -505,13 +548,13 @@ export default function Pipelines({
                                       height={12}
                                       style={{ marginBottom: "0px" }}
                                     />
-                                    <span className="-translate-x-1/5 absolute bottom-full left-1/2 mb-2 w-auto transform whitespace-nowrap rounded bg-[#66738C] px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                    <span className="invisible absolute bottom-full left-14 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
                                       Create Draft Estimate
                                     </span>
                                   </Link>
                                   <Link href="/" className="group relative">
                                     <CiCalendar size={18} />
-                                    <span className="translate-x-1/6 absolute bottom-full left-1/2 mb-2 transform whitespace-nowrap rounded bg-[#66738C] px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                    <span className="invisible absolute bottom-full left-16 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
                                       Create Appointment
                                     </span>
                                   </Link>

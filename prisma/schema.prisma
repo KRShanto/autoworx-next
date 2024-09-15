@@ -108,7 +108,7 @@ model User {
   state            String?
   zip              String?
   companyName      String?           @map("company_name")
-  commission       Decimal?          @default(0)
+  commission       Decimal?          @default(0) @db.Decimal(10,3)
   role             Role              @default(admin)
   employeeType     EmployeeType      @default(Admin)
   joinDate         DateTime?         @map("join_date")
@@ -862,6 +862,7 @@ model Column {
   id    Int    @id @default(autoincrement())
   title String
   type  String // "sales" or "shop"
+  order Int
 }
 
 // TODO: this might need to be renamed

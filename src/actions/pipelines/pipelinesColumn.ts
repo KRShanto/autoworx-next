@@ -2,10 +2,10 @@
 import { db } from "@/lib/db";
 import { defaultSalesColumn, defaultShopColumn } from "@/lib/defaultColumns";
 
-// TODO: insert columns when creating a new company
+// Insert default columns when creating a new company
 const insertDefaultColumns = async (type: string) => {
-  const defaultColumns =
-    type === "sales" ? defaultSalesColumn : defaultShopColumn;
+  const defaultColumns = type === "sales" ? defaultSalesColumn : defaultShopColumn;
+
 
   await db.column.createMany({
     data: defaultColumns,
@@ -13,44 +13,71 @@ const insertDefaultColumns = async (type: string) => {
   });
 };
 
-// fetch all columns by type
+// Fetch all columns by type
 export const getColumnsByType = async (type: string) => {
   let columns = await db.column.findMany({
     where: { type },
+    orderBy: { order: "asc" },  // Ensure they are returned in the correct order
   });
 
+  // If no columns exist, insert default columns and fetch them again
   if (columns.length === 0) {
     await insertDefaultColumns(type);
-
     columns = await db.column.findMany({
-      where: {
-        type,
-      },
+      where: { type },
+      orderBy: { order: "asc" },  // Fetch them in the correct order after insertion
     });
   }
 
   return columns;
 };
 
-// Create a new column with type
+// Create a new column with type and automatically set the correct order
 export const createColumn = async (title: string, type: string) => {
+  // Find the maximum order value for the existing columns of the same type
+  const maxOrder = await db.column.findFirst({
+    where: { type },
+    orderBy: { order: 'desc' },
+    select: { order: true },
+  });
+
+  // Set the new column's order to be one greater than the max order, or 0 if no columns exist
+  const newOrder = maxOrder ? maxOrder.order + 1 : 0;
+
+  // Create the new column with the calculated order
   return await db.column.create({
     data: {
       title,
       type,
+      order: newOrder,
     },
   });
 };
 
-export const updateColumn = async (id: number, title: string, type: string) => {
+// Update column (now includes `order`)
+export const updateColumn = async (id: number, title: string, type: string, order: number) => {
   return await db.column.update({
     where: { id },
-    data: { title, type },
+    data: { title, type, order },
   });
 };
 
+// Delete a column
 export const deleteColumn = async (id: number) => {
   return await db.column.delete({
     where: { id },
   });
+};
+
+// Update the order of multiple columns
+export const updateColumnOrder = async (reorderedColumns: { id: number; order: number }[]) => {
+  const updatePromises = reorderedColumns.map(({ id, order }) =>
+    db.column.update({
+      where: { id },
+      data: { order },  // Update each column's order
+    })
+  );
+  
+  // Wait for all updates to complete
+  await Promise.all(updatePromises);
 };
