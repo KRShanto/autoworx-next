@@ -63,6 +63,7 @@ export function useInvoiceCreate(type: InvoiceType) {
       const data = json.data;
       photoPaths.push(...data);
     }
+    console.log({ invoiceId });
     let res;
     if (isEditPage) {
       res = await updateInvoice({

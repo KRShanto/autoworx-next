@@ -45,7 +45,6 @@ export default function FilterByMultiple({
       }
       return rangeObj;
     });
-    console.log(updatedRangeFromSearchParams);
     setRange(updatedRangeFromSearchParams);
   }, []);
 

@@ -3,10 +3,14 @@ import FilterBySearchBox from "../../components/filter/FilterBySearchBox";
 import FilterByDateRange from "../../components/filter/FilterByDateRange";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
-import { getClientsData } from "../../data";
 import FilterBySelection from "../../components/filter/FilterBySelection";
 import Analytics from "./Analytics";
 import FilterByMultiple from "../../components/filter/FilterByMultiple";
+import { db } from "@/lib/db";
+import { InventoryProductType } from "@prisma/client";
+import moment from "moment";
+import CalculationContainer from "./CalculationContainer";
+import { Suspense } from "react";
 type TProps = {
   searchParams: {
     category?: string;
@@ -48,14 +52,50 @@ const filterMultipleSliders: TSliderData[] = [
     max: 500,
   },
 ];
-export default function InventoryReportPage({ searchParams }: TProps) {
-  const clients = getClientsData();
+
+const ProductType = {
+  supply: "Supply",
+  product: "Product",
+};
+
+export default async function InventoryReportPage({ searchParams }: TProps) {
+  const filterOR = [];
+  if (searchParams.category) {
+    filterOR.push({
+      type: searchParams.category as InventoryProductType,
+    });
+  } else if (searchParams.startDate && searchParams.endDate) {
+    const formattedStartDate =
+      searchParams.startDate &&
+      moment(decodeURIComponent(searchParams.startDate!), "MM-DD-YYYY").format(
+        "YYYY-MM-DD",
+      );
+
+    const formattedEndDate =
+      searchParams.endDate &&
+      moment(decodeURIComponent(searchParams.endDate!), "MM-DD-YYYY").format(
+        "YYYY-MM-DD",
+      );
+    filterOR.push({
+      createdAt: {
+        gte:
+          formattedStartDate && new Date(`${formattedStartDate}T00:00:00.000Z`), // Start of the day
+        lte: formattedEndDate && new Date(`${formattedEndDate}T23:59:59.999Z`), // End of the day
+      },
+    });
+  }
+
+  const inventoryProducts = await db.inventoryProduct.findMany({
+    where: {
+      OR: filterOR.length ? filterOR : undefined,
+      name: { contains: searchParams.search },
+    },
+  });
   return (
     <div className="space-y-5">
-      <div className="my-7 grid grid-cols-5 gap-4">
-        <Calculation content="Total Products" amount={0} />
-        <Calculation content="Total Supplies" amount={0} />
-      </div>
+      <Suspense fallback="loading...">
+        <CalculationContainer />
+      </Suspense>
       {/* filter section */}
       <div className="flex w-full items-center justify-between gap-x-3">
         <div className="flex flex-1 items-center space-x-4">
@@ -72,7 +112,7 @@ export default function InventoryReportPage({ searchParams }: TProps) {
           />
           <FilterBySelection
             selectedItem={searchParams?.category as string}
-            items={["product", "parts", "wheel"]}
+            items={Object.values(ProductType)}
             type="category"
           />
           <FilterBySelection
@@ -100,31 +140,34 @@ export default function InventoryReportPage({ searchParams }: TProps) {
           </thead>
 
           <tbody>
-            {clients.map((client, index) => (
+            {inventoryProducts.map((productInfo, index) => (
               <tr
-                key={index}
+                key={productInfo.id}
                 className={cn(
                   "cursor-pointer rounded-md py-3",
                   index % 2 === 0 ? "bg-white" : "bg-blue-100",
                 )}
               >
                 <td className="border-b px-4 py-2 text-center">
-                  <Link className="text-blue-500" href={`/client/${client.id}`}>
-                    {client.name}
+                  <Link
+                    className="text-blue-500"
+                    href={`/client/${productInfo.id}`}
+                  >
+                    {productInfo.id}
                   </Link>
                 </td>
                 <td className="border-b px-4 py-2 text-center">
-                  {client.email}
+                  {productInfo.name}
                 </td>
+                <td className="border-b px-4 py-2 text-center"></td>
+                <td className="border-b px-4 py-2 text-center"></td>
                 <td className="border-b px-4 py-2 text-center">
-                  {client.phone}
+                  {productInfo.quantity}
                 </td>
+                <td className="border-b px-4 py-2 text-center"></td>
                 <td className="border-b px-4 py-2 text-center">
-                  {client.phone}
+                  {productInfo.type}
                 </td>
-                <td className="border-b px-4 py-2 text-center">0</td>
-                <td className="border-b px-4 py-2 text-center">0</td>
-                <td className="border-b px-4 py-2 text-center">0</td>
                 <td className="border-b px-4 py-2 text-center"></td>
                 <td className="border-b px-4 py-2 text-center"></td>
               </tr>
@@ -132,6 +175,7 @@ export default function InventoryReportPage({ searchParams }: TProps) {
           </tbody>
         </table>
       </div>
+
       <Analytics
         leftChart={searchParams.leftChart}
         rightChart={searchParams.rightChart}
