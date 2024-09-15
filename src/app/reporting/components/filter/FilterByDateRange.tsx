@@ -64,6 +64,23 @@ export default function FilterDateRange({ startDate, endDate }: TProps) {
       return "Date Range";
     }
   };
+
+  const handleClear = () => {
+    const searchParams = new URLSearchParams(params);
+    searchParams.delete("startDate");
+    searchParams.delete("endDate");
+    const newPath = `${pathname}?${searchParams.toString()}`;
+    router.replace(newPath);
+    setState({
+      selection: {
+        startDate: new Date(),
+        endDate: new Date(),
+        key: "selection",
+      },
+    });
+    setShowPicker(false);
+    setIsRangeSelected(false);
+  };
   return (
     <div>
       <button
@@ -77,7 +94,7 @@ export default function FilterDateRange({ startDate, endDate }: TProps) {
       </button>
 
       {showPicker && (
-        <div className="absolute hover:z-10 border border-gray-300 bg-white p-4 shadow-lg">
+        <div className="absolute z-10 border border-gray-300 bg-white p-4 shadow-lg hover:z-20">
           <DateRangePicker
             ranges={[tempRange]}
             onChange={handleSelect}
@@ -88,6 +105,12 @@ export default function FilterDateRange({ startDate, endDate }: TProps) {
             calendarFocus="forwards"
           />
           <div className="mt-2 flex justify-end">
+            <button
+              onClick={handleClear}
+              className="mr-2 rounded bg-red-500 p-2 text-white"
+            >
+              Clear
+            </button>
             <button
               onClick={handleOk}
               className="mr-2 rounded bg-blue-500 p-2 text-white"

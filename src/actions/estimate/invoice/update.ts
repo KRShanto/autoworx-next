@@ -65,7 +65,7 @@ export async function updateInvoice(
     },
   });
   // update invoice itself
-  await db.invoice.update({
+  const updatedInvoice = await db.invoice.update({
     where: {
       id: data.id,
     },
@@ -208,6 +208,7 @@ export async function updateInvoice(
   revalidatePath("/estimate");
   return {
     type: "success",
+    data: updatedInvoice,
   };
 
 

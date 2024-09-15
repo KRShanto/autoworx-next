@@ -25,6 +25,14 @@ export default function FilterBySelection({
     router.push(newPath);
     setShow(false);
   };
+
+  const handleClear = () => {
+    const searchParams = new URLSearchParams(params);
+    searchParams.delete(type);
+    const newPath = `${pathname}?${searchParams.toString()}`;
+    router.replace(newPath);
+    setShow(false);
+  };
   return (
     <div>
       <button
@@ -50,6 +58,12 @@ export default function FilterBySelection({
               {item}
             </button>
           ))}
+          <button
+            onClick={handleClear}
+            className="mt-1 border-t text-sm hover:text-red-500"
+          >
+            Clear
+          </button>
         </div>
       )}
     </div>
