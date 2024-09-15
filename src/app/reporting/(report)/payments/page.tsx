@@ -6,6 +6,9 @@ import { getClientsData } from "../../data";
 import FilterBySelection from "../../components/filter/FilterBySelection";
 import Analytics from "./Analytics";
 import FilterByMultiple from "../../components/filter/FilterByMultiple";
+import { db } from "@/lib/db";
+import { formatDate } from "@/utils/taskAndActivity";
+import moment from "moment";
 type TProps = {
   searchParams: {
     category?: string;
@@ -44,8 +47,58 @@ const filterMultipleSliders: TSliderData[] = [
     max: 500,
   },
 ];
-export default function PaymentReportPage({ searchParams }: TProps) {
-  const clients = getClientsData();
+export default async function PaymentReportPage({ searchParams }: TProps) {
+  const filterOR = [];
+  if (searchParams.startDate && searchParams.endDate) {
+    const formattedStartDate =
+      searchParams.startDate &&
+      moment(decodeURIComponent(searchParams.startDate!), "MM-DD-YYYY").format(
+        "YYYY-MM-DD",
+      );
+
+    const formattedEndDate =
+      searchParams.endDate &&
+      moment(decodeURIComponent(searchParams.endDate!), "MM-DD-YYYY").format(
+        "YYYY-MM-DD",
+      );
+    filterOR.push({
+      createdAt: {
+        gte:
+          formattedStartDate && new Date(`${formattedStartDate}T00:00:00.000Z`), // Start of the day
+        lte: formattedEndDate && new Date(`${formattedEndDate}T23:59:59.999Z`), // End of the day
+      },
+    });
+  }
+
+  const paymentInfo = await db.payment.findMany({
+    where: {
+      OR: filterOR.length ? filterOR : undefined,
+      invoice: {
+        client: {
+          OR: searchParams.search
+            ? [
+                { firstName: { contains: searchParams.search?.trim() } },
+                { lastName: { contains: searchParams.search?.trim() } },
+              ]
+            : undefined,
+        },
+      },
+    },
+    include: {
+      invoice: {
+        include: {
+          vehicle: true,
+          client: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
   return (
     <div className="space-y-5">
       {/* filter section */}
@@ -96,26 +149,35 @@ export default function PaymentReportPage({ searchParams }: TProps) {
           </thead>
 
           <tbody>
-            {clients.map((client, index) => (
+            {paymentInfo.map((payment, index) => (
               <tr
-                key={index}
+                key={payment.id}
                 className={cn(
                   "cursor-pointer rounded-md py-3",
                   index % 2 === 0 ? "bg-white" : "bg-blue-100",
                 )}
               >
-                <td className="border-b px-4 py-2 text-center">12/4/24</td>
                 <td className="border-b px-4 py-2 text-center">
-                  {client.phone}
+                  {payment?.date && formatDate(payment.date)}
                 </td>
                 <td className="border-b px-4 py-2 text-center">
-                  {client.name}
+                  {payment.invoiceId}
                 </td>
                 <td className="border-b px-4 py-2 text-center">
-                  {client.email}
+                  {payment.invoice?.client?.firstName}{" "}
+                  {payment.invoice?.client?.lastName}
                 </td>
-                <td className="border-b px-4 py-2 text-center">Bkash</td>
-                <td className="border-b px-4 py-2 text-center">100</td>
+                <td className="border-b px-4 py-2 text-center">
+                  {payment.invoice?.vehicle?.year} -{" "}
+                  {payment.invoice?.vehicle?.make} -{" "}
+                  {payment.invoice?.vehicle?.model}
+                </td>
+                <td className="border-b px-4 py-2 text-center">
+                  {payment.type}
+                </td>
+                <td className="border-b px-4 py-2 text-center">
+                  {Number(payment.amount)}
+                </td>
                 <td className="border-b px-4 py-2 text-center">paid</td>
               </tr>
             ))}
