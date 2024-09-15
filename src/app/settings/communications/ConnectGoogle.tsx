@@ -9,7 +9,10 @@ function generateAuthURL() {
     process.env.GMAIL_CLIENT_SECRET,
     `${process.env.NEXT_PUBLIC_APP_URL}communication/client/auth`,
   );
-  const scopes = ["https://www.googleapis.com/auth/gmail.readonly"];
+  const scopes = [
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/gmail.send",
+  ];
   const state = crypto.randomBytes(32).toString("hex");
   const authorizationUrl = oauth2Client.generateAuthUrl({
     access_type: "offline",
