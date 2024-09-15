@@ -9,23 +9,30 @@ export default function Avatar({
   className,
 }: {
   photo?: string;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   className?: string;
 }) {
   return (
-    <Image
-      src={
-        !photo
-          ? "/images/default.png"
-          : photo.includes("/images/default.png")
+    <div
+      className={cn("relative overflow-hidden rounded-full", className)}
+      style={{
+        width: `${width || 50}px`,
+        height: `${height || 50}px`,
+      }}
+    >
+      <Image
+        src={
+          !photo
             ? "/images/default.png"
-            : `/api/images/${photo}`
-      }
-      alt="User Image"
-      width={width}
-      height={height}
-      className={cn("rounded-full", className)}
-    />
+            : photo.includes("/images/default.png")
+              ? "/images/default.png"
+              : `/api/images/${photo}`
+        }
+        alt="User Image"
+        className={"rounded-full object-fill"}
+        fill
+      />
+    </div>
   );
 }
