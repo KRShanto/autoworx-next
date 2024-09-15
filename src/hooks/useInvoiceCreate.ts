@@ -26,6 +26,7 @@ export function useInvoiceCreate(type: InvoiceType) {
     photos,
     tasks,
     items,
+    coupon,
     reset: resetEstimateCreate,
   } = useEstimateCreateStore();
   const { client, vehicle, status, reset: resetLists } = useListsStore();
@@ -57,11 +58,7 @@ export function useInvoiceCreate(type: InvoiceType) {
       }
 
       const json = await res.json();
-      // if (json.status === "fail") {
-      //   console.error("Fail to upload photos");
 
-      //   return json
-      // }
       console.log({ json });
       const data = json.data;
       photoPaths.push(...data);
@@ -113,6 +110,7 @@ export function useInvoiceCreate(type: InvoiceType) {
         photos: photoPaths,
         items,
         tasks,
+        coupon,
       });
     }
 

@@ -3,28 +3,46 @@
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 
-export async function checkCouponCode(
-  couponCode: string,
-): Promise<ServerAction> {
-  const code = await db.coupon.findFirst({
+export async function checkCouponCode({
+  code,
+  clientId,
+}: {
+  code: string;
+  clientId: number;
+}): Promise<ServerAction> {
+  const couponCode = await db.coupon.findFirst({
     where: {
-      code: couponCode,
+      code,
     },
   });
 
-  if (!code) {
+  if (!couponCode) {
     return {
       type: "error",
       message: "Coupon does not exist",
     };
   }
 
-  if (code.endDate < new Date()) {
+  if (couponCode.endDate < new Date()) {
     return {
       type: "error",
       message: "Coupon has expired",
     };
   }
 
-  return { type: "success", data: code };
+  const clientCoupon = await db.clientCoupon.findFirst({
+    where: {
+      clientId,
+      couponId: couponCode.id,
+    },
+  });
+
+  if (clientCoupon) {
+    return {
+      type: "error",
+      message: "Coupon has already been used",
+    };
+  }
+
+  return { type: "success", data: couponCode };
 }
