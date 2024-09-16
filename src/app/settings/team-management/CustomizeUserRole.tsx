@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { Switch, Checkbox } from "antd";
-import {Role,EmployeeType} from "@prisma/client"
-
-interface Module {
-  name: string;
- 
-}
+import { Switch } from "antd";
+import { Role, EmployeeType } from "@prisma/client";
+import { permissionModule } from "@/lib/permissionModule";
+import {
+  getUserPermissions,
+  savePermissions,
+} from "@/actions/settings/teamManagement";
 
 interface CustomizeUserRolesProps {
   user: {
@@ -20,23 +20,33 @@ interface CustomizeUserRolesProps {
   onBack: () => void;
 }
 
+interface PermissionType {
+  [key: string]: boolean;
+}
+
 const CustomizeUserRole = ({ user, onBack }: CustomizeUserRolesProps) => {
- 
-
-  const [modules, setModules] = useState<Module[]>([
-    { name: "Dashboard", },
-    { name: "Communications Hub: Internal" },
-    { name: "Communications Hub: Clients" },
-    { name: "Communications Hub: Collaboration" },
-    { name: "Estimates & Invoices",  },
-    { name: "Calendar & Task"},
-    { name: "Reporting & Analytics" },
-    { name: "Inventory" },
-    { name: "Settings"},
-  ]);
-
- 
   const name = `${user.firstName} ${user.lastName}`;
+
+  const [permissions, setPermissions] = useState<PermissionType>({});
+
+  useEffect(() => {
+    // Fetch default and user-specific permissions
+    getUserPermissions(user.id, user.employeeType).then((data) => {
+      console.log(data);
+      setPermissions(data || {}); // Initialize with an empty object if no permissions
+    });
+  }, [user.id, user.employeeType]);
+
+  const handlePermissionChange = async (key: string, checked: boolean) => {
+    setPermissions((prev) => ({ ...prev, [key]: checked }));
+
+    try {
+      await savePermissions(user.id, { [key]: checked });
+      console.log(`Permission for ${key} updated to ${checked}`);
+    } catch (error) {
+      console.error("Failed to update permission:", error);
+    }
+  };
 
   return (
     <div className="">
@@ -53,8 +63,6 @@ const CustomizeUserRole = ({ user, onBack }: CustomizeUserRolesProps) => {
             width={40}
             height={40}
             className="object-cover"
-            ml-4
-            mr-4
           />
         </div>
         <div className="ml-3">
@@ -70,12 +78,17 @@ const CustomizeUserRole = ({ user, onBack }: CustomizeUserRolesProps) => {
           </tr>
         </thead>
         <tbody>
-          {modules.map((module, index) => (
+          {permissionModule.map((module, index) => (
             <tr key={index} className="p-4">
-              <td className="px-4 py-2">{module.name}</td>
+              <td className="px-4 py-2">{module.label}</td>
               <td className="px-4 py-2.5 text-left">
-                <Switch defaultChecked={false} className="shadow-md" />
-               
+                <Switch
+                  checked={permissions[module.key] ?? false}
+                  onChange={(checked) =>
+                    handlePermissionChange(module.key, checked)
+                  }
+                  className="shadow-md"
+                />
               </td>
             </tr>
           ))}

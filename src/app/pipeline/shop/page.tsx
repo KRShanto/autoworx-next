@@ -4,16 +4,20 @@ import Header from "../components/Header";
 import WorkOrders from "../components/WorkOrders";
 import Pipelines from "../components/Pipelines";
 import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
+import { getEmployees } from "@/actions/employee/get";
+import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
+import { User } from "@prisma/client";
 
 type Props = {
   searchParams?: { view?: string };
 };
 
-type Column = {
+interface Column {
   id: number | null;
   title: string;
   type: string;
-};
+  order: number; 
+}
 
 const Page = (props: Props) => {
   const activeView = props.searchParams?.view || "workOrders";
@@ -29,6 +33,7 @@ const Page = (props: Props) => {
 
     fetchShopColumns();
   }, []);
+
   // console.log(JSON.stringify(pipelineColumns, null, 2));
   const handleColumnsUpdate = async ({ columns }: { columns: Column[] }) => {
     setPipelineColumns(columns);
