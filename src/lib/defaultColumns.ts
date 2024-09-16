@@ -1,18 +1,18 @@
 export  const defaultSalesColumn=[
-  { title: "New Leads", type: "sales" },
-  { title: "Leads Generated", type: "sales" },
-  { title: "Follow-up", type: "sales" },
-  { title: "Estimates Created", type: "sales" },
-  { title: "Archived", type: "sales" },
-  { title: "Converted", type: "sales" },
+  { title: "New Leads", type: "sales",order:0 },
+  { title: "Leads Generated", type: "sales",order:1 },
+  { title: "Follow-up", type: "sales",order:2  },
+  { title: "Estimates Created", type: "sales" ,order:3 },
+  { title: "Archived", type: "sales" ,order:4 },
+  { title: "Converted", type: "sales" ,order:5 },
 ];
 
 export  const defaultShopColumn=[
-  { title: "Pending", type: "shop" },
-  { title: "Completed", type: "shop" },
-  { title: "Cancelled", type: "shop" },
-  { title: "Re-Dos", type: "shop" },
-  { title: "Optional", type: "shop" },
+  { title: "Pending", type: "shop",order:0  },
+  { title: "Completed", type: "shop" ,order:1 },
+  { title: "Cancelled", type: "shop" ,order:2 },
+  { title: "Re-Dos", type: "shop" ,order:3 },
+  { title: "Optional", type: "shop",order:4  },
  
 ];
 

@@ -1,4 +1,3 @@
-
 "use server";
 
 import { db } from "@/lib/db";
@@ -9,8 +8,10 @@ import {
   EmployeeType,
   Prisma,
   PermissionForManager,
+  PrismaClient,
 } from "@prisma/client";
 
+const prisma = new PrismaClient();
 export const teamManagementUser = async (): Promise<
   {
     id: number;
@@ -75,15 +76,14 @@ interface userRolePermission {
   role: string;
   moduleKey: string;
   value: boolean;
-  isViewOnly?:boolean;
-  
+  isViewOnly?: boolean;
 }
 
 export const updatePermissionForRole = async ({
   role,
   moduleKey,
   value,
-  isViewOnly
+  isViewOnly,
 }: userRolePermission) => {
   if (!role || !moduleKey || typeof value !== "boolean")
     throw new Error("Invalid arguments for permission update");
@@ -122,9 +122,11 @@ export const updatePermissionForRole = async ({
         break;
 
       case "Technician":
-        const technicianPermission = await db.permissionForTechnician.findFirst({
-          where: { companyId },
-        });
+        const technicianPermission = await db.permissionForTechnician.findFirst(
+          {
+            where: { companyId },
+          },
+        );
         if (technicianPermission) {
           await db.permissionForTechnician.update({
             where: { id: technicianPermission.id },
@@ -158,4 +160,84 @@ export const updatePermissionForRole = async ({
   }
 };
 
+//customization of users
+interface PrismaClientWithIndex {
+  [key: string]: any;
+}
+interface PermissionModelMap {
+  Manager: string;
+  Sales: string;
+  Technician: string;
+  Other: string;
+}
 
+const permissionModelMap: PermissionModelMap = {
+  Manager: "permissionForManager",
+  Sales: "permissionForSales",
+  Technician: "permissionForTechnician",
+  Other: "permissionForOther",
+};
+
+const getRoleModel = (role: string): string => {
+  const roleModel = permissionModelMap[role as keyof PermissionModelMap];
+  if (!roleModel) {
+    throw new Error(`Unknown role: ${role}`);
+  }
+  return roleModel;
+};
+
+// Fetch user permissions (role + user-specific overrides)
+export const getUserPermissions = async (userId: number, role: string) => {
+  const roleModel = getRoleModel(role);
+
+  try {
+    const companyId = await getCompanyId();
+
+    const rolePermission = await (prisma as PrismaClientWithIndex)[
+      roleModel
+    ].findFirst({
+      where: { companyId },
+    });
+
+    if (!rolePermission) {
+      console.error(`No role permissions found for companyId: ${companyId}`);
+      return {};
+    }
+
+    const userPermissions = await prisma.permission.findFirst({
+      where: { userId, companyId },
+    });
+
+    const mergedPermissions = { ...rolePermission, ...(userPermissions || {}) };
+
+    return mergedPermissions;
+  } catch (error) {
+    console.error(
+      `Error fetching permissions for userId: ${userId} and role: ${role}`,
+      error,
+    );
+    return {};
+  }
+};
+
+// Save user permissions
+export const savePermissions = async (
+  userId: number,
+  newPermissions: object,
+) => {
+  try {
+    const companyId = await getCompanyId();
+
+    await prisma.permission.upsert({
+      where: {
+        userId_companyId: { userId, companyId },
+      },
+      create: { userId, companyId, ...newPermissions },
+      update: { ...newPermissions },
+    });
+
+    console.log("Permissions saved successfully!");
+  } catch (error) {
+    console.error("Error saving permissions:", error);
+  }
+};
