@@ -12,11 +12,12 @@ type Props = {
   searchParams?: { view?: string };
 };
 
-type Column = {
+interface Column {
   id: number | null;
   title: string;
   type: string;
-};
+  order: number; 
+}
 
 const Page = (props: Props) => {
   const activeView = props.searchParams?.view || "workOrders";
