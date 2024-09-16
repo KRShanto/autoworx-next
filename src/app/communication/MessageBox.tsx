@@ -16,6 +16,7 @@ import Message from "./Message";
 import toast from "react-hot-toast";
 import { usePathname } from "next/navigation";
 import InvoiceEstimateModal from "./collaboration/InvoiceEstimateModal";
+import { getUserInGroup } from "@/actions/communication/internal/query";
 // import Message from "./Message";
 
 export default function MessageBox({
@@ -28,12 +29,10 @@ export default function MessageBox({
   group,
   setGroupsList,
   companyName,
-  setPrevMessageStore,
 }: {
   user?: User; // TODO: type this
   setUsersList?: React.Dispatch<React.SetStateAction<any[]>>;
   setGroupsList?: React.Dispatch<React.SetStateAction<any[]>>;
-  setPrevMessageStore?: React.Dispatch<React.SetStateAction<any[]>>;
   messages: (TMessage & { attachment: Attachment | null })[];
   companyName?: string | null;
   totalMessageBox: number;
@@ -50,7 +49,6 @@ export default function MessageBox({
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
   const [showAttachment, setShowAttachment] = useState(false);
   const pathname = usePathname();
-
   const isEstimateAttachmentShow = pathname.includes(
     "/communication/collaboration",
   );
@@ -115,27 +113,7 @@ export default function MessageBox({
           sender: "USER",
           attachment: json.attachment,
         };
-        setPrevMessageStore &&
-          setPrevMessageStore((prevMessage) => [
-            ...prevMessage,
-            { ...json.newMessage, attachment: json.attachment },
-          ]);
-        if (fromGroup) {
-          setMessages((messages) => [...messages, newMessage]);
-        } else {
-          setMessages((messages) => {
-            const newMessages = messages.map((m) => {
-              if (m.user === user?.id) {
-                return {
-                  user: user?.id,
-                  messages: [...m.messages, newMessage],
-                };
-              }
-              return m;
-            });
-            return newMessages;
-          });
-        }
+        setMessages((messages) => [...messages, newMessage]);
         setMessage("");
         setAttachmentFile(null);
       } else {
@@ -157,6 +135,14 @@ export default function MessageBox({
   };
 
   const handleDeleteUserFromGroupList = async (userId: number) => {
+    const isUserExistInGroup = await getUserInGroup(
+      parseInt(session?.user?.id!),
+      group?.id!,
+    );
+    if (!isUserExistInGroup) {
+      toast.error("You can not remove this User from this group");
+      return;
+    }
     const response = await deleteUserFromGroup(userId, group?.id!);
     if (response.status === 200) {
       if (userId === parseInt(session?.user?.id!)) {

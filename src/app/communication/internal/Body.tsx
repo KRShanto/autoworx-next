@@ -4,17 +4,15 @@ import { useState } from "react";
 import List from "./List";
 import UsersArea from "./UsersArea";
 import { User as NextAuthUser } from "next-auth";
-import { Attachment, Group, Message, User } from "@prisma/client";
+import { Group, User } from "@prisma/client";
 
 export default function Body({
   users,
   currentUser,
-  messages,
   groups,
 }: {
   users: User[];
   currentUser: NextAuthUser;
-  messages: (Message & { attachment: Attachment | null })[];
   groups: (Group & { users: User[] })[];
 }) {
   const [usersList, setUsersList] = useState<User[]>([]);
@@ -39,7 +37,6 @@ export default function Body({
         usersList={usersList}
         setUsersList={setUsersList}
         currentUser={currentUser}
-        previousMessages={messages}
         groupsList={groupsList}
         setGroupsList={setGroupsList}
       />

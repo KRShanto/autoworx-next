@@ -47,7 +47,6 @@ export default async function InternalPage() {
       <Body
         users={users}
         currentUser={session.user}
-        messages={messages}
         groups={groups}
       />
     </div>

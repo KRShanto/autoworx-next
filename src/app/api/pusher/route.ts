@@ -51,7 +51,10 @@ export async function POST(req: Request, res: Response) {
       });
       if (!isUserInExistGroup) {
         return new Response(
-          JSON.stringify({ message: "User is not in the group", success: false }),
+          JSON.stringify({
+            message: "User is not in the group",
+            success: false,
+          }),
           { status: 400 },
         );
       }
@@ -64,6 +67,7 @@ export async function POST(req: Request, res: Response) {
     }
     // send the raw message to the room
     pusher.trigger(channel, "message", {
+      groupId: type === sendType.Group ? to : null,
       from: userId,
       message,
       attachment: attachmentFile
@@ -102,8 +106,11 @@ export async function POST(req: Request, res: Response) {
     );
   } catch (e) {
     console.error(e);
-    return new Response(JSON.stringify({ message: "Failed to send message" , success: false}), {
-      status: 500,
-    });
+    return new Response(
+      JSON.stringify({ message: "Failed to send message", success: false }),
+      {
+        status: 500,
+      },
+    );
   }
 }

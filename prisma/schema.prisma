@@ -804,6 +804,7 @@ model Message {
   groupId    Int?        @map("group_id")
   createdAt  DateTime    @default(now()) @map("created_at")
   updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
+  group     Group?     @relation(fields: [groupId], references: [id])
   attachment Attachment?
 
   @@index([to], name: "fk_messages_to")
@@ -828,6 +829,7 @@ model Group {
   name      String
   type      String   @default("Group")
   users     User[]   @relation("UserGroups")
+  messages  Message[]
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 }

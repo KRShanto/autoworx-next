@@ -1,11 +1,14 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { getPusherInstance } from "@/lib/pusher/server";
 import { revalidatePath } from "next/cache";
+
+const pusher = getPusherInstance();
 
 export const deleteUserFromGroup = async (userId: number, groupId: number) => {
   try {
-    const deleteUser = db.group.update({
+    const deleteUser = await db.group.update({
       where: { id: groupId },
       data: {
         users: {
@@ -13,10 +16,15 @@ export const deleteUserFromGroup = async (userId: number, groupId: number) => {
         },
       },
     });
+    if (deleteUser) {
+      pusher.trigger("create", "create-group", {
+        userId,
+        groupId,
+      });
+    }
     revalidatePath("/communication/internal");
     return {
       status: 200,
-      data: deleteUser,
       message: "User deleted from group",
     };
   } catch (err) {

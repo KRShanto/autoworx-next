@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import MessageBox from "../MessageBox";
-import { getGroupMessagesById } from "@/actions/communication/internal/query";
+import {
+  getGroupMessagesById,
+  getUserInGroup,
+} from "@/actions/communication/internal/query";
 import { useSession } from "next-auth/react";
 import { pusher } from "@/lib/pusher/client";
 import { Attachment, Group, User } from "@prisma/client";
@@ -23,21 +26,29 @@ export default function GroupMessageBox({
   useEffect(() => {
     const fetchGroupMessages = async () => {
       const groupMessages = await getGroupMessagesById(group.id);
-      setGroupMessages(
-        groupMessages.map((m) => {
-          return {
-            userId: m.from,
-            message: m.message,
-            sender: m.from === parseInt(session?.user?.id!) ? "USER" : "CLIENT",
-            attachment: m.attachment,
-          };
-        }),
+      const isUserExistInGroup = await getUserInGroup(
+        parseInt(session?.user?.id!),
+        group.id,
       );
+      if (!isUserExistInGroup) {
+        return;
+      }
+      groupMessages &&
+        setGroupMessages(
+          groupMessages?.messages.map((m) => {
+            return {
+              groupId: m.groupId,
+              userId: m.from,
+              message: m.message,
+              sender:
+                m.from === parseInt(session?.user?.id!) ? "USER" : "CLIENT",
+              attachment: m.attachment,
+            };
+          }),
+        );
     };
     fetchGroupMessages();
   }, []);
-
-  console.log({ groupMessages });
 
   // for group real-time messages
   useEffect(() => {
@@ -45,16 +56,28 @@ export default function GroupMessageBox({
       .subscribe(`group-${group.id}`)
       .bind(
         "message",
-        ({
+        async ({
+          groupId,
           from,
           message,
           attachment,
         }: {
+          groupId: number;
           from: number;
           message: string;
           attachment: Attachment | null;
         }) => {
-          if (from !== parseInt(session?.user?.id!)) {
+          const isUserExistInGroup = await getUserInGroup(
+            parseInt(session?.user?.id!),
+            groupId,
+          );
+          if (!isUserExistInGroup) {
+            setGroupsList((groupList) =>
+              groupList.filter((g) => g.id !== groupId),
+            );
+            return;
+          }
+          if (from !== parseInt(session?.user?.id!) && isUserExistInGroup) {
             const newMessage = {
               userId: from,
               message: message,
