@@ -205,7 +205,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const oAuth2Client = new google.auth.OAuth2(
       process.env.GMAIL_CLIENT_ID,
       process.env.GMAIL_CLIENT_SECRET,
-      `${process.env.NEXT_PUBLIC_APP_URL}communication/client/auth`,
+      `${process.env.NEXT_PUBLIC_APP_URL}/communication/client/auth`,
     );
     let refreshToken = (cookies().get("gmail_refresh_token")?.value ||
       "") as string;

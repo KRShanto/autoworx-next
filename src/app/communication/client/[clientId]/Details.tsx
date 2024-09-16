@@ -1,4 +1,4 @@
-import { tempClients } from "@/lib/tempClients";
+import { useServerGet } from "@/hooks/useServerGet";
 import { Vehicle } from "@prisma/client";
 import Image from "next/image";
 import { useState } from "react";
@@ -11,20 +11,15 @@ import {
 } from "react-icons/fa";
 import { IoIosFlash } from "react-icons/io";
 import { MdOutlineEdit } from "react-icons/md";
-const sharedFiles = [
-  {
-    url: "/icons/image.png",
-  },
-  {
-    url: "/icons/image.png",
-  },
-  {
-    url: "/icons/media.png",
-  },
-  {
-    url: "/icons/bar.png",
-  },
-];
+import {
+  getClient,
+  getEstimates,
+  getServices,
+  saveNotes,
+} from "../actions/actions";
+import { useDebounce } from "@/hooks/useDebounce";
+import Link from "next/link";
+
 function downloadAttachment(
   filename: string,
   mimeType: string,
@@ -59,13 +54,26 @@ export default function Details({
   id,
   conversations,
   vehicles,
+  clientId,
 }: {
   id: string;
   conversations: any[];
   vehicles: Vehicle[];
+  clientId: number;
 }) {
-  const user = tempClients.find((user: any) => user.id == id);
+  const { data: user } = useServerGet(getClient, clientId);
+  const { data: services } = useServerGet(getServices, clientId);
+  const { data: estimates } = useServerGet(getEstimates, clientId);
   const [selectedVehicleIndex, setSelectedVehicleIndex] = useState(0);
+
+  const debouncedSave = useDebounce((noteContent: string) => {
+    saveNotes(clientId, noteContent);
+  }, 1000);
+
+  const handleSaveNote = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    debouncedSave(e.target.value);
+  };
+
   return (
     <div className="app-shadow h-[83vh] w-[40%] rounded-lg bg-white">
       {/* Client Heading */}
@@ -76,7 +84,13 @@ export default function Details({
           {/* Content */}
           <div className="flex flex-col items-center gap-5 px-5 2xl:flex-row">
             <Image
-              src={user!.image}
+              src={
+                !user?.photo
+                  ? "/images/default.png"
+                  : user.photo.includes("/images/default.png")
+                    ? "/images/default.png"
+                    : `/api/images/${user.photo}`
+              }
               alt="user"
               width={50}
               height={50}
@@ -84,9 +98,11 @@ export default function Details({
             />
 
             <div className="flex flex-col">
-              <h2 className="text-white">{user!.name}</h2>
-              <p className="text-white">Email : client@example.com</p>
-              <p className="text-white">Phone : 0123456789</p>
+              <h2 className="text-white">
+                {user?.firstName} {user?.lastName}
+              </h2>
+              <p className="text-white">Email : {user?.email}</p>
+              <p className="text-white">Phone : {user?.mobile}</p>
             </div>
           </div>
         </div>
@@ -125,7 +141,12 @@ export default function Details({
           </div>
           <div className="">
             <p className="font-semibold">Service Requested :</p>
-            <p>Service 1, Service 2, Service 3, Service 4, Service 5</p>
+
+            <ul className="list-inside list-disc">
+              {services?.map((service, index) => (
+                <>{service.length > 0 && <li key={index}>{service}</li>}</>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
@@ -135,16 +156,12 @@ export default function Details({
         {/* client notes */}
         <div>
           <h2 className="mt-2 py-3 text-[#797979]">Client Notes</h2>
-          <p className="rounded-md border border-emerald-600 p-2 text-xs text-[#797979]">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed
-            consequuntur similique at ipsa sapiente non aspernatur dolorum.
-            Quia, laboriosam autem ut corrupti officia modi cum saepe ipsam!
-            Dignissimos, repudiandae repellendus. Beatae quod quas esse. Lorem
-            ipsum dolor sit amet, consectetur adipisicing elit. Sed consequuntur
-            similique at ipsa sapiente non aspernatur dolorum. Quia, laboriosam
-            autem ut corrupti officia modi cum saepe ipsam! Dignissimos,
-            repudiandae repellendus. Beatae quod quas esse.
-          </p>
+          <textarea
+            className="w-full rounded-md border border-emerald-600 p-2 text-xs text-[#797979]"
+            defaultValue={user?.notes || ""}
+            onChange={handleSaveNote}
+            placeholder="Type your notes here..."
+          />
         </div>
         {/* shared files */}
         <div>
@@ -179,12 +196,14 @@ export default function Details({
         <div>
           <p>Estimate and Invoices</p>
           <div className="mt-4 flex flex-wrap items-center gap-4 text-xs">
-            {new Array(5).fill(0).map((item, idx) => (
+            {estimates?.map((estimate, idx) => (
               <div
                 key={idx}
                 className="flex items-center gap-x-4 rounded-full border border-emerald-600 px-2 py-1"
               >
-                <span>Estimate #123456</span>
+                <Link href={`/estimate/view/${estimate}`}>
+                  Estimate #{estimate}
+                </Link>
                 <span>
                   <AiOutlineCloseCircle />
                 </span>
@@ -196,6 +215,7 @@ export default function Details({
           </div>
         </div>
         {/* task */}
+        {/* TODO */}
         <div>
           <p>Task List</p>
           <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
@@ -217,8 +237,8 @@ export default function Details({
           </div>
         </div>
 
-        {/*  */}
-        <div className="mt-auto">
+        {/* TODO: Reply frequency - skip this for now */}
+        {/* <div className="mt-auto">
           <p className="flex items-center gap-x-2">
             <span className="text-yellow-500">
               <IoIosFlash />
@@ -243,7 +263,7 @@ export default function Details({
               Typically replies in a few days
             </span>
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );

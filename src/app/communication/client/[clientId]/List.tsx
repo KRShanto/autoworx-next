@@ -60,7 +60,13 @@ export default function List({ id }: { id: string }) {
               href={`/communication/client/${user.id}`}
             >
               <Image
-                src={user.photo}
+                src={
+                  !user.photo
+                    ? "/images/default.png"
+                    : user.photo.includes("/images/default.png")
+                      ? "/images/default.png"
+                      : `/api/images/${user.photo}`
+                }
                 alt={user.firstName + " " + user.lastName}
                 width={60}
                 height={60}
@@ -81,7 +87,7 @@ export default function List({ id }: { id: string }) {
                     selected ? "text-white" : "text-[#797979]",
                   )}
                 >
-                  Client Company
+                  {user.customerCompany}
                 </p>
               </div>
             </Link>

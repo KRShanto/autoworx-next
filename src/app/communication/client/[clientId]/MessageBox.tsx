@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useState } from "react";
 import Email from "./Email";
 import Messages from "./Messages";
+import { useServerGet } from "@/hooks/useServerGet";
+import { getClient } from "../actions/actions";
 
 export default function MessageBox({
   conversations,
@@ -14,7 +16,7 @@ export default function MessageBox({
   setBase64Data,
   setConversations,
 }: any) {
-  const user = tempClients[0];
+  const { data: user } = useServerGet(getClient, clientId);
   const [selected, setSelected] = useState<"MESSAGES" | "EMAILS" | "PHONE">(
     "MESSAGES",
   );
@@ -30,15 +32,23 @@ export default function MessageBox({
       <div className="flex h-[15%] items-center justify-between gap-2 rounded-md bg-[#006D77] p-2 text-white 2xl:h-[10%]">
         <div className="flex items-center">
           <Image
-            src={user.image}
+            src={
+              !user?.photo
+                ? "/images/default.png"
+                : user.photo.includes("/images/default.png")
+                  ? "/images/default.png"
+                  : `/api/images/${user.photo}`
+            }
             alt="user"
             width={50}
             height={50}
             className="rounded-full"
           />
           <div className="flex flex-col">
-            <p className="text-[14px] font-bold">{user.name}</p>
-            <p className="text-[8px]">{user.company}</p>
+            <p className="text-[14px] font-bold">
+              {user?.firstName} {user?.lastName}
+            </p>
+            <p className="text-[8px]">{user?.customerCompany}</p>
           </div>
         </div>
 

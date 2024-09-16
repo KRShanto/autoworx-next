@@ -156,7 +156,7 @@ export default function Page({
           body,
         };
       });
-      console.log("🚀 ~ emailsWithBody ~ emailsWithBody:", emailsWithBody)
+      console.log("🚀 ~ emailsWithBody ~ emailsWithBody:", emailsWithBody);
 
       setConversations(emailsWithBody);
     } catch (error) {
@@ -194,6 +194,7 @@ export default function Page({
           id={params.clientId}
           conversations={conversations}
           vehicles={vehicles}
+          clientId={parseInt(params.clientId)}
         />
       </div>
     </div>

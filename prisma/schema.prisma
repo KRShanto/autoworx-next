@@ -185,6 +185,7 @@ model Client {
   company         Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
   customerCompany String?        @map("customer_company")
   tagId           Int?           @map("tag_id")
+  notes           String?
   appointments    Appointment[]
   source          Source?        @relation(fields: [sourceId], references: [id])
   tag             Tag?           @relation(fields: [tagId], references: [id])

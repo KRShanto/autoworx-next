@@ -40,7 +40,7 @@ const OrderList = ({
                   {invoice.grandTotal as any}
                 </td>
                 <td className="px-4 py-2 text-left 2xl:px-10">
-                  {invoice.status.name}
+                  {invoice.status?.name}
                 </td>
               </tr>
             ))}
