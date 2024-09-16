@@ -1,7 +1,9 @@
-import { useServerGet } from "@/hooks/useServerGet";
-import { Vehicle } from "@prisma/client";
+"use client";
+
 import Image from "next/image";
-import { useState } from "react";
+import { useServerGet } from "@/hooks/useServerGet";
+import { Client, Invoice, Service, Vehicle } from "@prisma/client";
+import { useEffect, useState } from "react";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import {
   FaArrowLeft,
@@ -19,6 +21,12 @@ import {
 } from "../actions/actions";
 import { useDebounce } from "@/hooks/useDebounce";
 import Link from "next/link";
+import { db } from "@/lib/db";
+import { getCompanyId } from "@/lib/companyId";
+import { Conversation } from "../@box/page";
+import { customAlphabet } from "nanoid";
+import { createDraftEstimate } from "@/actions/estimate/invoice/createDraft";
+import { useSearchParams } from "next/navigation";
 
 function downloadAttachment(
   filename: string,
@@ -50,34 +58,59 @@ function downloadAttachment(
   document.body.removeChild(link);
 }
 
-export default function Details({
-  id,
-  conversations,
+export default function DetailsComponent({
+  client,
   vehicles,
-  clientId,
+  services,
+  conversations,
+  estimates,
 }: {
-  id: string;
-  conversations: any[];
+  client: Client;
   vehicles: Vehicle[];
-  clientId: number;
+  services: Service[];
+  conversations: Conversation[];
+  estimates: Invoice[];
 }) {
-  const { data: user } = useServerGet(getClient, clientId);
-  const { data: services } = useServerGet(getServices, clientId);
-  const { data: estimates } = useServerGet(getEstimates, clientId);
   const [selectedVehicleIndex, setSelectedVehicleIndex] = useState(0);
+  const [estimateList, setEstimateList] = useState<Invoice[]>(estimates);
+  const [notes, setNotes] = useState(client.notes);
+
+  useEffect(() => {
+    setEstimateList(estimates);
+  }, [estimates]);
+
+  useEffect(() => {
+    setNotes(client.notes);
+  }, [client.notes]);
 
   const debouncedSave = useDebounce((noteContent: string) => {
-    saveNotes(clientId, noteContent);
+    saveNotes(client.id, noteContent);
   }, 1000);
 
   const handleSaveNote = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     debouncedSave(e.target.value);
+    setNotes(e.target.value);
   };
+
+  const handleCreateEstimate = async () => {
+    const newId = customAlphabet("1234567890", 10)();
+    const res = await createDraftEstimate({
+      id: newId,
+      clientId: client.id,
+      vehicleId: vehicles[selectedVehicleIndex].id,
+    });
+
+    if (res.type === "success") {
+      setEstimateList([...estimateList, res.data]);
+    }
+  };
+
+  console.log("Services: ", services);
 
   return (
     <div className="app-shadow h-[83vh] w-[40%] rounded-lg bg-white">
       {/* Client Heading */}
-      <div className="2xl:[25%] flex h-[35%] items-center justify-between bg-[#006D77] text-xs 2xl:text-base">
+      <div className="2xl:[25%] flex h-[35%] items-center justify-between rounded-t-lg bg-[#006D77] text-xs text-white 2xl:text-base">
         <div className="h-[180px] w-[70%] rounded-lg">
           {/* Header */}
           <h2 className="p-3 text-white">Client Data</h2>
@@ -85,13 +118,13 @@ export default function Details({
           <div className="flex flex-col items-center gap-5 px-5 2xl:flex-row">
             <Image
               src={
-                !user?.photo
+                !client?.photo
                   ? "/images/default.png"
-                  : user.photo.includes("/images/default.png")
+                  : client.photo.includes("/images/default.png")
                     ? "/images/default.png"
-                    : `/api/images/${user.photo}`
+                    : `/api/images/${client.photo}`
               }
-              alt="user"
+              alt="client"
               width={50}
               height={50}
               className="m h-[50px] w-[50px] 2xl:h-[110px] 2xl:w-[110px]"
@@ -99,10 +132,10 @@ export default function Details({
 
             <div className="flex flex-col">
               <h2 className="text-white">
-                {user?.firstName} {user?.lastName}
+                {client?.firstName} {client?.lastName}
               </h2>
-              <p className="text-white">Email : {user?.email}</p>
-              <p className="text-white">Phone : {user?.mobile}</p>
+              <p className="text-white">Email : {client?.email}</p>
+              <p className="text-white">Phone : {client?.mobile}</p>
             </div>
           </div>
         </div>
@@ -144,7 +177,7 @@ export default function Details({
 
             <ul className="list-inside list-disc">
               {services?.map((service, index) => (
-                <>{service.length > 0 && <li key={index}>{service}</li>}</>
+                <>{service && <li key={index}>{service.name}</li>}</>
               ))}
             </ul>
           </div>
@@ -158,7 +191,7 @@ export default function Details({
           <h2 className="mt-2 py-3 text-[#797979]">Client Notes</h2>
           <textarea
             className="w-full rounded-md border border-emerald-600 p-2 text-xs text-[#797979]"
-            defaultValue={user?.notes || ""}
+            value={notes || ""}
             onChange={handleSaveNote}
             placeholder="Type your notes here..."
           />
@@ -196,27 +229,27 @@ export default function Details({
         <div>
           <p>Estimate and Invoices</p>
           <div className="mt-4 flex flex-wrap items-center gap-4 text-xs">
-            {estimates?.map((estimate, idx) => (
+            {estimateList?.map((estimate, idx) => (
               <div
                 key={idx}
                 className="flex items-center gap-x-4 rounded-full border border-emerald-600 px-2 py-1"
               >
-                <Link href={`/estimate/view/${estimate}`}>
-                  Estimate #{estimate}
+                <Link href={`/estimate/view/${estimate.id}`}>
+                  Estimate #{estimate.id}
                 </Link>
-                <span>
-                  <AiOutlineCloseCircle />
-                </span>
               </div>
             ))}
-            <button className="rounded-full bg-gray-400 px-6 py-1 text-white">
+            <button
+              className="rounded-full bg-gray-400 px-6 py-1 text-white"
+              onClick={handleCreateEstimate}
+            >
               <FaPlus />
             </button>
           </div>
         </div>
         {/* task */}
         {/* TODO */}
-        <div>
+        {/* <div>
           <p>Task List</p>
           <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
             {new Array(5).fill(0).map((item, idx) => (
@@ -235,35 +268,35 @@ export default function Details({
               <FaPlus />
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* TODO: Reply frequency - skip this for now */}
         {/* <div className="mt-auto">
-          <p className="flex items-center gap-x-2">
-            <span className="text-yellow-500">
-              <IoIosFlash />
-            </span>
-            <span className="text-xs text-[#006D77]">
-              Typically replies in a few seconds
-            </span>
-          </p>
-          <p className="flex items-center gap-x-2">
-            <span className="text-yellow-500">
-              <IoIosFlash />
-            </span>
-            <span className="text-xs text-[#006D77]">
-              Typically replies in a few hours
-            </span>
-          </p>
-          <p className="flex items-center gap-x-2">
-            <span className="text-yellow-500">
-              <IoIosFlash />
-            </span>
-            <span className="text-xs text-[#006D77]">
-              Typically replies in a few days
-            </span>
-          </p>
-        </div> */}
+      <p className="flex items-center gap-x-2">
+        <span className="text-yellow-500">
+          <IoIosFlash />
+        </span>
+        <span className="text-xs text-[#006D77]">
+          Typically replies in a few seconds
+        </span>
+      </p>
+      <p className="flex items-center gap-x-2">
+        <span className="text-yellow-500">
+          <IoIosFlash />
+        </span>
+        <span className="text-xs text-[#006D77]">
+          Typically replies in a few hours
+        </span>
+      </p>
+      <p className="flex items-center gap-x-2">
+        <span className="text-yellow-500">
+          <IoIosFlash />
+        </span>
+        <span className="text-xs text-[#006D77]">
+          Typically replies in a few days
+        </span>
+      </p>
+    </div> */}
       </div>
     </div>
   );

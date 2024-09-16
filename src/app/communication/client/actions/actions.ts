@@ -14,12 +14,16 @@ export async function getToken(code: string) {
     );
     const { tokens } = await oauth2Client.getToken(code);
     if (tokens.refresh_token) {
+      console.log("Refresh token", tokens.refresh_token);
       cookies().set("gmail_refresh_token", tokens.refresh_token.toString(), {
         httpOnly: true,
       });
     }
-  } catch (error) {}
-  redirect("/settings/communications");
+
+    redirect("/settings/communications");
+  } catch (error) {
+    console.log("Error getting token", error);
+  }
 }
 
 export async function getClients() {

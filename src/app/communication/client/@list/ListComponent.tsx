@@ -1,21 +1,21 @@
+"use client";
+
 import { cn } from "@/lib/cn";
 import { Client } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getClients } from "../actions/actions";
 
 // TODO: use layout for this component
-export default function List({ id }: { id: string }) {
-  const [clients, setClients] = useState<Client[]>([]);
+export default function ListComponent({
+  clients,
+  id,
+}: {
+  clients: Client[];
+  id: string;
+}) {
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [search, setSearch] = useState<string>("");
-
-  useEffect(() => {
-    getClients().then((data) => {
-      setClients(data);
-    });
-  }, []);
 
   useEffect(() => {
     if (search !== "") {
@@ -47,27 +47,27 @@ export default function List({ id }: { id: string }) {
 
       {/* List */}
       <div className="mt-2 flex h-[87%] flex-col gap-2 overflow-y-auto max-[1835px]:h-[82%]">
-        {filteredClients?.map((user: any) => {
-          const selected = id == user.id;
+        {filteredClients?.map((client: any) => {
+          const selected = id == client.id;
 
           return (
             <Link
-              key={user.id}
+              key={client.id}
               className={cn(
                 "flex items-center gap-2 rounded-md p-3",
                 selected ? "bg-[#006D77]" : "bg-[#F2F2F2]",
               )}
-              href={`/communication/client/${user.id}`}
+              href={`/communication/client?clientId=${client.id}`}
             >
               <Image
                 src={
-                  !user.photo
+                  !client.photo
                     ? "/images/default.png"
-                    : user.photo.includes("/images/default.png")
+                    : client.photo.includes("/images/default.png")
                       ? "/images/default.png"
-                      : `/api/images/${user.photo}`
+                      : `/api/images/${client.photo}`
                 }
-                alt={user.firstName + " " + user.lastName}
+                alt={client.firstName + " " + client.lastName}
                 width={60}
                 height={60}
                 className="rounded-full max-[1400px]:h-[40px] max-[1400px]:w-[40px]"
@@ -79,7 +79,7 @@ export default function List({ id }: { id: string }) {
                     selected ? "text-white" : "text-[#797979]",
                   )}
                 >
-                  {user.firstName} {user.lastName}
+                  {client.firstName} {client.lastName}
                 </p>
                 <p
                   className={cn(
@@ -87,7 +87,7 @@ export default function List({ id }: { id: string }) {
                     selected ? "text-white" : "text-[#797979]",
                   )}
                 >
-                  {user.customerCompany}
+                  {client.customerCompany}
                 </p>
               </div>
             </Link>
