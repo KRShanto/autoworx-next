@@ -7,6 +7,8 @@ import MakePayment from "./MakePayment";
 import { errorToast, successToast } from "@/lib/toast";
 import { checkCouponCode } from "@/actions/coupon/checkCouponCode";
 import { RotatingLines } from "react-loader-spinner";
+import { useListsStore } from "@/stores/lists";
+import { usePathname } from "next/navigation";
 
 export function BillSummary() {
   const {
@@ -19,6 +21,7 @@ export function BillSummary() {
     due,
     depositMethod,
     depositNotes,
+    coupon,
   } = useEstimateCreateStore();
   const {
     setSubtotal,
@@ -29,13 +32,16 @@ export function BillSummary() {
     setDue,
     setDepositMethod,
     setDepositNotes,
+    setCoupon,
   } = useEstimateCreateStore();
-  const [coupon, setCoupon] = useState("");
+  const { client } = useListsStore();
+  const [couponInput, setCouponInput] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     let newServicesTotal = 0;
-    let newDiscountTotal = 0;
+    let newDiscountTotal = discount;
 
     items.forEach((item) => {
       const { service, materials, labor } = item;
@@ -95,13 +101,22 @@ export function BillSummary() {
   }, [grandTotal, deposit]);
 
   async function checkCoupon() {
-    if (!coupon) return;
+    if (!couponInput || !client) return;
 
     setCouponLoading(true);
-    const res = await checkCouponCode(coupon);
+    const res = await checkCouponCode({
+      code: couponInput,
+      clientId: client?.id,
+    });
 
     if (res.type === "success") {
       successToast("Coupon applied successfully");
+      setCoupon(res.data);
+      setDiscount(
+        Number(discount) +
+          Number(res.data.discount) -
+          Number(coupon ? coupon.discount : 0),
+      );
     } else {
       errorToast(res.message!);
     }
@@ -154,27 +169,33 @@ export function BillSummary() {
         <dl className="flex justify-between">
           <dt>Grand Total</dt> <dd>${grandTotal}</dd>
         </dl>
-        <div className="flex justify-between rounded-md border p-1">
-          <input
-            type="text"
-            placeholder="Add Coupon"
-            className="w-full bg-transparent p-2 focus:outline-none"
-            value={coupon}
-            onChange={(e) => setCoupon(e.target.value)}
-          />
-          {couponLoading ? (
-            <>
-              <RotatingLines width="24" strokeColor="#fff" />
-            </>
-          ) : (
-            <button
-              className="rounded-md p-2 transition-colors hover:bg-white/20"
-              onClick={checkCoupon}
-            >
-              Apply
-            </button>
-          )}
-        </div>
+
+        {/* Coupon code */}
+        {pathname.includes("/estimate/create") && (
+          <div className="flex justify-between rounded-md border p-1">
+            <input
+              type="text"
+              placeholder="Add Coupon"
+              className="w-full bg-transparent p-2 focus:outline-none"
+              value={couponInput}
+              onChange={(e) => setCouponInput(e.target.value)}
+            />
+            {couponLoading ? (
+              <>
+                <RotatingLines width="24" strokeColor="#fff" />
+              </>
+            ) : (
+              <button
+                className="rounded-md p-2 transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
+                onClick={checkCoupon}
+                disabled={!client}
+                title={!client ? "Please select a client" : undefined}
+              >
+                Apply
+              </button>
+            )}
+          </div>
+        )}
         <MakePayment />
       </div>
     </>

@@ -109,11 +109,17 @@ export function SelectTags({
                 });
               } else {
                 setDropdownsOpen({
-                  SERVICE: type === "SERVICE" ? [...index] : -1,
-                  MATERIAL: type === "MATERIAL" ? [...index] : -1,
-                  LABOR: type === "LABOR" ? [...index] : -1,
-                  TAG: type === "TAG" ? [...index] : -1,
+                  SERVICE: type === "SERVICE" ? [...index] : [-1,-1],
+                  MATERIAL: type === "MATERIAL" ? [...index] : [-1,-1],
+                  LABOR: type === "LABOR" ? [...index] : [-1,-1],
+                  TAG: type === "TAG" ? [...index] : [-1,-1],
                 });
+                // setDropdownsOpen({
+                //   SERVICE: type === "SERVICE" ? [...index] : -1,
+                //   MATERIAL: type === "MATERIAL" ? [...index] : -1,
+                //   LABOR: type === "LABOR" ? [...index] : -1,
+                //   TAG: type === "TAG" ? [...index] : -1,
+                // });
               }
             }
           }}

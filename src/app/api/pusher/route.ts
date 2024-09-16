@@ -39,6 +39,22 @@ export async function POST(req: Request, res: Response) {
       message,
     };
     if (type === sendType.Group) {
+      const isUserInExistGroup = await db.group.findFirst({
+        where: {
+          id: to,
+          users: {
+            some: {
+              id: userId,
+            },
+          },
+        },
+      });
+      if (!isUserInExistGroup) {
+        return new Response(
+          JSON.stringify({ message: "User is not in the group", success: false }),
+          { status: 400 },
+        );
+      }
       channel = `group-${to}`;
       messageData = {
         ...messageData,
@@ -86,6 +102,8 @@ export async function POST(req: Request, res: Response) {
     );
   } catch (e) {
     console.error(e);
-    return new Response("Failed to send message", { status: 500 });
+    return new Response(JSON.stringify({ message: "Failed to send message" , success: false}), {
+      status: 500,
+    });
   }
 }

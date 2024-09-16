@@ -2,7 +2,7 @@ import { cn } from "@/lib/cn";
 import { Item } from "@/stores/estimate-create";
 import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   FaChevronDown,
   FaChevronUp,
@@ -47,7 +47,9 @@ export default function ItemSelector<T>({
   const [open, setOpen] = useState(false);
   const [itemIist, setItemIist] = useState<T[]>(list);
   const [selected, setSelected] = useState<T | null>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
   const { open: openPopup } = useEstimatePopupStore();
+
   useEffect(() => {
     if (
       dropdownsOpen[type][0] === index[0] &&
@@ -58,6 +60,7 @@ export default function ItemSelector<T>({
       setOpen(false);
     }
   }, [dropdownsOpen]);
+
   useEffect(() => {
     setItemIist(list);
   }, [list]);
@@ -85,11 +88,16 @@ export default function ItemSelector<T>({
 
   return (
     <div
-      onClick={() => {
+      onClick={(e) => {
+        if (searchRef?.current?.contains(e.target as Node)) {
+          return;
+        }
+
         if (
           dropdownsOpen[type][0] === index[0] &&
           dropdownsOpen[type][1] === index[1]
         ) {
+          console.log("here");
           setDropdownsOpen({
             SERVICE: [-1, -1],
             MATERIAL: [-1, -1],
@@ -97,12 +105,20 @@ export default function ItemSelector<T>({
             TAG: [-1, -1],
           });
         } else {
+          console.log("there");
+
           setDropdownsOpen({
-            SERVICE: type === "SERVICE" ? [...index] : -1,
-            MATERIAL: type === "MATERIAL" ? [...index] : -1,
-            LABOR: type === "LABOR" ? [...index] : -1,
-            TAG: -1,
+            SERVICE: type === "SERVICE" ? [...index] : [-1, -1],
+            MATERIAL: type === "MATERIAL" ? [...index] : [-1, -1],
+            LABOR: type === "LABOR" ? [...index] : [-1, -1],
+            TAG: [-1, -1],
           });
+          // setDropdownsOpen({
+          //   SERVICE: type === "SERVICE" ? [...index] : -1,
+          //   MATERIAL: type === "MATERIAL" ? [...index] : -1,
+          //   LABOR: type === "LABOR" ? [...index] : -1,
+          //   TAG: -1,
+          // });
         }
       }}
     >
@@ -187,6 +203,7 @@ export default function ItemSelector<T>({
             <div className="relative m-2">
               <FaSearch className="absolute left-2 top-1/2 -translate-y-1/2 transform text-[#797979]" />
               <input
+                ref={searchRef}
                 type="text"
                 placeholder="Search"
                 className="w-full rounded-md border-2 border-slate-400 p-1 pl-6 pr-10 focus:outline-none"

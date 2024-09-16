@@ -168,28 +168,29 @@ model OAuthToken {
 // Client of a company.
 // Client is just data, they can't login.
 model Client {
-  id              Int           @id @default(autoincrement())
-  firstName       String        @map("first_name")
-  lastName        String?       @map("last_name")
+  id              Int            @id @default(autoincrement())
+  firstName       String         @map("first_name")
+  lastName        String?        @map("last_name")
   mobile          String?
   email           String?
   address         String?
   city            String?
   state           String?
   zip             String?
-  photo           String        @default("/images/default.png")
-  sourceId        Int?          @map("source_id")
-  companyId       Int           @map("company_id")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @default(now()) @updatedAt @map("updated_at")
-  company         Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  customerCompany String?       @map("customer_company")
-  tagId           Int?          @map("tag_id")
+  photo           String         @default("/images/default.png")
+  sourceId        Int?           @map("source_id")
+  companyId       Int            @map("company_id")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @default(now()) @updatedAt @map("updated_at")
+  company         Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customerCompany String?        @map("customer_company")
+  tagId           Int?           @map("tag_id")
   appointments    Appointment[]
-  source          Source?       @relation(fields: [sourceId], references: [id])
-  tag             Tag?          @relation(fields: [tagId], references: [id])
+  source          Source?        @relation(fields: [sourceId], references: [id])
+  tag             Tag?           @relation(fields: [tagId], references: [id])
   Vehicle         Vehicle[]
   Invoice         Invoice[]
+  ClientCoupon    ClientCoupon[]
 
   @@index([companyId], name: "fk_customers_company")
   @@map("Client")
@@ -832,7 +833,7 @@ model Group {
 }
 
 model Coupon {
-  id           Int          @id @default(autoincrement())
+  id           Int            @id @default(autoincrement())
   name         String
   code         String
   type         String
@@ -842,10 +843,11 @@ model Coupon {
   discountType DiscountType
   status       CouponStatus
   redemptions  Int
-  companyId    Int          @map("company_id")
-  createdAt    DateTime     @default(now()) @map("created_at")
-  updatedAt    DateTime     @default(now()) @updatedAt @map("updated_at")
-  company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId    Int            @map("company_id")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @default(now()) @updatedAt @map("updated_at")
+  company      Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  ClientCoupon ClientCoupon[]
 }
 
 enum CouponStatus {
@@ -856,6 +858,16 @@ enum CouponStatus {
 enum DiscountType {
   Percentage
   Fixed
+}
+
+model ClientCoupon {
+  id        Int      @id @default(autoincrement())
+  couponId  Int      @map("coupon_id")
+  clientId  Int      @map("client_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  coupon    Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
 }
 
 model Column {

@@ -5,7 +5,14 @@ import { createTask } from "@/actions/task/createTask";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
-import { InvoiceType, Service, Material, Labor, Tag } from "@prisma/client";
+import {
+  InvoiceType,
+  Service,
+  Material,
+  Labor,
+  Tag,
+  Coupon,
+} from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export async function createInvoice({
@@ -34,6 +41,8 @@ export async function createInvoice({
   photos,
   items,
   tasks,
+
+  coupon,
 }: {
   invoiceId: string;
   type: InvoiceType;
@@ -66,6 +75,8 @@ export async function createInvoice({
   }[];
 
   tasks: { id: undefined | number; task: string }[];
+
+  coupon?: Coupon | null;
 }): Promise<ServerAction> {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
@@ -164,6 +175,26 @@ export async function createInvoice({
       invoiceId: invoice.id,
     });
   });
+
+  // Update coupon
+  if (coupon) {
+    await db.coupon.update({
+      where: {
+        id: coupon.id,
+      },
+      data: {
+        redemptions: coupon.redemptions + 1,
+      },
+    });
+
+    // Create client coupon
+    await db.clientCoupon.create({
+      data: {
+        clientId: clientId!,
+        couponId: coupon.id,
+      },
+    });
+  }
 
   revalidatePath("/estimate");
 

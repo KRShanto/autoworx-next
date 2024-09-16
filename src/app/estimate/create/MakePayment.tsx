@@ -107,7 +107,7 @@ export default function MakePayment() {
 
   async function handleSubmit() {
     const res1 = await createInvoice();
-
+    console.log({ res1 });
     let res2;
 
     if (isEditPage && payment) {
