@@ -80,6 +80,7 @@ export async function addAppointment(
     });
   }
 
+  // TODO: use `createDraftEstimate` action
   // Create draft estimate (if doesn't exist)
   if (appointment.draftEstimate) {
     const draftEstimate = await db.invoice.findFirst({
