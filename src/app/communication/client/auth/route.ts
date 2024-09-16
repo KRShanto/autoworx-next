@@ -1,13 +1,12 @@
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { google } from "googleapis";
+import { NextRequest } from "next/server";
+import { redirect } from "next/navigation";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: { code: string };
-}) {
-  const code = searchParams.code;
+export async function GET(request: NextRequest) {
+  const url = new URL(request.url);
+  const code = url.searchParams.get("code") as string;
 
   try {
     const oauth2Client = new google.auth.OAuth2(
@@ -31,5 +30,5 @@ export default async function Page({
     console.log("Error getting token", error);
   }
 
-  return <div>Connecting with Google...</div>;
+  redirect("/settings/communications");
 }
