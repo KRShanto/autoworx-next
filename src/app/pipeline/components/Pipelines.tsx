@@ -50,6 +50,7 @@ interface Lead {
   name: string;
   email: string;
   phone: string;
+  clientId: number | null;
   vehicle: string;
   services: {
     completed: string[];
@@ -158,6 +159,7 @@ export default function Pipelines({
           name: `${invoice.client?.firstName ?? ""} ${invoice.client?.lastName ?? ""}`.trim(),
           email: invoice.client?.email ?? "",
           phone: invoice.client?.mobile ?? "",
+          clientId: invoice.clientId,
           vehicle:
             `${invoice.vehicle?.year ?? ""} ${invoice.vehicle?.make ?? ""} ${invoice.vehicle?.model ?? ""}`.trim(),
           workOrderStatus: invoice.workOrderStatus ?? "Pending",
@@ -450,7 +452,7 @@ export default function Pipelines({
                   </h2>
 
                   <ul
-                    className="mt-1 flex flex-col gap-1 overflow-auto p-1 min-h-[70vh]"
+                    className="mt-1 flex min-h-[70vh] flex-col gap-1 overflow-auto p-1"
                     style={{ maxHeight: "70vh" }}
                   >
                     {item.leads.map((lead, leadIndex) => {
@@ -613,13 +615,19 @@ export default function Pipelines({
                               )}
                               <div className="flex justify-between">
                                 <div className="flex items-center gap-2">
-                                  <Link href="/" className="group relative">
+                                  <Link
+                                    href={`/communication/client?clientId=${lead.clientId}`}
+                                    className="group relative"
+                                  >
                                     <PiWechatLogoLight size={18} />
                                     <span className="invisible absolute bottom-full left-14 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
                                       Communications
                                     </span>
                                   </Link>
-                                  <Link href="/" className="group relative">
+                                  <Link
+                                    href={`/estimate/view/${lead.invoiceId}`}
+                                    className="group relative"
+                                  >
                                     <img
                                       src="/icons/invoice.png"
                                       alt=""
