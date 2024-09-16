@@ -36,3 +36,18 @@ export async function getWorkOrders() {
 
   return invoices;
 }
+ export const updateAssignedTo = async(invoiceId:string,userId:number)=>{
+  try {
+    await db.invoice.update({
+      where: { id: invoiceId },
+      data: {
+        assignedToId: userId, 
+      },
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating assignedTo:", error);
+    throw new Error("Error updating assignedTo: " + error);
+  }
+
+ }

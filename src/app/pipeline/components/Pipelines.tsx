@@ -21,7 +21,10 @@ import { EmployeeTagSelector } from "./EmployeeTagSelector";
 import TaskForm from "./TaskForm";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ServiceSelector from "./ServiceSelector";
-import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
+import {
+  getWorkOrders,
+  updateAssignedTo,
+} from "@/actions/pipelines/getWorkOrders";
 import { Tooltip } from "antd";
 import { updateInvoiceStatus } from "@/actions/estimate/invoice/updateInvoiceStatus";
 import { getEmployees } from "@/actions/employee/get";
@@ -40,7 +43,7 @@ interface Service {
 interface Employee {
   id: number;
   firstName: string;
-  lastName: string;
+  lastName: string | null;
 }
 interface Lead {
   invoiceId: string;
@@ -57,7 +60,7 @@ interface Lead {
   tags: InvoiceTag[];
 
   tasks?: Task[];
-  assignedTo: User | null;
+  assignedTo: User | Employee | null;
 }
 interface InvoiceTag {
   id: number;
@@ -195,11 +198,6 @@ export default function Pipelines({
   }>({});
   const [leadTags, setLeadTags] = useState<{ [key: string]: Tag[] }>({});
 
-  // Track selected services per item
-  const [selectedServices, setSelectedServices] = useState<{
-    [key: string]: Service | null;
-  }>({});
-
   const [openServiceDropdown, setOpenServiceDropdown] = useState<{
     [key: string]: boolean;
   }>({});
@@ -218,7 +216,7 @@ export default function Pipelines({
   const getInitials = (employee: Employee | null) => {
     if (employee) {
       const firstNameInitial = employee.firstName.charAt(0).toUpperCase();
-      const lastNameInitial = employee.lastName.charAt(0).toUpperCase();
+      const lastNameInitial = employee.lastName?.charAt(0).toUpperCase();
       return `${firstNameInitial}${lastNameInitial}`;
     }
     return "";
@@ -226,13 +224,44 @@ export default function Pipelines({
 
   const createEmployeeSelectHandler =
     (categoryIndex: number, leadIndex: number) =>
-    (value: SetStateAction<Employee | null>) => {
+    async (value: SetStateAction<Employee | null>) => {
       const key = `${categoryIndex}-${leadIndex}`;
+      const resolvedValue =
+        typeof value === "function" ? value(selectedEmployees[key]) : value;
+
+      // Update the selected employee in the state
       setSelectedEmployees((prevState) => ({
         ...prevState,
-        [key]: typeof value === "function" ? value(prevState[key]) : value,
+        [key]: resolvedValue,
       }));
+
+      // Close the dropdown
       setOpenDropdownIndex(null);
+
+      const invoiceId = pipelineData[categoryIndex].leads[leadIndex].invoiceId;
+
+      if (resolvedValue && resolvedValue.id) {
+        try {
+          const response = await updateAssignedTo(invoiceId, resolvedValue.id);
+          if (response.success) {
+            // Update pipelineData to persist the selected employee in the UI
+            const updatedPipelineData = [...pipelineData];
+            updatedPipelineData[categoryIndex].leads[leadIndex].assignedTo =
+              resolvedValue;
+
+            setPipelineData(updatedPipelineData); // Update the state to reflect the change
+          } else {
+            console.error("Failed to update assigned employee");
+          }
+          if (!response.success) {
+            console.error("Failed to update assigned employee");
+          }
+        } catch (error) {
+          console.error("Error updating assigned employee:", error);
+        }
+      } else {
+        console.error("No employee selected");
+      }
     };
 
   const handleTagDropdownToggle = (
@@ -257,7 +286,6 @@ export default function Pipelines({
       try {
         const result = await saveInvoiceTag(invoiceId, selectedTag.id);
         if (result) {
-          // Update the pipelineData with the newly added tag
           const updatedPipelineData = [...pipelineData];
           updatedPipelineData[categoryIndex].leads[leadIndex].tags.push({
             id: selectedTag.id,
@@ -422,25 +450,22 @@ export default function Pipelines({
                   </h2>
 
                   <ul
-                    className="mt-1 flex flex-col gap-1 overflow-auto p-1"
+                    className="mt-1 flex flex-col gap-1 overflow-auto p-1 min-h-[70vh]"
                     style={{ maxHeight: "70vh" }}
                   >
                     {item.leads.map((lead, leadIndex) => {
                       const key = `${categoryIndex}-${leadIndex}`;
-                      const selectedEmployee = selectedEmployees[key];
+
                       const isDropdownOpen =
                         openDropdownIndex?.category === categoryIndex &&
                         openDropdownIndex.index === leadIndex;
 
                       const isTagDropdownOpen = tagDropdownStates[key];
-                      const tagsForLead = leadTags[key] || [];
-
-                      const selectedService = selectedServices[key];
 
                       const isServiceDropdownOpen =
                         openServiceDropdown[key] || false;
-                      const invoiceTags = lead.tags || []; // Fetch InvoiceTags
-                      // console.log("Lead", lead);
+
+                      const selectedEmployee = lead.assignedTo;
                       return (
                         <Draggable
                           key={lead.invoiceId}
@@ -491,13 +516,16 @@ export default function Pipelines({
                                       setOpenDropdown={() =>
                                         setOpenDropdownIndex(null)
                                       }
+                                      companyUsers={companyUsers}
                                     />
                                   </div>
                                 )}
                               </div>
 
                               <div className="mb-1 flex flex-wrap items-center gap-1">
-                                {pipelineData[categoryIndex].leads[leadIndex].tags.map((invoiceTag) => (
+                                {pipelineData[categoryIndex].leads[
+                                  leadIndex
+                                ].tags.map((invoiceTag) => (
                                   <span
                                     key={`tag-${invoiceTag.id}`}
                                     className="mr-2 inline-flex h-[20px] items-center rounded bg-gray-300 px-1 py-1 text-xs font-semibold text-black"

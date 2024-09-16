@@ -1,18 +1,15 @@
 import { Dispatch, SetStateAction } from "react";
 import PipelineSelector from "./PipelineSelector";
 import { SelectProps } from "@/components/Lists/select-props";
+import { User } from "@prisma/client";
 
 interface Employee {
   id: number;
   firstName: string;
-  lastName: string;
+  lastName: string|null;
 }
 
-const demoEmployees: Employee[] = [
-  { id: 1, firstName: "Shanto", lastName: "x" },
-  { id: 2, firstName: "Noman", lastName: "y" },
-  { id: 3, firstName: "Satyajit", lastName: "z" },
-];
+
 
 export function EmployeeSelector({
   name = "employeeId",
@@ -20,9 +17,10 @@ export function EmployeeSelector({
   setValue,
   openDropdown,
   setOpenDropdown,
-}: SelectProps<Employee | null>) {
+  companyUsers
+}: SelectProps<Employee | null> & { companyUsers: User[] }) {
   const handleSearch = (search: string) =>
-    demoEmployees.filter((employee) =>
+    companyUsers.filter((employee) =>
       `${employee.firstName} ${employee.lastName}`
         .toLowerCase()
         .includes(search.toLowerCase())
@@ -44,7 +42,7 @@ export function EmployeeSelector({
             </div>
           </div>
         )}
-        items={demoEmployees}
+        items={companyUsers}
         onSearch={handleSearch}
         openState={[
           openDropdown ?? false,

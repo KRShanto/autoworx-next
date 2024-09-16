@@ -95,8 +95,8 @@ export default function TaskForm({
         </div>
         {/* Hover content */}
         {tasks.length > 0 && (
-         <div className="absolute  z-[9999] mt-1 hidden w-[200px] h-[100px] max-h-[120px] -left-36 transform rounded-lg border border-[#66738C] bg-white p-2 overflow-y-auto group-hover:block"
-         style={{ top: '-6.5rem' }}
+         <div className="absolute  z-[9999] mt-1 hidden w-[200px] h-[110px] max-h-[120px] -left-36 transform rounded-lg border border-[#66738C] bg-white p-2 overflow-y-auto group-hover:block"
+         style={{ top: '-7rem' }}
          >
             {tasks.map((task) => (
               <div
