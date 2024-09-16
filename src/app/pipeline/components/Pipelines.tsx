@@ -25,6 +25,10 @@ import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
 import { Tooltip } from "antd";
 import { updateInvoiceStatus } from "@/actions/estimate/invoice/updateInvoiceStatus";
 import { getEmployees } from "@/actions/employee/get";
+import {
+  saveInvoiceTag,
+  removeInvoiceTag,
+} from "@/actions/pipelines/invoiceTag";
 //dummy services
 
 //interfaces
@@ -50,11 +54,15 @@ interface Lead {
   };
   createdAt: string;
   workOrderStatus?: string;
-  tags: Tag[];
+  tags: InvoiceTag[];
+
   tasks?: Task[];
   assignedTo: User | null;
 }
-
+interface InvoiceTag {
+  id: number;
+  tag: Tag;
+}
 interface PipelineData {
   title: string;
   leads: Lead[];
@@ -86,6 +94,7 @@ type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
     };
     tags: {
       select: {
+        id: true;
         tag: true;
       };
     };
@@ -153,7 +162,7 @@ export default function Pipelines({
             completed: completedServices,
             incomplete: incompleteServices,
           },
-          tags: invoice.tags.map((tag) => tag.tag),
+          tags: invoice.tags.map((tag) => ({ id: tag.id, tag: tag.tag })),
           tasks: invoice.tasks,
           assignedTo: invoice.assignedTo,
           createdAt: new Date(invoice.createdAt).toDateString(),
@@ -237,29 +246,71 @@ export default function Pipelines({
     }));
   };
   //for tag handling
-  const handleTagSelect = (
+  const handleTagSelect = async (
     categoryIndex: number,
     leadIndex: number,
     selectedTag: Tag | undefined,
   ) => {
     if (selectedTag) {
       const key = `${categoryIndex}-${leadIndex}`;
-      setLeadTags((prevState) => {
-        const existingTags = prevState[key] || [];
-        const tagExists = existingTags.find((tag) => tag.id === selectedTag.id);
-        //deleting each tag
-        if (tagExists) {
-          return {
-            ...prevState,
-            [key]: existingTags.filter((tag) => tag.id !== selectedTag.id),
-          };
-        } else {
-          return {
-            ...prevState,
-            [key]: [...existingTags, selectedTag],
-          };
+      const invoiceId = pipelineData[categoryIndex].leads[leadIndex].invoiceId;
+      try {
+        const result = await saveInvoiceTag(invoiceId, selectedTag.id);
+        if (result) {
+          // Update the pipelineData with the newly added tag
+          const updatedPipelineData = [...pipelineData];
+          updatedPipelineData[categoryIndex].leads[leadIndex].tags.push({
+            id: selectedTag.id,
+            tag: selectedTag,
+          });
+          setPipelineData(updatedPipelineData);
+
+          // Optionally update the leadTags state (if needed)
+          setLeadTags((prevState) => {
+            const existingTags = prevState[key] || [];
+            return {
+              ...prevState,
+              [key]: [...existingTags, selectedTag],
+            };
+          });
         }
-      });
+      } catch (error) {
+        console.error("Error saving tag:", error);
+      }
+    }
+  };
+  // Handle tag removal
+  const handleTagRemove = async (
+    categoryIndex: number,
+    leadIndex: number,
+    tagToRemove: Tag,
+  ) => {
+    const key = `${categoryIndex}-${leadIndex}`;
+    const invoiceId = pipelineData[categoryIndex].leads[leadIndex].invoiceId;
+
+    try {
+      // Remove the tag from the database
+      const result = await removeInvoiceTag(invoiceId, tagToRemove.id);
+
+      if (result) {
+        // Update the UI after removing the tag
+        const updatedPipelineData = [...pipelineData];
+        updatedPipelineData[categoryIndex].leads[leadIndex].tags =
+          updatedPipelineData[categoryIndex].leads[leadIndex].tags.filter(
+            (tag) => tag.id !== tagToRemove.id,
+          );
+        setPipelineData(updatedPipelineData);
+        setLeadTags((prevState) => {
+          const existingTags =
+            prevState[key] || pipelineData[categoryIndex].leads[leadIndex].tags;
+          return {
+            ...prevState,
+            [key]: existingTags.filter((tag) => tag.id !== tagToRemove.id),
+          };
+        });
+      }
+    } catch (error) {
+      console.error("Error removing tag:", error);
     }
   };
 
@@ -388,7 +439,7 @@ export default function Pipelines({
 
                       const isServiceDropdownOpen =
                         openServiceDropdown[key] || false;
-
+                      const invoiceTags = lead.tags || []; // Fetch InvoiceTags
                       // console.log("Lead", lead);
                       return (
                         <Draggable
@@ -402,7 +453,7 @@ export default function Pipelines({
                               {...provided.dragHandleProps}
                               ref={provided.innerRef}
                               key={lead.invoiceId}
-                              className="relative mx-1 my-1 rounded-xl border bg-white p-1 overflow-hidden"
+                              className="relative mx-1 my-1 max-w-[350px] overflow-hidden rounded-xl border bg-white p-1"
                             >
                               <div className="flex items-center justify-between">
                                 <h3 className="font-inter overflow-auto pb-2 font-semibold text-black">
@@ -445,24 +496,24 @@ export default function Pipelines({
                                 )}
                               </div>
 
-                              <div className="mb-1 flex items-center">
-                                {lead.tags?.map((tag) => (
+                              <div className="mb-1 flex flex-wrap items-center gap-1">
+                                {pipelineData[categoryIndex].leads[leadIndex].tags.map((invoiceTag) => (
                                   <span
-                                    key={tag.id}
+                                    key={`tag-${invoiceTag.id}`}
                                     className="mr-2 inline-flex h-[20px] items-center rounded bg-gray-300 px-1 py-1 text-xs font-semibold text-black"
                                     style={{
-                                      backgroundColor: tag?.bgColor,
-                                      color: tag?.textColor,
+                                      backgroundColor: invoiceTag.tag?.bgColor,
+                                      color: invoiceTag.tag?.textColor,
                                     }}
                                   >
-                                    {tag.name}
+                                    {invoiceTag.tag.name}
                                     <div
                                       className="ml-1 text-xs text-white"
                                       onClick={() =>
-                                        handleTagSelect(
+                                        handleTagRemove(
                                           categoryIndex,
                                           leadIndex,
-                                          tag,
+                                          invoiceTag.tag,
                                         )
                                       }
                                     >
@@ -549,7 +600,7 @@ export default function Pipelines({
                                       style={{ marginBottom: "0px" }}
                                     />
                                     <span className="invisible absolute bottom-full left-14 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
-                                      Create Draft Estimate
+                                      View Work Order
                                     </span>
                                   </Link>
                                   <Link href="/" className="group relative">

@@ -23,7 +23,9 @@ export async function getWorkOrders() {
         },
       },
       tags: {
+      
         select: {
+          id:true,
           tag: true,
         },
       },
