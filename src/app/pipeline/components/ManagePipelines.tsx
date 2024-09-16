@@ -9,7 +9,7 @@ interface Column {
   id: number | null;
   title: string;
   type: string;
-  order: number;  // Make sure 'order' is required here
+  order: number; 
 }
 
 interface ManagePipelinesModalProps {
