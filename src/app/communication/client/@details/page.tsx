@@ -119,7 +119,6 @@ export default async function Details({
 
   const data: EmailData[] = await res.json();
 
-  console.log("🚀 ~ getEmails ~ data:", data);
 
   const conversations = data?.map((emailData) => {
     let body = decodeEmails(emailData) || "";
