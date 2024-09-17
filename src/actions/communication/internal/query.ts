@@ -2,15 +2,6 @@
 
 import { db } from "@/lib/db";
 
-export const getGroupsData = async (userId: number) => {
-  return await db.group.findMany({
-    where: { users: { some: { id: userId } } },
-    include: {
-      users: true,
-    },
-  });
-};
-
 export const getGroupById = async (groupId: number, userId: number) => {
   const group = await db.group.findUnique({
     where: {

@@ -66,6 +66,7 @@ export default function UsersArea({
   }, []);
 
   const totalMessageBoxLength = usersList.length + groupsList.length;
+  
   return (
     <div
       className={cn(

@@ -60,7 +60,7 @@ export async function POST(req: Request, res: Response) {
       }
       channel = `group-${to}`;
       messageData = {
-        ...messageData,
+        from: userId,
         groupId: to,
         message,
       };
