@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { AuthSession } from "@/types/auth";
 import Body from "./Body";
 import { Metadata } from "next";
+import { getGroupsData } from "@/actions/communication/internal/query";
 
 export const metadata: Metadata = {
   title: "Communication Hub - Internal",
@@ -20,35 +21,11 @@ export default async function InternalPage() {
     },
   });
 
-  const groups = await db.group.findMany({
-    where: { users: { some: { id: parseInt(session?.user?.id) } } },
-    include: {
-      users: true,
-    },
-  });
+  const groups = await getGroupsData(parseInt(session?.user?.id!));
 
-  const messages = await db.message.findMany({
-    where: {
-      OR: [
-        {
-          from: parseInt(session?.user?.id),
-        },
-        {
-          to: parseInt(session?.user?.id),
-        },
-      ],
-    },
-    include: {
-      attachment: true
-    }
-  });
   return (
     <div className="mt-5 flex gap-5">
-      <Body
-        users={users}
-        currentUser={session.user}
-        groups={groups}
-      />
+      <Body users={users} currentUser={session.user} groups={groups} />
     </div>
   );
 }

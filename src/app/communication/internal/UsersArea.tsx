@@ -61,7 +61,7 @@ export default function UsersArea({
       );
 
     return () => {
-      channel.unbind();
+      channel.unbind("message");
     };
   }, []);
 

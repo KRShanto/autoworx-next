@@ -17,12 +17,12 @@ export const deleteUserFromGroup = async (userId: number, groupId: number) => {
       },
     });
     if (deleteUser) {
-      pusher.trigger("create", "create-group", {
+      pusher.trigger("delete-group", "delete", {
         userId,
         groupId,
       });
     }
-    revalidatePath("/communication/internal");
+    // revalidatePath("/communication/internal");
     return {
       status: 200,
       message: "User deleted from group",

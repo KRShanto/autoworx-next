@@ -15,6 +15,7 @@ type TProps = {
   totalMessageBox: number;
   group: Group & { users: User[] };
 };
+
 export default function GroupMessageBox({
   group,
   totalMessageBox,
@@ -93,9 +94,10 @@ export default function GroupMessageBox({
       );
 
     return () => {
-      channel.unbind();
+      channel.unbind("message");
     };
   }, []);
+
   return (
     <MessageBox
       fromGroup

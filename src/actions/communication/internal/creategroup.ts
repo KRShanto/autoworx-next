@@ -21,12 +21,14 @@ export const createGroup = async ({ name, users }: TGroup) => {
         },
       },
     });
+
     if (groupData) {
-      pusher.trigger("delete-group", "delete", {
+      pusher.trigger("create-group", "create", {
+        groupId: groupData.id,
         usersIds: users,
       });
     }
-    revalidatePath("/communication/internal");
+    // revalidatePath("/communication/internal");
     return { status: 200, data: groupData };
   } catch (err) {
     throw err;
