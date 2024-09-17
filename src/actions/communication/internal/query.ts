@@ -34,17 +34,7 @@ export const getGroupMessagesById = async (groupId: number) => {
 export const getUserMessagesById = async (userId: number) => {
   const messages = await db.message.findMany({
     where: {
-      OR: [
-        {
-          from: userId,
-        },
-        {
-          to: userId,
-        },
-        {
-          groupId: null,
-        },
-      ],
+      AND: [{ OR: [{ from: userId }, { to: userId }] }, { groupId: null }],
     },
     include: {
       attachment: true,
