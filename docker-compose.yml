@@ -1,0 +1,38 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - autoworx-network
+    platform: linux/amd64
+
+  autoworx-next-app:
+    image: krshanto/autoworx-next-app:latest
+    container_name: autoworx-next-app
+    depends_on:
+      - mysql
+    ports:
+      - "80:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    networks:
+      - autoworx-network
+    platform: linux/amd64
+
+volumes:
+  mysql_data:
+
+networks:
+  autoworx-network:
+    driver: bridge
