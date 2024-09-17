@@ -1,11 +1,10 @@
 "use client";
 
-import { tempClients } from "@/lib/tempClients";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Email from "./Email";
 import Messages from "./Messages";
-import { Conversation } from "./page";
+import { Conversation } from "../utils/types";
 import { Client } from "@prisma/client";
 
 export default function BoxComponent({

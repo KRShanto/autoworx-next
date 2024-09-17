@@ -2,7 +2,7 @@ import { cn } from "@/lib/cn";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Conversation } from "./page";
+import { Conversation } from "../utils/types";
 
 export default function Messages({
   conversations,
