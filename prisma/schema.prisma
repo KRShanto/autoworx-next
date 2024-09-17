@@ -802,8 +802,6 @@ model Message {
   message    String
   from       Int
   groupId    Int?        @map("group_id")
-  toCompany  Int?        @map("to_company")
-  fromCompany  Int?      @map("from_company")
   createdAt  DateTime    @default(now()) @map("created_at")
   updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
   group     Group?     @relation(fields: [groupId], references: [id])
