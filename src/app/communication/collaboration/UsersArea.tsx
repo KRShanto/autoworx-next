@@ -1,7 +1,4 @@
-import React, { useEffect, useState } from "react";
-// import MessageBox from "./MessageBox";
 import { cn } from "@/lib/cn";
-import { pusher } from "@/lib/pusher/client";
 import { Attachment, Message } from "@prisma/client";
 import { User as NextAuthUser } from "next-auth";
 import UserMessageBox from "../internal/UserMessageBox";
@@ -20,33 +17,6 @@ export default function UsersArea({
   setSelectedUsersList: React.Dispatch<React.SetStateAction<any[]>>;
   totalMessageBoxLength: number;
 }) {
-  const [realTimeMessages, setRealTimeMessages] = useState<Record<
-    string,
-    any
-  > | null>(null);
-  // for user real-time messages
-  useEffect(() => {
-    const channel = pusher
-      .subscribe(`user-${currentUser.id}`)
-      .bind(
-        "message",
-        ({
-          from,
-          message,
-          attachment,
-        }: {
-          from: number;
-          message: string;
-          attachment: Partial<Attachment>;
-        }) => {
-          setRealTimeMessages({ from, message, attachment });
-        },
-      );
-
-    return () => {
-      channel.unbind();
-    };
-  }, []);
   return (
     <div
       className={cn(
@@ -62,7 +32,6 @@ export default function UsersArea({
             companyName={companyName}
             setUsersList={setSelectedUsersList}
             totalMessageBoxLength={totalMessageBoxLength}
-            realTimeMessages={realTimeMessages}
           />
         );
       })}

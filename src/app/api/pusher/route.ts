@@ -30,9 +30,9 @@ export async function POST(req: Request, res: Response) {
   if (!to || (!message && !attachmentFile)) {
     return new Response("Missing to or message", { status: 400 });
   }
-
+  
   try {
-    let channel = `user-${to}`;
+    let channel = `user-${userId}`;
     let messageData: TMessageDate = {
       from: userId,
       to,

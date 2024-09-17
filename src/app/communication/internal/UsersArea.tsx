@@ -36,37 +36,10 @@ export default function UsersArea({
   setUsersList: React.Dispatch<React.SetStateAction<any[]>>;
   setGroupsList: React.Dispatch<React.SetStateAction<any[]>>;
   groupsList: any;
-}) {
-  const [realTimeMessages, setRealTimeMessages] = useState<Record<
-    string,
-    any
-  > | null>(null);
-
-  useEffect(() => {
-    const channel = pusher
-      .subscribe(`user-${currentUser.id}`)
-      .bind(
-        "message",
-        ({
-          from,
-          message,
-          attachment,
-        }: {
-          from: number;
-          message: string;
-          attachment: Attachment | null;
-        }) => {
-          setRealTimeMessages({ from, message, attachment });
-        },
-      );
-
-    return () => {
-      channel.unbind("message");
-    };
-  }, []);
-
-  const totalMessageBoxLength = usersList.length + groupsList.length;
+  }) {
   
+  const totalMessageBoxLength = usersList.length + groupsList.length;
+
   return (
     <div
       className={cn(
@@ -79,7 +52,6 @@ export default function UsersArea({
           <UserMessageBox
             key={user.id}
             user={user}
-            realTimeMessages={realTimeMessages}
             setUsersList={setUsersList}
             totalMessageBoxLength={totalMessageBoxLength}
           />

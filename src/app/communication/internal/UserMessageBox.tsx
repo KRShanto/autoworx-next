@@ -2,12 +2,13 @@ import { useState, useEffect, SetStateAction } from "react";
 import MessageBox from "../MessageBox";
 import { useSession } from "next-auth/react";
 import { getUserMessagesById } from "@/actions/communication/internal/query";
+import { Attachment } from "@prisma/client";
+import { pusher } from "@/lib/pusher/client";
 
 type TProps = {
   user: any;
   setUsersList: React.Dispatch<SetStateAction<any[]>>;
   totalMessageBoxLength: number;
-  realTimeMessages: any;
   companyName?: string | null;
 };
 
@@ -15,10 +16,10 @@ export default function UserMessageBox({
   user,
   setUsersList,
   totalMessageBoxLength,
-  realTimeMessages,
   companyName,
 }: TProps) {
   const [messages, setMessages] = useState<any[]>([]);
+  const [realTimeMessage, setRealTimeMessage] = useState({});
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -44,19 +45,42 @@ export default function UserMessageBox({
   }, []);
 
   useEffect(() => {
-    if (
-      realTimeMessages &&
-      realTimeMessages?.from !== parseInt(session?.user?.id!)
-    ) {
-      const newMessage = {
-        message: realTimeMessages?.message,
-        sender: "CLIENT",
-        attachment: realTimeMessages?.attachment,
-      };
-      setMessages((prevGroupMessages) => [...prevGroupMessages, newMessage]);
-    }
-  }, [realTimeMessages]);
-
+    const channel = pusher
+      .subscribe(`user-${user?.id}`)
+      .bind(
+        "message",
+        ({
+          from,
+          message,
+          attachment,
+        }: {
+          from: number;
+          message: string;
+          attachment: Partial<Attachment>;
+        }) => {
+          console.log("Received message", {
+            from,
+            userId: user.id,
+          });
+          if (from !== parseInt(session?.user?.id!)) {
+            const newMessage = {
+              message,
+              sender: "CLIENT",
+              attachment,
+            };
+            setRealTimeMessage(newMessage);
+            setMessages((prevGroupMessages) => [
+              ...prevGroupMessages,
+              newMessage,
+            ]);
+          }
+        },
+      );
+    return () => {
+      channel.unbind("message");
+    };
+  }, [user]);
+  console.log({ realTimeMessage });
   // useEffect(() => {
   //   console.log("running useEffect", { currentUserId: currentUser.id });
   //   const channel = pusher
