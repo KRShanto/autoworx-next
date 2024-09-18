@@ -109,7 +109,7 @@ model User {
   state            String?
   zip              String?
   companyName      String?           @map("company_name")
-  commission       Decimal?          @default(0) @db.Decimal(10,3)
+  commission       Decimal?          @default(0) @db.Decimal(10, 3)
   role             Role              @default(admin)
   employeeType     EmployeeType      @default(Admin)
   joinDate         DateTime?         @map("join_date")
@@ -193,6 +193,7 @@ model Client {
   Vehicle         Vehicle[]
   Invoice         Invoice[]
   ClientCoupon    ClientCoupon[]
+  Task            Task[]
 
   @@index([companyId], name: "fk_customers_company")
   @@map("Client")
@@ -641,6 +642,8 @@ model Task {
   user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
   Invoice     Invoice?   @relation(fields: [invoiceId], references: [id])
+  clientId    Int?       @map("client_id")
+  client      Client?    @relation(fields: [clientId], references: [id])
 }
 
 enum Priority {
@@ -983,8 +986,8 @@ model Permission {
   shopPipeline                  Boolean @default(false) @map("shop_pipeline")
   businessSettings              Boolean @default(false) @map("business_settings")
 
-  @@unique([userId, companyId])
-
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId])
 }

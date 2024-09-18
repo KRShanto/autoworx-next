@@ -25,6 +25,7 @@ export async function deleteTask(id: number): Promise<ServerAction> {
   });
 
   revalidatePath("/task");
+  revalidatePath("/communication/client");
 
   return {
     type: "success",

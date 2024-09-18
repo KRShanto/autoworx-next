@@ -1,63 +1,27 @@
 "use client";
 
-import Image from "next/image";
-import { useServerGet } from "@/hooks/useServerGet";
+import { saveNotes } from "@/actions/client/saveNotes";
+import { createDraftEstimate } from "@/actions/estimate/invoice/createDraft";
+import { deleteTask } from "@/actions/task/deleteTask";
+import getTasksOfClient from "@/actions/task/getTasksOfClient";
+import getAllUserOfCompany from "@/actions/user/getAllUser";
+import NewTask from "@/app/task/[type]/components/task/NewTask";
+import { useDebounce } from "@/hooks/useDebounce";
+import { usePopupStore } from "@/stores/popup";
 import { Client, Invoice, Service, Vehicle } from "@prisma/client";
+import { customAlphabet } from "nanoid";
+import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { AiOutlineCloseCircle } from "react-icons/ai";
 import {
   FaArrowLeft,
   FaArrowRight,
   FaPlus,
   FaRegCheckCircle,
 } from "react-icons/fa";
-import { IoIosFlash } from "react-icons/io";
 import { MdOutlineEdit } from "react-icons/md";
-import {
-  getClient,
-  getEstimates,
-  getServices,
-  saveNotes,
-} from "../actions/actions";
-import { useDebounce } from "@/hooks/useDebounce";
-import Link from "next/link";
-import { db } from "@/lib/db";
-import { getCompanyId } from "@/lib/companyId";
-import { Conversation } from "../@box/page";
-import { customAlphabet } from "nanoid";
-import { createDraftEstimate } from "@/actions/estimate/invoice/createDraft";
-import { useSearchParams } from "next/navigation";
-
-function downloadAttachment(
-  filename: string,
-  mimeType: string,
-  base64Data: string,
-) {
-  // Replace URL-safe base64 characters
-  base64Data = base64Data.replace(/-/g, "+").replace(/_/g, "/");
-
-  // Handle padding (if needed)
-  const padding = "=".repeat((4 - (base64Data.length % 4)) % 4);
-  base64Data += padding;
-
-  const byteCharacters = atob(base64Data);
-  const byteNumbers = new Array(byteCharacters.length);
-
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-
-  const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], { type: mimeType });
-
-  const link = document.createElement("a");
-  link.href = window.URL.createObjectURL(blob);
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
+import { downloadAttachment } from "../utils/downloadAttachment";
+import { Conversation } from "../utils/types";
 export default function DetailsComponent({
   client,
   vehicles,
@@ -74,6 +38,10 @@ export default function DetailsComponent({
   const [selectedVehicleIndex, setSelectedVehicleIndex] = useState(0);
   const [estimateList, setEstimateList] = useState<Invoice[]>(estimates);
   const [notes, setNotes] = useState(client.notes);
+  const [tasks, setTasks] = useState([]);
+  const [usersOfCompany, setUsersOfCompany] = useState([]);
+
+  const { popup, data, close, open } = usePopupStore();
 
   useEffect(() => {
     setEstimateList(estimates);
@@ -82,6 +50,14 @@ export default function DetailsComponent({
   useEffect(() => {
     setNotes(client.notes);
   }, [client.notes]);
+  useEffect(() => {
+    getAllUserOfCompany(client.companyId).then((res) => {
+      setUsersOfCompany(res);
+    });
+    getTasksOfClient(client.id).then((res) => {
+      setTasks(res);
+    });
+  }, [client]);
 
   const debouncedSave = useDebounce((noteContent: string) => {
     saveNotes(client.id, noteContent);
@@ -104,8 +80,6 @@ export default function DetailsComponent({
       setEstimateList([...estimateList, res.data]);
     }
   };
-
-  console.log("Services: ", services);
 
   return (
     <div className="app-shadow h-[83vh] w-[40%] rounded-lg bg-white">
@@ -248,27 +222,42 @@ export default function DetailsComponent({
           </div>
         </div>
         {/* task */}
-        {/* TODO */}
-        {/* <div>
+        {/* TODO: @bettercallsundim - complete this feature */}
+        <div>
           <p>Task List</p>
           <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
-            {new Array(5).fill(0).map((item, idx) => (
+            {tasks.map((task, idx) => (
               <div
                 key={idx}
                 className="flex items-center gap-x-4 rounded-full bg-[#6571FF] px-2 py-1 text-white"
               >
                 <span>This is task 1</span>
                 <span className="flex items-center gap-x-2">
-                  <MdOutlineEdit />
-                  <FaRegCheckCircle />
+                  <MdOutlineEdit
+                    onClick={() => {
+                      open("UPDATE_TASK", {
+                        task,
+                        companyUsers: usersOfCompany,
+                      });
+                    }}
+                  />
+                  <FaRegCheckCircle
+                    onClick={async () => {
+                      await deleteTask(task.id);
+                    }}
+                  />
                 </span>
               </div>
             ))}
-            <button className="rounded-full bg-gray-400 px-6 py-1 text-white">
-              <FaPlus />
-            </button>
+            <div>
+              <NewTask
+                companyUsers={usersOfCompany}
+                isClientTask={true}
+                clientId={client.id}
+              />
+            </div>
           </div>
-        </div> */}
+        </div>
 
         {/* TODO: Reply frequency - skip this for now */}
         {/* <div className="mt-auto">
