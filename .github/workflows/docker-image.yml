@@ -2,10 +2,6 @@ name: Docker Build and Push
 
 on:
   workflow_dispatch:
-    inputs:
-      trigger_build:
-        description: "Trigger Docker Build"
-        required: true
 
 jobs:
   build:
