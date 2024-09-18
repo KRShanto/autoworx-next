@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-  workflow_dispatch: # Adds the manual trigger button
+  workflow_dispatch:  # Adds the manual trigger button
 
 jobs:
   build:
@@ -21,8 +21,8 @@ jobs:
 
       - name: Install Docker Compose
         run: |
-          sudo apt update
-          sudo apt install -y docker-compose
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
 
       # Step 3: Log in to Docker Hub using secrets
       - name: Log in to Docker Hub
