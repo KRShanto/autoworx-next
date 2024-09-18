@@ -4,11 +4,7 @@ on:
   push:
     branches:
       - master
-  workflow_dispatch:
-    inputs:
-      trigger_build:
-        description: "Trigger Docker Build"
-        required: true
+  workflow_dispatch: # To trigger manually with a button
 
 jobs:
   build:
@@ -42,8 +38,9 @@ jobs:
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
         run: |
-          docker-compose build autoworx-next-app
+          docker-compose -f docker-compose.yml config # Validate the config
+          docker-compose -f docker-compose.yml build autoworx-next-app
 
       - name: Push Docker image to Docker Hub
         run: |
-          docker-compose push autoworx-next-app
+          docker-compose -f docker-compose.yml push autoworx-next-app
