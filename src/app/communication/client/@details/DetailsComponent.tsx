@@ -1,62 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { useServerGet } from "@/hooks/useServerGet";
 import { Client, Invoice, Service, Vehicle } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { AiOutlineCloseCircle } from "react-icons/ai";
-import {
-  FaArrowLeft,
-  FaArrowRight,
-  FaPlus,
-  FaRegCheckCircle,
-} from "react-icons/fa";
-import { IoIosFlash } from "react-icons/io";
-import { MdOutlineEdit } from "react-icons/md";
-import {
-  getClient,
-  getEstimates,
-  getServices,
-  saveNotes,
-} from "../actions/actions";
+import { FaArrowLeft, FaArrowRight, FaPlus } from "react-icons/fa";
+import { saveNotes } from "@/actions/client/saveNotes";
 import { useDebounce } from "@/hooks/useDebounce";
 import Link from "next/link";
-import { db } from "@/lib/db";
-import { getCompanyId } from "@/lib/companyId";
-import { Conversation } from "../@box/page";
+import { Conversation } from "../utils/types";
 import { customAlphabet } from "nanoid";
 import { createDraftEstimate } from "@/actions/estimate/invoice/createDraft";
-import { useSearchParams } from "next/navigation";
-
-function downloadAttachment(
-  filename: string,
-  mimeType: string,
-  base64Data: string,
-) {
-  // Replace URL-safe base64 characters
-  base64Data = base64Data.replace(/-/g, "+").replace(/_/g, "/");
-
-  // Handle padding (if needed)
-  const padding = "=".repeat((4 - (base64Data.length % 4)) % 4);
-  base64Data += padding;
-
-  const byteCharacters = atob(base64Data);
-  const byteNumbers = new Array(byteCharacters.length);
-
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-
-  const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], { type: mimeType });
-
-  const link = document.createElement("a");
-  link.href = window.URL.createObjectURL(blob);
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
+import { downloadAttachment } from "../utils/downloadAttachment";
 
 export default function DetailsComponent({
   client,
@@ -104,8 +58,6 @@ export default function DetailsComponent({
       setEstimateList([...estimateList, res.data]);
     }
   };
-
-  console.log("Services: ", services);
 
   return (
     <div className="app-shadow h-[83vh] w-[40%] rounded-lg bg-white">
@@ -248,7 +200,7 @@ export default function DetailsComponent({
           </div>
         </div>
         {/* task */}
-        {/* TODO */}
+        {/* TODO: @bettercallsundim - complete this feature */}
         {/* <div>
           <p>Task List</p>
           <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">

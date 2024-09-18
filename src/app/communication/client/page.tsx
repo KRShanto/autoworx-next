@@ -3,7 +3,6 @@ import { db } from "@/lib/db";
 import crypto from "crypto";
 import { google } from "googleapis";
 import { cookies } from "next/headers";
-
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -21,7 +20,7 @@ async function Page(props: Props) {
     });
 
     if (clients.length === 0) {
-      // TODO
+      // TODO: @bettercallsundim - Show a message that there are no clients. Add a link to go to /client page
       return <div>No Clients</div>;
     } else {
       redirect(`/communication/client/?clientId=${clients[0].id}`);
@@ -33,7 +32,7 @@ async function Page(props: Props) {
   });
 
   if (!client) {
-    // TODO
+    // TODO: @bettercallsundim - Show a message that the client was not found
     return <div>Client not found</div>;
   }
 }
