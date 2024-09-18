@@ -8,6 +8,8 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code") as string;
 
+  console.log("Code found from google: ", code);
+
   try {
     const oauth2Client = new google.auth.OAuth2(
       process.env.GMAIL_CLIENT_ID,
@@ -25,10 +27,12 @@ export async function GET(request: NextRequest) {
           googleRefreshToken: tokens.refresh_token,
         },
       });
+
+      redirect("/settings/communications");
+    } else {
+      console.log("No refresh token found in response from google");
     }
   } catch (error) {
     console.log("Error getting token", error);
   }
-
-  redirect("/settings/communications");
 }
