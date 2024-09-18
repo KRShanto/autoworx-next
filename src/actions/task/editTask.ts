@@ -80,6 +80,7 @@ export async function editTask({
   });
 
   revalidatePath("/task");
+  revalidatePath("/communication/client");
 
   return {
     type: "success",

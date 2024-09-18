@@ -18,8 +18,8 @@ import { useState } from "react";
 import { FaChevronDown, FaChevronUp, FaTractor, FaTrash } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa6";
 import { editTask } from "../../../../../actions/task/editTask";
-// @ts-ignore
 import Avatar from "@/components/Avatar";
+// @ts-ignore
 import dayjs from "dayjs";
 import { deleteTask } from "../../../../../actions/task/deleteTask";
 
@@ -29,7 +29,6 @@ export default function UpdateTask() {
     companyUsers: User[];
     task: CalendarTask;
   };
-  console.log("🚀 ~ UpdateTask ~ task:", task)
 
   const [showUsers, setShowUsers] = useState(false);
   const [title, setTitle] = useState(task.title);

@@ -72,9 +72,16 @@ export default function NewTask({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="w-full rounded-md bg-[#797979] p-2 text-[17px] text-white max-[1300px]:py-1 max-[1300px]:text-[14px]">
-          <FaPlus className="mx-auto block" />
-        </button>
+        {/* if its a task which will be created from C.Hub Client, then it will show a different styled button  */}
+        {isClientTask ? (
+          <button className="rounded-full bg-gray-400 px-6 py-1 text-white">
+            <FaPlus />
+          </button>
+        ) : (
+          <button className="w-full rounded-md bg-[#797979] p-2 text-[17px] text-white max-[1300px]:py-1 max-[1300px]:text-[14px]">
+            <FaPlus className="mx-auto block" />
+          </button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

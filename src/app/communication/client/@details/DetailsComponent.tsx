@@ -8,7 +8,7 @@ import getAllUserOfCompany from "@/actions/user/getAllUser";
 import NewTask from "@/app/task/[type]/components/task/NewTask";
 import { useDebounce } from "@/hooks/useDebounce";
 import { usePopupStore } from "@/stores/popup";
-import { Client, Invoice, Service, Vehicle } from "@prisma/client";
+import { Client, Invoice, Service, Task, User, Vehicle } from "@prisma/client";
 import { customAlphabet } from "nanoid";
 import Image from "next/image";
 import Link from "next/link";
@@ -38,10 +38,10 @@ export default function DetailsComponent({
   const [selectedVehicleIndex, setSelectedVehicleIndex] = useState(0);
   const [estimateList, setEstimateList] = useState<Invoice[]>(estimates);
   const [notes, setNotes] = useState(client.notes);
-  const [tasks, setTasks] = useState([]);
-  const [usersOfCompany, setUsersOfCompany] = useState([]);
+  const [tasks, setTasks] = useState<Task[] | []>([]);
+  const [usersOfCompany, setUsersOfCompany] = useState<User[] | []>([]);
 
-  const { popup, data, close, open } = usePopupStore();
+  const { open } = usePopupStore();
 
   useEffect(() => {
     setEstimateList(estimates);
@@ -50,6 +50,7 @@ export default function DetailsComponent({
   useEffect(() => {
     setNotes(client.notes);
   }, [client.notes]);
+
   useEffect(() => {
     getAllUserOfCompany(client.companyId).then((res) => {
       setUsersOfCompany(res);
@@ -231,9 +232,14 @@ export default function DetailsComponent({
                 key={idx}
                 className="flex items-center gap-x-4 rounded-full bg-[#6571FF] px-2 py-1 text-white"
               >
-                <span>This is task 1</span>
+                <span>
+                  {task.title.length > 20
+                    ? task.title.slice(0, 20) + "..."
+                    : task.title}
+                </span>
                 <span className="flex items-center gap-x-2">
                   <MdOutlineEdit
+                    className="cursor-pointer"
                     onClick={() => {
                       open("UPDATE_TASK", {
                         task,
@@ -241,7 +247,9 @@ export default function DetailsComponent({
                       });
                     }}
                   />
+
                   <FaRegCheckCircle
+                    className="cursor-pointer"
                     onClick={async () => {
                       await deleteTask(task.id);
                     }}
