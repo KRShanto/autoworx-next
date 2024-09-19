@@ -2,6 +2,7 @@ import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import crypto from "crypto";
 import { google } from "googleapis";
+import { env } from "next-runtime-env";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
@@ -10,7 +11,7 @@ function generateAuthURL() {
   const oauth2Client = new google.auth.OAuth2(
     process.env.GMAIL_CLIENT_ID,
     process.env.GMAIL_CLIENT_SECRET,
-    `${process.env.NEXT_PUBLIC_APP_URL}/communication/client/auth`,
+    `${env("NEXT_PUBLIC_APP_URL")}/communication/client/auth`,
   );
   const scopes = [
     "https://www.googleapis.com/auth/gmail.readonly",

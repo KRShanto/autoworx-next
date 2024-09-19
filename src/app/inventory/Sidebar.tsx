@@ -8,6 +8,7 @@ import UseProductForm from "./UseProductForm";
 import { getCompanyId } from "@/lib/companyId";
 import { FaCircleExclamation } from "react-icons/fa6";
 import QRcode from "./QRcode";
+import { env } from "next-runtime-env";
 
 export default async function Sidebar({ productId }: { productId: number }) {
   const companyId = await getCompanyId();
@@ -26,7 +27,7 @@ export default async function Sidebar({ productId }: { productId: number }) {
 
   const imgUrl = product
     ? await QRCode.toDataURL(
-        `${process.env.NEXT_PUBLIC_APP_URL}/inventory/use/${product.id}`,
+        `${env("NEXT_PUBLIC_APP_URL")}/inventory/use/${product.id}`,
       )
     : null;
 
