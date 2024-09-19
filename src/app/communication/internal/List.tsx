@@ -6,7 +6,10 @@ import Avatar from "@/components/Avatar";
 // import { useEffect, useState } from "react";
 // import { searchGroups } from "@/actions/communication/internal/searchGroup";
 import { cn } from "@/lib/cn";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { pusher } from "@/lib/pusher/client";
+import { useSession } from "next-auth/react";
+import { getGroupById } from "@/actions/communication/internal/query";
 export default function List({
   users,
   setUsersList,
@@ -22,7 +25,93 @@ export default function List({
 }) {
   // const [usersStore, setUsersStore] = useState(users);
   // const [groupsStore, setGroupsStore] = useState(groups);
+  const { data: session } = useSession();
   const [searchTerm, setSearchTerm] = useState("");
+  const [sideBarGroupsLists, setSideBarGroupLists] = useState(groups);
+
+  useEffect(() => {
+    let ignore = true;
+    pusher
+      .subscribe("create-group")
+      .bind(
+        "create",
+        ({
+          groupId,
+          usersIds,
+        }: {
+          groupId: number;
+          usersIds: { id: number }[];
+        }) => {
+          usersIds.forEach((userId) => {
+            if (userId.id === Number(session?.user?.id!)) {
+              const group = sideBarGroupsLists.find((g) => g.id === groupId);
+              if (!group) {
+                getGroupById(groupId, userId.id).then((groupFromDb) => {
+                  if (groupFromDb) {
+                    if (!ignore) {
+                      setSideBarGroupLists((prevGroups) => [
+                        ...prevGroups,
+                        groupFromDb,
+                      ]);
+                    }
+                  }
+                });
+              }
+            }
+          });
+        },
+      );
+    return () => {
+      ignore = false;
+      pusher.unbind("create");
+    };
+  }, []);
+
+  useEffect(() => {
+    // let ignore = true;
+    pusher
+      .subscribe("delete-group")
+      .bind(
+        "delete",
+        ({ groupId, userId }: { groupId: number; userId: number }) => {
+          if (userId === Number(session?.user?.id!)) {
+            setSideBarGroupLists((prevSideBarGroupsLists) => {
+              const isAlreadyExistInGroup = prevSideBarGroupsLists.find(
+                (group) => group.id === groupId,
+              );
+              console.log({ isAlreadyExistInGroup });
+              if (isAlreadyExistInGroup) {
+                return prevSideBarGroupsLists.filter(
+                  (group) => group.id !== groupId,
+                );
+              } else {
+                return prevSideBarGroupsLists;
+              }
+            });
+
+            setGroupsList((groupLists: any) => {
+              return groupLists.filter((group: any) => group.id !== groupId);
+            });
+          } else {
+            const removeGroupUser = (groupList: any) =>
+              groupList.map((g: any) => {
+                if (g.id === groupId) {
+                  return {
+                    ...g,
+                    users: g.users.filter((user: User) => user.id !== userId),
+                  };
+                }
+                return g;
+              });
+            setGroupsList(removeGroupUser);
+            setSideBarGroupLists(removeGroupUser);
+          }
+        },
+      );
+    return () => {
+      pusher.unbind("delete");
+    };
+  }, []);
 
   // useEffect(() => {
   //   setGroupsStore(groups);
@@ -61,7 +150,7 @@ export default function List({
 
       <div className="mt-2 flex h-[88%] flex-col gap-2 overflow-y-auto max-[2127px]:h-[80%]">
         {/* Group list */}
-        {groups
+        {sideBarGroupsLists
           .filter((group) =>
             group.name.toLowerCase().includes(searchTerm.toLowerCase()),
           )
@@ -110,7 +199,9 @@ export default function List({
         {users
           .filter(
             (user) =>
-              user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              user.firstName
+                ?.toLowerCase()
+                .includes(searchTerm.toLowerCase()) ||
               user.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
               user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
               user.phone?.toLowerCase().includes(searchTerm.toLowerCase()),

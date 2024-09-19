@@ -1,12 +1,15 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { getPusherInstance } from "@/lib/pusher/server";
 import { revalidatePath } from "next/cache";
 
 type TGroup = {
   name: string;
   users: { id: number }[];
 };
+
+const pusher = getPusherInstance();
 
 export const createGroup = async ({ name, users }: TGroup) => {
   try {
@@ -18,7 +21,14 @@ export const createGroup = async ({ name, users }: TGroup) => {
         },
       },
     });
-    revalidatePath("/communication/internal");
+
+    if (groupData) {
+      pusher.trigger("create-group", "create", {
+        groupId: groupData.id,
+        usersIds: users,
+      });
+    }
+    // revalidatePath("/communication/internal");
     return { status: 200, data: groupData };
   } catch (err) {
     throw err;

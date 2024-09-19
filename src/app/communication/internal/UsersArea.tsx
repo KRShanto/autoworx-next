@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { SetStateAction, useEffect, useState } from "react";
 import MessageBox from "../MessageBox";
 import { User } from "next-auth";
 import { pusher } from "@/lib/pusher/client";
-import { Attachment, Message as DbMessage } from "@prisma/client";
+import { Attachment, Message as DbMessage, Group } from "@prisma/client";
 import { cn } from "@/lib/cn";
 import GroupMessageBox from "./GroupMessageBox";
+import UserMessageBox from "./UserMessageBox";
 
 export interface MessageQue {
   user: number;
@@ -27,7 +28,6 @@ export default function UsersArea({
   currentUser,
   usersList,
   setUsersList,
-  previousMessages,
   groupsList,
   setGroupsList,
 }: {
@@ -35,81 +35,11 @@ export default function UsersArea({
   usersList: any[];
   setUsersList: React.Dispatch<React.SetStateAction<any[]>>;
   setGroupsList: React.Dispatch<React.SetStateAction<any[]>>;
-  previousMessages: (DbMessage & { attachment: Attachment | null })[];
   groupsList: any;
-}) {
-  const [prevMessageStore, setPrevMessageStore] = useState(previousMessages);
-  const [messages, setMessages] = useState<MessageQue[]>([]);
-
-  // for normal messages
-  useEffect(() => {
-    const messages: MessageQue[] = [];
-    for (const user of usersList) {
-      const userMessages = prevMessageStore.filter(
-        (m) => m.from === user.id || m.to === user.id,
-      );
-
-      messages.push({
-        user: user.id,
-        messages: userMessages.map((m) => {
-          return {
-            message: m.message,
-            // @ts-ignore
-            sender: m.from === currentUser.id ? "USER" : "CLIENT",
-            attachment: m.attachment,
-          };
-        }),
-      });
-    }
-    setMessages(messages);
-  }, [usersList, prevMessageStore, currentUser]);
-
-  // for user real-time messages
-  useEffect(() => {
-    const channel = pusher
-      .subscribe(`user-${currentUser.id}`)
-      .bind(
-        "message",
-        ({
-          from,
-          message,
-          attachment,
-        }: {
-          from: number;
-          message: string;
-          attachment: Attachment | null;
-        }) => {
-          const user = usersList.find((u) => {
-            return u.id === from;
-          });
-          if (!user) {
-            return;
-          }
-
-          const newMessages = [...messages];
-          const userMessages = newMessages.find((m) => m.user === from);
-          if (userMessages) {
-            userMessages.messages.push({
-              message,
-              sender: "CLIENT",
-              attachment: attachment,
-            });
-          } else {
-            newMessages.push({
-              user: from,
-              messages: [{ message, sender: "CLIENT", attachment: attachment }],
-            });
-          }
-          setMessages(newMessages);
-        },
-      );
-
-    return () => {
-      channel.unbind();
-    };
-  }, [usersList, messages]);
-
+  }) {
+  
   const totalMessageBoxLength = usersList.length + groupsList.length;
+
   return (
     <div
       className={cn(
@@ -118,17 +48,12 @@ export default function UsersArea({
       )}
     >
       {usersList.map((user) => {
-        const findMessages =
-          messages.find((m) => m.user === user.id)?.messages || [];
         return (
-          <MessageBox
+          <UserMessageBox
             key={user.id}
-            setPrevMessageStore={setPrevMessageStore}
             user={user}
             setUsersList={setUsersList}
-            messages={[...findMessages]}
-            setMessages={setMessages}
-            totalMessageBox={totalMessageBoxLength}
+            totalMessageBoxLength={totalMessageBoxLength}
           />
         );
       })}
@@ -137,8 +62,8 @@ export default function UsersArea({
           <GroupMessageBox
             key={group.id}
             group={group}
-            totalMessageBox={totalMessageBoxLength}
             setGroupsList={setGroupsList}
+            totalMessageBox={totalMessageBoxLength}
           />
         );
       })}
