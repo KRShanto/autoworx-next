@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 import { MdErrorOutline } from "react-icons/md";
 
@@ -20,8 +20,30 @@ function ServiceSelector({
   handleServiceDropdownToggle,
   type,
 }: ServiceSelectorProps) {
+ 
+  const dropdownRef = useRef<HTMLDivElement>(null); 
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        handleServiceDropdownToggle(); 
+      }
+    };
+
+    if (isServiceDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+  
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isServiceDropdownOpen, handleServiceDropdownToggle]);
+
   return (
-    <div className="relative mb-2">
+    <div className="relative mb-2" ref={dropdownRef}>
       <div className="flex gap-2">
         <div
           onClick={handleServiceDropdownToggle}
@@ -66,7 +88,8 @@ function ServiceSelector({
           {completedServices.length > 0 && (
             <>
               {type === "Shop Pipelines" && (
-                <p className="flex items-center gap-1 px-2 py-1 font-bold text-[#03A7A2]">
+                <p className="flex items-center gap-1 px-2 py-1 font-bold text-[#03A7A2]"
+                onClick={handleServiceDropdownToggle}>
                   Complete <IoIosCheckmarkCircleOutline />
                 </p>
               )}
@@ -86,7 +109,8 @@ function ServiceSelector({
           {incompleteServices.length > 0 && (
             <>
               {type === "Shop Pipelines" && (
-                <p className="flex items-center gap-1 px-2 py-1 font-bold text-yellow-500">
+                <p className="flex items-center gap-1 px-2 py-1 font-bold text-yellow-500"
+                onClick={handleServiceDropdownToggle}>
                   Incomplete <MdErrorOutline />
                 </p>
               )}

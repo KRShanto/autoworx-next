@@ -1,68 +1,18 @@
 import { cn } from "@/lib/cn";
-
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { Conversation } from "../utils/types";
 
-// import Attachment from "@/public/icons/Attachment.svg";
-// import Send from "@/public/icons/Send.svg";
-// const messages = [
-//   {
-//     id: 1,
-//     message: "Hello",
-//     sender: "client",
-//   },
-//   {
-//     id: 2,
-//     message: "Hello there. How are you? I am fine. What about you?",
-//     sender: "user",
-//   },
-//   {
-//     id: 3,
-//     message: "I am fine. Thanks for asking. What about you?",
-//     sender: "client",
-//   },
-//   {
-//     id: 4,
-//     message: "I am fine. Thanks for asking. What about you?",
-//     sender: "client",
-//   },
-//   {
-//     id: 5,
-//     message: "I am fine. Thanks for asking. What about you?",
-//     sender: "client",
-//   },
-//   {
-//     id: 6,
-//     message: "Hello there. How are you? I am fine. What about you?",
-//     sender: "user",
-//   },
-
-//   {
-//     id: 7,
-//     message: "I am fine. Thanks for asking. What about you?",
-//     sender: "client",
-//   },
-//   {
-//     id: 8,
-//     message: "Hello there. How are you? I am fine. What about you?",
-//     sender: "user",
-//   },
-
-//   {
-//     id: 9,
-//     message: "I am fine. Thanks for asking. What about you?",
-//     sender: "client",
-//   },
-// ];
 export default function Messages({
   conversations,
   clientId,
-  loading,
-  base64Data,
-  setBase64Data,
   setConversations,
-}: any) {
+}: {
+  conversations: Conversation[];
+  clientId: number;
+  setConversations: React.Dispatch<React.SetStateAction<Conversation[]>>;
+}) {
   const fileRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [messageInput, setMessageInput] = useState("");
@@ -101,7 +51,7 @@ export default function Messages({
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("recipient", clientId);
+    formData.append("recipient", clientId.toString());
     formData.append("subject", "Test Subject");
     formData.append("text", messageInput);
 
@@ -194,12 +144,6 @@ export default function Messages({
             </div>
           ))}
       </div>
-
-      {loading && conversations.length === 0 && (
-        <div className="flex w-full items-center justify-center">
-          Loading...
-        </div>
-      )}
 
       <form
         onSubmit={handleSendMessage}

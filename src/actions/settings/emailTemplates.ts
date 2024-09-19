@@ -114,20 +114,20 @@ export const updateEmailTemplate = async (
 // };
 //update the tax,terms and policy
 
-const companyUpdatesTSchema=z.object({
+const companyTaxUpdatesTSchema=z.object({
   tax: z.string().transform((val) => {
     return new Prisma.Decimal(val);
   }),
   currency:z.string().min(1,"Currency is required"),
-  terms: z.string().min(1, "Terms is required").optional(),
-  policy: z.string().min(1, "Policy is required").optional(),
+ 
 
 
 })
 
-export const updateTaxTerms=async(data:z.infer<typeof companyUpdatesTSchema>)=>{
 
-  const dataValidation=companyUpdatesTSchema.safeParse(data);
+export const updateTaxCurrency=async(data:z.infer<typeof companyTaxUpdatesTSchema>)=>{
+
+  const dataValidation=companyTaxUpdatesTSchema.safeParse(data);
 
   if(!dataValidation.success)
   {
@@ -138,21 +138,72 @@ export const updateTaxTerms=async(data:z.infer<typeof companyUpdatesTSchema>)=>{
 
  try {
   const companyId = await getCompanyId(); 
-  const updatedCompany = await db.company.update({
+  await db.company.update({
     where: { id: companyId },
     data: {
       tax: validatedData?.tax,
       currency: validatedData?.currency,
-      terms: validatedData?.terms,
-      policy: validatedData?.policy,
+      
     },
   });
 
 } catch (error) {
-  console.error("Error updating company:", error);
+  console.error("Error updating company tax:", error);
 }
 
+};
 
-   
+const companyUpdatesTermsPolicySchema=z.object({
+  terms: z.string().min(1, "Terms is required").optional(),
+  policy: z.string().min(1, "Policy is required").optional(),
+ 
+})
+export const updateTermsPolicy=async(data:z.infer<typeof companyUpdatesTermsPolicySchema>)=>{
+
+  const dataValidation=companyUpdatesTermsPolicySchema.safeParse(data);
+
+  if(!dataValidation.success)
+  {
+    console.log("Update tax policy error",dataValidation.error)
+  }
+
+ const validatedData = dataValidation.data;
+
+ try {
+  const companyId = await getCompanyId(); 
+  await db.company.update({
+    where: { id: companyId },
+    data: {
+      terms: validatedData?.terms,
+      policy: validatedData?.policy,
+      
+    },
+  });
+
+} catch (error) {
+  console.error("Error updating company terms and policy:", error);
+}
 
 }
+
+export const getCompanyTermsAndPolicy = async (): Promise<{ terms: string; policy: string }> => {
+  try {
+    const companyId = await getCompanyId();
+   const companyData = await db.company.findUnique({
+    where: { id:companyId },
+    select:{terms:true,policy:true}
+   })
+ 
+    if (!companyData) {
+      throw new Error('Company not found');
+    }
+
+    return {
+      terms: companyData.terms??'',
+      policy: companyData.policy??'',
+    };
+  } catch (error) {
+    console.error("Error fetching company terms and policy:", error);
+    throw error;
+  }
+};

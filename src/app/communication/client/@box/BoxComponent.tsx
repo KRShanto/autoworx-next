@@ -1,28 +1,35 @@
 "use client";
 
-import { tempClients } from "@/lib/tempClients";
+import { Client } from "@prisma/client";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Conversation } from "../utils/types";
 import Email from "./Email";
 import Messages from "./Messages";
 
-export default function MessageBox({
+export default function BoxComponent({
   conversations,
   clientId,
-  loading,
-  base64Data,
-  setBase64Data,
-  setConversations,
-}: any) {
-  const user = tempClients[0];
+  client,
+}: {
+  conversations: Conversation[];
+  clientId: number;
+  client: Client;
+}) {
   const [selected, setSelected] = useState<"MESSAGES" | "EMAILS" | "PHONE">(
     "MESSAGES",
   );
+  const [conversationState, setConversationState] =
+    useState<Conversation[]>(conversations);
+
+  useEffect(() => {
+    setConversationState(conversations);
+  }, [conversations]);
 
   return (
     <div className="app-shadow h-[83vh] w-[25%] rounded-lg bg-white">
       {/* Header */}
-      <h2 className="h-[10%] border p-3 text-[14px] text-[#797979] 2xl:h-[5%]">
+      <h2 className="h-[10%] rounded-t-lg border p-3 text-[14px] text-[#797979] 2xl:h-[5%]">
         Client Message
       </h2>
 
@@ -30,15 +37,23 @@ export default function MessageBox({
       <div className="flex h-[15%] items-center justify-between gap-2 rounded-md bg-[#006D77] p-2 text-white 2xl:h-[10%]">
         <div className="flex items-center">
           <Image
-            src={user.image}
-            alt="user"
+            src={
+              !client?.photo
+                ? "/images/default.png"
+                : client.photo.includes("/images/default.png")
+                  ? "/images/default.png"
+                  : `/api/images/${client.photo}`
+            }
+            alt="client"
             width={50}
             height={50}
             className="rounded-full"
           />
-          <div className="flex flex-col">
-            <p className="text-[14px] font-bold">{user.name}</p>
-            <p className="text-[8px]">{user.company}</p>
+          <div className="ml-4 flex flex-col">
+            <p className="text-[14px] font-bold">
+              {client?.firstName} {client?.lastName}
+            </p>
+            <p className="text-[8px]">{client?.customerCompany}</p>
           </div>
         </div>
 
@@ -81,10 +96,8 @@ export default function MessageBox({
       {selected === "MESSAGES" && (
         <Messages
           clientId={clientId}
-          conversations={conversations}
-          loading={loading}
-          setConversations={setConversations}
-          setBase64Data={setBase64Data}
+          conversations={conversationState}
+          setConversations={setConversationState}
         />
       )}
       {selected === "EMAILS" && <Email />}

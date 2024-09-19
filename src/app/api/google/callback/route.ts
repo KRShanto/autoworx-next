@@ -1,6 +1,7 @@
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { getGoogleToken } from "@/lib/google";
+import { env } from "next-runtime-env";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest, res: Response) {
@@ -29,5 +30,5 @@ export async function GET(req: NextRequest, res: Response) {
     },
   });
 
-  return Response.redirect(process.env.NEXT_PUBLIC_APP_URL!);
+  return Response.redirect(env("NEXT_PUBLIC_APP_URL")!);
 }

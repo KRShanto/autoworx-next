@@ -1,13 +1,13 @@
-import Title from "@/components/Title";
-import { Metadata } from "next";
-import { db } from "@/lib/db";
-import { CalendarSettings, User } from "@prisma/client";
-import { AuthSession } from "@/types/auth";
 import { auth } from "@/app/auth";
-import { CalendarType } from "@/types/calendar";
-import TaskPage from "./TaskPage";
-import { AppointmentFull } from "@/types/db";
 import { SyncLists } from "@/components/SyncLists";
+import Title from "@/components/Title";
+import { db } from "@/lib/db";
+import { AuthSession } from "@/types/auth";
+import { CalendarType } from "@/types/calendar";
+import { AppointmentFull } from "@/types/db";
+import { CalendarSettings, User } from "@prisma/client";
+import { Metadata } from "next";
+import TaskPage from "./TaskPage";
 
 export const metadata: Metadata = {
   title: "Task and Activity Management",

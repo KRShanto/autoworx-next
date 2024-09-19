@@ -43,9 +43,10 @@ interface PipelineData {
 }
 
 interface Column {
-  id: number|null;
+  id: number | null;
   title: string;
   type: string;
+  order: number; 
 }
 const Page = (props: Props) => {
   const activeView = props.searchParams?.view || "workOrders";

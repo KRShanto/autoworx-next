@@ -16,11 +16,11 @@ interface HeaderProps {
   [key: string]: any;
 }
 interface Column {
-  id: number|null;
+  id: number | null;
   title: string;
   type: string;
+  order: number; 
 }
-
 
 export default function Header({
   activeView,

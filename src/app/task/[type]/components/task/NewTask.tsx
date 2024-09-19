@@ -1,30 +1,34 @@
 "use client";
 
-import { Priority, User } from "@prisma/client";
-import { useState } from "react";
+import Avatar from "@/components/Avatar";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
-  DialogClose,
 } from "@/components/Dialog";
 import Submit from "@/components/Submit";
-import { FaCheck, FaPlus } from "react-icons/fa6";
-import Image from "next/image";
-import { FaChevronUp, FaChevronDown } from "react-icons/fa";
-import { createTask } from "../../../../../actions/task/createTask";
+import { Priority, User } from "@prisma/client";
 import { TimePicker } from "antd";
-import Avatar from "@/components/Avatar";
+import Image from "next/image";
+import { useState } from "react";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaCheck, FaPlus } from "react-icons/fa6";
+import { createTask } from "../../../../../actions/task/createTask";
 
 export default function NewTask({
   companyUsers,
   onlyOneUser = false,
+  isClientTask = false,
+  clientId = null,
 }: {
   companyUsers: User[];
   onlyOneUser?: boolean;
+  isClientTask?: boolean;
+  clientId?: number | null;
 }) {
   const [open, setOpen] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
@@ -42,6 +46,7 @@ export default function NewTask({
       priority,
       startTime: time?.startTime,
       endTime: time?.endTime,
+      clientId,
     });
 
     // reset form
@@ -66,10 +71,17 @@ export default function NewTask({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        <button className="w-full rounded-md bg-[#797979] p-2 text-[17px] text-white max-[1300px]:py-1 max-[1300px]:text-[14px]">
-          <FaPlus className="mx-auto block" />
-        </button>
+      <DialogTrigger asChild>
+        {/* if its a task which will be created from C.Hub Client, then it will show a different styled button  */}
+        {isClientTask ? (
+          <button className="rounded-full bg-gray-400 px-6 py-1 text-white">
+            <FaPlus />
+          </button>
+        ) : (
+          <button className="w-full rounded-md bg-[#797979] p-2 text-[17px] text-white max-[1300px]:py-1 max-[1300px]:text-[14px]">
+            <FaPlus className="mx-auto block" />
+          </button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

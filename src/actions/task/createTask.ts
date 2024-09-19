@@ -1,11 +1,11 @@
 "use server";
 
-import { db } from "@/lib/db";
-import { Priority } from "@prisma/client";
 import { auth } from "@/app/auth";
-import { AuthSession } from "@/types/auth";
-import { revalidatePath } from "next/cache";
+import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
+import { AuthSession } from "@/types/auth";
+import { Priority } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 interface TaskType {
   title: string;
@@ -15,6 +15,7 @@ interface TaskType {
   invoiceId?: string;
   startTime?: string;
   endTime?: string;
+  clientId?: number | null;
 }
 
 export async function createTask(task: TaskType): Promise<ServerAction> {
@@ -30,6 +31,7 @@ export async function createTask(task: TaskType): Promise<ServerAction> {
       invoiceId: task.invoiceId,
       startTime: task.startTime,
       endTime: task.endTime,
+      clientId: task.clientId,
     },
   });
 
@@ -54,6 +56,7 @@ export async function createTask(task: TaskType): Promise<ServerAction> {
   }
 
   revalidatePath("/task");
+  revalidatePath("/communication/client");
 
   return {
     type: "success",

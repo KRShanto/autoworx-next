@@ -31,6 +31,7 @@ model Company {
   currency                String?                   @default("USD")
   terms                   String?
   policy                  String?
+  googleRefreshToken      String?                   @map("google_refresh_token")
   createdAt               DateTime                  @default(now()) @map("created_at")
   updatedAt               DateTime                  @default(now()) @updatedAt @map("updated_at")
   users                   User[]
@@ -108,7 +109,7 @@ model User {
   state            String?
   zip              String?
   companyName      String?           @map("company_name")
-  commission       Decimal?          @default(0)
+  commission       Decimal?          @default(0) @db.Decimal(10, 3)
   role             Role              @default(admin)
   employeeType     EmployeeType      @default(Admin)
   joinDate         DateTime?         @map("join_date")
@@ -185,12 +186,14 @@ model Client {
   company         Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
   customerCompany String?        @map("customer_company")
   tagId           Int?           @map("tag_id")
+  notes           String?
   appointments    Appointment[]
   source          Source?        @relation(fields: [sourceId], references: [id])
   tag             Tag?           @relation(fields: [tagId], references: [id])
   Vehicle         Vehicle[]
   Invoice         Invoice[]
   ClientCoupon    ClientCoupon[]
+  Task            Task[]
 
   @@index([companyId], name: "fk_customers_company")
   @@map("Client")
@@ -639,6 +642,8 @@ model Task {
   user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
   Invoice     Invoice?   @relation(fields: [invoiceId], references: [id])
+  clientId    Int?       @map("client_id")
+  client      Client?    @relation(fields: [clientId], references: [id])
 }
 
 enum Priority {
@@ -876,6 +881,7 @@ model Column {
   id    Int    @id @default(autoincrement())
   title String
   type  String // "sales" or "shop"
+  order Int
 }
 
 // TODO: this might need to be renamed
@@ -971,17 +977,19 @@ model Permission {
   communicationHubInternal      Boolean @default(false) @map("communication_hub_internal")
   communicationHubClients       Boolean @default(false) @map("communication_hub_clients")
   communicationHubCollaboration Boolean @default(false) @map("communication_hub_collaboration")
-  estimate                      Boolean @default(false)
-  calendar                      Boolean @default(false)
-  reporting                     Boolean @default(false)
+  estimatesInvoices             Boolean @default(false) @map("estimates_invoices")
+  calendarTask                  Boolean @default(false) @map("calendar_task")
   payments                      Boolean @default(false)
   workforceManagement           Boolean @default(false) @map("workforce_management")
+  reporting                     Boolean @default(false)
   inventory                     Boolean @default(false)
   integrations                  Boolean @default(false)
   salesPipeline                 Boolean @default(false) @map("sales_pipeline")
-  accountSettings               Boolean @default(false) @map("account_settings")
+  shopPipeline                  Boolean @default(false) @map("shop_pipeline")
   businessSettings              Boolean @default(false) @map("business_settings")
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId])
 }

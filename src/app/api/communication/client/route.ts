@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import fs from "fs";
 import { google } from "googleapis";
-import { cookies } from "next/headers";
+import { env } from "next-runtime-env";
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import path from "path";
@@ -37,11 +37,14 @@ export async function GET(request: NextRequest) {
 
     const clientId = process.env.GMAIL_CLIENT_ID;
     const clientSecret = process.env.GMAIL_CLIENT_SECRET;
-    const refreshToken = cookies().get("gmail_refresh_token");
+    const company = await db.company.findFirst({
+      where: { id: client.companyId },
+    });
+    const refreshToken = company?.googleRefreshToken;
 
     const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret);
     if (refreshToken)
-      oAuth2Client.setCredentials({ refresh_token: refreshToken.value });
+      oAuth2Client.setCredentials({ refresh_token: refreshToken });
 
     const gmail = google.gmail({ version: "v1", auth: oAuth2Client });
 
@@ -102,7 +105,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching emails:", error);
-    cookies().delete("gmail_refresh_token");
+
     return new Response(JSON.stringify({ error: "Failed to fetch emails" }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
@@ -205,10 +208,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const oAuth2Client = new google.auth.OAuth2(
       process.env.GMAIL_CLIENT_ID,
       process.env.GMAIL_CLIENT_SECRET,
-      `${process.env.NEXT_PUBLIC_APP_URL}communication/client/auth`,
+      `${env("NEXT_PUBLIC_APP_URL")}/communication/client/auth`,
     );
-    let refreshToken = (cookies().get("gmail_refresh_token")?.value ||
-      "") as string;
+    // let refreshToken = (cookies().get("gmail_refresh_token")?.value || "") as string;
+
+    const company = await db.company.findFirst({
+      where: { id: client.companyId },
+    });
+    const refreshToken = company?.googleRefreshToken;
     if (!refreshToken) {
       throw new Error("No refresh token found");
     }

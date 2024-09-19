@@ -18,10 +18,10 @@ import { useState } from "react";
 import { FaChevronDown, FaChevronUp, FaTractor, FaTrash } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa6";
 import { editTask } from "../../../../../actions/task/editTask";
+import Avatar from "@/components/Avatar";
 // @ts-ignore
 import dayjs from "dayjs";
 import { deleteTask } from "../../../../../actions/task/deleteTask";
-import Avatar from "@/components/Avatar";
 
 export default function UpdateTask() {
   const { popup, data, close } = usePopupStore();
@@ -29,11 +29,12 @@ export default function UpdateTask() {
     companyUsers: User[];
     task: CalendarTask;
   };
+
   const [showUsers, setShowUsers] = useState(false);
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description);
   const [assignedUsers, setAssignedUsers] = useState<number[]>(
-    task.assignedUsers.map((user) => user.id),
+    task?.assignedUsers?.map((user) => user.id),
   );
   const [priority, setPriority] = useState<Priority>(task.priority);
   const [time, setTime] = useState<{ startTime: string; endTime: string }>({
@@ -150,11 +151,11 @@ export default function UpdateTask() {
                           setAssignedUsers([...assignedUsers, user.id]);
                         } else {
                           setAssignedUsers(
-                            assignedUsers.filter((id) => id !== user.id),
+                            assignedUsers?.filter((id) => id !== user.id),
                           );
                         }
                       }}
-                      checked={assignedUsers.includes(user.id)}
+                      checked={assignedUsers?.includes(user.id)}
                     />
                     <Avatar photo={user.image} width={40} height={40} />
                     <span>

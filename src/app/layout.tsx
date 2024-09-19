@@ -7,6 +7,7 @@ import TopLoader from "../components/TopLoader";
 import { auth } from "./auth";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import { PublicEnvScript } from "next-runtime-env";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +27,9 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <PublicEnvScript />
+      </head>
       <body className={inter.className}>
         <TopLoader />
         <Toaster position="top-right" reverseOrder={false} />
