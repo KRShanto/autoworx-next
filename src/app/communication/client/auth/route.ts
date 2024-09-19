@@ -19,6 +19,8 @@ export async function GET(request: NextRequest) {
 
     const { tokens } = await oauth2Client.getToken(code);
 
+    console.log("Tokens from google: ", tokens);
+
     if (tokens.refresh_token) {
       const companyId = await getCompanyId();
       await db.company.update({
