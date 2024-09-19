@@ -3,8 +3,7 @@
 import { saveNotes } from "@/actions/client/saveNotes";
 import { createDraftEstimate } from "@/actions/estimate/invoice/createDraft";
 import { deleteTask } from "@/actions/task/deleteTask";
-import getTasksOfClient from "@/actions/task/getTasksOfClient";
-import getAllUserOfCompany from "@/actions/user/getAllUser";
+
 import NewTask from "@/app/task/[type]/components/task/NewTask";
 import { useDebounce } from "@/hooks/useDebounce";
 import { usePopupStore } from "@/stores/popup";
@@ -28,18 +27,20 @@ export default function DetailsComponent({
   services,
   conversations,
   estimates,
+  tasks,
+  usersOfCompany,
 }: {
   client: Client;
   vehicles: Vehicle[];
   services: Service[];
   conversations: Conversation[];
   estimates: Invoice[];
+  tasks: Task[];
+  usersOfCompany: User[];
 }) {
   const [selectedVehicleIndex, setSelectedVehicleIndex] = useState(0);
   const [estimateList, setEstimateList] = useState<Invoice[]>(estimates);
   const [notes, setNotes] = useState(client.notes);
-  const [tasks, setTasks] = useState<Task[] | []>([]);
-  const [usersOfCompany, setUsersOfCompany] = useState<User[] | []>([]);
 
   const { open } = usePopupStore();
 
@@ -50,15 +51,6 @@ export default function DetailsComponent({
   useEffect(() => {
     setNotes(client.notes);
   }, [client.notes]);
-
-  useEffect(() => {
-    getAllUserOfCompany(client.companyId).then((res) => {
-      setUsersOfCompany(res);
-    });
-    getTasksOfClient(client.id).then((res) => {
-      setTasks(res);
-    });
-  }, [client]);
 
   const debouncedSave = useDebounce((noteContent: string) => {
     saveNotes(client.id, noteContent);
@@ -83,7 +75,7 @@ export default function DetailsComponent({
   };
 
   return (
-    <div className="app-shadow h-[83vh] w-[40%] rounded-lg bg-white">
+    <div className="app-shadow h-[83vh] w-[40%] rounded-lg bg-white pb-4">
       {/* Client Heading */}
       <div className="2xl:[25%] flex h-[35%] items-center justify-between rounded-t-lg bg-[#006D77] text-xs text-white 2xl:text-base">
         <div className="h-[180px] w-[70%] rounded-lg">
