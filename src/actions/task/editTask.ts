@@ -32,9 +32,9 @@ export async function editTask({
 
   // Find the difference between the existing users and the new users
   const toRemove = taskUsers.filter(
-    (taskUser) => !assignedUsers.includes(taskUser.userId),
+    (taskUser) => !assignedUsers?.includes(taskUser.userId),
   );
-  const toAdd = assignedUsers.filter(
+  const toAdd = assignedUsers?.filter(
     (userId) => !taskUsers.find((taskUser) => taskUser.userId === userId),
   );
 
@@ -49,18 +49,20 @@ export async function editTask({
     });
   }
 
-  // Add the users
-  for (const user of toAdd) {
-    // TODO: Add the task to the user's Google Calendar
+  if (Array.isArray(toAdd)) {
+    // Add the users
+    for (const user of toAdd) {
+      // TODO: Add the task to the user's Google Calendar
 
-    // Create the task user
-    await db.taskUser.create({
-      data: {
-        taskId: id,
-        userId: user,
-        eventId: "null-for-now",
-      },
-    });
+      // Create the task user
+      await db.taskUser.create({
+        data: {
+          taskId: id,
+          userId: user,
+          eventId: "null-for-now",
+        },
+      });
+    }
   }
 
   // Update the task
@@ -78,6 +80,7 @@ export async function editTask({
   });
 
   revalidatePath("/task");
+  revalidatePath("/communication/client");
 
   return {
     type: "success",

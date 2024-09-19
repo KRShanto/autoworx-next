@@ -16,7 +16,7 @@ export default function ClientPageLayout({
     <div>
       <Title>Communication Hub - Client</Title>
 
-      <div className="mt-5 flex justify-around">
+      <div className="mt-5 flex justify-around ">
         {children}
         {list}
         {box}

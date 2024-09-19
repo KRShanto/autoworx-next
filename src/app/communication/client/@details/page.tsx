@@ -1,9 +1,9 @@
-import { db } from "@/lib/db";
 import { getCompanyId } from "@/lib/companyId";
-import DetailsComponent from "./DetailsComponent";
-import { Service } from "@prisma/client";
-import { getConversations } from "../utils/getConversations";
+import { db } from "@/lib/db";
+import { Service, User } from "@prisma/client";
 import { fetchClientData } from "../utils/fetchClientsData";
+import { getConversations } from "../utils/getConversations";
+import DetailsComponent from "./DetailsComponent";
 
 export default async function Details({
   searchParams,
@@ -44,6 +44,50 @@ export default async function Details({
     where: { clientId: parseInt(clientId) },
   });
 
+  let companyId = await getCompanyId();
+
+  const tasks = await db.task.findMany({
+    where: {
+      companyId,
+      clientId: parseInt(clientId),
+    },
+  });
+  let taskWithAssignedUsers = [];
+  // Loop through all the tasks
+  for (const task of tasks) {
+    let assignedUsers: User[] = [];
+
+    // Get the assigned users for the task
+    const taskUsers = (await db.taskUser.findMany({
+      where: {
+        taskId: task.id,
+      },
+    })) as any;
+
+    // Get the user details for the assigned users
+    for (const taskUser of taskUsers) {
+      const user = (await db.user.findUnique({
+        where: {
+          id: taskUser.userId,
+        },
+      })) as User;
+
+      // Add the user to the assigned users array
+      assignedUsers.push(user);
+    }
+
+    // Add the task and the assigned users to the array
+    taskWithAssignedUsers.push({
+      ...task,
+      assignedUsers,
+    });
+  }
+  const companyUsers = await db.user.findMany({
+    where: {
+      companyId,
+    },
+  });
+
   return (
     <DetailsComponent
       conversations={conversations}
@@ -51,6 +95,8 @@ export default async function Details({
       services={services}
       vehicles={vehicles}
       estimates={estimates}
+      tasks={taskWithAssignedUsers}
+      usersOfCompany={companyUsers}
     />
   );
 }

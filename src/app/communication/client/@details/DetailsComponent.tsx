@@ -1,33 +1,48 @@
 "use client";
 
-import Image from "next/image";
-import { Client, Invoice, Service, Vehicle } from "@prisma/client";
-import { useEffect, useState } from "react";
-import { FaArrowLeft, FaArrowRight, FaPlus } from "react-icons/fa";
 import { saveNotes } from "@/actions/client/saveNotes";
-import { useDebounce } from "@/hooks/useDebounce";
-import Link from "next/link";
-import { Conversation } from "../utils/types";
-import { customAlphabet } from "nanoid";
 import { createDraftEstimate } from "@/actions/estimate/invoice/createDraft";
-import { downloadAttachment } from "../utils/downloadAttachment";
+import { deleteTask } from "@/actions/task/deleteTask";
 
+import NewTask from "@/app/task/[type]/components/task/NewTask";
+import { useDebounce } from "@/hooks/useDebounce";
+import { usePopupStore } from "@/stores/popup";
+import { Client, Invoice, Service, Task, User, Vehicle } from "@prisma/client";
+import { customAlphabet } from "nanoid";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaPlus,
+  FaRegCheckCircle,
+} from "react-icons/fa";
+import { MdOutlineEdit } from "react-icons/md";
+import { downloadAttachment } from "../utils/downloadAttachment";
+import { Conversation } from "../utils/types";
 export default function DetailsComponent({
   client,
   vehicles,
   services,
   conversations,
   estimates,
+  tasks,
+  usersOfCompany,
 }: {
   client: Client;
   vehicles: Vehicle[];
   services: Service[];
   conversations: Conversation[];
   estimates: Invoice[];
+  tasks: Task[];
+  usersOfCompany: User[];
 }) {
   const [selectedVehicleIndex, setSelectedVehicleIndex] = useState(0);
   const [estimateList, setEstimateList] = useState<Invoice[]>(estimates);
   const [notes, setNotes] = useState(client.notes);
+
+  const { open } = usePopupStore();
 
   useEffect(() => {
     setEstimateList(estimates);
@@ -60,7 +75,7 @@ export default function DetailsComponent({
   };
 
   return (
-    <div className="app-shadow h-[83vh] w-[40%] rounded-lg bg-white">
+    <div className="app-shadow h-[83vh] w-[40%] rounded-lg bg-white pb-4">
       {/* Client Heading */}
       <div className="2xl:[25%] flex h-[35%] items-center justify-between rounded-t-lg bg-[#006D77] text-xs text-white 2xl:text-base">
         <div className="h-[180px] w-[70%] rounded-lg">
@@ -201,26 +216,48 @@ export default function DetailsComponent({
         </div>
         {/* task */}
         {/* TODO: @bettercallsundim - complete this feature */}
-        {/* <div>
+        <div>
           <p>Task List</p>
           <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
-            {new Array(5).fill(0).map((item, idx) => (
+            {tasks.map((task, idx) => (
               <div
                 key={idx}
                 className="flex items-center gap-x-4 rounded-full bg-[#6571FF] px-2 py-1 text-white"
               >
-                <span>This is task 1</span>
+                <span>
+                  {task.title.length > 20
+                    ? task.title.slice(0, 20) + "..."
+                    : task.title}
+                </span>
                 <span className="flex items-center gap-x-2">
-                  <MdOutlineEdit />
-                  <FaRegCheckCircle />
+                  <MdOutlineEdit
+                    className="cursor-pointer"
+                    onClick={() => {
+                      open("UPDATE_TASK", {
+                        task,
+                        companyUsers: usersOfCompany,
+                      });
+                    }}
+                  />
+
+                  <FaRegCheckCircle
+                    className="cursor-pointer"
+                    onClick={async () => {
+                      await deleteTask(task.id);
+                    }}
+                  />
                 </span>
               </div>
             ))}
-            <button className="rounded-full bg-gray-400 px-6 py-1 text-white">
-              <FaPlus />
-            </button>
+            <div>
+              <NewTask
+                companyUsers={usersOfCompany}
+                isClientTask={true}
+                clientId={client.id}
+              />
+            </div>
           </div>
-        </div> */}
+        </div>
 
         {/* TODO: Reply frequency - skip this for now */}
         {/* <div className="mt-auto">
