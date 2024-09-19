@@ -61,6 +61,7 @@
     "next": "^14.2.3",
     "next-auth": "^5.0.0-beta.16",
     "next-connect": "^1.0.0",
+    "next-runtime-env": "^3.2.2",
     "nextjs-toploader": "^1.6.11",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.13",
