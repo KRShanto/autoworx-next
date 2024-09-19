@@ -452,7 +452,7 @@ export default function Pipelines({
                   </h2>
 
                   <ul
-                    className="mt-1 flex min-h-[70vh] flex-col gap-1 overflow-auto p-1"
+                    className="mt-1 flex min-h-[70vh] max-h-[70vh] flex-col gap-1 overflow-auto p-1"
                     style={{ maxHeight: "70vh" }}
                   >
                     {item.leads.map((lead, leadIndex) => {
@@ -480,7 +480,7 @@ export default function Pipelines({
                               {...provided.dragHandleProps}
                               ref={provided.innerRef}
                               key={lead.invoiceId}
-                              className="relative mx-1 my-1 max-w-[350px] overflow-hidden rounded-xl border bg-white p-1"
+                              className="relative mx-1 my-1 h-fit max-w-[350px] rounded-xl border bg-white p-1"
                             >
                               <div className="flex items-center justify-between">
                                 <h3 className="font-inter overflow-auto pb-2 font-semibold text-black">
