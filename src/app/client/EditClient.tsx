@@ -61,8 +61,6 @@ export default function EditCustomer({
     }
   }
 
-  console.log("profilePic", profilePic);
-
   async function handleSubmit() {
     let photo;
 

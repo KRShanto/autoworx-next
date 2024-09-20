@@ -68,7 +68,6 @@ export default function Day({
       }
     }),
   );
-  console.log({ rows });
   const date = useDate();
   const parentRef = useRef<HTMLDivElement>(null);
   const [isRefAvailable, setIsRefAvailable] = useState<boolean>(false);

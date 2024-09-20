@@ -87,7 +87,6 @@ const LaborComponent = ({
     });
 
     setIsEdit(false);
-    console.log("Edit");
   };
 
   return (

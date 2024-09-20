@@ -43,27 +43,7 @@ export async function updateInvoice(
   data: UpdateEstimateInput,
 ): Promise<ServerAction> {
   const companyId = await getCompanyId();
-  console.log({
-    id: data.id,
-    data: {
-      clientId: data.clientId,
-      vehicleId: data.vehicleId,
-      statusId: data.statusId,
-      subtotal: data.subtotal,
-      discount: data.discount,
-      tax: data.tax,
-      deposit: data.deposit,
-      depositNotes: data.depositNotes,
-      depositMethod: data.depositMethod,
-      grandTotal: data.grandTotal,
-      due: data.due,
-      internalNotes: data.internalNotes,
-      terms: data.terms,
-      policy: data.policy,
-      customerNotes: data.customerNotes,
-      customerComments: data.customerComments,
-    },
-  });
+
   // update invoice itself
   const updatedInvoice = await db.invoice.update({
     where: {
@@ -210,6 +190,4 @@ export async function updateInvoice(
     type: "success",
     data: updatedInvoice,
   };
-
-
 }

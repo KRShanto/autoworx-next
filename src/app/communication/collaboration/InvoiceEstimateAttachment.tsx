@@ -6,7 +6,6 @@ type TProps = {};
 
 export default function InvoiceEstimateAttachment({}: TProps) {
   const [photos, setPhotos] = useState<File[]>([]);
-  console.log({ photos });
   return (
     <div className="relative flex w-full snap-x gap-6 overflow-x-auto py-2">
       <label className="grid aspect-square h-32 w-32 shrink-0 cursor-pointer snap-center content-center justify-items-center gap-2 rounded-md bg-gray-200 p-2 text-center">

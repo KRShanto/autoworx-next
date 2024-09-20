@@ -235,8 +235,6 @@ export const savePermissions = async (
       create: { userId, companyId, ...newPermissions },
       update: { ...newPermissions },
     });
-
-    console.log("Permissions saved successfully!");
   } catch (error) {
     console.error("Error saving permissions:", error);
   }

@@ -79,7 +79,6 @@ export default function List({
               const isAlreadyExistInGroup = prevSideBarGroupsLists.find(
                 (group) => group.id === groupId,
               );
-              console.log({ isAlreadyExistInGroup });
               if (isAlreadyExistInGroup) {
                 return prevSideBarGroupsLists.filter(
                   (group) => group.id !== groupId,

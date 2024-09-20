@@ -37,7 +37,6 @@ export default function EstimateAndInvoicePage() {
       });
 
       setEmailTemplate(updatedTemplate);
-      console.log("Template updated:", updatedTemplate);
     }
   };
 

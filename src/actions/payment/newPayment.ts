@@ -58,8 +58,6 @@ export async function newPayment({
     },
   });
 
-  // console.log("Materials: ", materials);
-
   // merge all the same products and sum the quantity
   const productsWithQuantity = materials.reduce(
     (acc: { id: number; quantity: number }[], material) => {

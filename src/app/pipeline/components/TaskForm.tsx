@@ -39,15 +39,6 @@ export default function TaskForm({
   const [tasks, setTasks] = useState<Task[]>(previousTasks);
 
   const handleSave = async () => {
-    console.log({
-      title,
-      description,
-      assignedUsers,
-      priority,
-      startTime: time?.startTime,
-      endTime: time?.endTime,
-    });
-
     // save task
     const res = await createTask({
       title,
@@ -95,9 +86,10 @@ export default function TaskForm({
         </div>
         {/* Hover content */}
         {tasks.length > 0 && (
-         <div className="absolute  z-[9999] mt-1 hidden w-[200px] h-[110px] max-h-[120px] -left-36 transform rounded-lg border border-[#66738C] bg-white p-2 overflow-y-auto group-hover:block"
-         style={{ top: '-7rem' }}
-         >
+          <div
+            className="absolute -left-36 z-[9999] mt-1 hidden h-[110px] max-h-[120px] w-[200px] transform overflow-y-auto rounded-lg border border-[#66738C] bg-white p-2 group-hover:block"
+            style={{ top: "-7rem" }}
+          >
             {tasks.map((task) => (
               <div
                 key={task.id}

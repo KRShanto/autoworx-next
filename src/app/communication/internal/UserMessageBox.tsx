@@ -58,10 +58,6 @@ export default function UserMessageBox({
           message: string;
           attachment: Partial<Attachment>;
         }) => {
-          console.log("Received message", {
-            from,
-            userId: user.id,
-          });
           if (from !== parseInt(session?.user?.id!)) {
             const newMessage = {
               message,
@@ -80,45 +76,6 @@ export default function UserMessageBox({
       channel.unbind("message");
     };
   }, [user]);
-  console.log({ realTimeMessage });
-  // useEffect(() => {
-  //   console.log("running useEffect", { currentUserId: currentUser.id });
-  //   const channel = pusher
-  //     .subscribe(`user-${currentUser.id}`)
-  //     .bind(
-  //       "message",
-  //       ({
-  //         from,
-  //         message,
-  //         attachment,
-  //       }: {
-  //         from: number;
-  //         message: string;
-  //         attachment: Attachment | null;
-  //       }) => {
-  //         console.log("Received message", {
-  //           from,
-  //           message,
-  //           currentUser: user.id,
-  //         });
-  //         if (from !== parseInt(session?.user?.id!)) {
-  //           const newMessage = {
-  //             message,
-  //             sender: "CLIENT",
-  //             attachment: attachment,
-  //           };
-  //           setMessages((prevGroupMessages) => [
-  //             ...prevGroupMessages,
-  //             newMessage,
-  //           ]);
-  //         }
-  //       },
-  //     );
-
-  //   return () => {
-  //     channel.unbind();
-  //   };
-  // }, []);
 
   return (
     <MessageBox

@@ -26,10 +26,6 @@ export function CreateTab() {
     TAG: [-1, -1],
   });
 
-  useEffect(() => {
-    console.log(dropdownsOpen);
-  },[dropdownsOpen])
-
   return (
     <>
       <div className="-mx-8">

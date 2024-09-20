@@ -24,7 +24,6 @@ export default function TaskComponent({ task }: { task: Task }) {
     await deleteTask(task.id);
   };
   const existingDate = moment(task?.date).format("YYYY-MM-DD");
-  // console.log({existingDate});
   return (
     <div
       className="flex items-center rounded-md px-4 py-2 text-[17px] text-white max-[1300px]:px-2 max-[1300px]:py-1 max-[1300px]:text-[14px]"

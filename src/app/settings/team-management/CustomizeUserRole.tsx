@@ -32,7 +32,6 @@ const CustomizeUserRole = ({ user, onBack }: CustomizeUserRolesProps) => {
   useEffect(() => {
     // Fetch default and user-specific permissions
     getUserPermissions(user.id, user.employeeType).then((data) => {
-      console.log(data);
       setPermissions(data || {}); // Initialize with an empty object if no permissions
     });
   }, [user.id, user.employeeType]);

@@ -23,8 +23,6 @@ export default function AssignTask() {
     })),
   );
 
-  console.log("User: ", user);
-
   async function handleSubmit() {
     await assignTask({ userId: user.id, tasksToAssign: taskDataInput });
 

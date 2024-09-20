@@ -54,7 +54,6 @@ const SearchBox = React.forwardRef(function SearchBox(
         value={searchText}
         onChange={(e) => {
           if (e.target.value === "") {
-            console.log(e.target.value);
             handleSubmit();
           }
           setSearchText(e.target.value);

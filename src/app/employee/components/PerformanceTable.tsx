@@ -3,7 +3,6 @@ import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { useState } from "react";
 import BarChartComponent from "./BarChartComponent";
 
-
 interface AttendanceData {
   day: string;
   clockedIn: string;
@@ -44,7 +43,6 @@ export default function PerformanceTable() {
   const [infoIndex, setInfoIndex] = useState<number | null>(null);
 
   const getPerformanceContent = (label: string): string | undefined => {
-    // console.log(label);
     const labelword = label.split(" ");
     for (const word of labelword) {
       if (arrayOfPerformanceWord.includes(word)) {
@@ -59,7 +57,7 @@ export default function PerformanceTable() {
   };
 
   return (
-    <div className="flex h-full w-1/2 flex-col  mb-4">
+    <div className="mb-4 flex h-full w-1/2 flex-col">
       <h2 className="mb-2 text-xl font-bold">Performance</h2>
       <div className="flex gap-4">
         {/* First Half */}
@@ -107,22 +105,36 @@ export default function PerformanceTable() {
               </div>
             ))}
           </div>
-          <div className="flex-shrink rounded-lg border border-gray-300 bg-white p-" style={{ height: '60%' }}>
+          <div
+            className="p- flex-shrink rounded-lg border border-gray-300 bg-white"
+            style={{ height: "60%" }}
+          >
             {/* //bar chart will be here */}
-            <BarChartComponent height={300} title="Total Number of Jobs Assigned"/>
-            
+            <BarChartComponent
+              height={300}
+              title="Total Number of Jobs Assigned"
+            />
           </div>
-         
         </div>
         {/* Second Half */}
         <div className="flex w-1/2 flex-col gap-4">
-          <div className="flex-shrink rounded-lg border border-gray-300 bg-white p-2 " style={{ height: '50%' }}>
-            
-            <BarChartComponent height={230} title="Total Number of Jobs Completed on Time"/>
+          <div
+            className="flex-shrink rounded-lg border border-gray-300 bg-white p-2"
+            style={{ height: "50%" }}
+          >
+            <BarChartComponent
+              height={230}
+              title="Total Number of Jobs Completed on Time"
+            />
           </div>
-          <div className="flex-shrink rounded-lg border border-gray-300 bg-white p-2" style={{ height: '50%' }}>
-           
-            <BarChartComponent height={230} title="Total Number of Jobs Completed Late"/>
+          <div
+            className="flex-shrink rounded-lg border border-gray-300 bg-white p-2"
+            style={{ height: "50%" }}
+          >
+            <BarChartComponent
+              height={230}
+              title="Total Number of Jobs Completed Late"
+            />
           </div>
         </div>
       </div>

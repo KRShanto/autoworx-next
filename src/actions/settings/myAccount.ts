@@ -79,12 +79,6 @@ export async function changePassword(
     if (!user) {
       throw new Error("User not found");
     }
-    console.log("pw", {
-      currentPassword,
-      newPassword,
-      confirmNewPassword,
-      user,
-    });
 
     let comparePassword = await bcrypt.compare(currentPassword, user.password);
 

@@ -36,16 +36,6 @@ export default function NewCoupon({
     const startDate = data.get("startDate");
     const endDate = data.get("endDate");
 
-    console.log({
-      couponName,
-      couponCode,
-      discountType,
-      discountValue,
-      startDate,
-      endDate,
-      couponType,
-    });
-
     const res = await newCoupon({
       couponName: couponName as string,
       couponCode: couponCode as string,

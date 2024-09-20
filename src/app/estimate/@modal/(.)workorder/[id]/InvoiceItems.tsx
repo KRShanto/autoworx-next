@@ -22,7 +22,6 @@ export function InvoiceItems({
   >;
 }) {
   const [openService, setOpenService] = useState<number | null>(null);
-  console.log({ items });
   return items.map((item) => {
     if (!item.service) return null;
 

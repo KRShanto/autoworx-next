@@ -3,8 +3,6 @@ import PusherServer from "pusher";
 
 let pusherInstance: PusherServer | null = null;
 
-console.log("Pusher ID (server): ", process.env.PUSHER_ID);
-
 export const getPusherInstance = () => {
   if (!pusherInstance) {
     pusherInstance = new PusherServer({

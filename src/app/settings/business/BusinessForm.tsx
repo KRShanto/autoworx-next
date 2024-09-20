@@ -62,7 +62,6 @@ export default function BusinessForm({ company }: TProps) {
           });
           const json = await response.json();
           if (json.status === "success") {
-            console.log("Deleted old image");
           }
         }
         const formData = new FormData();
@@ -97,7 +96,6 @@ export default function BusinessForm({ company }: TProps) {
       const response = await updateCompany(company?.id, companyData);
       if (response.type === "success") {
         setError("");
-        console.log("Company updated successfully");
       }
     } catch (err: any) {
       setError(err.message);

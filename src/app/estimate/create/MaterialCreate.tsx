@@ -31,9 +31,6 @@ export default function MaterialCreate() {
   const itemId = data?.itemId;
   const materialIndex = data?.materialIndex;
 
-  console.log("Item ID", itemId);
-  console.log("Material Index", materialIndex);
-
   const [vendorSearch, setVendorSearch] = useState("");
   const [vendorOpen, setVendorOpen] = useState(false);
   const [tagsOpen, setTagsOpen] = useState(false);

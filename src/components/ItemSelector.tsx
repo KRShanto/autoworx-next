@@ -97,7 +97,6 @@ export default function ItemSelector<T>({
           dropdownsOpen[type][0] === index[0] &&
           dropdownsOpen[type][1] === index[1]
         ) {
-          console.log("here");
           setDropdownsOpen({
             SERVICE: [-1, -1],
             MATERIAL: [-1, -1],
@@ -105,8 +104,6 @@ export default function ItemSelector<T>({
             TAG: [-1, -1],
           });
         } else {
-          console.log("there");
-
           setDropdownsOpen({
             SERVICE: type === "SERVICE" ? [...index] : [-1, -1],
             MATERIAL: type === "MATERIAL" ? [...index] : [-1, -1],

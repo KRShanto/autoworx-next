@@ -111,7 +111,6 @@ const Page = (props: Props) => {
         location.longitude,
         nearByCompanyRange,
       ).then((res) => {
-        console.log("nearby companies", res.data);
         setNearbyCompanies(res.data);
       });
     }
@@ -358,7 +357,6 @@ const Page = (props: Props) => {
               />
             </div>
             <div className="space-y-8 overflow-y-auto rounded-md p-8 shadow-md">
-
               {!locationAllow && (
                 <p className="text-center text-sm">
                   Allow location to find nearby companies

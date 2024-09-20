@@ -16,7 +16,7 @@ interface Column {
   id: number | null;
   title: string;
   type: string;
-  order: number; 
+  order: number;
 }
 
 const Page = (props: Props) => {
@@ -34,7 +34,6 @@ const Page = (props: Props) => {
     fetchShopColumns();
   }, []);
 
-  // console.log(JSON.stringify(pipelineColumns, null, 2));
   const handleColumnsUpdate = async ({ columns }: { columns: Column[] }) => {
     setPipelineColumns(columns);
   };

@@ -91,8 +91,6 @@ export default function Messages({
       if (!res.ok) {
         throw new Error("Failed to send message");
       }
-
-      console.log("Message sent successfully:", res);
     } catch (err) {
       console.error("Error sending message:", err);
       // Optionally revert optimistic update here if needed

@@ -42,8 +42,6 @@ export async function addCustomer(data: {
       },
     });
 
-    console.log("New Customer", newCustomer);
-
     revalidatePath("/client");
 
     return { type: "success", data: newCustomer };
