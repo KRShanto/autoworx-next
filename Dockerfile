@@ -15,7 +15,6 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
-
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
@@ -50,6 +49,10 @@ COPY --from=builder /app/public ./public
 # Set the correct permission for prerender cache
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
+
+# Create the uploads directory and set permissions
+RUN mkdir -p /app/images/uploads
+RUN chown -R nextjs:nodejs /app/images
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
