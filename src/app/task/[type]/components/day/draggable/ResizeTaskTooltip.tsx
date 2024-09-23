@@ -1,3 +1,4 @@
+import { updateAppointments } from "@/actions/appointment/updateAppointmentTime";
 import { updateTask } from "@/actions/task/dragTask";
 import { cn } from "@/lib/cn";
 import moment from "moment";
@@ -81,12 +82,21 @@ export default function ResizeTaskTooltip({
       const height = Math.round((diffByMinutes / 60) * 75);
       setSize({ ...size, height: height });
     } else {
-      await updateTask({
-        id: task.id,
-        date: new Date(task.date),
-        startTime: task.startTime,
-        endTime: newEndTime,
-      });
+      if (task.type === "appointment") {
+        await updateAppointments({
+          id: task.id,
+          date: new Date(task.date),
+          startTime: task.startTime,
+          endTime: newEndTime,
+        });
+      } else {
+        await updateTask({
+          id: task.id,
+          date: new Date(task.date),
+          startTime: task.startTime,
+          endTime: newEndTime,
+        });
+      }
     }
   };
 
