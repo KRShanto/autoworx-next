@@ -43,98 +43,105 @@ export async function updateInvoice(
   data: UpdateEstimateInput,
 ): Promise<ServerAction> {
   const companyId = await getCompanyId();
-
-  // merge all the same products and sum the quantity
-  let materials: Material[] = [];
-
-  for (const item in data.items) {
-    const itemMaterials = data.items[item].materials;
-
-    if (itemMaterials) {
-      // @ts-ignore
-      materials = [...materials, ...itemMaterials];
-    }
-  }
-
-  const productsWithQuantity = materials.reduce(
-    (acc: { id: number; quantity: number }[], material) => {
-      const product = acc.find((p) => p.id === material.productId);
-
-      if (product) {
-        if (material.quantity !== null) {
-          product.quantity += material.quantity;
-        }
-      } else {
-        acc.push({
-          id: material.productId as number,
-          quantity: material.quantity || 0,
-        });
-      }
-
-      return acc;
+  const invoice = await db.invoice.findUnique({
+    where: {
+      id: data.id,
     },
-    [],
-  );
+  });
 
-  await Promise.all(
-    productsWithQuantity.map(async (product) => {
-      if (!product.id) return;
+  if (invoice?.type === "Invoice") {
+    // merge all the same products and sum the quantity
+    let materials: Material[] = [];
 
-      const inventoryProduct = await db.inventoryProduct.findUnique({
-        where: {
-          id: product.id,
-        },
-      });
+    for (const item in data.items) {
+      const itemMaterials = data.items[item].materials;
 
-      if (!inventoryProduct) {
-        return;
+      if (itemMaterials) {
+        // @ts-ignore
+        materials = [...materials, ...itemMaterials];
       }
+    }
 
-      // const newQuantity = Math.abs(
-      //   inventoryProduct.quantity - product.quantity,
-      // );
+    const productsWithQuantity = materials.reduce(
+      (acc: { id: number; quantity: number }[], material) => {
+        const product = acc.find((p) => p.id === material.productId);
 
-      const oldMaterials = await db.material.findMany({
-        where: {
-          invoiceId: data.id,
-          productId: product.id,
-        },
-      });
+        if (product) {
+          if (material.quantity !== null) {
+            product.quantity += material.quantity;
+          }
+        } else {
+          acc.push({
+            id: material.productId as number,
+            quantity: material.quantity || 0,
+          });
+        }
 
-      const oldQuantity = oldMaterials.reduce((acc, material) => {
-        return acc + material.quantity!;
-      }, 0);
+        return acc;
+      },
+      [],
+    );
 
-      console.log("old quantity: ", oldQuantity);
-      console.log("new quantity: ", product.quantity);
+    await Promise.all(
+      productsWithQuantity.map(async (product) => {
+        if (!product.id) return;
 
-      const diffQuantity = oldQuantity - product.quantity;
-
-      console.log("difference: : ", diffQuantity);
-
-      // Update the history quantity
-      await db.inventoryProductHistory.update({
-        where: {
-          id: inventoryProduct.id,
-        },
-        data: {
-          quantity: product.quantity,
-        },
-      });
-
-      // Update the inventoryProduct quantity
-      await db.inventoryProduct.update({
-        where: {
-          id: product.id,
-        },
-        data: {
-          quantity: {
-            increment: diffQuantity,
+        const inventoryProduct = await db.inventoryProduct.findUnique({
+          where: {
+            id: product.id,
           },
-        },
-      });
-    }),
-  );
+        });
+
+        if (!inventoryProduct) {
+          return;
+        }
+
+        // const newQuantity = Math.abs(
+        //   inventoryProduct.quantity - product.quantity,
+        // );
+
+        const oldMaterials = await db.material.findMany({
+          where: {
+            invoiceId: data.id,
+            productId: product.id,
+          },
+        });
+
+        const oldQuantity = oldMaterials.reduce((acc, material) => {
+          return acc + material.quantity!;
+        }, 0);
+
+        console.log("old quantity: ", oldQuantity);
+        console.log("new quantity: ", product.quantity);
+
+        const diffQuantity = oldQuantity - product.quantity;
+
+        console.log("difference: : ", diffQuantity);
+
+        // Update the history quantity
+        await db.inventoryProductHistory.update({
+          where: {
+            id: inventoryProduct.id,
+          },
+          data: {
+            quantity: product.quantity,
+          },
+        });
+
+        // Update the inventoryProduct quantity
+        await db.inventoryProduct.update({
+          where: {
+            id: product.id,
+          },
+          data: {
+            quantity: {
+              increment: diffQuantity,
+            },
+          },
+        });
+      }),
+    );
+  }
 
   // update invoice itself
   const updatedInvoice = await db.invoice.update({

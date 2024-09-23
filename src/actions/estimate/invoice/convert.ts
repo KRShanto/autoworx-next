@@ -67,14 +67,18 @@ export async function convertInvoice(id: string): Promise<ServerAction> {
         },
       });
 
-      // update the inventoryProduct quantity
+      // NOTE: if its Estimate -> Invoice, we should decrement the quantity
+      // if its Invoice -> Estimate, we should increment the quantity
       await db.inventoryProduct.update({
         where: {
           id: product.id,
         },
         data: {
           quantity: {
-            decrement: product.quantity,
+            increment:
+              invoice.type === "Estimate"
+                ? -product.quantity
+                : product.quantity,
           },
         },
       });
