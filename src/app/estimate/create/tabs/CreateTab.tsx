@@ -120,7 +120,10 @@ export function CreateTab() {
                         onSelect={(material) =>
                           useEstimateCreateStore.setState((x) =>
                             create(x, (x) => {
-                              x.items[i].materials[j] = material;
+                              x.items[i].materials[j] = {
+                                ...material,
+                                quantity: 0,
+                              };
                             }),
                           )
                         }

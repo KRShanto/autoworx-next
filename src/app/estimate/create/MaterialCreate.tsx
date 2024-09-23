@@ -51,9 +51,11 @@ export default function MaterialCreate() {
       );
       setTags(data.material.tags || []);
       setNotes(data.material.notes || "");
-      setQuantity(data.material.quantity || 1);
+      setQuantity(
+        data.material.quantity === 0 ? undefined : data.material.quantity,
+      );
       setCost(data.material.cost);
-      setSell(data.material.sell);
+      setSell(data.material.sell || data.material.cost);
       setDiscount(data.material.discount);
       setAddToInventory(data.material.addToInventory || false);
     } else {
