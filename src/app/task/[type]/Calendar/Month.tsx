@@ -246,7 +246,7 @@ export default function Month({
                       return (
                         <Tooltip key={i}>
                           <TooltipTrigger asChild>
-                            <div className="h-10 max-h-10 rounded border-2 text-sm text-slate-500">
+                            <div className="h-10 max-h-10 rounded border-2 border-gray-300 text-sm text-slate-500">
                               {appointment.title}
                             </div>
                           </TooltipTrigger>
