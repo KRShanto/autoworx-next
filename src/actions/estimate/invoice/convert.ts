@@ -85,7 +85,8 @@ export async function convertInvoice(id: string): Promise<ServerAction> {
     }),
   );
 
-  revalidatePath("/estimate");
+  // TODO
+  // revalidatePath("/estimate");
 
   return { type: "success", message: "Invoice converted" };
 }
