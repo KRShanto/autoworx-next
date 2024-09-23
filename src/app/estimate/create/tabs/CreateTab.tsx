@@ -117,7 +117,7 @@ export function CreateTab() {
                             materialIndex: j,
                           })
                         }
-                        onSelect={(material) =>
+                        onSelect={(material) => {
                           useEstimateCreateStore.setState((x) =>
                             create(x, (x) => {
                               x.items[i].materials[j] = {
@@ -125,8 +125,15 @@ export function CreateTab() {
                                 quantity: 0,
                               };
                             }),
-                          )
-                        }
+                          );
+
+                          open("MATERIAL", {
+                            itemId: item.id,
+                            edit: true,
+                            material,
+                            materialIndex: j,
+                          });
+                        }}
                         onSearch={(search) => {
                           const filteredMaterials = materials.filter(
                             (material) =>
@@ -174,13 +181,19 @@ export function CreateTab() {
                               labor: item.labor,
                             })
                           }
-                          onSelect={(labor) =>
+                          onSelect={(labor) => {
                             useEstimateCreateStore.setState((x) =>
                               create(x, (x) => {
                                 x.items[i].labor = labor;
                               }),
-                            )
-                          }
+                            );
+
+                            open("LABOR", {
+                              itemId: item.id,
+                              edit: true,
+                              labor,
+                            });
+                          }}
                           onSearch={(search) => {
                             const filteredLabors = labors.filter((labor) =>
                               labor.name
