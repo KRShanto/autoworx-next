@@ -92,7 +92,7 @@ export default function ResizeTaskTooltip({
       } else {
         await updateTask({
           id: task.id,
-          date: new Date(task.date),
+          date: task.date,
           startTime: task.startTime,
           endTime: newEndTime,
         });

@@ -231,7 +231,7 @@ export default function Week({
         // Add task to database
         await updateTask({
           id: taskFoundWithoutTime.id,
-          date: taskFoundWithoutTime.date || date,
+          date: new Date(taskFoundWithoutTime?.date!) || date,
           startTime: oldTask?.startTime || startTime,
           endTime: oldTask?.endTime || endTime,
         });
@@ -242,7 +242,7 @@ export default function Week({
           rowTime,
         );
         await updateTask({
-          id: oldTask?.id,
+          id: oldTask?.id!,
           date: new Date(date),
           startTime: newStartTime,
           endTime: newEndTime,
@@ -409,9 +409,11 @@ export default function Week({
             }
           });
           const limitOfTasks = 5;
-          const taskIndex = tasksInRow.findIndex(
-            (task) => task.id === event.id,
-          );
+          const taskIndex = tasksInRow.findIndex((task) => {
+            if (task.id === event.id && task.type === event.type) {
+              return true;
+            }
+          });
           const diffByMinutes = eventEndTime.diff(eventStartTime, "minutes");
           const height = `${(diffByMinutes / 60) * 71}px`;
           if (taskIndex) {
@@ -557,7 +559,7 @@ export default function Week({
                   lastIndex === taskIndex && "z-40",
                 )}
                 style={{
-                  left: `calc(10% + 12.9% * ${event.columnIndex} + 170px)`,
+                  left: `calc(10% + 12.9% * ${event.columnIndex} + 160px)`,
                   top,
                   height,
                   backgroundColor: "rgb(0, 0, 255, 0.2)",
