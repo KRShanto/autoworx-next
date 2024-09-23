@@ -282,7 +282,7 @@ export default function Day({
       ))}
 
       {/* Tasks */}
-      {events.map((event, index) => {
+      {sortedEvents.map((event, index) => {
         const eventStartTime = moment(event.startTime, "HH:mm");
         const eventEndTime = moment(event.endTime, "HH:mm");
         const tasksInRow = sortedEvents.filter((task) => {
@@ -297,7 +297,13 @@ export default function Day({
             return true;
           }
         });
-        const taskIndex = tasksInRow.findIndex((task) => task.id === event.id);
+
+        const taskIndex = tasksInRow.findIndex((task) => {
+          if (task.id === event.id && task.type === event.type) {
+            return true;
+          }
+        });
+
         return (
           <DayTask
             key={index}

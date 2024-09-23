@@ -1,4 +1,4 @@
-import { updateAppointments } from "@/actions/appointment/updateAppointmentTime";
+import { assignAppointmentDate } from "@/actions/appointment/assignAppointmentDate";
 import { updateTask } from "@/actions/task/dragTask";
 import { cn } from "@/lib/cn";
 import moment from "moment";
@@ -83,7 +83,7 @@ export default function ResizeTaskTooltip({
       setSize({ ...size, height: height });
     } else {
       if (task.type === "appointment") {
-        await updateAppointments({
+        await assignAppointmentDate({
           id: task.id,
           date: new Date(task.date),
           startTime: task.startTime,
