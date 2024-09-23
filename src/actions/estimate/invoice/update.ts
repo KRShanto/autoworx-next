@@ -185,7 +185,9 @@ export async function updateInvoice(
       });
     }
   });
+
   revalidatePath("/estimate");
+
   return {
     type: "success",
     data: updatedInvoice,
