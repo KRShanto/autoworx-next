@@ -29,6 +29,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "jest.config.ts"
-  ],
+, "testTwilio.js"  ],
   "exclude": ["node_modules"]
 }

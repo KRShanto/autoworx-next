@@ -66,7 +66,7 @@ export default function DetailsComponent({
     const res = await createDraftEstimate({
       id: newId,
       clientId: client.id,
-      vehicleId: vehicles[selectedVehicleIndex].id,
+      vehicleId: vehicles[selectedVehicleIndex]?.id ?? null,
     });
 
     if (res.type === "success") {
@@ -107,47 +107,55 @@ export default function DetailsComponent({
           </div>
         </div>
         <div className="mr-2 h-[90%] space-y-4 rounded bg-[#63a6ac] p-4 text-sm text-white">
-          <div className="flex items-center justify-between gap-x-8">
-            <div>
-              <span className="mr-4 font-semibold">
-                Vehicle {selectedVehicleIndex + 1}
-              </span>
-              <span className="">
-                {vehicles[selectedVehicleIndex]?.year}{" "}
-                {vehicles[selectedVehicleIndex]?.make}{" "}
-                {vehicles[selectedVehicleIndex]?.model}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <FaArrowLeft
-                onClick={() => {
-                  if (selectedVehicleIndex > 0) {
-                    setSelectedVehicleIndex(selectedVehicleIndex - 1);
-                  } else {
-                    setSelectedVehicleIndex(vehicles.length - 1);
-                  }
-                }}
-              />
-              <FaArrowRight
-                onClick={() => {
-                  if (selectedVehicleIndex < vehicles.length - 1) {
-                    setSelectedVehicleIndex(selectedVehicleIndex + 1);
-                  } else {
-                    setSelectedVehicleIndex(0);
-                  }
-                }}
-              />
-            </div>
-          </div>
-          <div className="">
-            <p className="font-semibold">Service Requested :</p>
+          {vehicles.length > 0 ? (
+            <>
+              <div className="flex items-center justify-between gap-x-8">
+                <div>
+                  <span className="mr-4 font-semibold">
+                    Vehicle {selectedVehicleIndex + 1}
+                  </span>
+                  <span className="">
+                    {vehicles[selectedVehicleIndex]?.year}{" "}
+                    {vehicles[selectedVehicleIndex]?.make}{" "}
+                    {vehicles[selectedVehicleIndex]?.model}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FaArrowLeft
+                    onClick={() => {
+                      if (selectedVehicleIndex > 0) {
+                        setSelectedVehicleIndex(selectedVehicleIndex - 1);
+                      } else {
+                        setSelectedVehicleIndex(vehicles.length - 1);
+                      }
+                    }}
+                  />
+                  <FaArrowRight
+                    onClick={() => {
+                      if (selectedVehicleIndex < vehicles.length - 1) {
+                        setSelectedVehicleIndex(selectedVehicleIndex + 1);
+                      } else {
+                        setSelectedVehicleIndex(0);
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="">
+                <p className="font-semibold">Service Requested :</p>
 
-            <ul className="list-inside list-disc">
-              {services?.map((service, index) => (
-                <>{service && <li key={index}>{service.name}</li>}</>
-              ))}
-            </ul>
-          </div>
+                <ul className="list-inside list-disc">
+                  {services?.map((service, index) => (
+                    <>{service && <li key={index}>{service.name}</li>}</>
+                  ))}
+                </ul>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center justify-center px-8">
+              <span>No Vehicles</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -170,7 +178,7 @@ export default function DetailsComponent({
             {conversations.map((email: any) =>
               email.attachments.map((attachment: any, index: number) => (
                 <div
-                  className="rounded-md border border-emerald-600 p-5"
+                  className="cursor-pointer rounded-md border border-emerald-600 p-5"
                   key={index}
                   onClick={() =>
                     downloadAttachment(

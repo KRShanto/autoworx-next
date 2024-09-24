@@ -147,7 +147,7 @@ export default function Messages({
         onSubmit={handleSendMessage}
         className="flex h-[5%] items-center gap-x-2 rounded-b-md bg-[#D9D9D9] px-2 py-1"
       >
-        {file && (
+        {/* {file && (
           <div className="text-xs text-[#006D77]">
             {file.name.length > 10 ? file.name.slice(0, 10) + "..." : file.name}
           </div>
@@ -169,7 +169,7 @@ export default function Messages({
           onClick={() => {
             fileRef?.current?.click();
           }}
-        />
+        /> */}
         <div className="flex h-full w-full items-center gap-x-2 rounded-md bg-white">
           <input
             type="text"

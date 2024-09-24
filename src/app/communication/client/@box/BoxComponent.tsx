@@ -92,7 +92,13 @@ export default function BoxComponent({
           </button>
         </div>
       </div>
-
+      {selected === "EMAILS" && (
+        <Email
+          clientId={clientId}
+          conversations={conversationState}
+          setConversations={setConversationState}
+        />
+      )}
       {selected === "MESSAGES" && (
         <Messages
           clientId={clientId}
@@ -100,7 +106,6 @@ export default function BoxComponent({
           setConversations={setConversationState}
         />
       )}
-      {selected === "EMAILS" && <Email />}
     </div>
   );
 }
