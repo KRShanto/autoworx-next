@@ -273,6 +273,7 @@ model Invoice {
   companyId               Int                       @map("company_id")
   userId                  Int?                      @map("user_id")
   assignedToId            Int?                      @map("assigned_to")
+  workOrderStatus         String?                   @default("Pending") @map("work_order_status")
   company                 Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   invoiceItems            InvoiceItem[]
   photos                  InvoicePhoto[]
@@ -285,7 +286,6 @@ model Invoice {
   vehicle                 Vehicle?                  @relation(fields: [vehicleId], references: [id])
   client                  Client?                   @relation(fields: [clientId], references: [id])
   technician              Technician[]
-  workOrderStatus         String?                   @default("Pending") @map("work_order_status")
   tags                    InvoiceTags[]
   assignedTo              User?                     @relation(name: "assignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
 
@@ -809,7 +809,7 @@ model Message {
   groupId    Int?        @map("group_id")
   createdAt  DateTime    @default(now()) @map("created_at")
   updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
-  group     Group?     @relation(fields: [groupId], references: [id])
+  group      Group?      @relation(fields: [groupId], references: [id])
   attachment Attachment?
 
   @@index([to], name: "fk_messages_to")
@@ -830,13 +830,13 @@ model Attachment {
 }
 
 model Group {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String
-  type      String   @default("Group")
-  users     User[]   @relation("UserGroups")
+  type      String    @default("Group")
+  users     User[]    @relation("UserGroups")
   messages  Message[]
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
 }
 
 model Coupon {
