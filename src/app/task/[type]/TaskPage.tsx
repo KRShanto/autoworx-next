@@ -8,6 +8,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Calendar from "./Calendar/Calendar";
 import CalendarSidebar from "./CalendarSidebar/CalendarSidebar";
+import DnDWrapper from "@/components/DnDWrapper";
 
 export default function TaskPage({
   type,
@@ -42,7 +43,7 @@ export default function TaskPage({
   const tasksWithoutTime = taskWithAssignedUsers.filter((task) => !task.date);
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DnDWrapper id="task">
       <CalendarSidebar usersWithTasks={usersWithTasks} tasks={tasks} />
       <Calendar
         type={type}
@@ -56,6 +57,6 @@ export default function TaskPage({
         templates={templates}
         appointmentsFull={appointmentsFull}
       />
-    </DndProvider>
+    </DnDWrapper>
   );
 }

@@ -3,13 +3,18 @@ import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { IoReorderTwoSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
-import { createColumn, deleteColumn, updateColumn, updateColumnOrder } from "@/actions/pipelines/pipelinesColumn";
+import {
+  createColumn,
+  deleteColumn,
+  updateColumn,
+  updateColumnOrder,
+} from "@/actions/pipelines/pipelinesColumn";
 
 interface Column {
   id: number | null;
   title: string;
   type: string;
-  order: number; 
+  order: number;
 }
 
 interface ManagePipelinesModalProps {
@@ -66,7 +71,7 @@ function ColumnItem({
   return (
     <div
       ref={ref}
-      className={`flex items-center mb-2 bg-white p-2 rounded-md cursor-move ${
+      className={`mb-2 flex cursor-move items-center rounded-md bg-white p-2 ${
         isDragging ? "opacity-50" : "opacity-100"
       }`}
     >
@@ -76,7 +81,7 @@ function ColumnItem({
         ref={inputRef}
         value={column.title}
         onChange={(e) => handleColumnChange(index, e.target.value)}
-        className="border border-gray-300 rounded-md p-1 flex-grow"
+        className="flex-grow rounded-md border border-gray-300 p-1"
       />
       <button
         onClick={() => handleDeleteColumn(index)}
@@ -175,10 +180,10 @@ export default function ManagePipelines({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-        <div className="bg-white rounded-lg p-6 w-180">
-          <h2 className="text-lg font-semibold mb-4">Edit Pipeline</h2>
-          <div className="flex flex-col justify-center items-center">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="w-180 rounded-lg bg-white p-6">
+          <h2 className="mb-4 text-lg font-semibold">Edit Pipeline</h2>
+          <div className="flex flex-col items-center justify-center">
             {localColumns.map((column, index) => (
               <ColumnItem
                 key={column.id || `new-${index}`} // Fallback key for new columns
@@ -192,7 +197,7 @@ export default function ManagePipelines({
             ))}
             <button
               onClick={handleAddColumn}
-              className="text-blue-500 text-sm mt-2 border-2 border-blue-500 rounded px-1 py-1 text-center w-[75%]"
+              className="mt-2 w-[75%] rounded border-2 border-blue-500 px-1 py-1 text-center text-sm text-blue-500"
             >
               + Add New Column
             </button>
@@ -200,13 +205,13 @@ export default function ManagePipelines({
           <div className="mt-4 flex justify-end">
             <button
               onClick={onClose}
-              className="mr-2 px-4 py-2 bg-gray-200 rounded-md"
+              className="mr-2 rounded-md bg-gray-200 px-4 py-2"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md"
+              className="rounded-md bg-blue-500 px-4 py-2 text-white"
             >
               Apply
             </button>

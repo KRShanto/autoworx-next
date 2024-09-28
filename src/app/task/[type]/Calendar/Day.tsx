@@ -154,7 +154,7 @@ export default function Day({
         // Add task to database
         await updateTask({
           id: taskFoundWithoutTime.id,
-          date: taskFoundWithoutTime?.date || date,
+          date: new Date(taskFoundWithoutTime?.date!) || date,
           startTime: oldTask?.startTime || startTime,
           endTime: oldTask?.endTime || endTime,
         });
@@ -262,6 +262,8 @@ export default function Day({
     return aBigIndex - bBigIndex;
   });
 
+  console.log({ events });
+
   return (
     <div
       ref={mergeRefs(dropRef, parentRef, containerRef)}
@@ -280,7 +282,7 @@ export default function Day({
       ))}
 
       {/* Tasks */}
-      {events.map((event) => {
+      {sortedEvents.map((event, index) => {
         const eventStartTime = moment(event.startTime, "HH:mm");
         const eventEndTime = moment(event.endTime, "HH:mm");
         const tasksInRow = sortedEvents.filter((task) => {
@@ -295,10 +297,16 @@ export default function Day({
             return true;
           }
         });
-        const taskIndex = tasksInRow.findIndex((task) => task.id === event.id);
+
+        const taskIndex = tasksInRow.findIndex((task) => {
+          if (task.id === event.id && task.type === event.type) {
+            return true;
+          }
+        });
+
         return (
           <DayTask
-            key={event.id}
+            key={index}
             rowsLength={rows.length}
             totalTaskInRow={tasksInRow.length}
             calculateLeftPosition={calculateLeftPosition(
