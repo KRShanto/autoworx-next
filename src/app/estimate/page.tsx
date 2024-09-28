@@ -16,89 +16,17 @@ import ConvertTo from "./ConvertTo";
 import { Filter } from "./Filter";
 import Header from "./Header";
 import Table from "./Table";
+import { fetchAndTransformData } from "@/lib/fetchAndTransformData";
 
-async function fetchAndTransformData(
-  type: InvoiceType,
-  companyId: number,
-  searchParams: { startDate?: string; endDate?: string; status?: string },
-) {
-  const { startDate, endDate, status } = searchParams;
 
-  const data = await db.invoice.findMany({
-    where: {
-      type,
-      companyId,
-      createdAt: {
-        gte: startDate ? new Date(`${startDate}T00:00:00`) : undefined,
-        lte: endDate ? new Date(`${endDate}T23:59:59.999`) : undefined,
-      },
-      statusId: status ? parseInt(status) : undefined,
-    },
-  });
-
-  return await Promise.all(
-    data.map(async (item) => {
-      const vehicle = item.vehicleId
-        ? await db.vehicle.findFirst({
-            where: { id: item.vehicleId },
-          })
-        : null;
-      const client = item.clientId
-        ? await db.client.findFirst({
-            where: { id: item.clientId },
-          })
-        : null;
-      const status = item.statusId
-        ? await db.status.findFirst({
-            where: { id: item.statusId },
-          })
-        : null;
-
-      return {
-        id: item.id,
-        clientName: client?.firstName + " " + client?.lastName || "",
-        vehicle: vehicle?.model || "",
-        email: client?.email || "",
-        phone: client?.mobile || "",
-        grandTotal: item.grandTotal as any,
-        createdAt: item.createdAt,
-        status: status?.name || "",
-        textColor: status?.textColor || "",
-        bgColor: status?.bgColor || "",
-      };
-    }),
-  );
-}
-
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: { startDate?: string; endDate?: string; status?: string };
-}) {
+export default async function EstimatesPage({ searchParams }: { searchParams: { startDate?: string; endDate?: string; status?: string } }) {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
-  const estimates = await fetchAndTransformData(
-    InvoiceType.Estimate,
-    companyId,
-    searchParams,
-  );
-  const invoices = await fetchAndTransformData(
-    InvoiceType.Invoice,
-    companyId,
-    searchParams,
-  );
-  const statuses = await db.status.findMany({ where: { companyId } });
-
-  const labors = await db.labor.findMany({
-    where: { companyId },
-    include: { category: true },
-  });
+  const estimates = await fetchAndTransformData(InvoiceType.Estimate, companyId, searchParams);
+  //
   const categories = await db.category.findMany({ where: { companyId } });
-  const tags = await db.tag.findMany({ where: { companyId } });
-  const services = await db.service.findMany({
-    where: { companyId },
-    include: { category: true },
-  });
+const tags = await db.tag.findMany({ where: { companyId } });
+const statuses = await db.status.findMany({ where: { companyId } });
 
   return (
     <div>
@@ -109,24 +37,24 @@ export default async function Page({
 
       <Header />
 
-      <Tabs defaultValue="a-estimate" className="mt-5 grid-cols-1">
-        <TabsList>
-          <TabsTrigger value="c-canned">Canned</TabsTrigger>
-          <TabsTrigger value="b-invoice">Invoices</TabsTrigger>
-          <TabsTrigger value="a-estimate">Estimates</TabsTrigger>
+      <Tabs defaultValue="a-estimate" className="mt-5 ">
+         <TabsList>
+          
+          <Link href="/estimate/invoices">
+            <TabsTrigger value="b-invoice">Invoices</TabsTrigger>
+          </Link>
+          <Link href="/estimate/canned">
+            <TabsTrigger value="c-canned">Canned</TabsTrigger>
+          </Link>
+          <TabsTrigger value="a-estimate">
+            Estimates
+          </TabsTrigger>
         </TabsList>
-
         <TabsContent value="a-estimate">
           <Table data={estimates} />
         </TabsContent>
 
-        <TabsContent value="b-invoice">
-          <Table data={invoices} />
-        </TabsContent>
-
-        <TabsContent value="c-canned">
-          <CannedTable labors={labors as any} services={services as any} />
-        </TabsContent>
+        
       </Tabs>
     </div>
   );
