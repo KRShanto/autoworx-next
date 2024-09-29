@@ -1,14 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import {
-  Client,
-  Invoice,
-  InvoiceItem,
   Prisma,
   Task,
-  Technician,
   User,
-  Vehicle,
 } from "@prisma/client";
 import React, { SetStateAction, useEffect, useState } from "react";
 import { IoAddCircleOutline } from "react-icons/io5";
@@ -25,7 +20,6 @@ import {
   getWorkOrders,
   updateAssignedTo,
 } from "@/actions/pipelines/getWorkOrders";
-import { Tooltip } from "antd";
 import { updateInvoiceStatus } from "@/actions/estimate/invoice/updateInvoiceStatus";
 import { getEmployees } from "@/actions/employee/get";
 import {
@@ -35,11 +29,7 @@ import {
 //dummy services
 
 //interfaces
-interface Service {
-  id: number;
-  name: string;
-  completed: boolean;
-}
+
 interface Employee {
   id: number;
   firstName: string;
@@ -193,7 +183,7 @@ export default function Pipelines({
     index: number;
   } | null>(null);
 
-  // const [tagOpenDropdown, setTagOpenDropdown] = useState(false);
+  
   const [tag, setTag] = useState<Tag>();
   const [tagDropdownStates, setTagDropdownStates] = useState<{
     [key: string]: boolean;
@@ -480,7 +470,7 @@ export default function Pipelines({
                               {...provided.dragHandleProps}
                               ref={provided.innerRef}
                               key={lead.invoiceId}
-                              className="relative mx-1 my-1 h-fit max-w-[350px] rounded-xl border bg-white p-1"
+                              className="relative mx-1 my-1 h-fit max-w-auto rounded-xl border bg-white p-1"
                             >
                               <div className="flex items-center justify-between">
                                 <h3 className="font-inter overflow-auto pb-2 font-semibold text-black">

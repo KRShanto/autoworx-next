@@ -17,7 +17,7 @@ const insertDefaultColumns = async (type: string) => {
 export const getColumnsByType = async (type: string) => {
   let columns = await db.column.findMany({
     where: { type },
-    orderBy: { order: "asc" },  // Ensure they are returned in the correct order
+    orderBy: { order: "asc" },
   });
 
   // If no columns exist, insert default columns and fetch them again
@@ -25,7 +25,7 @@ export const getColumnsByType = async (type: string) => {
     await insertDefaultColumns(type);
     columns = await db.column.findMany({
       where: { type },
-      orderBy: { order: "asc" },  // Fetch them in the correct order after insertion
+      orderBy: { order: "asc" }, 
     });
   }
 
