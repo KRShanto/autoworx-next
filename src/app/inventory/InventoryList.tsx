@@ -31,16 +31,16 @@ export default function InventoryList({
           Procurement
         </TabsTrigger>
         <TabsTrigger
-          value="products"
-          onClick={() => router.push("/inventory?view=products")}
-        >
-          Products
-        </TabsTrigger>
-        <TabsTrigger
           value="supplies"
           onClick={() => router.push("/inventory?view=supplies")}
         >
           Supplies
+        </TabsTrigger>
+        <TabsTrigger
+          value="products"
+          onClick={() => router.push("/inventory?view=products")}
+        >
+          Products
         </TabsTrigger>
       </TabsList>
 
