@@ -4,9 +4,7 @@ import Header from "../components/Header";
 import WorkOrders from "../components/WorkOrders";
 import Pipelines from "../components/Pipelines";
 import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
-import { getEmployees } from "@/actions/employee/get";
-import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
-import { User } from "@prisma/client";
+
 
 type Props = {
   searchParams?: { view?: string };
@@ -20,7 +18,7 @@ interface Column {
 }
 
 const Page = (props: Props) => {
-  const activeView = props.searchParams?.view || "workOrders";
+  const activeView = props.searchParams?.view ?? "workOrders";
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
 
   const columnType = "shop";
