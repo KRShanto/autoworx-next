@@ -9,7 +9,7 @@ import {
   updateColumn,
   updateColumnOrder,
 } from "@/actions/pipelines/pipelinesColumn";
-import { toast, Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 interface Column {
   id: number | null;
   title: string;
@@ -37,6 +37,7 @@ function ColumnItem({
   index,
   moveColumn,
   handleColumnChange,
+  handleBlurColumnChange,
   handleDeleteColumn,
   inputRef,
 }: Readonly<{
@@ -44,6 +45,7 @@ function ColumnItem({
   index: number;
   moveColumn: (dragIndex: number, hoverIndex: number) => void;
   handleColumnChange: (index: number, newName: string) => void;
+  handleBlurColumnChange:(index:number,newName:string)=>void;
   handleDeleteColumn: (index: number) => void;
   inputRef: (el: HTMLInputElement) => void;
 }>) {
@@ -75,28 +77,24 @@ function ColumnItem({
         isDragging ? "opacity-50" : "opacity-100"
       }`}
     >
-      <Toaster position="top-center" reverseOrder={false} />
       <IoReorderTwoSharp className="mr-2 text-gray-600" size={20} />
       <input
         type="text"
         ref={inputRef}
         value={column.title}
         onChange={(e) => handleColumnChange(index, e.target.value)}
+        onBlur={(e)=> handleBlurColumnChange(index,e.target.value)}
         className="flex-grow rounded-md border border-gray-300 p-1"
       />
-
-      {!restrictedColumns.includes(column.title) ? (
-        <button
-          onClick={() => handleDeleteColumn(index)}
-          className="ml-2 text-[#FF6262] hover:text-red-700"
-        >
-          <RxCross2 size={20} />
-        </button>
-      ):(<div className="ml-2" style={{ width: 20, height: 20 }} />)}
+      <button
+        onClick={() => handleDeleteColumn(index)}
+        className="ml-2 text-[#FF6262] hover:text-red-700"
+      >
+        <RxCross2 size={20} />
+      </button>
     </div>
   );
 }
-
 export default function ManagePipelines({
   columns,
   onSave,
@@ -104,6 +102,7 @@ export default function ManagePipelines({
   pipelineType,
 }: Readonly<ManagePipelinesModalProps>) {
   const [localColumns, setLocalColumns] = useState<Column[]>(columns);
+  const [deletedColumns,setDeletedColumns]=useState<Column[]>([]);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -135,7 +134,15 @@ export default function ManagePipelines({
     } else {
       updatedColumns[index].title = newName;
     }
+    
     setLocalColumns(updatedColumns);
+  };
+
+  const handleBlurColumnChange = (index: number, newName: string) => {
+    if (restrictedColumns.includes(newName)) {
+      toast.error(`The column cannot be named to '${newName}'.`);
+      return;
+    }
   };
 
   const handleDeleteColumn = async (index: number) => {
@@ -147,12 +154,15 @@ export default function ManagePipelines({
       return;
     }
 
-    if (columnToDelete.id !== null) {
-      await deleteColumn(columnToDelete.id);
-    }
-
+   
+    //reflect on UI
     const updatedColumns = localColumns.filter((_, i) => i !== index);
     setLocalColumns(updatedColumns);
+
+    if(columnToDelete.id != null)
+    {
+      setDeletedColumns([...deletedColumns,columnToDelete]);
+    }
   };
 
   const handleAddColumn = () => {
@@ -182,8 +192,14 @@ export default function ManagePipelines({
       }
     });
 
-    // Wait for all columns to be saved/updated
-    await Promise.all(columnsToSave);
+    const columnsToDelete = deletedColumns.map(async (column) => {
+      if (column.id !== null) {
+        await deleteColumn(column.id);
+      }
+    });
+
+    // Wait for all columns to be saved/updated and deleted
+    await Promise.all([...columnsToSave, ...columnsToDelete]);
 
     onSave(localColumns);
     onClose();
@@ -194,10 +210,10 @@ export default function ManagePipelines({
       .filter((column) => column.id !== null)
       .map((column, index) => ({
         id: column.id!,
-        order: index, // Save the index as the new order
+        order: index, 
       }));
     try {
-      await updateColumnOrder(reorderedColumns); // API to save column order
+      await updateColumnOrder(reorderedColumns); 
     } catch (error) {
       console.error("Error saving column order:", error);
     }
@@ -216,6 +232,7 @@ export default function ManagePipelines({
                 column={column}
                 moveColumn={moveColumn}
                 handleColumnChange={handleColumnChange}
+                handleBlurColumnChange={handleBlurColumnChange}
                 handleDeleteColumn={handleDeleteColumn}
                 inputRef={(el) => (inputRefs.current[index] = el)}
               />
