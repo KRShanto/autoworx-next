@@ -104,7 +104,7 @@ export default async function Sidebar({ productId }: { productId: number }) {
                       )}
                       <div>
                         <span className="text-6xl">{product.quantity}</span>
-                        <span>/pc</span>
+                        <span>/{product.unit}</span>
                       </div>
                       <span>Remaining</span>
                     </div>
