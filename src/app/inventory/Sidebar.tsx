@@ -123,6 +123,7 @@ export default async function Sidebar({ productId }: { productId: number }) {
                         // @ts-ignore
                         // TODO: Fix this
                         cost={lastHistory?.price}
+                        productType={product.type}
                       />
                       <ReplenishProductForm productId={productId} />
                     </div>

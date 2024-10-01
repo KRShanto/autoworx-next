@@ -15,13 +15,16 @@ import Submit from "@/components/Submit";
 import { useState } from "react";
 import { useProduct as productUse } from "../../actions/inventory/useProduct";
 import Selector from "@/components/Selector";
+import { InventoryProductType } from "@prisma/client";
 
 export default function UseProductForm({
   productId,
+  productType,
   invoiceIds,
   cost,
 }: {
   productId: number;
+  productType: InventoryProductType;
   invoiceIds: string[];
   cost: number;
 }) {
@@ -51,7 +54,7 @@ export default function UseProductForm({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button className="w-28 rounded-md bg-[#FF6262] p-1 text-white">
-          Loss
+          {productType === "Product" ? "Loss" : "Use"}
         </button>
       </DialogTrigger>
 
@@ -77,16 +80,18 @@ export default function UseProductForm({
             disabled
           />
 
-          <div className="col-span-2">
-            <Selector
-              label={(invoice: string | null) => invoice || "Select Invoice"}
-              items={invoiceIds}
-              selectedItem={invoiceId}
-              setSelectedItem={setInvoiceId}
-              displayList={(invoiceId) => <p>{invoiceId}</p>}
-              newButton={<></>}
-            />
-          </div>
+          {productType === "Product" && (
+            <div className="col-span-2">
+              <Selector
+                label={(invoice: string | null) => invoice || "Select Invoice"}
+                items={invoiceIds}
+                selectedItem={invoiceId}
+                setSelectedItem={setInvoiceId}
+                displayList={(invoiceId) => <p>{invoiceId}</p>}
+                newButton={<></>}
+              />
+            </div>
+          )}
 
           <div className="col-span-2">
             <label htmlFor="notes"> Notes</label>
