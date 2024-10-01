@@ -57,7 +57,9 @@ async function fetchAndTransformData(
       return {
         id: item.id,
         clientName: client?.firstName + " " + client?.lastName || "",
-        vehicle: vehicle?.model || "",
+        vehicle: vehicle
+          ? `${vehicle.year} ${vehicle.make} ${vehicle.model}`
+          : "",
         email: client?.email || "",
         phone: client?.mobile || "",
         grandTotal: item.grandTotal as any,

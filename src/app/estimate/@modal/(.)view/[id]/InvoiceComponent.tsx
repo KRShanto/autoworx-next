@@ -1,13 +1,10 @@
 "use client";
-import { auth } from "@/app/auth";
 import {
   DialogClose,
   DialogContentBlank,
   DialogOverlay,
   DialogPortal,
-  InterceptedDialog,
 } from "@/components/Dialog";
-import { db } from "@/lib/db";
 import {
   Company,
   Invoice,
@@ -20,25 +17,19 @@ import {
   User,
   Vehicle,
 } from "@prisma/client";
-import { MdOutlineFileDownload } from "react-icons/md";
-
 import { sendInvoiceEmail } from "@/actions/estimate/invoice/sendInvoiceEmail";
-import { pdf, PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound, useRouter } from "next/navigation";
-import path from "path";
-import { useCallback, useRef } from "react";
-import { CiFileOn } from "react-icons/ci";
+import { useRouter } from "next/navigation";
+import { useRef } from "react";
 import { FaPrint, FaRegFile, FaShare } from "react-icons/fa";
 import { FaRegShareFromSquare } from "react-icons/fa6";
 import { HiXMark } from "react-icons/hi2";
 import { useReactToPrint } from "react-to-print";
 import { InvoiceItems } from "./InvoiceItems";
 import PDFComponent from "./PDFComponent";
-
-type Props = {};
 
 const InvoiceComponent = ({
   id,
@@ -117,12 +108,6 @@ const InvoiceComponent = ({
                     }
                   </PDFDownloadLink>
                 </button>
-                {/* <button
-                  className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
-                  onClick={handleDownload}
-                >
-
-                </button> */}
 
                 <button
                   className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
@@ -169,9 +154,11 @@ const InvoiceComponent = ({
                 </div>
                 <div>
                   <h2 className="font-bold text-slate-500">Vehicle Details:</h2>
-                  <p>{vehicle?.year}</p>
-                  <p>{vehicle?.make}</p>
-                  <p>{vehicle?.model}</p>
+                  <div className="flex gap-2">
+                    <p>{vehicle?.year}</p>
+                    <p>{vehicle?.make}</p>
+                    <p>{vehicle?.model}</p>
+                  </div>
                   <p>{vehicle?.submodel}</p>
                   <p>{vehicle?.type}</p>
                 </div>
