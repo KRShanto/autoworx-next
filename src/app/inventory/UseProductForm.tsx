@@ -28,6 +28,7 @@ export default function UseProductForm({
   const [open, setOpen] = useState(false);
   const [invoiceId, setInvoiceId] = useState<string | null>(null);
 
+  // TODO: Add validation for quantity
   async function handleSubmit(formData: FormData) {
     const date = formData.get("date") as string;
     const quantity = formData.get("quantity") as string;
@@ -69,7 +70,12 @@ export default function UseProductForm({
             defaultValue={new Date().toISOString().split("T")[0]}
           />
           <SlimInput name="quantity" className="col-span-1" />
-          <SlimInput name="cost" className="col-span-1" value={cost} disabled />
+          <SlimInput
+            name="cost"
+            className="col-span-1"
+            defaultValue={cost}
+            disabled
+          />
 
           <div className="col-span-2">
             <Selector

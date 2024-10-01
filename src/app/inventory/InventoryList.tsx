@@ -16,7 +16,7 @@ export default function InventoryList({
 }) {
   const router = useRouter();
   const search = useSearchParams();
-  const view = search.get("view") || "supplies";
+  const view = search.get("view") || "products";
 
   return (
     <Tabs
