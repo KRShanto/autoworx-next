@@ -12,7 +12,7 @@ export async function createDraftEstimate({
 }: {
   id: string;
   clientId: number;
-  vehicleId: number;
+  vehicleId?: number;
 }) {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
@@ -26,16 +26,28 @@ export async function createDraftEstimate({
   });
 
   if (!draftEstimate) {
-    estimate = await db.invoice.create({
-      data: {
-        id,
-        type: "Estimate",
-        clientId,
-        vehicleId,
-        userId: session.user.id as any,
-        companyId,
-      },
-    });
+    if (vehicleId) {
+      estimate = await db.invoice.create({
+        data: {
+          id,
+          type: "Estimate",
+          clientId,
+          vehicleId,
+          userId: session.user.id as any,
+          companyId,
+        },
+      });
+    } else {
+      estimate = await db.invoice.create({
+        data: {
+          id,
+          type: "Estimate",
+          clientId,
+          userId: session.user.id as any,
+          companyId,
+        },
+      });
+    }
   } else {
     estimate = draftEstimate;
   }

@@ -63,11 +63,14 @@ export default function DetailsComponent({
 
   const handleCreateEstimate = async () => {
     const newId = customAlphabet("1234567890", 10)();
-    const res = await createDraftEstimate({
+    let estimateData: { id: string; clientId: number; vehicleId?: number } = {
       id: newId,
       clientId: client.id,
-      vehicleId: vehicles[selectedVehicleIndex].id,
-    });
+    };
+    if (vehicles.length > 0) {
+      estimateData.vehicleId = vehicles[selectedVehicleIndex].id;
+    }
+    const res = await createDraftEstimate(estimateData);
 
     if (res.type === "success") {
       setEstimateList([...estimateList, res.data]);
