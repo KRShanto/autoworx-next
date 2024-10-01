@@ -29,7 +29,7 @@ export default function Header({
   columns,
   type,
   ...restProps
-}: HeaderProps) {
+}: Readonly<HeaderProps>) {
   const router = useRouter();
 
   const [isPipelineManaged, setPipelineManaged] = useState(false);

@@ -49,12 +49,11 @@ interface Column {
   order: number; 
 }
 const Page = (props: Props) => {
-  const activeView = props.searchParams?.view || "workOrders";
+  const activeView = props.searchParams?.view ?? "workOrders";
   const columnType = "sales";
 
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
-  const [salesPipelineData, setSalesPipelineData] =
-    useState<PipelineData[]>(salesData);
+  
 
   useEffect(() => {
     const fetchShopColumns = async () => {
@@ -81,7 +80,6 @@ const Page = (props: Props) => {
         pipelinesTitle={type}
         columns={pipelineColumns}
         onColumnsUpdate={handleColumnsUpdate}
-        pipelineData={salesPipelineData}
         type={columnType}
       />
 

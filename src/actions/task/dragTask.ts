@@ -4,8 +4,15 @@ import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { revalidatePath } from "next/cache";
 
+type TTask = {
+  id: number;
+  date: Date;
+  startTime: string;
+  endTime: string;
+};
+
 // TODO: later, use updateTask instead of dragTask
-export async function dragTask(task: any): Promise<ServerAction> {
+export async function dragTask(task: TTask): Promise<ServerAction> {
   const oldTask = await db.task.findUnique({
     where: {
       id: task.id,
@@ -30,8 +37,8 @@ export async function dragTask(task: any): Promise<ServerAction> {
   };
 }
 
-export async function updateTask(task: any): Promise<ServerAction> {
-  const updatedData = await db.task.update({
+export async function updateTask(task: TTask): Promise<ServerAction> {
+  await db.task.update({
     where: {
       id: task.id,
     },

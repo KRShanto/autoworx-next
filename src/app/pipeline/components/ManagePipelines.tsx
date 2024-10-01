@@ -3,13 +3,18 @@ import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { IoReorderTwoSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
-import { createColumn, deleteColumn, updateColumn, updateColumnOrder } from "@/actions/pipelines/pipelinesColumn";
-
+import {
+  createColumn,
+  deleteColumn,
+  updateColumn,
+  updateColumnOrder,
+} from "@/actions/pipelines/pipelinesColumn";
+import { toast, Toaster } from "react-hot-toast";
 interface Column {
   id: number | null;
   title: string;
   type: string;
-  order: number; 
+  order: number;
 }
 
 interface ManagePipelinesModalProps {
@@ -26,7 +31,7 @@ interface DragItem {
   id: string;
   type: string;
 }
-
+const restrictedColumns = ["Pending", "In Progress", "Completed"];
 function ColumnItem({
   column,
   index,
@@ -34,14 +39,14 @@ function ColumnItem({
   handleColumnChange,
   handleDeleteColumn,
   inputRef,
-}: {
+}: Readonly<{
   column: Column;
   index: number;
   moveColumn: (dragIndex: number, hoverIndex: number) => void;
   handleColumnChange: (index: number, newName: string) => void;
   handleDeleteColumn: (index: number) => void;
   inputRef: (el: HTMLInputElement) => void;
-}) {
+}>) {
   const [, drop] = useDrop({
     accept: ItemType,
     hover(item: DragItem) {
@@ -66,24 +71,28 @@ function ColumnItem({
   return (
     <div
       ref={ref}
-      className={`flex items-center mb-2 bg-white p-2 rounded-md cursor-move ${
+      className={`mb-2 flex cursor-move items-center rounded-md bg-white p-2 ${
         isDragging ? "opacity-50" : "opacity-100"
       }`}
     >
+      <Toaster position="top-center" reverseOrder={false} />
       <IoReorderTwoSharp className="mr-2 text-gray-600" size={20} />
       <input
         type="text"
         ref={inputRef}
         value={column.title}
         onChange={(e) => handleColumnChange(index, e.target.value)}
-        className="border border-gray-300 rounded-md p-1 flex-grow"
+        className="flex-grow rounded-md border border-gray-300 p-1"
       />
-      <button
-        onClick={() => handleDeleteColumn(index)}
-        className="ml-2 text-[#FF6262] hover:text-red-700"
-      >
-        <RxCross2 size={20} />
-      </button>
+
+      {!restrictedColumns.includes(column.title) ? (
+        <button
+          onClick={() => handleDeleteColumn(index)}
+          className="ml-2 text-[#FF6262] hover:text-red-700"
+        >
+          <RxCross2 size={20} />
+        </button>
+      ):(<div className="ml-2" style={{ width: 20, height: 20 }} />)}
     </div>
   );
 }
@@ -93,7 +102,7 @@ export default function ManagePipelines({
   onSave,
   onClose,
   pipelineType,
-}: ManagePipelinesModalProps) {
+}: Readonly<ManagePipelinesModalProps>) {
   const [localColumns, setLocalColumns] = useState<Column[]>(columns);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -115,12 +124,28 @@ export default function ManagePipelines({
 
   const handleColumnChange = (index: number, newName: string) => {
     const updatedColumns = [...localColumns];
-    updatedColumns[index].title = newName;
+
+    if (restrictedColumns.includes(updatedColumns[index].title)) {
+      toast.error(`The column "${updatedColumns[index].title}" cannot be edited.`);
+      return;
+    }
+    if (restrictedColumns.includes(newName)) {
+      toast.error(`The column cannot be renamed to '${newName}'.`);
+      return;
+    } else {
+      updatedColumns[index].title = newName;
+    }
     setLocalColumns(updatedColumns);
   };
 
   const handleDeleteColumn = async (index: number) => {
     const columnToDelete = localColumns[index];
+
+    //prevent from deletion
+    if (restrictedColumns.includes(columnToDelete.title)) {
+      toast.error("Deletion of restricted column is not allowed.");
+      return;
+    }
 
     if (columnToDelete.id !== null) {
       await deleteColumn(columnToDelete.id);
@@ -131,12 +156,12 @@ export default function ManagePipelines({
   };
 
   const handleAddColumn = () => {
-    const newOrder = localColumns.length; // Assign the new order as the length of the array
+    const newOrder = localColumns.length;
     const newColumn: Column = {
       id: null,
       title: "New Column",
       type: pipelineType,
-      order: newOrder, // New column gets the next available order
+      order: newOrder,
     };
     setLocalColumns([...localColumns, newColumn]);
   };
@@ -144,6 +169,11 @@ export default function ManagePipelines({
   const handleSave = async () => {
     const columnsToSave = localColumns.map(async (column, index) => {
       column.order = index; // Ensure the correct order is saved
+
+      if (restrictedColumns.includes(column.title)) {
+        return;
+      }
+
       if (column.id === null) {
         const newColumn = await createColumn(column.title, column.type);
         column.id = newColumn.id;
@@ -175,13 +205,13 @@ export default function ManagePipelines({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-        <div className="bg-white rounded-lg p-6 w-180">
-          <h2 className="text-lg font-semibold mb-4">Edit Pipeline</h2>
-          <div className="flex flex-col justify-center items-center">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="w-180 rounded-lg bg-white p-6">
+          <h2 className="mb-4 text-lg font-semibold">Edit Pipeline</h2>
+          <div className="flex flex-col items-center justify-center">
             {localColumns.map((column, index) => (
               <ColumnItem
-                key={column.id || `new-${index}`} // Fallback key for new columns
+                key={column.id ?? `new-${index}`} // Fallback key for new columns
                 index={index}
                 column={column}
                 moveColumn={moveColumn}
@@ -192,7 +222,7 @@ export default function ManagePipelines({
             ))}
             <button
               onClick={handleAddColumn}
-              className="text-blue-500 text-sm mt-2 border-2 border-blue-500 rounded px-1 py-1 text-center w-[75%]"
+              className="mt-2 w-[75%] rounded border-2 border-blue-500 px-1 py-1 text-center text-sm text-blue-500"
             >
               + Add New Column
             </button>
@@ -200,13 +230,13 @@ export default function ManagePipelines({
           <div className="mt-4 flex justify-end">
             <button
               onClick={onClose}
-              className="mr-2 px-4 py-2 bg-gray-200 rounded-md"
+              className="mr-2 rounded-md bg-gray-200 px-4 py-2"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md"
+              className="rounded-md bg-blue-500 px-4 py-2 text-white"
             >
               Apply
             </button>

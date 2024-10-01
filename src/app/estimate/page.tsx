@@ -1,21 +1,14 @@
-import { SyncLists } from "@/components/SyncLists";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
-import Title from "@/components/Title";
-import { cn } from "@/lib/cn";
-import { db } from "@/lib/db";
+// pages/estimate/page.tsx
+
 import { AuthSession } from "@/types/auth";
 import { InvoiceType } from "@prisma/client";
-import moment from "moment";
-import Link from "next/link";
-import React from "react";
-import { CiEdit } from "react-icons/ci";
-import { FaSearch } from "react-icons/fa";
-import { auth } from "../auth";
-import CannedTable from "./CannedTable";
-import ConvertTo from "./ConvertTo";
-import { Filter } from "./Filter";
 import Header from "./Header";
+import { auth } from "@/app/auth";
+import { SyncLists } from "@/components/SyncLists";
+import { db } from "@/lib/db";
+import NavigationTabs from "./NavigationTabs";
 import Table from "./Table";
+import Title from "@/components/Title";
 
 async function fetchAndTransformData(
   type: InvoiceType,
@@ -72,11 +65,11 @@ async function fetchAndTransformData(
   );
 }
 
-export default async function Page({
+export default async function EstimatesPage({
   searchParams,
-}: {
+}: Readonly<{
   searchParams: { startDate?: string; endDate?: string; status?: string };
-}) {
+}>) {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
   const estimates = await fetchAndTransformData(
@@ -84,52 +77,23 @@ export default async function Page({
     companyId,
     searchParams,
   );
-  const invoices = await fetchAndTransformData(
-    InvoiceType.Invoice,
-    companyId,
-    searchParams,
-  );
-  const statuses = await db.status.findMany({ where: { companyId } });
 
-  const labors = await db.labor.findMany({
-    where: { companyId },
-    include: { category: true },
-  });
   const categories = await db.category.findMany({ where: { companyId } });
   const tags = await db.tag.findMany({ where: { companyId } });
-  const services = await db.service.findMany({
-    where: { companyId },
-    include: { category: true },
-  });
+  const statuses = await db.status.findMany({ where: { companyId } });
 
   return (
     <div>
       <Title>Estimates</Title>
 
-      {/* TODO: find a better way. fetch these values from client side in where they are actually needed */}
       <SyncLists categories={categories} tags={tags} statuses={statuses} />
 
       <Header />
 
-      <Tabs defaultValue="a-estimate" className="mt-5 grid-cols-1">
-        <TabsList>
-          <TabsTrigger value="c-canned">Canned</TabsTrigger>
-          <TabsTrigger value="b-invoice">Invoices</TabsTrigger>
-          <TabsTrigger value="a-estimate">Estimates</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="a-estimate">
-          <Table data={estimates} />
-        </TabsContent>
-
-        <TabsContent value="b-invoice">
-          <Table data={invoices} />
-        </TabsContent>
-
-        <TabsContent value="c-canned">
-          <CannedTable labors={labors as any} services={services as any} />
-        </TabsContent>
-      </Tabs>
+      {/* Use the NavigationTabs component with the 'a-estimate' tab as active */}
+      <NavigationTabs activeTab="a-estimate">
+        <Table data={estimates} />
+      </NavigationTabs>
     </div>
   );
 }

@@ -5,10 +5,13 @@ import { FaSearch } from "react-icons/fa";
 import { Filter } from "./Filter";
 import Link from "next/link";
 import { useEstimateFilterStore } from "@/stores/estimate-filter";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const { setFilter } = useEstimateFilterStore();
+  const pathname = usePathname();
 
+  const shouldShowCreateEstimate = pathname != "/estimate/canned";
   return (
     <div className="mt-5 flex justify-between">
       <div className="app-shadow flex gap-3 rounded-md p-3">
@@ -27,12 +30,14 @@ export default function Header() {
       </div>
 
       {/* Create Estimate */}
-      <Link
-        href="/estimate/create"
-        className="app-shadow flex h-10 items-center rounded-md bg-[#6571FF] px-5 text-white"
-      >
-        + Create Estimate
-      </Link>
+      {shouldShowCreateEstimate && (
+        <Link
+          href="/estimate/create"
+          className="app-shadow flex h-10 items-center rounded-md bg-[#6571FF] px-5 text-white"
+        >
+          + Create Estimate
+        </Link>
+      )}
     </div>
   );
 }
