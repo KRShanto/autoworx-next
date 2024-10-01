@@ -22,7 +22,7 @@ export default function ProductTable({
   const search = useSearchParams();
 
   return (
-    <div>
+    <div className="h-full overflow-x-auto">
       <table className="w-full">
         <thead className="bg-white">
           <tr className="h-10 border-b">
