@@ -3,10 +3,11 @@
 import { cn } from "@/lib/cn";
 import { Category, InventoryProduct, Vendor } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import EditProduct from "./EditProduct";
 import { deleteInventory } from "@/actions/inventory/delete";
+import { useInventoryFilterStore } from "@/stores/inventoryFilter";
 
 const evenColor = "bg-white";
 const oddColor = "bg-[#F8FAFF]";
@@ -20,6 +21,27 @@ export default function ProductTable({
 }) {
   const router = useRouter();
   const search = useSearchParams();
+  const { search: productSearch, category } = useInventoryFilterStore();
+  const [filteredProducts, setFilteredProducts] = useState(products);
+
+  useEffect(() => {
+    const filtered = products.filter((product) => {
+      if (
+        productSearch &&
+        !product.name.toLowerCase().includes(productSearch.toLowerCase())
+      ) {
+        return false;
+      }
+      if (category && !product.category) {
+        return false;
+      }
+      if (category && product.category.name !== category) {
+        return false;
+      }
+      return true;
+    });
+    setFilteredProducts(filtered);
+  }, [productSearch, category, products]);
 
   return (
     <div className="h-full overflow-x-auto">
@@ -36,7 +58,7 @@ export default function ProductTable({
         </thead>
 
         <tbody>
-          {products.map((product, index) => (
+          {filteredProducts.map((product, index) => (
             <tr
               key={product.id}
               className={cn(
