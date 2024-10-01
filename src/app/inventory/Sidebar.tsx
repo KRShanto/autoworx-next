@@ -9,6 +9,7 @@ import { getCompanyId } from "@/lib/companyId";
 import { FaCircleExclamation } from "react-icons/fa6";
 import QRcode from "./QRcode";
 import { env } from "next-runtime-env";
+import { cn } from "@/lib/cn";
 
 export default async function Sidebar({ productId }: { productId: number }) {
   const companyId = await getCompanyId();
@@ -103,7 +104,14 @@ export default async function Sidebar({ productId }: { productId: number }) {
                         </div>
                       )}
                       <div>
-                        <span className="text-6xl">{product.quantity}</span>
+                        <span
+                          className={cn(
+                            "text-6xl",
+                            product.quantity === 0 && "text-red-600",
+                          )}
+                        >
+                          {product.quantity}
+                        </span>
                         <span>/{product.unit}</span>
                       </div>
                       <span>Remaining</span>
@@ -112,7 +120,9 @@ export default async function Sidebar({ productId }: { productId: number }) {
                       <UseProductForm
                         productId={productId}
                         invoiceIds={invoices.map((invoice) => invoice.id)}
-                        cost={parseInt(lastHistory?.price?.toString() || "0")}
+                        // @ts-ignore
+                        // TODO: Fix this
+                        cost={lastHistory?.price}
                       />
                       <ReplenishProductForm productId={productId} />
                     </div>
