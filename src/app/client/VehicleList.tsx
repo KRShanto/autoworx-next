@@ -1,9 +1,12 @@
 "use client";
-import { cn } from "@/lib/cn";
-import React from "react";
+import { deleteVehicle } from "@/actions/vehicle/editVehicle";
+import EditVehicle from "@/components/Lists/EditVehicle";
 import NewVehicle from "@/components/Lists/NewVehicle";
-import { Vehicle } from "@prisma/client";
+import { cn } from "@/lib/cn";
+import { Vehicle, VehicleColor } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
+import React from "react";
+import { FaTimes } from "react-icons/fa";
 
 export default function VehicleList({
   clientId,
@@ -39,6 +42,7 @@ export default function VehicleList({
               <th className="px-4 text-left 2xl:px-10">Make</th>
               <th className="px-4 text-left 2xl:px-10">Model</th>
               <th className="px-4 text-left 2xl:px-10">Plate</th>
+              <th className="px-4 text-left 2xl:px-10">Actions</th>
             </tr>
           </thead>
 
@@ -68,6 +72,21 @@ export default function VehicleList({
                 </td>
                 <td className="px-4 py-1 text-left 2xl:px-10">
                   {vehicle.license}
+                </td>
+                <td className="px-4 py-1 text-left 2xl:px-10">
+                  <div className="flex items-center gap-x-4 text-xl">
+                    {" "}
+                    <EditVehicle vehicle={vehicle} />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        deleteVehicle(vehicle.id, clientId);
+                      }}
+                      className="text-xs text-red-500"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
