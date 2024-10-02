@@ -56,6 +56,7 @@ export default async function Page({
           productId={productId}
           invoiceIds={invoices.map((invoice) => invoice.id)}
           cost={parseInt(lastHistory?.price?.toString() || "0")}
+          productType={product.type}
         />
         <ReplenishProductForm productId={productId} />
       </div>
