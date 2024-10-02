@@ -206,6 +206,18 @@ export async function newPayment({
       };
   }
 
+  // update the invoice
+  await db.invoice.update({
+    where: {
+      id: invoiceId,
+    },
+    data: {
+      due: {
+        decrement: amount,
+      },
+    },
+  });
+
   return {
     type: "success",
     message: "Payment created",
