@@ -53,8 +53,10 @@ export default async function Sidebar({ productId }: { productId: number }) {
                 {product && (
                   <>
                     $
-                    {parseFloat(product?.price?.toString() || "0") *
-                      parseFloat(product?.quantity?.toString() || "0")}
+                    {(
+                      parseFloat(product?.price?.toString() || "0") *
+                      parseFloat(product?.quantity?.toString() || "0")
+                    ).toFixed(2)}
                   </>
                 )}
               </p>

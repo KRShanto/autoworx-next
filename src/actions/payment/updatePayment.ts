@@ -117,6 +117,19 @@ export async function updatePayment({
       throw new Error("Invalid payment type");
   }
 
+  // Update invoice
+  const invoice = await db.invoice.findUnique({
+    where: { id: updatedPayment.invoiceId! },
+  });
+
+  await db.invoice.update({
+    where: { id: invoice!.id },
+    data: {
+      // @ts-ignore
+      due: (invoice!.due || 0) - (updatedPayment.amount || 0),
+    },
+  });
+
   revalidatePath("/estimate");
 
   return { type: "success", data: updatedPayment };

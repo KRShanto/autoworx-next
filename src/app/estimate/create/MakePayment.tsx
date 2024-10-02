@@ -50,7 +50,7 @@ function TabTrigger({
 
 export default function MakePayment() {
   const { paymentMethods } = useListsStore();
-  const { payment, grandTotal } = useEstimateCreateStore();
+  const { payment, due, grandTotal } = useEstimateCreateStore();
   const createInvoice = useInvoiceCreate("Invoice");
   const router = useRouter();
   const pathaname = usePathname();
@@ -78,7 +78,6 @@ export default function MakePayment() {
       setTab(payment.type);
       setDate(payment.date || new Date());
       setNotes(payment.notes || "");
-      setAmount(Number(payment.amount));
 
       switch (payment.type) {
         case "CARD":
@@ -98,12 +97,7 @@ export default function MakePayment() {
     }
   }, [payment]);
 
-  // set grandTotal to amount when grandTotal changes
-  useEffect(() => {
-    if (grandTotal && !payment) {
-      setAmount(grandTotal);
-    }
-  }, [grandTotal]);
+  useEffect(() => setAmount(due), [due]);
 
   async function handleSubmit() {
     const res1 = await createInvoice();
