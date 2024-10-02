@@ -34,7 +34,6 @@ type TInputType = {
   productName: string | null;
   description: string | null;
   price: number | null;
-  quantity: number | null;
   unit: string | null;
   lot: string | null;
   type: InventoryProductType;
@@ -58,7 +57,6 @@ export default function EditProduct({ productData }: TProps) {
     productName: productData.name,
     description: productData.description,
     price: Number(productData.price) as number,
-    quantity: productData.quantity,
     unit: productData.unit,
     lot: productData.lot,
     type: productData.type,
@@ -82,7 +80,6 @@ export default function EditProduct({ productData }: TProps) {
     const description = product.description as string;
     const price = Number(product.price) as number;
     const categoryId = category?.id as number;
-    const quantity = Number(product.quantity) as number;
     const unit = product.unit as string;
     const lot = product.lot as string;
     const type = product.type as InventoryProductType;
@@ -90,9 +87,6 @@ export default function EditProduct({ productData }: TProps) {
     const lowInventory = Number(product.lowInventory) as number;
 
     try {
-      if (!(price > 0 && quantity > 0)) {
-        throw new Error("Price and quantity must be greater than 0");
-      }
       const res = await editProduct({
         id: productData.id,
         name,
@@ -100,7 +94,6 @@ export default function EditProduct({ productData }: TProps) {
         price,
         categoryId,
         vendorId: vendor?.id,
-        quantity,
         unit,
         lot,
         type,
@@ -225,13 +218,6 @@ export default function EditProduct({ productData }: TProps) {
             </div>
 
             <div className="col-span-3 mt-5 flex w-[90%] gap-5">
-              <SlimInput
-                onChange={handleChange}
-                value={product.quantity as number}
-                name="quantity"
-                type="number"
-                required={false}
-              />
               <SlimInput
                 onChange={handleChange}
                 value={product.price as number}
