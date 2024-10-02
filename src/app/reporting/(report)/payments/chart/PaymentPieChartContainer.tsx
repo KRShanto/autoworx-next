@@ -1,10 +1,10 @@
 "use client";
 import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer } from "recharts";
 
-const data = [
-  { name: "Payment Paid", value: 1300 },
-  { name: "Payment Overdue", value: 300 },
-];
+type TProps = {
+  totalPayments: number;
+  paymentDue: number;
+};
 
 const COLORS = ["#03A7A2", "#7BEADF"];
 const CustomTooltip = ({ active, payload }: any) => {
@@ -20,7 +20,14 @@ const CustomTooltip = ({ active, payload }: any) => {
 
   return null;
 };
-export default function PaymentPieChartContainer() {
+export default function PaymentPieChartContainer({
+  totalPayments,
+  paymentDue,
+}: TProps) {
+  const data = [
+    { name: "Payment Paid", value: totalPayments },
+    { name: "Payment Overdue", value: paymentDue },
+  ];
   return (
     <div className="chart-container grid grid-cols-2 items-center">
       <ResponsiveContainer width="70%" height="100%">

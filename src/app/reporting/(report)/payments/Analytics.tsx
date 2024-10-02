@@ -1,8 +1,30 @@
-import RevenueBarChartContainer from "../revenue/chart/RevenueBarChartContainer";
+import { db } from "@/lib/db";
 import PaymentBarChartContainer from "./chart/PaymentBarChartContainer";
 import PaymentPieChartContainer from "./chart/PaymentPieChartContainer";
 
-export default function Analytics() {
+export default async function Analytics() {
+  const invoices = await db.invoice.findMany({
+    select: {
+      grandTotal: true,
+    },
+  });
+  const payments = await db.payment.findMany({
+    select: {
+      amount: true,
+    },
+  });
+
+  const totalInvoicesGrandTotal = invoices.reduce(
+    (acc, invoice) => acc + Number(invoice.grandTotal),
+    0,
+  );
+
+  const totalPayments = payments.reduce(
+    (acc, payment) => acc + Number(payment.amount),
+    0,
+  );
+
+  const paymentDue = totalInvoicesGrandTotal - totalPayments;
   return (
     <div className="rounded-lg border p-6">
       <h1 className="py-4 text-4xl font-bold">Analytics</h1>
@@ -10,7 +32,10 @@ export default function Analytics() {
         {/* bar chart */}
         <PaymentBarChartContainer />
         {/* pie chart */}
-        <PaymentPieChartContainer />
+        <PaymentPieChartContainer
+          totalPayments={totalPayments}
+          paymentDue={paymentDue}
+        />
       </div>
     </div>
   );

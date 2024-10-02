@@ -34,7 +34,7 @@ export default async function Analytics() {
   });
 
   const days = Array.from({ length: 31 }, (_, i) => {
-    let day = moment().subtract(i, "days").format("YYYY-MM-DD");
+    let day = moment().subtract(i, "days").format("MMM Do, YYYY");
     return last30DaysInvoice.reduce(
       (acc, invoice) => {
         const profitInfo = invoice.invoiceItems.reduce(
@@ -56,7 +56,7 @@ export default async function Analytics() {
               Number(cur.labor?.charge) * cur?.labor?.hours!;
             const costPrice = materialCostPrice + laborCostPrice;
             const formattedDate = moment(invoice.createdAt).format(
-              "YYYY-MM-DD",
+              "MMM Do, YYYY",
             );
             acc.profit = Number(invoice.grandTotal) - costPrice;
             acc.day = formattedDate;
@@ -77,7 +77,7 @@ export default async function Analytics() {
         profit: 0,
       },
     );
-  });
+  }).reverse();
   return (
     <div className="rounded-lg border p-6">
       <h1 className="py-4 text-4xl font-bold">Analytics</h1>

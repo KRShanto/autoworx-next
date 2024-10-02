@@ -1,5 +1,4 @@
 "use client";
-import { Suspense } from "react";
 import RevenueBarChartContainer from "../revenue/chart/RevenueBarChartContainer";
 import RevenueLineChartContainer from "../revenue/chart/RevenueLineChartContainer";
 import ChartNavigateButtons from "./ChartNavigateButtons";
@@ -8,6 +7,9 @@ type TProps = {
   rightChart: string;
 };
 export default function Analytics({ leftChart, rightChart }: TProps) {
+  const days = Array.from({ length: 31 }, (_, i) => {
+    return { day: `Day ${i + 1}`, profit: Math.floor(Math.random() * 1000) };
+  });
   return (
     <div className="rounded-lg border p-6">
       <h1 className="py-4 text-4xl font-bold">Analytics</h1>
@@ -32,7 +34,7 @@ export default function Analytics({ leftChart, rightChart }: TProps) {
               chartDirectionValue={rightChart}
             />
           </div>
-          <RevenueLineChartContainer />
+          <RevenueLineChartContainer days={days} />
         </div>
       </div>
     </div>
