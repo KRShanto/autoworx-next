@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Calculation from "../../components/Calculation";
 import FilterBySearchBox from "../../components/filter/FilterBySearchBox";
 import FilterByDateRange from "../../components/filter/FilterByDateRange";
@@ -168,7 +168,9 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
           </tbody>
         </table>
       </div>
-      <Analytics />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Analytics />
+      </Suspense>
     </div>
   );
 }

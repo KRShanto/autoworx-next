@@ -49,7 +49,9 @@ const filterMultipleSliders: TSliderData[] = [
 ];
 export default async function PaymentReportPage({ searchParams }: TProps) {
   const filterOR = [];
-  if (searchParams.startDate && searchParams.endDate) {
+  if (searchParams.search) {
+    filterOR.push({ invoiceId: { contains: searchParams.search?.trim() } });
+  } else if (searchParams.startDate && searchParams.endDate) {
     const formattedStartDate =
       searchParams.startDate &&
       moment(decodeURIComponent(searchParams.startDate!), "MM-DD-YYYY").format(

@@ -1,4 +1,5 @@
 "use client";
+import moment from "moment";
 import {
   CartesianGrid,
   Label,
@@ -10,43 +11,22 @@ import {
   YAxis,
 } from "recharts";
 
-const data = [
-  {
-    month: "Jan",
-    leads: 600,
-  },
-  {
-    month: "Feb",
-    leads: 200,
-  },
-  {
-    month: "Mar",
-    leads: 400,
-  },
-  {
-    month: "Apr",
-    leads: 200,
-  },
-  {
-    month: "May",
-    leads: 800,
-  },
-  {
-    month: "May",
-    leads: 300,
-  },
-  {
-    month: "May",
-    leads: 900,
-  },
-];
-export default function RevenueLineChartContainer() {
+type TDays = {
+  day: string;
+  profit: number;
+}[];
+
+type TProps = {
+  days: TDays;
+};
+
+export default function RevenueLineChartContainer({ days }: TProps) {
   return (
     <div className="chart-container border-none">
       <div style={{ width: "100%" }}>
         <ResponsiveContainer width="95%" height={500}>
-          <LineChart data={data}>
-            <XAxis tick={false} dataKey="month">
+          <LineChart data={days}>
+            <XAxis tick={false} dataKey="day">
               <Label
                 angle={-360}
                 value="Number of Jobs"
@@ -60,7 +40,7 @@ export default function RevenueLineChartContainer() {
               </Label>
             </XAxis>
             <YAxis
-              dataKey="leads"
+              dataKey="profit"
               stroke="#fffff"
               tickCount={8}
               domain={[0, "dataMax"]}
@@ -71,7 +51,7 @@ export default function RevenueLineChartContainer() {
               verticalCoordinatesGenerator={() => []}
             />
             <Line
-              dataKey="leads"
+              dataKey="profit"
               stroke="#03A7A2"
               strokeWidth="4px"
               dot={false}
