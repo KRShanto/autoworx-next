@@ -57,7 +57,6 @@ const NotificationServiceContainer = ({ serviceKey }: Props) => {
                 <td></td>
                 <td className="text-sm font-semibold">Email</td>
                 <td className="text-sm font-semibold">Push</td>
-                <td className="text-sm font-semibold">Silence</td>
               </tr>
             </thead>
             <tbody>

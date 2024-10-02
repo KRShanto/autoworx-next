@@ -12,7 +12,6 @@ export type TOpenService = {
 export type TSwitchValue = {
   email: boolean;
   push: boolean;
-  silence: boolean;
 };
 
 export type TNotification = {

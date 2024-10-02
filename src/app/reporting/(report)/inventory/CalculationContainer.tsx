@@ -1,7 +1,6 @@
 import React from "react";
 import Calculation from "../../components/Calculation";
 import { db } from "@/lib/db";
-import { InventoryProduct } from "@prisma/client";
 
 export default async function CalculationContainer() {
   const suppliesPromise = db.inventoryProduct.findMany({

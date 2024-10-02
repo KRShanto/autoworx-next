@@ -159,7 +159,14 @@ export default async function InventoryReportPage({ searchParams }: TProps) {
                 <td className="border-b px-4 py-2 text-center">
                   {productInfo.name}
                 </td>
-                <td className="border-b px-4 py-2 text-center"></td>
+                <td className="border-b px-4 py-2 text-center">
+                  {productInfo &&
+                    Math.round(
+                      (Number(productInfo?.price) *
+                        Number(productInfo?.quantity)) /
+                        Number(productInfo?.quantity),
+                    )}
+                </td>
                 <td className="border-b px-4 py-2 text-center"></td>
                 <td className="border-b px-4 py-2 text-center">
                   {productInfo.quantity}

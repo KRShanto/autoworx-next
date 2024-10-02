@@ -8,6 +8,10 @@ import { cn } from "@/lib/cn";
 import { getClientsData } from "../../data";
 import Analytics from "./Analytics";
 import FilterByMultiple from "../../components/filter/FilterByMultiple";
+import { db } from "@/lib/db";
+import RevenueTableRow from "./RevenueTableRow";
+import moment from "moment";
+import { QueryOptions } from "@prisma/client/runtime/library";
 
 type TProps = {
   searchParams: {
@@ -47,8 +51,63 @@ const filterMultipleSliders: TSliderData[] = [
     max: 500,
   },
 ];
-export default function RevenueReportPage({ searchParams }: TProps) {
-  const clients = getClientsData();
+export default async function RevenueReportPage({ searchParams }: TProps) {
+  const filterOR = [];
+  if (searchParams.startDate && searchParams.endDate) {
+    const formattedStartDate =
+      searchParams.startDate &&
+      moment(decodeURIComponent(searchParams.startDate!), "MM-DD-YYYY").format(
+        "YYYY-MM-DD",
+      );
+
+    const formattedEndDate =
+      searchParams.endDate &&
+      moment(decodeURIComponent(searchParams.endDate!), "MM-DD-YYYY").format(
+        "YYYY-MM-DD",
+      );
+    filterOR.push({
+      createdAt: {
+        gte:
+          formattedStartDate && new Date(`${formattedStartDate}T00:00:00.000Z`), // Start of the day
+        lte: formattedEndDate && new Date(`${formattedEndDate}T23:59:59.999Z`), // End of the day
+      },
+    });
+  }
+
+  const invoices = await db.invoice.findMany({
+    where: {
+      client: {
+        OR: searchParams.search
+          ? [
+              { firstName: { contains: searchParams.search?.trim() } },
+              { lastName: { contains: searchParams.search?.trim() } },
+            ]
+          : undefined,
+      },
+      OR: filterOR.length > 0 ? filterOR : undefined,
+    },
+    include: {
+      invoiceItems: {
+        include: {
+          materials: true,
+          labor: true,
+        },
+      },
+      vehicle: {
+        select: {
+          make: true,
+          model: true,
+          submodel: true,
+        },
+      },
+      client: {
+        select: {
+          firstName: true,
+          lastName: true,
+        },
+      },
+    },
+  });
   return (
     <div className="space-y-5">
       <div className="my-7 grid grid-cols-5 gap-4">
@@ -99,32 +158,12 @@ export default function RevenueReportPage({ searchParams }: TProps) {
           </thead>
 
           <tbody>
-            {clients.map((client, index) => (
-              <tr
-                key={index}
-                className={cn(
-                  "cursor-pointer rounded-md py-3",
-                  index % 2 === 0 ? "bg-white" : "bg-blue-100",
-                )}
-              >
-                <td className="border-b px-4 py-2 text-center">
-                  <Link className="text-blue-500" href={`/client/${client.id}`}>
-                    {client.name}
-                  </Link>
-                </td>
-                <td className="border-b px-4 py-2 text-center">
-                  {client.email}
-                </td>
-                <td className="border-b px-4 py-2 text-center">
-                  {client.phone}
-                </td>
-                <td className="border-b px-4 py-2 text-center">
-                  {client.phone}
-                </td>
-                <td className="border-b px-4 py-2 text-center">0</td>
-                <td className="border-b px-4 py-2 text-center">0</td>
-                <td className="border-b px-4 py-2 text-center">0</td>
-              </tr>
+            {invoices.map((invoice, index) => (
+              <RevenueTableRow
+                key={invoice.id}
+                invoice={invoice}
+                index={index}
+              />
             ))}
           </tbody>
         </table>
