@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { HiExternalLink } from "react-icons/hi";
 import EditHistory from "./EditHistory";
+import { FaEdit } from "react-icons/fa";
 
 enum Tab {
   Sales = "sales",
@@ -28,7 +29,10 @@ export default function SalesPurchaseHistoryClient({
   histories,
 }: {
   product?: InventoryProduct;
-  histories: (InventoryProductHistory & { vendor: Vendor | null, client: Client | null })[];
+  histories: (InventoryProductHistory & {
+    vendor: Vendor | null;
+    client: Client | null;
+  })[];
 }) {
   const [tab, setTab] = useState<Tab>(Tab.Sales);
 
@@ -87,7 +91,10 @@ function Table({
   type,
   product,
 }: {
-  histories: (InventoryProductHistory & { vendor: Vendor | null, client: Client | null })[];
+  histories: (InventoryProductHistory & {
+    vendor: Vendor | null;
+    client: Client | null;
+  })[];
   type: InventoryProductHistoryType;
   product?: InventoryProduct;
 }) {
@@ -105,7 +112,7 @@ function Table({
           <th className="text-center">Quantity</th>
           <th className="text-center">Total</th>
           <th className="text-center">Date</th>
-          {type === "Purchase" && <th className="text-center">Action</th>}
+          <th className="text-center">Action</th>
         </tr>
       </thead>
 
@@ -134,14 +141,10 @@ function Table({
             )}
 
             <td className="text-nowrap text-center">
-              {type === "Sale" ? (
-                history.client?.firstName
-              ) : (
-                history.vendor?.name
-              )}
-
-
-              </td>
+              {type === "Sale"
+                ? history.client?.firstName
+                : history.vendor?.name}
+            </td>
             <td className="text-nowrap text-center">
               ${history.price?.toString()}
             </td>
@@ -155,7 +158,7 @@ function Table({
                 "DD.MM.YYYY",
               )}
             </td>
-            {type === "Purchase" && (
+            {type === "Purchase" ? (
               <td className="text-center">
                 <EditHistory
                   historyId={history.id}
@@ -168,6 +171,15 @@ function Table({
                   lot={product?.lot!}
                   notes={history.notes!}
                 />
+              </td>
+            ) : (
+              <td className="text-center">
+                <Link
+                  href={`/estimate/edit/${history.invoiceId}`}
+                  className="text-[#6571FF]"
+                >
+                  <FaEdit />
+                </Link>
               </td>
             )}
           </tr>

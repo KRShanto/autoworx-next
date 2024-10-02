@@ -2,6 +2,9 @@ name: Docker Build and Push
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - master
 
 jobs:
   build:
@@ -38,6 +41,10 @@ jobs:
             --build-arg GMAIL_CLIENT_SECRET=${{ secrets.GMAIL_CLIENT_SECRET }} \
             --build-arg GMAIL_USER=${{ secrets.GMAIL_USER }} \
             --build-arg GMAIL_PASS=${{ secrets.GMAIL_PASS }} \
-            --platform linux/amd64 .
+            --build-arg TWILIO_SID=${{ secrets.TWILIO_SID }} \
+            --build-arg TWILIO_TOKEN=${{ secrets.TWILIO_TOKEN }} \
+            --build-arg TWILIO_PHONE=${{ secrets.TWILIO_PHONE }} \
+            --platform linux/amd64 \
+            .
 
           docker push krshanto/autoworx-next-app:latest
