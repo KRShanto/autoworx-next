@@ -15,19 +15,23 @@ import Submit from "@/components/Submit";
 import { useState } from "react";
 import { useProduct as productUse } from "../../actions/inventory/useProduct";
 import Selector from "@/components/Selector";
+import { InventoryProductType } from "@prisma/client";
 
 export default function UseProductForm({
   productId,
+  productType,
   invoiceIds,
   cost,
 }: {
   productId: number;
+  productType: InventoryProductType;
   invoiceIds: string[];
   cost: number;
 }) {
   const [open, setOpen] = useState(false);
   const [invoiceId, setInvoiceId] = useState<string | null>(null);
 
+  // TODO: Add validation for quantity
   async function handleSubmit(formData: FormData) {
     const date = formData.get("date") as string;
     const quantity = formData.get("quantity") as string;
@@ -50,7 +54,7 @@ export default function UseProductForm({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button className="w-28 rounded-md bg-[#FF6262] p-1 text-white">
-          Loss
+          {productType === "Product" ? "Loss" : "Use"}
         </button>
       </DialogTrigger>
 
@@ -69,18 +73,25 @@ export default function UseProductForm({
             defaultValue={new Date().toISOString().split("T")[0]}
           />
           <SlimInput name="quantity" className="col-span-1" />
-          <SlimInput name="cost" className="col-span-1" value={cost} disabled />
+          <SlimInput
+            name="cost"
+            className="col-span-1"
+            defaultValue={cost}
+            disabled
+          />
 
-          <div className="col-span-2">
-            <Selector
-              label={(invoice: string | null) => invoice || "Select Invoice"}
-              items={invoiceIds}
-              selectedItem={invoiceId}
-              setSelectedItem={setInvoiceId}
-              displayList={(invoiceId) => <p>{invoiceId}</p>}
-              newButton={<></>}
-            />
-          </div>
+          {productType === "Product" && (
+            <div className="col-span-2">
+              <Selector
+                label={(invoice: string | null) => invoice || "Select Invoice"}
+                items={invoiceIds}
+                selectedItem={invoiceId}
+                setSelectedItem={setInvoiceId}
+                displayList={(invoiceId) => <p>{invoiceId}</p>}
+                newButton={<></>}
+              />
+            </div>
+          )}
 
           <div className="col-span-2">
             <label htmlFor="notes"> Notes</label>

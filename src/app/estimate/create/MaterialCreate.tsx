@@ -51,10 +51,12 @@ export default function MaterialCreate() {
       );
       setTags(data.material.tags || []);
       setNotes(data.material.notes || "");
-      setQuantity(data.material.quantity || 0);
-      setCost(data.material.cost || 0);
-      setSell(data.material.sell || 0);
-      setDiscount(data.material.discount || 0);
+      setQuantity(
+        data.material.quantity === 0 ? undefined : data.material.quantity,
+      );
+      setCost(data.material.cost);
+      setSell(data.material.sell || data.material.cost);
+      setDiscount(data.material.discount);
       setAddToInventory(data.material.addToInventory || false);
     } else {
       setName("");
@@ -310,6 +312,7 @@ export default function MaterialCreate() {
           onChange={(e) => setCost(parseInt(e.target.value as any))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
           placeholder="0"
+          disabled={data.edit}
         />
       </div>
 

@@ -11,6 +11,12 @@ export default function ConvertTo({ id }: { id: string }) {
 
   async function convert() {
     const res = await convertInvoice(id);
+
+    // TODO: remove this
+    if (res.type === "success") {
+      // reload the page
+      window.location.reload();
+    }
   }
 
   return (

@@ -43,13 +43,14 @@ export default function LaborCreate() {
 
   useEffect(() => {
     if (data?.labor && data.edit) {
+      console.log("hello there");
       setName(data.labor.name);
       setCategory(categories.find((cat) => cat.id === data.labor.categoryId)!);
       setTags(data.labor.tags);
       setNotes(data.labor.notes);
-      setHours(data.labor.hours);
-      setCharge(data.labor.charge);
-      setDiscount(data.labor.discount);
+      setHours(data.labor.hours == 0 ? undefined : data.labor.hours);
+      setCharge(data.labor.charge == 0 ? undefined : data.labor.charge);
+      setDiscount(data.labor.discount == 0 ? undefined : data.labor.discount);
       setAddToCannedLabor(data.labor.addToCannedLabor);
     } else {
       setName("");
@@ -62,6 +63,8 @@ export default function LaborCreate() {
       setAddToCannedLabor(false);
     }
   }, [data]);
+
+  console.log("discount", discount);
 
   async function handleSubmit() {
     if (!name) {

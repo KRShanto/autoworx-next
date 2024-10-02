@@ -35,7 +35,10 @@ export default function LaborItems({
 
   const handleTechnicianDelete = async (technicianId: number) => {
     try {
-      await deleteTechnician(technicianId);
+      await deleteTechnician({
+        id: technicianId,
+        invoiceId,
+      });
       const updatedTechnicians = technicians.filter(
         (technician) => technician.id !== technicianId,
       );

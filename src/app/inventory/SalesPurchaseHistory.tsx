@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import SalesPurchaseHistoryClient from "./SalesPurchaseHistoryClient";
+import { Client, InventoryProductHistory, Vendor } from "@prisma/client";
 
 export default async function SalesPurchaseHistory({
   productId,
@@ -11,7 +12,11 @@ export default async function SalesPurchaseHistory({
         where: { id: productId },
       })
     : undefined;
-  const history = productId
+  // @ts-ignore
+  const histories: (InventoryProductHistory & {
+    vendor: Vendor | null;
+    client: Client | null;
+  })[] = productId
     ? await db.inventoryProductHistory.findMany({
         where: { productId },
         orderBy: { date: "desc" },
@@ -19,5 +24,18 @@ export default async function SalesPurchaseHistory({
       })
     : [];
 
-  return <SalesPurchaseHistoryClient histories={history} product={product!} />;
+  // add `client` to each history
+  for (const history of histories) {
+    if (history.invoiceId) {
+      const invoice = await db.invoice.findUnique({
+        where: { id: history.invoiceId },
+        include: { client: true },
+      });
+      history.client = invoice?.client || null;
+    }
+  }
+
+  return (
+    <SalesPurchaseHistoryClient histories={histories} product={product!} />
+  );
 }

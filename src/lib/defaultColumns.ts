@@ -10,9 +10,9 @@ export  const defaultSalesColumn=[
 export  const defaultShopColumn=[
   { title: "Pending", type: "shop",order:0  },
   { title: "Completed", type: "shop" ,order:1 },
-  { title: "Cancelled", type: "shop" ,order:2 },
+  { title: "In Progress", type: "shop" ,order:2 },
   { title: "Re-Dos", type: "shop" ,order:3 },
-  { title: "Optional", type: "shop",order:4  },
+  { title: "Cancelled", type: "shop",order:4  },
  
 ];
 

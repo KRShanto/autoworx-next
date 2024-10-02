@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { Priority, Technician } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { updateWorkOrderStatus } from "./updateWorkOrderStatus";
 
 type TechnicianInput = {
   date: Date;
@@ -36,6 +37,8 @@ export const updateTechnician = async (
     const user = await db.user.findUnique({
       where: { id: payload.userId },
     });
+
+    await updateWorkOrderStatus(payload.invoiceId);
 
     return {
       type: "success",

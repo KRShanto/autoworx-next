@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/cn";
 import {
+  Client,
   InventoryProduct,
   InventoryProductHistory,
   InventoryProductHistoryType,
@@ -27,7 +28,7 @@ export default function SalesPurchaseHistoryClient({
   histories,
 }: {
   product?: InventoryProduct;
-  histories: (InventoryProductHistory & { vendor: Vendor | null })[];
+  histories: (InventoryProductHistory & { vendor: Vendor | null, client: Client | null })[];
 }) {
   const [tab, setTab] = useState<Tab>(Tab.Sales);
 
@@ -86,7 +87,7 @@ function Table({
   type,
   product,
 }: {
-  histories: (InventoryProductHistory & { vendor: Vendor | null })[];
+  histories: (InventoryProductHistory & { vendor: Vendor | null, client: Client | null })[];
   type: InventoryProductHistoryType;
   product?: InventoryProduct;
 }) {
@@ -132,7 +133,15 @@ function Table({
               </>
             )}
 
-            <td className="text-nowrap text-center">{history.vendor?.name}</td>
+            <td className="text-nowrap text-center">
+              {type === "Sale" ? (
+                history.client?.firstName
+              ) : (
+                history.vendor?.name
+              )}
+
+
+              </td>
             <td className="text-nowrap text-center">
               ${history.price?.toString()}
             </td>

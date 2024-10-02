@@ -140,7 +140,7 @@ export default function Table({ data }: { data: InvoiceData[] }) {
                   href={`/estimate/view/${data.id}`}
                   className="block h-full w-full"
                 >
-                  {data.grandTotal?.toString()}
+                  ${(+data.grandTotal).toFixed(2)}
                 </Link>
               </td>
               <td className="px-4 py-2 text-left">
