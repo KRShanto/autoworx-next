@@ -10,7 +10,6 @@ export default async function Analytics() {
 
   let formattedToday = today.format("YYYY-MM-DD");
   let formattedLast30Days = last30Days.format("YYYY-MM-DD");
-  console.log(formattedToday, formattedLast30Days);
 
   const last30DaysInvoice = await db.invoice.findMany({
     where: {

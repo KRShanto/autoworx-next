@@ -9,6 +9,7 @@ import FilterByMultiple from "../../components/filter/FilterByMultiple";
 import { db } from "@/lib/db";
 import { formatDate } from "@/utils/taskAndActivity";
 import moment from "moment";
+import { Suspense } from "react";
 type TProps = {
   searchParams: {
     category?: string;
@@ -198,7 +199,9 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
           </tbody>
         </table>
       </div>
-      <Analytics />
+      <Suspense fallback="loading...">
+        <Analytics />
+      </Suspense>
     </div>
   );
 }

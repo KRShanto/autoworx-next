@@ -2,28 +2,7 @@
 import BarChartComponent from "@/app/reporting/components/BarChartComponent";
 import { Bar, Tooltip, XAxis, YAxis } from "recharts";
 
-const data = [
-  {
-    method: "method 1",
-    payment: 500,
-  },
-  {
-    method: "method 2",
-    payment: 400,
-  },
-  {
-    method: "method 3",
-    payment: 300,
-  },
-  {
-    method: "method 4",
-    payment: 200,
-  },
-  {
-    method: "method 5",
-    payment: 100,
-  },
-];
+
 
 const CustomBar = (props: any) => {
   const { x, y, width, height, fill } = props;
@@ -67,10 +46,16 @@ const CustomTooltip = ({ active, payload }: any) => {
 
   return null;
 };
-export default function PaymentBarChartContainer() {
+
+
+type TProps = {
+  paymentData: Array<{ method: string; payment: number }>;
+}
+
+export default function PaymentBarChartContainer({paymentData}: TProps) {
   return (
     <div className="chart-container">
-      <BarChartComponent height={500} title="" data={data}>
+      <BarChartComponent height={500} title="" data={paymentData}>
         <XAxis
           tickLine={false}
           dataKey={"method"}
