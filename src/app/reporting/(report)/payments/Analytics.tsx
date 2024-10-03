@@ -6,38 +6,18 @@ import moment from "moment";
 const paymentMethods = ["CARD", "CHECK", "CASH", "OTHER"];
 
 export default async function Analytics() {
-  let last30Days = moment().subtract(30, "days");
-  let today = moment();
+  // let last30Days = moment().subtract(30, "days");
+  // let today = moment();
 
-  let formattedToday = today.format("YYYY-MM-DD");
-  let formattedLast30Days = last30Days.format("YYYY-MM-DD");
+  // let formattedToday = today.format("YYYY-MM-DD");
+  // let formattedLast30Days = last30Days.format("YYYY-MM-DD");
 
   const invoices = await db.invoice.findMany({
-    where: {
-      AND: [
-        {
-          createdAt: {
-            gte: new Date(`${formattedLast30Days}T00:00:00.000Z`), // Start of the day
-            lte: new Date(`${formattedToday}T23:59:59.999Z`), // End of the day
-          },
-        },
-      ],
-    },
     select: {
       grandTotal: true,
     },
   });
   const payments = await db.payment.findMany({
-    where: {
-      AND: [
-        {
-          createdAt: {
-            gte: new Date(`${formattedLast30Days}T00:00:00.000Z`), // Start of the day
-            lte: new Date(`${formattedToday}T23:59:59.999Z`), // End of the day
-          },
-        },
-      ],
-    },
     select: {
       amount: true,
       type: true,

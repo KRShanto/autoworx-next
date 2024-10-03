@@ -8,6 +8,7 @@ import FilterByMultiple from "../../components/filter/FilterByMultiple";
 import { db } from "@/lib/db";
 import RevenueTableRow from "./RevenueTableRow";
 import moment from "moment";
+import { Prisma } from "@prisma/client";
 
 type TProps = {
   searchParams: {
@@ -16,6 +17,9 @@ type TProps = {
     endDate?: string;
     service?: string;
     search?: string;
+    price?: string;
+    cost?: string;
+    profit?: string;
   };
 };
 
@@ -27,29 +31,33 @@ type TSliderData = {
   type: "price" | "cost" | "profit";
 };
 
-const filterMultipleSliders: TSliderData[] = [
-  {
-    id: 1,
-    type: "price",
-    min: 0,
-    max: 300,
-    // defaultValue: [50, 250],
-  },
-  {
-    id: 2,
-    type: "cost",
-    min: 0,
-    max: 400,
-  },
-  {
-    id: 3,
-    type: "profit",
-    min: 0,
-    max: 500,
-  },
-];
+export type TInvoice = Prisma.InvoiceGetPayload<{
+  include: {
+    invoiceItems: {
+      include: {
+        materials: true;
+        labor: true;
+      };
+    };
+    vehicle: {
+      select: {
+        make: true;
+        model: true;
+        submodel: true;
+      };
+    };
+    client: {
+      select: {
+        firstName: true;
+        lastName: true;
+      };
+    };
+  };
+}>;
+
 export default async function RevenueReportPage({ searchParams }: TProps) {
   const filterOR = [];
+
   if (searchParams.startDate && searchParams.endDate) {
     const formattedStartDate =
       searchParams.startDate &&
@@ -134,8 +142,99 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
     servicesPromise,
     categoriesPromise,
   ]);
+
   const getService = services.map((service) => service.name);
   const getCategory = categories.map((category) => category.name);
+
+  const maxPrice = Math.max(
+    ...invoices.map((invoice) => Number(invoice.grandTotal)),
+  );
+
+  let maxCost = 0;
+  let maxProfit = 0;
+
+  const filteredInvoice = invoices.filter((invoice) => {
+    const { costPrice, profitPrice } = invoice.invoiceItems.reduce(
+      (
+        acc,
+        cur: Prisma.InvoiceItemGetPayload<{
+          include: {
+            materials: true;
+            labor: true;
+          };
+        }>,
+      ) => {
+        const materialCostPrice = cur.materials.reduce(
+          (acc, cur) => acc + Number(cur?.cost) * Number(cur?.quantity),
+          0,
+        );
+        // labor cost price is assumed to be per hour
+        const laborCostPrice = Number(cur.labor?.charge) * cur?.labor?.hours!;
+        const costPrice = materialCostPrice + laborCostPrice;
+        acc.costPrice = costPrice;
+        acc.profitPrice = Number(invoice.grandTotal) - acc.costPrice;
+        return acc;
+      },
+      {
+        costPrice: 0,
+        profitPrice: 0,
+      },
+    );
+    (invoice as any).costPrice = costPrice;
+    (invoice as any).profitPrice = profitPrice;
+    maxCost = Math.max(maxCost, costPrice);
+    maxProfit = Math.max(maxProfit, profitPrice);
+    if (!searchParams.price && !searchParams.cost && !searchParams.profit) {
+      return true;
+    }
+    // filter by price of invoice
+    if (searchParams.price) {
+      const [minPrice, maxPrice] = searchParams.price.split("-").map(Number);
+      if (
+        Number(invoice?.grandTotal) >= minPrice &&
+        Number(invoice?.grandTotal) <= maxPrice
+      ) {
+        return true;
+      }
+    }
+    // filter by cost of invoice
+    if (searchParams.cost) {
+      const [minCost, maxCost] = searchParams.cost.split("-").map(Number);
+      if (costPrice >= minCost && costPrice <= maxCost) {
+        return true;
+      }
+    }
+    // filter by profit of invoice
+    if (searchParams.profit) {
+      const [minProfit, maxProfit] = searchParams.profit.split("-").map(Number);
+      if (profitPrice >= minProfit && profitPrice <= maxProfit) {
+        return true;
+      }
+    }
+  });
+
+  // multiple filters 
+  const filterMultipleSliders: TSliderData[] = [
+    {
+      id: 1,
+      type: "price",
+      min: 0,
+      max: maxPrice,
+      // defaultValue: [50, 250],
+    },
+    {
+      id: 2,
+      type: "cost",
+      min: 0,
+      max: maxCost,
+    },
+    {
+      id: 3,
+      type: "profit",
+      min: 0,
+      max: maxProfit,
+    },
+  ];
 
   return (
     <div className="space-y-5">
@@ -187,10 +286,15 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
           </thead>
 
           <tbody>
-            {invoices.map((invoice, index) => (
+            {filteredInvoice.map((invoice, index) => (
               <RevenueTableRow
                 key={invoice.id}
-                invoice={invoice}
+                invoice={
+                  invoice as TInvoice & {
+                    costPrice: number;
+                    profitPrice: number;
+                  }
+                }
                 index={index}
               />
             ))}
