@@ -1,9 +1,9 @@
 "use client";
-import { deleteVehicle } from "@/actions/vehicle/editVehicle";
+import { deleteVehicle } from "@/actions/vehicle/deleteVehicle";
 import EditVehicle from "@/components/Lists/EditVehicle";
 import NewVehicle from "@/components/Lists/NewVehicle";
 import { cn } from "@/lib/cn";
-import { Vehicle, VehicleColor } from "@prisma/client";
+import { Vehicle } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { FaTimes } from "react-icons/fa";
