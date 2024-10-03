@@ -3,15 +3,11 @@ import Calculation from "../../components/Calculation";
 import FilterBySearchBox from "../../components/filter/FilterBySearchBox";
 import FilterByDateRange from "../../components/filter/FilterByDateRange";
 import FilterBySelection from "../../components/filter/FilterBySelection";
-import Link from "next/link";
-import { cn } from "@/lib/cn";
-import { getClientsData } from "../../data";
 import Analytics from "./Analytics";
 import FilterByMultiple from "../../components/filter/FilterByMultiple";
 import { db } from "@/lib/db";
 import RevenueTableRow from "./RevenueTableRow";
 import moment from "moment";
-import { QueryOptions } from "@prisma/client/runtime/library";
 
 type TProps = {
   searchParams: {
@@ -30,6 +26,7 @@ type TSliderData = {
   defaultValue?: [number, number];
   type: "price" | "cost" | "profit";
 };
+
 const filterMultipleSliders: TSliderData[] = [
   {
     id: 1,
@@ -74,8 +71,23 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
     });
   }
 
-  const invoices = await db.invoice.findMany({
+  const invoicesPromise = db.invoice.findMany({
     where: {
+      invoiceItems: {
+        some:
+          searchParams.category || searchParams.service
+            ? {
+                OR: [
+                  {
+                    service: {
+                      name: searchParams.service?.trim(),
+                      category: { name: searchParams.category },
+                    },
+                  },
+                ],
+              }
+            : undefined,
+      },
       client: {
         OR: searchParams.search
           ? [
@@ -108,6 +120,23 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
       },
     },
   });
+
+  const servicesPromise = db.service.findMany({
+    include: {
+      category: true,
+    },
+  });
+
+  const categoriesPromise = db.category.findMany();
+
+  const [invoices, services, categories] = await Promise.all([
+    invoicesPromise,
+    servicesPromise,
+    categoriesPromise,
+  ]);
+  const getService = services.map((service) => service.name);
+  const getCategory = categories.map((category) => category.name);
+
   return (
     <div className="space-y-5">
       <div className="my-7 grid grid-cols-5 gap-4">
@@ -132,12 +161,12 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
           />
           <FilterBySelection
             selectedItem={searchParams?.category as string}
-            items={["product", "parts", "wheel"]}
+            items={getCategory}
             type="category"
           />
           <FilterBySelection
             selectedItem={searchParams?.service as string}
-            items={["washing", "changing wheel", "full service"]}
+            items={getService}
             type="service"
           />
         </div>
