@@ -1,11 +1,11 @@
+import NewCustomer from "@/components/Lists/NewCustomer";
 import Title from "@/components/Title";
-import { IoSearchOutline } from "react-icons/io5";
-import ClientInformation from "../ClientInformation";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
-import NewCustomer from "@/components/Lists/NewCustomer";
-import VehicleList from "../VehicleList";
+import { IoSearchOutline } from "react-icons/io5";
+import ClientInformation from "../ClientInformation";
 import OrderList from "../OrderList";
+import VehicleList from "../VehicleList";
 
 type Props = {
   params: {
@@ -47,6 +47,9 @@ const Page = async (props: Props) => {
 
   const vehicles = await db.vehicle.findMany({
     where: { clientId: Number(clientId) },
+    include: {
+      color: true,
+    },
   });
 
   return (
