@@ -2,29 +2,6 @@
 import BarChartComponent from "@/app/reporting/components/BarChartComponent";
 import { Bar, Label, Tooltip, XAxis, YAxis } from "recharts";
 
-const data = [
-  {
-    month: "Jan",
-    leads: 100,
-  },
-  {
-    month: "Feb",
-    leads: 200,
-  },
-  {
-    month: "Mar",
-    leads: 200,
-  },
-  {
-    month: "Apr",
-    leads: 300,
-  },
-  {
-    month: "May",
-    leads: 600,
-  },
-];
-
 const CustomBar = (props: any) => {
   const { x, y, width, height, fill, style } = props;
   return (
@@ -58,19 +35,26 @@ const CustomTooltip = ({ active, payload }: any) => {
     const { payload: data } = payload[0];
     return (
       <div className="w-36 rounded-lg border border-black bg-white p-4 text-[#03A7A2]">
-        <p className="text-xl">{data?.month}</p>
-        <p className="text-2xl">${data?.leads}</p>
+        <p className="text-xl">{data?.categoryName}</p>
+        <p className="text-2xl">${data?.salePrice}</p>
       </div>
     );
   }
 
   return null;
 };
-export default function RevenueBarChartContainer() {
+
+type TProps = {
+  data: {
+    categoryName: string | undefined;
+    salePrice: number;
+  }[];
+};
+export default function RevenueBarChartContainer({ data }: TProps) {
   return (
     <div className="chart-container border-none">
       <BarChartComponent height={500} title="" data={data}>
-        <XAxis tick={false} dataKey={"month"}>
+        <XAxis tick={false} dataKey={"categoryName"}>
           <Label
             angle={-360}
             value="Number of Jobs"
@@ -84,7 +68,7 @@ export default function RevenueBarChartContainer() {
           </Label>
         </XAxis>
         <Tooltip cursor={{ fill: "transparent" }} content={<CustomTooltip />} />
-        <YAxis tick={false} dataKey={"leads"}>
+        <YAxis tick={false} dataKey={"salePrice"}>
           <Label
             angle={270}
             value="Number of Jobs"
@@ -100,7 +84,7 @@ export default function RevenueBarChartContainer() {
           </Label>
         </YAxis>
         <Bar
-          dataKey={"leads"}
+          dataKey={"salePrice"}
           fill="#ffffff"
           style={{ stroke: "#03A7A2", strokeWidth: 2 }}
           shape={<CustomBar />}

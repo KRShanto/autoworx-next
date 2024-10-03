@@ -77,11 +77,26 @@ export default async function Analytics() {
       },
     );
   }).reverse();
+
+  const data = [
+    {
+      categoryName: "Jan",
+      salePrice: 500,
+    },
+    {
+      categoryName: "Feb",
+      salePrice: 400,
+    },
+    {
+      categoryName: "Mar",
+      salePrice: 500,
+    },
+  ];
   return (
     <div className="rounded-lg border p-6">
       <h1 className="py-4 text-4xl font-bold">Analytics</h1>
       <div className="mx-10 grid grid-cols-2 space-x-20">
-        <RevenueBarChartContainer />
+        <RevenueBarChartContainer data={data} />
         <RevenueLineChartContainer days={days} />
       </div>
     </div>
