@@ -95,7 +95,7 @@ export default async function InventoryReportPage({ searchParams }: TProps) {
       InventoryProductHistory: {
         where: {
           type: "Sale",
-        }
+        },
       },
     },
   });
@@ -158,10 +158,12 @@ export default async function InventoryReportPage({ searchParams }: TProps) {
         </table>
       </div>
 
-      <Analytics
-        leftChart={searchParams.leftChart}
-        rightChart={searchParams.rightChart}
-      />
+      <Suspense fallback={"loading ..."}>
+        <Analytics
+          leftChart={searchParams.leftChart}
+          rightChart={searchParams.rightChart}
+        />
+      </Suspense>
     </div>
   );
 }
