@@ -1,7 +1,11 @@
 import { db } from "@/lib/db";
 import { AuthSession } from "@/types/auth";
 import { auth } from "../auth";
-import Dashboard from "./Dashboard";
+import DashboardAdmin from "./DashboardAdmin";
+import DashboardSales from "./DashboardSales";
+import DashboardTechnician from "./DashboardTechnician";
+
+let dashboard_view = ["ADMIN"];
 
 export default async function Page() {
   const session = (await auth()) as AuthSession;
@@ -51,6 +55,21 @@ export default async function Page() {
       client,
     });
   }
-  console.log("calendarAppointments", calendarAppointments);
-  return <Dashboard tasks={tasks} companyUsers={companyUsers} appointments={calendarAppointments} />;
+  return (
+    <DashboardTechnician
+      tasks={tasks}
+      companyUsers={companyUsers}
+      appointments={calendarAppointments}
+    />
+    // <DashboardSales
+    //   tasks={tasks}
+    //   companyUsers={companyUsers}
+    //   appointments={calendarAppointments}
+    // />
+    // <DashboardAdmin
+    //   tasks={tasks}
+    //   companyUsers={companyUsers}
+    //   appointments={calendarAppointments}
+    // />
+  );
 }

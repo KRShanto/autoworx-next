@@ -20,37 +20,7 @@ import {
   YAxis,
 } from "recharts";
 import NewTask from "../task/[type]/components/task/NewTask";
-
-const data = [
-  {
-    month: "Jan",
-    leads: 600,
-  },
-  {
-    month: "Feb",
-    leads: 200,
-  },
-  {
-    month: "Mar",
-    leads: 400,
-  },
-  {
-    month: "Apr",
-    leads: 200,
-  },
-  {
-    month: "May",
-    leads: 800,
-  },
-  {
-    month: "May",
-    leads: 300,
-  },
-  {
-    month: "May",
-    leads: 900,
-  },
-];
+import ChartData from "./ChartData";
 
 const Dashboard = ({
   tasks,
@@ -78,13 +48,13 @@ const Dashboard = ({
               </span>
             </div>
             <div className="#px-4">
-              <DataComponent
+              <ChartData
                 heading="Leads coming in"
                 subHeading="/month"
                 number={567}
               />
-              <DataComponent heading="Leads Converted" number={767} />
-              <DataComponent
+              <ChartData heading="Leads Converted" number={767} />
+              <ChartData
                 heading="Conversion Rate"
                 subHeading="Leads Converted/Total Leads"
                 number={435}
@@ -94,19 +64,19 @@ const Dashboard = ({
           {/* Shop pipeline */}
           <div className="rounded-md p-8 shadow-lg">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-3xl font-bold">Sales Pipeline</span>{" "}
+              <span className="text-3xl font-bold">Shop Pipeline</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
             </div>
             <div className="#px-4">
-              <DataComponent
+              <ChartData
                 heading="Leads coming in"
                 subHeading="/month"
                 number={567}
               />
-              <DataComponent heading="Leads Converted" number={767} />
-              <DataComponent
+              <ChartData heading="Leads Converted" number={767} />
+              <ChartData
                 heading="Conversion Rate"
                 subHeading="Leads Converted/Total Leads"
                 number={435}
@@ -116,7 +86,92 @@ const Dashboard = ({
         </div>
         {/* col 2 */}
         <div className="col-span-2 space-y-12">
-          {/* sales pipeline */}
+          {/* Revenue */}
+          <div className="rounded-md p-8 shadow-lg">
+            <div className="mb-8 flex items-center justify-between">
+              <span className="text-3xl font-bold">Revenue</span>{" "}
+              <span>
+                <FaExternalLinkAlt />
+              </span>
+            </div>
+            <div className="#px-4">
+              <ChartData
+                heading="Current Value"
+                number={567}
+                dollarSign={true}
+              />
+              <ChartData
+                heading="Current Monthly Total"
+                number={767}
+                dollarSign={true}
+              />
+            </div>
+          </div>
+          {/* Inventory */}
+          <div className="rounded-md p-8 shadow-lg">
+            <div className="mb-8 flex items-center justify-between">
+              <span className="text-3xl font-bold">Inventory</span>{" "}
+              <span>
+                <FaExternalLinkAlt />
+              </span>
+            </div>
+            <div className="#px-4">
+              <ChartData
+                heading="Current Value"
+                number={567}
+                dollarSign={true}
+              />
+              <ChartData
+                heading="Current Monthly Total"
+                number={767}
+                dollarSign={true}
+              />
+            </div>
+          </div>
+          {/* Employee Payout */}
+          <div className="rounded-md p-8 shadow-lg">
+            <div className="mb-8 flex items-center justify-between">
+              <span className="text-3xl font-bold">Employee Payout</span>{" "}
+              <span>
+                <FaExternalLinkAlt />
+              </span>
+            </div>
+            <div className="#px-4">
+              <ChartData
+                heading="Previous Month Payout"
+                number={567}
+                dollarSign
+              />
+              <ChartData
+                heading="Current Month Payout"
+                number={767}
+                dollarSign
+              />
+              <ChartData heading="YTD Payout" number={435} dollarSign />
+            </div>
+          </div>
+        </div>
+
+        {/* col 3 */}
+        <div className="col-span-2 space-y-12">
+          {/* appointments */}
+          <div className="rounded-md p-8 shadow-lg">
+            <div className="mb-8 flex items-center justify-between">
+              <span className="text-3xl font-bold">Appointments</span>{" "}
+              <span>
+                <FaExternalLinkAlt />
+              </span>
+            </div>
+            <div className="space-y-4">
+              {appointments.map((appointment: any, idx: any) => (
+                <AppointmentDetails appointment={appointment} key={idx} />
+              ))}
+            </div>
+          </div>
+        </div>
+        {/* col 4*/}
+        <div className="col-span-3 space-y-12">
+          {/* task list */}
           <div className="rounded-md p-8 shadow-lg">
             <div className="mb-8 flex items-center justify-between">
               <span className="text-3xl font-bold">Task List</span>{" "}
@@ -160,70 +215,6 @@ const Dashboard = ({
               </div>
             </div>
           </div>
-          {/* Shop pipeline */}
-          <div className="rounded-md p-8 shadow-lg">
-            <div className="mb-8 flex items-center justify-between">
-              <span className="text-3xl font-bold">Inventory</span>{" "}
-              <span>
-                <FaExternalLinkAlt />
-              </span>
-            </div>
-            <div className="#px-4">
-              <DataComponent
-                heading="Current Value"
-                number={567}
-                dollarSign={true}
-              />
-              <DataComponent
-                heading="Current Monthly Total"
-                number={767}
-                dollarSign={true}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* col 3 */}
-        <div className="col-span-2 space-y-12">
-          {/* appointments */}
-          <div className="rounded-md p-8 shadow-lg">
-            <div className="mb-8 flex items-center justify-between">
-              <span className="text-3xl font-bold">Appointments</span>{" "}
-              <span>
-                <FaExternalLinkAlt />
-              </span>
-            </div>
-            <div className="space-y-4">
-              {appointments.map((appointment: any, idx: any) => (
-                <AppointmentDetails appointment={appointment} key={idx} />
-              ))}
-            </div>
-          </div>
-        </div>
-        {/* col 4*/}
-        <div className="col-span-3 space-y-12">
-          {/* sales pipeline */}
-          <div className="rounded-md p-8 shadow-lg">
-            <div className="mb-8 flex items-center justify-between">
-              <span className="text-3xl font-bold">Employee Payout</span>{" "}
-              <span>
-                <FaExternalLinkAlt />
-              </span>
-            </div>
-            <div className="#px-4">
-              <DataComponent
-                heading="Previous Month Payout"
-                number={567}
-                dollarSign
-              />
-              <DataComponent
-                heading="Current Month Payout"
-                number={767}
-                dollarSign
-              />
-              <DataComponent heading="YTD Payout" number={435} dollarSign />
-            </div>
-          </div>
           {/* employee leave request */}
           <div className="rounded-md p-8 shadow-lg">
             <div className="mb-8 flex items-center justify-between">
@@ -246,7 +237,7 @@ const Dashboard = ({
 
 const EmployeeLeaveRequest = () => {
   return (
-    <div className="flex items-start justify-between rounded-md border border-gray-400 py-4 pl-4 pr-2 text-xs">
+    <div className="flex items-start justify-between rounded-md border border-gray-400 px-4 py-4 text-xs">
       <div className="w-[35%]">
         <p className="font-semibold">Leave Reason</p>
         <p>Employee : John Doe</p>
@@ -309,75 +300,5 @@ const AppointmentDetails = ({ appointment }: any) => {
     </div>
   );
 };
-
-const DataComponent = ({
-  heading,
-  subHeading,
-  number,
-  dollarSign = false,
-}: any) => {
-  return (
-    <div className="flex items-start justify-between">
-      <div>
-        <h3 className="font-bold">{heading}</h3>
-        {subHeading && <h6 className="text-xs">{subHeading}</h6>}
-        <div className="mt-4">
-          <span className="text-4xl font-bold">
-            {" "}
-            {dollarSign && "$"}
-            {number}
-          </span>
-        </div>
-      </div>
-      <div>
-        <div>
-          <RevenueLineChartContainer />
-        </div>
-      </div>
-    </div>
-  );
-};
-function RevenueLineChartContainer() {
-  return (
-    <div className="">
-      <div style={{ width: "100%" }}>
-        <ResponsiveContainer width={200} height={150}>
-          <LineChart data={data}>
-            <XAxis tick={false} dataKey="month">
-              {/* <Label
-                angle={-360}
-                value="Number of Jobs"
-                position="insideBottomRight"
-                style={{
-                  textAnchor: "end",
-                  fontWeight: "bold",
-                }}
-              >
-                Day
-              </Label> */}
-            </XAxis>
-            {/* <YAxis
-              dataKey="leads"
-              stroke="#fffff"
-              tickCount={8}
-              domain={[0, "dataMax"]}
-            /> */}
-            <Tooltip />
-            {/* <CartesianGrid
-              stroke="#9ca3af"
-              verticalCoordinatesGenerator={() => []}
-            /> */}
-            <Line
-              dataKey="leads"
-              stroke="#03A7A2"
-              strokeWidth="4px"
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
-  );
-}
 
 export default Dashboard;
