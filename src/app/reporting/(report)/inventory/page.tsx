@@ -11,6 +11,7 @@ import { InventoryProductType } from "@prisma/client";
 import moment from "moment";
 import CalculationContainer from "./CalculationContainer";
 import { Suspense } from "react";
+import InventoryTableRow from "./InventoryTableRow";
 type TProps = {
   searchParams: {
     category?: string;
@@ -90,6 +91,13 @@ export default async function InventoryReportPage({ searchParams }: TProps) {
       OR: filterOR.length ? filterOR : undefined,
       name: { contains: searchParams.search },
     },
+    include: {
+      InventoryProductHistory: {
+        where: {
+          type: "Sale",
+        },
+      },
+    },
   });
   return (
     <div className="space-y-5">
@@ -135,51 +143,27 @@ export default async function InventoryReportPage({ searchParams }: TProps) {
               <th className="border-b px-4 py-2 text-center">Qty. Sold</th>
               <th className="border-b px-4 py-2 text-center">Type</th>
               <th className="border-b px-4 py-2 text-center">ROI Average</th>
-              <th className="border-b px-4 py-2 text-center">Forecast</th>
             </tr>
           </thead>
 
           <tbody>
             {inventoryProducts.map((productInfo, index) => (
-              <tr
+              <InventoryTableRow
                 key={productInfo.id}
-                className={cn(
-                  "cursor-pointer rounded-md py-3",
-                  index % 2 === 0 ? "bg-white" : "bg-blue-100",
-                )}
-              >
-                <td className="border-b px-4 py-2 text-center">
-                  <Link
-                    className="text-blue-500"
-                    href={`/client/${productInfo.id}`}
-                  >
-                    {productInfo.id}
-                  </Link>
-                </td>
-                <td className="border-b px-4 py-2 text-center">
-                  {productInfo.name}
-                </td>
-                <td className="border-b px-4 py-2 text-center"></td>
-                <td className="border-b px-4 py-2 text-center"></td>
-                <td className="border-b px-4 py-2 text-center">
-                  {productInfo.quantity}
-                </td>
-                <td className="border-b px-4 py-2 text-center"></td>
-                <td className="border-b px-4 py-2 text-center">
-                  {productInfo.type}
-                </td>
-                <td className="border-b px-4 py-2 text-center"></td>
-                <td className="border-b px-4 py-2 text-center"></td>
-              </tr>
+                productInfo={productInfo}
+                index={index}
+              />
             ))}
           </tbody>
         </table>
       </div>
 
-      <Analytics
-        leftChart={searchParams.leftChart}
-        rightChart={searchParams.rightChart}
-      />
+      <Suspense fallback={"loading ..."}>
+        <Analytics
+          leftChart={searchParams.leftChart}
+          rightChart={searchParams.rightChart}
+        />
+      </Suspense>
     </div>
   );
 }

@@ -60,6 +60,7 @@ export function useInvoiceCreate(type: InvoiceType) {
       const json = await res.json();
 
       const data = json.data;
+      console.log({ data });
       photoPaths.push(...data);
     }
     let res;

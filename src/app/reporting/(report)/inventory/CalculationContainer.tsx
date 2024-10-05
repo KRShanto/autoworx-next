@@ -1,7 +1,6 @@
 import React from "react";
 import Calculation from "../../components/Calculation";
 import { db } from "@/lib/db";
-import { InventoryProduct } from "@prisma/client";
 
 export default async function CalculationContainer() {
   const suppliesPromise = db.inventoryProduct.findMany({
@@ -37,7 +36,7 @@ export default async function CalculationContainer() {
     0,
   );
   return (
-    <div className="my-7 grid grid-cols-5 gap-4">
+    <div className="my-7 grid grid-cols-4 gap-4">
       <Calculation content="Total Products" amount={totalProductPrice} />
       <Calculation content="Total Supplies" amount={totalSuppliesPrice} />
     </div>

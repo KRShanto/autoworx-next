@@ -9,6 +9,7 @@ import FilterByMultiple from "../../components/filter/FilterByMultiple";
 import { db } from "@/lib/db";
 import { formatDate } from "@/utils/taskAndActivity";
 import moment from "moment";
+import { Suspense } from "react";
 type TProps = {
   searchParams: {
     category?: string;
@@ -49,7 +50,9 @@ const filterMultipleSliders: TSliderData[] = [
 ];
 export default async function PaymentReportPage({ searchParams }: TProps) {
   const filterOR = [];
-  if (searchParams.startDate && searchParams.endDate) {
+  if (searchParams.search) {
+    filterOR.push({ invoiceId: { contains: searchParams.search?.trim() } });
+  } else if (searchParams.startDate && searchParams.endDate) {
     const formattedStartDate =
       searchParams.startDate &&
       moment(decodeURIComponent(searchParams.startDate!), "MM-DD-YYYY").format(
@@ -86,7 +89,8 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
     },
     include: {
       invoice: {
-        include: {
+        select: {
+          due: true,
           vehicle: true,
           client: {
             select: {
@@ -98,7 +102,6 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
       },
     },
   });
-
   return (
     <div className="space-y-5">
       {/* filter section */}
@@ -149,42 +152,56 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
           </thead>
 
           <tbody>
-            {paymentInfo.map((payment, index) => (
-              <tr
-                key={payment.id}
-                className={cn(
-                  "cursor-pointer rounded-md py-3",
-                  index % 2 === 0 ? "bg-white" : "bg-blue-100",
-                )}
-              >
-                <td className="border-b px-4 py-2 text-center">
-                  {payment?.date && formatDate(payment.date)}
-                </td>
-                <td className="border-b px-4 py-2 text-center">
-                  {payment.invoiceId}
-                </td>
-                <td className="border-b px-4 py-2 text-center">
-                  {payment.invoice?.client?.firstName}{" "}
-                  {payment.invoice?.client?.lastName}
-                </td>
-                <td className="border-b px-4 py-2 text-center">
-                  {payment.invoice?.vehicle?.year} -{" "}
-                  {payment.invoice?.vehicle?.make} -{" "}
-                  {payment.invoice?.vehicle?.model}
-                </td>
-                <td className="border-b px-4 py-2 text-center">
-                  {payment.type}
-                </td>
-                <td className="border-b px-4 py-2 text-center">
-                  {Number(payment.amount)}
-                </td>
-                <td className="border-b px-4 py-2 text-center">paid</td>
-              </tr>
-            ))}
+            {paymentInfo.map((payment, index) => {
+              const paymentStatus =
+                Number(payment.invoice?.due) <= 0 ? "paid" : "due";
+              return (
+                <tr
+                  key={payment.id}
+                  className={cn(
+                    "cursor-pointer rounded-md py-3",
+                    index % 2 === 0 ? "bg-white" : "bg-blue-100",
+                  )}
+                >
+                  <td className="border-b px-4 py-2 text-center">
+                    {payment?.date && formatDate(payment.date)}
+                  </td>
+                  <td className="border-b px-4 py-2 text-center">
+                    {payment.invoiceId}
+                  </td>
+                  <td className="border-b px-4 py-2 text-center">
+                    {payment.invoice?.client?.firstName}{" "}
+                    {payment.invoice?.client?.lastName}
+                  </td>
+                  <td className="border-b px-4 py-2 text-center">
+                    {payment.invoice?.vehicle?.year} -{" "}
+                    {payment.invoice?.vehicle?.make} -{" "}
+                    {payment.invoice?.vehicle?.model}
+                  </td>
+                  <td className="border-b px-4 py-2 text-center">
+                    {payment.type}
+                  </td>
+                  <td className="border-b px-4 py-2 text-center">
+                    {Number(payment.amount)}
+                  </td>
+                  <td
+                    className={cn(
+                      `border-b px-4 py-2 text-center`,
+                      paymentStatus === "due" && "text-red-500",
+                      paymentStatus === "paid" && "text-green-500",
+                    )}
+                  >
+                    {paymentStatus}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
-      <Analytics />
+      <Suspense fallback="loading...">
+        <Analytics />
+      </Suspense>
     </div>
   );
 }
