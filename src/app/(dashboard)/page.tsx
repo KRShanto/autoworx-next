@@ -2,10 +2,12 @@ import { db } from "@/lib/db";
 import { AuthSession } from "@/types/auth";
 import { auth } from "../auth";
 import DashboardAdmin from "./DashboardAdmin";
+import DashboardManager from "./DashboardManager";
+import DashboardOther from "./DashboardOther";
 import DashboardSales from "./DashboardSales";
 import DashboardTechnician from "./DashboardTechnician";
 
-let dashboard_view = ["ADMIN"];
+let dashboard_view = ["ADMIN", "OTHER", "SALES", "TECHNICIAN"];
 
 export default async function Page() {
   const session = (await auth()) as AuthSession;
@@ -55,21 +57,38 @@ export default async function Page() {
       client,
     });
   }
+
   return (
-    <DashboardTechnician
+    <>
+      {/* <DashboardOther
       tasks={tasks}
       companyUsers={companyUsers}
       appointments={calendarAppointments}
-    />
-    // <DashboardSales
-    //   tasks={tasks}
-    //   companyUsers={companyUsers}
-    //   appointments={calendarAppointments}
-    // />
-    // <DashboardAdmin
-    //   tasks={tasks}
-    //   companyUsers={companyUsers}
-    //   appointments={calendarAppointments}
-    // />
+    /> */}
+
+      {/* <DashboardTechnician
+      tasks={tasks}
+      companyUsers={companyUsers}
+      appointments={calendarAppointments}
+    /> */}
+
+      {/* <DashboardSales
+      tasks={tasks}
+      companyUsers={companyUsers}
+      appointments={calendarAppointments}
+    /> */}
+
+      {/* <DashboardManager
+      tasks={tasks}
+      companyUsers={companyUsers}
+      appointments={calendarAppointments}
+    /> */}
+
+      <DashboardAdmin
+        tasks={tasks}
+        companyUsers={companyUsers}
+        appointments={calendarAppointments}
+      />
+    </>
   );
 }

@@ -46,14 +46,18 @@ const ChartData = ({
   subHeading,
   number,
   dollarSign = false,
+  columnView = false,
+  largeChart = false,
 }: any) => {
   return (
-    <div className="flex items-start justify-between">
+    <div
+      className={`mb-8 ${columnView ? "flex flex-col" : "flex items-start justify-between"}`}
+    >
       <div>
         <h3 className="font-bold">{heading}</h3>
-        {subHeading && <h6 className="text-xs">{subHeading}</h6>}
-        <div className="mt-4">
-          <span className="text-4xl font-bold">
+        {subHeading && <h6 className="text-xs xl:text-sm">{subHeading}</h6>}
+        <div className="mt-2 xl:mt-4">
+          <span className="text-2xl font-bold xl:text-4xl">
             {" "}
             {dollarSign && "$"}
             {number}
@@ -61,19 +65,22 @@ const ChartData = ({
         </div>
       </div>
       <div>
-        <div className="scale-[0.7]">
-          <RevenueLineChartContainer />
+        <div className="#scale-[0.7]">
+          <RevenueLineChartContainer largeChart={largeChart} />
         </div>
       </div>
     </div>
   );
 };
 
-function RevenueLineChartContainer() {
+function RevenueLineChartContainer({ largeChart } :{ largeChart: boolean }) {
   return (
     <div className="">
       <div style={{ width: "100%" }}>
-        <ResponsiveContainer width={200} height={150}>
+        <ResponsiveContainer
+          width={largeChart ? "80%" : 100}
+          height={largeChart ? 150 : 70}
+        >
           <LineChart data={data}>
             <XAxis tick={false} dataKey="month">
               {/* <Label
