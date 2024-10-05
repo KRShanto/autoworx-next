@@ -67,6 +67,7 @@ model Company {
 
   companyLatitude  Float?
   companyLongitude Float?
+  Lead             Lead[]
 }
 
 // notification settings model
@@ -127,6 +128,7 @@ model User {
   Technician       Technician[]
   permissions      Permission[]
   assignedInvoices Invoice[]         @relation("assignedTo")
+  Lead             Lead[]
 
   @@index([companyId], name: "fk_users_company")
 }
@@ -992,4 +994,21 @@ model Permission {
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([userId, companyId])
+}
+
+model Lead {
+  id          Int      @id @default(autoincrement())
+  clientName  String   @map("client_name")
+  clientEmail String?  @map("client_email")
+  clientPhone String?  @map("client_phone")
+  vehicleInfo String   @map("vehicle_info")
+  services    String
+  source      String
+  comments    String?
+  userId      Int      @map("user_id")
+  companyId   Int      @map("company_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
