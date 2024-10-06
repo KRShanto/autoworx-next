@@ -1,10 +1,11 @@
 "use server";
 
+import { MIN_PASSWORD_LENGTH } from "@/lib/consts";
 import { db } from "@/lib/db";
+import generateZapierToken from "@/lib/generateZapierToken";
+import { FormErrorType } from "@/types/form-errror";
 import bcrypt from "bcrypt";
 import * as EmailValidator from "email-validator";
-import { FormErrorType } from "@/types/form-errror";
-import { MIN_PASSWORD_LENGTH } from "@/lib/consts";
 
 interface RegisterData {
   firstName: string;
@@ -70,6 +71,7 @@ export async function register({
     const newCompany = await db.company.create({
       data: {
         name: company,
+        zapierToken: generateZapierToken(),
       },
     });
 
