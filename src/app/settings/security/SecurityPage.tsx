@@ -6,6 +6,9 @@ import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
 export default function SecurityPage({ company }: { company: any }) {
   const [showToken, setShowToken] = useState(false);
+  if (!company?.zapierToken) {
+    regenerateZapierToken();
+  }
   return (
     <div className="grid w-full grid-cols-2 items-start gap-4 px-5">
       <div className="space-y-4">
