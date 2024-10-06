@@ -68,6 +68,8 @@ model Company {
   companyLatitude  Float?
   companyLongitude Float?
   Lead             Lead[]
+
+  zapierToken String? @unique @db.VarChar(240)
 }
 
 // notification settings model

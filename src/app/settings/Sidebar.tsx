@@ -49,6 +49,10 @@ const businessSettings = [
     link: "/settings/communications",
     label: "Communications Hub",
   },
+  {
+    link: "/settings/security",
+    label: "Security",
+  },
 ];
 
 const Sidebar = (props: Props) => {
