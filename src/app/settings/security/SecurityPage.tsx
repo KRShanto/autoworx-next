@@ -1,11 +1,13 @@
 "use client";
 import { regenerateZapierToken } from "@/actions/settings/regenerateZapierToken";
-import { SlimInput } from "@/components/SlimInput";
+import { successToast } from "@/lib/toast";
 import { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { BsCopy } from "react-icons/bs";
 
 export default function SecurityPage({ company }: { company: any }) {
   const [showToken, setShowToken] = useState(false);
+  const [isTokenGenerating, setIsTokenGenerating] = useState(false);
   if (!company?.zapierToken) {
     regenerateZapierToken();
   }
@@ -37,15 +39,35 @@ export default function SecurityPage({ company }: { company: any }) {
               <button
                 onClick={() => setShowToken(!showToken)}
                 type="button"
-                className="mr-8 rounded-md bg-[#6571FF] px-10 py-1.5 text-white"
+                className="mr-6 rounded-md bg-[#6571FF] px-6 py-1.5 text-white"
               >
                 {showToken ? <AiFillEyeInvisible /> : <AiFillEye />}
               </button>
 
               <button
                 type="button"
+                className="mr-6 rounded-md bg-[#6571FF] px-6 py-1.5 text-white"
+                onClick={() => {
+                  company?.zapierToken &&
+                    navigator.clipboard.writeText(company?.zapierToken);
+                  successToast("Token Copied to Clipboard");
+                }}
+              >
+                <BsCopy />
+              </button>
+              <button
+                type="button"
                 className="rounded-md bg-[#6571FF] px-10 py-1.5 text-white"
-                onClick={() => regenerateZapierToken()}
+                disabled={isTokenGenerating}
+                onClick={async () => {
+                  setIsTokenGenerating(true);
+
+                  regenerateZapierToken()
+                    .then(() => successToast("Token Regenerated"))
+                    .finally(() => {
+                      setIsTokenGenerating(false);
+                    });
+                }}
               >
                 Regenerate Token
               </button>
