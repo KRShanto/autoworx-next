@@ -31,9 +31,7 @@ const DashboardManager = ({
           {/* sales pipeline */}
           <div className="rounded-md p-4 shadow-lg 2xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold 2xl:text-3xl">
-                Sales Pipeline
-              </span>{" "}
+              <span className="text-2xl font-bold">Sales Pipeline</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -55,9 +53,7 @@ const DashboardManager = ({
           {/* Shop pipeline */}
           <div className="rounded-md p-4 shadow-lg 2xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold 2xl:text-3xl">
-                Shop Pipeline
-              </span>{" "}
+              <span className="text-2xl font-bold">Shop Pipeline</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -82,7 +78,7 @@ const DashboardManager = ({
           {/* task list */}
           <div className="rounded-md p-4 shadow-lg 2xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold 2xl:text-3xl">Task List</span>{" "}
+              <span className="text-2xl font-bold">Task List</span>{" "}
               <Link href="/task/day">
                 <FaExternalLinkAlt />
               </Link>
@@ -103,9 +99,7 @@ const DashboardManager = ({
           {/* appointments */}
           <div className="rounded-md p-4 shadow-lg 2xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold 2xl:text-3xl">
-                Appointments
-              </span>{" "}
+              <span className="text-2xl font-bold">Appointments</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -123,7 +117,7 @@ const DashboardManager = ({
             {/* Revenue */}
             <div className="w-1/2 rounded-md p-4 shadow-lg 2xl:p-8">
               <div className="mb-8 flex items-center justify-between">
-                <span className="text-2xl font-bold 2xl:text-3xl">Revenue</span>{" "}
+                <span className="text-2xl font-bold">Revenue</span>{" "}
                 <span>
                   <FaExternalLinkAlt />
                 </span>
@@ -144,9 +138,7 @@ const DashboardManager = ({
             {/* Inventory */}
             <div className="w-1/2 rounded-md p-4 shadow-lg 2xl:p-8">
               <div className="mb-8 flex items-center justify-between">
-                <span className="text-2xl font-bold 2xl:text-3xl">
-                  Inventory
-                </span>{" "}
+                <span className="text-2xl font-bold">Inventory</span>{" "}
                 <span>
                   <FaExternalLinkAlt />
                 </span>
@@ -168,9 +160,7 @@ const DashboardManager = ({
           {/* Employee Payout */}
           <div className="rounded-md p-4 shadow-lg 2xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold 2xl:text-3xl">
-                Employee Payout
-              </span>{" "}
+              <span className="text-2xl font-bold">Employee Payout</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -192,9 +182,7 @@ const DashboardManager = ({
           {/* employee leave request */}
           <div className="rounded-md p-4 shadow-lg 2xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold 2xl:text-3xl">
-                Employee Leave Request
-              </span>{" "}
+              <span className="text-2xl font-bold">Employee Leave Request</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -210,7 +198,5 @@ const DashboardManager = ({
     </div>
   );
 };
-
-
 
 export default DashboardManager;

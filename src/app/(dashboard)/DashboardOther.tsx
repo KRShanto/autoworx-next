@@ -36,9 +36,7 @@ const DashboardOther = ({
           {/* recent messages */}
           <div className="rounded-md p-8 shadow-lg">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">
-                Recent Messages
-              </span>{" "}
+              <span className="text-2xl font-bold">Recent Messages</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -63,9 +61,7 @@ const DashboardOther = ({
           {/* appointments */}
           <div className="rounded-md p-8 shadow-lg">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">
-                Appointments
-              </span>{" "}
+              <span className="text-2xl font-bold">Appointments</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -79,7 +75,7 @@ const DashboardOther = ({
           {/* task list */}
           <div className="rounded-md p-8 shadow-lg">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">Task List</span>{" "}
+              <span className="text-2xl font-bold">Task List</span>{" "}
               <Link href="/task/day">
                 <FaExternalLinkAlt />
               </Link>

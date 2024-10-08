@@ -36,9 +36,7 @@ const DashboardTechnician = ({
           {/* Current Projects */}
           <div className="rounded-md p-4 shadow-lg xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">
-                Current Projects
-              </span>{" "}
+              <span className="text-2xl font-bold">Current Projects</span>{" "}
               <Link href="/task/day">
                 <FaExternalLinkAlt />
               </Link>
@@ -78,7 +76,7 @@ const DashboardTechnician = ({
           {/* task list */}
           <div className="rounded-md p-4 shadow-lg xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">Task List</span>{" "}
+              <span className="text-2xl font-bold">Task List</span>{" "}
               <Link href="/task/day">
                 <FaExternalLinkAlt />
               </Link>
@@ -95,9 +93,7 @@ const DashboardTechnician = ({
           {/* appointments */}
           <div className="rounded-md p-4 shadow-lg xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">
-                Appointments
-              </span>{" "}
+              <span className="text-2xl font-bold">Appointments</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -140,9 +136,7 @@ const DashboardTechnician = ({
               {/* Performance */}
               <div className="rounded-md p-4 shadow-lg xl:p-8">
                 <div className="mb-8 flex items-center justify-between">
-                  <span className="text-2xl font-bold xl:text-3xl">
-                    Performance
-                  </span>{" "}
+                  <span className="text-2xl font-bold">Performance</span>{" "}
                   <span>
                     <FaExternalLinkAlt />
                   </span>
@@ -155,9 +149,7 @@ const DashboardTechnician = ({
               </div>
               <div className="rounded-md p-4 shadow-lg xl:p-8">
                 <div className="mb-8 flex items-center justify-between">
-                  <span className="text-2xl font-bold xl:text-3xl">
-                    Monthly Payout
-                  </span>{" "}
+                  <span className="text-2xl font-bold">Monthly Payout</span>{" "}
                   <span>
                     <FaExternalLinkAlt />
                   </span>
@@ -174,9 +166,7 @@ const DashboardTechnician = ({
               {/* recent messages */}
               <div className="rounded-md p-4 shadow-lg xl:p-8">
                 <div className="mb-8 flex items-center justify-between">
-                  <span className="text-2xl font-bold xl:text-3xl">
-                    Recent Messages
-                  </span>{" "}
+                  <span className="text-2xl font-bold">Recent Messages</span>{" "}
                   <span>
                     <FaExternalLinkAlt />
                   </span>
@@ -201,7 +191,5 @@ const DashboardTechnician = ({
     </div>
   );
 };
-
-
 
 export default DashboardTechnician;

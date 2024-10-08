@@ -51,11 +51,11 @@ const ChartData = ({
 }: any) => {
   return (
     <div
-      className={`mb-8 ${columnView ? "flex flex-col" : "flex items-start justify-between"}`}
+      className={`mb-8 ${columnView ? "flex flex-col" : "flex items-start justify-between gap-x-1"}`}
     >
       <div>
-        <h3 className="font-bold">{heading}</h3>
-        {subHeading && <h6 className="text-xs xl:text-sm">{subHeading}</h6>}
+        <h3 className="text-sm font-bold">{heading}</h3>
+        {subHeading && <h6 className="#xl:text-sm text-xs">{subHeading}</h6>}
         <div className="mt-2 xl:mt-4">
           <span className="text-2xl font-bold xl:text-4xl">
             {" "}
@@ -65,7 +65,7 @@ const ChartData = ({
         </div>
       </div>
       <div>
-        <div className="#scale-[0.7]">
+        <div className="">
           <RevenueLineChartContainer largeChart={largeChart} />
         </div>
       </div>
@@ -73,13 +73,13 @@ const ChartData = ({
   );
 };
 
-function RevenueLineChartContainer({ largeChart } :{ largeChart: boolean }) {
+function RevenueLineChartContainer({ largeChart }: { largeChart: boolean }) {
   return (
     <div className="">
       <div style={{ width: "100%" }}>
         <ResponsiveContainer
           width={largeChart ? "80%" : 100}
-          height={largeChart ? 150 : 70}
+          height={largeChart ? 120 : 70}
         >
           <LineChart data={data}>
             <XAxis tick={false} dataKey="month">

@@ -25,13 +25,13 @@ const Dashboard = ({
   return (
     <div className="p-8">
       <Title>Dashboard</Title>
-      <div className="grid grid-cols-4 gap-x-4 xl:gap-x-8">
+      <div className="flex items-start gap-x-2 xl:gap-x-8">
         {/* col 1 */}
-        <div className="col-span-1 space-y-12">
+        <div className="w-[25%] space-y-12">
           {/* task list */}
           <div className="rounded-md p-4 shadow-lg xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">Task List</span>{" "}
+              <span className="text-2xl font-bold">Task List</span>{" "}
               <Link href="/task/day">
                 <FaExternalLinkAlt />
               </Link>
@@ -48,13 +48,11 @@ const Dashboard = ({
         </div>
 
         {/* col 2 */}
-        <div className="col-span-1 space-y-12">
+        <div className="w-[25%] space-y-12">
           {/* appointments */}
           <div className="rounded-md p-4 shadow-lg xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">
-                Appointments
-              </span>{" "}
+              <span className="text-2xl font-bold">Appointments</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -67,13 +65,11 @@ const Dashboard = ({
           </div>
         </div>
         {/* col 3 */}
-        <div className="col-span-1 space-y-12">
+        <div className="w-[20%] space-y-12">
           {/* Performance */}
           <div className="rounded-md p-4 shadow-lg xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">
-                Performance
-              </span>{" "}
+              <span className="text-2xl font-bold">Performance</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -109,13 +105,11 @@ const Dashboard = ({
           </div>
         </div>
         {/* col 4 */}
-        <div className="col-span-1 space-y-12">
+        <div className="w-[25%] space-y-12">
           {/* recent messages */}
           <div className="rounded-md p-4 shadow-lg xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">
-                Recent Messages
-              </span>{" "}
+              <span className="text-2xl font-bold">Recent Messages</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
