@@ -1,16 +1,18 @@
 import moment from "moment";
 import { FaExternalLinkAlt } from "react-icons/fa";
 
-const Appointments = ({ appointments }: any) => {
+const Appointments = ({ appointments, fullHeight }: any) => {
   return (
-    <div className="flex h-[38vh] flex-col rounded-md p-8 shadow-lg">
+    <div
+      className={`flex ${fullHeight ? "h-[82vh]" : "h-[38vh]"} flex-col rounded-md p-8 shadow-lg`}
+    >
       <div className="mb-8 flex items-center justify-between">
         <span className="text-2xl font-bold">Appointments</span>{" "}
         <span>
           <FaExternalLinkAlt />
         </span>
       </div>
-      <div className="custom-scrollbar flex flex-1 flex-col space-y-4 ">
+      <div className="custom-scrollbar flex flex-1 flex-col space-y-4">
         {appointments.map((appointment: any, idx: any) => (
           <AppointmentDetails appointment={appointment} key={idx} />
         ))}

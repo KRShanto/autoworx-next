@@ -11,12 +11,16 @@ import NewTask from "../task/[type]/components/task/NewTask";
 const Tasks = ({
   tasks,
   companyUsers,
+  fullHeight = false,
 }: {
   tasks: TaskType[];
   companyUsers: User[];
+  fullHeight?: boolean;
 }) => {
   return (
-    <div className="flex h-[38vh] flex-col rounded-md p-8 shadow-lg">
+    <div
+      className={`flex flex-col rounded-md p-8 shadow-lg ${fullHeight ? "h-[82vh]" : "h-[38vh]"}`}
+    >
       <div className="mb-8 flex items-center justify-between">
         <span className="text-2xl font-bold">Task List</span>{" "}
         <Link href="/task/day">

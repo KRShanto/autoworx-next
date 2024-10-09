@@ -5,7 +5,7 @@ import { Task as TaskType, User } from "@prisma/client";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import Appointments from "./Appointments";
 import ChartData from "./ChartData";
-import EmployeeLeaveRequest from "./EmployeeLeaveRequest";
+import EmployeeLeaveRequests from "./EmployeeLeaveRequests";
 import Tasks from "./Tasks";
 
 const DashboardManager = ({
@@ -73,13 +73,13 @@ const DashboardManager = ({
         {/* col 2 */}
         <div className="w-[20%] space-y-12">
           {/* task list */}
-          <Tasks tasks={tasks} companyUsers={companyUsers} />
+          <Tasks tasks={tasks} companyUsers={companyUsers} fullHeight />
         </div>
 
         {/* col 3 */}
         <div className="w-[20%] space-y-12">
           {/* appointments */}
-          <Appointments appointments={appointments} />
+          <Appointments appointments={appointments} fullHeight />
         </div>
         {/* col 4*/}
         <div className="w-[40%] space-y-12">
@@ -150,19 +150,7 @@ const DashboardManager = ({
             </div>
           </div>
           {/* employee leave request */}
-          <div className="rounded-md p-4 shadow-lg 2xl:p-8">
-            <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold">Employee Leave Request</span>{" "}
-              <span>
-                <FaExternalLinkAlt />
-              </span>
-            </div>
-            <div className="space-y-4">
-              <EmployeeLeaveRequest />
-              <EmployeeLeaveRequest />
-              <EmployeeLeaveRequest />
-            </div>
-          </div>
+          <EmployeeLeaveRequests />
         </div>
       </div>
     </div>
