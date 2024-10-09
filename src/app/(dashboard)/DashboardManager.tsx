@@ -2,19 +2,16 @@
 import Title from "@/components/Title";
 import { usePopupStore } from "@/stores/popup";
 import { Task as TaskType, User } from "@prisma/client";
-import moment from "moment";
-import Link from "next/link";
 import { FaExternalLinkAlt } from "react-icons/fa";
-import NewTask from "../task/[type]/components/task/NewTask";
-import AppointmentDetails from "./AppointmentDetails";
+import Appointments from "./Appointments";
 import ChartData from "./ChartData";
 import EmployeeLeaveRequest from "./EmployeeLeaveRequest";
-import Task from "./Task";
+import Tasks from "./Tasks";
 
 const DashboardManager = ({
-  tasks,
-  companyUsers,
-  appointments,
+  tasks = [],
+  companyUsers = [],
+  appointments = [],
 }: {
   tasks: TaskType[];
   companyUsers: User[];
@@ -76,40 +73,13 @@ const DashboardManager = ({
         {/* col 2 */}
         <div className="w-[20%] space-y-12">
           {/* task list */}
-          <div className="rounded-md p-4 shadow-lg 2xl:p-8">
-            <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold">Task List</span>{" "}
-              <Link href="/task/day">
-                <FaExternalLinkAlt />
-              </Link>
-            </div>
-            <div className="space-y-2">
-              {tasks.map((task, idx) => (
-                <Task key={idx} task={task} companyUsers={companyUsers} />
-              ))}
-              <div className="mt-4 w-20 rounded-full">
-                <NewTask companyUsers={companyUsers} />
-              </div>
-            </div>
-          </div>
+          <Tasks tasks={tasks} companyUsers={companyUsers} />
         </div>
 
         {/* col 3 */}
         <div className="w-[20%] space-y-12">
           {/* appointments */}
-          <div className="rounded-md p-4 shadow-lg 2xl:p-8">
-            <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold">Appointments</span>{" "}
-              <span>
-                <FaExternalLinkAlt />
-              </span>
-            </div>
-            <div className="space-y-4">
-              {appointments.map((appointment: any, idx: any) => (
-                <AppointmentDetails appointment={appointment} key={idx} />
-              ))}
-            </div>
-          </div>
+          <Appointments appointments={appointments} />
         </div>
         {/* col 4*/}
         <div className="w-[40%] space-y-12">

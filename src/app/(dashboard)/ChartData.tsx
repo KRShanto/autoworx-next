@@ -1,13 +1,9 @@
-import { PiLinkFill } from "react-icons/pi";
 import {
-  CartesianGrid,
-  Label,
   Line,
   LineChart,
   ResponsiveContainer,
   Tooltip,
-  XAxis,
-  YAxis,
+  XAxis
 } from "recharts";
 
 const data = [

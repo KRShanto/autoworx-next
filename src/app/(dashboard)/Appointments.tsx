@@ -1,4 +1,28 @@
 import moment from "moment";
+import { FaExternalLinkAlt } from "react-icons/fa";
+
+const Appointments = ({ appointments }: any) => {
+  return (
+    <div className="flex h-[38vh] flex-col rounded-md p-8 shadow-lg">
+      <div className="mb-8 flex items-center justify-between">
+        <span className="text-2xl font-bold">Appointments</span>{" "}
+        <span>
+          <FaExternalLinkAlt />
+        </span>
+      </div>
+      <div className="custom-scrollbar flex flex-1 flex-col space-y-4 ">
+        {appointments.map((appointment: any, idx: any) => (
+          <AppointmentDetails appointment={appointment} key={idx} />
+        ))}
+        {appointments.length === 0 && (
+          <span className="self-center text-center">
+            You have no upcoming appointments
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const AppointmentDetails = ({ appointment }: any) => {
   const start = moment(appointment.startTime, "HH:mm");
@@ -38,4 +62,4 @@ const AppointmentDetails = ({ appointment }: any) => {
   );
 };
 
-export default AppointmentDetails;
+export default Appointments;
