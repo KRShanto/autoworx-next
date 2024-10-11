@@ -2,19 +2,16 @@
 import Title from "@/components/Title";
 import { usePopupStore } from "@/stores/popup";
 import { Task as TaskType, User } from "@prisma/client";
-import moment from "moment";
-import Link from "next/link";
 import { FaExternalLinkAlt } from "react-icons/fa";
-import NewTask from "../task/[type]/components/task/NewTask";
-import AppointmentDetails from "./AppointmentDetails";
+import Appointments from "./Appointments";
 import ChartData from "./ChartData";
-import EmployeeLeaveRequest from "./EmployeeLeaveRequest";
-import Task from "./Task";
+import EmployeeLeaveRequests from "./EmployeeLeaveRequests";
+import Tasks from "./Tasks";
 
 const Dashboard = ({
-  tasks,
-  companyUsers,
-  appointments,
+  tasks = [],
+  companyUsers = [],
+  appointments = [],
 }: {
   tasks: TaskType[];
   companyUsers: User[];
@@ -31,9 +28,7 @@ const Dashboard = ({
           {/* sales pipeline */}
           <div className="rounded-md p-4 shadow-lg xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">
-                Sales Pipeline
-              </span>{" "}
+              <span className="text-2xl font-bold">Sales Pipeline</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -55,9 +50,7 @@ const Dashboard = ({
           {/* Shop pipeline */}
           <div className="rounded-md p-4 shadow-lg xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">
-                Shop Pipeline
-              </span>{" "}
+              <span className="text-2xl font-bold">Shop Pipeline</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -82,7 +75,7 @@ const Dashboard = ({
           {/* Revenue */}
           <div className="rounded-md p-4 shadow-lg xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">Revenue</span>{" "}
+              <span className="text-2xl font-bold">Revenue</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -103,7 +96,7 @@ const Dashboard = ({
           {/* Inventory */}
           <div className="rounded-md p-4 shadow-lg xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">Inventory</span>{" "}
+              <span className="text-2xl font-bold">Inventory</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -124,9 +117,7 @@ const Dashboard = ({
           {/* Employee Payout */}
           <div className="rounded-md p-4 shadow-lg xl:p-8">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">
-                Employee Payout
-              </span>{" "}
+              <span className="text-2xl font-bold">Employee Payout</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -150,57 +141,14 @@ const Dashboard = ({
         {/* col 3 */}
         <div className="w-[23%] space-y-12">
           {/* appointments */}
-          <div className="rounded-md p-4 shadow-lg xl:p-8">
-            <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">
-                Appointments
-              </span>{" "}
-              <span>
-                <FaExternalLinkAlt />
-              </span>
-            </div>
-            <div className="space-y-4">
-              {appointments.map((appointment: any, idx: any) => (
-                <AppointmentDetails appointment={appointment} key={idx} />
-              ))}
-            </div>
-          </div>
+          <Appointments appointments={appointments} fullHeight />
         </div>
         {/* col 4*/}
         <div className="w-[30%] space-y-12">
           {/* task list */}
-          <div className="rounded-md p-4 shadow-lg xl:p-8">
-            <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">Task List</span>{" "}
-              <Link href="/task/day">
-                <FaExternalLinkAlt />
-              </Link>
-            </div>
-            <div className="space-y-2">
-              {tasks.map((task, idx) => (
-                <Task key={idx} task={task} companyUsers={companyUsers} />
-              ))}
-              <div className="mt-4 w-20 rounded-full">
-                <NewTask companyUsers={companyUsers} />
-              </div>
-            </div>
-          </div>
+          <Tasks tasks={tasks} companyUsers={companyUsers} />
           {/* employee leave request */}
-          <div className="rounded-md p-4 shadow-lg xl:p-8">
-            <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold xl:text-3xl">
-                Employee Leave Request
-              </span>{" "}
-              <span>
-                <FaExternalLinkAlt />
-              </span>
-            </div>
-            <div className="space-y-4">
-              <EmployeeLeaveRequest />
-              <EmployeeLeaveRequest />
-              <EmployeeLeaveRequest />
-            </div>
-          </div>
+          <EmployeeLeaveRequests />
         </div>
       </div>
     </div>

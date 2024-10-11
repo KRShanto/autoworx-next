@@ -61,28 +61,28 @@ export default async function Page() {
   return (
     <>
       {/* <DashboardOther
-      tasks={tasks}
-      companyUsers={companyUsers}
-      appointments={calendarAppointments}
-    /> */}
+        tasks={tasks}
+        companyUsers={companyUsers}
+        appointments={calendarAppointments}
+      /> */}
 
       {/* <DashboardTechnician
-      tasks={tasks}
-      companyUsers={companyUsers}
-      appointments={calendarAppointments}
-    /> */}
+        tasks={tasks}
+        companyUsers={companyUsers}
+        appointments={calendarAppointments}
+      /> */}
 
       {/* <DashboardSales
-      tasks={tasks}
-      companyUsers={companyUsers}
-      appointments={calendarAppointments}
-    /> */}
+        tasks={tasks}
+        companyUsers={companyUsers}
+        appointments={calendarAppointments}
+      /> */}
 
       {/* <DashboardManager
-      tasks={tasks}
-      companyUsers={companyUsers}
-      appointments={calendarAppointments}
-    /> */}
+        tasks={tasks}
+        companyUsers={companyUsers}
+        appointments={calendarAppointments}
+      /> */}
 
       <DashboardAdmin
         tasks={tasks}
