@@ -34,6 +34,9 @@ model Company {
   googleRefreshToken      String?                   @map("google_refresh_token")
   createdAt               DateTime                  @default(now()) @map("created_at")
   updatedAt               DateTime                  @default(now()) @updatedAt @map("updated_at")
+  companyLatitude         Float?
+  companyLongitude        Float?
+  zapierToken             String?                   @unique @db.VarChar(240)
   users                   User[]
   tasks                   Task[]
   clients                 Client[]
@@ -64,12 +67,7 @@ model Company {
   permissionForTechnician PermissionForTechnician[]
   permissionForOther      PermissionForOther[]
   permissions             Permission[]
-
-  companyLatitude  Float?
-  companyLongitude Float?
-  Lead             Lead[]
-
-  zapierToken String? @unique @db.VarChar(240)
+  Lead                    Lead[]
 }
 
 // notification settings model
