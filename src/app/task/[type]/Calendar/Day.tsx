@@ -4,6 +4,7 @@ import type {
   CalendarAppointment,
   CalendarTask,
 } from "@/types/db";
+import { formatTime, updateTimeSpace } from "@/utils/taskAndActivity";
 import type {
   CalendarSettings,
   Client,
@@ -12,14 +13,13 @@ import type {
   User,
   Vehicle,
 } from "@prisma/client";
+import mergeRefs from "merge-refs";
 import moment from "moment";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDrop } from "react-dnd";
 import { assignAppointmentDate } from "../../../../actions/appointment/assignAppointmentDate";
 import { updateTask } from "../../../../actions/task/dragTask";
-import mergeRefs from "merge-refs";
-import { formatTime, updateTimeSpace } from "@/utils/taskAndActivity";
 import DayRow from "../components/day/DayRow";
 import DayTask from "../components/day/DayTask";
 
@@ -154,7 +154,7 @@ export default function Day({
         // Add task to database
         await updateTask({
           id: taskFoundWithoutTime.id,
-          date: new Date(taskFoundWithoutTime?.date!) || date,
+          date: date ? date.toDate() : new Date(),
           startTime: oldTask?.startTime || startTime,
           endTime: oldTask?.endTime || endTime,
         });
