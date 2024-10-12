@@ -21,6 +21,9 @@ export const NO_ACCESS_ROUTES = {
     notAccess: [ROLES.TECHNICIAN, ROLES.OTHER],
   },
   //* inventory page
+  "/inventory": {
+    notAccess: [ROLES.SALES, ROLES.TECHNICIAN, ROLES.OTHER]
+  },
   "/inventory?view=products": {
     notAccess: [ROLES.TECHNICIAN, ROLES.OTHER],
   },
