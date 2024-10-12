@@ -281,3 +281,43 @@ html body[data-scroll-locked] {
     overflow: hidden;
   }
 }
+
+/* Custom scrollbar for elements with the class 'custom-scrollbar' */
+.custom-scrollbar {
+  overflow-y: auto; /* Enable vertical scrolling */
+  scroll-behavior: smooth; /* Smooth scrolling */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 12px; /* Width of the scrollbar */
+  border-radius: 10px; /* Rounded scrollbar container */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #e0e0e0; /* Light gray track background */
+  border-radius: 10px; /* Fully rounded track */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    #a9a9a9,
+    #808080
+  ); /* Gray gradient thumb */
+  border-radius: 12px; /* Fully rounded scrollbar */
+  transition: background-color 0.3s ease; /* Smooth transition on hover */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    #808080,
+    #696969
+  ); /* Darker gray on hover */
+}
+
+/* Scrollbar for Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin; /* Thin scrollbar */
+  scrollbar-color: #808080 #e0e0e0; /* Gray thumb and light gray track */
+}
