@@ -9,6 +9,11 @@ import type {
   CalendarAppointment,
   CalendarTask,
 } from "@/types/db";
+import {
+  formatDate,
+  formatTime,
+  updateTimeSpace,
+} from "@/utils/taskAndActivity";
 import type {
   CalendarSettings,
   Client,
@@ -17,7 +22,9 @@ import type {
   User,
   Vehicle,
 } from "@prisma/client";
+import mergeRefs from "merge-refs";
 import moment from "moment";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDrop } from "react-dnd";
@@ -25,13 +32,6 @@ import { FaPen } from "react-icons/fa6";
 import { assignAppointmentDate } from "../../../../actions/appointment/assignAppointmentDate";
 import { updateTask } from "../../../../actions/task/dragTask";
 import DraggableTaskTooltip from "../components/day/draggable/DraggableTaskTooltip";
-import {
-  formatDate,
-  formatTime,
-  updateTimeSpace,
-} from "@/utils/taskAndActivity";
-import mergeRefs from "merge-refs";
-import Link from "next/link";
 
 function useWeek() {
   const searchParams = useSearchParams();
@@ -231,7 +231,10 @@ export default function Week({
         // Add task to database
         await updateTask({
           id: taskFoundWithoutTime.id,
-          date: new Date(taskFoundWithoutTime?.date!) || date,
+          date:
+            (taskFoundWithoutTime?.date
+              ? new Date(taskFoundWithoutTime?.date)
+              : new Date()) || date,
           startTime: oldTask?.startTime || startTime,
           endTime: oldTask?.endTime || endTime,
         });
