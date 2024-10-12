@@ -8,7 +8,6 @@ import { EmployeeType, Role } from "@prisma/client";
 import { teamManagementUser } from "@/actions/settings/teamManagement";
 import { useEmployeeWorkFilterStore } from "@/stores/employeeWorkFilter";
 
-
 interface User {
   id: number;
   firstName: string;
@@ -28,12 +27,16 @@ const UserList: React.FC = () => {
     const usersFetchFunction = async () => {
       try {
         const fetchedUsers = await teamManagementUser();
-        const searchedUsers=search.toLowerCase();
-        let filteredUsers = fetchedUsers.filter(user => user.employeeType !== EmployeeType.Admin);
-        if(searchedUsers){
-            filteredUsers=filteredUsers.filter(user=>
-              `${user.firstName}${user.lastName}`.toLowerCase().includes(searchedUsers)
-            );
+        const searchedUsers = search.toLowerCase();
+        let filteredUsers = fetchedUsers.filter(
+          (user) => user.employeeType !== EmployeeType.Admin,
+        );
+        if (searchedUsers) {
+          filteredUsers = filteredUsers.filter((user) =>
+            `${user.firstName}${user.lastName}`
+              .toLowerCase()
+              .includes(searchedUsers),
+          );
         }
         setUsers(filteredUsers);
       } catch (error: any) {
@@ -42,8 +45,6 @@ const UserList: React.FC = () => {
     };
 
     usersFetchFunction();
-
-    
   }, [search]);
 
   const handleEditClick = (user: User) => {
@@ -70,9 +71,7 @@ const UserList: React.FC = () => {
           <>
             <h3 className="text-lg font-medium">User List</h3>
             <div className="mb-4 mt-4">
-              <Search 
-              
-              />
+              <Search />
             </div>
             <ul>
               {users.map((user) => {
@@ -93,7 +92,9 @@ const UserList: React.FC = () => {
                     </div>
                     <div className="ml-3 flex-1">
                       <h4 className="text-md font-semibold">{name}</h4>
-                      <p className="text-sm text-gray-500">{user.employeeType}</p>
+                      <p className="text-sm text-gray-500">
+                        {user.employeeType}
+                      </p>
                     </div>
                     <div>
                       <button
