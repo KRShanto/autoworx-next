@@ -231,10 +231,8 @@ export default function Week({
         // Add task to database
         await updateTask({
           id: taskFoundWithoutTime.id,
-          date:
-            (taskFoundWithoutTime?.date
-              ? new Date(taskFoundWithoutTime?.date)
-              : new Date()) || date,
+          date: date ? new Date(date) : new Date(),
+
           startTime: oldTask?.startTime || startTime,
           endTime: oldTask?.endTime || endTime,
         });

@@ -154,10 +154,7 @@ export default function Day({
         // Add task to database
         await updateTask({
           id: taskFoundWithoutTime.id,
-          date:
-            (taskFoundWithoutTime?.date
-              ? new Date(taskFoundWithoutTime?.date)
-              : new Date()) || date,
+          date: date ? date.toDate() : new Date(),
           startTime: oldTask?.startTime || startTime,
           endTime: oldTask?.endTime || endTime,
         });
@@ -168,7 +165,6 @@ export default function Day({
           rows[rowIndex],
         );
         if (oldTask) {
-
           await updateTask({
             id: oldTask.id,
             date: new Date(oldTask.date),
