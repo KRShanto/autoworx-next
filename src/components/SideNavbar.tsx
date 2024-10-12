@@ -17,6 +17,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./DropdownMenu";
+import { getCompanyUser } from "@/actions/user/getCompanyUser";
+import UserTypes from "@/types/userTypes";
 
 const navList = [
   {
@@ -114,6 +116,19 @@ export default function SideNavbar() {
   const pathName = usePathname();
   const [visibleTooltip, setVisibleTooltip] = useState<number | null>(null);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
+  const [usersType, setUsersType] = useState<UserTypes[]>([]);
+
+  useEffect(() => {
+    const fetchUserType = async () => {
+      const companyUserType = await getCompanyUser();
+      setUsersType(companyUserType);
+    };
+    fetchUserType();
+  }, []);
+
+  const isShopofSales = usersType.some(
+    (users) => users.employeeType === "Sales",
+  );
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -148,7 +163,9 @@ export default function SideNavbar() {
                 }
               >
                 {activeDropdown === index &&
-                  item.subnav.map((subnavItem, index) => (
+                  item.subnav .filter((subnavItem) => 
+                    !(isShopofSales && subnavItem.title === "Shop Pipeline")
+                  ).map((subnavItem, index) => (
                     <DropdownMenuItem
                       key={index}
                       asChild

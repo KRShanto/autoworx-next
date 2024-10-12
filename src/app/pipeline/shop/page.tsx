@@ -4,6 +4,9 @@ import Header from "../components/Header";
 import WorkOrders from "../components/WorkOrders";
 import Pipelines from "../components/Pipelines";
 import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
+import { EmployeeType } from "@prisma/client";
+import { getCompanyUser } from "@/actions/user/getCompanyUser";
+import UserTypes from "@/types/userTypes";
 
 
 type Props = {
@@ -17,9 +20,11 @@ interface Column {
   order: number;
 }
 
+
 const Page = (props: Props) => {
   const activeView = props.searchParams?.view ?? "workOrders";
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
+  const [usersType, setUsersType] = useState<UserTypes[]>([]);
 
   const columnType = "shop";
 
@@ -30,6 +35,16 @@ const Page = (props: Props) => {
     };
 
     fetchShopColumns();
+  }, []);
+  
+  useEffect(() => {
+    const fetchUserTypes = async () => {
+      const fetchedUsersType = await getCompanyUser();
+
+      setUsersType(fetchedUsersType);
+    };
+
+    fetchUserTypes();
   }, []);
 
   const handleColumnsUpdate = async ({ columns }: { columns: Column[] }) => {
@@ -45,6 +60,7 @@ const Page = (props: Props) => {
         columns={pipelineColumns}
         onColumnsUpdate={handleColumnsUpdate}
         type={columnType}
+        usersType={usersType}
       />
       {activeView === "pipelines" ? (
         <Pipelines
