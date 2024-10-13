@@ -12,16 +12,8 @@ type Props = {
   searchParams?: { view?: string };
 };
 
-interface Lead {
-  name: string;
-  email: string;
-  phone: string;
-}
 
-interface PipelineData {
-  title: string;
-  leads: Lead[];
-}
+
 
 interface Column {
   id: number | null;
@@ -77,7 +69,7 @@ const Page = (props: Props) => {
         <Pipelines
           pipelinesTitle={type}
           columns={pipelineColumns}
-          type={columnType}
+          usersType={usersType}
         />
       ) : (
         <WorkOrders type={columnType} />

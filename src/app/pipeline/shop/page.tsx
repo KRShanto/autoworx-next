@@ -4,7 +4,6 @@ import Header from "../components/Header";
 import WorkOrders from "../components/WorkOrders";
 import Pipelines from "../components/Pipelines";
 import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
-import { EmployeeType } from "@prisma/client";
 import { getCompanyUser } from "@/actions/user/getCompanyUser";
 import UserTypes from "@/types/userTypes";
 
@@ -66,7 +65,8 @@ const Page = (props: Props) => {
         <Pipelines
           pipelinesTitle={type}
           columns={pipelineColumns}
-          type={columnType}
+
+          usersType={usersType}
         />
       ) : (
         <WorkOrders type={columnType} />

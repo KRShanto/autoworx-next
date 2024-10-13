@@ -1,7 +1,5 @@
-import { Session } from "next-auth";
-
-export interface AuthSession extends Session {
-  user: {
+import { EmployeeType } from "@prisma/client";
+export default interface SessionUserType {
     id: string;
     name: string;
     email: string;
@@ -9,5 +7,5 @@ export interface AuthSession extends Session {
     role: string;
     companyId: number;
     employeeType: string;
-  };
-}
+  }
+  

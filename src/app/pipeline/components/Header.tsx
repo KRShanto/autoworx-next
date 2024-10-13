@@ -60,7 +60,7 @@ export default function Header({
   const hasManagePipelineAccess = usersType?.some(
     (user) => user.employeeType === "Admin" || user.employeeType === "Manager",
   );
-  console.log(hasManagePipelineAccess)
+  // console.log(hasManagePipelineAccess)
   return (
     <div className="flex items-center justify-between p-4" {...restProps}>
       <div className="flex items-center">
