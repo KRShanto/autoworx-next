@@ -8,6 +8,7 @@ const ROLES = {
   OTHER: EmployeeType.Other,
 };
 
+// all routes
 export const NO_ACCESS_ROUTES = {
   //* communication page
   "/communication/client": {
@@ -22,7 +23,7 @@ export const NO_ACCESS_ROUTES = {
   },
   //* inventory page
   "/inventory": {
-    notAccess: [ROLES.SALES, ROLES.TECHNICIAN, ROLES.OTHER]
+    notAccess: [ROLES.SALES, ROLES.TECHNICIAN, ROLES.OTHER],
   },
   "/inventory?view=products": {
     notAccess: [ROLES.TECHNICIAN, ROLES.OTHER],
@@ -71,6 +72,8 @@ export const NO_ACCESS_ROUTES = {
   },
 };
 
+// dynamic routes
+
 export const NO_ACCESS_FOR_DYNAMIC_ROUTES = [
   {
     path: "/estimate/view/:id",
@@ -82,6 +85,7 @@ export const NO_ACCESS_FOR_DYNAMIC_ROUTES = [
   },
 ];
 
+// settings routes
 export const NO_ACCESS_FOR_SETTINGS_ROUTES = {
   "/settings/business": {
     notAccess: [ROLES.SALES, ROLES.TECHNICIAN, ROLES.OTHER],

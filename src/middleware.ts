@@ -6,6 +6,7 @@ import {
   NO_ACCESS_FOR_SETTINGS_ROUTES,
   NO_ACCESS_ROUTES,
 } from "./lib/routes";
+
 import { NextResponse, URLPattern } from "next/server";
 
 let cache = new Map();
@@ -30,6 +31,7 @@ export default auth(async (request: NextAuthRequest) => {
     const result = pattern.exec(nextUrl.pathname, origin);
     return result;
   });
+  
   //@ts-ignore
   const notAccessForSettings = NO_ACCESS_FOR_SETTINGS_ROUTES[actualUrl];
   const notFoundUrl = new URL("/404", request.url);
@@ -38,7 +40,7 @@ export default auth(async (request: NextAuthRequest) => {
     if (
       notAccessRoute?.notAccess?.includes(cachedUser.employeeType) ||
       noAccessForDynamicRoute?.notAccess?.includes(cachedUser.employeeType) ||
-      notAccessForSettings?.notAccess.includes("Sales")
+      notAccessForSettings?.notAccess.includes(cachedUser.employeeType)
     ) {
       return NextResponse.rewrite(notFoundUrl, { status: 404 });
     } else {
