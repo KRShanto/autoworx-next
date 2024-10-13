@@ -31,7 +31,7 @@ export default auth(async (request: NextAuthRequest) => {
     const result = pattern.exec(nextUrl.pathname, origin);
     return result;
   });
-  
+
   //@ts-ignore
   const notAccessForSettings = NO_ACCESS_FOR_SETTINGS_ROUTES[actualUrl];
   const notFoundUrl = new URL("/404", request.url);
@@ -48,24 +48,26 @@ export default auth(async (request: NextAuthRequest) => {
     }
   }
 
-  cache.delete(auth?.user?.email);
-  const url = `${origin}/api/auth/user/${auth?.user?.email}`;
-  const response = await fetch(url);
-  const user = await response.json();
-  if (user.status === 200) {
-    cache.set(auth?.user?.email, {
-      ...user.data,
-      expires: Date.now() + 60 * 1000,
-    });
+  if (auth?.user?.email) {
+    cache.delete(auth?.user?.email);
+    const url = `${origin}/api/auth/user/${auth?.user?.email}`;
+    const response = await fetch(url);
+    const user = await response.json();
+    if (user.status === 200) {
+      cache.set(auth?.user?.email, {
+        ...user.data,
+        expires: Date.now() + 60 * 1000,
+      });
 
-    if (
-      notAccessRoute?.notAccess?.includes(user.data.employeeType) ||
-      noAccessForDynamicRoute?.notAccess?.includes(user.data.employeeType) ||
-      notAccessForSettings?.notAccess?.includes(user.data.employeeType)
-    ) {
-      return NextResponse.rewrite(notFoundUrl, { status: 404 });
-    } else {
-      return NextResponse.next();
+      if (
+        notAccessRoute?.notAccess?.includes(user.data.employeeType) ||
+        noAccessForDynamicRoute?.notAccess?.includes(user.data.employeeType) ||
+        notAccessForSettings?.notAccess?.includes(user.data.employeeType)
+      ) {
+        return NextResponse.rewrite(notFoundUrl, { status: 404 });
+      } else {
+        return NextResponse.next();
+      }
     }
   }
 });
