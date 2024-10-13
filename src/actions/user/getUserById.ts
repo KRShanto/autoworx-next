@@ -18,3 +18,20 @@ export const getUserById = async (id: number) => {
     throw new Error(err);
   }
 };
+
+export const getUserByEmail = async (email: string) => {
+  try {
+    const user = await db.user.findUnique({
+      where: {
+        email,
+      },
+    });
+    if (user) {
+      return { type: "success", data: user };
+    } else {
+      return { type: "fail", data: null };
+    }
+  } catch (err: any) {
+    throw new Error(err);
+  }
+};
