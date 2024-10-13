@@ -69,7 +69,6 @@ export default async function Page({ params }: { params: { type: string } }) {
         ],
       },
     });
-    console.log("tasskkk", tasks);
   }
 
   // aggregating assigned users data
