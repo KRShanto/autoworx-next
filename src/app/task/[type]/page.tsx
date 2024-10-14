@@ -16,16 +16,62 @@ export const metadata: Metadata = {
 export default async function Page({ params }: { params: { type: string } }) {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
-
-  const calendarAppointments = [];
-
-  // Get all appointments
-  const appointments = await db.appointment.findMany({
+  let user = (await db.user.findFirst({
     where: {
-      companyId,
+      id: +session.user.id,
     },
-  });
+  })) as User;
+  const calendarAppointments = [];
+  let appointments;
+  let tasks;
 
+  if (user.employeeType == "Admin" || user.employeeType == "Manager") {
+    // only admin and manager can see all appointments
+    appointments = await db.appointment.findMany({
+      where: {
+        companyId,
+      },
+    });
+    // Get all the tasks for the company
+    // where startTime, endTime, and date are not null
+    tasks = await db.task.findMany({
+      where: {
+        companyId,
+      },
+    });
+  } else {
+    // else, only show appointments for the assigned user
+    appointments = await db.appointment.findMany({
+      where: {
+        companyId,
+        appointmentUsers: {
+          some: {
+            userId: +user.id,
+          },
+        },
+      },
+    });
+
+    tasks = await db.task.findMany({
+      where: {
+        companyId,
+        OR: [
+          {
+            taskUser: {
+              some: {
+                userId: +user.id,
+              },
+            },
+          },
+          {
+            userId: +user.id,
+          },
+        ],
+      },
+    });
+  }
+
+  // aggregating assigned users data
   for (const appointment of appointments) {
     const appointmentUsers = await db.appointmentUser.findMany({
       where: { appointmentId: appointment.id },
@@ -55,14 +101,6 @@ export default async function Page({ params }: { params: { type: string } }) {
   // Tasks with assigned users
   // Here we will store both the task and the assigned users
   const taskWithAssignedUsers = [];
-
-  // Get all the tasks for the company
-  // where startTime, endTime, and date are not null
-  const tasks = await db.task.findMany({
-    where: {
-      companyId,
-    },
-  });
 
   // Loop through all the tasks
   for (const task of tasks) {
