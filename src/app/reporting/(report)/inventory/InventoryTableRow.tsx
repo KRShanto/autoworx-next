@@ -40,7 +40,7 @@ export default function InventoryTableRow({ productInfo, index }: TProps) {
     );
   const ReturnAndInvestment =
     averageSales > averageCost
-      ? ((averageSales - averageCost) / averageCost) * 100
+      ? (((averageSales - averageCost) / averageCost) * 100).toFixed(2)
       : 0;
   return (
     <tr
@@ -57,7 +57,9 @@ export default function InventoryTableRow({ productInfo, index }: TProps) {
       </td>
       <td className="border-b px-4 py-2 text-center">{productInfo.name}</td>
       <td className="border-b px-4 py-2 text-center">{averageCost}</td>
-      <td className="border-b px-4 py-2 text-center">{averageSales}</td>
+      <td className="border-b px-4 py-2 text-center">
+        {averageSales.toFixed()}
+      </td>
       <td className="border-b px-4 py-2 text-center">{productInfo.quantity}</td>
       <td className="border-b px-4 py-2 text-center">{quantitySold}</td>
       <td className="border-b px-4 py-2 text-center">{productInfo.type}</td>

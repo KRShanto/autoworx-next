@@ -1,22 +1,14 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcrypt";
-import NextAuth, { CredentialsSignin } from "next-auth";
+import NextAuth, { CredentialsSignin, NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import "server-only";
 import { db } from "../lib/db";
+import { authConfig } from "./auth.config";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(db),
-  secret: process.env.SECRET!,
-  trustHost: true,
-  session: {
-    strategy: "jwt",
-  },
-  theme: {
-    colorScheme: "light",
-  },
-
+  ...(authConfig as NextAuthConfig),
   providers: [
     CredentialsProvider({
       name: "AutoWorx",
@@ -76,25 +68,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
-
   callbacks: {
-    async session({ session, token }: any) {
-      if (token) {
-        // @ts-ignore
-        session.user.id = token.id;
-        // @ts-ignore
-        session.user.name = token.name;
-        // @ts-ignore
-        session.user.email = token.email;
-        // @ts-ignore
-        session.user.role = token.role;
-        // @ts-ignore
-        session.user.companyId = token.companyId;
-        session.user.employeeType = token.employeeType;
-      }
-      return session;
-    },
-
     async jwt({ token, user }: any) {
       // find the user
       const dbUser = await db.user.findUnique({
@@ -115,6 +89,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         companyId: dbUser.companyId,
         employeeType: dbUser.employeeType,
       };
+    },
+    async session({ session, token }: any) {
+      if (token) {
+        // @ts-ignore
+        session.user.id = token.id;
+        // @ts-ignore
+        session.user.name = token.name;
+        // @ts-ignore
+        session.user.email = token.email;
+        // @ts-ignore
+        session.user.role = token.role;
+        // @ts-ignore
+        session.user.companyId = token.companyId;
+        session.user.employeeType = token.employeeType;
+      }
+      return session;
     },
   },
 });
