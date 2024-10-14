@@ -10,6 +10,8 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { NewAppointment } from "../components/appointment/NewAppointment";
 import Settings from "../components/appointment/Settings";
 
+const ALLOWED_ROLES_FOR_NEW_APPOINTMENT = ["Admin", "Manager", "Sales"];
+
 function DisplayDate({ type }: { type: CalendarType }) {
   const searchParams = useSearchParams();
   const date = moment(searchParams.get(type === "day" ? "date" : type));
@@ -43,6 +45,7 @@ export default function Heading({
   settings,
   employees,
   templates,
+  user,
 }: {
   type: CalendarType;
   customers: Client[];
@@ -50,6 +53,7 @@ export default function Heading({
   settings: CalendarSettings;
   employees: User[];
   templates: EmailTemplate[];
+  user: User;
 }) {
   const router = useRouter();
   const q = type === "day" ? "date" : type;
@@ -131,11 +135,13 @@ export default function Heading({
         </select>
 
         {/* New Appointment button */}
-        <NewAppointment
-          settings={settings}
-          employees={employees}
-          templates={templates}
-        />
+        {ALLOWED_ROLES_FOR_NEW_APPOINTMENT.includes(user.employeeType) && (
+          <NewAppointment
+            settings={settings}
+            employees={employees}
+            templates={templates}
+          />
+        )}
 
         <Settings settings={settings} />
       </div>
