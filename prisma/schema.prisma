@@ -128,7 +128,6 @@ model User {
   Technician       Technician[]
   permissions      Permission[]
   assignedInvoices Invoice[]         @relation("assignedTo")
-  Lead             Lead[]
 
   @@index([companyId], name: "fk_users_company")
 }
@@ -1009,6 +1008,4 @@ model Lead {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
   company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  User        User?    @relation(fields: [userId], references: [id])
-  userId      Int?
 }
