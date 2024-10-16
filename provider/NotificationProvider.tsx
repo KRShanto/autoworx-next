@@ -1,7 +1,6 @@
 "use client";
 import { NotificationContext } from "context";
-import React, { useEffect, useState } from "react";
-import { any } from "zod";
+import React, { useState } from "react";
 
 type TProps = {
   notification: any;

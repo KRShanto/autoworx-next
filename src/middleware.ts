@@ -48,26 +48,41 @@ export default auth(async (request: NextAuthRequest) => {
     }
   }
 
-  if (auth?.user?.email) {
-    cache.delete(auth?.user?.email);
-    const url = `${origin}/api/auth/user/${auth?.user?.email}`;
-    const response = await fetch(url);
-    const user = await response.json();
-    if (user.status === 200) {
-      cache.set(auth?.user?.email, {
-        ...user.data,
-        expires: Date.now() + 60 * 1000,
-      });
+  cache.delete(auth?.user?.email);
 
-      if (
-        notAccessRoute?.notAccess?.includes(user.data.employeeType) ||
-        noAccessForDynamicRoute?.notAccess?.includes(user.data.employeeType) ||
-        notAccessForSettings?.notAccess?.includes(user.data.employeeType)
-      ) {
-        return NextResponse.rewrite(notFoundUrl, { status: 404 });
-      } else {
-        return NextResponse.next();
+  if (auth?.user?.email) {
+    try {
+      const url = new URL(`${origin}/api/auth/user/${auth?.user?.email}`);
+      const user = await (
+        await fetch(url.href, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+      ).json();
+      // const user = await response.json();
+      if (user.status === 200) {
+        cache.set(auth?.user?.email, {
+          ...user.data,
+          expires: Date.now() + 60 * 1000,
+        });
+
+        if (
+          notAccessRoute?.notAccess?.includes(user.data.employeeType) ||
+          noAccessForDynamicRoute?.notAccess?.includes(
+            user.data.employeeType,
+          ) ||
+          notAccessForSettings?.notAccess?.includes(user.data.employeeType)
+        ) {
+          return NextResponse.rewrite(notFoundUrl, { status: 404 });
+        } else {
+          return NextResponse.next();
+        }
       }
+    } catch (err) {
+      console.error(err);
+      return NextResponse.rewrite(notFoundUrl, { status: 404 });
     }
   }
 });
