@@ -1,10 +1,10 @@
 "use client";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProductTable from "./ProductTable";
-import Sidebar from "./Sidebar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import SearchFilter from "./SearchFilter";
+import Sidebar from "./Sidebar";
 
 export default function InventoryList({
   products,
@@ -21,11 +21,11 @@ export default function InventoryList({
 
   return (
     <Tabs
-      value={view}
+      value="products"
       className="col-start-1 mt-3 flex h-[93%] min-h-0 w-1/2 flex-col overflow-clip text-xs 2xl:text-base"
     >
       <TabsList>
-        <TabsTrigger
+        {/* <TabsTrigger
           value="procurement"
           onClick={() => router.push("/inventory?view=procurement")}
         >
@@ -36,28 +36,28 @@ export default function InventoryList({
           onClick={() => router.push("/inventory?view=supplies")}
         >
           Supplies
-        </TabsTrigger>
+        </TabsTrigger> */}
         <TabsTrigger
           value="products"
           onClick={() => router.push("/inventory?view=products")}
         >
-          Products
+          <span className="text-lg font-semibold text-[#797979]">Products</span>
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="procurement">
+      {/* <TabsContent value="procurement">
         <p>Procurement</p>
-      </TabsContent>
+      </TabsContent> */}
 
       <TabsContent value="products" className="#overflow-x-scroll">
         <SearchFilter />
         <ProductTable products={products as any} currentProductId={productId} />
       </TabsContent>
-
+      {/*
       <TabsContent value="supplies">
         <SearchFilter />
         <ProductTable products={supplies as any} currentProductId={productId} />
-      </TabsContent>
+      </TabsContent> */}
     </Tabs>
   );
 }

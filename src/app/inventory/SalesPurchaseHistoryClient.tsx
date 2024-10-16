@@ -1,20 +1,23 @@
 "use client";
 
 import { cn } from "@/lib/cn";
+import { AuthSession } from "@/types/auth";
 import {
   Client,
   InventoryProduct,
   InventoryProductHistory,
   InventoryProductHistoryType,
+  User,
   Vendor,
 } from "@prisma/client";
 import * as Tabs from "@radix-ui/react-tabs";
 import moment from "moment";
 import Link from "next/link";
 import { useState } from "react";
-import { HiExternalLink } from "react-icons/hi";
-import EditHistory from "./EditHistory";
 import { FaEdit } from "react-icons/fa";
+import { HiExternalLink } from "react-icons/hi";
+import { auth } from "../auth";
+import EditHistory from "./EditHistory";
 
 enum Tab {
   Sales = "sales",
@@ -25,9 +28,11 @@ const evenColor = "bg-white";
 const oddColor = "bg-[#F8FAFF]";
 
 export default function SalesPurchaseHistoryClient({
+  user,
   product,
   histories,
 }: {
+  user: User;
   product?: InventoryProduct;
   histories: (InventoryProductHistory & {
     vendor: Vendor | null;
@@ -69,6 +74,7 @@ export default function SalesPurchaseHistoryClient({
               histories={histories.filter((history) => history.type === "Sale")}
               type="Sale"
               product={product}
+              user={user}
             />
           </Tabs.Content>
           <Tabs.Content value={Tab.Purchase}>
@@ -76,6 +82,7 @@ export default function SalesPurchaseHistoryClient({
               histories={histories.filter(
                 (history) => history.type === "Purchase",
               )}
+              user={user}
               type="Purchase"
               product={product}
             />
@@ -87,10 +94,12 @@ export default function SalesPurchaseHistoryClient({
 }
 
 function Table({
+  user,
   histories,
   type,
   product,
 }: {
+  user: User;
   histories: (InventoryProductHistory & {
     vendor: Vendor | null;
     client: Client | null;
@@ -112,7 +121,10 @@ function Table({
           <th className="text-center">Quantity</th>
           <th className="text-center">Total</th>
           <th className="text-center">Date</th>
-          <th className="text-center">Action</th>
+          {(user?.employeeType === "Admin" ||
+            user?.employeeType === "Manager") && (
+            <th className="text-center">Action</th>
+          )}
         </tr>
       </thead>
 
@@ -158,7 +170,8 @@ function Table({
                 "DD.MM.YYYY",
               )}
             </td>
-            {type === "Purchase" ? (
+            {(user?.employeeType === "Admin" ||
+            user?.employeeType === "Manager") && (type === "Purchase" ? (
               <td className="text-center">
                 <EditHistory
                   historyId={history.id}
@@ -181,7 +194,8 @@ function Table({
                   <FaEdit />
                 </Link>
               </td>
-            )}
+            ))}
+           
           </tr>
         ))}
       </tbody>
