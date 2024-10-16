@@ -1,10 +1,9 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcrypt";
 
 export async function POST(request: NextRequest) {
   try {
-    const token = request.headers.get("Authorization");
+    const token = request.headers.get("X-TOKEN");
 
     if (!token) {
       return NextResponse.json("Invalid token", { status: 401 });
