@@ -5,6 +5,7 @@ import type { db } from "@/lib/db";
 import React, { useState } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import LaborItems from "./LaborItems";
+import ReDoModal from "./ReDoModal";
 
 export function InvoiceItems({
   items,
@@ -24,11 +25,10 @@ export function InvoiceItems({
   const [openService, setOpenService] = useState<number | null>(null);
   return items.map((item) => {
     if (!item.service) return null;
-
     return (
       <div
         key={item.id}
-        className="overflow-y-auto rounded-md border border-[#6571FF] py-1"
+        className="overflow-y-auto rounded-md border border-[#6571FF] py-2"
       >
         <div
           className={cn(
@@ -37,15 +37,18 @@ export function InvoiceItems({
           )}
         >
           <p className="px-5">{item.service.name}</p>
-          <button
-            type="button"
-            onClick={() =>
-              setOpenService(openService === item.id ? null : item.id)
-            }
-            className="mr-5 flex items-center gap-1"
-          >
-            {openService === item.id ? <FaChevronUp /> : <FaChevronDown />}
-          </button>
+          <div className="mr-5 flex items-center space-x-3">
+            <ReDoModal />
+            <button
+              type="button"
+              onClick={() =>
+                setOpenService(openService === item.id ? null : item.id)
+              }
+              className="flex items-center gap-1"
+            >
+              {openService === item.id ? <FaChevronUp /> : <FaChevronDown />}
+            </button>
+          </div>
         </div>
 
         {openService === item.id && (

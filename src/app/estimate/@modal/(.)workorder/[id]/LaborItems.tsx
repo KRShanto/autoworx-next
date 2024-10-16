@@ -53,7 +53,7 @@ export default function LaborItems({
     <div className="mx-10 h-32 overflow-y-auto rounded-md border border-solid border-[#6571FF] p-2">
       {error && <p className="text-center text-sm text-red-400">{error}</p>}
 
-      <div className="grid grid-cols-4 gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <CreateAndEditLabor
           invoiceId={invoiceId}
           serviceId={serviceId}
