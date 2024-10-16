@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "./DropdownMenu";
 
+
 const navList = [
   {
     title: "Dashboard",
@@ -148,7 +149,7 @@ export default function SideNavbar() {
                 }
               >
                 {activeDropdown === index &&
-                  item.subnav.map((subnavItem, index) => (
+                  item.subnav .map((subnavItem, index) => (
                     <DropdownMenuItem
                       key={index}
                       asChild
