@@ -12,7 +12,7 @@ const Appointments = ({ appointments, fullHeight }: any) => {
           <FaExternalLinkAlt />
         </span>
       </div>
-      <div className="custom-scrollbar flex flex-1 flex-col space-y-4">
+      <div className="custom-scrollbar flex flex-1 flex-col space-y-4 overflow-x-hidden">
         {appointments.map((appointment: any, idx: any) => (
           <AppointmentDetails appointment={appointment} key={idx} />
         ))}
@@ -34,7 +34,11 @@ const AppointmentDetails = ({ appointment }: any) => {
   return (
     <div className="flex rounded-md border border-gray-400 py-4 pl-4 pr-2 text-sm">
       <div className="w-[98%]">
-        <h1 className="font-semibold">{appointment.title}</h1>
+        <h1 className="font-semibold">
+          {appointment.title.length > 20
+            ? appointment.title.slice(0, 20) + "..."
+            : appointment.title}
+        </h1>
         {appointment.client && (
           <p className="mt-4">
             Client : {appointment.client.firstName}{" "}

@@ -1,5 +1,6 @@
 "use client";
 
+import DnDWrapper from "@/components/DnDWrapper";
 import { CalendarType } from "@/types/calendar";
 import { AppointmentFull, CalendarAppointment } from "@/types/db";
 import type { EmailTemplate } from "@prisma/client";
@@ -8,7 +9,6 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Calendar from "./Calendar/Calendar";
 import CalendarSidebar from "./CalendarSidebar/CalendarSidebar";
-import DnDWrapper from "@/components/DnDWrapper";
 
 export default function TaskPage({
   type,
@@ -22,6 +22,7 @@ export default function TaskPage({
   appointments,
   templates,
   appointmentsFull,
+  user,
 }: {
   type: CalendarType;
   taskWithAssignedUsers: (Task & { assignedUsers: User[] })[];
@@ -34,6 +35,7 @@ export default function TaskPage({
   appointments: CalendarAppointment[];
   templates: EmailTemplate[];
   appointmentsFull: AppointmentFull[];
+  user: User;
 }) {
   // Filter the tasks where startTime, endTime, and date are not null
   const calendarTasks = taskWithAssignedUsers.filter(
@@ -56,6 +58,7 @@ export default function TaskPage({
         appointments={appointments}
         templates={templates}
         appointmentsFull={appointmentsFull}
+        user={user}
       />
     </DnDWrapper>
   );

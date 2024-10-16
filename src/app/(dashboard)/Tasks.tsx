@@ -27,7 +27,7 @@ const Tasks = ({
           <FaExternalLinkAlt />
         </Link>
       </div>
-      <div className="custom-scrollbar flex flex-1 flex-col space-y-4">
+      <div className="custom-scrollbar flex flex-1 flex-col space-y-2 overflow-x-hidden">
         {tasks.map((task, idx) => (
           <Task key={idx} task={task} companyUsers={companyUsers} />
         ))}

@@ -267,6 +267,7 @@ export default async function Page({ params }: { params: { type: string } }) {
           appointments={calendarAppointments!}
           templates={emailTemplates}
           appointmentsFull={appointmentsFull}
+          user={user}
         />
       </div>
     </>

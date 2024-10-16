@@ -10,6 +10,8 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { NewAppointment } from "../components/appointment/NewAppointment";
 import Settings from "../components/appointment/Settings";
 
+const ALLOWED_ROLES_FOR_NEW_APPOINTMENT = ["Admin", "Manager", "Sales"];
+
 function DisplayDate({ type }: { type: CalendarType }) {
   const searchParams = useSearchParams();
   const date = moment(searchParams.get(type === "day" ? "date" : type));
@@ -26,6 +28,7 @@ function getNextValidDate(
   weekend1: string,
   weekend2: string,
 ): Moment {
+
   let nextDate = moment(date);
   while (
     nextDate.format("dddd") === weekend1 ||
@@ -43,6 +46,7 @@ export default function Heading({
   settings,
   employees,
   templates,
+  user,
 }: {
   type: CalendarType;
   customers: Client[];
@@ -50,6 +54,7 @@ export default function Heading({
   settings: CalendarSettings;
   employees: User[];
   templates: EmailTemplate[];
+  user: User;
 }) {
   const router = useRouter();
   const q = type === "day" ? "date" : type;
@@ -81,7 +86,10 @@ export default function Heading({
           className="app-shadow rounded-md p-2 text-[#797979]"
           onClick={() => {
             const searchParams = new URLSearchParams(window.location.search);
-            const date = moment(searchParams.get(q));
+            const date = moment(searchParams.get(q)).isValid()
+              ? moment(searchParams.get(q))
+              : moment();
+
             const validDate = getNextValidDate(
               date.subtract(1, `${type}s`),
               -1,
@@ -102,7 +110,9 @@ export default function Heading({
           className="app-shadow rounded-md p-2 text-[#797979]"
           onClick={() => {
             const searchParams = new URLSearchParams(window.location.search);
-            const date = moment(searchParams.get(q));
+            const date = moment(searchParams.get(q)).isValid()
+              ? moment(searchParams.get(q))
+              : moment();
             const validDate = getNextValidDate(
               date.add(1, `${type}s`),
               1,
@@ -131,11 +141,13 @@ export default function Heading({
         </select>
 
         {/* New Appointment button */}
-        <NewAppointment
-          settings={settings}
-          employees={employees}
-          templates={templates}
-        />
+        {ALLOWED_ROLES_FOR_NEW_APPOINTMENT.includes(user.employeeType) && (
+          <NewAppointment
+            settings={settings}
+            employees={employees}
+            templates={templates}
+          />
+        )}
 
         <Settings settings={settings} />
       </div>

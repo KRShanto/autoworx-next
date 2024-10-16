@@ -28,6 +28,7 @@ import type {
 } from "@prisma/client";
 import { TimePicker } from "antd";
 import moment from "moment";
+import { customAlphabet } from "nanoid";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -39,11 +40,11 @@ import {
 import { TbBell, TbCalendar } from "react-icons/tb";
 import { addAppointment } from "../../../../../actions/appointment/addAppointment";
 import { Reminder } from "./Reminder";
-import { customAlphabet } from "nanoid";
 // @ts-ignore
+import Avatar from "@/components/Avatar";
 import dayjs from "dayjs";
 import { usePathname, useRouter } from "next/navigation";
-import Avatar from "@/components/Avatar";
+import { IoCloseSharp } from "react-icons/io5";
 
 enum Tab {
   Schedule = 0,
@@ -382,11 +383,26 @@ export function NewAppointment({
               {
                 // Assigned users
                 assignedUsers.map((user) => (
-                  <div key={user.id} className="flex items-center gap-4">
-                    <Avatar photo={user.image} width={30} height={30} />
-                    <p>
-                      {user.firstName} {user.lastName}
-                    </p>
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between gap-x-4 rounded-md border border-gray-300 px-4 py-2"
+                  >
+                    <div className="flex items-center gap-x-4">
+                      <Avatar photo={user.image} width={30} height={30} />
+                      <p>
+                        {user.firstName} {user.lastName}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        let filteredAssignedUser = assignedUsers.filter(
+                          (assignedUser) => user.id != assignedUser.id,
+                        );
+                        setAssignedUsers(filteredAssignedUser);
+                      }}
+                    >
+                      <IoCloseSharp size={16} />
+                    </button>
                   </div>
                 ))
               }
@@ -410,7 +426,11 @@ export function NewAppointment({
                   </div>
 
                   {employeesToDisplay
-                    .filter((employee) => !assignedUsers.includes(employee))
+                    .filter(
+                      (employee) =>
+                        !assignedUsers.includes(employee) &&
+                        employee.employeeType == "Sales",
+                    )
                     .map((employee) => (
                       <button
                         key={employee.id}

@@ -1,14 +1,15 @@
 "use client";
 
+import { deleteInventory } from "@/actions/inventory/delete";
 import { cn } from "@/lib/cn";
-import { Category, InventoryProduct, Vendor } from "@prisma/client";
+import getUser from "@/lib/getUser";
+import { useInventoryFilterStore } from "@/stores/inventoryFilter";
+import { Category, InventoryProduct, User, Vendor } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
+import { userAgent } from "next/server";
 import React, { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import EditProduct from "./EditProduct";
-import { deleteInventory } from "@/actions/inventory/delete";
-import { useInventoryFilterStore } from "@/stores/inventoryFilter";
-
 const evenColor = "bg-white";
 const oddColor = "bg-[#F8FAFF]";
 
@@ -21,8 +22,14 @@ export default function ProductTable({
 }) {
   const router = useRouter();
   const search = useSearchParams();
+  async function getUserInfo() {
+    getUser().then((user) => {
+      setUser(user);
+    });
+  }
   const { search: productSearch, category } = useInventoryFilterStore();
   const [filteredProducts, setFilteredProducts] = useState(products);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const filtered = products.filter((product) => {
@@ -43,6 +50,10 @@ export default function ProductTable({
     setFilteredProducts(filtered);
   }, [productSearch, category, products]);
 
+  useEffect(() => {
+    getUserInfo();
+  }, []);
+
   return (
     <div className="h-full overflow-x-auto">
       <table className="w-full">
@@ -53,7 +64,10 @@ export default function ProductTable({
             <th className="px-4 text-left 2xl:px-10">Category</th>
             <th className="px-4 text-left 2xl:px-10">Quantity</th>
             <th className="px-4 text-left 2xl:px-10">Unit</th>
-            <th className="px-4 text-left 2xl:px-10">Action</th>
+            {(user?.employeeType === "Admin" ||
+              user?.employeeType === "Manager") && (
+              <th className="px-4 text-left 2xl:px-10">Action</th>
+            )}
           </tr>
         </thead>
 
@@ -83,20 +97,23 @@ export default function ProductTable({
               </td>
               <td className="px-4 text-left 2xl:px-10">{product.quantity}</td>
               <td className="px-4 text-left 2xl:px-10">{product.unit}</td>
-              <td className="item-center mt-2 flex gap-3 px-4 2xl:px-10">
-                <button className="text-2xl text-blue-600">
-                  <EditProduct productData={product} />
-                </button>
-                <button
-                  className="text-xl text-red-400"
-                  onClick={async () => {
-                    await deleteInventory(product.id);
-                    router.push(`/inventory?view=${search.get("view")}`);
-                  }}
-                >
-                  <FaTimes />
-                </button>
-              </td>
+              {(user?.employeeType === "Admin" ||
+                user?.employeeType === "Manager") && (
+                <td className="item-center mt-2 flex gap-3 px-4 2xl:px-10">
+                  <button className="text-2xl text-blue-600">
+                    <EditProduct productData={product} />
+                  </button>
+                  <button
+                    className="text-xl text-red-400"
+                    onClick={async () => {
+                      await deleteInventory(product.id);
+                      router.push(`/inventory?view=${search.get("view")}`);
+                    }}
+                  >
+                    <FaTimes />
+                  </button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

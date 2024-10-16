@@ -27,6 +27,7 @@ import type {
 } from "@prisma/client";
 import { TimePicker } from "antd";
 // @ts-ignore
+import Avatar from "@/components/Avatar";
 import dayjs from "dayjs";
 import moment from "moment";
 import { customAlphabet } from "nanoid";
@@ -40,11 +41,11 @@ import {
   FaTimes,
   FaTrash,
 } from "react-icons/fa";
+import { IoCloseSharp } from "react-icons/io5";
 import { TbBell, TbCalendar } from "react-icons/tb";
 import { deleteAppointment } from "../../../../../actions/appointment/deleteAppointment";
 import { editAppointment } from "../../../../../actions/appointment/editAppointment";
 import { Reminder } from "./Reminder";
-import Avatar from "@/components/Avatar";
 
 enum Tab {
   Schedule = 0,
@@ -345,11 +346,26 @@ export function UpdateAppointment() {
             {
               // Assigned users
               assignedUsers.map((user) => (
-                <div key={user.id} className="flex items-center gap-4">
-                  <Avatar photo={user.image} width={30} height={30} />
-                  <p>
-                    {user.firstName} {user.lastName}
-                  </p>
+                <div
+                  key={user.id}
+                  className="flex items-center justify-between gap-x-4 rounded-md border border-gray-300 px-4 py-2"
+                >
+                  <div className="flex items-center gap-x-4">
+                    <Avatar photo={user.image} width={30} height={30} />
+                    <p>
+                      {user.firstName} {user.lastName}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      let filteredAssignedUser = assignedUsers.filter(
+                        (assignedUser) => user.id != assignedUser.id,
+                      );
+                      setAssignedUsers(filteredAssignedUser);
+                    }}
+                  >
+                    <IoCloseSharp size={16} />
+                  </button>
                 </div>
               ))
             }
@@ -373,7 +389,11 @@ export function UpdateAppointment() {
                 </div>
 
                 {employeesToDisplay
-                  .filter((employee) => !assignedUsers.includes(employee))
+                  .filter(
+                    (employee) =>
+                      !assignedUsers.includes(employee) &&
+                      employee.employeeType == "Sales",
+                  )
                   .map((employee) => (
                     <button
                       key={employee.id}
