@@ -28,6 +28,7 @@ function getNextValidDate(
   weekend1: string,
   weekend2: string,
 ): Moment {
+
   let nextDate = moment(date);
   while (
     nextDate.format("dddd") === weekend1 ||
@@ -85,7 +86,10 @@ export default function Heading({
           className="app-shadow rounded-md p-2 text-[#797979]"
           onClick={() => {
             const searchParams = new URLSearchParams(window.location.search);
-            const date = moment(searchParams.get(q));
+            const date = moment(searchParams.get(q)).isValid()
+              ? moment(searchParams.get(q))
+              : moment();
+
             const validDate = getNextValidDate(
               date.subtract(1, `${type}s`),
               -1,
@@ -106,7 +110,9 @@ export default function Heading({
           className="app-shadow rounded-md p-2 text-[#797979]"
           onClick={() => {
             const searchParams = new URLSearchParams(window.location.search);
-            const date = moment(searchParams.get(q));
+            const date = moment(searchParams.get(q)).isValid()
+              ? moment(searchParams.get(q))
+              : moment();
             const validDate = getNextValidDate(
               date.add(1, `${type}s`),
               1,
