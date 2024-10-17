@@ -1,29 +1,27 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { EmployeeType, Prisma, Task, User } from "@prisma/client";
-import React, { SetStateAction, useEffect, useState } from "react";
-import { IoAddCircleOutline } from "react-icons/io5";
-import { PiWechatLogoLight } from "react-icons/pi";
-import { CiCalendar } from "react-icons/ci";
-import { EmployeeSelector } from "./EmployeeSelector";
-import Link from "next/link";
-import { Tag } from "@prisma/client";
-import { EmployeeTagSelector } from "./EmployeeTagSelector";
-import TaskForm from "./TaskForm";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import ServiceSelector from "./ServiceSelector";
+import { getEmployees } from "@/actions/employee/get";
+import { updateInvoiceStatus } from "@/actions/estimate/invoice/updateInvoiceStatus";
 import {
   getWorkOrders,
   updateAssignedTo,
 } from "@/actions/pipelines/getWorkOrders";
-import { updateInvoiceStatus } from "@/actions/estimate/invoice/updateInvoiceStatus";
-import { getEmployees } from "@/actions/employee/get";
 import {
-  saveInvoiceTag,
   removeInvoiceTag,
+  saveInvoiceTag,
 } from "@/actions/pipelines/invoiceTag";
 import SessionUserType from "@/types/sessionUserType";
-import { getUserFromSession } from "@/lib/getCurrentUser";
+import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
+import { EmployeeType, Prisma, Tag, Task, User } from "@prisma/client";
+import Link from "next/link";
+import { SetStateAction, useEffect, useState } from "react";
+import { CiCalendar } from "react-icons/ci";
+import { IoAddCircleOutline } from "react-icons/io5";
+import { PiWechatLogoLight } from "react-icons/pi";
+import { EmployeeSelector } from "./EmployeeSelector";
+import { EmployeeTagSelector } from "./EmployeeTagSelector";
+import ServiceSelector from "./ServiceSelector";
+import TaskForm from "./TaskForm";
 //dummy services
 
 //interfaces
@@ -69,7 +67,6 @@ type Column = {
 interface PipelinesProps {
   pipelinesTitle: string;
   columns?: Column[];
-  usersType: UserTypes[];
 }
 interface UserTypes {
   id: number;
@@ -105,20 +102,19 @@ type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
 export default function Pipelines({
   pipelinesTitle: pipelineType,
   columns,
-  usersType,
 }: Readonly<PipelinesProps>) {
   const [pipelineData, setPipelineData] = useState<PipelineData[]>([]);
   const [invoices, setInvoices] = useState<InvoiceWithRelations[]>([]);
 
   const [companyUsers, setCompanyUsers] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<SessionUserType>();
+  const servicesOfCurrentUser: any = [];
 
   useEffect(() => {
     const fetchUser = async () => {
       const response = await fetch("/api/getUser");
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setCurrentUser(data);
       }
     };
@@ -149,9 +145,16 @@ export default function Pipelines({
 
         invoice.invoiceItems.forEach((item) => {
           const technicians = item.service?.Technician || [];
+
           const statuses = technicians.map((tech) =>
             tech.status?.toLowerCase(),
           );
+          servicesOfCurrentUser.push(
+            ...technicians.filter(
+              (tech) => tech.userId === Number(currentUser?.id),
+            ),
+          );
+          console.log("The services of currentUser:", servicesOfCurrentUser);
           const isServiceComplete = statuses.every(
             (status) => status === "complete",
           );
@@ -196,15 +199,17 @@ export default function Pipelines({
       if (currentUser?.employeeType === "Technician") {
         updatedPipelineData = updatedPipelineData.map((column) => ({
           ...column,
-          leads: column.leads.filter(
-            (lead) => lead.assignedTo?.id === Number(currentUser.id),
+          leads: column.leads.filter((lead) =>
+            servicesOfCurrentUser.some(
+              (service: any) => lead.invoiceId === service.invoiceId,
+            ),
           ),
         }));
       }
 
       setPipelineData(updatedPipelineData);
     }
-  }, [invoices, columns]);
+  }, [invoices, columns, currentUser]);
 
   const [selectedEmployees, setSelectedEmployees] = useState<{
     [key: string]: Employee | null;
@@ -506,44 +511,48 @@ export default function Pipelines({
                                 <h3 className="font-inter overflow-auto pb-2 font-semibold text-black">
                                   {lead.name}
                                 </h3>
-                                {!isDropdownOpen && (
-                                  <div
-                                    role="button"
-                                    onClick={() =>
-                                      handleDropdownToggle(
-                                        categoryIndex,
-                                        leadIndex,
-                                      )
-                                    }
-                                  >
-                                    {selectedEmployee ? (
-                                      <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-gray-600 bg-white text-xs text-black">
-                                        {getInitials(selectedEmployee)}
+                                {pipelineType === "Sales Pipelines" && (
+                                  <div>
+                                    {!isDropdownOpen && (
+                                      <div
+                                        role="button"
+                                        onClick={() =>
+                                          handleDropdownToggle(
+                                            categoryIndex,
+                                            leadIndex,
+                                          )
+                                        }
+                                      >
+                                        {selectedEmployee ? (
+                                          <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-gray-600 bg-white text-xs text-black">
+                                            {getInitials(selectedEmployee)}
+                                          </div>
+                                        ) : (
+                                          <IoAddCircleOutline size={26} />
+                                        )}
                                       </div>
-                                    ) : (
-                                      <IoAddCircleOutline size={26} />
+                                    )}
+
+                                    {isDropdownOpen && (
+                                      <div className="absolute right-0 top-8 z-10">
+                                        <EmployeeSelector
+                                          name="employeeId"
+                                          value={selectedEmployee}
+                                          setValue={createEmployeeSelectHandler(
+                                            categoryIndex,
+                                            leadIndex,
+                                          )}
+                                          openDropdown={true}
+                                          setOpenDropdown={() =>
+                                            setOpenDropdownIndex(null)
+                                          }
+                                          companyUsers={companyUsers}
+                                        />
+                                      </div>
                                     )}
                                   </div>
                                 )}
-                                {isDropdownOpen && (
-                                  <div className="absolute right-0 top-8 z-10">
-                                    <EmployeeSelector
-                                      name="employeeId"
-                                      value={selectedEmployee}
-                                      setValue={createEmployeeSelectHandler(
-                                        categoryIndex,
-                                        leadIndex,
-                                      )}
-                                      openDropdown={true}
-                                      setOpenDropdown={() =>
-                                        setOpenDropdownIndex(null)
-                                      }
-                                      companyUsers={companyUsers}
-                                    />
-                                  </div>
-                                )}
                               </div>
-
                               <div className="mb-1 flex flex-wrap items-center gap-1">
                                 {pipelineData[categoryIndex].leads[
                                   leadIndex

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import ManagePipelines from "./ManagePipelines";
 import { useRouter } from "next/navigation";
 import { EmployeeType } from "@prisma/client";
+import SessionUserType from "@/types/sessionUserType";
 
 interface UserTypes {
   id: number;
@@ -19,7 +20,7 @@ interface HeaderProps {
   onColumnsUpdate: (data: { columns: Column[] }) => void;
   columns: Column[];
   type: string;
-  usersType: UserTypes[];
+  currentUser: SessionUserType | undefined;
 
   [key: string]: any;
 }
@@ -36,7 +37,8 @@ export default function Header({
   onColumnsUpdate,
   columns,
   type,
-  usersType,
+  currentUser,
+
   ...restProps
 }: Readonly<HeaderProps>) {
   const router = useRouter();
@@ -57,10 +59,10 @@ export default function Header({
     router.push(`?view=${view}`);
   };
 
-  const hasManagePipelineAccess = usersType?.some(
-    (user) => user.employeeType === "Admin" || user.employeeType === "Manager",
-  );
-  // console.log(hasManagePipelineAccess)
+  const hasManagePipelineAccess =
+    currentUser?.employeeType === "Admin" ||
+    currentUser?.employeeType === "Manager";
+
   return (
     <div className="flex items-center justify-between p-4" {...restProps}>
       <div className="flex items-center">

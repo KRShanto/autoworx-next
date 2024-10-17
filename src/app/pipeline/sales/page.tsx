@@ -1,19 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Header from "../components/Header";
-import WorkOrders from "../components/WorkOrders";
-import Pipelines from "../components/Pipelines";
 import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
-import { getCompanyUser } from "@/actions/user/getCompanyUser";
+import { useEffect, useState } from "react";
+import Header from "../components/Header";
+import Pipelines from "../components/Pipelines";
+import WorkOrders from "../components/WorkOrders";
 
-import UserTypes from "@/types/userTypes";
+import SessionUserType from "@/types/sessionUserType";
 type Props = {
   searchParams?: { view?: string };
 };
-
-
-
 
 interface Column {
   id: number | null;
@@ -27,7 +23,7 @@ const Page = (props: Props) => {
   const columnType = "sales";
 
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
-  const [usersType, setUsersType] = useState<UserTypes[]>([]);
+  const [currentUser, setCurrentUser] = useState<SessionUserType>();
 
   useEffect(() => {
     const fetchShopColumns = async () => {
@@ -39,16 +35,18 @@ const Page = (props: Props) => {
   }, []);
 
   useEffect(() => {
-    const fetchUserTypes = async () => {
-      const fetchedUsersType = await getCompanyUser();
-
-      setUsersType(fetchedUsersType);
+    const fetchUser = async () => {
+      const response = await fetch("/api/getUser");
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setCurrentUser(data);
+      }
     };
-
-    fetchUserTypes();
+    fetchUser();
   }, []);
 
-  console.warn(usersType);
+  // console.warn(usersType);
   const handleColumnsUpdate = async ({ columns }: { columns: Column[] }) => {
     setPipelineColumns(columns);
   };
@@ -62,15 +60,11 @@ const Page = (props: Props) => {
         columns={pipelineColumns}
         onColumnsUpdate={handleColumnsUpdate}
         type={columnType}
-        usersType={usersType}
+        currentUser={currentUser}
       />
 
       {activeView === "pipelines" ? (
-        <Pipelines
-          pipelinesTitle={type}
-          columns={pipelineColumns}
-          usersType={usersType}
-        />
+        <Pipelines pipelinesTitle={type} columns={pipelineColumns} />
       ) : (
         <WorkOrders type={columnType} />
       )}

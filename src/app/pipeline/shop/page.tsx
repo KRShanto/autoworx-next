@@ -5,8 +5,8 @@ import WorkOrders from "../components/WorkOrders";
 import Pipelines from "../components/Pipelines";
 import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
 import { getCompanyUser } from "@/actions/user/getCompanyUser";
-import UserTypes from "@/types/userTypes";
 
+import SessionUserType from "@/types/sessionUserType";
 
 type Props = {
   searchParams?: { view?: string };
@@ -19,11 +19,10 @@ interface Column {
   order: number;
 }
 
-
 const Page = (props: Props) => {
   const activeView = props.searchParams?.view ?? "workOrders";
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
-  const [usersType, setUsersType] = useState<UserTypes[]>([]);
+  const [currentUser, setCurrentUser] = useState<SessionUserType>();
 
   const columnType = "shop";
 
@@ -35,15 +34,16 @@ const Page = (props: Props) => {
 
     fetchShopColumns();
   }, []);
-  
+
   useEffect(() => {
-    const fetchUserTypes = async () => {
-      const fetchedUsersType = await getCompanyUser();
-
-      setUsersType(fetchedUsersType);
+    const fetchUser = async () => {
+      const response = await fetch("/api/getUser");
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentUser(data);
+      }
     };
-
-    fetchUserTypes();
+    fetchUser();
   }, []);
 
   const handleColumnsUpdate = async ({ columns }: { columns: Column[] }) => {
@@ -59,15 +59,10 @@ const Page = (props: Props) => {
         columns={pipelineColumns}
         onColumnsUpdate={handleColumnsUpdate}
         type={columnType}
-        usersType={usersType}
+        currentUser={currentUser}
       />
       {activeView === "pipelines" ? (
-        <Pipelines
-          pipelinesTitle={type}
-          columns={pipelineColumns}
-
-          usersType={usersType}
-        />
+        <Pipelines pipelinesTitle={type} columns={pipelineColumns} />
       ) : (
         <WorkOrders type={columnType} />
       )}
