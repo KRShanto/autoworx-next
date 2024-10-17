@@ -128,7 +128,6 @@ model User {
   Technician       Technician[]
   permissions      Permission[]
   assignedInvoices Invoice[]         @relation("assignedTo")
-  Lead             Lead[]
 
   @@index([companyId], name: "fk_users_company")
 }
@@ -1005,10 +1004,8 @@ model Lead {
   services    String
   source      String
   comments    String?
-  userId      Int      @map("user_id")
   companyId   Int      @map("company_id")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
