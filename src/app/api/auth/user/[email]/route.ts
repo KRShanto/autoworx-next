@@ -5,27 +5,41 @@ export async function GET(
   request: NextRequest,
   searchParams: { params: { email: string } },
 ) {
-  const email = searchParams.params.email;
-  const user = await db.user.findUnique({
-    where: {
-      email,
-    },
-    select: {
-      email: true,
-      role: true,
-      employeeType: true,
-    },
-  });
+  const email = searchParams?.params?.email;
 
-  if (!user) {
+  if (!email) {
     return NextResponse.json({
-      message: "User not found",
+      message: "Email doesn't provided",
       status: 404,
     });
   }
+  try {
+    const user = await db.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        email: true,
+        role: true,
+        employeeType: true,
+      },
+    });
 
-  return NextResponse.json({
-    status: 200,
-    data: user,
-  });
+    if (!user) {
+      return NextResponse.json({
+        message: "User not found",
+        status: 404,
+      });
+    }
+
+    return NextResponse.json({
+      status: 200,
+      data: user,
+    });
+  } catch (err) {
+    return NextResponse.json({
+      message: "Something was wrong",
+      status: 500,
+    });
+  }
 }
