@@ -55,6 +55,8 @@ export async function POST(request: NextRequest) {
     const newLead = await db.lead.create({
       data: {
         clientName: clientFirstName + " " + clientLastName,
+        clientEmail,
+        clientPhone,        
         vehicleInfo,
         services,
         source,
