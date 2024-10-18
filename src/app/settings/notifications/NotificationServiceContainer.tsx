@@ -7,7 +7,6 @@ import useNotification from "@/hooks/useNotification";
 import {
   TNotification,
   TOpenService,
-  TSwitchValue,
 } from "@/types/notification";
 
 type Props = {
@@ -23,8 +22,9 @@ const NotificationServiceContainer = ({ serviceKey }: Props) => {
   const featuresKeys = featureItems && Object.keys(featureItems);
 
   const handleServiceToggle = () => {
-    const closeService = Object.keys(notificationState!).reduce(
-      (acc: any, cur: any) => {
+    const closeService =
+      notificationState &&
+      Object.keys(notificationState).reduce((acc: any, cur: any) => {
         if (cur === serviceKey) {
           return {
             ...acc,
@@ -33,9 +33,7 @@ const NotificationServiceContainer = ({ serviceKey }: Props) => {
         } else {
           return { ...acc, [cur]: false };
         }
-      },
-      {},
-    );
+      }, {});
     setOpenService && setOpenService(closeService);
   };
   return (

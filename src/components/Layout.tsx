@@ -5,6 +5,99 @@ import { redirect, usePathname } from "next/navigation";
 import PopupState from "./PopupState";
 import SideNavbar from "./SideNavbar";
 import TopNavbar from "./TopNavbar";
+import MobileNav from "./mobile-responsive/MobileNav";
+
+const navList = [
+  {
+    title: "Dashboard",
+    icon: "/icons/navbar/Dashboard.svg",
+    link: "/",
+  },
+  {
+    title: "Communication Hub",
+    icon: "/icons/navbar/Community.svg",
+    subnav: [
+      {
+        title: "Client",
+        link: "/communication/client",
+      },
+      {
+        title: "Internal",
+        link: "/communication/internal",
+      },
+      {
+        title: "Collaboration",
+        link: "/communication/collaboration",
+      },
+    ],
+  },
+  {
+    title: "Pipelines",
+    icon: "/icons/navbar/Sales.svg",
+    subnav: [
+      {
+        title: "Shop Pipeline",
+        link: "/pipeline/shop",
+      },
+      {
+        title: "Seles Pipeline",
+        link: "/pipeline/sales",
+      },
+    ],
+  },
+  {
+    title: "Task and Activity Management",
+    icon: "/icons/navbar/Task.svg",
+    link: "/task/day",
+  },
+  {
+    title: "Analytics and Reporting",
+    icon: "/icons/navbar/Analytics.svg",
+    link: "/reporting/revenue",
+  },
+  {
+    title: "Invoices",
+    icon: "/icons/navbar/Invoices.svg",
+    link: "/estimate",
+  },
+  {
+    title: "Payments",
+    icon: "/icons/navbar/Payments.svg",
+    link: "/payments",
+  },
+  {
+    title: "Inventory",
+    icon: "/icons/navbar/Inventory.svg",
+    subnav: [
+      {
+        title: "Inventory List",
+        link: "/inventory",
+      },
+      {
+        title: "Vendor List",
+        link: "/inventory/vendor",
+      },
+      {
+        title: "Camera",
+        link: "/inventory/camera",
+      },
+    ],
+  },
+  {
+    title: "Directory",
+    icon: "/icons/navbar/Employee.png",
+    subnav: [
+      {
+        title: "Employee",
+        link: "/employee",
+      },
+      {
+        title: "Client",
+        link: "/client",
+      },
+    ],
+  },
+];
 
 export default function Layout({
   children,
@@ -28,8 +121,9 @@ export default function Layout({
     );
 
   return (
-    <div className="#overflow-y-hidden w-full">
-      <SideNavbar />
+    <div className="w-full overflow-y-hidden">
+      <SideNavbar navList={navList} />
+      <MobileNav navList={navList} />
       <div className="ml-[5%]">
         <TopNavbar />
         <PopupState />
