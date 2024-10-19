@@ -1,42 +1,50 @@
 import Title from "@/components/Title";
+import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 
 export default async function ZapPage() {
+  const companyId = await getCompanyId();
   // get all the leads
-  const leads = await db.lead.findMany();
+  const leads = await db.lead.findMany({
+    where: {
+      companyId,
+    },
+  });
 
   return (
-    <div>
-      <Title>Dashboard</Title>
+    <div className="p-4">
+      <Title>Zapier data</Title>
 
-      <h1>Leads</h1>
+      <h1 className="mb-4 text-2xl font-bold">Leads</h1>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Client Name</th>
-            <th>Client Email</th>
-            <th>Client Phone</th>
-            <th>Vehicle Info</th>
-            <th>Services</th>
-            <th>Source</th>
-            <th>Comments</th>
-          </tr>
-        </thead>
-        <tbody>
-          {leads.map((lead) => (
-            <tr key={lead.id}>
-              <td>{lead.clientName}</td>
-              <td>{lead.clientEmail}</td>
-              <td>{lead.clientPhone}</td>
-              <td>{lead.vehicleInfo}</td>
-              <td>{lead.services}</td>
-              <td>{lead.source}</td>
-              <td>{lead.comments}</td>
+      <div className="overflow-x-auto">
+        <table className="min-w-full border border-gray-200 bg-white">
+          <thead>
+            <tr className="border-b bg-gray-100">
+              <th className="px-4 py-2 text-left">Client Name</th>
+              <th className="px-4 py-2 text-left">Client Email</th>
+              <th className="px-4 py-2 text-left">Client Phone</th>
+              <th className="px-4 py-2 text-left">Vehicle Info</th>
+              <th className="px-4 py-2 text-left">Services</th>
+              <th className="px-4 py-2 text-left">Source</th>
+              <th className="px-4 py-2 text-left">Comments</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {leads.map((lead) => (
+              <tr key={lead.id} className="border-b hover:bg-gray-50">
+                <td className="px-4 py-2">{lead.clientName}</td>
+                <td className="px-4 py-2">{lead.clientEmail}</td>
+                <td className="px-4 py-2">{lead.clientPhone}</td>
+                <td className="px-4 py-2">{lead.vehicleInfo}</td>
+                <td className="px-4 py-2">{lead.services}</td>
+                <td className="px-4 py-2">{lead.source}</td>
+                <td className="px-4 py-2">{lead.comments}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

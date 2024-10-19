@@ -1,10 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import {
-  Prisma,
-  Task,
-  User,
-} from "@prisma/client";
+import { EmployeeType, Prisma, Task, User } from "@prisma/client";
 import React, { SetStateAction, useEffect, useState } from "react";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { PiWechatLogoLight } from "react-icons/pi";
@@ -26,6 +22,8 @@ import {
   saveInvoiceTag,
   removeInvoiceTag,
 } from "@/actions/pipelines/invoiceTag";
+import SessionUserType from "@/types/sessionUserType";
+import { getUserFromSession } from "@/lib/getCurrentUser";
 //dummy services
 
 //interfaces
@@ -71,7 +69,15 @@ type Column = {
 interface PipelinesProps {
   pipelinesTitle: string;
   columns?: Column[];
-  type: string;
+  usersType: UserTypes[];
+}
+interface UserTypes {
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string | null;
+  employeeType: EmployeeType;
+  companyId: number;
 }
 type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
   include: {
@@ -99,12 +105,25 @@ type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
 export default function Pipelines({
   pipelinesTitle: pipelineType,
   columns,
-  type,
-}: PipelinesProps) {
+  usersType,
+}: Readonly<PipelinesProps>) {
   const [pipelineData, setPipelineData] = useState<PipelineData[]>([]);
   const [invoices, setInvoices] = useState<InvoiceWithRelations[]>([]);
 
   const [companyUsers, setCompanyUsers] = useState<User[]>([]);
+  const [currentUser, setCurrentUser] = useState<SessionUserType>();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const response = await fetch("/api/getUser");
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setCurrentUser(data);
+      }
+    };
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -164,12 +183,24 @@ export default function Pipelines({
         };
       });
 
-      const updatedPipelineData = columns.map((column) => ({
+      let updatedPipelineData = columns.map((column) => ({
         title: column.title,
         leads: transformedLeads.filter(
           (lead) => lead.workOrderStatus?.trim() === column.title.trim(),
         ),
       }));
+
+      console.log("Current user:", currentUser);
+
+      // Only filter for technicians
+      if (currentUser?.employeeType === "Technician") {
+        updatedPipelineData = updatedPipelineData.map((column) => ({
+          ...column,
+          leads: column.leads.filter(
+            (lead) => lead.assignedTo?.id === Number(currentUser.id),
+          ),
+        }));
+      }
 
       setPipelineData(updatedPipelineData);
     }
@@ -183,7 +214,6 @@ export default function Pipelines({
     index: number;
   } | null>(null);
 
-  
   const [tag, setTag] = useState<Tag>();
   const [tagDropdownStates, setTagDropdownStates] = useState<{
     [key: string]: boolean;
@@ -442,7 +472,7 @@ export default function Pipelines({
                   </h2>
 
                   <ul
-                    className="mt-1 flex min-h-[70vh] max-h-[70vh] flex-col gap-1 overflow-auto p-1"
+                    className="mt-1 flex max-h-[70vh] min-h-[70vh] flex-col gap-1 overflow-auto p-1"
                     style={{ maxHeight: "70vh" }}
                   >
                     {item.leads.map((lead, leadIndex) => {
@@ -470,7 +500,7 @@ export default function Pipelines({
                               {...provided.dragHandleProps}
                               ref={provided.innerRef}
                               key={lead.invoiceId}
-                              className="relative mx-1 my-1 h-fit max-w-auto rounded-xl border bg-white p-1"
+                              className="max-w-auto relative mx-1 my-1 h-fit rounded-xl border bg-white p-1"
                             >
                               <div className="flex items-center justify-between">
                                 <h3 className="font-inter overflow-auto pb-2 font-semibold text-black">

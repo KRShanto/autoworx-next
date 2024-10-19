@@ -3,15 +3,23 @@
 import React, { useEffect, useState } from "react";
 import ManagePipelines from "./ManagePipelines";
 import { useRouter } from "next/navigation";
+import { EmployeeType } from "@prisma/client";
 
+interface UserTypes {
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string | null;
+  employeeType: EmployeeType;
+  companyId: number;
+}
 interface HeaderProps {
   activeView: string;
   pipelinesTitle: string;
-  onColumnsUpdate: (data: {
-  columns: Column[];
-  }) => void;
+  onColumnsUpdate: (data: { columns: Column[] }) => void;
   columns: Column[];
   type: string;
+  usersType: UserTypes[];
 
   [key: string]: any;
 }
@@ -19,7 +27,7 @@ interface Column {
   id: number | null;
   title: string;
   type: string;
-  order: number; 
+  order: number;
 }
 
 export default function Header({
@@ -28,6 +36,7 @@ export default function Header({
   onColumnsUpdate,
   columns,
   type,
+  usersType,
   ...restProps
 }: Readonly<HeaderProps>) {
   const router = useRouter();
@@ -40,7 +49,6 @@ export default function Header({
     onColumnsUpdate({ columns: updatedColumns });
   };
 
-
   useEffect(() => {
     setCurrentColumns(columns);
   }, [columns]);
@@ -49,6 +57,10 @@ export default function Header({
     router.push(`?view=${view}`);
   };
 
+  const hasManagePipelineAccess = usersType?.some(
+    (user) => user.employeeType === "Admin" || user.employeeType === "Manager",
+  );
+  // console.log(hasManagePipelineAccess)
   return (
     <div className="flex items-center justify-between p-4" {...restProps}>
       <div className="flex items-center">
@@ -71,7 +83,7 @@ export default function Header({
         </div>
       </div>
 
-      {activeView === "pipelines" && (
+      {activeView === "pipelines" && hasManagePipelineAccess && (
         <div>
           <button
             onClick={() => {
