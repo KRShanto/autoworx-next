@@ -13,7 +13,7 @@ const page = async (props: Props) => {
       companyId: user.companyId,
     },
   });
-  return <LeaveRequest leaveRequests={leaveRequests}  />;
+  return <LeaveRequest leaveRequests={leaveRequests} user={user} />;
 };
 
 export default page;

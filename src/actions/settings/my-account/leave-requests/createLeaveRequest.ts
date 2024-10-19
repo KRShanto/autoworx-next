@@ -1,6 +1,7 @@
 "use server";
 import { db } from "@/lib/db";
 import getUser from "@/lib/getUser";
+import { revalidatePath } from "next/cache";
 
 interface TLeaveRequestData {
   title: string;
@@ -24,6 +25,8 @@ export const createLeaveRequest = async (
         endDate: new Date(leaveRequestData.endDate),
       },
     });
+    revalidatePath("/settings/my-account/leave-requests");
+
     return {
       success: true,
       message: "Leave Request Submitted Successfully",

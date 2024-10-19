@@ -1,5 +1,5 @@
 "use client";
-import { createLeaveRequest } from "@/actions/settings/my-account/leaveRequests/createLeaveRequest";
+import { createLeaveRequest } from "@/actions/settings/my-account/leave-requests/createLeaveRequest";
 import {
   changePassword,
   editMyAccountInfo,
@@ -50,6 +50,8 @@ const Page = (props: Props) => {
       leaveRequest.description === ""
     ) {
       errorToast("All fields are required");
+
+      return
     }
     let res = await createLeaveRequest(leaveRequest);
     if (!res.success) {
@@ -392,7 +394,7 @@ const Page = (props: Props) => {
                 />
                 <div className="mt-4 text-right">
                   <Link
-                    href="/settings/my-account/leaveRequests"
+                    href="/settings/my-account/leave-requests"
                     className="ml-auto mt-4 rounded-md bg-white px-4 py-1 text-[#6571FF]"
                   >
                     View All Request
