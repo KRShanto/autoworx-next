@@ -1,13 +1,16 @@
 "use client";
+import { createLeaveRequest } from "@/actions/settings/my-account/leaveRequests/createLeaveRequest";
 import {
   changePassword,
   editMyAccountInfo,
   getMyAccountInfo,
 } from "@/actions/settings/myAccount";
 import { SlimInput } from "@/components/SlimInput";
+import { SlimTextarea } from "@/components/SlimTextarea";
 import { errorToast, successToast } from "@/lib/toast";
 import { User } from "@prisma/client";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 type Props = {};
@@ -30,6 +33,39 @@ const Page = (props: Props) => {
   const [currentPw, setCurrentPw] = useState("");
   const [newPw, setNewPw] = useState("");
   const [confirmNewPw, setConfirmNewPw] = useState("");
+
+  // leave request
+  const [leaveRequest, setLeaveRequest] = useState({
+    title: "",
+    startDate: "",
+    endDate: "",
+    description: "",
+  });
+
+  const handleSubmitLeaveRequest = async () => {
+    if (
+      leaveRequest.title === "" ||
+      leaveRequest.startDate === "" ||
+      leaveRequest.endDate === "" ||
+      leaveRequest.description === ""
+    ) {
+      errorToast("All fields are required");
+    }
+    let res = await createLeaveRequest(leaveRequest);
+    if (!res.success) {
+      errorToast(res?.message);
+      return;
+    }
+    if (res.success) {
+      setLeaveRequest({
+        title: "",
+        startDate: "",
+        endDate: "",
+        description: "",
+      });
+      successToast(res.message);
+    }
+  };
 
   useEffect(() => {
     getMyAccountInfo().then((res) => {
@@ -251,52 +287,126 @@ const Page = (props: Props) => {
         </div>
         {/* new password */}
         <div className="#w-1/2">
-          <h3 className="my-4 text-lg font-bold">New Password</h3>
+          <>
+            <h3 className="my-4 text-lg font-bold">New Password</h3>
 
-          <div className="space-y-4 rounded-md p-8 shadow-md">
-            <SlimInput
-              name="currentPassword"
-              type="password"
-              value={currentPw}
-              onChange={(e) => setCurrentPw(e.target.value)}
-            />
-            <SlimInput
-              name="newPassword"
-              type="password"
-              value={newPw}
-              onChange={(e) => setNewPw(e.target.value)}
-            />
-            <SlimInput
-              name="confirmNewPassword"
-              type="password"
-              value={confirmNewPw}
-              onChange={(e) => setConfirmNewPw(e.target.value)}
-            />
-            <div className="mt-4 text-right">
-              <button
-                onClick={async () => {
-                  let res = await changePassword(
-                    currentPw,
-                    newPw,
-                    confirmNewPw,
-                  );
-                  if (newPw !== confirmNewPw) {
-                    errorToast("Passwords do not match");
-                    return;
-                  }
-                  if (res?.success) {
-                    setCurrentPw("");
-                    setNewPw("");
-                    setConfirmNewPw("");
-                    successToast("Password changed successfully");
-                  }
-                }}
-                className="ml-auto mt-4 rounded-md bg-[#6571FF] px-4 py-1 text-white"
-              >
-                Change Password
-              </button>
+            <div className="space-y-4 rounded-md p-8 shadow-md">
+              <SlimInput
+                name="currentPassword"
+                type="password"
+                value={currentPw}
+                onChange={(e) => setCurrentPw(e.target.value)}
+              />
+              <SlimInput
+                name="newPassword"
+                type="password"
+                value={newPw}
+                onChange={(e) => setNewPw(e.target.value)}
+              />
+              <SlimInput
+                name="confirmNewPassword"
+                type="password"
+                value={confirmNewPw}
+                onChange={(e) => setConfirmNewPw(e.target.value)}
+              />
+              <div className="mt-4 text-right">
+                <button
+                  onClick={async () => {
+                    let res = await changePassword(
+                      currentPw,
+                      newPw,
+                      confirmNewPw,
+                    );
+                    if (newPw !== confirmNewPw) {
+                      errorToast("Passwords do not match");
+                      return;
+                    }
+                    if (res?.success) {
+                      setCurrentPw("");
+                      setNewPw("");
+                      setConfirmNewPw("");
+                      successToast("Password changed successfully");
+                    }
+                  }}
+                  className="ml-auto mt-4 rounded-md bg-[#6571FF] px-4 py-1 text-white"
+                >
+                  Change Password
+                </button>
+              </div>
             </div>
-          </div>
+          </>
+
+          <>
+            {/* employee leave request */}
+            <div className="#w-1/2">
+              <h3 className="my-4 text-lg font-bold">Leave Requests</h3>
+
+              <div className="space-y-4 rounded-md p-8 shadow-md">
+                <div className="">
+                  <SlimInput
+                    name="title"
+                    value={leaveRequest.title}
+                    onChange={(e) =>
+                      setLeaveRequest({
+                        ...leaveRequest,
+                        title: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-x-8">
+                  <SlimInput
+                    name="startDate"
+                    value={leaveRequest.startDate}
+                    onChange={(e) =>
+                      setLeaveRequest({
+                        ...leaveRequest,
+                        startDate: e.target.value,
+                      })
+                    }
+                    type="date"
+                  />
+                  <SlimInput
+                    name="endDate"
+                    value={leaveRequest.endDate}
+                    onChange={(e) =>
+                      setLeaveRequest({
+                        ...leaveRequest,
+                        endDate: e.target.value,
+                      })
+                    }
+                    type="date"
+                  />
+                </div>
+
+                <SlimTextarea
+                  name="description"
+                  label="Description"
+                  value={leaveRequest.description}
+                  onChange={(e) =>
+                    setLeaveRequest({
+                      ...leaveRequest,
+                      description: e.target.value,
+                    })
+                  }
+                />
+                <div className="mt-4 text-right">
+                  <Link
+                    href="/settings/my-account/leaveRequests"
+                    className="ml-auto mt-4 rounded-md bg-white px-4 py-1 text-[#6571FF]"
+                  >
+                    View All Request
+                  </Link>
+                  <button
+                    onClick={handleSubmitLeaveRequest}
+                    className="ml-auto mt-4 rounded-md bg-[#6571FF] px-4 py-1 text-white"
+                  >
+                    Submit Request
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
         </div>
       </div>
     </div>

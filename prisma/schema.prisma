@@ -1018,6 +1018,7 @@ model LeaveRequest {
   startDate   DateTime           @map("start_date")
   endDate     DateTime           @map("end_date")
   status      LeaveRequestStatus
+  title       String
   description String
   companyId   Int                @map("company_id")
   createdAt   DateTime           @default(now()) @map("created_at")
