@@ -68,6 +68,7 @@ model Company {
   permissionForOther      PermissionForOther[]
   permissions             Permission[]
   Lead                    Lead[]
+  LeaveRequest            LeaveRequest[]
 }
 
 // notification settings model
@@ -128,6 +129,7 @@ model User {
   Technician       Technician[]
   permissions      Permission[]
   assignedInvoices Invoice[]         @relation("assignedTo")
+  LeaveRequest     LeaveRequest[]
 
   @@index([companyId], name: "fk_users_company")
 }
@@ -1008,4 +1010,24 @@ model Lead {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
   company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model LeaveRequest {
+  id          Int                @id @default(autoincrement())
+  userId      Int                @map("user_id")
+  startDate   DateTime           @map("start_date")
+  endDate     DateTime           @map("end_date")
+  status      LeaveRequestStatus
+  description String
+  companyId   Int                @map("company_id")
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @default(now()) @updatedAt @map("updated_at")
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company     Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+enum LeaveRequestStatus {
+  Pending
+  Approved
+  Rejected
 }
