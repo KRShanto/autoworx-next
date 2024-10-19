@@ -124,11 +124,11 @@ export default function Layout({
     <div className="w-full overflow-y-hidden">
       <SideNavbar navList={navList} />
       <MobileNav navList={navList} />
-      <div className="ml-[5%]">
+      <div className="sm:ml-[5%]">
         <TopNavbar />
         <PopupState />
 
-        <main className="relative h-[93vh] bg-[#F8F9FA] p-2 px-4">
+        <main className="relative h-[93vh] bg-[#F8F9FA] sm:p-2 sm:px-4">
           {children}
         </main>
       </div>

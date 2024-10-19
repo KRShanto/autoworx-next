@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 import Image from "next/image";
 import { Message as TMessage } from "./internal/UsersArea";
 import { FiMessageCircle } from "react-icons/fi";
-import { IoMdSend, IoMdSettings } from "react-icons/io";
+import { IoIosArrowBack, IoMdSend, IoMdSettings } from "react-icons/io";
 import { TiDeleteOutline } from "react-icons/ti";
 import { MdModeEdit } from "react-icons/md";
 import { sendType } from "@/types/Chat";
@@ -181,15 +181,21 @@ export default function MessageBox({
     link.click();
     link.remove();
   };
+
+  // this handler for mobile device
+  const handleBack = () => {
+    setUsersList && setUsersList([]);
+    setGroupsList && setGroupsList([]);
+  };
   return (
     <div
       className={cn(
-        "app-shadow flex w-full flex-col overflow-hidden rounded-lg border bg-white max-[1400px]:w-[100%]",
+        "app-shadow flex h-[calc(100vh-50px)] w-full flex-col overflow-hidden border bg-white max-[1400px]:w-[100%] sm:h-[88vh] sm:rounded-lg",
         totalMessageBox > 2 && "h-[44vh]",
       )}
     >
       {/* name and delete */}
-      <div className="flex items-center justify-between rounded-md bg-white px-2 py-1">
+      <div className="hidden items-center justify-between rounded-md bg-white px-2 py-1 sm:flex">
         <p className="text-sm">
           {fromGroup ? "Group Message" : "User Message"}
         </p>
@@ -200,8 +206,11 @@ export default function MessageBox({
       </div>
 
       {/* Chat Header */}
-      <div className="flex items-center justify-between gap-2 rounded-sm bg-[#006D77] p-3 text-white">
+      <div className="flex items-center justify-between gap-2 bg-[#006D77] p-3 text-white sm:rounded-sm">
         <div className="flex items-center gap-1">
+          <button onClick={handleBack} className="flex-shrink-0 sm:hidden">
+            <IoIosArrowBack size={20} className="font-bold" />
+          </button>
           {fromGroup ? (
             <div className="flex items-center">
               {group?.users
@@ -214,7 +223,7 @@ export default function MessageBox({
                     height={50}
                     className={cn(
                       "rounded-full",
-                      index === 0 ? "ml-0" : "-ml-8",
+                      index === 0 ? "ml-0" : "-ml-9 sm:-ml-8",
                     )}
                   />
                 ))}
@@ -223,7 +232,7 @@ export default function MessageBox({
             <Avatar photo={user?.image} width={50} height={50} />
           )}
           <div className="flex flex-col">
-            <p className="flex flex-col text-[20px] font-bold">
+            <p className="flex flex-col text-[18px] font-bold sm:text-[20px]">
               {fromGroup ? group?.name : `${user?.firstName} ${user?.lastName}`}
               {companyName && (
                 <span className="text-sm font-light">{companyName}</span>
@@ -256,7 +265,7 @@ export default function MessageBox({
       {/* group user setting */}
       {fromGroup && openSettings && (
         <div className="flex w-full items-center justify-between rounded-sm bg-[#D9D9D9] p-3">
-          <div className="flex flex-wrap items-center space-x-2">
+          <div className="flex flex-wrap items-center gap-2">
             {group?.users.map((user: User) => (
               <div
                 key={user.id}

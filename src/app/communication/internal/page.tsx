@@ -28,7 +28,7 @@ export default async function InternalPage() {
   });
 
   return (
-    <div className="mt-5 flex gap-5">
+    <div className="sm:mt-5 flex gap-5">
       <Body users={users} currentUser={session.user} groups={groups} />
     </div>
   );

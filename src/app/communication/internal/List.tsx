@@ -15,6 +15,7 @@ export default function List({
   setUsersList,
   groups,
   setGroupsList,
+  className,
 }: {
   users: User[];
   setUsersList: React.Dispatch<React.SetStateAction<User[]>>;
@@ -22,6 +23,7 @@ export default function List({
     React.SetStateAction<(Group & { users: User[] }[]) | []>
   >;
   groups: (Group & { users: User[] })[] | [];
+  className?: string;
 }) {
   // const [usersStore, setUsersStore] = useState(users);
   // const [groupsStore, setGroupsStore] = useState(groups);
@@ -131,10 +133,17 @@ export default function List({
   //   500,
   // );
   return (
-    <div className="app-shadow w-[20%] rounded-lg bg-white p-3">
+    <div
+      className={cn(
+        "app-shadow min-h-screen w-full rounded-lg bg-white p-3 sm:block sm:min-h-[80vh] sm:w-[20%]",
+        className,
+      )}
+    >
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-[14px] text-[#795252]">User List</h2>
+        <h2 className="font-bold text-[#795252] sm:text-[14px] sm:font-normal">
+          User List
+        </h2>
         <CreateGroupModal users={users} />
       </div>
       {/* Search */}
@@ -157,7 +166,7 @@ export default function List({
             return (
               <button
                 key={group.id}
-                className="flex items-center gap-2 rounded-md bg-[#F2F2F2] p-2"
+                className="flex items-center gap-2 rounded-md border border-[#006D77] bg-[#F2F2F2] p-2 sm:border-0"
                 onClick={() => {
                   // add this user to the list (if not already in it)
                   setGroupsList((groupList: any) => {
@@ -209,7 +218,7 @@ export default function List({
             return (
               <button
                 key={user.id}
-                className="flex items-center gap-2 rounded-md bg-[#F2F2F2] p-2"
+                className="flex items-center gap-2 rounded-md border border-[#006D77] bg-[#F2F2F2] p-2 sm:border-0"
                 onClick={() => {
                   // add this user to the list (if not already in it)
                   setUsersList((usersList) => {
