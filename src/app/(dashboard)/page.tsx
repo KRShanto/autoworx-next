@@ -25,7 +25,8 @@ export default async function Page() {
     },
   });
 
-  const pendingLeaveRequests = await db.leaveRequest.findMany({
+  // fetching all the leave requests
+  let pendingLeaveRequests = await db.leaveRequest.findMany({
     where: {
       companyId: user.companyId,
       status: "Pending",
@@ -33,7 +34,24 @@ export default async function Page() {
     include: {
       user: true,
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
+
+  let filteredLeaveRequests = [];
+
+  // if current user is Manager, then he should not be shown leave requests of other Managers
+  // only Admin can approve Manager's leave requests
+  if (user.employeeType === "Manager") {
+    for (const leaveRequest of pendingLeaveRequests) {
+      if (leaveRequest.user.employeeType !== "Manager") {
+        filteredLeaveRequests.push(leaveRequest);
+      }
+    }
+  } else {
+    filteredLeaveRequests = pendingLeaveRequests;
+  }
 
   const calendarAppointments = [];
 
@@ -76,7 +94,7 @@ export default async function Page() {
         tasks={tasks}
         companyUsers={companyUsers}
         appointments={calendarAppointments}
-        pendingLeaveRequests={pendingLeaveRequests}
+        pendingLeaveRequests={filteredLeaveRequests}
       />
     );
   } else if (user.employeeType === "Manager") {
@@ -85,7 +103,7 @@ export default async function Page() {
         tasks={tasks}
         companyUsers={companyUsers}
         appointments={calendarAppointments}
-        pendingLeaveRequests={pendingLeaveRequests}
+        pendingLeaveRequests={filteredLeaveRequests}
       />
     );
   } else if (user.employeeType === "Sales") {

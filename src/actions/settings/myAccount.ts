@@ -107,25 +107,3 @@ export async function changePassword(
     };
   }
 }
-export async function getMyAccountInfo(): Promise<{
-  success: boolean;
-  data?: User | null;
-}> {
-  try {
-    const session = (await auth()) as AuthSession;
-    const userId = session.user.id;
-
-    const user = await db.user.findUnique({
-      where: {
-        id: +userId,
-      },
-    });
-
-    return { success: true, data: user };
-  } catch (error) {
-    console.log(error);
-    return {
-      success: false,
-    };
-  }
-}

@@ -1,7 +1,7 @@
 import { updateLeaveRequestStatus } from "@/actions/settings/my-account/leave-requests/updateLeaveRequestStatus";
 import { errorToast, successToast } from "@/lib/toast";
 import formatDateToReadable from "@/utils/formatDate";
-import { LeaveRequest } from "@prisma/client";
+import { LeaveRequest, User } from "@prisma/client";
 import React from "react";
 import { FaExternalLinkAlt } from "react-icons/fa";
 
@@ -11,7 +11,7 @@ const EmployeeLeaveRequests = ({
   pendingLeaveRequests = [],
   fullHeight = false,
 }: {
-  pendingLeaveRequests: LeaveRequest[];
+  pendingLeaveRequests: (LeaveRequest & { user: User })[];
   fullHeight?: boolean;
 }) => {
   return (
@@ -41,14 +41,17 @@ const EmployeeLeaveRequests = ({
 const EmployeeLeaveRequest = ({
   leaveRequest,
 }: {
-  leaveRequest: LeaveRequest;
+  leaveRequest: LeaveRequest & { user: User };
 }) => {
   return (
     <div className="flex flex-col gap-y-2 rounded-md border border-gray-400 px-4 py-4 text-xs 2xl:flex-row 2xl:items-start 2xl:justify-between">
       <div className="flex h-full flex-col justify-between 2xl:w-[35%]">
         <div>
           <p className="font-semibold">{leaveRequest.title}</p>
-          <p>Employee : John Doe</p>
+          <p>
+            Employee : {leaveRequest.user.firstName}{" "}
+            {leaveRequest.user.lastName}
+          </p>
         </div>
         <div>
           <p className="mt-4 font-semibold">

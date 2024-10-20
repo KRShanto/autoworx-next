@@ -1,4 +1,5 @@
 import { deleteLeaveRequest } from "@/actions/settings/my-account/leave-requests/deleteLeaveRequest";
+import { cn } from "@/lib/cn";
 import { errorToast, successToast } from "@/lib/toast";
 import formatDateToReadable from "@/utils/formatDate";
 import { LeaveRequest } from "@prisma/client";
@@ -59,7 +60,13 @@ const EmployeeLeaveRequest = ({
         <p>{leaveRequest.description}</p>
       </div>
       <div className="flex flex-col gap-y-3 text-xs 2xl:w-[15%]">
-        <span className="w-full rounded bg-[#6571FF] py-1 text-center text-white">
+        <span
+          className={cn("w-full rounded py-1 text-center text-white", {
+            "bg-[#6571FF]": leaveRequest.status === "Approved",
+            "bg-yellow-500": leaveRequest.status === "Pending",
+            "bg-rose-500": leaveRequest.status === "Rejected",
+          })}
+        >
           {leaveRequest.status}
         </span>
         {leaveRequest.status === "Pending" && (
