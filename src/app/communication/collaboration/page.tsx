@@ -90,7 +90,9 @@ export default async function CollaborationPage() {
     .flat();
   return (
     <div>
-      <Title>Communication Hub - Collaboration</Title>
+      <Title className="hidden sm:block">
+        Communication Hub - Collaboration
+      </Title>
       <Collaboration
         companyWithAdmin={filteredCompanyWithAdmin}
         companies={oppositeCompanies}

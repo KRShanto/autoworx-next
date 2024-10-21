@@ -9,6 +9,7 @@ export default function UsersArea({
   setSelectedUsersList,
   totalMessageBoxLength,
   companyName,
+  className,
 }: {
   companyName: string | null;
   previousMessages: (Message & { attachment: Attachment | null })[];
@@ -16,12 +17,14 @@ export default function UsersArea({
   selectedUsersList: any[];
   setSelectedUsersList: React.Dispatch<React.SetStateAction<any[]>>;
   totalMessageBoxLength: number;
+  className?: string;
 }) {
   return (
     <div
       className={cn(
-        "grid h-[88vh] w-full gap-3",
+        "h-[88vh] w-full gap-3 sm:grid",
         totalMessageBoxLength > 1 ? "grid-cols-2" : "grid-cols-1",
+        className,
       )}
     >
       {selectedUsersList.map((user) => {

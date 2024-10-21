@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { Company, User } from "@prisma/client";
 import SearchCollaborationModal from "./SearchCollaborationModal";
+import { cn } from "@/lib/cn";
 
 export default function List({
   companyAdmins,
@@ -9,20 +10,29 @@ export default function List({
   setCompanyName,
   companies,
   setCompanyAdmins,
+  className,
 }: {
   companyAdmins: Partial<User>[];
   setCompanyAdmins: React.Dispatch<React.SetStateAction<Partial<User>[]>>;
   setSelectedUsersList: React.Dispatch<React.SetStateAction<any[]>>;
   setCompanyName: React.Dispatch<React.SetStateAction<string | null>>;
   companies: (Company & { users: User[] })[];
+  className?: string;
 }) {
   const [selectedCompany, setSelectedCompany] = useState<any>(null); // TODO: type this
   const [searchTerm, setSearchTerm] = useState("");
   return (
-    <div className="app-shadow h-[83vh] w-[23%] rounded-lg bg-white p-3">
+    <div
+      className={cn(
+        "app-shadow h-screen w-full overflow-y-auto rounded-lg bg-white p-3 sm:h-[83vh] sm:w-[23%] sm:block",
+        className,
+      )}
+    >
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-[14px] text-[#797979]">User List</h2>
+        <h2 className="text-xl font-bold text-[#797979] sm:text-[14px] sm:font-normal">
+          User List
+        </h2>
         <SearchCollaborationModal
           companies={companies}
           setCompanyAdmins={setCompanyAdmins}

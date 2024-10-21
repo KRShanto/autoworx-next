@@ -83,6 +83,7 @@ export default function SearchCollaborationModal({
       errorToast(err.message);
     }
   }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -90,7 +91,7 @@ export default function SearchCollaborationModal({
           Search for Collabortors
         </button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="w-96 sm:w-full">
         {error && <p className="text-center text-sm text-red-400">{error}</p>}
         <h2 className="mb-5 text-2xl font-bold">Search for Collaborators</h2>
         <div>
@@ -164,7 +165,7 @@ export default function SearchCollaborationModal({
             </div>
           )}
         </div>
-        <DialogFooter>
+        <DialogFooter className="flex-row-reverse sm:flex-row gap-x-2 sm:gap-x-0">
           <DialogClose className="rounded-lg border-2 border-slate-400 p-2">
             Cancel
           </DialogClose>
