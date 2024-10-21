@@ -30,21 +30,23 @@ export default function UsersArea({
   setUsersList,
   groupsList,
   setGroupsList,
+  className,
 }: {
   currentUser: User;
   usersList: any[];
   setUsersList: React.Dispatch<React.SetStateAction<any[]>>;
   setGroupsList: React.Dispatch<React.SetStateAction<any[]>>;
   groupsList: any;
-  }) {
-  
+  className?: string;
+}) {
   const totalMessageBoxLength = usersList.length + groupsList.length;
 
   return (
     <div
       className={cn(
-        "grid h-[88vh] w-full gap-3",
+        "w-full gap-3 sm:grid",
         totalMessageBoxLength > 1 ? "grid-cols-2" : "grid-cols-1",
+        className,
       )}
     >
       {usersList.map((user) => {

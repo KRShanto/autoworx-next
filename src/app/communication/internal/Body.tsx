@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import List from "./List";
 import UsersArea from "./UsersArea";
 import { User as NextAuthUser } from "next-auth";
 import { Group, User } from "@prisma/client";
+import { cn } from "@/lib/cn";
 
 export default function Body({
   users,
@@ -21,9 +22,29 @@ export default function Body({
     [],
   );
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 600) {
+        if (usersList.length > 1) {
+          setUsersList((prev) => [prev[0]]);
+        }
+        if (groupsList.length > 1) {
+          setGroupsList((prev) => [prev[0]]);
+        }
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [usersList.length]);
+
+  const totalLengthOfUsersAndGroups = usersList.length + groupsList.length;
+  console.log(totalLengthOfUsersAndGroups);
   return (
     <>
       <List
+        className={cn(totalLengthOfUsersAndGroups === 0 ? "block" : "hidden")}
         groups={groups}
         users={users}
         setUsersList={setUsersList}
@@ -34,6 +55,7 @@ export default function Body({
         }
       />
       <UsersArea
+        className={cn(totalLengthOfUsersAndGroups === 0 ? "hidden" : "block")}
         usersList={usersList}
         setUsersList={setUsersList}
         currentUser={currentUser}

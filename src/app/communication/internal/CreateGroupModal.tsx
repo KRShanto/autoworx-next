@@ -136,7 +136,7 @@ export default function CreateGroupModal({ users }: TProps) {
           <MdGroupAdd className="size-5 text-white" />
         </button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="w-[350px] sm:w-full">
         {error && <p className="text-center text-sm text-red-400">{error}</p>}
         <h2 className="mb-5 text-2xl font-bold">Create Group</h2>
         <div className="grid grid-cols-1">
@@ -236,7 +236,7 @@ export default function CreateGroupModal({ users }: TProps) {
             </div>
           )}
         </div>
-        <DialogFooter>
+        <DialogFooter className="flex-row-reverse gap-x-2 sm:gap-x-0">
           <DialogClose className="rounded-lg border-2 border-slate-400 p-2">
             Cancel
           </DialogClose>
