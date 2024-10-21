@@ -1,17 +1,16 @@
-import { updateLeaveRequestStatus } from "@/actions/settings/my-account/leave-requests/updateLeaveRequestStatus";
+import { deleteLeaveRequest } from "@/actions/settings/my-account/leave-requests/deleteLeaveRequest";
+import { cn } from "@/lib/cn";
 import { errorToast, successToast } from "@/lib/toast";
 import formatDateToReadable from "@/utils/formatDate";
-import { LeaveRequest, User } from "@prisma/client";
+import { LeaveRequest } from "@prisma/client";
 import React from "react";
 import { FaExternalLinkAlt } from "react-icons/fa";
 
-type Props = {};
-
 const EmployeeLeaveRequests = ({
-  pendingLeaveRequests = [],
+  leaveRequests = [],
   fullHeight = false,
 }: {
-  pendingLeaveRequests: (LeaveRequest & { user: User })[];
+  leaveRequests: LeaveRequest[];
   fullHeight?: boolean;
 }) => {
   return (
@@ -19,18 +18,15 @@ const EmployeeLeaveRequests = ({
       className={`flex flex-col rounded-md p-8 shadow-lg ${fullHeight ? "h-[82vh]" : "h-[38vh]"}`}
     >
       <div className="mb-8 flex items-center justify-between">
-        <span className="text-2xl font-bold">Employee Leave Request</span>{" "}
-        <span>
-          <FaExternalLinkAlt />
-        </span>
+        <span className="text-2xl font-bold">Leave Requests</span>{" "}
       </div>
       <div className="custom-scrollbar flex flex-1 flex-col space-y-4">
-        {pendingLeaveRequests.map((leaveRequest, idx) => (
+        {leaveRequests.map((leaveRequest, idx) => (
           <EmployeeLeaveRequest key={idx} leaveRequest={leaveRequest} />
         ))}
-        {[0].length === 0 && (
+        {leaveRequests.length === 0 && (
           <div className="flex flex-1 items-center justify-center self-center text-center">
-            <span>No Employee Leave Requests</span>
+            <span>No Leave Requests</span>
           </div>
         )}
       </div>
@@ -41,17 +37,14 @@ const EmployeeLeaveRequests = ({
 const EmployeeLeaveRequest = ({
   leaveRequest,
 }: {
-  leaveRequest: LeaveRequest & { user: User };
+  leaveRequest: LeaveRequest;
 }) => {
   return (
     <div className="flex flex-col gap-y-2 rounded-md border border-gray-400 px-4 py-4 text-xs 2xl:flex-row 2xl:items-start 2xl:justify-between">
       <div className="flex h-full flex-col justify-between 2xl:w-[35%]">
         <div>
           <p className="font-semibold">{leaveRequest.title}</p>
-          <p>
-            Employee : {leaveRequest.user.firstName}{" "}
-            {leaveRequest.user.lastName}
-          </p>
+          {/* <p>Employee : John Doe</p> */}
         </div>
         <div>
           <p className="mt-4 font-semibold">
@@ -67,38 +60,30 @@ const EmployeeLeaveRequest = ({
         <p>{leaveRequest.description}</p>
       </div>
       <div className="flex flex-col gap-y-3 text-xs 2xl:w-[15%]">
-        <button
-          onClick={async () => {
-            const res = await updateLeaveRequestStatus(
-              leaveRequest.id,
-              "Approved",
-            );
-            if (res.success) {
-              successToast(res.message);
-            } else {
-              errorToast(res.message);
-            }
-          }}
-          className="w-full rounded bg-[#6571FF] py-1 text-white"
+        <span
+          className={cn("w-full rounded py-1 text-center text-white", {
+            "bg-[#6571FF]": leaveRequest.status === "Approved",
+            "bg-yellow-500": leaveRequest.status === "Pending",
+            "bg-rose-500": leaveRequest.status === "Rejected",
+          })}
         >
-          Accept
-        </button>
-        <button
-          onClick={async () => {
-            const res = await updateLeaveRequestStatus(
-              leaveRequest.id,
-              "Rejected",
-            );
-            if (res.success) {
-              successToast(res.message);
-            } else {
-              errorToast(res.message);
-            }
-          }}
-          className="w-full rounded bg-red-500 py-1 text-white"
-        >
-          Reject
-        </button>
+          {leaveRequest.status}
+        </span>
+        {leaveRequest.status === "Pending" && (
+          <button
+            onClick={async () => {
+              const res = await deleteLeaveRequest(leaveRequest);
+              if (res.success) {
+                successToast(res.message);
+              } else {
+                errorToast(res.message);
+              }
+            }}
+            className="text-cente w-full rounded bg-red-500 py-1 text-white"
+          >
+            Delete
+          </button>
+        )}
       </div>
     </div>
   );

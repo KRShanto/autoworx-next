@@ -1,7 +1,7 @@
 "use client";
 import Title from "@/components/Title";
 import { usePopupStore } from "@/stores/popup";
-import { Task as TaskType, User } from "@prisma/client";
+import { LeaveRequest, Task as TaskType, User } from "@prisma/client";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import Appointments from "./Appointments";
 import ChartData from "./ChartData";
@@ -12,10 +12,12 @@ const Dashboard = ({
   tasks = [],
   companyUsers = [],
   appointments = [],
+  pendingLeaveRequests,
 }: {
   tasks: TaskType[];
   companyUsers: User[];
   appointments: any;
+  pendingLeaveRequests: (LeaveRequest & { user: User })[];
 }) => {
   const { open } = usePopupStore();
 
@@ -148,7 +150,7 @@ const Dashboard = ({
           {/* task list */}
           <Tasks tasks={tasks} companyUsers={companyUsers} />
           {/* employee leave request */}
-          <EmployeeLeaveRequests />
+          <EmployeeLeaveRequests pendingLeaveRequests={pendingLeaveRequests} />
         </div>
       </div>
     </div>

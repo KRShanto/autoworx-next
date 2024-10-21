@@ -1,18 +1,21 @@
+import { cn } from "@/lib/cn";
+import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
+import getUser from "@/lib/getUser";
+import { AuthSession } from "@/types/auth";
+import { env } from "next-runtime-env";
 import QRCode from "qrcode";
 import React from "react";
-import { FaPrint } from "react-icons/fa6";
+import { FaCircleExclamation, FaPrint } from "react-icons/fa6";
+import { auth } from "../auth";
+import QRcode from "./QRcode";
 import ReplenishProductForm from "./ReplenishProductForm";
 import SalesPurchaseHistory from "./SalesPurchaseHistory";
 import UseProductForm from "./UseProductForm";
-import { getCompanyId } from "@/lib/companyId";
-import { FaCircleExclamation } from "react-icons/fa6";
-import QRcode from "./QRcode";
-import { env } from "next-runtime-env";
-import { cn } from "@/lib/cn";
 
 export default async function Sidebar({ productId }: { productId: number }) {
   const companyId = await getCompanyId();
+  const user = await getUser();
 
   const product = productId
     ? await db.inventoryProduct.findUnique({ where: { id: productId } })
@@ -159,7 +162,7 @@ export default async function Sidebar({ productId }: { productId: number }) {
         </div>
       </div>
 
-      <SalesPurchaseHistory productId={productId} />
+      <SalesPurchaseHistory user={user} productId={productId} />
     </div>
   );
 }

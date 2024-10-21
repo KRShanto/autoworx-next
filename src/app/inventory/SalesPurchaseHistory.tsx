@@ -1,10 +1,13 @@
 import { db } from "@/lib/db";
+import { AuthSession } from "@/types/auth";
+import { Client, InventoryProductHistory, User, Vendor } from "@prisma/client";
 import SalesPurchaseHistoryClient from "./SalesPurchaseHistoryClient";
-import { Client, InventoryProductHistory, Vendor } from "@prisma/client";
 
 export default async function SalesPurchaseHistory({
+  user,
   productId,
 }: {
+  user: User;
   productId: number | undefined;
 }) {
   const product = productId
@@ -36,6 +39,10 @@ export default async function SalesPurchaseHistory({
   }
 
   return (
-    <SalesPurchaseHistoryClient histories={histories} product={product!} />
+    <SalesPurchaseHistoryClient
+      user={user}
+      histories={histories}
+      product={product!}
+    />
   );
 }

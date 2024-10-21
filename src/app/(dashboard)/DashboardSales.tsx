@@ -23,13 +23,13 @@ const Dashboard = ({
         {/* col 1 */}
         <div className="w-[25%] space-y-12">
           {/* task list */}
-          <Tasks tasks={tasks} companyUsers={companyUsers} />
+          <Tasks fullHeight tasks={tasks} companyUsers={companyUsers} />
         </div>
 
         {/* col 2 */}
         <div className="w-[25%] space-y-12">
           {/* appointments */}
-          <Appointments appointments={appointments} />
+          <Appointments fullHeight appointments={appointments} fu />
         </div>
         {/* col 3 */}
         <div className="w-[20%] space-y-12">
