@@ -6,6 +6,8 @@ import PopupState from "./PopupState";
 import SideNavbar from "./SideNavbar";
 import TopNavbar from "./TopNavbar";
 import MobileNav from "./mobile-responsive/MobileNav";
+import PrivateRoute from "./PrivateRoute";
+import { EmployeeType } from "@prisma/client";
 
 const navList = [
   {
@@ -104,7 +106,7 @@ export default function Layout({
   session,
 }: {
   children: React.ReactNode;
-  session: Session | null;
+  session: (Session & { user: { employeeType: string } }) | null;
 }) {
   const pathname = usePathname();
 
@@ -129,7 +131,7 @@ export default function Layout({
         <PopupState />
 
         <main className="relative h-[93vh] bg-[#F8F9FA] sm:p-2 sm:px-4">
-          {children}
+          <PrivateRoute session={session}>{children}</PrivateRoute>
         </main>
       </div>
     </div>

@@ -88,6 +88,7 @@
     "react-to-pdf": "^1.0.1",
     "react-to-print": "^2.15.1",
     "recharts": "^2.12.7",
+    "regexparam": "^3.0.0",
     "rsuite": "^5.65.1",
     "sass": "^1.72.0",
     "server-only": "^0.0.1",
