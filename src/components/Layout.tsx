@@ -128,7 +128,7 @@ export default function Layout({
         <TopNavbar />
         <PopupState />
 
-        <main className="relative h-[93vh] bg-[#F8F9FA] sm:p-2 sm:px-4">
+        <main className="relative h-[93vh] overflow-y-auto bg-[#F8F9FA] sm:p-2 sm:px-4">
           {children}
         </main>
       </div>

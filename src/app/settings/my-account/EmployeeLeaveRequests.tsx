@@ -9,13 +9,15 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 const EmployeeLeaveRequests = ({
   leaveRequests = [],
   fullHeight = false,
+  shadow = true
 }: {
   leaveRequests: LeaveRequest[];
   fullHeight?: boolean;
+  shadow?: boolean;
 }) => {
   return (
     <div
-      className={`flex flex-col rounded-md p-8 shadow-lg ${fullHeight ? "h-[82vh]" : "h-[38vh]"}`}
+      className={`flex flex-col rounded-md p-8 ${shadow && "shadow-lg"} ${fullHeight ? "h-[82vh]" : "h-[38vh]"}`}
     >
       <div className="mb-8 flex items-center justify-between">
         <span className="text-2xl font-bold">Leave Requests</span>{" "}
