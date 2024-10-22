@@ -99,6 +99,7 @@ export default function NewTask({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               autoFocus
+              required
             />
           </div>
 

@@ -37,11 +37,17 @@ export default function TaskComponent({ task }: { task: Task }) {
       draggable={task.date ? false : true}
       onDragStart={task.date ? undefined : handleDragStart}
     >
-      <Link href={`/task/day?date=${existingDate}`} className="w-[90%]">
+      <Link
+        style={{
+          cursor: task.date ? "pointer" : "move",
+        }}
+        href={`/task/day?date=${existingDate}`}
+        className="w-[90%]"
+      >
         {task.title}
       </Link>
       <FaRegCheckCircle
-        className="cursor-pointer text-xl text-white hover:text-gray-400"
+        className="text-xl text-white hover:text-gray-400"
         onClick={handleDelete}
       />
     </div>
