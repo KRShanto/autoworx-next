@@ -24,7 +24,6 @@ export default function PrivateRoute({ children, session }: TProps) {
 
   //   @ts-ignore
   const notAccessRoute = NO_ACCESS_ROUTES[actualUrl];
-  console.log({ notAccessRoute });
 
   const noAccessForDynamicRoute = NO_ACCESS_FOR_DYNAMIC_ROUTES.find((route) => {
     //   @ts-ignore
@@ -32,10 +31,8 @@ export default function PrivateRoute({ children, session }: TProps) {
     const match = result.pattern.test(pathname);
     return match;
   });
-  console.log({ noAccessForDynamicRoute });
   //   @ts-ignore
   const notAccessForSettings = NO_ACCESS_FOR_SETTINGS_ROUTES[actualUrl];
-  console.log({ notAccessForSettings });
 
   if (
     notAccessRoute?.notAccess?.includes(authUser?.employeeType) ||
