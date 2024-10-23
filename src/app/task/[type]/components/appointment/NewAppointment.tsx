@@ -213,7 +213,7 @@ export function NewAppointment({
     setReminderTemplateStatus(true);
     setTimes([]);
     // remove the clientId from the url
-    router.push(pathname);
+    // router.push(pathname);
   }
 
   useEffect(() => {
