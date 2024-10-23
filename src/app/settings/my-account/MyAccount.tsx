@@ -120,20 +120,23 @@ const MyAccount = ({ user }: { user: User }) => {
                 onClick={() => {
                   profilePicRef.current?.click();
                 }}
-                className="relative mr-4 flex h-[150px] w-[150px] cursor-pointer items-center justify-center rounded-full bg-violet-400/20"
+                className="relative mr-4 flex aspect-square h-[80px] cursor-pointer items-center justify-center rounded-full bg-violet-400/20 2xl:h-[150px]"
               >
                 <Image
                   src={
                     profilePic
                       ? URL.createObjectURL(profilePic)
-                      : `/api/images/${userInfo?.image}`
+                      : userInfo?.image === "/images/default.png"
+                        ? "/images/default.png"
+                        : `/api/images/${userInfo?.image}`
                   }
                   alt=""
+                  className="h-full w-full shrink-0 rounded-full object-cover"
                   width={80}
                   height={80}
                 />
                 <Image
-                  src="/icons/up arrow.png"
+                  src="/icons/upArrow.png"
                   alt=""
                   className="absolute bottom-2 right-2"
                   width={30}
@@ -363,16 +366,16 @@ const MyAccount = ({ user }: { user: User }) => {
                       })
                     }
                   />
-                  <div className="mt-4 text-right">
+                  <div className="mt-4 flex items-center justify-end gap-x-4">
                     <Link
                       href="/settings/my-account/leave-requests"
-                      className="ml-auto mt-4 rounded-md bg-white px-4 py-1 text-[#6571FF] shadow"
+                      className="rounded-md border border-gray-300 bg-white px-4 py-1 text-[#6571FF]"
                     >
                       View All Request
                     </Link>
                     <button
                       onClick={handleSubmitLeaveRequest}
-                      className="ml-auto mt-4 rounded-md bg-[#6571FF] px-4 py-1 text-white"
+                      className="rounded-md bg-[#6571FF] px-4 py-1 text-white"
                     >
                       Submit Request
                     </button>

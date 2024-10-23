@@ -18,6 +18,7 @@ import { useState } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { FaCheck, FaPlus } from "react-icons/fa6";
 import { createTask } from "../../../../../actions/task/createTask";
+import moment from "moment";
 
 export default function NewTask({
   companyUsers,
@@ -37,6 +38,7 @@ export default function NewTask({
   const [assignedUsers, setAssignedUsers] = useState<number[]>([]);
   const [priority, setPriority] = useState<Priority>("Low");
   const [time, setTime] = useState<{ startTime: string; endTime: string }>();
+  const [date, setDate] = useState<string>("");
 
   async function handleSubmit() {
     const res = await createTask({
@@ -47,6 +49,7 @@ export default function NewTask({
       startTime: time?.startTime,
       endTime: time?.endTime,
       clientId,
+      date: date ? new Date(date).toISOString() : new Date().toISOString(),
     });
 
     // reset form
@@ -116,15 +119,25 @@ export default function NewTask({
 
           <div id="timer-parent" className="mb-4 flex flex-col">
             <label htmlFor="time">Time</label>
-            <TimePicker.RangePicker
-              id="time"
-              onChange={onChange}
-              getPopupContainer={() => document.getElementById("timer-parent")!}
-              use12Hours
-              format="h:mm a"
-              className="mt-2 rounded-md border-2 border-gray-500 p-1 placeholder-slate-800"
-              needConfirm={false}
-            />
+            <div className="flex items-center space-x-2">
+              <input
+                id="time"
+                onChange={(e) => setDate(e.target.value)}
+                className="mt-2 w-full rounded-md border-2 border-gray-500 p-0.5 placeholder-slate-800"
+                type="date"
+              />
+              <TimePicker.RangePicker
+                id="time"
+                onChange={onChange}
+                getPopupContainer={() =>
+                  document.getElementById("timer-parent")!
+                }
+                use12Hours
+                format="h:mm a"
+                className="mt-2 w-full rounded-md border-2 border-gray-500 p-1 placeholder-slate-800"
+                needConfirm={false}
+              />
+            </div>
           </div>
 
           {/* custom radio. show user name and image (column)*/}

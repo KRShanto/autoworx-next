@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { deleteLeaveRequest } from "@/actions/settings/my-account/leave-requests/deleteLeaveRequest";
 import { cn } from "@/lib/cn";
 import { errorToast, successToast } from "@/lib/toast";
@@ -9,13 +10,15 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 const EmployeeLeaveRequests = ({
   leaveRequests = [],
   fullHeight = false,
+  shadow = true,
 }: {
   leaveRequests: LeaveRequest[];
   fullHeight?: boolean;
+  shadow?: boolean;
 }) => {
   return (
     <div
-      className={`flex flex-col rounded-md p-8 shadow-lg ${fullHeight ? "h-[82vh]" : "h-[38vh]"}`}
+      className={`flex flex-col rounded-md p-8 ${shadow && "shadow-lg"} ${fullHeight ? "h-[82vh]" : "h-[38vh]"}`}
     >
       <div className="mb-8 flex items-center justify-between">
         <span className="text-2xl font-bold">Leave Requests</span>{" "}
@@ -59,16 +62,7 @@ const EmployeeLeaveRequest = ({
         <p className="font-semibold">Details :</p>
         <p>{leaveRequest.description}</p>
       </div>
-      <div className="flex flex-col gap-y-3 text-xs 2xl:w-[15%]">
-        <span
-          className={cn("w-full rounded py-1 text-center text-white", {
-            "bg-[#6571FF]": leaveRequest.status === "Approved",
-            "bg-yellow-500": leaveRequest.status === "Pending",
-            "bg-rose-500": leaveRequest.status === "Rejected",
-          })}
-        >
-          {leaveRequest.status}
-        </span>
+      <div className="relative flex h-full flex-col items-center justify-between gap-y-3 text-xs 2xl:w-[15%]">
         {leaveRequest.status === "Pending" && (
           <button
             onClick={async () => {
@@ -79,11 +73,20 @@ const EmployeeLeaveRequest = ({
                 errorToast(res.message);
               }
             }}
-            className="text-cente w-full rounded bg-red-500 py-1 text-white"
+            className="flex items-center justify-center self-end"
           >
-            Delete
+            <img src="/icons/delete.png" alt="" />
           </button>
         )}
+        <span
+          className={cn("w-full rounded py-1 text-center text-white", {
+            "bg-[#6571FF]": leaveRequest.status === "Approved",
+            "bg-yellow-500": leaveRequest.status === "Pending",
+            "bg-rose-500": leaveRequest.status === "Rejected",
+          })}
+        >
+          {leaveRequest.status}
+        </span>
       </div>
     </div>
   );

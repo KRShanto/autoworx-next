@@ -12,10 +12,10 @@ import EmployeeLeaveRequests from "../../EmployeeLeaveRequests";
 
 const LeaveRequest = ({
   leaveRequests,
-  user
+  user,
 }: {
   leaveRequests: TLeaveRequest[];
-  user:User
+  user: User;
 }) => {
   return (
     <InterceptedDialog>
@@ -28,6 +28,7 @@ const LeaveRequest = ({
                 <EmployeeLeaveRequests
                   fullHeight
                   leaveRequests={leaveRequests}
+                  shadow={false}
                 />
               </div>
 

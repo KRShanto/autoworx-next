@@ -22,7 +22,6 @@ import { assignAppointmentDate } from "../../../../actions/appointment/assignApp
 import { updateTask } from "../../../../actions/task/dragTask";
 import DayRow from "../components/day/DayRow";
 import DayTask from "../components/day/DayTask";
-import { TIME_VALIDATION_PROP_NAMES } from "@mui/x-date-pickers/internals/utils/validation/extractValidationProps";
 
 function useDate() {
   const searchParams = useSearchParams();
@@ -164,7 +163,9 @@ export default function Day({
         // Add task to database
         await updateTask({
           id: taskFoundWithoutTime.id,
-          date: date ? date.toDate() : new Date(),
+          date: taskFoundWithoutTime?.date
+            ? taskFoundWithoutTime.date
+            : new Date(),
           startTime: oldTask?.startTime || startTime,
           endTime: oldTask?.endTime || endTime,
         });
