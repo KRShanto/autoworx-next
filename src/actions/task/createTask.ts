@@ -33,7 +33,11 @@ export async function createTask(task: TaskType): Promise<ServerAction> {
       startTime: task.startTime,
       endTime: task.endTime,
       clientId: task.clientId,
+<<<<<<< HEAD
       date: task?.date ? task?.date : new Date().toISOString(),
+=======
+      date: task.date,
+>>>>>>> 587042ba3f46f278fcf5c19d1052e82150e4cab7
     },
   });
 
