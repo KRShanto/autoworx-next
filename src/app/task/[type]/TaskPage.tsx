@@ -1,12 +1,9 @@
-"use client";
-
+'use client'
 import DnDWrapper from "@/components/DnDWrapper";
 import { CalendarType } from "@/types/calendar";
 import { AppointmentFull, CalendarAppointment } from "@/types/db";
 import type { EmailTemplate } from "@prisma/client";
 import { CalendarSettings, Client, Task, User, Vehicle } from "@prisma/client";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import Calendar from "./Calendar/Calendar";
 import CalendarSidebar from "./CalendarSidebar/CalendarSidebar";
 
@@ -25,6 +22,7 @@ export default function TaskPage({
   user,
 }: {
   type: CalendarType;
+  tasksWithoutTime: Task[];
   taskWithAssignedUsers: (Task & { assignedUsers: User[] })[];
   companyUsers: User[];
   usersWithTasks: any; // TODO: Fix this type
@@ -48,7 +46,10 @@ export default function TaskPage({
 
   return (
     <DnDWrapper id="task">
-      <CalendarSidebar usersWithTasks={usersWithTasks} tasks={tasks} />
+      <CalendarSidebar
+        usersWithTasks={usersWithTasks}
+        tasks={tasksWithoutTime}
+      />
       <Calendar
         type={type}
         tasks={calendarTasks as any}
