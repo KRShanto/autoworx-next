@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import DnDWrapper from "@/components/DnDWrapper";
 import { CalendarType } from "@/types/calendar";
 import { AppointmentFull, CalendarAppointment } from "@/types/db";
@@ -12,7 +12,6 @@ export default function TaskPage({
   taskWithAssignedUsers,
   companyUsers,
   usersWithTasks,
-  tasks,
   customers,
   vehicles,
   settings,
@@ -22,11 +21,9 @@ export default function TaskPage({
   user,
 }: {
   type: CalendarType;
-  tasksWithoutTime: Task[];
   taskWithAssignedUsers: (Task & { assignedUsers: User[] })[];
   companyUsers: User[];
   usersWithTasks: any; // TODO: Fix this type
-  tasks: Task[];
   customers: Client[];
   vehicles: Vehicle[];
   settings: CalendarSettings;

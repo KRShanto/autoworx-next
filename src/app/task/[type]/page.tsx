@@ -24,7 +24,7 @@ export default async function Page({ params }: { params: { type: string } }) {
   const calendarAppointments = [];
   let appointments;
   let tasks;
-  let tasksWithoutTime;
+
   if (user.employeeType == "Admin" || user.employeeType == "Manager") {
     // only admin and manager can see all appointments
     appointments = await db.appointment.findMany({
@@ -37,20 +37,6 @@ export default async function Page({ params }: { params: { type: string } }) {
     tasks = await db.task.findMany({
       where: {
         companyId
-      },
-    });
-
-    tasksWithoutTime = await db.task.findMany({
-      where: {
-        companyId,
-        OR: [
-          {
-            startTime: null,
-          },
-          {
-            endTime: null,
-          },
-        ],
       },
     });
   } else {
@@ -79,30 +65,6 @@ export default async function Page({ params }: { params: { type: string } }) {
           },
           {
             userId: +user.id,
-          },
-        ],
-      },
-    });
-
-    tasksWithoutTime = await db.task.findMany({
-      where: {
-        companyId,
-        OR: [
-          {
-            taskUser: {
-              some: {
-                userId: +user.id,
-              },
-            },
-          },
-          {
-            userId: +user.id,
-          },
-          {
-            startTime: null,
-          },
-          {
-            endTime: null,
           },
         ],
       },
@@ -297,11 +259,9 @@ export default async function Page({ params }: { params: { type: string } }) {
         />
         <TaskPage
           type={params.type as CalendarType}
-          tasksWithoutTime={tasksWithoutTime}
           taskWithAssignedUsers={taskWithAssignedUsers}
           companyUsers={companyUsers}
           usersWithTasks={usersWithTasks}
-          tasks={tasks}
           customers={customers}
           vehicles={vehicles}
           settings={settings}
