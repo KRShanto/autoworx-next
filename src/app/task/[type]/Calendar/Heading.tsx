@@ -28,7 +28,6 @@ function getNextValidDate(
   weekend1: string,
   weekend2: string,
 ): Moment {
-
   let nextDate = moment(date);
   while (
     nextDate.format("dddd") === weekend1 ||
@@ -75,7 +74,7 @@ export default function Heading({
         {/* Highlight day's date in Month section */}
         <Link
           className="app-shadow rounded-md p-2 text-[#797979]"
-          href="/task/month"
+          href={`/task/${type}`}
         >
           Today
         </Link>

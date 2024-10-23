@@ -16,6 +16,7 @@ interface TaskType {
   startTime?: string;
   endTime?: string;
   clientId?: number | null;
+  date: string;
 }
 
 export async function createTask(task: TaskType): Promise<ServerAction> {
@@ -32,6 +33,7 @@ export async function createTask(task: TaskType): Promise<ServerAction> {
       startTime: task.startTime,
       endTime: task.endTime,
       clientId: task.clientId,
+      date: task.date,
     },
   });
 

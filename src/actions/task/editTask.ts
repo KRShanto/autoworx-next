@@ -12,6 +12,7 @@ interface TaskType {
   priority: Priority;
   startTime?: string;
   endTime?: string;
+  date?: string
 }
 
 export async function editTask({
@@ -76,6 +77,7 @@ export async function editTask({
       priority: task.priority,
       startTime: task.startTime,
       endTime: task.endTime,
+      date: task.date
     },
   });
 
