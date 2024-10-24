@@ -17,7 +17,7 @@ export default function Calender({
   appointments,
   appointmentsFull,
   templates,
-  user
+  user,
 }: {
   type: CalendarType;
   tasks: CalendarTask[];
@@ -29,7 +29,7 @@ export default function Calender({
   appointments: CalendarAppointment[];
   appointmentsFull: AppointmentFull[];
   templates: EmailTemplate[];
-  user:User
+  user: User;
 }) {
   return (
     <div className="app-shadow relative w-full overflow-hidden rounded-[18px] bg-white p-4">
