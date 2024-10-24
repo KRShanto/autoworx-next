@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Switch, Checkbox } from "antd";
-import { permissionModule } from "@/lib/permissionModule";
+import { permissionModuleForAdminManager } from "@/lib/permissionModule";
 import {
   getPermissionsForRole,
   updatePermissionForRole,
@@ -57,7 +57,7 @@ export default function UserRolesTable() {
 
       if (updatedPermissions[roleKey]) {
         updatedPermissions[roleKey]![fieldKey] = value; // Update locally
-        setPermissions(updatedPermissions); // Update the component state
+        setPermissions(updatedPermissions); 
         await updatePermissionForRole({ role, moduleKey, value, isViewOnly }); // Update the database
       }
     } catch (error) {
@@ -128,8 +128,8 @@ export default function UserRolesTable() {
             </tr>
           </thead>
           <tbody>
-            {permissionModule.map((module, index) => (
-              <tr key={index}>
+            {permissionModuleForAdminManager.map((module, index) => (
+              <tr key={index+1}>
                 <td className="py-2 text-left">{module.label}</td>
                 {roles.map((role) => {
                   const permission = getPermissionForRole(role, module.key);
