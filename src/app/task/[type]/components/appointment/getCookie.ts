@@ -12,21 +12,24 @@ export async function getCookies() {
 
 export async function generateAuthURL() {
   const oauth2Client = new google.auth.OAuth2(
-    process.env.GMAIL_CLIENT_ID,
-    process.env.GMAIL_CLIENT_SECRET,
+    env("GMAIL_CLIENT_ID"),
+    env("GMAIL_CLIENT_SECRET"),
     `${env("NEXT_PUBLIC_APP_URL")}/task/auth`,
   );
+
   const scopes = [
     "https://www.googleapis.com/auth/calendar",
     "https://www.googleapis.com/auth/calendar.events",
   ];
+
   const state = crypto.randomBytes(32).toString("hex");
+
   const authorizationUrl = oauth2Client.generateAuthUrl({
     access_type: "offline",
     scope: scopes,
     include_granted_scopes: true,
     state: state,
   });
-  console.log("🚀 ~ generateAuthURL ~ authorizationUrl:", authorizationUrl);
+
   return authorizationUrl;
 }

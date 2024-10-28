@@ -1,9 +1,4 @@
 "use client";
-import getUser from "@/lib/getUser";
-import crypto from "crypto";
-import { google } from "googleapis";
-import { env } from "next-runtime-env";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
@@ -14,18 +9,20 @@ type Props = {};
 const ConnectGoogle = (props: Props) => {
   const [cookie, setCookie] = useState<string>("");
   const [authUrl, setAuthUrl] = useState<string | null>(null);
+
   const [inc, setInc] = useState(0);
   const router = useRouter();
 
   async function cookieFn() {
-    let gotCookie = await getCookies();
-    if (gotCookie) setCookie(gotCookie.value);
+    let Cookie = await getCookies();
+    if (Cookie) setCookie(Cookie.value);
   }
   async function getAuthUrl() {
     if (authUrl) return;
     let url = await generateAuthURL();
     if (url) setAuthUrl(url);
   }
+
   useEffect(() => {
     cookieFn();
     getAuthUrl();

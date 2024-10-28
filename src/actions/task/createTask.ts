@@ -101,15 +101,20 @@ export async function createTask(task: TaskType): Promise<ServerAction> {
 // Function to insert event into Google Calendar
 export async function createGoogleCalendarEvent(task: TaskType) {
   if (!task.date) return;
+
   const cookie = await cookies();
   const refreshToken = cookie.get("googleCalendarToken")?.value;
 
   const clientId = env("GMAIL_CLIENT_ID");
   const clientSecret = env("GMAIL_CLIENT_SECRET");
+
   const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret);
+
   if (refreshToken)
     oAuth2Client.setCredentials({ refresh_token: refreshToken });
+
   const calendar = google.calendar({ version: "v3", auth: oAuth2Client }); // Make sure 'auth' is correctly authorized
+
   const startDateTime = new Date(
     `${task.date.split("T")[0]}T${task.startTime}:00.000Z`,
   ); // Add seconds
