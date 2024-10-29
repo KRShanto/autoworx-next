@@ -7,6 +7,7 @@ import { google } from "googleapis";
 import { env } from "next-runtime-env";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { createGoogleCalendarEvent } from "./createTask";
 
 interface TaskType {
   title: string;
@@ -97,10 +98,27 @@ export async function editTask({
       updatedTask.endTime &&
       updatedTask.date
     ) {
-      await updateGoogleCalendarEvent(
-        updatedTask.googleEventId,
-        task,
-      );
+      await updateGoogleCalendarEvent(updatedTask.googleEventId, task);
+    } else if (
+      googleCalendarToken &&
+      !updatedTask.googleEventId &&
+      updatedTask.startTime &&
+      updatedTask.endTime &&
+      updatedTask.date
+    ) {
+      let event = await createGoogleCalendarEvent(task);
+
+      // if event is successfully created in google calendar, then save the event id in task model
+      if (event.id) {
+        await db.task.update({
+          where: {
+            id: updatedTask.id,
+          },
+          data: {
+            googleEventId: event.id,
+          },
+        });
+      }
     }
 
     revalidatePath("/task");
