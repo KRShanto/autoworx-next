@@ -8,11 +8,72 @@ import {
 import { SlimInput } from "@/components/SlimInput";
 import { useState } from "react";
 import InvoiceEstimateAttachment from "./InvoiceEstimateAttachment";
+import { requestEstimate } from "@/actions/communication/collaboration/requestEstimate";
+import { User } from "@prisma/client";
 
-type TProps = {};
+type TProps = { user: User };
 
-export default function InvoiceEstimateModal({}: TProps) {
+export default function InvoiceEstimateModal({ user }: TProps) {
   const [open, setOpen] = useState(false);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [error, setError] = useState("");
+  const [estimateInfo, setEstimateInfo] = useState({
+    vehicleName: "",
+    model: "",
+    year: "",
+    make: "",
+    serviceRequest: "",
+    dueDate: "",
+    notes: "",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { value, name } = e.target || {};
+    setEstimateInfo({ ...estimateInfo, [name]: value });
+  };
+
+  const handleEstimateSubmit = async () => {
+    let photoPaths: string[] = [];
+    try {
+      // upload photos
+      if (photos.length > 0) {
+        const formData = new FormData();
+
+        photos.forEach((photo) => {
+          formData.append("photos", photo);
+        });
+
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) {
+          console.error("Failed to upload photos");
+          throw new Error("Failed to upload photos");
+        }
+
+        const json = await res.json();
+        const data = json.data;
+
+        photoPaths.push(...data);
+      }
+      console.log({ photoPaths });
+      await requestEstimate({
+        photoPaths,
+        ...estimateInfo,
+        year: parseInt(estimateInfo.year),
+        userId: user.id,
+        companyId: user.companyId,
+      });
+    } catch (err: any) {
+      setError(err.message);
+      console.error(err);
+    }
+    console.log("Estimate submitted");
+  };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -20,44 +81,74 @@ export default function InvoiceEstimateModal({}: TProps) {
           Request Estimate
         </p>
       </DialogTrigger>
-      <DialogContent className="overflow-y-auto">
+      <DialogContent
+        form
+        onSubmit={handleEstimateSubmit}
+        className="overflow-y-auto"
+      >
         {/* {error && <p className="text-center text-sm text-red-400">{error}</p>} */}
         <h2 className="mb-5 text-2xl font-bold">Request an Invoice/Estimate</h2>
         <div className="flex flex-col justify-center space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <SlimInput label="Vehicle Name" name="vehicleName" type="text" />
-            <SlimInput label="Year" name="year" type="text" />
-            <SlimInput label="Make" name="make" type="text" />
-            <SlimInput label="Model" name="model" type="text" />
-          </div>
-          <div className="grid grid-cols-1 gap-y-2">
             <SlimInput
-              label="Service Requested"
+              onChange={handleChange}
+              label="Vehicle Name"
               name="vehicleName"
               type="text"
             />
             <SlimInput
+              onChange={handleChange}
+              label="Year"
+              name="year"
+              type="number"
+            />
+            <SlimInput
+              onChange={handleChange}
+              label="Make"
+              name="make"
+              type="text"
+            />
+            <SlimInput
+              onChange={handleChange}
+              label="Model"
+              name="model"
+              type="text"
+            />
+          </div>
+          <div className="grid grid-cols-1 gap-y-2">
+            <SlimInput
+              label="Service Requested"
+              name="serviceRequested"
+              type="text"
+              onChange={handleChange}
+            />
+            <SlimInput
+              onChange={handleChange}
               className="w-2/4"
               label="Due Date"
               name="dueDate"
               type="date"
             />
-            <label className={"block"}>
+            <label htmlFor="notes" className={"block"}>
               <div className="mb-1 px-2 font-medium">Notes</div>
               <textarea
-                name=""
-                id=""
+                onChange={handleChange}
+                name="notes"
+                id="notes"
                 className="h-[93px] w-full resize-none rounded-md border border-gray-500 px-2 focus:outline-none"
               ></textarea>
             </label>
           </div>
         </div>
-        <InvoiceEstimateAttachment />
+        <InvoiceEstimateAttachment photos={photos} setPhotos={setPhotos} />
         <DialogFooter>
           <DialogClose className="rounded-lg border-2 border-slate-400 p-2">
             Cancel
           </DialogClose>
-          <button className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white">
+          <button
+            type="submit"
+            className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
+          >
             Add
           </button>
         </DialogFooter>

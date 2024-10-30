@@ -20,7 +20,7 @@ export default function UsersArea({
   return (
     <div
       className={cn(
-        "grid h-[88vh] w-full gap-3",
+        "grid h-[83vh] w-full gap-3",
         totalMessageBoxLength > 1 ? "grid-cols-2" : "grid-cols-1",
       )}
     >

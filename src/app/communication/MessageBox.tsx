@@ -187,10 +187,11 @@ export default function MessageBox({
     setUsersList && setUsersList([]);
     setGroupsList && setGroupsList([]);
   };
+
   return (
     <div
       className={cn(
-        "app-shadow flex h-[calc(100vh-50px)] w-full flex-col overflow-hidden border bg-white max-[1400px]:w-[100%] sm:h-[88vh] sm:rounded-lg",
+        "app-shadow flex h-[calc(100vh-50px)] w-full flex-col overflow-hidden border bg-white max-[1400px]:w-[100%] sm:h-full sm:rounded-lg",
         totalMessageBox > 2 && "sm:h-[44vh]",
       )}
     >
@@ -357,7 +358,7 @@ export default function MessageBox({
             >
               Attach Document/Media
             </p>
-            {isEstimateAttachmentShow && <InvoiceEstimateModal />}
+            {isEstimateAttachmentShow && <InvoiceEstimateModal user={user!} />}
           </div>
         )}
         <Image

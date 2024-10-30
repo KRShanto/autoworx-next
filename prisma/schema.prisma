@@ -812,6 +812,7 @@ model Message {
   groupId    Int?        @map("group_id")
   createdAt  DateTime    @default(now()) @map("created_at")
   updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
+  requestEstimate Boolean @default(false)
   group      Group?      @relation(fields: [groupId], references: [id])
   attachment Attachment?
 

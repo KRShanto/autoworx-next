@@ -40,7 +40,7 @@ export default function PrivateRoute({ children, session }: TProps) {
     noAccessForDynamicRoute?.notAccess?.includes(authUser?.employeeType) ||
     notAccessForSettings?.notAccess.includes(authUser?.employeeType)
   ) {
-    router.push("/404");
+    router.replace("/404");
     return null;
   } else {
     return children;

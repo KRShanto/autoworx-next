@@ -19,7 +19,6 @@ export default function UserMessageBox({
   companyName,
 }: TProps) {
   const [messages, setMessages] = useState<any[]>([]);
-  const [realTimeMessage, setRealTimeMessage] = useState({});
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -64,7 +63,6 @@ export default function UserMessageBox({
               sender: "CLIENT",
               attachment,
             };
-            setRealTimeMessage(newMessage);
             setMessages((prevGroupMessages) => [
               ...prevGroupMessages,
               newMessage,
