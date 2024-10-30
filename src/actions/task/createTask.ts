@@ -72,7 +72,7 @@ export async function createTask(task: TaskType): Promise<ServerAction> {
       let event = await createGoogleCalendarEvent(task);
 
       // if event is successfully created in google calendar, then save the event id in task model
-      if (event.id) {
+      if (event && event.id) {
         newTask = await db.task.update({
           where: {
             id: newTask.id,

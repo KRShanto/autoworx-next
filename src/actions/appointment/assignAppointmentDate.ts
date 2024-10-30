@@ -76,7 +76,7 @@ export async function assignAppointmentDate({
       let event = await createGoogleCalendarEvent(appointmentForGoogleCalendar);
 
       // if event is successfully created in google calendar, then save the event id in task model
-      if (event.id) {
+      if (event && event.id) {
         await db.appointment.update({
           where: {
             id: updatedAppointment.id,
