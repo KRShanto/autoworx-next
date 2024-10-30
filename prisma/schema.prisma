@@ -69,6 +69,8 @@ model Company {
   permissions             Permission[]
   Lead                    Lead[]
   LeaveRequest            LeaveRequest[]
+  RequestEstimateSent     RequestEstimate[]         @relation("SenderCompany")
+  RequestEstimateReceived RequestEstimate[]         @relation("ReceiverCompany")
 }
 
 // notification settings model
@@ -96,40 +98,42 @@ model CompanyJoin {
 // When user registers, they have to create a company. So, every new user is an admin.
 // After that, they can add employees to the company.
 model User {
-  id               Int               @id @default(autoincrement())
-  firstName        String
-  lastName         String?
-  email            String            @unique
-  emailVerifiedAt  DateTime?         @map("email_verified_at")
-  image            String            @default("/images/default.png")
-  password         String
-  provider         Provider          @default(email)
-  timezone         String            @default("UTC")
-  phone            String?
-  address          String?
-  city             String?
-  state            String?
-  zip              String?
-  companyName      String?           @map("company_name")
-  commission       Decimal?          @default(0) @db.Decimal(10, 3)
-  role             Role              @default(admin)
-  employeeType     EmployeeType      @default(Admin)
-  joinDate         DateTime?         @map("join_date")
-  companyId        Int               @map("company_id")
-  createdAt        DateTime          @default(now()) @map("created_at")
-  updatedAt        DateTime          @default(now()) @updatedAt @map("updated_at")
-  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  groups           Group[]           @relation("UserGroups")
-  tasks            Task[]
-  oauthTokens      OAuthToken[]
-  taskUsers        TaskUser[]
-  appointments     Appointment[]
-  appointmentUsers AppointmentUser[]
-  invoices         Invoice[]         @relation("user")
-  Technician       Technician[]
-  permissions      Permission[]
-  assignedInvoices Invoice[]         @relation("assignedTo")
-  LeaveRequest     LeaveRequest[]
+  id                Int               @id @default(autoincrement())
+  firstName         String
+  lastName          String?
+  email             String            @unique
+  emailVerifiedAt   DateTime?         @map("email_verified_at")
+  image             String            @default("/images/default.png")
+  password          String
+  provider          Provider          @default(email)
+  timezone          String            @default("UTC")
+  phone             String?
+  address           String?
+  city              String?
+  state             String?
+  zip               String?
+  companyName       String?           @map("company_name")
+  commission        Decimal?          @default(0) @db.Decimal(10, 3)
+  role              Role              @default(admin)
+  employeeType      EmployeeType      @default(Admin)
+  joinDate          DateTime?         @map("join_date")
+  companyId         Int               @map("company_id")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @default(now()) @updatedAt @map("updated_at")
+  company           Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  groups            Group[]           @relation("UserGroups")
+  tasks             Task[]
+  oauthTokens       OAuthToken[]
+  taskUsers         TaskUser[]
+  appointments      Appointment[]
+  appointmentUsers  AppointmentUser[]
+  invoices          Invoice[]         @relation("user")
+  Technician        Technician[]
+  permissions       Permission[]
+  assignedInvoices  Invoice[]         @relation("assignedTo")
+  LeaveRequest      LeaveRequest[]
+  sentEstimates     RequestEstimate[] @relation("Sender")
+  receivedEstimates RequestEstimate[] @relation("Receiver")
 
   @@index([companyId], name: "fk_users_company")
 }
@@ -172,31 +176,33 @@ model OAuthToken {
 // Client of a company.
 // Client is just data, they can't login.
 model Client {
-  id              Int            @id @default(autoincrement())
-  firstName       String         @map("first_name")
-  lastName        String?        @map("last_name")
-  mobile          String?
-  email           String?
-  address         String?
-  city            String?
-  state           String?
-  zip             String?
-  photo           String         @default("/images/default.png")
-  sourceId        Int?           @map("source_id")
-  companyId       Int            @map("company_id")
-  createdAt       DateTime       @default(now()) @map("created_at")
-  updatedAt       DateTime       @default(now()) @updatedAt @map("updated_at")
-  company         Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  customerCompany String?        @map("customer_company")
-  tagId           Int?           @map("tag_id")
-  notes           String?
-  appointments    Appointment[]
-  source          Source?        @relation(fields: [sourceId], references: [id])
-  tag             Tag?           @relation(fields: [tagId], references: [id])
-  Vehicle         Vehicle[]
-  Invoice         Invoice[]
-  ClientCoupon    ClientCoupon[]
-  Task            Task[]
+  id                     Int            @id @default(autoincrement())
+  firstName              String         @map("first_name")
+  lastName               String?        @map("last_name")
+  mobile                 String?
+  email                  String?
+  address                String?
+  city                   String?
+  state                  String?
+  zip                    String?
+  photo                  String         @default("/images/default.png")
+  fromRequest            Boolean?       @default(false) @map("from_request")
+  fromRequestedCompanyId Int?           @map("from_requested_company_id")
+  sourceId               Int?           @map("source_id")
+  companyId              Int            @map("company_id")
+  createdAt              DateTime       @default(now()) @map("created_at")
+  updatedAt              DateTime       @default(now()) @updatedAt @map("updated_at")
+  company                Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customerCompany        String?        @map("customer_company")
+  tagId                  Int?           @map("tag_id")
+  notes                  String?
+  appointments           Appointment[]
+  source                 Source?        @relation(fields: [sourceId], references: [id])
+  tag                    Tag?           @relation(fields: [tagId], references: [id])
+  Vehicle                Vehicle[]
+  Invoice                Invoice[]
+  ClientCoupon           ClientCoupon[]
+  Task                   Task[]
 
   @@index([companyId], name: "fk_customers_company")
   @@map("Client")
@@ -214,17 +220,20 @@ model Source {
 
 // Vehicle of a company.
 model Vehicle {
-  id           Int           @id @default(autoincrement())
-  year         Int?
-  make         String?
-  model        String?
-  submodel     String?
-  type         String?
-  transmission String?
-  engineSize   String?
-  license      String?
-  vin          String?
-  notes        String?
+  id                     Int      @id @default(autoincrement())
+  year                   Int?
+  make                   String?
+  model                  String?
+  submodel               String?
+  type                   String?
+  transmission           String?
+  engineSize             String?
+  license                String?
+  vin                    String?
+  notes                  String?
+  fromRequest            Boolean? @default(false) @map("from_request")
+  fromRequestedCompanyId Int?     @map("from_requested_company_id")
+
   colorId      Int?          @map("color_id")
   clientId     Int?          @map("customer_id")
   companyId    Int           @map("company_id")
@@ -277,6 +286,9 @@ model Invoice {
   userId                  Int?                      @map("user_id")
   assignedToId            Int?                      @map("assigned_to")
   workOrderStatus         String?                   @default("Pending") @map("work_order_status")
+  fromRequest             Boolean?                  @default(false) @map("from_request")
+  fromRequestedCompanyId  Int?                      @map("from_requested_company_id")
+  requestEstimateId       Int?                      @unique @map("request_estimate_id")
   company                 Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   invoiceItems            InvoiceItem[]
   photos                  InvoicePhoto[]
@@ -290,6 +302,7 @@ model Invoice {
   client                  Client?                   @relation(fields: [clientId], references: [id])
   technician              Technician[]
   tags                    InvoiceTags[]
+  requestEstimate         RequestEstimate?          @relation(fields: [requestEstimateId], onDelete: SetNull, references: [id])
   assignedTo              User?                     @relation(name: "assignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
 
   @@index([companyId], name: "fk_invoices_company")
@@ -357,17 +370,19 @@ enum InvoiceItemMaterialType {
 // Service itself is an independant model, So one service can be in multiple invoices.
 // And if you want to fetch services for a client, you need to fetch all invoices and then all invoice items and then you'll get services.
 model Service {
-  id           Int           @id @default(autoincrement())
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
-  name         String
-  description  String?
-  categoryId   Int?          @map("category_id")
-  companyId    Int           @map("company_id")
-  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  category     Category?     @relation(fields: [categoryId], references: [id])
-  invoiceItems InvoiceItem[]
-  Technician   Technician[]
+  id                     Int           @id @default(autoincrement())
+  createdAt              DateTime      @default(now()) @map("created_at")
+  updatedAt              DateTime      @default(now()) @updatedAt @map("updated_at")
+  name                   String
+  description            String?
+  fromRequest            Boolean?      @default(false) @map("from_request")
+  fromRequestedCompanyId Int?          @map("from_requested_company_id")
+  categoryId             Int?          @map("category_id")
+  companyId              Int           @map("company_id")
+  company                Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category               Category?     @relation(fields: [categoryId], references: [id])
+  invoiceItems           InvoiceItem[]
+  Technician             Technician[]
 
   @@index([companyId], name: "fk_services_company")
 }
@@ -1032,4 +1047,37 @@ enum LeaveRequestStatus {
   Pending
   Approved
   Rejected
+}
+
+model RequestEstimate {
+  id                Int                         @id @default(autoincrement())
+  senderId          Int                         @map("sender_id")
+  senderCompanyId   Int                         @map("sender_company_id")
+  receiverId        Int                         @map("receiver_id")
+  receiverCompanyId Int                         @map("receiver_company_id")
+  vehicleYear       String                      @map("vehicle_year")
+  vehicleMake       String                      @map("vehicle_make")
+  vehicleModel      String                      @map("vehicle_model")
+  service           String
+  due               DateTime
+  notes             String?
+  createdAt         DateTime                    @default(now()) @map("created_at")
+  updatedAt         DateTime                    @default(now()) @updatedAt @map("updated_at")
+  sender            User                        @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver          User                        @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  senderCompany     Company                     @relation("SenderCompany", fields: [senderCompanyId], references: [id], onDelete: Cascade)
+  receiverCompany   Company                     @relation("ReceiverCompany", fields: [receiverCompanyId], references: [id], onDelete: Cascade)
+  attachments       RequestEstimateAttachment[]
+  invoice           Invoice?
+}
+
+model RequestEstimateAttachment {
+  id        Int             @id @default(autoincrement())
+  fileName  String
+  fileType  String
+  fileUrl   String
+  requestId Int             @map("request_id")
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @default(now()) @updatedAt @map("updated_at")
+  request   RequestEstimate @relation(fields: [requestId], references: [id], onDelete: Cascade)
 }
