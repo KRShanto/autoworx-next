@@ -694,6 +694,7 @@ model Appointment {
   appointmentUsers                AppointmentUser[]
   client                          Client?           @relation(fields: [clientId], references: [id])
   vehicle                         Vehicle?          @relation(fields: [vehicleId], references: [id])
+  googleEventId                   String?
 
   @@index([userId], name: "fk_tasks_user")
   @@index([companyId], name: "fk_tasks_company")

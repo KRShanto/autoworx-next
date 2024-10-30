@@ -7,7 +7,11 @@ import { google } from "googleapis";
 import { env } from "next-runtime-env";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { createGoogleCalendarEvent } from "./createTask";
+import { AppointmentToAdd } from "../appointment/addAppointment";
+import { AppointmentToUpdate } from "../appointment/editAppointment";
+
+import createGoogleCalendarEvent from "./google-calendar/createGoogleCalendarEvent";
+import updateGoogleCalendarEvent from "./google-calendar/updateGoogleCalendarEvent";
 
 interface TaskType {
   title: string;
@@ -132,75 +136,5 @@ export async function editTask({
     return {
       type: "error",
     };
-  }
-}
-
-// Function to update event in Google Calendar
-export async function updateGoogleCalendarEvent(
-  eventId: string,
-  task: TaskType,
-) {
-  if (!task.date) return;
-
-  const cookie = await cookies();
-  const refreshToken = cookie.get("googleCalendarToken")?.value;
-
-  const clientId = env("GMAIL_CLIENT_ID");
-  const clientSecret = env("GMAIL_CLIENT_SECRET");
-
-  const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret);
-
-  if (refreshToken)
-    oAuth2Client.setCredentials({ refresh_token: refreshToken });
-
-  const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
-
-  const startDateTime = new Date(
-    `${task.date.split("T")[0]}T${task.startTime}:00.000Z`,
-  );
-  const endDateTime = new Date(
-    `${task.date.split("T")[0]}T${task.endTime}:00.000Z`,
-  );
-
-  const event = {
-    summary: task.title,
-    description: task.description,
-    start: {
-      dateTime: startDateTime.toISOString(),
-      timeZone: "UTC", // Adjust timezone if necessary
-    },
-    end: {
-      dateTime: endDateTime.toISOString(),
-      timeZone: "UTC",
-    },
-    // attendees: task.assignedUsers.map((user) => ({ email: user.email })),
-    // reminders: {
-    //   useDefault: false,
-    //   overrides: [
-    //     { method: "email", minutes: 24 * 60 },
-    //     { method: "popup", minutes: 10 },
-    //   ],
-    // },
-  };
-
-  try {
-    const response = await calendar.events.update({
-      auth: oAuth2Client,
-      calendarId: "primary",
-      eventId: eventId,
-      resource: event,
-    });
-
-    console.log("Google Calendar Event updated:", response);
-    return response.data;
-  } catch (error) {
-    //@ts-ignore
-    if (error?.response?.data?.error === "invalid_grant") {
-      const cookieStore = await cookies();
-      cookieStore.delete("googleCalendarToken");
-      console.log("Invalid or expired refresh token. Token deleted.");
-    }
-    console.error("Error updating Google Calendar event:", error);
-    throw error;
   }
 }

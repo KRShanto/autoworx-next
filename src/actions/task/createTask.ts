@@ -4,13 +4,12 @@ import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
-import { Priority, Task } from "@prisma/client";
-import { google } from "googleapis";
-import { env } from "next-runtime-env";
+import { Priority } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import createGoogleCalendarEvent from "./google-calendar/createGoogleCalendarEvent";
 
-interface TaskType {
+export interface TaskType {
   title: string;
   description: string;
   assignedUsers: number[];
@@ -61,6 +60,9 @@ export async function createTask(task: TaskType): Promise<ServerAction> {
       });
     }
 
+    revalidatePath("/task");
+    revalidatePath("/communication/client");
+
     // if the task has date, start time and end time, then insert it in google calendar
     // also need to check if google calendar token exists or not, if not, then no need of inserting
     const cookie = await cookies();
@@ -82,9 +84,6 @@ export async function createTask(task: TaskType): Promise<ServerAction> {
       }
     }
 
-    revalidatePath("/task");
-    revalidatePath("/communication/client");
-
     return {
       type: "success",
       data: newTask,
@@ -95,71 +94,5 @@ export async function createTask(task: TaskType): Promise<ServerAction> {
     return {
       type: "error",
     };
-  }
-}
-
-// Function to insert event into Google Calendar
-export async function createGoogleCalendarEvent(task: TaskType) {
-  if (!task.date) return;
-
-  const cookie = await cookies();
-  const refreshToken = cookie.get("googleCalendarToken")?.value;
-
-  const clientId = env("GMAIL_CLIENT_ID");
-  const clientSecret = env("GMAIL_CLIENT_SECRET");
-
-  const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret);
-
-  if (refreshToken)
-    oAuth2Client.setCredentials({ refresh_token: refreshToken });
-
-  const calendar = google.calendar({ version: "v3", auth: oAuth2Client }); // Make sure 'auth' is correctly authorized
-
-  const startDateTime = new Date(
-    `${task.date.split("T")[0]}T${task.startTime}:00.000Z`,
-  ); // Add seconds
-  const endDateTime = new Date(
-    `${task.date.split("T")[0]}T${task.endTime}:00.000Z`,
-  ); // Add seconds
-
-  const event = {
-    summary: task.title,
-    description: task?.description,
-    start: {
-      dateTime: startDateTime.toISOString(),
-      timeZone: "UTC", // Adjust timezone as per requirement
-    },
-    end: {
-      dateTime: endDateTime.toISOString(),
-      timeZone: "UTC",
-    },
-    // attendees: task.assignedUsers.map((user) => ({ email: user.email })),
-    // reminders: {
-    //   useDefault: false,
-    //   overrides: [
-    //     { method: "email", minutes: 24 * 60 },
-    //     { method: "popup", minutes: 10 },
-    //   ],
-    // },
-  };
-
-  try {
-    const response = await calendar.events.insert({
-      auth: oAuth2Client,
-      calendarId: "primary",
-      resource: event,
-    });
-
-    console.log("Google Calendar Event created:", response);
-    return response.data;
-  } catch (error) {
-    //@ts-ignore
-    if (error?.response?.data?.error === "invalid_grant") {
-      const cookieStore = await cookies();
-      cookieStore.delete("googleCalendarToken");
-      console.log("Invalid or expired refresh token. Token deleted.");
-    }
-    console.error("Error creating Google Calendar event:", error);
-    throw error;
   }
 }
