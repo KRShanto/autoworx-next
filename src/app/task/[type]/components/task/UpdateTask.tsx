@@ -22,6 +22,8 @@ import Avatar from "@/components/Avatar";
 // @ts-ignore
 import dayjs from "dayjs";
 import { deleteTask } from "../../../../../actions/task/deleteTask";
+import moment from "moment";
+import { useRouter } from "next/navigation";
 
 export default function UpdateTask() {
   const { popup, data, close } = usePopupStore();
@@ -29,6 +31,8 @@ export default function UpdateTask() {
     companyUsers: User[];
     task: CalendarTask;
   };
+
+  const router = useRouter();
 
   const [showUsers, setShowUsers] = useState(false);
   const [title, setTitle] = useState(task.title);
@@ -41,21 +45,31 @@ export default function UpdateTask() {
     startTime: task.startTime,
     endTime: task.endTime,
   });
+  const [date, setDate] = useState<string>(
+    moment(task.date).format("YYYY-MM-DD"),
+  );
 
   async function handleSubmit() {
-    const res = await editTask({
-      id: task.id,
-      task: {
-        title,
-        description,
-        assignedUsers,
-        priority,
-        startTime: time?.startTime,
-        endTime: time?.endTime,
-      },
-    });
-
-    close();
+    try {
+      await editTask({
+        id: task.id,
+        task: {
+          title,
+          description,
+          assignedUsers,
+          priority,
+          startTime: time?.startTime,
+          endTime: time?.endTime,
+          date: date ? new Date(date).toISOString() : new Date().toISOString(),
+        },
+      });
+      router.push(
+        `/task/day?date=${date ? date : moment().format("YYYY-MM-DD")}`,
+      );
+      close();
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   function onChange(e: any) {
@@ -102,18 +116,30 @@ export default function UpdateTask() {
 
           <div id="timer-parent" className="mb-4 flex flex-col">
             <label htmlFor="time">Time</label>
-            <TimePicker.RangePicker
-              onChange={onChange}
-              getPopupContainer={() => document.getElementById("timer-parent")!}
-              use12Hours
-              format="h:mm a"
-              className="mt-2 rounded-md border-2 border-gray-500 p-1 placeholder-slate-800"
-              value={[
-                dayjs(time.startTime, "HH:mm"),
-                dayjs(time.endTime, "HH:mm"),
-              ]}
-              needConfirm={false}
-            />
+            <div className="flex items-center space-x-2">
+              <input
+                type="date"
+                name="date"
+                id="time"
+                className="mt-2 w-full rounded-md border-2 border-gray-500 p-0.5 placeholder-slate-800"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
+              <TimePicker.RangePicker
+                onChange={onChange}
+                getPopupContainer={() =>
+                  document.getElementById("timer-parent")!
+                }
+                use12Hours
+                format="h:mm a"
+                className="mt-2 w-full rounded-md border-2 border-gray-500 p-1 placeholder-slate-800"
+                value={[
+                  dayjs(time.startTime, "HH:mm"),
+                  dayjs(time.endTime, "HH:mm"),
+                ]}
+                needConfirm={false}
+              />
+            </div>
           </div>
 
           {/* custom radio. show user name and image (column)*/}

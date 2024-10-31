@@ -25,7 +25,7 @@ async function fetchAndTransformData(
         gte: startDate ? new Date(`${startDate}T00:00:00`) : undefined,
         lte: endDate ? new Date(`${endDate}T23:59:59.999`) : undefined,
       },
-      statusId: status ? parseInt(status) : undefined,
+      columnId: status ? parseInt(status) : undefined,
     },
   });
 
@@ -41,9 +41,9 @@ async function fetchAndTransformData(
             where: { id: item.clientId },
           })
         : null;
-      const status = item.statusId
-        ? await db.status.findFirst({
-            where: { id: item.statusId },
+      const status = item.columnId
+        ? await db.column.findFirst({
+            where: { id: item.columnId },
           })
         : null;
 
@@ -57,7 +57,7 @@ async function fetchAndTransformData(
         phone: client?.mobile || "",
         grandTotal: item.grandTotal as any,
         createdAt: item.createdAt,
-        status: status?.name || "",
+        status: status?.title || "",
         textColor: status?.textColor || "",
         bgColor: status?.bgColor || "",
       };
@@ -80,7 +80,7 @@ export default async function EstimatesPage({
 
   const categories = await db.category.findMany({ where: { companyId } });
   const tags = await db.tag.findMany({ where: { companyId } });
-  const statuses = await db.status.findMany({ where: { companyId } });
+  const statuses = await db.column.findMany({ where: { companyId } });
 
   return (
     <div>

@@ -8,6 +8,8 @@ import { auth } from "./auth";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { PublicEnvScript } from "next-runtime-env";
+import { Session } from "next-auth";
+import { EmployeeType } from "@prisma/client";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +25,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
+  const session = (await auth()) as Session & {
+    user: { employeeType: string };
+  };
 
   return (
     <html lang="en">

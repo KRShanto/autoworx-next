@@ -36,7 +36,7 @@ export default async function Page({ params }: { params: { type: string } }) {
     // where startTime, endTime, and date are not null
     tasks = await db.task.findMany({
       where: {
-        companyId,
+        companyId
       },
     });
   } else {
@@ -69,6 +69,8 @@ export default async function Page({ params }: { params: { type: string } }) {
         ],
       },
     });
+
+
   }
 
   // aggregating assigned users data
@@ -260,7 +262,6 @@ export default async function Page({ params }: { params: { type: string } }) {
           taskWithAssignedUsers={taskWithAssignedUsers}
           companyUsers={companyUsers}
           usersWithTasks={usersWithTasks}
-          tasks={tasks}
           customers={customers}
           vehicles={vehicles}
           settings={settings}

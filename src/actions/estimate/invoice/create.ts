@@ -21,7 +21,6 @@ export async function createInvoice({
 
   clientId,
   vehicleId,
-  statusId,
 
   subtotal,
   discount,
@@ -43,13 +42,13 @@ export async function createInvoice({
   tasks,
 
   coupon,
+  columnId,
 }: {
   invoiceId: string;
   type: InvoiceType;
 
   clientId?: number;
   vehicleId?: number;
-  statusId?: number;
 
   subtotal: number;
   discount: number;
@@ -77,6 +76,7 @@ export async function createInvoice({
   tasks: { id: undefined | number; task: string }[];
 
   coupon?: Coupon | null;
+  columnId?: number;
 }): Promise<ServerAction> {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
@@ -87,7 +87,7 @@ export async function createInvoice({
       type,
       clientId,
       vehicleId,
-      statusId,
+
       subtotal,
       discount,
       tax,
@@ -103,6 +103,7 @@ export async function createInvoice({
       customerComments,
       companyId,
       userId: session.user.id as any,
+      columnId,
     },
   });
 

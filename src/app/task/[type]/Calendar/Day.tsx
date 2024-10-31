@@ -14,7 +14,7 @@ import type {
   Vehicle,
 } from "@prisma/client";
 import mergeRefs from "merge-refs";
-import moment from "moment";
+import moment, { Moment } from "moment";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDrop } from "react-dnd";
@@ -27,6 +27,15 @@ function useDate() {
   const searchParams = useSearchParams();
   const date = moment(searchParams.get("date"), moment.HTML5_FMT.DATE);
   return date.isValid() ? date : moment();
+}
+
+function doesTaskOrAppointmentEndNextDay(startTime: Moment, endTime: Moment) {
+  // Parse the start and end times as moment objects with specific time format
+  const start = moment(startTime, "HH:mm");
+  const end = moment(endTime, "HH:mm");
+
+  // If the end time is before the start time, it means the appointment ends the next day
+  return end.isBefore(start);
 }
 
 export default function Day({
@@ -154,7 +163,9 @@ export default function Day({
         // Add task to database
         await updateTask({
           id: taskFoundWithoutTime.id,
-          date: date ? date.toDate() : new Date(),
+          date: taskFoundWithoutTime?.date
+            ? taskFoundWithoutTime.date
+            : new Date(),
           startTime: oldTask?.startTime || startTime,
           endTime: oldTask?.endTime || endTime,
         });
@@ -262,8 +273,6 @@ export default function Day({
     return aBigIndex - bBigIndex;
   });
 
-  console.log({ events });
-
   return (
     <div
       ref={mergeRefs(dropRef, parentRef, containerRef)}
@@ -285,14 +294,31 @@ export default function Day({
       {sortedEvents.map((event, index) => {
         const eventStartTime = moment(event.startTime, "HH:mm");
         const eventEndTime = moment(event.endTime, "HH:mm");
+
+        const isEventEndNextDay = doesTaskOrAppointmentEndNextDay(
+          eventStartTime,
+          eventEndTime,
+        );
+
+        const dayEnd = moment("23:59", "HH:mm");
+
         const tasksInRow = sortedEvents.filter((task) => {
           const taskStartTime = moment(task.startTime, "HH:mm");
           const taskEndTime = moment(task.endTime, "HH:mm");
+          const isTaskEndNextDay = doesTaskOrAppointmentEndNextDay(
+            taskStartTime,
+            taskEndTime,
+          );
           if (
             event.rowStartIndex === task.rowStartIndex ||
             (eventStartTime.isBefore(taskEndTime) &&
               eventEndTime.isAfter(taskStartTime)) ||
-            eventStartTime.isBefore(taskStartTime)
+            (isEventEndNextDay &&
+              eventStartTime.isBefore(taskEndTime) &&
+              dayEnd.isAfter(taskStartTime)) ||
+            (isTaskEndNextDay &&
+              eventStartTime.isBefore(dayEnd) &&
+              eventEndTime.isAfter(taskStartTime))
           ) {
             return true;
           }

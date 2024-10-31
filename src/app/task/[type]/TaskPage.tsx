@@ -1,12 +1,9 @@
 "use client";
-
 import DnDWrapper from "@/components/DnDWrapper";
 import { CalendarType } from "@/types/calendar";
 import { AppointmentFull, CalendarAppointment } from "@/types/db";
 import type { EmailTemplate } from "@prisma/client";
 import { CalendarSettings, Client, Task, User, Vehicle } from "@prisma/client";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import Calendar from "./Calendar/Calendar";
 import CalendarSidebar from "./CalendarSidebar/CalendarSidebar";
 
@@ -15,7 +12,6 @@ export default function TaskPage({
   taskWithAssignedUsers,
   companyUsers,
   usersWithTasks,
-  tasks,
   customers,
   vehicles,
   settings,
@@ -28,7 +24,6 @@ export default function TaskPage({
   taskWithAssignedUsers: (Task & { assignedUsers: User[] })[];
   companyUsers: User[];
   usersWithTasks: any; // TODO: Fix this type
-  tasks: Task[];
   customers: Client[];
   vehicles: Vehicle[];
   settings: CalendarSettings;
@@ -42,11 +37,16 @@ export default function TaskPage({
     (task) => task.startTime && task.endTime && task.date,
   );
   // Filter the tasks without startTime, endTime, and date
-  const tasksWithoutTime = taskWithAssignedUsers.filter((task) => !task.date);
+  const tasksWithoutTime = taskWithAssignedUsers.filter(
+    (task) => !task.startTime && !task.endTime,
+  );
 
   return (
     <DnDWrapper id="task">
-      <CalendarSidebar usersWithTasks={usersWithTasks} tasks={tasks} />
+      <CalendarSidebar
+        usersWithTasks={usersWithTasks}
+        tasks={tasksWithoutTime}
+      />
       <Calendar
         type={type}
         tasks={calendarTasks as any}

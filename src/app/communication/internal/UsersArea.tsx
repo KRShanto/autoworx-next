@@ -74,7 +74,7 @@ export default function UsersArea({
         <div
           className={cn(
             "app-shadow flex w-full border-spacing-4 flex-col overflow-hidden rounded-lg max-[1400px]:w-[100%]",
-            totalMessageBoxLength > 2 && "h-[44vh]",
+            totalMessageBoxLength > 2 && "sm:h-[44vh]",
           )}
           style={{
             borderWidth: "4px",

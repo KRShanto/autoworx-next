@@ -12,6 +12,7 @@ import type {
   Status,
   PaymentMethod,
   Invoice,
+  Column,
 } from "@prisma/client";
 import { create } from "zustand";
 
@@ -27,13 +28,13 @@ interface ListsStore {
   labors: Labor[];
   tags: Tag[];
   vendors: Vendor[];
-  statuses: Status[];
+  statuses: Column[];
   newAddedCustomer: Client | null;
   newAddedVehicle: Vehicle | null;
   paymentMethods: PaymentMethod[];
   client: Client | null;
   vehicle: Vehicle | null;
-  status: Status | null;
+  status: Column | null;
   reset: () => void;
 }
 

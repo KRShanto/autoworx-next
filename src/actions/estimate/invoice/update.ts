@@ -12,7 +12,8 @@ interface UpdateEstimateInput {
 
   clientId: number | undefined;
   vehicleId: number | undefined;
-  statusId: number | undefined;
+  
+  columnId: number | undefined;
 
   subtotal: number;
   discount: number;
@@ -151,7 +152,8 @@ export async function updateInvoice(
     data: {
       clientId: data.clientId,
       vehicleId: data.vehicleId,
-      statusId: data.statusId,
+      
+      columnId: data.columnId,
       subtotal: data.subtotal,
       discount: data.discount,
       tax: data.tax,
