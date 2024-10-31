@@ -949,7 +949,7 @@ model PermissionForSales {
   salesPipeline                 Boolean @default(true) @map("sales_pipeline")
 
   //view only
-  workforceManagementViewOnly Boolean @default(true) @map("workforce_management")
+  workforceManagementViewOnly Boolean @default(true) 
   reportingViewOnly           Boolean @default(true)
   inventoryViewOnly           Boolean @default(true)
 
@@ -964,7 +964,7 @@ model PermissionForTechnician {
   shopPipeline             Boolean @default(true) @map("shop_pipeline")
 
   //view only
-  workforceManagementViewOnly Boolean @default(true) @map("workforce_management")
+  workforceManagementViewOnly Boolean @default(true) 
   reportingViewOnly           Boolean @default(true)
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
