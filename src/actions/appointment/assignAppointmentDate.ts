@@ -12,11 +12,13 @@ export async function assignAppointmentDate({
   date,
   startTime,
   endTime,
+  timezone,
 }: {
   id: number;
   date: Date | string;
   startTime: string;
   endTime: string;
+  timezone: string;
 }): Promise<ServerAction> {
   try {
     let updatedAppointment = await db.appointment.update({
@@ -51,6 +53,7 @@ export async function assignAppointmentDate({
         endTime: updatedAppointment.endTime,
         date: new Date(updatedAppointment.date).toISOString(),
         assignedUsers: [],
+        timezone,
       };
 
       await updateGoogleCalendarEvent(
@@ -71,6 +74,7 @@ export async function assignAppointmentDate({
         endTime: updatedAppointment.endTime,
         date: new Date(updatedAppointment.date).toISOString(),
         assignedUsers: [],
+        timezone,
       };
 
       let event = await createGoogleCalendarEvent(appointmentForGoogleCalendar);

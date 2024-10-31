@@ -88,6 +88,7 @@ export default function ResizeTaskTooltip({
           date: new Date(task.date),
           startTime: task.startTime,
           endTime: newEndTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       } else {
         await updateTask({
@@ -95,6 +96,7 @@ export default function ResizeTaskTooltip({
           date: task.date,
           startTime: task.startTime,
           endTime: newEndTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       }
     }

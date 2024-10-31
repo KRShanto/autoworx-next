@@ -1,17 +1,17 @@
 "use server";
 
-import { auth } from "@/app/auth";
 import { createTask } from "@/actions/task/createTask";
+import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
 import {
-  InvoiceType,
-  Service,
-  Material,
-  Labor,
-  Tag,
   Coupon,
+  InvoiceType,
+  Labor,
+  Material,
+  Service,
+  Tag,
 } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
@@ -173,6 +173,7 @@ export async function createInvoice({
       priority: "Medium",
       assignedUsers: [],
       invoiceId: invoice.id,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
   });
 

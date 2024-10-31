@@ -1,10 +1,10 @@
 "use server";
-import fs from "fs";
 import { createTask } from "@/actions/task/createTask";
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { Labor, Material, Service, Tag } from "@prisma/client";
+import fs from "fs";
 import { revalidatePath } from "next/cache";
 
 interface UpdateEstimateInput {
@@ -270,6 +270,7 @@ export async function updateInvoice(
         assignedUsers: [],
         priority: "Medium",
         invoiceId: data.id,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
     } else {
       // if task.id is not undefined, update the task

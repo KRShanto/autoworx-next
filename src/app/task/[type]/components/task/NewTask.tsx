@@ -50,6 +50,7 @@ export default function NewTask({
       endTime: time?.endTime,
       clientId,
       date: date ? new Date(date).toISOString() : new Date().toISOString(),
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
 
     // reset form
