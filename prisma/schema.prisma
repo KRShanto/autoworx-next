@@ -644,24 +644,25 @@ model CalendarSettings {
 
 // Task for a company.
 model Task {
-  id          Int        @id @default(autoincrement())
-  title       String     @db.VarChar(100)
-  description String?
-  date        DateTime?
-  startTime   String?    @map("start_time")
-  endTime     String?    @map("end_time")
-  priority    Priority
-  taskUser    TaskUser[]
-  createdAt   DateTime   @default(now()) @map("created_at")
-  updatedAt   DateTime   @default(now()) @updatedAt @map("updated_at")
-  userId      Int        @map("user_id")
-  companyId   Int        @map("company_id")
-  invoiceId   String?    @map("invoice_id")
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  Invoice     Invoice?   @relation(fields: [invoiceId], references: [id])
-  clientId    Int?       @map("client_id")
-  client      Client?    @relation(fields: [clientId], references: [id])
+  id            Int        @id @default(autoincrement())
+  title         String     @db.VarChar(100)
+  description   String?
+  date          DateTime?
+  startTime     String?    @map("start_time")
+  endTime       String?    @map("end_time")
+  priority      Priority
+  taskUser      TaskUser[]
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @default(now()) @updatedAt @map("updated_at")
+  userId        Int        @map("user_id")
+  companyId     Int        @map("company_id")
+  invoiceId     String?    @map("invoice_id")
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company       Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Invoice       Invoice?   @relation(fields: [invoiceId], references: [id])
+  clientId      Int?       @map("client_id")
+  client        Client?    @relation(fields: [clientId], references: [id])
+  googleEventId String?
 }
 
 enum Priority {
@@ -708,6 +709,7 @@ model Appointment {
   appointmentUsers                AppointmentUser[]
   client                          Client?           @relation(fields: [clientId], references: [id])
   vehicle                         Vehicle?          @relation(fields: [vehicleId], references: [id])
+  googleEventId                   String?
 
   @@index([userId], name: "fk_tasks_user")
   @@index([companyId], name: "fk_tasks_company")
