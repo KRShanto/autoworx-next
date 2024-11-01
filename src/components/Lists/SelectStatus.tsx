@@ -1,7 +1,4 @@
 "use client";
-
-import { deleteStatus } from "@/actions/status/deleteStatus";
-import newStatus from "@/actions/status/newStatus";
 import useOutsideClick from "@/hooks/useOutsideClick";
 import { INVOICE_COLORS } from "@/lib/consts";
 import { useFormErrorStore } from "@/stores/form-error";
