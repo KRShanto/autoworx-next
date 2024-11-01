@@ -10,15 +10,17 @@ import { useState } from "react";
 import InvoiceEstimateAttachment from "./InvoiceEstimateAttachment";
 import { requestEstimate } from "@/actions/communication/collaboration/requestEstimate";
 import { User } from "@prisma/client";
+import { useSession } from "next-auth/react";
+import { Session } from "next-auth";
 
-type TProps = { user: User };
+type TProps = { receiverUser: User };
 
-export default function InvoiceEstimateModal({ user }: TProps) {
+export default function InvoiceEstimateModal({ receiverUser }: TProps) {
+  const { data: authUser } = useSession();
   const [open, setOpen] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
   const [error, setError] = useState("");
   const [estimateInfo, setEstimateInfo] = useState({
-    vehicleName: "",
     model: "",
     year: "",
     make: "",
@@ -65,8 +67,11 @@ export default function InvoiceEstimateModal({ user }: TProps) {
         photoPaths,
         ...estimateInfo,
         year: parseInt(estimateInfo.year),
-        userId: user.id,
-        companyId: user.companyId,
+        receiverId: receiverUser.id,
+        receiverCompanyId: receiverUser.companyId,
+        senderId: parseInt(authUser?.user?.id!),
+        senderCompanyId: (authUser as Session & { user: { companyId: number } })
+          ?.user?.companyId,
       });
     } catch (err: any) {
       setError(err.message);
@@ -92,12 +97,6 @@ export default function InvoiceEstimateModal({ user }: TProps) {
           <div className="grid grid-cols-2 gap-4">
             <SlimInput
               onChange={handleChange}
-              label="Vehicle Name"
-              name="vehicleName"
-              type="text"
-            />
-            <SlimInput
-              onChange={handleChange}
               label="Year"
               name="year"
               type="number"
@@ -114,14 +113,14 @@ export default function InvoiceEstimateModal({ user }: TProps) {
               name="model"
               type="text"
             />
-          </div>
-          <div className="grid grid-cols-1 gap-y-2">
             <SlimInput
               label="Service Requested"
-              name="serviceRequested"
+              name="serviceRequest"
               type="text"
               onChange={handleChange}
             />
+          </div>
+          <div className="grid grid-cols-1 gap-y-2">
             <SlimInput
               onChange={handleChange}
               className="w-2/4"

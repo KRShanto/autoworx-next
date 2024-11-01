@@ -20,7 +20,7 @@ import { getUserInGroup } from "@/actions/communication/internal/query";
 // import Message from "./Message";
 
 export default function MessageBox({
-  user,
+  user: receiverUser,
   setUsersList,
   messages,
   totalMessageBox,
@@ -90,7 +90,7 @@ export default function MessageBox({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          to: fromGroup ? group?.id : user?.id,
+          to: fromGroup ? group?.id : receiverUser?.id,
           type: fromGroup ? sendType.Group : sendType.User,
           message,
           attachmentFile: attachmentFile
@@ -131,7 +131,7 @@ export default function MessageBox({
 
   const handleUserClose = () => {
     setUsersList &&
-      setUsersList((usersList) => usersList.filter((u) => u.id !== user?.id));
+      setUsersList((usersList) => usersList.filter((u) => u.id !== receiverUser?.id));
   };
 
   const handleDeleteUserFromGroupList = async (userId: number) => {
@@ -230,11 +230,11 @@ export default function MessageBox({
                 ))}
             </div>
           ) : (
-            <Avatar photo={user?.image} width={50} height={50} />
+            <Avatar photo={receiverUser?.image} width={50} height={50} />
           )}
           <div className="flex flex-col">
             <p className="flex flex-col text-[18px] font-bold sm:text-[20px]">
-              {fromGroup ? group?.name : `${user?.firstName} ${user?.lastName}`}
+              {fromGroup ? group?.name : `${receiverUser?.firstName} ${receiverUser?.lastName}`}
               {companyName && (
                 <span className="text-sm font-light">{companyName}</span>
               )}
@@ -358,7 +358,9 @@ export default function MessageBox({
             >
               Attach Document/Media
             </p>
-            {isEstimateAttachmentShow && <InvoiceEstimateModal user={user!} />}
+            {isEstimateAttachmentShow && (
+              <InvoiceEstimateModal receiverUser={receiverUser!} />
+            )}
           </div>
         )}
         <Image

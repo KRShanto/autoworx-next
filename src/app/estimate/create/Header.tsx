@@ -25,9 +25,11 @@ export default function Header({
   const [clientOpenDropdown, setClientOpenDropdown] = useState(false);
   const [vehicleOpenDropdown, setVehicleOpenDropdown] = useState(false);
   const [statusOpenDropdown, setStatusOpenDropdown] = useState(false);
+
   useEffect(() => {
     if (!id) setInvoiceId(customAlphabet("1234567890", 10)());
   }, [id]);
+
   useEffect(() => {
     if (clientOpenDropdown && (vehicleOpenDropdown || statusOpenDropdown)) {
       setVehicleOpenDropdown(false);

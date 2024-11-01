@@ -244,6 +244,7 @@ model Vehicle {
   color        VehicleColor? @relation(fields: [colorId], references: [id], onDelete: SetNull)
   client       Client?       @relation(fields: [clientId], references: [id], onDelete: Cascade)
   invoices     Invoice[]
+  requestEstimate RequestEstimate? @relation("Vehicle")
 
   @@index([companyId], name: "fk_vehicles_company")
 }
@@ -383,6 +384,7 @@ model Service {
   category               Category?     @relation(fields: [categoryId], references: [id])
   invoiceItems           InvoiceItem[]
   Technician             Technician[]
+  requestEstimate RequestEstimate? @relation("Service")
 
   @@index([companyId], name: "fk_services_company")
 }
@@ -827,9 +829,10 @@ model Message {
   groupId    Int?        @map("group_id")
   createdAt  DateTime    @default(now()) @map("created_at")
   updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
-  requestEstimate Boolean @default(false)
+  requestEstimateId Int? @map("request_estimate_id") @unique
   group      Group?      @relation(fields: [groupId], references: [id])
   attachment Attachment?
+  requestEstimate           RequestEstimate?                    @relation("Message", fields: [requestEstimateId], references: [id])
 
   @@index([to], name: "fk_messages_to")
   @@index([from], name: "fk_messages_from")
@@ -1055,29 +1058,35 @@ model RequestEstimate {
   senderCompanyId   Int                         @map("sender_company_id")
   receiverId        Int                         @map("receiver_id")
   receiverCompanyId Int                         @map("receiver_company_id")
-  vehicleYear       String                      @map("vehicle_year")
-  vehicleMake       String                      @map("vehicle_make")
-  vehicleModel      String                      @map("vehicle_model")
-  service           String
-  due               DateTime
-  notes             String?
+  // vehicleYear       String                      @map("vehicle_year")
+  // vehicleMake       String                      @map("vehicle_make")
+  // vehicleModel      String                      @map("vehicle_model")
+  vehicleId          Int                         @map("vehicle_id")@unique
+  serviceId          Int                        @map("service_id")@unique
+  // service           String
+  // due               DateTime
+  // notes             String?
+  invoiceId           String                    @map("invoice_id")
   createdAt         DateTime                    @default(now()) @map("created_at")
   updatedAt         DateTime                    @default(now()) @updatedAt @map("updated_at")
   sender            User                        @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
   receiver          User                        @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
   senderCompany     Company                     @relation("SenderCompany", fields: [senderCompanyId], references: [id], onDelete: Cascade)
   receiverCompany   Company                     @relation("ReceiverCompany", fields: [receiverCompanyId], references: [id], onDelete: Cascade)
-  attachments       RequestEstimateAttachment[]
+  // attachments       RequestEstimateAttachment[]
   invoice           Invoice?
+  vehicle          Vehicle?                    @relation("Vehicle", fields: [vehicleId], references: [id], onDelete: Cascade)
+  service           Service?                    @relation("Service", fields: [serviceId], references: [id], onDelete: Cascade)
+  message           Message?                     @relation("Message")
 }
 
-model RequestEstimateAttachment {
-  id        Int             @id @default(autoincrement())
-  fileName  String
-  fileType  String
-  fileUrl   String
-  requestId Int             @map("request_id")
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @default(now()) @updatedAt @map("updated_at")
-  request   RequestEstimate @relation(fields: [requestId], references: [id], onDelete: Cascade)
-}
+// model RequestEstimateAttachment {
+//   id        Int             @id @default(autoincrement())
+//   fileName  String
+//   fileType  String
+//   fileUrl   String
+//   requestId Int             @map("request_id")
+//   createdAt DateTime        @default(now())
+//   updatedAt DateTime        @default(now()) @updatedAt @map("updated_at")
+//   request   RequestEstimate @relation(fields: [requestId], references: [id], onDelete: Cascade)
+// }

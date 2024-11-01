@@ -13,8 +13,6 @@ import ConvertButton from "../../create/ConvertButton";
 import { notFound } from "next/navigation";
 import SyncEstimate from "../../create/SyncEstimate";
 import { FaSave } from "react-icons/fa";
-import { SiConvertio } from "react-icons/si";
-import ConvertTo from "./ConvertTo";
 import { Labor, Material, Tag } from "@prisma/client";
 import PaymentTab from "../../create/tabs/PaymentTab";
 
@@ -26,7 +24,12 @@ export default async function Page({
   searchParams: { clientId?: string };
 }) {
   const { id } = params;
-  const invoice = await db.invoice.findUnique({ where: { id } });
+  const invoice = await db.invoice.findUnique({
+    where: { id },
+    include: {
+      requestEstimate: true,
+    },
+  });
 
   if (!invoice) return notFound();
 
@@ -53,6 +56,13 @@ export default async function Page({
     const tags = itemTagsTags.filter((tag) =>
       itemTags.find((itemTag) => itemTag.tagId === tag.id),
     );
+    if (Array.isArray(item.materials) && item.materials.length === 0) {
+      return {
+        ...item,
+        materials: [null],
+        tags,
+      };
+    }
     return { ...item, tags };
   });
 
@@ -60,7 +70,9 @@ export default async function Page({
   const tasks = await db.task.findMany({ where: { invoiceId: id } });
 
   const session = (await auth()) as AuthSession;
-  const companyId = session.user.companyId;
+  const companyId = invoice?.fromRequest
+    ? invoice.requestEstimate?.receiverCompanyId
+    : session.user.companyId;
   const customers = await db.client.findMany({ where: { companyId } });
   const vehicles = await db.vehicle.findMany({ where: { companyId } });
   const categories = await db.category.findMany({ where: { companyId } });
@@ -116,7 +128,6 @@ export default async function Page({
       },
     },
   });
-
   return (
     <div className="-my-2 grid h-[93vh] gap-3 overflow-clip py-2 md:grid-cols-[1fr,24rem] md:grid-rows-[auto,auto,1fr]">
       <Title>Estimate</Title>

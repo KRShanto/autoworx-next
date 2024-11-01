@@ -36,29 +36,31 @@ export function SelectVehicle({
     }
   }, [vehicle]);
 
+  console.log("vehicleList", vehicle);
+
   // Select vehicle when client changes
   // Select the first vehicle that belongs to the client
   // If there are no vehicles, set vehicle to null
   useEffect(() => {
     if (clientId) {
+      // console.log("vehicle list", vehicleList);
       const clientVehicles = vehicleList.filter(
         (vehicle) => vehicle.clientId === +clientId,
       );
-
       if (clientVehicles.length > 0) {
         setVehicle(clientVehicles[0]);
       } else {
         setVehicle(null);
       }
     }
-  }, [clientId]);
+  }, [clientId, vehicleList]);
 
   return (
     <>
       <input type="hidden" name={name} value={vehicle?.id ?? ""} />
 
       <Selector
-        disabledDropdown={clientId ? false : true}
+        disabledDropdown={(clientId && !vehicle?.fromRequest) ? false : true}
         label={(vehicle: Vehicle | null) =>
           vehicle ? vehicle.model || `Vehicle ${vehicle.id}` : "Vehicle"
         }
