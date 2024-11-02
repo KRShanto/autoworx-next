@@ -23,9 +23,9 @@ export default async function WorkOrderPage({
       },
       photos: true,
       tasks: true,
-      status: true,
       user: true,
       client: true,
+      column: true,
       vehicle: true,
     },
   });
@@ -84,11 +84,11 @@ export default async function WorkOrderPage({
               <p
                 className="max-w-32 rounded-md px-2 py-[1px] text-xs font-semibold"
                 style={{
-                  color: invoice.status?.textColor,
-                  backgroundColor: invoice.status?.bgColor,
+                  color: invoice.column?.textColor||undefined,
+                  backgroundColor: invoice.column?.bgColor||undefined,
                 }}
               >
-                {invoice.status?.name}
+                {invoice.column?.title}
               </p>
             </div>
           </div>

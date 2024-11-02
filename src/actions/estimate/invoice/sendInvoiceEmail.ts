@@ -17,7 +17,7 @@ export async function sendInvoiceEmail({ invoiceId }: { invoiceId: string }) {
       },
       photos: true,
       tasks: true,
-      status: true,
+      column: true,
       user: true,
       client: true,
       vehicle: true,

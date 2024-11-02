@@ -1,11 +1,11 @@
 "use server";
 import { db } from "@/lib/db";
 
-export async function updateInvoiceStatus(invoiceId: string, newStatus: string) {
+export async function updateInvoiceStatus(invoiceId: string, newStatusId: number) {
   try {
     await db.invoice.update({
       where: { id: invoiceId },
-      data: { workOrderStatus: newStatus },
+      data: { columnId: newStatusId },
     });
     return { type: "success" };
   } catch (error) {

@@ -48,12 +48,14 @@ interface Lead {
 
   tasks?: Task[];
   assignedTo: User | Employee | null;
+  columnId: number | null;
 }
 interface InvoiceTag {
   id: number;
   tag: Tag;
 }
 interface PipelineData {
+  id: number | null;
   title: string;
   leads: Lead[];
 }
@@ -68,14 +70,7 @@ interface PipelinesProps {
   pipelinesTitle: string;
   columns?: Column[];
 }
-interface UserTypes {
-  id: number;
-  email: string;
-  firstName: string;
-  lastName: string | null;
-  employeeType: EmployeeType;
-  companyId: number;
-}
+
 type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
   include: {
     client: true;
@@ -97,6 +92,7 @@ type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
     };
     tasks: true;
     assignedTo: true;
+    column: true;
   };
 }>;
 export default function Pipelines({
@@ -165,6 +161,7 @@ export default function Pipelines({
             incompleteServices.push(item.service?.name ?? "");
           }
         });
+        const columnStatusId = invoice.columnId;
 
         return {
           invoiceId: invoice.id,
@@ -183,13 +180,15 @@ export default function Pipelines({
           tasks: invoice.tasks,
           assignedTo: invoice.assignedTo,
           createdAt: new Date(invoice.createdAt).toDateString(),
+          columnId: columnStatusId,
         };
       });
 
       let updatedPipelineData = columns.map((column) => ({
+        id: column.id,
         title: column.title,
         leads: transformedLeads.filter(
-          (lead) => lead.workOrderStatus?.trim() === column.title.trim(),
+          (lead) => lead.columnId=== column.id,
         ),
       }));
 
@@ -440,16 +439,20 @@ export default function Pipelines({
     setPipelineData(updatedData);
 
     const invoiceId = removed.invoiceId;
-    const newStatus = destinationColumn.title;
-
-    try {
-      const response = await updateInvoiceStatus(invoiceId, newStatus);
-      if (response.type === "success") {
-      } else {
-        console.error("Failed to update invoice status:", response.message);
+    const newStatusId = destinationColumn.id;
+    if (newStatusId !== null) {
+      try {
+        const response = await updateInvoiceStatus(invoiceId, newStatusId);
+        if (response.type === "success") {
+          console.log("Invoice status updated successfully");
+        } else {
+          console.error("Failed to update invoice status:", response.message);
+        }
+      } catch (error) {
+        console.error("Error updating invoice status:", error);
       }
-    } catch (error) {
-      console.error("Error updating invoice status:", error);
+    } else {
+      console.error("newStatusId is null");
     }
   };
 

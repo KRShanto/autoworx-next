@@ -1,3 +1,5 @@
+import { INVOICE_COLORS } from "./consts";
+
 export  const defaultSalesColumn=[
   { title: "New Leads", type: "sales",order:0 },
   { title: "Leads Generated", type: "sales",order:1 },
@@ -16,3 +18,20 @@ export  const defaultShopColumn=[
  
 ];
 
+function createColumnWithColor(){
+
+  const defaultSalesColumnWithColor=defaultSalesColumn.map((column,index)=>({
+    ...column,
+    ...INVOICE_COLORS[index%INVOICE_COLORS.length],
+  }));
+
+  const defaultShopColumnWithColor=defaultShopColumn.map((column,index)=>({
+
+    ...column,
+    ...INVOICE_COLORS[index%INVOICE_COLORS.length], 
+  }));
+
+return [...defaultSalesColumnWithColor,...defaultShopColumnWithColor]
+}
+
+export const defaultColumnWithColor= createColumnWithColor();

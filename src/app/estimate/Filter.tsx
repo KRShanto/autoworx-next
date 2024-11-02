@@ -14,7 +14,7 @@ import Submit from "@/components/Submit";
 import { cn } from "@/lib/cn";
 import { useEstimateFilterStore } from "@/stores/estimate-filter";
 import { useListsStore } from "@/stores/lists";
-import { Status } from "@prisma/client";
+import { Column} from "@prisma/client";
 import { matchSorter } from "match-sorter";
 import moment from "moment";
 import Image from "next/image";
@@ -39,7 +39,7 @@ export function Filter() {
     [allStatuses, statusSearch],
   );
   const paramStatus = +(searchParams.get("status") ?? "");
-  const [status, setStatus] = useState<Status | null>(
+  const [status, setStatus] = useState<Column | null>(
     allStatuses.find((x) => x.id === paramStatus) ?? null,
   );
   const router = useRouter();
@@ -125,14 +125,14 @@ export function Filter() {
                   type="button"
                   className="mx-2 my-1 rounded px-2"
                   style={{
-                    color: status.textColor,
-                    backgroundColor: status.bgColor,
+                    color: status.textColor||undefined,
+                    backgroundColor: status.bgColor||undefined,
                   }}
                   onClick={() => {
                     setStatus(null);
                   }}
                 >
-                  {status.name}
+                  {status.title}
                 </button>
               )}
               <div className="mt-2 flex flex-wrap gap-2">
@@ -141,12 +141,12 @@ export function Filter() {
                     type="button"
                     key={x.id}
                     className="rounded px-2"
-                    style={{ color: x.textColor, backgroundColor: x.bgColor }}
+                    style={{ color: x.textColor||undefined, backgroundColor: x.bgColor||undefined }}
                     onClick={() => {
                       setStatus(x);
                     }}
                   >
-                    {x.name}
+                    {x.title}
                   </button>
                 ))}
               </div>
@@ -164,7 +164,7 @@ export function Filter() {
                   start ? new Date(start) : null,
                   end ? new Date(end) : null,
                 ],
-                status: status?.name,
+                status: status?.title,
               });
               setOpen(false);
             }}

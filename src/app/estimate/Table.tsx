@@ -43,14 +43,16 @@ export default function Table({ data }: { data: InvoiceData[] }) {
       }
       return true;
     });
-
+    console.log("Filtered::::", filtered);
     const filteredStatus = filtered.filter((row) => {
       if (status) {
         return row.status === status;
       }
       return true;
     });
-
+    console.log("Filterstatus", filteredStatus);
+    console.log("Status of store in table", status);
+    console.log("Data actual", data);
     const filteredDate = filteredStatus.filter((row) => {
       if (dateRange) {
         const [start, end] = dateRange;
@@ -157,14 +159,15 @@ export default function Table({ data }: { data: InvoiceData[] }) {
                   className="block h-full w-full"
                 >
                   <p
-                    className="rounded-md text-center text-white"
+                    className="rounded-md text-left "
                     style={{
                       backgroundColor: data.bgColor,
                       color: data.textColor,
                     }}
                   >
-                    {data.status}
+                    {data.status||""}
                   </p>
+                  
                 </Link>
               </td>
               <td className="flex items-center gap-3 px-4 py-2">

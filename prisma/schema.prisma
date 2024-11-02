@@ -71,6 +71,7 @@ model Company {
   LeaveRequest            LeaveRequest[]
   RequestEstimateSent     RequestEstimate[]         @relation("SenderCompany")
   RequestEstimateReceived RequestEstimate[]         @relation("ReceiverCompany")
+  column                  Column[]
 }
 
 // notification settings model
@@ -276,7 +277,7 @@ model Invoice {
   depositNotes            String?                   @default("") @map("deposit_notes")
   depositMethod           String?                   @default("") @map("deposit_method")
   due                     Decimal?                  @default(0) @db.Decimal(8, 2)
-  statusId                Int?                      @map("status_id")
+  
   internalNotes           String?
   terms                   String?
   policy                  String?
@@ -293,7 +294,7 @@ model Invoice {
   invoiceItems            InvoiceItem[]
   photos                  InvoicePhoto[]
   tasks                   Task[]
-  status                  Status?                   @relation(fields: [statusId], references: [id])
+  
   payments                Payment[]
   user                    User?                     @relation(name: "user", fields: [userId], references: [id], onDelete: SetNull)
   Material                Material[]
@@ -304,6 +305,8 @@ model Invoice {
   tags                    InvoiceTags[]
   requestEstimate         RequestEstimate?          @relation(fields: [requestEstimateId], onDelete: SetNull, references: [id])
   assignedTo              User?                     @relation(name: "assignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
+  columnId                Int?                      @map("column_status_id")
+  column                  Column?                   @relation(fields: [columnId], references: [id])
 
   @@index([companyId], name: "fk_invoices_company")
 }
@@ -548,7 +551,7 @@ model Status {
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
   companyId Int       @map("company_id")
   company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  Invoice   Invoice[]
+  // Invoice   Invoice[]
 }
 
 // Payment of a invoice.
@@ -898,10 +901,16 @@ model ClientCoupon {
 }
 
 model Column {
-  id    Int    @id @default(autoincrement())
-  title String
-  type  String // "sales" or "shop"
-  order Int
+  id        Int     @id @default(autoincrement())
+  title     String
+  type      String // "sales" or "shop"
+  order     Int
+  textColor String? 
+  bgColor   String? 
+  companyId Int     @map("company_id")
+
+  company  Company   @relation(fields: [companyId], references: [id])
+  invoices Invoice[]
 }
 
 // TODO: this might need to be renamed
@@ -949,7 +958,7 @@ model PermissionForSales {
   salesPipeline                 Boolean @default(true) @map("sales_pipeline")
 
   //view only
-  workforceManagementViewOnly Boolean @default(true) 
+  workforceManagementViewOnly Boolean @default(true)
   reportingViewOnly           Boolean @default(true)
   inventoryViewOnly           Boolean @default(true)
 
@@ -964,7 +973,7 @@ model PermissionForTechnician {
   shopPipeline             Boolean @default(true) @map("shop_pipeline")
 
   //view only
-  workforceManagementViewOnly Boolean @default(true) 
+  workforceManagementViewOnly Boolean @default(true)
   reportingViewOnly           Boolean @default(true)
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
