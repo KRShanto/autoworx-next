@@ -60,7 +60,7 @@ export default function MessageBox({
     }
   }, [messages]);
 
-  async function handleSubmit(e: any) {
+  async function handleSendMessage(e: any) {
     e.preventDefault();
     try {
       if (!message && !attachmentFile) return;
@@ -131,7 +131,9 @@ export default function MessageBox({
 
   const handleUserClose = () => {
     setUsersList &&
-      setUsersList((usersList) => usersList.filter((u) => u.id !== receiverUser?.id));
+      setUsersList((usersList) =>
+        usersList.filter((u) => u.id !== receiverUser?.id),
+      );
   };
 
   const handleDeleteUserFromGroupList = async (userId: number) => {
@@ -234,7 +236,9 @@ export default function MessageBox({
           )}
           <div className="flex flex-col">
             <p className="flex flex-col text-[18px] font-bold sm:text-[20px]">
-              {fromGroup ? group?.name : `${receiverUser?.firstName} ${receiverUser?.lastName}`}
+              {fromGroup
+                ? group?.name
+                : `${receiverUser?.firstName} ${receiverUser?.lastName}`}
               {companyName && (
                 <span className="text-sm font-light">{companyName}</span>
               )}
@@ -342,7 +346,7 @@ export default function MessageBox({
       {/* Input */}
       <form
         className="relative flex h-[8%] items-center gap-2 bg-[#D9D9D9] p-2"
-        onSubmit={(e) => startTransition(() => handleSubmit(e))}
+        onSubmit={(e) => startTransition(() => handleSendMessage(e))}
       >
         {/* attachment or estimate dropdown */}
         {showAttachment && (
@@ -359,7 +363,11 @@ export default function MessageBox({
               Attach Document/Media
             </p>
             {isEstimateAttachmentShow && (
-              <InvoiceEstimateModal receiverUser={receiverUser!} />
+              <InvoiceEstimateModal
+                setShowAttachment={setShowAttachment}
+                setMessages={setMessages}
+                receiverUser={receiverUser!}
+              />
             )}
           </div>
         )}

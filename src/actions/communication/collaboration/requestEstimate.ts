@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { sendType } from "@/types/Chat";
 import { InvoiceType, Prisma } from "@prisma/client";
 import { customAlphabet } from "nanoid";
 import { headers } from "next/headers";
@@ -34,25 +35,10 @@ export const requestEstimate = async (
       throw new Error("Estimate for this client already exists");
     }
 
-    const { message } = await db.$transaction(async () => {
+    const { requestEstimateFromDB } = await db.$transaction(async (prisma) => {
       const origin = headers().get("origin");
 
-      const photoPaths = [];
-      const res = await fetch(`${origin}/api/upload`, {
-        method: "POST",
-        body: formDataForPhoto,
-      });
-
-      if (!res.ok) {
-        console.error("Failed to upload photos");
-        throw new Error("Failed to upload photos");
-      }
-
-      const json = await res.json();
-      const data = json.data;
-
-      photoPaths.push(...data);
-      const receiverCompanyDataFormDB = await db.company.findUnique({
+      const receiverCompanyDataFormDB = await prisma.company.findUnique({
         where: {
           id: requestEstimateData.receiverCompanyId,
         },
@@ -70,7 +56,7 @@ export const requestEstimate = async (
       };
 
       // create client in the db
-      const client = await db.client.create({
+      const client = await prisma.client.create({
         data: clientInfo,
       });
 
@@ -85,7 +71,7 @@ export const requestEstimate = async (
       };
 
       // create vehicle in the db
-      const vehicle = await db.vehicle.create({
+      const vehicle = await prisma.vehicle.create({
         data: vehicleInfo,
       });
 
@@ -102,10 +88,10 @@ export const requestEstimate = async (
       };
 
       // create a invoice estimate in db
-      const estimate = await db.invoice.create({ data: estimateInfo });
+      const estimate = await prisma.invoice.create({ data: estimateInfo });
 
       // create a service for estimate
-      const service = await db.service.create({
+      const service = await prisma.service.create({
         data: {
           name: requestEstimateData.serviceRequest,
           companyId: requestEstimateData.receiverCompanyId,
@@ -115,7 +101,7 @@ export const requestEstimate = async (
       });
 
       // create invoice in db or set service id or invoice id
-      await db.invoiceItem.create({
+      await prisma.invoiceItem.create({
         data: {
           invoiceId: estimate.id,
           serviceId: service?.id,
@@ -132,50 +118,63 @@ export const requestEstimate = async (
         vehicleId: vehicle.id,
       };
       // create a new request for estimate
-      const requestEstimate = await db.requestEstimate.create({
+      const requestEstimateFromDB = await prisma.requestEstimate.create({
         data: requestedEstimateInfo,
       });
 
-      await db.invoice.update({
+      // update invoice with request estimate id
+      await prisma.invoice.update({
         where: {
           id: estimate.id,
         },
         data: {
-          requestEstimateId: requestEstimate.id,
-        },
-      });
-      // create message
-      const message = await db.message.create({
-        data: {
-          requestEstimateId: requestEstimate.id,
-          from: requestEstimateData.senderId,
-          to: requestEstimateData.receiverId,
-          message: requestEstimateData.messageText
-            ? requestEstimateData.messageText
-            : "",
+          requestEstimateId: requestEstimateFromDB.id,
         },
       });
 
-      for await (const photoPath of photoPaths) {
-        await db.invoicePhoto.create({
-          data: {
-            invoiceId: estimate?.id,
-            photo: photoPath,
-          },
-        });
+      //  upload image
+      const photoPaths = [];
+      const res = await fetch(`${origin}/api/upload`, {
+        method: "POST",
+        body: formDataForPhoto,
+      });
+
+      if (!res.ok) {
+        console.error("Failed to upload photos");
+        throw new Error("Failed to upload photos");
       }
-      return { message };
+
+      const json = await res.json();
+      const data = json.data;
+
+      photoPaths.push(...data);
+
+      await Promise.all(
+        photoPaths.map((photoPath) =>
+          prisma.invoicePhoto.create({
+            data: {
+              invoiceId: estimate?.id,
+              photo: photoPath,
+            },
+          }),
+        ),
+      );
+
+      return { requestEstimateFromDB };
     });
 
-    return { status: 200, data: { message } };
+    return { status: 200, data: { requestEstimateFromDB } };
   } catch (err: any) {
     if (
       err instanceof Prisma.PrismaClientUnknownRequestError ||
       err instanceof Prisma.PrismaClientKnownRequestError
     ) {
+      console.log(err);
       throw new Error("something went wrong from db");
     }
     console.error(err);
     throw new Error(`Error: ${err.message}`);
+  } finally {
+    await db.$disconnect();
   }
 };

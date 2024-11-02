@@ -2,7 +2,7 @@ import { useState, useEffect, SetStateAction } from "react";
 import MessageBox from "../MessageBox";
 import { useSession } from "next-auth/react";
 import { getUserMessagesById } from "@/actions/communication/internal/query";
-import { Attachment } from "@prisma/client";
+import { Attachment, RequestEstimate } from "@prisma/client";
 import { pusher } from "@/lib/pusher/client";
 
 type TProps = {
@@ -56,16 +56,19 @@ export default function UserMessageBox({
           from,
           message,
           attachment,
+          requestEstimate,
         }: {
           from: number;
           message: string;
-          attachment: Partial<Attachment>;
+            attachment: Partial<Attachment>;
+            requestEstimate: RequestEstimate | null;
         }) => {
           if (from !== parseInt(session?.user?.id!)) {
             const newMessage = {
               message,
               sender: "CLIENT",
               attachment,
+              requestEstimate,
             };
             setMessages((prevGroupMessages) => [
               ...prevGroupMessages,

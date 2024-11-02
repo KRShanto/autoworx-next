@@ -6,17 +6,28 @@ import {
   DialogTrigger,
 } from "@/components/Dialog";
 import { SlimInput } from "@/components/SlimInput";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import InvoiceEstimateAttachment from "./InvoiceEstimateAttachment";
 import { requestEstimate } from "@/actions/communication/collaboration/requestEstimate";
 import { User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
 import toast from "react-hot-toast";
+import { Message as TMessage } from "../internal/UsersArea";
+import { sendType } from "@/types/Chat";
 
-type TProps = { receiverUser: User };
+type TProps = {
+  receiverUser: User;
+  setMessages: React.Dispatch<React.SetStateAction<any[]>>;
+  setShowAttachment: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-export default function InvoiceEstimateModal({ receiverUser }: TProps) {
+export default function InvoiceEstimateModal({
+  receiverUser,
+  setMessages,
+  setShowAttachment,
+}: TProps) {
+  const [pending, startTransaction] = useTransition();
   const { data: authUser } = useSession();
   const [open, setOpen] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
@@ -39,6 +50,7 @@ export default function InvoiceEstimateModal({ receiverUser }: TProps) {
 
   const handleEstimateSubmit = async () => {
     try {
+      setError("");
       // upload photos
       const formDataForPhoto = new FormData();
       if (photos.length > 0) {
@@ -49,7 +61,7 @@ export default function InvoiceEstimateModal({ receiverUser }: TProps) {
 
       const {
         status,
-        data: { message },
+        data: { requestEstimateFromDB },
       } = await requestEstimate(formDataForPhoto, {
         ...estimateInfo,
         year: parseInt(estimateInfo.year),
@@ -69,9 +81,40 @@ export default function InvoiceEstimateModal({ receiverUser }: TProps) {
           dueDate: "",
           notes: "",
         });
+
+        // send request estimate message realtime
+        const pusherResponse = await fetch(`/api/pusher`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            to: receiverUser.id,
+            type: sendType.User,
+            message: "",
+            attachmentFile: null,
+            requestEstimate: requestEstimateFromDB,
+          }),
+        });
+        const messageData = await pusherResponse.json();
+        if (!pusherResponse.ok || !messageData.success) {
+          throw new Error(`message wasn't sended`);
+        }
+
+        const newMessage: TMessage = {
+          message: "",
+          sender: "USER",
+          attachment: null,
+          requestEstimate: requestEstimateFromDB,
+        };
+
+        setMessages((messages) => [...messages, newMessage]);
         setPhotos([]);
         setError("");
+        setShowAttachment(false);
         toast.success("Estimate requested successfully");
+      } else {
+        throw new Error("Failed to request estimate");
       }
     } catch (err: any) {
       setError(err.message);
@@ -87,7 +130,7 @@ export default function InvoiceEstimateModal({ receiverUser }: TProps) {
       </DialogTrigger>
       <DialogContent
         form
-        onSubmit={handleEstimateSubmit}
+        onSubmit={(e) => startTransaction(handleEstimateSubmit)}
         className="overflow-y-auto"
       >
         {error && <p className="text-center text-sm text-red-400">{error}</p>}
@@ -144,6 +187,7 @@ export default function InvoiceEstimateModal({ receiverUser }: TProps) {
             Cancel
           </DialogClose>
           <button
+            disabled={pending}
             type="submit"
             className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
           >

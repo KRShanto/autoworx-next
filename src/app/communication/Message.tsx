@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { getUserById } from "@/actions/user/getUserById";
 import { User } from "@prisma/client";
 import Link from "next/link";
-import { requestEstimate } from "@/actions/communication/collaboration/requestEstimate";
 
 type TProps = {
   message: TMessage;
@@ -33,12 +32,13 @@ export default function Message({ message, onDownload }: TProps) {
       )}
     >
       <div className="flex items-start gap-2 p-1">
-        {message.sender === "CLIENT" && (
-          <div>
-            <Avatar photo={senderInfo?.image} width={40} height={40} />
-            <p className="text-center text-[10px]">{senderInfo?.firstName}</p>
-          </div>
-        )}
+        {message.sender === "CLIENT" &&
+          (message?.attachment || message?.requestEstimate) && (
+            <div>
+              <Avatar photo={senderInfo?.image} width={40} height={40} />
+              <p className="text-center text-[10px]">{senderInfo?.firstName}</p>
+            </div>
+          )}
         <div
           className={cn(
             "flex flex-col space-y-3",
