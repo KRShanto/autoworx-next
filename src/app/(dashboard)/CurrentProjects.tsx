@@ -6,9 +6,9 @@ type Props = {};
 
 const CurrentProjects = (props: Props) => {
   return (
-    <div className="flex h-[82vh] flex-col rounded-md p-8 shadow-lg">
+    <div className="flex h-[82vh] flex-col rounded-md p-6 shadow-lg">
       <div className="mb-8 flex items-center justify-between">
-        <span className="text-2xl font-bold">Current Projects</span>{" "}
+        <span className="text-xl font-bold">Current Projects</span>{" "}
         <Link href="/task/day">
           <FaExternalLinkAlt />
         </Link>

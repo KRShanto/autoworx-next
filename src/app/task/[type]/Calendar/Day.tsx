@@ -168,6 +168,7 @@ export default function Day({
             : new Date(),
           startTime: oldTask?.startTime || startTime,
           endTime: oldTask?.endTime || endTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       } else {
         const { newStartTime, newEndTime } = updateTimeSpace(
@@ -181,6 +182,7 @@ export default function Day({
             date: new Date(oldTask.date),
             startTime: newStartTime,
             endTime: newEndTime,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           });
         }
       }
@@ -202,6 +204,7 @@ export default function Day({
           date: oldAppointment.date as Date | string,
           startTime: newStartTime,
           endTime: newEndTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       }
     }

@@ -19,6 +19,7 @@ export interface TaskType {
   endTime?: string;
   clientId?: number | null;
   date?: string;
+  timezone?:string
 }
 
 export async function createTask(task: TaskType): Promise<ServerAction> {

@@ -23,24 +23,23 @@ const DashboardTechnician = ({
   const { open } = usePopupStore();
 
   return (
-    <div className="p-8">
-      <Title>Dashboard</Title>
+
       <div className="flex items-start gap-x-4">
         {/* col 1 */}
-        <div className="w-[30%] space-y-12">
+        <div className="w-[30%] space-y-4">
           {/* Current Projects */}
           <CurrentProjects />
         </div>
 
         {/* col 2 */}
-        <div className="w-[25%] space-y-12">
+        <div className="w-[25%] space-y-4">
           {/* task list */}
           <Tasks tasks={tasks} companyUsers={companyUsers} />
           {/* appointments */}
           <Appointments appointments={appointments} />
         </div>
         {/* col 3 */}
-        <div className="w-[45%] space-y-12">
+        <div className="w-[45%] space-y-4">
           {/* attendance buttons */}
           <div className="flex justify-between gap-x-2 rounded-md p-4 shadow-lg xl:p-8">
             <div>
@@ -68,27 +67,27 @@ const DashboardTechnician = ({
             {/* <!--col 1 --> */}
             <div>
               {/* Performance */}
-              <div className="rounded-md p-4 shadow-lg xl:p-8">
+              <div className="rounded-md p-4 shadow-lg 2xl:px-6">
                 <div className="mb-8 flex items-center justify-between">
-                  <span className="text-2xl font-bold">Performance</span>{" "}
+                  <span className="text-xl font-bold">Performance</span>{" "}
                   <span>
                     <FaExternalLinkAlt />
                   </span>
                 </div>
-                <div className="#px-4">
+                <div className="space-y-3">
                   <ChartData heading="Total Jobs" number={567} />
                   <ChartData heading="On-time Completion Rate" number={767} />
                   <ChartData heading="Job Return Rate" number={435} />
                 </div>
               </div>
-              <div className="rounded-md p-4 shadow-lg xl:p-8">
+              <div className="rounded-md p-4 shadow-lg xl:p-6">
                 <div className="mb-8 flex items-center justify-between">
-                  <span className="text-2xl font-bold">Monthly Payout</span>{" "}
+                  <span className="text-xl font-bold">Monthly Payout</span>{" "}
                   <span>
                     <FaExternalLinkAlt />
                   </span>
                 </div>
-                <div className="#px-4">
+                <div className="space-y-3">
                   <ChartData heading="Current Payout" number={567} />
                   <ChartData heading="Projected Payout" number={767} />
                 </div>
@@ -103,7 +102,7 @@ const DashboardTechnician = ({
           </div>
         </div>
       </div>
-    </div>
+
   );
 };
 
