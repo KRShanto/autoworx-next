@@ -24,7 +24,7 @@ export default async function CannedPage() {
 
   const categories = await db.category.findMany({ where: { companyId } });
   const tags = await db.tag.findMany({ where: { companyId } });
-  const statuses = await db.status.findMany({ where: { companyId } });
+  const statuses = await db.column.findMany({ where: { companyId } });
 
   return (
     <div>
