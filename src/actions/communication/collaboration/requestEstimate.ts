@@ -21,16 +21,15 @@ type TEstimateData = {
 
 export const requestEstimate = async (requestEstimateData: TEstimateData) => {
   try {
-    // const isAlreadyExistsEstimate = await db.invoice.findFirst({
-    //   where: {
-    //     companyId: requestEstimateData.receiverCompanyId,
-    //     type: InvoiceType.Estimate,
-    //   },
-    // });
+    const isAlreadyExistsEstimate = await db.client.findFirst({
+      where: {
+        companyId: requestEstimateData.receiverCompanyId
+      },
+    });
 
-    // if (!!isAlreadyExistsEstimate) {
-    //   throw new Error("Estimate for this client already exists");
-    // }
+    if (!!isAlreadyExistsEstimate) {
+      throw new Error("Estimate for this client already exists");
+    }
 
     await db.$transaction(async () => {
       const receiverCompanyDataFormDB = await db.company.findUnique({

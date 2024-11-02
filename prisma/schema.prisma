@@ -949,12 +949,10 @@ model PermissionForSales {
   calendarTask                  Boolean @default(true) @map("calendar_task")
   payments                      Boolean @default(false)
   salesPipeline                 Boolean @default(true) @map("sales_pipeline")
-
   //view only
   workforceManagementViewOnly Boolean @default(true) @map("workforce_management")
   reportingViewOnly           Boolean @default(true)
   inventoryViewOnly           Boolean @default(true)
-
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
@@ -988,7 +986,6 @@ model PermissionForOther {
   salesPipeline                 Boolean @default(false) @map("sales_pipeline")
   shopPipeline                  Boolean @default(false) @map("shop_pipeline")
   businessSettings              Boolean @default(false) @map("business_settings")
-
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
