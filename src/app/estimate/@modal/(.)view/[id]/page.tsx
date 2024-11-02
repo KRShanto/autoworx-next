@@ -23,7 +23,7 @@ export default async function ViewEstimate({
       },
       photos: true,
       tasks: true,
-      status: true,
+      column: true,
       user: true,
     },
   });

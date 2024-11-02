@@ -1,5 +1,6 @@
 "use client";
 
+import Avatar from "@/components/Avatar";
 import {
   Dialog,
   DialogClose,
@@ -18,12 +19,11 @@ import { useState } from "react";
 import { FaChevronDown, FaChevronUp, FaTractor, FaTrash } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa6";
 import { editTask } from "../../../../../actions/task/editTask";
-import Avatar from "@/components/Avatar";
 // @ts-ignore
 import dayjs from "dayjs";
-import { deleteTask } from "../../../../../actions/task/deleteTask";
 import moment from "moment";
 import { useRouter } from "next/navigation";
+import { deleteTask } from "../../../../../actions/task/deleteTask";
 
 export default function UpdateTask() {
   const { popup, data, close } = usePopupStore();
@@ -61,6 +61,7 @@ export default function UpdateTask() {
           startTime: time?.startTime,
           endTime: time?.endTime,
           date: date ? new Date(date).toISOString() : new Date().toISOString(),
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         },
       });
       router.push(

@@ -42,8 +42,8 @@ export default async function Page({
   const client = invoice.clientId
     ? await db.client.findUnique({ where: { id: invoice.clientId } })
     : null;
-  const status = invoice.statusId
-    ? await db.status.findUnique({ where: { id: invoice.statusId } })
+  const status = invoice.columnId
+    ? await db.column.findUnique({ where: { id: invoice.columnId } })
     : null;
   const items = await db.invoiceItem.findMany({
     where: { invoiceId: id },
@@ -79,7 +79,7 @@ export default async function Page({
   const services = await db.service.findMany({ where: { companyId } });
   const tags = await db.tag.findMany({ where: { companyId } });
   const vendors = await db.vendor.findMany({ where: { companyId } });
-  const statuses = await db.status.findMany({ where: { companyId } });
+  const statuses = await db.column.findMany({ where: { companyId } });
 
   const materials = (await db.material.findMany({
     where: { companyId, invoiceId: null },

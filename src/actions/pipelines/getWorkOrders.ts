@@ -31,6 +31,7 @@ export async function getWorkOrders() {
       },
       tasks: true,
       assignedTo: true,
+      column: true,
     },
   });
 

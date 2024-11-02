@@ -6,6 +6,7 @@ import {
   DialogPortal,
 } from "@/components/Dialog";
 import {
+  Column,
   Company,
   Invoice,
   InvoiceItem,
@@ -40,7 +41,7 @@ const InvoiceComponent = ({
   id: string;
   clientId: any;
   invoice: Invoice & {
-    status: Status | null;
+    column: Column | null;
     company: Company;
     invoiceItems: (InvoiceItem & {
       materials: Material[] | [];
@@ -172,11 +173,11 @@ const InvoiceComponent = ({
                   <p
                     className="max-w-32 rounded-md px-2 py-[1px] text-xs font-semibold"
                     style={{
-                      color: invoice.status?.textColor,
-                      backgroundColor: invoice?.status?.bgColor,
+                      color: invoice.column?.textColor || undefined,
+                      backgroundColor: invoice?.column?.bgColor || undefined,
                     }}
                   >
-                    {invoice.status?.name}
+                    {invoice.column?.title}
                   </p>
                 </div>
               </div>

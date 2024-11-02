@@ -181,6 +181,7 @@ export function UpdateAppointment() {
         confirmationEmailTemplateStatus: confirmationTemplateStatus,
         reminderEmailTemplateStatus: reminderTemplateStatus,
         times,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       },
     });
 

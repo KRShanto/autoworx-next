@@ -48,7 +48,7 @@ export default function DepositCreate({
       <DialogTrigger asChild>
         <button
           type="button"
-          className="absolute right-1 rounded-md border-2 border-white px-2 py-1 text-white "
+          className="absolute right-1 rounded-md border-2 border-white px-2 py-1 text-white"
         >
           <FaPlus />
         </button>
