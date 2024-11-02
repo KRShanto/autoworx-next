@@ -6,6 +6,8 @@ import { IoCloudDownloadOutline } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { getUserById } from "@/actions/user/getUserById";
 import { User } from "@prisma/client";
+import Link from "next/link";
+import { requestEstimate } from "@/actions/communication/collaboration/requestEstimate";
 
 type TProps = {
   message: TMessage;
@@ -24,9 +26,11 @@ export default function Message({ message, onDownload }: TProps) {
   }, []);
   return (
     <div
-      className={`flex items-center p-1 ${
-        message.sender === "CLIENT" ? "justify-start" : "justify-end"
-      }`}
+      className={cn(
+        "flex items-center",
+        message.sender === "CLIENT" ? "justify-start" : "justify-end",
+        message.message && "p-1",
+      )}
     >
       <div className="flex items-start gap-2 p-1">
         {message.sender === "CLIENT" && (
@@ -53,6 +57,7 @@ export default function Message({ message, onDownload }: TProps) {
               {message.message}
             </p>
           )}
+
           {message.attachment && (
             <div
               className={cn(
@@ -84,6 +89,42 @@ export default function Message({ message, onDownload }: TProps) {
                 />
               </button>
             </div>
+          )}
+
+          {message.requestEstimate && (
+            <Link
+              href={
+                message.sender === "USER"
+                  ? `/estimate/view/${message.requestEstimate.invoiceId}`
+                  : `/estimate/edit/${message.requestEstimate.invoiceId}`
+              }
+              className={cn(
+                "w-96 rounded-md bg-[#006D77] p-1",
+                message.sender === "CLIENT" && "bg-[#D9D9D9]",
+              )}
+            >
+              <div
+                className={cn(
+                  "flex items-center justify-center gap-x-2 rounded-md border border-white p-5",
+                  message.sender === "CLIENT" && "border-[#006D77]",
+                )}
+              >
+                <Image
+                  src="/icons/navbar/Invoices.svg"
+                  alt="estimate icon"
+                  width={20}
+                  height={20}
+                />
+                <p
+                  className={cn(
+                    "font-semibold text-white",
+                    message.sender === "CLIENT" && "text-[#006D77]",
+                  )}
+                >
+                  Requested an Estimate
+                </p>
+              </div>
+            </Link>
           )}
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import ItemSelector from "@/components/ItemSelector";
 import { SelectTags } from "@/components/Lists/SelectTags";
+import { cn } from "@/lib/cn";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useListsStore } from "@/stores/lists";
@@ -102,7 +103,10 @@ export function CreateTab() {
                       return item?.materials?.length > 0 ? (
                         <td className="relative">
                           {item.materials.map((material, j) => (
-                            <div className="mt-2.5" key={`material-${j}`}>
+                            <div
+                              className={cn("mt-2.5", j === 0 && "mt-0")}
+                              key={`material-${j}`}
+                            >
                               <ItemSelector
                                 key={`material-${j}`}
                                 type="MATERIAL"

@@ -21,6 +21,7 @@ export default function UserMessageBox({
   const [messages, setMessages] = useState<any[]>([]);
   const { data: session } = useSession();
 
+  // message from db
   useEffect(() => {
     const fetchMessages = async function () {
       const findUserMessage = await getUserMessagesById(
@@ -29,6 +30,7 @@ export default function UserMessageBox({
       const userMessages = findUserMessage.filter(
         (m) => m.from === user.id || m.to === user.id,
       );
+      console.log("userMessages", userMessages);
       setMessages(
         userMessages.map((m) => {
           return {
@@ -36,6 +38,7 @@ export default function UserMessageBox({
             // @ts-ignore
             sender: m.from === session?.user.id ? "USER" : "CLIENT",
             attachment: m.attachment,
+            requestEstimate: m.requestEstimate,
           };
         }),
       );
@@ -43,6 +46,7 @@ export default function UserMessageBox({
     fetchMessages();
   }, []);
 
+  // real-time message from pusher
   useEffect(() => {
     const channel = pusher
       .subscribe(`user-${user?.id}`)

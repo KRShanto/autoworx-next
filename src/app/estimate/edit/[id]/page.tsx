@@ -23,6 +23,7 @@ export default async function Page({
   params: { id: string };
   searchParams: { clientId?: string };
 }) {
+  const session = (await auth()) as AuthSession;
   const { id } = params;
   const invoice = await db.invoice.findUnique({
     where: { id },
@@ -32,6 +33,8 @@ export default async function Page({
   });
 
   if (!invoice) return notFound();
+  if (session.user.companyId === invoice.fromRequestedCompanyId)
+    return notFound();
 
   const vehicle = invoice.vehicleId
     ? await db.vehicle.findUnique({ where: { id: invoice.vehicleId } })
@@ -69,10 +72,7 @@ export default async function Page({
   const photos = await db.invoicePhoto.findMany({ where: { invoiceId: id } });
   const tasks = await db.task.findMany({ where: { invoiceId: id } });
 
-  const session = (await auth()) as AuthSession;
-  const companyId = invoice?.fromRequest
-    ? invoice.requestEstimate?.receiverCompanyId
-    : session.user.companyId;
+  const companyId = session.user.companyId;
   const customers = await db.client.findMany({ where: { companyId } });
   const vehicles = await db.vehicle.findMany({ where: { companyId } });
   const categories = await db.category.findMany({ where: { companyId } });

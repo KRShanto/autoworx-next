@@ -8,7 +8,7 @@ export default function UsersArea({
   selectedUsersList,
   setSelectedUsersList,
   totalMessageBoxLength,
-  companyName,
+  companyName
 }: {
   companyName: string | null;
   previousMessages: (Message & { attachment: Attachment | null })[];

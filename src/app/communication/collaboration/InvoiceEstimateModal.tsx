@@ -12,6 +12,7 @@ import { requestEstimate } from "@/actions/communication/collaboration/requestEs
 import { User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
+import toast from "react-hot-toast";
 
 type TProps = { receiverUser: User };
 
@@ -37,34 +38,19 @@ export default function InvoiceEstimateModal({ receiverUser }: TProps) {
   };
 
   const handleEstimateSubmit = async () => {
-    let photoPaths: string[] = [];
     try {
       // upload photos
+      const formDataForPhoto = new FormData();
       if (photos.length > 0) {
-        const formData = new FormData();
-
         photos.forEach((photo) => {
-          formData.append("photos", photo);
+          formDataForPhoto.append("photos", photo);
         });
-
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!res.ok) {
-          console.error("Failed to upload photos");
-          throw new Error("Failed to upload photos");
-        }
-
-        const json = await res.json();
-        const data = json.data;
-
-        photoPaths.push(...data);
       }
-      console.log({ photoPaths });
-      await requestEstimate({
-        photoPaths,
+
+      const {
+        status,
+        data: { message },
+      } = await requestEstimate(formDataForPhoto, {
         ...estimateInfo,
         year: parseInt(estimateInfo.year),
         receiverId: receiverUser.id,
@@ -73,11 +59,24 @@ export default function InvoiceEstimateModal({ receiverUser }: TProps) {
         senderCompanyId: (authUser as Session & { user: { companyId: number } })
           ?.user?.companyId,
       });
+      if (status === 200) {
+        setOpen(false);
+        setEstimateInfo({
+          model: "",
+          year: "",
+          make: "",
+          serviceRequest: "",
+          dueDate: "",
+          notes: "",
+        });
+        setPhotos([]);
+        setError("");
+        toast.success("Estimate requested successfully");
+      }
     } catch (err: any) {
       setError(err.message);
       console.error(err);
     }
-    console.log("Estimate submitted");
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -91,7 +90,7 @@ export default function InvoiceEstimateModal({ receiverUser }: TProps) {
         onSubmit={handleEstimateSubmit}
         className="overflow-y-auto"
       >
-        {/* {error && <p className="text-center text-sm text-red-400">{error}</p>} */}
+        {error && <p className="text-center text-sm text-red-400">{error}</p>}
         <h2 className="mb-5 text-2xl font-bold">Request an Invoice/Estimate</h2>
         <div className="flex flex-col justify-center space-y-4">
           <div className="grid grid-cols-2 gap-4">

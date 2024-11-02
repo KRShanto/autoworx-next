@@ -2,7 +2,7 @@ import React, { SetStateAction, useEffect, useState } from "react";
 import MessageBox from "../MessageBox";
 import { User } from "next-auth";
 import { pusher } from "@/lib/pusher/client";
-import { Attachment, Message as DbMessage, Group } from "@prisma/client";
+import { Attachment, Message as DbMessage, Group, RequestEstimate } from "@prisma/client";
 import { cn } from "@/lib/cn";
 import GroupMessageBox from "./GroupMessageBox";
 import UserMessageBox from "./UserMessageBox";
@@ -21,7 +21,8 @@ export interface Message {
   userId?: number;
   message: string;
   sender: "CLIENT" | "USER";
-  attachment: Attachment | null;
+  attachment?: Attachment | null;
+  requestEstimate?: RequestEstimate | null;
 }
 
 export default function UsersArea({
