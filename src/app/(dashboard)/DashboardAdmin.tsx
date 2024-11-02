@@ -22,20 +22,19 @@ const Dashboard = ({
   const { open } = usePopupStore();
 
   return (
-    <div className="p-8">
-      <Title>Dashboard</Title>
+
       <div className="flex items-start gap-x-2 xl:gap-x-8">
         {/* col 1 */}
-        <div className="w-[23%] space-y-12">
+        <div className="w-[23%] space-y-4">
           {/* sales pipeline */}
-          <div className="rounded-md p-4 shadow-lg xl:p-8">
+          <div className="rounded-md p-4 shadow-lg 2xl:px-6">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold">Sales Pipeline</span>{" "}
+              <span className="text-xl font-bold">Sales Pipeline</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
             </div>
-            <div className="#px-4">
+            <div className="space-y-3">
               <ChartData
                 heading="Leads coming in"
                 subHeading="/month"
@@ -50,14 +49,14 @@ const Dashboard = ({
             </div>
           </div>
           {/* Shop pipeline */}
-          <div className="rounded-md p-4 shadow-lg xl:p-8">
+          <div className="rounded-md p-4 shadow-lg 2xl:px-6">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold">Shop Pipeline</span>{" "}
+              <span className="text-xl font-bold">Shop Pipeline</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
             </div>
-            <div className="#px-4">
+            <div className="space-y-3">
               <ChartData
                 heading="Leads coming in"
                 subHeading="/month"
@@ -73,11 +72,11 @@ const Dashboard = ({
           </div>
         </div>
         {/* col 2 */}
-        <div className="w-[23%] space-y-12">
+        <div className="w-[23%] space-y-4">
           {/* Revenue */}
-          <div className="rounded-md p-4 shadow-lg xl:p-8">
+          <div className="rounded-md p-4 shadow-lg 2xl:px-6">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold">Revenue</span>{" "}
+              <span className="text-xl font-bold">Revenue</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -96,9 +95,9 @@ const Dashboard = ({
             </div>
           </div>
           {/* Inventory */}
-          <div className="rounded-md p-4 shadow-lg xl:p-8">
+          <div className="rounded-md p-4 shadow-lg 2xl:px-6">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold">Inventory</span>{" "}
+              <span className="text-xl font-bold">Inventory</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -117,9 +116,9 @@ const Dashboard = ({
             </div>
           </div>
           {/* Employee Payout */}
-          <div className="rounded-md p-4 shadow-lg xl:p-8">
+          <div className="rounded-md p-4 shadow-lg 2xl:px-6">
             <div className="mb-8 flex items-center justify-between">
-              <span className="text-2xl font-bold">Employee Payout</span>{" "}
+              <span className="text-xl font-bold">Employee Payout</span>{" "}
               <span>
                 <FaExternalLinkAlt />
               </span>
@@ -141,19 +140,19 @@ const Dashboard = ({
         </div>
 
         {/* col 3 */}
-        <div className="w-[23%] space-y-12">
+        <div className="w-[23%] space-y-4">
           {/* appointments */}
           <Appointments appointments={appointments} fullHeight />
         </div>
         {/* col 4*/}
-        <div className="w-[30%] space-y-12">
+        <div className="w-[30%] space-y-4">
           {/* task list */}
           <Tasks tasks={tasks} companyUsers={companyUsers} />
           {/* employee leave request */}
           <EmployeeLeaveRequests pendingLeaveRequests={pendingLeaveRequests} />
         </div>
       </div>
-    </div>
+
   );
 };
 

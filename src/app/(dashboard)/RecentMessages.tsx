@@ -3,9 +3,9 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 
 const RecentMessages = () => {
   return (
-    <div className="flex h-[82vh] flex-col rounded-md p-8 shadow-lg">
+    <div className="flex h-[82vh] flex-col rounded-md p-6 shadow-lg">
       <div className="mb-8 flex items-center justify-between">
-        <span className="text-2xl font-bold">Recent Messages</span>{" "}
+        <span className="text-xl font-bold">Recent Messages</span>{" "}
         <span>
           <FaExternalLinkAlt />
         </span>
