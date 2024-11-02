@@ -6,8 +6,10 @@ import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
 import { Priority } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
+import createGoogleCalendarEvent from "./google-calendar/createGoogleCalendarEvent";
 
-interface TaskType {
+export interface TaskType {
   title: string;
   description: string;
   assignedUsers: number[];
@@ -20,48 +22,77 @@ interface TaskType {
 }
 
 export async function createTask(task: TaskType): Promise<ServerAction> {
-  const session = (await auth()) as AuthSession;
+  try {
+    const session = (await auth()) as AuthSession;
 
-  const newTask = await db.task.create({
-    data: {
-      title: task.title,
-      description: task.description,
-      priority: task.priority,
-      userId: parseInt(session.user.id),
-      companyId: session.user.companyId,
-      invoiceId: task.invoiceId,
-      startTime: task.startTime,
-      endTime: task.endTime,
-      clientId: task.clientId,
-      date: task?.date ? task?.date : new Date().toISOString(),
-    },
-  });
-
-  // Loop the assigned users and add them to the Google Calendar
-  for (const user of task.assignedUsers) {
-    const assignedUser = await db.user.findUnique({
-      where: {
-        id: user,
-      },
-    });
-
-    // TODO: Add the task to the user's Google Calendar
-
-    // Create the task user
-    await db.taskUser.create({
+    let newTask = await db.task.create({
       data: {
-        taskId: newTask.id,
-        userId: user,
-        eventId: "null-for-now",
+        title: task.title,
+        description: task.description,
+        priority: task.priority,
+        userId: parseInt(session.user.id),
+        companyId: session.user.companyId,
+        invoiceId: task.invoiceId,
+        startTime: task.startTime,
+        endTime: task.endTime,
+        clientId: task.clientId,
+        date: task?.date ? task?.date : new Date().toISOString(),
       },
     });
+
+    // Loop the assigned users and add them to the Google Calendar
+    for (const user of task.assignedUsers) {
+      const assignedUser = await db.user.findUnique({
+        where: {
+          id: user,
+        },
+      });
+
+      // TODO: Add the task to the user's Google Calendar
+
+      // Create the task user
+      await db.taskUser.create({
+        data: {
+          taskId: newTask.id,
+          userId: user,
+          eventId: "null-for-now",
+        },
+      });
+    }
+
+    revalidatePath("/task");
+    revalidatePath("/communication/client");
+
+    // if the task has date, start time and end time, then insert it in google calendar
+    // also need to check if google calendar token exists or not, if not, then no need of inserting
+    const cookie = await cookies();
+    let googleCalendarToken = cookie.get("googleCalendarToken")?.value;
+
+    if (googleCalendarToken && task.startTime && task.endTime && task.date) {
+      let event = await createGoogleCalendarEvent(task);
+
+      // if event is successfully created in google calendar, then save the event id in task model
+      if (event && event.id) {
+        newTask = await db.task.update({
+          where: {
+            id: newTask.id,
+          },
+          data: {
+            googleEventId: event.id,
+          },
+        });
+      }
+    }
+
+    return {
+      type: "success",
+      data: newTask,
+    };
+  } catch (error) {
+    console.log("Error while creating new task", error);
+
+    return {
+      type: "error",
+    };
   }
-
-  revalidatePath("/task");
-  revalidatePath("/communication/client");
-
-  return {
-    type: "success",
-    data: newTask,
-  };
 }

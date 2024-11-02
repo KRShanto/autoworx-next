@@ -40,9 +40,11 @@ export function SelectTags({
   const [open, setOpen] = openStates || useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
+
   useOutsideClick(() => {
     setOpen(false);
   });
+
   useEffect(() => {
     if (type) {
       if (
@@ -55,6 +57,7 @@ export function SelectTags({
       }
     }
   }, [dropdownsOpen]);
+
   return (
     <div>
       <input
@@ -109,17 +112,11 @@ export function SelectTags({
                 });
               } else {
                 setDropdownsOpen({
-                  SERVICE: type === "SERVICE" ? [...index] : [-1,-1],
-                  MATERIAL: type === "MATERIAL" ? [...index] : [-1,-1],
-                  LABOR: type === "LABOR" ? [...index] : [-1,-1],
-                  TAG: type === "TAG" ? [...index] : [-1,-1],
+                  SERVICE: type === "SERVICE" ? [...index] : [-1, -1],
+                  MATERIAL: type === "MATERIAL" ? [...index] : [-1, -1],
+                  LABOR: type === "LABOR" ? [...index] : [-1, -1],
+                  TAG: type === "TAG" ? [...index] : [-1, -1],
                 });
-                // setDropdownsOpen({
-                //   SERVICE: type === "SERVICE" ? [...index] : -1,
-                //   MATERIAL: type === "MATERIAL" ? [...index] : -1,
-                //   LABOR: type === "LABOR" ? [...index] : -1,
-                //   TAG: type === "TAG" ? [...index] : -1,
-                // });
               }
             }
           }}
@@ -153,7 +150,16 @@ export function SelectTags({
               .map((tag) => (
                 <DropdownMenuItem
                   key={tag.id}
-                  onClick={() => setTags((tags) => [...tags, tag])}
+                  onClick={() => {
+                    setTags((tags) => [...tags, tag]);
+                    setDropdownsOpen && setDropdownsOpen({
+                      SERVICE: [-1, -1],
+                      MATERIAL: [-1, -1],
+                      LABOR: [-1, -1],
+                      TAG: [-1, -1],
+                    });
+                    setOpen(false);
+                  }}
                   className="mx-4 cursor-pointer"
                   style={{
                     backgroundColor: tag.bgColor,

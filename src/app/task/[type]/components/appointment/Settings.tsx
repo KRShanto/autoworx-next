@@ -1,17 +1,18 @@
-import React, { useState } from "react";
-import { updateCalendarSettings } from "../../../../../actions/appointment/updateCalendarSettings";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
-  DialogClose,
 } from "@/components/Dialog";
-import { CalendarSettings } from "@prisma/client";
-import { GoGear } from "react-icons/go";
 import Submit from "@/components/Submit";
+import { CalendarSettings } from "@prisma/client";
+import React, { useState } from "react";
+import { GoGear } from "react-icons/go";
+import { updateCalendarSettings } from "../../../../../actions/appointment/updateCalendarSettings";
+import ConnectGoogle from "./ConnectGoogle";
 
 const week = [
   "Saturday",
@@ -159,12 +160,7 @@ export default function Settings({
             <div className="h-36 rounded-md bg-[#FAFAFA] p-3">
               <div className="flex justify-between">
                 <p className="font-semibold">Google Calendar Api</p>
-                <button
-                  className="rounded-md border-2 border-slate-400 p-1"
-                  type="button"
-                >
-                  Connect
-                </button>
+                <ConnectGoogle />
               </div>
             </div>
 
