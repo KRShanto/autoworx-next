@@ -62,6 +62,7 @@ model Company {
     LeaveRequest            LeaveRequest[]
     RequestEstimateSent     RequestEstimate[]         @relation("SenderCompany")
     RequestEstimateReceived RequestEstimate[]         @relation("ReceiverCompany")
+    Column                  Column[]
 }
 
 // create model that will handle multiple companies join and collaboration

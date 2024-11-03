@@ -44,8 +44,14 @@ enum Priority {
 }
 
 model Column {
-    id    Int    @id @default(autoincrement())
-    title String
-    type  String // "sales" or "shop"
-    order Int
+    id        Int     @id @default(autoincrement())
+    title     String
+    type      String // "sales" or "shop"
+    order     Int
+    textColor String?
+    bgColor   String?
+    companyId Int     @map("company_id")
+
+    company  Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    invoices Invoice[]
 }

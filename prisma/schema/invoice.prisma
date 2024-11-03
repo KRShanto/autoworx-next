@@ -29,6 +29,7 @@ model Invoice {
     fromRequest             Boolean?                  @default(false) @map("from_request")
     fromRequestedCompanyId  Int?                      @map("from_requested_company_id")
     requestEstimateId       Int?                      @unique @map("request_estimate_id")
+    columnId                Int?                      @map("column_id")
     company                 Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
     invoiceItems            InvoiceItem[]
     photos                  InvoicePhoto[]
@@ -44,6 +45,7 @@ model Invoice {
     tags                    InvoiceTags[]
     requestEstimate         RequestEstimate?          @relation(fields: [requestEstimateId], onDelete: SetNull, references: [id])
     assignedTo              User?                     @relation(name: "assignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
+    column                  Column?                   @relation(fields: [columnId], references: [id], onDelete: SetNull)
 
     @@index([companyId], name: "fk_invoices_company")
 }
