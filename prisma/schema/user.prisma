@@ -1,0 +1,176 @@
+// User model.
+// User can be employee or admin.
+// When user registers, they have to create a company. So, every new user is an admin.
+// After that, they can add employees to the company.
+model User {
+    id                Int               @id @default(autoincrement())
+    firstName         String
+    lastName          String?
+    email             String            @unique
+    emailVerifiedAt   DateTime?         @map("email_verified_at")
+    image             String            @default("/images/default.png")
+    password          String
+    provider          Provider          @default(email)
+    timezone          String            @default("UTC")
+    phone             String?
+    address           String?
+    city              String?
+    state             String?
+    zip               String?
+    companyName       String?           @map("company_name")
+    commission        Decimal?          @default(0) @db.Decimal(10, 3)
+    role              Role              @default(admin)
+    employeeType      EmployeeType      @default(Admin)
+    joinDate          DateTime?         @map("join_date")
+    companyId         Int               @map("company_id")
+    createdAt         DateTime          @default(now()) @map("created_at")
+    updatedAt         DateTime          @default(now()) @updatedAt @map("updated_at")
+    company           Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    groups            Group[]           @relation("UserGroups")
+    tasks             Task[]
+    taskUsers         TaskUser[]
+    appointments      Appointment[]
+    appointmentUsers  AppointmentUser[]
+    invoices          Invoice[]         @relation("user")
+    Technician        Technician[]
+    permissions       Permission[]
+    assignedInvoices  Invoice[]         @relation("assignedTo")
+    LeaveRequest      LeaveRequest[]
+    sentEstimates     RequestEstimate[] @relation("Sender")
+    receivedEstimates RequestEstimate[] @relation("Receiver")
+    OAuthToken        OAuthToken?
+
+    @@index([companyId], name: "fk_users_company")
+}
+
+// OAuth token for user.
+// This is mainly used for google calendar integration.
+model OAuthToken {
+    id           Int       @id @default(autoincrement())
+    userId       Int       @unique @map("user_id")
+    provider     String
+    accessToken  String    @map("access_token")
+    refreshToken String?   @map("refresh_token")
+    expiresIn    DateTime? @map("expires_in")
+    createdAt    DateTime  @default(now()) @map("created_at")
+    updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at")
+    user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId], name: "fk_oauth_tokens_user")
+}
+
+enum Provider {
+    google
+    apple
+    email
+}
+
+enum Role {
+    admin
+    employee
+}
+
+enum EmployeeType {
+    Admin
+    Manager
+    Sales
+    Technician
+    Other
+}
+
+model PermissionForManager {
+    id                            Int     @id @default(autoincrement())
+    companyId                     Int     @map("company_id")
+    communicationHubInternal      Boolean @default(true) @map("communication_hub_internal")
+    communicationHubClients       Boolean @default(true) @map("communication_hub_clients")
+    communicationHubCollaboration Boolean @default(true) @map("communication_hub_collaboration")
+    estimatesInvoices             Boolean @default(true) @map("estimates_invoices")
+    calendarTask                  Boolean @default(true) @map("calendar_task")
+    payments                      Boolean @default(true)
+    workforceManagement           Boolean @default(true) @map("workforce_management")
+    reporting                     Boolean @default(true)
+    inventory                     Boolean @default(true)
+    integrations                  Boolean @default(false)
+    salesPipeline                 Boolean @default(true) @map("sales_pipeline")
+    shopPipeline                  Boolean @default(true) @map("shop_pipeline")
+    businessSettings              Boolean @default(false) @map("business_settings")
+
+    company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model PermissionForSales {
+    id                            Int     @id @default(autoincrement())
+    companyId                     Int     @map("company_id")
+    communicationHubInternal      Boolean @default(true) @map("communication_hub_internal")
+    communicationHubClients       Boolean @default(true) @map("communication_hub_clients")
+    communicationHubCollaboration Boolean @default(true) @map("communication_hub_collaboration")
+    estimatesInvoices             Boolean @default(true) @map("estimates_invoices")
+    calendarTask                  Boolean @default(true) @map("calendar_task")
+    payments                      Boolean @default(false)
+    salesPipeline                 Boolean @default(true) @map("sales_pipeline")
+
+    //view only
+    workforceManagementViewOnly Boolean @default(true) @map("workforce_management")
+    reportingViewOnly           Boolean @default(true)
+    inventoryViewOnly           Boolean @default(true)
+
+    company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model PermissionForTechnician {
+    id                       Int     @id @default(autoincrement())
+    companyId                Int     @map("company_id")
+    communicationHubInternal Boolean @default(true) @map("communication_hub_internal")
+    calendarTask             Boolean @default(true) @map("calendar_task")
+    shopPipeline             Boolean @default(true) @map("shop_pipeline")
+
+    //view only
+    workforceManagementViewOnly Boolean @default(true) @map("workforce_management")
+    reportingViewOnly           Boolean @default(true)
+
+    company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model PermissionForOther {
+    id                            Int     @id @default(autoincrement())
+    companyId                     Int     @map("company_id")
+    communicationHubInternal      Boolean @default(false) @map("communication_hub_internal")
+    communicationHubClients       Boolean @default(false) @map("communication_hub_clients")
+    communicationHubCollaboration Boolean @default(false) @map("communication_hub_collaboration")
+    estimatesInvoices             Boolean @default(false) @map("estimates_invoices")
+    calendarTask                  Boolean @default(false) @map("calendar_task")
+    payments                      Boolean @default(false)
+    workforceManagement           Boolean @default(false) @map("workforce_management")
+    reporting                     Boolean @default(false)
+    inventory                     Boolean @default(false)
+    integrations                  Boolean @default(false)
+    salesPipeline                 Boolean @default(false) @map("sales_pipeline")
+    shopPipeline                  Boolean @default(false) @map("shop_pipeline")
+    businessSettings              Boolean @default(false) @map("business_settings")
+
+    company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model Permission {
+    id                            Int     @id @default(autoincrement())
+    userId                        Int     @map("user_id")
+    companyId                     Int     @map("company_id")
+    communicationHubInternal      Boolean @default(false) @map("communication_hub_internal")
+    communicationHubClients       Boolean @default(false) @map("communication_hub_clients")
+    communicationHubCollaboration Boolean @default(false) @map("communication_hub_collaboration")
+    estimatesInvoices             Boolean @default(false) @map("estimates_invoices")
+    calendarTask                  Boolean @default(false) @map("calendar_task")
+    payments                      Boolean @default(false)
+    workforceManagement           Boolean @default(false) @map("workforce_management")
+    reporting                     Boolean @default(false)
+    inventory                     Boolean @default(false)
+    integrations                  Boolean @default(false)
+    salesPipeline                 Boolean @default(false) @map("sales_pipeline")
+    shopPipeline                  Boolean @default(false) @map("shop_pipeline")
+    businessSettings              Boolean @default(false) @map("business_settings")
+
+    user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, companyId])
+}

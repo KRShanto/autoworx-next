@@ -1,0 +1,39 @@
+// Vehicle of a company.
+model Vehicle {
+    id                     Int      @id @default(autoincrement())
+    year                   Int?
+    make                   String?
+    model                  String?
+    submodel               String?
+    type                   String?
+    transmission           String?
+    engineSize             String?
+    license                String?
+    vin                    String?
+    notes                  String?
+    fromRequest            Boolean? @default(false) @map("from_request")
+    fromRequestedCompanyId Int?     @map("from_requested_company_id")
+
+    colorId      Int?          @map("color_id")
+    clientId     Int?          @map("customer_id")
+    companyId    Int           @map("company_id")
+    createdAt    DateTime      @default(now()) @map("created_at")
+    updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
+    company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    appointments Appointment[]
+    color        VehicleColor? @relation(fields: [colorId], references: [id], onDelete: SetNull)
+    client       Client?       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+    invoices     Invoice[]
+
+    @@index([companyId], name: "fk_vehicles_company")
+}
+
+model VehicleColor {
+    id        Int       @id @default(autoincrement())
+    name      String
+    companyId Int       @map("company_id")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+    Vehicle   Vehicle[]
+    company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
