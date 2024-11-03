@@ -6,6 +6,11 @@ import { getTechnicians } from "../../../../../actions/estimate/technician/getTe
 import { deleteTechnician } from "../../../../../actions/estimate/technician/deleteTechnician";
 import CreateAndEditLabor from "./CreateAndEditLabor";
 
+// type TProps = {
+//   technicians: (Technician & { name: string })[];
+//   setTechnicians: Dispatc<SetStateAction<(Technician & { name: string })[]>>;
+// };
+
 export default function LaborItems({
   invoiceId,
   serviceId,

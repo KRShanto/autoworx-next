@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useState, useEffect } from "react";
 
 type UseServerGetResult<T> = {
@@ -41,7 +41,7 @@ export function useServerGet<T>(
     return () => {
       isMounted = false;
     };
-  }, [fn, ...args]); // Add `args` to the dependency array
+  }, [...args]); // Add `args` to the dependency array
 
   return { data, loading, error };
 }
