@@ -191,7 +191,7 @@ export default function InvoiceEstimateModal({
           <button
             disabled={pending}
             type="submit"
-            className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white disabled:bg-gray-500"
+            className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white disabled:bg-blue-500"
           >
             {pending ? (
               <RotatingLines strokeColor="#fff" strokeWidth="5" width="25" />
