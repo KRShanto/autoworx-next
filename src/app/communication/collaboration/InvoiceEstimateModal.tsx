@@ -15,6 +15,7 @@ import { Session } from "next-auth";
 import toast from "react-hot-toast";
 import { Message as TMessage } from "../internal/UsersArea";
 import { sendType } from "@/types/Chat";
+import { RotatingLines } from "react-loader-spinner";
 
 type TProps = {
   receiverUser: User;
@@ -117,6 +118,7 @@ export default function InvoiceEstimateModal({
         throw new Error("Failed to request estimate");
       }
     } catch (err: any) {
+      toast.error("Failed to request estimate");
       setError(err.message);
       console.error(err);
     }
@@ -177,7 +179,7 @@ export default function InvoiceEstimateModal({
                 name="notes"
                 id="notes"
                 className="h-[93px] w-full resize-none rounded-md border border-gray-500 px-2 focus:outline-none"
-              ></textarea>
+              />
             </label>
           </div>
         </div>
@@ -189,9 +191,13 @@ export default function InvoiceEstimateModal({
           <button
             disabled={pending}
             type="submit"
-            className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
+            className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white disabled:bg-gray-500"
           >
-            Add
+            {pending ? (
+              <RotatingLines strokeColor="#fff" strokeWidth="5" width="25" />
+            ) : (
+              "Add"
+            )}
           </button>
         </DialogFooter>
       </DialogContent>
