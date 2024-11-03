@@ -63,6 +63,7 @@ model Company {
     RequestEstimateSent     RequestEstimate[]         @relation("SenderCompany")
     RequestEstimateReceived RequestEstimate[]         @relation("ReceiverCompany")
     Column                  Column[]
+    ClockInOut              ClockInOut[]
 }
 
 // create model that will handle multiple companies join and collaboration

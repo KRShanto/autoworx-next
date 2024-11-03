@@ -39,6 +39,7 @@ model User {
     sentEstimates     RequestEstimate[] @relation("Sender")
     receivedEstimates RequestEstimate[] @relation("Receiver")
     OAuthToken        OAuthToken?
+    ClockInOut        ClockInOut[]
 
     @@index([companyId], name: "fk_users_company")
 }
@@ -173,4 +174,35 @@ model Permission {
     company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
     @@unique([userId, companyId])
+}
+
+model ClockInOut {
+    id        Int       @id @default(autoincrement())
+    userId    Int       @map("user_id")
+    companyId Int       @map("company_id")
+    clockIn   DateTime  @map("clock_in")
+    clockOut  DateTime? @map("clock_out")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+
+    user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    company    Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    ClockBreak ClockBreak[]
+
+    @@index([userId], name: "fk_clock_in_out_user")
+    @@index([companyId], name: "fk_clock_in_out_company")
+}
+
+// breaks model ofr clockinout
+model ClockBreak {
+    id           Int      @id @default(autoincrement())
+    clockInOutId Int      @map("clock_in_out_id")
+    breakStart   DateTime @map("break_start")
+    breakEnd     DateTime @map("break_end")
+    createdAt    DateTime @default(now()) @map("created_at")
+    updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+    clockInOut ClockInOut @relation(fields: [clockInOutId], references: [id], onDelete: Cascade)
+
+    @@index([clockInOutId], name: "fk_clock_break_clock_in_out")
 }
