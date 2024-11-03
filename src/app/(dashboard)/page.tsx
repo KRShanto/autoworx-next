@@ -1,3 +1,4 @@
+import { getLastClockInOutForUser } from "@/actions/dashboard/clockIn";
 import { db } from "@/lib/db";
 import getUser from "@/lib/getUser";
 import { AuthSession } from "@/types/auth";
@@ -35,7 +36,7 @@ export default async function Page() {
       user: true,
     },
     orderBy: {
-      createdAt: 'desc',
+      createdAt: "desc",
     },
   });
 
@@ -115,11 +116,14 @@ export default async function Page() {
       />
     );
   } else if (user.employeeType === "Technician") {
+    let lastClockInOut = await getLastClockInOutForUser();
+    console.log("🚀 ~ Page ~ lastClockInOut:", lastClockInOut);
     return (
       <DashboardTechnician
         tasks={tasks}
         companyUsers={companyUsers}
         appointments={calendarAppointments}
+        lastClockInOut={lastClockInOut}
       />
     );
   } else if (user.employeeType === "Other") {
