@@ -4,12 +4,9 @@ import {
   DialogContent,
   DialogContentBlank,
   DialogFooter,
-  DialogOverlay,
-  DialogPortal,
 } from "@/components/Dialog";
 import { Dialog } from "@/components/Dialog";
 import { useState } from "react";
-import { HiXMark } from "react-icons/hi2";
 
 export default function ReDoModal() {
   const [open, setOpen] = useState(false);

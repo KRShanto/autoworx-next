@@ -9,7 +9,6 @@ import { customAlphabet } from "nanoid";
 import { useEffect, useState } from "react";
 import { CreateEstimateActionsButtons } from "./CreateEstimateActionButtons";
 
-
 export default function Header({
   id,
   vehicle,
@@ -26,10 +25,12 @@ export default function Header({
   const [clientOpenDropdown, setClientOpenDropdown] = useState(false);
   const [vehicleOpenDropdown, setVehicleOpenDropdown] = useState(false);
   const [statusOpenDropdown, setStatusOpenDropdown] = useState(false);
-  
+
   useEffect(() => {
     if (!id) setInvoiceId(customAlphabet("1234567890", 10)());
   }, [id]);
+
+  console.log({ vehicle, client });
 
   useEffect(() => {
     if (clientOpenDropdown && (vehicleOpenDropdown || statusOpenDropdown)) {

@@ -65,7 +65,7 @@ export const requestEstimate = async (
         make: requestEstimateData.make,
         year: requestEstimateData.year,
         companyId: requestEstimateData.receiverId,
-        clientId: client.id,
+        clientId: client?.id,
         fromRequest: true,
         fromRequestedCompanyId: requestEstimateData.senderCompanyId,
       };
