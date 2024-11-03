@@ -184,6 +184,7 @@ export function NewAppointment({
       confirmationEmailTemplateStatus: confirmationTemplateStatus,
       reminderEmailTemplateStatus: reminderTemplateStatus,
       times,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
 
     if (res.type === "error") {

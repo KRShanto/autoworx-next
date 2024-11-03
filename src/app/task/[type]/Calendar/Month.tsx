@@ -160,6 +160,7 @@ export default function Month({
           date: new Date(date),
           startTime,
           endTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       }
     } else {
@@ -180,6 +181,7 @@ export default function Month({
           date,
           startTime,
           endTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       }
     }

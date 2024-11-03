@@ -21,6 +21,7 @@ interface TaskType {
   startTime?: string;
   endTime?: string;
   date?: string;
+  timezone: string;
 }
 
 export async function editTask({

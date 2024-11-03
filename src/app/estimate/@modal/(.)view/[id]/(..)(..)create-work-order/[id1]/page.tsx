@@ -25,7 +25,7 @@ export default async function CreateWorkOrder({
       },
       photos: true,
       tasks: true,
-      status: true,
+      column: true,
       user: true,
     },
   });
@@ -94,11 +94,11 @@ export default async function CreateWorkOrder({
               <p
                 className="max-w-32 rounded-md px-2 py-[1px] text-xs font-semibold"
                 style={{
-                  color: invoice.status?.textColor,
-                  backgroundColor: invoice.status?.bgColor,
+                  color: invoice.column?.textColor||undefined,
+                  backgroundColor: invoice.column?.bgColor||undefined,
                 }}
               >
-                {invoice.status?.name}
+                {invoice.column?.title}
               </p>
             </div>
           </div>

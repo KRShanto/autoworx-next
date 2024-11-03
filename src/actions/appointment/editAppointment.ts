@@ -24,6 +24,7 @@ export interface AppointmentToUpdate {
   confirmationEmailTemplateStatus?: boolean;
   reminderEmailTemplateStatus?: boolean;
   times?: { date: string; time: string }[];
+  timezone?: string;
 }
 
 export async function editAppointment({
@@ -113,7 +114,7 @@ export async function editAppointment({
 
     revalidatePath("/task");
 
-    // if the task has date, start time and end time, then insert it in google calendar
+    // if the appointment has date, start time and end time, then insert it in google calendar
     // also need to check if google calendar token exists or not, if not, then no need of inserting
     const cookie = await cookies();
     let googleCalendarToken = cookie.get("googleCalendarToken")?.value;

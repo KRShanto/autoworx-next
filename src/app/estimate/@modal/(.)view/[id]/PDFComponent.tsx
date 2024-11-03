@@ -1,5 +1,6 @@
 "use client";
 import {
+  Column,
   Company,
   Invoice,
   InvoiceItem,
@@ -128,7 +129,6 @@ Font.register({
   fontWeight: 800,
   fontStyle: "italic",
 });
-
 
 // Create styles
 const styles = StyleSheet.create({
@@ -270,7 +270,7 @@ const PDFComponent = ({
   id: string;
   clientId: any;
   invoice: Invoice & {
-    status: Status | null;
+    column: Column | null;
     company: Company;
     invoiceItems: (InvoiceItem & {
       materials: Material[] | [];
@@ -341,7 +341,7 @@ const PDFComponent = ({
                 {moment(invoice.createdAt).format("MMM DD, YYYY")}
               </Text>
               <Text>Bill Status</Text>
-              <Text style={styles.fontSize10}>{invoice.status?.name}</Text>
+              <Text style={styles.fontSize10}>{invoice.column?.title}</Text>
             </View>
             <View style={styles.totalContainer}>
               {[

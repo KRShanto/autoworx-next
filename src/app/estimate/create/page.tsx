@@ -28,7 +28,7 @@ export default async function Page({
   const services = await db.service.findMany({ where: { companyId } });
   const tags = await db.tag.findMany({ where: { companyId } });
   const vendors = await db.vendor.findMany({ where: { companyId } });
-  const statuses = await db.status.findMany({ where: { companyId } });
+  const statuses = await db.column.findMany({ where: { companyId } });
   const paymentMethods = await db.paymentMethod.findMany({
     where: { companyId },
   });
@@ -93,7 +93,7 @@ export default async function Page({
         labors={labors}
         tags={tags}
         vendors={vendors}
-        statuses={statuses}
+        // statuses={statuses}
         paymentMethods={paymentMethods}
       />
       <div>

@@ -30,6 +30,7 @@ export function useInvoiceCreate(type: InvoiceType) {
     reset: resetEstimateCreate,
   } = useEstimateCreateStore();
   const { client, vehicle, status, reset: resetLists } = useListsStore();
+  console.log("The status from  the lists store is:", status);
 
   const pathaname = usePathname();
 
@@ -37,7 +38,7 @@ export function useInvoiceCreate(type: InvoiceType) {
     let photoPaths = [];
     const clientId = client?.id;
     const vehicleId = vehicle?.id;
-    const statusId = status?.id;
+    const columnId = status?.id;
     const isEditPage = pathaname.includes("/estimate/edit/");
 
     // upload photos
@@ -69,7 +70,8 @@ export function useInvoiceCreate(type: InvoiceType) {
         id: invoiceId,
         clientId: clientId ? clientId : undefined,
         vehicleId: vehicleId ? vehicleId : undefined,
-        statusId: statusId ? statusId : undefined,
+
+        columnId: columnId ? columnId : undefined,
         subtotal,
         discount,
         tax,
@@ -93,7 +95,8 @@ export function useInvoiceCreate(type: InvoiceType) {
         type,
         clientId: clientId ? +clientId : undefined,
         vehicleId: vehicleId ? +vehicleId : undefined,
-        statusId: statusId ? +statusId : undefined,
+
+        columnId: columnId ? +columnId : undefined,
         subtotal,
         discount,
         tax,

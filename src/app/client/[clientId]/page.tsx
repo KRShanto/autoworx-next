@@ -39,7 +39,7 @@ const Page = async (props: Props) => {
             where: {
               type: "Invoice",
             },
-            include: { status: true },
+            include: { column: true },
           },
         },
       })

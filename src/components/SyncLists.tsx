@@ -16,6 +16,7 @@ import type {
   Status,
   PaymentMethod,
   Invoice,
+  Column,
 } from "@prisma/client";
 import { useEffect } from "react";
 
@@ -44,7 +45,7 @@ export function SyncLists({
   labors?: Labor[];
   tags?: Tag[];
   vendors?: Vendor[];
-  statuses?: Status[];
+  statuses?: Column[];
   paymentMethods?: PaymentMethod[];
   estimates?: Invoice[];
 }) {

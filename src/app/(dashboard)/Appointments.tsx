@@ -4,10 +4,10 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 const Appointments = ({ appointments, fullHeight }: any) => {
   return (
     <div
-      className={`flex ${fullHeight ? "h-[82vh]" : "h-[38vh]"} flex-col rounded-md p-8 shadow-lg`}
+      className={`flex ${fullHeight ? "h-[82vh]" : "h-[38vh]"} flex-col rounded-md p-6 shadow-lg`}
     >
       <div className="mb-8 flex items-center justify-between">
-        <span className="text-2xl font-bold">Appointments</span>{" "}
+        <span className="text-xl font-bold">Appointments</span>{" "}
         <span>
           <FaExternalLinkAlt />
         </span>
