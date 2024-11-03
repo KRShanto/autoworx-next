@@ -46,6 +46,7 @@ model Invoice {
     requestEstimate         RequestEstimate?          @relation(fields: [requestEstimateId], onDelete: SetNull, references: [id])
     assignedTo              User?                     @relation(name: "assignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
     column                  Column?                   @relation(fields: [columnId], references: [id], onDelete: SetNull)
+    InvoiceRedo             InvoiceRedo[]
 
     @@index([companyId], name: "fk_invoices_company")
 }
@@ -133,8 +134,23 @@ model Technician {
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-    user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    service Service? @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-    invoice Invoice? @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-    company Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    service     Service?      @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+    invoice     Invoice?      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+    company     Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    InvoiceRedo InvoiceRedo[]
+}
+
+model InvoiceRedo {
+    id           Int      @id @default(autoincrement())
+    invoiceId    String   @map("invoice_id")
+    serviceId    Int      @map("service_id")
+    technicianId Int      @map("technician_id")
+    notes        String?
+    createdAt    DateTime @default(now()) @map("created_at")
+    updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+    invoice    Invoice    @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+    service    Service    @relation(fields: [serviceId], references: [id])
+    technician Technician @relation(fields: [technicianId], references: [id])
 }
