@@ -35,8 +35,8 @@ export default function LaborItems({
         setError(err.message);
       }
     };
-    fetchTechnicians();
-  }, []);
+    fetchTechnicians(); 
+  }, [invoiceId, serviceId]);
 
   const handleTechnicianDelete = async (technicianId: number) => {
     try {

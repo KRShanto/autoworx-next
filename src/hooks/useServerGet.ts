@@ -5,6 +5,9 @@ type UseServerGetResult<T> = {
   data: T | null;
   loading: boolean;
   error: Error | null;
+  setData: React.Dispatch<React.SetStateAction<T | null>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setError: React.Dispatch<React.SetStateAction<Error | null>>;
 };
 
 export function useServerGet<T>(
@@ -43,5 +46,5 @@ export function useServerGet<T>(
     };
   }, [...args]); // Add `args` to the dependency array
 
-  return { data, loading, error };
+  return { data, loading, error, setData, setLoading, setError };
 }
