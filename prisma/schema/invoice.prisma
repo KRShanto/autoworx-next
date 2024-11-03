@@ -83,36 +83,24 @@ model InvoicePhoto {
 }
 
 model RequestEstimate {
-    id                Int                         @id @default(autoincrement())
-    senderId          Int                         @map("sender_id")
-    senderCompanyId   Int                         @map("sender_company_id")
-    receiverId        Int                         @map("receiver_id")
-    receiverCompanyId Int                         @map("receiver_company_id")
-    vehicleYear       String                      @map("vehicle_year")
-    vehicleMake       String                      @map("vehicle_make")
-    vehicleModel      String                      @map("vehicle_model")
-    service           String
-    due               DateTime
-    notes             String?
-    createdAt         DateTime                    @default(now()) @map("created_at")
-    updatedAt         DateTime                    @default(now()) @updatedAt @map("updated_at")
-    sender            User                        @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
-    receiver          User                        @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
-    senderCompany     Company                     @relation("SenderCompany", fields: [senderCompanyId], references: [id], onDelete: Cascade)
-    receiverCompany   Company                     @relation("ReceiverCompany", fields: [receiverCompanyId], references: [id], onDelete: Cascade)
-    attachments       RequestEstimateAttachment[]
-    invoice           Invoice?
-}
-
-model RequestEstimateAttachment {
-    id        Int             @id @default(autoincrement())
-    fileName  String
-    fileType  String
-    fileUrl   String
-    requestId Int             @map("request_id")
-    createdAt DateTime        @default(now())
-    updatedAt DateTime        @default(now()) @updatedAt @map("updated_at")
-    request   RequestEstimate @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  id                Int                         @id @default(autoincrement())
+  senderId          Int                         @map("sender_id")
+  senderCompanyId   Int                         @map("sender_company_id")
+  receiverId        Int                         @map("receiver_id")
+  receiverCompanyId Int                         @map("receiver_company_id")
+  vehicleId          Int                         @map("vehicle_id")@unique
+  serviceId          Int                        @map("service_id")@unique
+  invoiceId           String                    @map("invoice_id")
+  createdAt         DateTime                    @default(now()) @map("created_at")
+  updatedAt         DateTime                    @default(now()) @updatedAt @map("updated_at")
+  sender            User                        @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver          User                        @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  senderCompany     Company                     @relation("SenderCompany", fields: [senderCompanyId], references: [id], onDelete: Cascade)
+  receiverCompany   Company                     @relation("ReceiverCompany", fields: [receiverCompanyId], references: [id], onDelete: Cascade)
+  invoice           Invoice?
+  vehicle          Vehicle?                    @relation("Vehicle", fields: [vehicleId], references: [id], onDelete: Cascade)
+  service           Service?                    @relation("Service", fields: [serviceId], references: [id], onDelete: Cascade)
+  message           Message?                     @relation("Message")
 }
 
 // Technician of a InvoiceItem.

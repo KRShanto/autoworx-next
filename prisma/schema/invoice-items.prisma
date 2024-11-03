@@ -42,6 +42,7 @@ model Service {
     category               Category?     @relation(fields: [categoryId], references: [id])
     invoiceItems           InvoiceItem[]
     Technician             Technician[]
+    requestEstimate RequestEstimate? @relation("Service")
     InvoiceRedo            InvoiceRedo[]
 
     @@index([companyId], name: "fk_services_company")

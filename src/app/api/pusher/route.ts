@@ -10,9 +10,7 @@ type TMessageDate = {
   to?: number;
   groupId?: number;
   message: string;
-  fileName?: string;
-  fileType?: string;
-  fileUrl?: string;
+  requestEstimateId?: number;
 };
 
 const pusher = getPusherInstance();
@@ -20,24 +18,26 @@ const pusher = getPusherInstance();
 // POST /api/pusher/trigger
 // Trigger a message to the client
 // Body: { message, roomId }
-export async function POST(req: Request, res: Response) {
-  const session = (await auth()) as AuthSession | null;
-  if (!session) return new Response("Unauthorized", { status: 401 });
-
-  const userId = parseInt(session.user.id);
+export async function POST(req: Request) {
   const body = await req.json();
-  const { to, message, type, attachmentFile } = body;
-  if (!to || (!message && !attachmentFile)) {
-    return new Response("Missing to or message", { status: 400 });
-  }
-  
+  const { to, message, type, attachmentFile, requestEstimate } = body;
   try {
+    const session = (await auth()) as AuthSession | null;
+    if (!session) throw new Error("Unauthorized");
+    const userId = parseInt(session.user.id);
+    if (!to || (!message && !attachmentFile && !requestEstimate)) {
+      throw new Error("Missing some argument for message");
+    }
     let channel = `user-${userId}`;
+    console.log({ requestEstimate });
     let messageData: TMessageDate = {
       from: userId,
       to,
       message,
+      requestEstimateId: requestEstimate ? requestEstimate?.id : null,
     };
+    console.log({ messageData });
+    // send a message for group
     if (type === sendType.Group) {
       const isUserInExistGroup = await db.group.findFirst({
         where: {
@@ -76,6 +76,7 @@ export async function POST(req: Request, res: Response) {
             fileSize: `${(attachmentFile?.fileSize / 1024 / 1024).toPrecision(2)} MB`,
           }
         : null,
+      requestEstimate: requestEstimate ? requestEstimate : null,
     });
     // Save to the database
     const createdMessage = await db.message.create({
@@ -104,7 +105,8 @@ export async function POST(req: Request, res: Response) {
         newMessage: createdMessage,
       }),
     );
-  } catch (e) {
+  } catch (e: any) {
+    console.log({ error: e.message });
     console.error(e);
     return new Response(
       JSON.stringify({ message: "Failed to send message", success: false }),
