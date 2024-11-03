@@ -1,10 +1,9 @@
 "use client";
-import Title from "@/components/Title";
 import { usePopupStore } from "@/stores/popup";
-import { ClockInOut, Task as TaskType, User } from "@prisma/client";
-import Link from "next/link";
+import { ClockBreak, ClockInOut, Task as TaskType, User } from "@prisma/client";
 import { FaExternalLinkAlt } from "react-icons/fa";
 
+import { stopBreak, takeBreak } from "@/actions/dashboard/break";
 import { clockIn } from "@/actions/dashboard/clockIn";
 import { clockOut } from "@/actions/dashboard/clockOut";
 import { successToast } from "@/lib/toast";
@@ -13,6 +12,18 @@ import ChartData from "./ChartData";
 import CurrentProjects from "./CurrentProjects";
 import RecentMessages from "./RecentMessages";
 import Tasks from "./Tasks";
+function formatDateToCustomString(date: Date) {
+  const options = {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+
+  return date.toLocaleString("en-US", options);
+}
 
 const DashboardTechnician = ({
   tasks = [],
@@ -23,7 +34,7 @@ const DashboardTechnician = ({
   tasks: TaskType[];
   companyUsers: User[];
   appointments: any;
-  lastClockInOut: ClockInOut;
+  lastClockInOut: ClockInOut & { ClockBreak: ClockBreak[] };
 }) => {
   console.log("🚀 ~ lastClockInOut:", lastClockInOut);
   const { open } = usePopupStore();
@@ -67,7 +78,7 @@ const DashboardTechnician = ({
               <br />
               {lastClockInOut?.clockIn && !lastClockInOut?.clockOut && (
                 <span className="text-xs">
-                  {new Date(lastClockInOut?.clockIn).toISOString()}
+                  {formatDateToCustomString(new Date(lastClockInOut?.clockIn))}
                 </span>
               )}
             </button>
@@ -89,13 +100,59 @@ const DashboardTechnician = ({
             >
               <span className="font-semibold xl:text-xl">Clock-Out</span>
               <br />
-              <span className="text-xs">10:00 AM</span>
+              {/* <span className="text-xs">10:00 AM</span> */}
             </button>
           </div>
           <div>
-            <button className="h-full rounded bg-[#6571FF] px-4 py-4 font-semibold text-white xl:px-10 xl:text-xl">
-              Break
-            </button>
+            {lastClockInOut?.ClockBreak[lastClockInOut.ClockBreak.length - 1]
+              ?.breakEnd === null || !lastClockInOut ? (
+              <button
+                onClick={async () => {
+                  if (
+                    lastClockInOut &&
+                    lastClockInOut.ClockBreak?.length > 0 &&
+                    lastClockInOut.ClockBreak[
+                      lastClockInOut.ClockBreak.length - 1
+                    ] &&
+                    lastClockInOut?.ClockBreak[
+                      lastClockInOut?.ClockBreak?.length - 1
+                    ].id
+                  ) {
+                    const res = await stopBreak({
+                      clockBreakId:
+                        lastClockInOut.ClockBreak[
+                          lastClockInOut.ClockBreak.length - 1
+                        ].id,
+                      breakEnd: new Date(),
+                    });
+                    if (res.success) {
+                      successToast("Break Started");
+                    }
+                  }
+                }}
+                className="h-full rounded bg-[#6571FF] px-4 py-4 font-semibold text-white xl:px-10 xl:text-xl"
+              >
+                End Break
+              </button>
+            ) : (
+              <button
+                onClick={async () => {
+                  if (!lastClockInOut?.clockOut) {
+                    const res = await takeBreak({
+                      clockInOutId: lastClockInOut.id,
+                      breakStart: new Date(),
+                    });
+                    if (res?.success) {
+                      successToast("Break Started");
+                    }
+                  }
+                }}
+                className="h-full rounded bg-[#6571FF] px-4 py-4 font-semibold text-white xl:px-10 xl:text-xl"
+              >
+                <span>Break</span> <br />
+                <span>{lastClockInOut?.ClockBreak?.length} Break</span>
+              </button>
+            )}
           </div>
         </div>
 

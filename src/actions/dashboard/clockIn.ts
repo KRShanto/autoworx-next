@@ -32,12 +32,11 @@ export async function getLastClockInOutForUser() {
     orderBy: {
       createdAt: "desc", // Replace with the appropriate timestamp field
     },
+    include: {
+      ClockBreak: true,
+    },
     take: 1,
   });
-  // console.log(
-  //   "🚀 ~ getLastClockInOutForUser ~ lastClockInOut:",
-  //   lastClockInOut,
-  // );
 
   return lastClockInOut;
 }
