@@ -2,7 +2,7 @@
 import { auth } from "@/app/auth";
 // import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
-import { defaultColumnWithColor, defaultSalesColumn, defaultShopColumn } from "@/lib/defaultColumns";
+import { defaultColumnWithColor } from "@/lib/defaultColumns";
 import { AuthSession } from "@/types/auth";
 
 // Insert default columns when creating a new company

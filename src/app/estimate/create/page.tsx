@@ -93,7 +93,7 @@ export default async function Page({
         labors={labors}
         tags={tags}
         vendors={vendors}
-        // statuses={statuses}
+        statuses={statuses}
         paymentMethods={paymentMethods}
       />
       <div>
