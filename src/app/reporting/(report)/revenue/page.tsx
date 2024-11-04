@@ -213,7 +213,7 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
     }
   });
 
-  // multiple filters 
+  // multiple filters
   const filterMultipleSliders: TSliderData[] = [
     {
       id: 1,
