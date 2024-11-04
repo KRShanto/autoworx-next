@@ -26,29 +26,29 @@ model CardPayment {
     paymentId  Int      @unique
     creditCard String?
     cardType   CardType
-    payment    Payment  @relation(fields: [paymentId], references: [id])
+    payment    Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
 }
 
 model CheckPayment {
     id          Int     @id @default(autoincrement())
     paymentId   Int     @unique
     checkNumber String?
-    payment     Payment @relation(fields: [paymentId], references: [id])
+    payment     Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
 }
 
 model CashPayment {
     id           Int     @id @default(autoincrement())
     paymentId    Int     @unique
     receivedCash Float?
-    payment      Payment @relation(fields: [paymentId], references: [id])
+    payment      Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
 }
 
 model OtherPayment {
     id              Int            @id @default(autoincrement())
     paymentId       Int            @unique
     paymentMethodId Int?
-    payment         Payment        @relation(fields: [paymentId], references: [id])
-    paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
+    payment         Payment        @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+    paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id], onDelete: Cascade)
 }
 
 model PaymentMethod {
