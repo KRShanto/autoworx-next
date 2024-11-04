@@ -198,7 +198,7 @@ model ClockBreak {
     id           Int      @id @default(autoincrement())
     clockInOutId Int      @map("clock_in_out_id")
     breakStart   DateTime @map("break_start")
-    breakEnd     DateTime @map("break_end")
+    breakEnd     DateTime? @map("break_end")
     createdAt    DateTime @default(now()) @map("created_at")
     updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
 
