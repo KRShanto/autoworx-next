@@ -26,7 +26,19 @@ function formatDateToCustomString(date: Date) {
   //@ts-ignore
   return date.toLocaleString("en-US", options);
 }
+function formatToTimeString(date) {
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const amPm = hours >= 12 ? "PM" : "AM";
 
+  // Convert 24-hour format to 12-hour format
+  hours = hours % 12 || 12;
+
+  // Format minutes with leading zero if needed
+  const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
+
+  return `${hours.toString().padStart(2, "0")}:${formattedMinutes} ${amPm}`;
+}
 const DashboardTechnician = ({
   tasks = [],
   companyUsers = [],
@@ -134,7 +146,7 @@ const DashboardTechnician = ({
                     }
                   }
                 }}
-                className={`h-full rounded bg-[#6571FF] px-4 py-4 font-semibold text-white xl:px-10 xl:text-xl`}
+                className={`h-full rounded bg-[#03A7A2] px-4 py-4 font-semibold text-white xl:px-10 xl:text-xl`}
               >
                 End Break
               </button>
@@ -154,11 +166,21 @@ const DashboardTechnician = ({
                 className={`h-full rounded bg-[#6571FF] px-4 py-4 font-semibold text-white xl:px-10 xl:text-xl ${!lastClockInOut?.clockOut ? "cursor-pointer" : "cursor-default"}`}
               >
                 <span>Break</span> <br />
-                {!lastClockInOut.clockOut && (
-                  <span className="text-xs font-light">
-                    {lastClockInOut?.ClockBreak?.length} Breaks
-                  </span>
-                )}
+                <div className="mt-1 flex flex-col">
+                  {!lastClockInOut.clockOut &&
+                    lastClockInOut.ClockBreak.slice(-3).map((Break, ind) => {
+                      return (
+                        <span
+                          key={ind}
+                          className="text-[10px] font-light leading-[1.3]"
+                        >
+                          {formatToTimeString(Break.breakStart)} -{" "}
+                          {Break?.breakEnd &&
+                            formatToTimeString(Break?.breakEnd)}
+                        </span>
+                      );
+                    })}
+                </div>
               </button>
             )}
           </div>
