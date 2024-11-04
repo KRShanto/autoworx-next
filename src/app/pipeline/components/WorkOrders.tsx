@@ -113,7 +113,7 @@ const WorkOrders = ({ type }: Props) => {
                         href={`/estimate/workorder/${id}`}
                         className="block h-full w-full"
                       >
-                        {invoice.workOrderStatus}
+                        {invoice.column?.title}
                       </Link>
                     </td>
                   </tr>
