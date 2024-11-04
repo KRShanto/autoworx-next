@@ -118,7 +118,6 @@ export default async function Page() {
     );
   } else if (user.employeeType === "Technician") {
     let lastClockInOut = await getLastClockInOutForUser();
-    console.log("🚀 ~ Page ~ lastClockInOut:", lastClockInOut);
     return (
       <DashboardTechnician
         tasks={tasks}

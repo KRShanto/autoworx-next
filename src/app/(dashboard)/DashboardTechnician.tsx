@@ -7,11 +7,13 @@ import { stopBreak, takeBreak } from "@/actions/dashboard/break";
 import { clockIn } from "@/actions/dashboard/clockIn";
 import { clockOut } from "@/actions/dashboard/clockOut";
 import { successToast } from "@/lib/toast";
+import { useCallback, useState } from "react";
 import Appointments from "./Appointments";
 import ChartData from "./ChartData";
 import CurrentProjects from "./CurrentProjects";
 import RecentMessages from "./RecentMessages";
 import Tasks from "./Tasks";
+
 function formatDateToCustomString(date: Date) {
   const options = {
     hour: "numeric",
@@ -21,7 +23,7 @@ function formatDateToCustomString(date: Date) {
     month: "long",
     day: "numeric",
   };
-
+  //@ts-ignore
   return date.toLocaleString("en-US", options);
 }
 
@@ -34,10 +36,21 @@ const DashboardTechnician = ({
   tasks: TaskType[];
   companyUsers: User[];
   appointments: any;
-  lastClockInOut: ClockInOut & { ClockBreak: ClockBreak[] };
+  lastClockInOut: (ClockInOut & { ClockBreak: ClockBreak[] }) | null;
 }) => {
-  console.log("🚀 ~ lastClockInOut:", lastClockInOut);
   const { open } = usePopupStore();
+
+  const validBreak = useCallback(
+    function (lastClockInOut: ClockInOut & { ClockBreak: ClockBreak[] }) {
+      return (
+        lastClockInOut &&
+        lastClockInOut.ClockBreak?.length > 0 &&
+        lastClockInOut.ClockBreak[lastClockInOut.ClockBreak.length - 1] &&
+        lastClockInOut?.ClockBreak[lastClockInOut?.ClockBreak?.length - 1].id
+      );
+    },
+    [lastClockInOut],
+  );
 
   return (
     <div className="flex items-start gap-x-4">
@@ -68,7 +81,7 @@ const DashboardTechnician = ({
                   }
                 }
               }}
-              className={`h-full rounded ${!lastClockInOut?.clockOut && lastClockInOut?.clockIn ? "bg-[#03A7A2]" : "bg-[#6571FF]"} px-4 py-4 text-white xl:px-10`}
+              className={`h-full rounded ${!lastClockInOut?.clockOut && lastClockInOut?.clockIn ? "bg-[#03A7A2]" : "bg-[#6571FF]"} ${lastClockInOut && lastClockInOut?.clockOut ? "cursor-pointer" : "cursor-default"} px-4 py-4 text-white xl:px-10`}
             >
               <span className="font-semibold xl:text-xl">
                 {!lastClockInOut?.clockOut && lastClockInOut?.clockIn
@@ -96,7 +109,7 @@ const DashboardTechnician = ({
                   }
                 }
               }}
-              className="h-full rounded bg-[#6571FF] px-4 py-4 text-xl font-semibold text-white xl:px-10"
+              className={`h-full rounded bg-[#6571FF] px-4 py-4 text-xl font-semibold text-white xl:px-10 ${!lastClockInOut || lastClockInOut?.clockOut ? "cursor-default" : "cursor-pointer"}`}
             >
               <span className="font-semibold xl:text-xl">Clock-Out</span>
               <br />
@@ -108,16 +121,7 @@ const DashboardTechnician = ({
               ?.breakEnd === null || !lastClockInOut ? (
               <button
                 onClick={async () => {
-                  if (
-                    lastClockInOut &&
-                    lastClockInOut.ClockBreak?.length > 0 &&
-                    lastClockInOut.ClockBreak[
-                      lastClockInOut.ClockBreak.length - 1
-                    ] &&
-                    lastClockInOut?.ClockBreak[
-                      lastClockInOut?.ClockBreak?.length - 1
-                    ].id
-                  ) {
+                  if (lastClockInOut && validBreak(lastClockInOut)) {
                     const res = await stopBreak({
                       clockBreakId:
                         lastClockInOut.ClockBreak[
@@ -126,11 +130,11 @@ const DashboardTechnician = ({
                       breakEnd: new Date(),
                     });
                     if (res.success) {
-                      successToast("Break Started");
+                      successToast("Break Ended");
                     }
                   }
                 }}
-                className="h-full rounded bg-[#6571FF] px-4 py-4 font-semibold text-white xl:px-10 xl:text-xl"
+                className={`h-full rounded bg-[#6571FF] px-4 py-4 font-semibold text-white xl:px-10 xl:text-xl`}
               >
                 End Break
               </button>
@@ -147,10 +151,14 @@ const DashboardTechnician = ({
                     }
                   }
                 }}
-                className="h-full rounded bg-[#6571FF] px-4 py-4 font-semibold text-white xl:px-10 xl:text-xl"
+                className={`h-full rounded bg-[#6571FF] px-4 py-4 font-semibold text-white xl:px-10 xl:text-xl ${!lastClockInOut?.clockOut ? "cursor-pointer" : "cursor-default"}`}
               >
                 <span>Break</span> <br />
-                <span>{lastClockInOut?.ClockBreak?.length} Break</span>
+                {!lastClockInOut.clockOut && (
+                  <span className="text-xs font-light">
+                    {lastClockInOut?.ClockBreak?.length} Breaks
+                  </span>
+                )}
               </button>
             )}
           </div>

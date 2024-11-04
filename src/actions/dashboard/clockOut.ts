@@ -22,7 +22,28 @@ export async function clockOut({
       data: {
         clockOut: clockOutTime,
       },
+      include: {
+        ClockBreak: true,
+      },
     });
+
+    let ClockBreaksLength = clockedOut?.ClockBreak?.length - 1;
+    let lastClockBreakId = clockedOut.ClockBreak[ClockBreaksLength]?.id;
+
+    if (
+      clockedOut?.ClockBreak[ClockBreaksLength]?.id &&
+      !clockedOut.ClockBreak[clockedOut?.ClockBreak?.length - 1]?.breakEnd
+    ) {
+      await db.clockBreak.update({
+        where: {
+          id: lastClockBreakId,
+        },
+        data: {
+          breakEnd: new Date(),
+        },
+      });
+    }
+
     revalidatePath("/");
 
     return { success: true, message: "Clocked Out", data: clockedOut };
