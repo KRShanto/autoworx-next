@@ -7,7 +7,7 @@ import { stopBreak, takeBreak } from "@/actions/dashboard/break";
 import { clockIn } from "@/actions/dashboard/clockIn";
 import { clockOut } from "@/actions/dashboard/clockOut";
 import { successToast } from "@/lib/toast";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import Appointments from "./Appointments";
 import ChartData from "./ChartData";
 import CurrentProjects from "./CurrentProjects";
@@ -26,7 +26,7 @@ function formatDateToCustomString(date: Date) {
   //@ts-ignore
   return date.toLocaleString("en-US", options);
 }
-function formatToTimeString(date) {
+function formatToTimeString(date: Date) {
   let hours = date.getHours();
   const minutes = date.getMinutes();
   const amPm = hours >= 12 ? "PM" : "AM";
