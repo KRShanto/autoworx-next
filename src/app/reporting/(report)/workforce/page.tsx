@@ -65,10 +65,13 @@ export default async function WorkforceReportPage({ searchParams }: TProps) {
 
   const totalPayout = employees.reduce((acc, cur) => {
     const { Technician } = cur;
-    const totalPayoutOfTechnician = Technician.reduce(
-      (acc, cur) => acc + Number(cur?.amount),
-      0,
-    );
+    const totalPayoutOfTechnician = Technician.reduce((acc, cur) => {
+      if (cur.status === "Complete") {
+        return acc + Number(cur?.amount);
+      } else {
+        return acc;
+      }
+    }, 0);
     return acc + totalPayoutOfTechnician;
   }, 0);
   return (
@@ -122,16 +125,25 @@ export default async function WorkforceReportPage({ searchParams }: TProps) {
 
           <tbody>
             {employees.map((employee, index) => {
-              const jobsStatusTechnician = employee.Technician.filter(
-                (technician) => technician.status !== "Complete",
+              const jobsCompleted: number = employee.Technician?.reduce(
+                (acc, cur) => {
+                  if (cur.status === "Complete") {
+                    return acc + 1;
+                  } else {
+                    return acc;
+                  }
+                },
+                0,
               );
 
-              const isJobCompleted =
-                jobsStatusTechnician.length === 0 ? true : false;
               const totalPayout =
                 employee.Technician?.length > 0
                   ? employee.Technician.reduce((acc, cur) => {
-                      return acc + Number(cur?.amount);
+                      if (cur.status === "Complete") {
+                        return acc + Number(cur?.amount);
+                      } else {
+                        return acc;
+                      }
                     }, 0)
                   : 0;
 
@@ -150,16 +162,11 @@ export default async function WorkforceReportPage({ searchParams }: TProps) {
                     {employee.employeeType}
                   </td>
                   <td className="border-b px-4 py-2 text-center">
-                    {totalPayout}
+                    ${totalPayout}
                   </td>
                   <td className="border-b px-4 py-2 text-center"></td>
-                  <td
-                    className={cn(
-                      "border-b px-4 py-2 text-center",
-                      isJobCompleted ? "text-green-500" : "text-red-500",
-                    )}
-                  >
-                    {isJobCompleted ? "Completed" : "Incomplete"}
+                  <td className={cn("border-b px-4 py-2 text-center")}>
+                    {jobsCompleted}
                   </td>
                 </tr>
               );
