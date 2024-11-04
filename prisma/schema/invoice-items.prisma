@@ -44,7 +44,6 @@ model Service {
     Technician             Technician[]
     requestEstimate RequestEstimate? @relation("Service")
     InvoiceRedo            InvoiceRedo[]
-
     @@index([companyId], name: "fk_services_company")
 }
 

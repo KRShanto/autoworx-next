@@ -1,10 +1,13 @@
-"use client"
+"use client";
 import { useState, useEffect } from "react";
 
 type UseServerGetResult<T> = {
   data: T | null;
   loading: boolean;
   error: Error | null;
+  setData: React.Dispatch<React.SetStateAction<T | null>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setError: React.Dispatch<React.SetStateAction<Error | null>>;
 };
 
 export function useServerGet<T>(
@@ -41,7 +44,7 @@ export function useServerGet<T>(
     return () => {
       isMounted = false;
     };
-  }, [fn, ...args]); // Add `args` to the dependency array
+  }, [...args]); // Add `args` to the dependency array
 
-  return { data, loading, error };
+  return { data, loading, error, setData, setLoading, setError };
 }
