@@ -121,7 +121,7 @@ export default function Selector<T>({
           <p className="text-sm font-medium text-slate-400">
             {selected ? label(selected) : label(null)}
           </p>
-          <FaChevronDown className="text-[#797979]" />
+          {!disabledDropdown && <FaChevronDown className="text-[#797979]" />}
         </DropdownMenuTrigger>
 
         <DropdownMenuContent

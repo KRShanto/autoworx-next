@@ -5,10 +5,12 @@ model Message {
     message    String
     from       Int
     groupId    Int?        @map("group_id")
+    requestEstimateId Int? @map("request_estimate_id") @unique
     createdAt  DateTime    @default(now()) @map("created_at")
     updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
     group      Group?      @relation(fields: [groupId], references: [id])
     attachment Attachment?
+    requestEstimate           RequestEstimate?   @relation("Message", fields: [requestEstimateId], references: [id])
 
     @@index([to], name: "fk_messages_to")
     @@index([from], name: "fk_messages_from")

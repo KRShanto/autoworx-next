@@ -24,6 +24,7 @@ model Vehicle {
     color        VehicleColor? @relation(fields: [colorId], references: [id], onDelete: SetNull)
     client       Client?       @relation(fields: [clientId], references: [id], onDelete: Cascade)
     invoices     Invoice[]
+    requestEstimate RequestEstimate? @relation("Vehicle")
 
     @@index([companyId], name: "fk_vehicles_company")
 }

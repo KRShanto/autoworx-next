@@ -38,6 +38,7 @@ export const getUserMessagesById = async (userId: number) => {
     },
     include: {
       attachment: true,
+      requestEstimate: true,
     },
   });
   return messages;
