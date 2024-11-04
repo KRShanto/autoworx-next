@@ -80,6 +80,25 @@ export async function createInvoice({
 }): Promise<ServerAction> {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
+  let finalColumnId = columnId;
+  if (!finalColumnId) {
+    const defaultColumnId = await db.column.findFirst({
+      where: {
+        title: "Pending",
+
+        type: "shop",
+        companyId,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (defaultColumnId) {
+      finalColumnId = defaultColumnId.id;
+    } else {
+      throw new Error("Default column not found");
+    }
+  }
 
   const invoice = await db.invoice.create({
     data: {
@@ -103,7 +122,7 @@ export async function createInvoice({
       customerComments,
       companyId,
       userId: session.user.id as any,
-      columnId,
+      columnId: finalColumnId,
     },
   });
 
