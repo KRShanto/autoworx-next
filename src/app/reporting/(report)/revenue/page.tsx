@@ -236,13 +236,56 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
     },
   ];
 
+  // Calculate the total week profit (Invoice has a `profit` field)
+  const now = new Date();
+  const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+  const endOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 6));
+
+  const weeklyInvoices = filteredInvoice.filter(
+    (invoice) =>
+      new Date(invoice.createdAt) >= startOfWeek &&
+      new Date(invoice.createdAt) <= endOfWeek,
+  );
+
+  const totalWeekProfit = weeklyInvoices.reduce(
+    (total, invoice) => total + (invoice.profit || 0),
+    0,
+  );
+
+  // Calculate the total month profit (Invoice has a `profit` field)
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+  const monthlyInvoices = filteredInvoice.filter(
+    (invoice) =>
+      new Date(invoice.createdAt) >= startOfMonth &&
+      new Date(invoice.createdAt) <= endOfMonth,
+  );
+
+  const totalMonthProfit = monthlyInvoices.reduce(
+    (total, invoice) => total + (invoice.profit || 0),
+    0,
+  );
+
+  // Calculate the all time profit (Invoice has a `profit` field)
+  const totalProfit = filteredInvoice.reduce(
+    (total, invoice) => total + (invoice.profit || 0),
+    0,
+  );
+
+  // profit for the filtered invoices
+  const totalFilteredProfit = filteredInvoice.reduce(
+    (total, invoice) => total + (invoice.profit || 0),
+    0,
+  );
+
   return (
     <div className="space-y-5">
       <div className="my-7 grid grid-cols-5 gap-4">
-        <Calculation content="WEEK" amount={0} />
-        <Calculation content="MONTH" amount={0} />
-        <Calculation content="YTD" amount={0} />
-        <Calculation content="REVENUE" amount={0} />
+        <Calculation content="WEEK" amount={totalWeekProfit} />
+        <Calculation content="MONTH" amount={totalMonthProfit} />
+        <Calculation content="YTD" amount={totalProfit} />
+        <Calculation content="REVENUE" amount={totalFilteredProfit} />
       </div>
       {/* filter section */}
       <div className="flex w-full items-center justify-between gap-x-3">
