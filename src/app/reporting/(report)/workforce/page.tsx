@@ -74,6 +74,20 @@ export default async function WorkforceReportPage({ searchParams }: TProps) {
     }, 0);
     return acc + totalPayoutOfTechnician;
   }, 0);
+
+  // total payout for technician
+  const totalPayoutForTechnician = employees.reduce((acc, cur) => {
+    const { Technician } = cur;
+    const totalPayoutOfTechnician = Technician.reduce((acc, cur) => {
+      if (cur.status === "Complete") {
+        return acc + Number(cur?.amount);
+      } else {
+        return acc;
+      }
+    }, 0);
+    return acc + totalPayoutOfTechnician;
+  }, 0);
+
   return (
     <div className="space-y-5">
       {/* filter section */}
@@ -105,7 +119,11 @@ export default async function WorkforceReportPage({ searchParams }: TProps) {
       </div>
       <div className="my-7 grid grid-cols-5 gap-4">
         <Calculation content="Total Payout" amount={totalPayout} />
-        <Calculation content="Overall Technician Performance" amount={0} />
+        <Calculation
+          content="Overall Technician Performance"
+          amount={totalPayoutForTechnician}
+        />
+        {/* TODO */}
         <Calculation content="Overall Sales Performance" amount={0} />
       </div>
       {/* Table */}
