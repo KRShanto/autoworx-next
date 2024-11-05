@@ -46,15 +46,9 @@ const metricData: MetricData[] = [
 const arrayOfPerformanceWord = ["Average", "Return"];
 
 export default function SalesPerformanceTable() {
-  const divRef = useRef(null); // Step 1: Create a ref
-  const [height, setHeight] = useState(230); // State to store height
-  const [infoIndex, setInfoIndex] = useState<number | null>(null);
-  useEffect(() => {
-    if (divRef.current) {
-      setHeight(divRef.current.clientHeight); // Step 3: Get and set the height
-    }
-  }, []); // Empty dependency array to run only once after initial render
 
+  const [infoIndex, setInfoIndex] = useState<number | null>(null);
+ 
   const getPerformanceContent = (label: string): string | undefined => {
     const labelword = label.split(" ");
     for (const word of labelword) {
@@ -74,7 +68,7 @@ export default function SalesPerformanceTable() {
       <h2 className="mb-2 text-xl font-bold">Performance</h2>
       <div className="flex gap-8">
         {/* First Half */}
-        <div ref={divRef} className="flex w-[30%] flex-col gap-6">
+        <div  className="flex w-[30%] flex-col gap-6">
           <div className="flex flex-col gap-4">
             {metricData.map((metric, index) => (
               <div
