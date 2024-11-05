@@ -1,8 +1,8 @@
-import EmployeeInformation from "../components/EmployeeInformation";
-import Header from "../components/Header";
-import EmployeeWorkInformation from "../components/EmployeeWorkInformation";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
+import EmployeeInformation from "../components/EmployeeInformation";
+import EmployeeWorkInformation from "../components/EmployeeWorkInformation";
+import Header from "../components/Header";
 
 export default async function Page({ params }: { params: { id: string } }) {
   const employee = await db.user.findUnique({
@@ -28,7 +28,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     <>
       <Header />
       <EmployeeInformation employee={employee} info={technicians} />
-      <EmployeeWorkInformation info={technicians} />
+      <EmployeeWorkInformation info={technicians} employeeType={employee.employeeType} />
     </>
   );
 }
