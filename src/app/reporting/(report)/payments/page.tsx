@@ -102,6 +102,20 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
       },
     },
   });
+
+  // find the average value
+  const totalAmount = paymentInfo.reduce(
+    (acc, payment) => acc + Number(payment.amount),
+    0,
+  );
+  const averageValue = totalAmount / paymentInfo.length;
+
+  // find the outstanding payment (total due)
+  const totalDue = paymentInfo.reduce(
+    (acc, payment) => acc + Number(payment.invoice?.due),
+    0,
+  );
+
   return (
     <div className="space-y-5">
       {/* filter section */}
@@ -131,9 +145,9 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
         </div>
       </div>
       <div className="my-7 grid grid-cols-5 gap-4">
-        <Calculation content="AVERAGE VALUE" amount={0} />
-        <Calculation content="OUTSTANDING PAYMENT" amount={0} />
-        <Calculation content="TOTAL PAYMENT" amount={0} />
+        <Calculation content="AVERAGE VALUE" amount={averageValue} />
+        <Calculation content="OUTSTANDING PAYMENT" amount={totalDue} />
+        <Calculation content="TOTAL PAYMENT" amount={totalAmount} />
         <Calculation content="REFUND RATE" amount={0} />
       </div>
       {/* Table */}
