@@ -9,9 +9,9 @@ import type { Dayjs } from "dayjs";
 import { useState } from "react";
 import DateRange from "../../../components/DateRange";
 
-const onChange: DatePickerProps<Dayjs[]>["onChange"] = (date, dateString) => {
-  // console.log(date, dateString);
-};
+// const onChange: DatePickerProps<Dayjs[]>["onChange"] = (date, dateString) => {
+//   // console.log(date, dateString);
+// };
 
 interface AttendanceData {
   clockedIn: string;

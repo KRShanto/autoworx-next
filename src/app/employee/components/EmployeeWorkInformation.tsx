@@ -1,16 +1,18 @@
 "use client";
 
+import { EmployeeType } from "@prisma/client";
 import { useSearchParams } from "next/navigation";
-import FilterComp from "./FilterComp";
-import EmployeeInfoTable from "./EmployeeInfoTable";
 import AttendancePerformance from "./AttendancePerformance";
-import { Client, Invoice, Technician, Vehicle } from "@prisma/client";
+import EmployeeInfoTable from "./EmployeeInfoTable";
 import { EmployeeWorkInfo } from "./employeeWorkInfoType";
+import FilterComp from "./FilterComp";
 
 export default function EmployeeWorkInformation({
   info,
+  employeeType,
 }: {
   info: EmployeeWorkInfo;
+  employeeType: EmployeeType;
 }) {
   const searchParams = useSearchParams();
   const activeView = searchParams.get("view") || "details";
@@ -24,5 +26,5 @@ export default function EmployeeWorkInformation({
     );
   }
 
-  return <AttendancePerformance />;
+  return <AttendancePerformance employeeType={employeeType} />;
 }
