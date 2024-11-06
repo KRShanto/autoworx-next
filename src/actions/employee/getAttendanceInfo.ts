@@ -1,8 +1,8 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { getCompany } from "../settings/getCompany";
 import moment from "moment";
+import { getCompany } from "../settings/getCompany";
 
 export async function getAttendanceInfo(id: number) {
   const company = await getCompany();
@@ -47,6 +47,21 @@ export async function getAttendanceInfo(id: number) {
 
   for (let i = 0; i < 7; i++) {
     const currentDate = moment(startOfWeek).add(i, "days");
+    const dayOfWeek = currentDate.format("dddd").toLowerCase();
+    const weekend1 = calendarSettings.weekend1.toLowerCase();
+    const weekend2 = calendarSettings.weekend2.toLowerCase();
+
+    // Check for weekend or holiday
+    if (dayOfWeek === weekend1 || dayOfWeek === weekend2) {
+      attInfo.push({
+        date: currentDate.toDate(),
+        clockedIn: "WEEKEND",
+        clockedOut: "WEEKEND",
+        hours: "WEEKEND",
+        extraHours: "WEEKEND",
+      });
+      continue;
+    }
 
     // Display "-" if the day hasn't come yet
     if (currentDate.isAfter(now, "day")) {
@@ -68,22 +83,6 @@ export async function getAttendanceInfo(id: number) {
         clockedOut: "ABSENT",
         hours: "ABSENT",
         extraHours: "ABSENT",
-      });
-      continue;
-    }
-
-    const dayOfWeek = currentDate.format("dddd").toLowerCase();
-    const weekend1 = calendarSettings.weekend1.toLowerCase();
-    const weekend2 = calendarSettings.weekend2.toLowerCase();
-
-    // Check for weekend or holiday
-    if (dayOfWeek === weekend1 || dayOfWeek === weekend2) {
-      attInfo.push({
-        date: currentDate.toDate(),
-        clockedIn: "WEEKEND",
-        clockedOut: "WEEKEND",
-        hours: "WEEKEND",
-        extraHours: "WEEKEND",
       });
       continue;
     }
