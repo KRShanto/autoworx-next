@@ -25,15 +25,15 @@ export const requestEstimate = async (
   requestEstimateData: TEstimateData,
 ) => {
   try {
-    const isAlreadyExistsEstimate = await db.client.findFirst({
-      where: {
-        companyId: requestEstimateData.receiverCompanyId,
-      },
-    });
+    // const isAlreadyExistsEstimate = await db.client.findFirst({
+    //   where: {
+    //     companyId: requestEstimateData.receiverCompanyId,
+    //   },
+    // });
 
-    if (!!isAlreadyExistsEstimate) {
-      throw new Error("Estimate for this client already exists");
-    }
+    // if (!!isAlreadyExistsEstimate) {
+    //   throw new Error("Estimate for this client already exists");
+    // }
 
     const { requestEstimateFromDB } = await db.$transaction(async (prisma) => {
       const origin = headers().get("origin");
@@ -47,28 +47,49 @@ export const requestEstimate = async (
         },
       });
 
+      const senderCompanyDataFormDB = await prisma.company.findUnique({
+        where: {
+          id: requestEstimateData.senderCompanyId,
+        },
+        select: {
+          name: true,
+        },
+      });
+
       const clientInfo = {
         companyId: requestEstimateData.receiverCompanyId,
-        firstName: receiverCompanyDataFormDB?.name!,
+        firstName: senderCompanyDataFormDB?.name!,
         lastName: "",
         fromRequest: true,
         fromRequestedCompanyId: requestEstimateData.senderCompanyId,
       };
 
-      // create client in the db
-      const client = await prisma.client.create({
-        data: clientInfo,
+      // if the client already exist
+      let client = await prisma.client.findFirst({
+        where: {
+          fromRequestedCompanyId: requestEstimateData.senderCompanyId,
+        },
       });
+      if (!client) {
+        // create client in the db
+        client = await prisma.client.create({
+          data: clientInfo,
+        });
+      }
+
+      // console.log("Company id: ", requestEstimateData.receiverCompanyId);
 
       const vehicleInfo = {
         model: requestEstimateData.model,
         make: requestEstimateData.make,
         year: requestEstimateData.year,
-        companyId: requestEstimateData.receiverId,
+        companyId: requestEstimateData.receiverCompanyId,
         clientId: client?.id,
         fromRequest: true,
         fromRequestedCompanyId: requestEstimateData.senderCompanyId,
       };
+
+      console.log("Vehicle info: ", vehicleInfo);
 
       // create vehicle in the db
       const vehicle = await prisma.vehicle.create({
