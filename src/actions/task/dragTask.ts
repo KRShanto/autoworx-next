@@ -12,6 +12,7 @@ type TTask = {
   date: Date;
   startTime: string;
   endTime: string;
+  timezone: string;
 };
 
 // TODO: later, use updateTask instead of dragTask
@@ -77,6 +78,7 @@ export async function updateTask(task: TTask): Promise<ServerAction> {
         startTime: updatedTask.startTime,
         endTime: updatedTask.endTime,
         date: new Date(updatedTask.date).toISOString(),
+        timezone: task.timezone,
       };
 
       await updateGoogleCalendarEvent(
@@ -100,6 +102,7 @@ export async function updateTask(task: TTask): Promise<ServerAction> {
         startTime: updatedTask.startTime,
         endTime: updatedTask.endTime,
         date: new Date(updatedTask.date).toISOString(),
+        timezone: task.timezone,
       };
 
       let event = await createGoogleCalendarEvent(taskForGoogleCalendar);

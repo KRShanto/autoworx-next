@@ -235,6 +235,7 @@ export default function Week({
 
           startTime: oldTask?.startTime || startTime,
           endTime: oldTask?.endTime || endTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       } else {
         const { newStartTime, newEndTime } = updateTimeSpace(
@@ -247,6 +248,8 @@ export default function Week({
           date: new Date(date),
           startTime: newStartTime,
           endTime: newEndTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+
         });
       }
     } else if (type === "appointment") {
@@ -267,6 +270,7 @@ export default function Week({
           date,
           startTime: newStartTime,
           endTime: newEndTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       }
     }

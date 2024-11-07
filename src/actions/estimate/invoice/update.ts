@@ -1,10 +1,10 @@
 "use server";
-import fs from "fs";
 import { createTask } from "@/actions/task/createTask";
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { Labor, Material, Service, Tag } from "@prisma/client";
+import fs from "fs";
 import { revalidatePath } from "next/cache";
 
 interface UpdateEstimateInput {
@@ -12,7 +12,7 @@ interface UpdateEstimateInput {
 
   clientId: number | undefined;
   vehicleId: number | undefined;
-  
+
   columnId: number | undefined;
 
   subtotal: number;
@@ -144,6 +144,20 @@ export async function updateInvoice(
     );
   }
 
+  // re-calculating the profit
+  const totalCost = data.items.reduce((acc, item) => {
+    const materials = item.materials;
+    const labor = item.labor;
+
+    const materialCost = materials.reduce((acc, material) => {
+      return acc + Number(material?.cost) * Number(material?.quantity);
+    }, 0);
+
+    const laborCost = Number(labor?.charge) * labor?.hours!;
+
+    return acc + materialCost + laborCost;
+  }, 0);
+
   // update invoice itself
   const updatedInvoice = await db.invoice.update({
     where: {
@@ -152,7 +166,7 @@ export async function updateInvoice(
     data: {
       clientId: data.clientId,
       vehicleId: data.vehicleId,
-      
+      profit: data.grandTotal - totalCost,
       columnId: data.columnId,
       subtotal: data.subtotal,
       discount: data.discount,
@@ -272,6 +286,7 @@ export async function updateInvoice(
         assignedUsers: [],
         priority: "Medium",
         invoiceId: data.id,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
     } else {
       // if task.id is not undefined, update the task

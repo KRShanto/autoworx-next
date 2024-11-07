@@ -1,0 +1,40 @@
+// Message for chat.
+model Message {
+    id         Int         @id @default(autoincrement())
+    to         Int?
+    message    String
+    from       Int
+    groupId    Int?        @map("group_id")
+    requestEstimateId Int? @map("request_estimate_id") @unique
+    createdAt  DateTime    @default(now()) @map("created_at")
+    updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
+    group      Group?      @relation(fields: [groupId], references: [id])
+    attachment Attachment?
+    requestEstimate           RequestEstimate?   @relation("Message", fields: [requestEstimateId], references: [id])
+
+    @@index([to], name: "fk_messages_to")
+    @@index([from], name: "fk_messages_from")
+    @@index([groupId], name: "fk_messages_group")
+}
+
+model Attachment {
+    id        Int      @id @default(autoincrement())
+    fileName  String // File name (e.g., 'image.png')
+    fileType  String // File type (e.g., 'image/png', 'application/pdf')
+    fileUrl   String // File storage path or URL
+    fileSize  String
+    messageId Int      @unique // Foreign key to Message model, enforces one-to-one relationship
+    message   Message  @relation(fields: [messageId], references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+}
+
+model Group {
+    id        Int       @id @default(autoincrement())
+    name      String
+    type      String    @default("Group")
+    users     User[]    @relation("UserGroups")
+    messages  Message[]
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+}

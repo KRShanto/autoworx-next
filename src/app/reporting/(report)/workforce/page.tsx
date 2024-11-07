@@ -7,6 +7,10 @@ import { FaPenToSquare } from "react-icons/fa6";
 import { FaTimes } from "react-icons/fa";
 import FilterBySelection from "../../components/filter/FilterBySelection";
 import FilterByMultiple from "../../components/filter/FilterByMultiple";
+import { db } from "@/lib/db";
+import { auth } from "@/app/auth";
+import { AuthSession } from "@/types/auth";
+import { Session } from "next-auth";
 type TProps = {
   searchParams: {
     category?: string;
@@ -45,8 +49,45 @@ const filterMultipleSliders: TSliderData[] = [
     max: 500,
   },
 ];
-export default function WorkforceReportPage({ searchParams }: TProps) {
-  const clients = getClientsData();
+export default async function WorkforceReportPage({ searchParams }: TProps) {
+  const session: any = await auth();
+
+  // TODO: fetching only technicians for now.
+  const employees = await db.user.findMany({
+    where: {
+      companyId: session?.user?.companyId,
+      employeeType: "Technician",
+    },
+    include: {
+      Technician: true,
+    },
+  });
+
+  const totalPayout = employees.reduce((acc, cur) => {
+    const { Technician } = cur;
+    const totalPayoutOfTechnician = Technician.reduce((acc, cur) => {
+      if (cur.status === "Complete") {
+        return acc + Number(cur?.amount);
+      } else {
+        return acc;
+      }
+    }, 0);
+    return acc + totalPayoutOfTechnician;
+  }, 0);
+
+  // total payout for technician
+  const totalPayoutForTechnician = employees.reduce((acc, cur) => {
+    const { Technician } = cur;
+    const totalPayoutOfTechnician = Technician.reduce((acc, cur) => {
+      if (cur.status === "Complete") {
+        return acc + Number(cur?.amount);
+      } else {
+        return acc;
+      }
+    }, 0);
+    return acc + totalPayoutOfTechnician;
+  }, 0);
+
   return (
     <div className="space-y-5">
       {/* filter section */}
@@ -77,9 +118,13 @@ export default function WorkforceReportPage({ searchParams }: TProps) {
         </div>
       </div>
       <div className="my-7 grid grid-cols-5 gap-4">
-        <Calculation content="Total Payout" amount={0} />
-        <Calculation content="Overall Technician Performance" amount={500} />
-        <Calculation content="Overall Sales Performance" amount={500} />
+        <Calculation content="Total Payout" amount={totalPayout} />
+        <Calculation
+          content="Overall Technician Performance"
+          amount={totalPayoutForTechnician}
+        />
+        {/* TODO */}
+        <Calculation content="Overall Sales Performance" amount={0} />
       </div>
       {/* Table */}
       <div>
@@ -93,40 +138,57 @@ export default function WorkforceReportPage({ searchParams }: TProps) {
               <th className="border-b px-4 py-2 text-center">
                 # Jobs Completed
               </th>
-              <th className="border-b px-4 py-2 text-center">Edit</th>
             </tr>
           </thead>
 
           <tbody>
-            {clients.map((client, index) => (
-              <tr
-                key={index}
-                className={cn(
-                  "cursor-pointer rounded-md py-3",
-                  index % 2 === 0 ? "bg-white" : "bg-blue-100",
-                )}
-              >
-                <td className="border-b px-4 py-2 text-center">
-                  {client.name}
-                </td>
-                <td className="border-b px-4 py-2 text-center">Technician</td>
-                <td className="border-b px-4 py-2 text-center">500</td>
-                <td className="border-b px-4 py-2 text-center">
-                  {client.email}
-                </td>
-                <td className="border-b px-4 py-2 text-center">Bkash</td>
-                <td className="border-b border-l bg-white px-4 py-2 text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <button className="text-xl text-[#6571FF]">
-                      <FaPenToSquare />
-                    </button>
-                    <button className="text-xl text-red-400">
-                      <FaTimes />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {employees.map((employee, index) => {
+              const jobsCompleted: number = employee.Technician?.reduce(
+                (acc, cur) => {
+                  if (cur.status === "Complete") {
+                    return acc + 1;
+                  } else {
+                    return acc;
+                  }
+                },
+                0,
+              );
+
+              const totalPayout =
+                employee.Technician?.length > 0
+                  ? employee.Technician.reduce((acc, cur) => {
+                      if (cur.status === "Complete") {
+                        return acc + Number(cur?.amount);
+                      } else {
+                        return acc;
+                      }
+                    }, 0)
+                  : 0;
+
+              return (
+                <tr
+                  key={employee.id}
+                  className={cn(
+                    "cursor-pointer rounded-md py-3",
+                    index % 2 === 0 ? "bg-white" : "bg-blue-100",
+                  )}
+                >
+                  <td className="border-b px-4 py-2 text-center">
+                    {employee.firstName} {employee.lastName}
+                  </td>
+                  <td className="border-b px-4 py-2 text-center">
+                    {employee.employeeType}
+                  </td>
+                  <td className="border-b px-4 py-2 text-center">
+                    ${totalPayout}
+                  </td>
+                  <td className="border-b px-4 py-2 text-center"></td>
+                  <td className={cn("border-b px-4 py-2 text-center")}>
+                    {jobsCompleted}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

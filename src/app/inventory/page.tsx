@@ -59,6 +59,7 @@ export default async function Page({
           products={products}
           supplies={supplies}
           productId={parseInt(productId)}
+          user={user}
         />
 
         <Sidebar productId={parseInt(productId)} />

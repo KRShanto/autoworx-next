@@ -1,0 +1,42 @@
+// Appointment for a company.
+model Appointment {
+    id                              Int               @id @default(autoincrement())
+    userId                          Int               @map("user_id")
+    title                           String            @db.VarChar(100)
+    date                            DateTime?
+    startTime                       String?           @map("start_time")
+    endTime                         String?           @map("end_time")
+    companyId                       Int               @map("company_id")
+    clientId                        Int?              @map("customer_id")
+    vehicleId                       Int?              @map("vehicle_id")
+    draftEstimate                   String?           @map("draft_estimate")
+    notes                           String?
+    confirmationEmailTemplateId     Int?              @map("confirmation_email_template_id")
+    confirmationEmailTemplateStatus Boolean           @default(false) @map("confirmation_email_template_status")
+    reminderEmailTemplateId         Int?              @map("reminder_email_template_id")
+    reminderEmailTemplateStatus     Boolean           @default(false) @map("reminder_email_template_status")
+    times                           Json? // { time: string; date: string }
+    createdAt                       DateTime          @default(now()) @map("created_at")
+    updatedAt                       DateTime          @default(now()) @updatedAt @map("updated_at")
+    user                            User              @relation(fields: [userId], references: [id])
+    company                         Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    appointmentUsers                AppointmentUser[]
+    client                          Client?           @relation(fields: [clientId], references: [id])
+    vehicle                         Vehicle?          @relation(fields: [vehicleId], references: [id])
+    googleEventId                   String?
+
+    @@index([userId], name: "fk_tasks_user")
+    @@index([companyId], name: "fk_tasks_company")
+}
+
+// Assigned user for an appointment.
+model AppointmentUser {
+    id            Int         @id @default(autoincrement())
+    appointmentId Int         @map("appointment_id")
+    userId        Int         @map("user_id")
+    eventId       String      @db.VarChar(100)
+    createdAt     DateTime    @default(now()) @map("created_at")
+    updatedAt     DateTime    @default(now()) @updatedAt @map("updated_at")
+    appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+    user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

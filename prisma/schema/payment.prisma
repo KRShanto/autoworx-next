@@ -1,0 +1,104 @@
+// Payment of a invoice.
+// One invoice can have one payment. And one payment can't be in multiple invoices.
+// Payment can be of type card, check, cash or other.
+// If payment type is other, then it can have a payment method.
+// If payment type is card, then it can have a card type.
+model Payment {
+    id        Int           @id @default(autoincrement())
+    date      DateTime?
+    notes     String?
+    amount    Decimal?
+    type      PaymentType
+    card      CardPayment?
+    check     CheckPayment?
+    cash      CashPayment?
+    other     OtherPayment?
+    invoiceId String?       @map("invoice_id")
+    companyId Int           @map("company_id")
+    createdAt DateTime      @default(now()) @map("created_at")
+    updatedAt DateTime      @default(now()) @updatedAt @map("updated_at")
+    invoice   Invoice?      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+    Company   Company?      @relation(fields: [companyId], references: [id])
+}
+
+model CardPayment {
+    id         Int      @id @default(autoincrement())
+    paymentId  Int      @unique
+    creditCard String?
+    cardType   CardType
+    payment    Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+}
+
+model CheckPayment {
+    id          Int     @id @default(autoincrement())
+    paymentId   Int     @unique
+    checkNumber String?
+    payment     Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+}
+
+model CashPayment {
+    id           Int     @id @default(autoincrement())
+    paymentId    Int     @unique
+    receivedCash Float?
+    payment      Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+}
+
+model OtherPayment {
+    id              Int            @id @default(autoincrement())
+    paymentId       Int            @unique
+    paymentMethodId Int?
+    payment         Payment        @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+    paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id], onDelete: Cascade)
+}
+
+model PaymentMethod {
+    id        Int            @id @default(autoincrement())
+    name      String
+    companyId Int            @map("company_id")
+    createdAt DateTime       @default(now()) @map("created_at")
+    updatedAt DateTime       @default(now()) @updatedAt @map("updated_at")
+    payments  OtherPayment[]
+    company   Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+enum PaymentType {
+    CARD
+    CHECK
+    CASH
+    OTHER
+}
+
+enum CardType {
+    MASTERCARD
+    VISA
+    AMEX
+    OTHER
+}
+
+model Coupon {
+    id           Int            @id @default(autoincrement())
+    name         String
+    code         String
+    type         String
+    startDate    DateTime
+    endDate      DateTime
+    discount     Decimal
+    discountType DiscountType
+    status       CouponStatus
+    redemptions  Int
+    companyId    Int            @map("company_id")
+    createdAt    DateTime       @default(now()) @map("created_at")
+    updatedAt    DateTime       @default(now()) @updatedAt @map("updated_at")
+    company      Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    ClientCoupon ClientCoupon[]
+}
+
+enum CouponStatus {
+    Active
+    Expired
+}
+
+enum DiscountType {
+    Percentage
+    Fixed
+}

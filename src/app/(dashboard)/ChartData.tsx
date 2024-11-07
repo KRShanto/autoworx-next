@@ -1,10 +1,4 @@
-import {
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis
-} from "recharts";
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 
 const data = [
   {
@@ -47,13 +41,13 @@ const ChartData = ({
 }: any) => {
   return (
     <div
-      className={`mb-8 ${columnView ? "flex flex-col" : "flex items-start justify-between gap-x-1"}`}
+      className={`${columnView ? "flex flex-col" : "flex items-start justify-between gap-x-1"}`}
     >
       <div>
-        <h3 className="text-sm font-bold">{heading}</h3>
+        <h3 className="text-xs font-bold">{heading}</h3>
         {subHeading && <h6 className="#xl:text-sm text-xs">{subHeading}</h6>}
-        <div className="mt-2 xl:mt-4">
-          <span className="text-2xl font-bold xl:text-4xl">
+        <div className="mt-2 #xl:mt-4">
+          <span className="text-lg font-bold xl:text-2xl">
             {" "}
             {dollarSign && "$"}
             {number}

@@ -83,6 +83,7 @@ export default function SearchCollaborationModal({
       errorToast(err.message);
     }
   }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -107,42 +108,44 @@ export default function SearchCollaborationModal({
                 />
                 {/* user list */}
                 <div className="flex h-72 flex-col items-start space-y-2 overflow-y-auto p-1">
-                  {companyAdmins.map((user) => (
-                    <div
-                      key={user.id}
-                      className="flex w-full cursor-pointer items-center justify-between space-x-2 p-1"
-                    >
-                      <Avatar photo={user.image} width={60} height={60} />
-                      <div className="flex flex-col overflow-hidden">
-                        <div className="flex items-center space-x-8">
-                          <p className="text-sm font-bold text-[#797979]">
-                            {user.firstName} {user.lastName}
-                          </p>
-                          <p className="text-sm font-bold capitalize text-[#006D77]">
-                            {user.companyName}
-                          </p>
-                        </div>
+                  {companyAdmins &&
+                    companyAdmins?.length > 0 &&
+                    companyAdmins.map((user) => (
+                      <div
+                        key={user?.id}
+                        className="flex w-full cursor-pointer items-center justify-between space-x-2 p-1"
+                      >
+                        <Avatar photo={user?.image} width={60} height={60} />
+                        <div className="flex flex-col overflow-hidden">
+                          <div className="flex items-center space-x-8">
+                            <p className="text-sm font-bold text-[#797979]">
+                              {user?.firstName} {user?.lastName}
+                            </p>
+                            <p className="text-sm font-bold capitalize text-[#006D77]">
+                              {user?.companyName}
+                            </p>
+                          </div>
 
-                        <div className="flex items-center space-x-3 text-[10px]">
-                          {user.phone && <p>{user.phone}</p>}
-                          <p>{user.email}</p>
+                          <div className="flex items-center space-x-3 text-[10px]">
+                            {user?.phone && <p>{user?.phone}</p>}
+                            <p>{user?.email}</p>
+                          </div>
+                        </div>
+                        <div>
+                          {!user?.isConnected && (
+                            <button
+                              onClick={() =>
+                                handleConnectCompany(user?.companyId!)
+                              }
+                              className="flex items-center space-x-1 rounded-md bg-[#006D77] px-1 py-1 text-[14px] text-white shadow-md"
+                            >
+                              <FaPlus size={8} />
+                              <span className="text-sm">Send Invite</span>
+                            </button>
+                          )}
                         </div>
                       </div>
-                      <div>
-                        {!user?.isConnected && (
-                          <button
-                            onClick={() =>
-                              handleConnectCompany(user?.companyId!)
-                            }
-                            className="flex items-center space-x-1 rounded-md bg-[#006D77] px-1 py-1 text-[14px] text-white shadow-md"
-                          >
-                            <FaPlus size={8} />
-                            <span className="text-sm">Send Invite</span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
             </>

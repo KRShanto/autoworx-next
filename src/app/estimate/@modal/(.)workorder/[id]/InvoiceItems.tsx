@@ -38,7 +38,10 @@ export function InvoiceItems({
         >
           <p className="px-5">{item.service.name}</p>
           <div className="mr-5 flex items-center space-x-3">
-            <ReDoModal />
+            <ReDoModal
+              invoiceId={item?.invoiceId as string}
+              serviceId={item?.serviceId as number}
+            />
             <button
               type="button"
               onClick={() =>
@@ -64,7 +67,7 @@ export function InvoiceItems({
             </div>
 
             <LaborItems
-              invoiceId={item.invoiceId as string}
+              invoiceId={item?.invoiceId as string}
               serviceId={item?.serviceId as number}
             />
           </div>

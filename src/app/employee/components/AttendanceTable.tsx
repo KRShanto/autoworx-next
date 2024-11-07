@@ -8,10 +8,13 @@ import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import type { Dayjs } from "dayjs";
 import { useState } from "react";
 import DateRange from "../../../components/DateRange";
+import { useParams } from "next/navigation";
+import { useServerGet } from "@/hooks/useServerGet";
+import { getAttendanceInfo } from "@/actions/employee/getAttendanceInfo";
 
-const onChange: DatePickerProps<Dayjs[]>["onChange"] = (date, dateString) => {
-  // console.log(date, dateString);
-};
+// const onChange: DatePickerProps<Dayjs[]>["onChange"] = (date, dateString) => {
+//   // console.log(date, dateString);
+// };
 
 interface AttendanceData {
   clockedIn: string;
@@ -31,24 +34,15 @@ interface buttonInfo {
   content: string;
 }
 
-const attendanceData: AttendanceData[] = [
-  { clockedIn: "9:04AM", clockedOut: "5:00PM", hours: "8" },
-  { clockedIn: "9:00AM", clockedOut: "5:00PM", hours: "8" },
-  { clockedIn: "9:15AM", clockedOut: "5:00PM", hours: "7.75" },
-  { clockedIn: "9:00AM", clockedOut: "5:00PM", hours: "8" },
-  { clockedIn: "9:00AM", clockedOut: "5:00PM", hours: "8" },
-  { clockedIn: "9:30AM", clockedOut: "5:00PM", hours: "7.5" },
-  { clockedIn: "OFF", clockedOut: "OFF", hours: "0" },
-];
-
-const metricData: MetricData[] = [
-  { label: "Absenteeism", value: "45 Hours", percentage: 4, isPositive: true },
-  { label: "Tardiness", value: "31 Days", percentage: -4, isPositive: false },
-  { label: "No Show", value: "13 Days", percentage: -14, isPositive: false },
-  { label: "Overtime", value: "13 Days", percentage: -14, isPositive: false },
-  { label: "Total Hours", value: "8 Days", percentage: 24, isPositive: true },
-  { label: "Total Days", value: "8 Days", percentage: 24, isPositive: true },
-];
+// const attendanceData: AttendanceData[] = [
+//   { clockedIn: "9:04AM", clockedOut: "5:00PM", hours: "8" },
+//   { clockedIn: "9:00AM", clockedOut: "5:00PM", hours: "8" },
+//   { clockedIn: "9:15AM", clockedOut: "5:00PM", hours: "7.75" },
+//   { clockedIn: "9:00AM", clockedOut: "5:00PM", hours: "8" },
+//   { clockedIn: "9:00AM", clockedOut: "5:00PM", hours: "8" },
+//   { clockedIn: "9:30AM", clockedOut: "5:00PM", hours: "7.5" },
+//   { clockedIn: "OFF", clockedOut: "OFF", hours: "0" },
+// ];
 
 const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
@@ -72,6 +66,28 @@ const Dashboard = () => {
     const info = infoData.find((info) => info.metricLabel === label);
     return info?.content;
   };
+
+  const params = useParams();
+  const { data: attendanceInfo } = useServerGet(
+    getAttendanceInfo,
+    Number(params.id),
+  );
+
+  const metricData: MetricData[] = [
+    {
+      label: "Absenteeism",
+      value: `${attendanceInfo?.absentDays} Days`,
+      percentage: 4,
+      isPositive: true,
+    },
+    { label: "Tardiness", value: "31 Days", percentage: -4, isPositive: false },
+    { label: "No Show", value: "13 Days", percentage: -14, isPositive: false },
+    { label: "Overtime", value: "13 Days", percentage: -14, isPositive: false },
+    { label: "Total Hours", value: "8 Days", percentage: 24, isPositive: true },
+    { label: "Total Days", value: "8 Days", percentage: 24, isPositive: true },
+  ];
+
+  // console.log("Attendance info: ", attendanceInfo);
 
   return (
     <div className="mb-4 box-border flex w-1/2 flex-col">
@@ -102,7 +118,7 @@ const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {attendanceData.map((data, index) => (
+                  {attendanceInfo?.attInfo?.map((data, index) => (
                     <tr
                       key={index}
                       className={index % 2 === 0 ? "bg-blue-100" : ""}
@@ -134,10 +150,10 @@ const Dashboard = () => {
                 >
                   <CiCircleInfo className="absolute left-1 top-0 h-3 w-3" />
                 </button>
-                <div className="w-[70%] text-lg font-bold text-gray-700">
+                <div className="w-[70%] text-base font-bold text-gray-700">
                   {metric.label}
                 </div>
-                <div className="w-[60%] text-xl font-semibold text-gray-800">
+                <div className="w-[60%] text-lg font-semibold text-gray-800">
                   {metric.value}
                 </div>
                 <div

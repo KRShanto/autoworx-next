@@ -5,15 +5,18 @@ import { useRouter, useSearchParams } from "next/navigation";
 import ProductTable from "./ProductTable";
 import SearchFilter from "./SearchFilter";
 import Sidebar from "./Sidebar";
+import { User } from "@prisma/client";
 
 export default function InventoryList({
   products,
   supplies,
   productId,
+  user,
 }: {
   products: any;
   supplies: any;
   productId: number;
+  user: User;
 }) {
   const router = useRouter();
   const search = useSearchParams();
@@ -25,18 +28,22 @@ export default function InventoryList({
       className="col-start-1 mt-3 flex h-[93%] min-h-0 w-1/2 flex-col overflow-clip text-xs 2xl:text-base"
     >
       <TabsList>
-        {/* <TabsTrigger
+        {/* TODO: comment this for now.
+        <TabsTrigger
           value="procurement"
           onClick={() => router.push("/inventory?view=procurement")}
         >
           Procurement
         </TabsTrigger>
-        <TabsTrigger
-          value="supplies"
-          onClick={() => router.push("/inventory?view=supplies")}
-        >
-          Supplies
-        </TabsTrigger> */}
+        */}
+        {(user.employeeType === "Admin" || user.employeeType === "Manager") && (
+          <TabsTrigger
+            value="supplies"
+            onClick={() => router.push("/inventory?view=supplies")}
+          >
+            Supplies
+          </TabsTrigger>
+        )}
         <TabsTrigger
           value="products"
           onClick={() => router.push("/inventory?view=products")}
@@ -45,19 +52,19 @@ export default function InventoryList({
         </TabsTrigger>
       </TabsList>
 
-      {/* <TabsContent value="procurement">
+      <TabsContent value="procurement">
         <p>Procurement</p>
-      </TabsContent> */}
+      </TabsContent>
 
       <TabsContent value="products" className="#overflow-x-scroll">
         <SearchFilter />
         <ProductTable products={products as any} currentProductId={productId} />
       </TabsContent>
-      {/*
+
       <TabsContent value="supplies">
         <SearchFilter />
         <ProductTable products={supplies as any} currentProductId={productId} />
-      </TabsContent> */}
+      </TabsContent>
     </Tabs>
   );
 }

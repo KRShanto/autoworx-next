@@ -1,17 +1,17 @@
 "use server";
 
-import { auth } from "@/app/auth";
 import { createTask } from "@/actions/task/createTask";
+import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
 import {
-  InvoiceType,
-  Service,
-  Material,
-  Labor,
-  Tag,
   Coupon,
+  InvoiceType,
+  Labor,
+  Material,
+  Service,
+  Tag,
 } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
@@ -100,13 +100,23 @@ export async function createInvoice({
     }
   }
 
+  // calculate the total cost. This is the sum of all the costs of the materials and labor
+  const totalCost = items.reduce((acc, item) => {
+    const materialCostPrice = item.materials.reduce(
+      (acc, cur) => acc + Number(cur?.cost) * Number(cur?.quantity),
+      0,
+    );
+    const laborCostPrice = Number(item.labor?.charge) * item?.labor?.hours!;
+    return acc + materialCostPrice + laborCostPrice;
+  }, 0);
+
   const invoice = await db.invoice.create({
     data: {
       id: invoiceId,
       type,
       clientId,
       vehicleId,
-
+      profit: grandTotal - totalCost,
       subtotal,
       discount,
       tax,
@@ -193,6 +203,7 @@ export async function createInvoice({
       priority: "Medium",
       assignedUsers: [],
       invoiceId: invoice.id,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
   });
 
