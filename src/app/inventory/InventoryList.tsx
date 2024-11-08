@@ -1,11 +1,11 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
+import { User } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProductTable from "./ProductTable";
 import SearchFilter from "./SearchFilter";
 import Sidebar from "./Sidebar";
-import { User } from "@prisma/client";
 
 export default function InventoryList({
   products,
@@ -24,18 +24,18 @@ export default function InventoryList({
 
   return (
     <Tabs
-      value="products"
+      value={view}
       className="col-start-1 mt-3 flex h-[93%] min-h-0 w-1/2 flex-col overflow-clip text-xs 2xl:text-base"
     >
       <TabsList>
-        {/* TODO: comment this for now.
-        <TabsTrigger
+        {/* TODO: comment this for now. */}
+        {/* <TabsTrigger
           value="procurement"
           onClick={() => router.push("/inventory?view=procurement")}
         >
           Procurement
-        </TabsTrigger>
-        */}
+        </TabsTrigger> */}
+
         {(user.employeeType === "Admin" || user.employeeType === "Manager") && (
           <TabsTrigger
             value="supplies"
@@ -44,17 +44,19 @@ export default function InventoryList({
             Supplies
           </TabsTrigger>
         )}
-        <TabsTrigger
-          value="products"
-          onClick={() => router.push("/inventory?view=products")}
-        >
-          <span className="text-lg font-semibold text-[#797979]">Products</span>
-        </TabsTrigger>
+        {user.employeeType !== "Technician" && (
+          <TabsTrigger
+            value="products"
+            onClick={() => router.push("/inventory?view=products")}
+          >
+            Products
+          </TabsTrigger>
+        )}
       </TabsList>
 
-      <TabsContent value="procurement">
+      {/* <TabsContent value="procurement">
         <p>Procurement</p>
-      </TabsContent>
+      </TabsContent> */}
 
       <TabsContent value="products" className="#overflow-x-scroll">
         <SearchFilter />
