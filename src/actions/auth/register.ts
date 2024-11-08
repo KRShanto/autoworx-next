@@ -2,6 +2,7 @@
 
 import { MIN_PASSWORD_LENGTH } from "@/lib/consts";
 import { db } from "@/lib/db";
+import { defaultColumnWithColor } from "@/lib/defaultColumns";
 import generateZapierToken from "@/lib/generateZapierToken";
 import { FormErrorType } from "@/types/form-errror";
 import bcrypt from "bcrypt";
@@ -19,6 +20,22 @@ interface Response {
   success?: boolean;
   error?: FormErrorType;
 }
+
+const insertDefaultColumns = async (columnId: number, type: string) => {
+  const columnsFortypes = defaultColumnWithColor.filter(
+    (column) => column.type === type,
+  );
+
+  const columnsWithCompany = columnsFortypes.map((column) => ({
+    ...column,
+    companyId: columnId,
+  }));
+
+ await db.column.createMany({
+    data: columnsWithCompany,
+    skipDuplicates: true,
+  });
+};
 
 export async function register({
   firstName,
@@ -119,6 +136,12 @@ export async function register({
         weekend2: "Sunday",
       },
     });
+
+    // Create default columns
+    await Promise.all([
+      insertDefaultColumns(newCompany.id, "sales"),
+      insertDefaultColumns(newCompany.id, "shop"),
+    ]);
 
     // TODO: Create default email template
 

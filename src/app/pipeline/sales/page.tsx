@@ -7,6 +7,7 @@ import Pipelines from "../components/Pipelines";
 import WorkOrders from "../components/WorkOrders";
 
 import SessionUserType from "@/types/sessionUserType";
+import { useSearchParams } from "next/navigation";
 type Props = {
   searchParams?: { view?: string };
 };
@@ -19,7 +20,8 @@ interface Column {
 }
 
 const Page = (props: Props) => {
-  const activeView = props.searchParams?.view ?? "workOrders";
+  const searchParam=useSearchParams();
+  const activeView = searchParam.get("view") ?? "workOrders";
   const columnType = "sales";
 
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);

@@ -11,11 +11,15 @@ import {
   updateColumnOrder,
 } from "@/actions/pipelines/pipelinesColumn";
 import { toast } from "react-hot-toast";
+import { INVOICE_COLORS } from "@/lib/consts";
 interface Column {
   id: number | null;
   title: string;
   type: string;
   order: number;
+  textColor?: string;
+  bgColor?: string;
+  isRestricted?: boolean;
 }
 
 interface ManagePipelinesModalProps {
@@ -24,6 +28,10 @@ interface ManagePipelinesModalProps {
   onClose: () => void;
   pipelineType: string;
 }
+const getRandomColor = () => {
+  const randomIndex = Math.floor(Math.random() * INVOICE_COLORS.length);
+  return INVOICE_COLORS[randomIndex];
+};
 
 const ItemType = "COLUMN";
 
@@ -33,82 +41,19 @@ interface DragItem {
   type: string;
 }
 const restrictedColumns = ["Pending", "In Progress", "Completed"];
-function ColumnItem({
-  column,
-  index,
-  moveColumn,
-  handleColumnChange,
 
-  handleDeleteColumn,
-  inputRef,
-}: Readonly<{
-  column: Column;
-  index: number;
-  moveColumn: (dragIndex: number, hoverIndex: number) => void;
-  handleColumnChange: (index: number, newName: string) => void;
-
-  handleDeleteColumn: (index: number) => void;
-  inputRef: (el: HTMLInputElement) => void;
-}>) {
-  const [, drop] = useDrop({
-    accept: ItemType,
-    hover(item: DragItem) {
-      if (item.index !== index) {
-        moveColumn(item.index, index);
-        item.index = index;
-      }
-    },
-  });
-
-  const [{ isDragging }, drag] = useDrag({
-    type: ItemType,
-    item: { id: column.id, index },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-
-  const ref = React.useRef(null);
-  drag(drop(ref));
-
-  return (
-    <div
-      ref={ref}
-      className={`mb-2 flex cursor-move items-center rounded-md border-red-800 bg-white p-2 ${
-        isDragging ? "opacity-50" : "opacity-100"
-      }`}
-    >
-      <IoReorderTwoSharp className="mr-2 text-gray-600" size={20} />
-      <input
-        type="text"
-        ref={inputRef}
-        value={column.title}
-        onChange={(e) => handleColumnChange(index, e.target.value)}
-        className="flex-grow rounded-md border border-red-300 p-1"
-        readOnly={
-          restrictedColumns.includes(column.title) && column.id !== null
-        }
-      />
-      {!restrictedColumns.includes(column.title) && column.id !== null ? (
-        <button
-          onClick={() => handleDeleteColumn(index)}
-          className="ml-2 text-[#FF6262] hover:text-red-700"
-        >
-          <RxCross2 size={20} />
-        </button>
-      ) : (
-        <div className="m-0 w-7 p-0"></div>
-      )}
-    </div>
-  );
-}
 export default function ManagePipelines({
   columns,
   onSave,
   onClose,
   pipelineType,
 }: Readonly<ManagePipelinesModalProps>) {
-  const [localColumns, setLocalColumns] = useState<Column[]>(columns);
+  const [localColumns, setLocalColumns] = useState<Column[]>(
+    columns.map((column) => ({
+      ...column,
+      isRestricted: restrictedColumns.includes(column.title),
+    })),
+  );
   const [deletedColumns, setDeletedColumns] = useState<Column[]>([]);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -130,7 +75,6 @@ export default function ManagePipelines({
 
   const handleColumnChange = (index: number, newName: string) => {
     const updatedColumns = [...localColumns];
-
     updatedColumns[index].title = newName;
     setLocalColumns(updatedColumns);
   };
@@ -139,7 +83,7 @@ export default function ManagePipelines({
     const columnToDelete = localColumns[index];
 
     //prevent from deletion
-    if (restrictedColumns.includes(columnToDelete.title)) {
+    if (columnToDelete.isRestricted) {
       toast.error("Deletion of restricted column is not allowed.");
       return;
     }
@@ -155,38 +99,61 @@ export default function ManagePipelines({
 
   const handleAddColumn = () => {
     const newOrder = localColumns.length;
+
+    const { textColor, bgColor } =
+      INVOICE_COLORS[localColumns.length % INVOICE_COLORS.length];
     const newColumn: Column = {
       id: null,
       title: "New Column",
       type: pipelineType,
       order: newOrder,
+      textColor,
+      bgColor,
     };
     setLocalColumns([...localColumns, newColumn]);
   };
 
   const handleSave = async () => {
-    const invalidColumns = localColumns.filter((column) =>
-      restrictedColumns.includes(column.title),
+    // Check for renamed restricted columns
+    const renamedRestrictedColumns = localColumns.filter(
+      (column) =>
+        column.isRestricted && !restrictedColumns.includes(column.title.trim()),
+    );
+
+    if (renamedRestrictedColumns.length > 0) {
+      toast.error(
+        `The restricted column "${renamedRestrictedColumns[0].title}" cannot be renamed.`,
+      );
+      return;
+    }
+
+    // Check if any non-restricted column has a restricted title
+    const invalidColumns = localColumns.filter(
+      (column) =>
+        !column.isRestricted && restrictedColumns.includes(column.title.trim()),
     );
 
     if (invalidColumns.length > 0) {
       toast.error(
-        `Cannot use restricted column names: ${invalidColumns
-          .map((c) => `'${c.title}'`)
-          .join(", ")}`,
+        `The column "${invalidColumns[0].title}" is a restricted title and cannot be used.`,
       );
       return;
     }
 
     const columnsToSave = localColumns.map(async (column, index) => {
-      column.order = index; // Ensure the correct order is saved
+      column.order = index;
 
       if (restrictedColumns.includes(column.title)) {
         return;
       }
 
       if (column.id === null) {
-        const newColumn = await createColumn(column.title, column.type);
+        const newColumn = await createColumn(
+          column.title,
+          column.type,
+          column.textColor,
+          column.bgColor,
+        );
         column.id = newColumn.id;
       } else {
         await updateColumn(column.id, column.title, pipelineType, column.order);
@@ -261,5 +228,70 @@ export default function ManagePipelines({
         </div>
       </div>
     </DndProvider>
+  );
+}
+function ColumnItem({
+  column,
+  index,
+  moveColumn,
+  handleColumnChange,
+  handleDeleteColumn,
+  inputRef,
+}: Readonly<{
+  column: Column;
+  index: number;
+  moveColumn: (dragIndex: number, hoverIndex: number) => void;
+  handleColumnChange: (index: number, newName: string) => void;
+  handleDeleteColumn: (index: number) => void;
+  inputRef: (el: HTMLInputElement) => void;
+}>) {
+  const [, drop] = useDrop({
+    accept: ItemType,
+    hover(item: DragItem) {
+      if (item.index !== index) {
+        moveColumn(item.index, index);
+        item.index = index;
+      }
+    },
+  });
+
+  const [{ isDragging }, drag] = useDrag({
+    type: ItemType,
+    item: { id: column.id, index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  const ref = React.useRef(null);
+  drag(drop(ref));
+  const isRestricted = column.isRestricted;
+  return (
+    <div
+      ref={ref}
+      className={`mb-2 flex cursor-move items-center rounded-md bg-white p-2 ${
+        isDragging ? "opacity-50" : "opacity-100"
+      }`}
+    >
+      <IoReorderTwoSharp className="mr-2 text-gray-600" size={20} />
+      <input
+        type="text"
+        ref={inputRef}
+        value={column.title}
+        onChange={(e) => handleColumnChange(index, e.target.value)}
+        className="flex-grow rounded-md border border-gray-300 p-1"
+        disabled={isRestricted}
+      />
+      {!isRestricted ? (
+        <button
+          onClick={() => handleDeleteColumn(index)}
+          className="ml-2 text-[#FF6262] hover:text-red-700"
+        >
+          <RxCross2 size={20} />
+        </button>
+      ) : (
+        <div className="m-0 w-7"></div>
+      )}
+    </div>
   );
 }
