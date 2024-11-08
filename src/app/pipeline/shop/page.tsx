@@ -7,6 +7,7 @@ import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
 import { getCompanyUser } from "@/actions/user/getCompanyUser";
 
 import SessionUserType from "@/types/sessionUserType";
+import { useSearchParams } from "next/navigation";
 
 type Props = {
   searchParams?: { view?: string };
@@ -20,7 +21,8 @@ interface Column {
 }
 
 const Page = (props: Props) => {
-  const activeView = props.searchParams?.view ?? "workOrders";
+  const searchParam=useSearchParams();
+  const activeView =searchParam.get('view') ?? "workOrders";
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
   const [currentUser, setCurrentUser] = useState<SessionUserType>();
 

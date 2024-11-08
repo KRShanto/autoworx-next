@@ -11,11 +11,14 @@ import {
   updateColumnOrder,
 } from "@/actions/pipelines/pipelinesColumn";
 import { toast } from "react-hot-toast";
+import { INVOICE_COLORS } from "@/lib/consts";
 interface Column {
   id: number | null;
   title: string;
   type: string;
   order: number;
+  textColor?: string;
+  bgColor?: string;
   isRestricted?: boolean;
 }
 
@@ -25,6 +28,10 @@ interface ManagePipelinesModalProps {
   onClose: () => void;
   pipelineType: string;
 }
+const getRandomColor = () => {
+  const randomIndex = Math.floor(Math.random() * INVOICE_COLORS.length);
+  return INVOICE_COLORS[randomIndex];
+};
 
 const ItemType = "COLUMN";
 
@@ -92,11 +99,16 @@ export default function ManagePipelines({
 
   const handleAddColumn = () => {
     const newOrder = localColumns.length;
+
+    const { textColor, bgColor } =
+      INVOICE_COLORS[localColumns.length % INVOICE_COLORS.length];
     const newColumn: Column = {
       id: null,
       title: "New Column",
       type: pipelineType,
       order: newOrder,
+      textColor,
+      bgColor,
     };
     setLocalColumns([...localColumns, newColumn]);
   };
@@ -136,7 +148,12 @@ export default function ManagePipelines({
       }
 
       if (column.id === null) {
-        const newColumn = await createColumn(column.title, column.type);
+        const newColumn = await createColumn(
+          column.title,
+          column.type,
+          column.textColor,
+          column.bgColor,
+        );
         column.id = newColumn.id;
       } else {
         await updateColumn(column.id, column.title, pipelineType, column.order);
