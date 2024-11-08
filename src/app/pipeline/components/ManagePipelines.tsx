@@ -129,7 +129,7 @@ export default function ManagePipelines({
     }
 
     const columnsToSave = localColumns.map(async (column, index) => {
-      column.order = index; // Ensure the correct order is saved
+      column.order = index;
 
       if (restrictedColumns.includes(column.title)) {
         return;
