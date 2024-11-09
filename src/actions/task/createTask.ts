@@ -19,26 +19,27 @@ export interface TaskType {
   endTime?: string;
   clientId?: number | null;
   date?: string;
-  timezone?:string
+  timezone?: string;
 }
 
 export async function createTask(task: TaskType): Promise<ServerAction> {
   try {
     const session = (await auth()) as AuthSession;
+    let taskData = {
+      title: task.title,
+      description: task.description,
+      priority: task.priority,
+      userId: parseInt(session.user.id),
+      companyId: session.user.companyId,
+      invoiceId: task.invoiceId,
+      startTime: task.startTime,
+      endTime: task.endTime,
+      clientId: task.clientId,
+      date: task?.date || undefined,
+    };
 
     let newTask = await db.task.create({
-      data: {
-        title: task.title,
-        description: task.description,
-        priority: task.priority,
-        userId: parseInt(session.user.id),
-        companyId: session.user.companyId,
-        invoiceId: task.invoiceId,
-        startTime: task.startTime,
-        endTime: task.endTime,
-        clientId: task.clientId,
-        date: task?.date ? task?.date : new Date().toISOString(),
-      },
+      data: taskData,
     });
 
     // Loop the assigned users and add them to the Google Calendar

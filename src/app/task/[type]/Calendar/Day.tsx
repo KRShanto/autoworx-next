@@ -23,7 +23,7 @@ import { updateTask } from "../../../../actions/task/dragTask";
 import DayRow from "../components/day/DayRow";
 import DayTask from "../components/day/DayTask";
 
-function useDate() {
+export function useDate() {
   const searchParams = useSearchParams();
   const date = moment(searchParams.get("date"), moment.HTML5_FMT.DATE);
   return date.isValid() ? date : moment();
@@ -160,12 +160,16 @@ export default function Day({
       );
       const oldTask = tasks.find((task) => task.id === taskId);
       if (taskFoundWithoutTime) {
+        console.log(
+          "🚀 ~ handleDrop ~ taskFoundWithoutTime:",
+          taskFoundWithoutTime,
+        );
         // Add task to database
         await updateTask({
           id: taskFoundWithoutTime.id,
           date: taskFoundWithoutTime?.date
             ? taskFoundWithoutTime.date
-            : new Date(),
+            : date.toDate(),
           startTime: oldTask?.startTime || startTime,
           endTime: oldTask?.endTime || endTime,
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
