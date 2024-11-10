@@ -1,12 +1,13 @@
 import { TASK_COLOR } from "@/lib/consts";
-import React, { LegacyRef } from "react";
 import { Task } from "@prisma/client";
-import { useDrag } from "react-dnd";
-import { FaRegCheckCircle } from "react-icons/fa";
-import { deleteTask } from "../../../../actions/task/deleteTask";
 import moment from "moment";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import React, { LegacyRef } from "react";
+import { useDrag } from "react-dnd";
+import { FaRegCheckCircle } from "react-icons/fa";
+import { deleteTask } from "../../../../actions/task/deleteTask";
+import { useDate } from "../Calendar/Day";
 
 export default function TaskComponent({ task }: { task: Task }) {
   const [{ isDragging }, drag] = useDrag({
@@ -18,6 +19,7 @@ export default function TaskComponent({ task }: { task: Task }) {
   });
 
   const router = useRouter();
+  const queryDate = useDate();
 
   const handleDragStart = (event: React.DragEvent) => {
     event.dataTransfer.setData("text/plain", `task|${task.id}`);
@@ -27,7 +29,9 @@ export default function TaskComponent({ task }: { task: Task }) {
     await deleteTask(task.id);
   };
 
-  const existingDate = moment(task?.date).format("YYYY-MM-DD");
+  const existingDate = task?.date
+    ? moment(task?.date).format("YYYY-MM-DD")
+    : queryDate.format("YYYY-MM-DD");
 
   const handleDragEnd = () => {
     router.push(`/task/day?date=${existingDate}`);

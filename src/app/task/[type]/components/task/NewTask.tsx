@@ -49,7 +49,7 @@ export default function NewTask({
       startTime: time?.startTime,
       endTime: time?.endTime,
       clientId,
-      date: date ? new Date(date).toISOString() : new Date().toISOString(),
+      date: date ? new Date(date).toISOString() : undefined,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
 
