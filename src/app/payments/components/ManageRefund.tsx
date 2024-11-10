@@ -14,13 +14,13 @@ import { SlimInput } from "@/components/SlimInput";
 import { SlimTextarea } from "@/components/SlimTextarea";
 import Submit from "@/components/Submit";
 import { useState } from "react";
-import { CiCreditCard2, CiSettings } from "react-icons/ci";
-import { FaMoneyCheckDollar } from "react-icons/fa6";
-import { GiMoneyStack } from "react-icons/gi";
+import { CiSettings } from "react-icons/ci";
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { paymentMethods } from "./NewRefund";
 
 export default function ManageRefund() {
   const [open, setOpen] = useState(false);
+  const [checkedMethod, setCheckedMethod] = useState<string>("card");
 
   async function handleSubmit(data: FormData) {}
 
@@ -28,7 +28,7 @@ export default function ManageRefund() {
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <button className="flex items-center gap-2 rounded-md border bg-white px-4 py-1 text-[#6571FF]">
+          <button className="flex items-center gap-2 rounded border bg-white px-4 py-1 text-[#6571FF]">
             <span>Refund</span>
             <CiSettings />
           </button>
@@ -44,27 +44,24 @@ export default function ManageRefund() {
           <FormError />
 
           <div className="relative grid gap-5 overflow-y-auto p-4">
-            <MdOutlineDeleteOutline className="absolute right-0 top-4 cursor-pointer text-xl text-red-500" />
+            <button className="absolute right-0 top-4 cursor-pointer rounded-md bg-red-500 p-2 text-xl text-white">
+              <MdOutlineDeleteOutline />
+            </button>
             <SlimInput name="amount" label="Amount" className="w-[200px]" />
 
             <div>
               <p className="mb-1 px-2 font-medium">Method</p>
               <div className="flex items-center gap-4">
-                <button className="flex items-center gap-x-2 rounded-md border border-[#6571ff] px-4 py-1 text-[#6571ff]">
-                  <CiCreditCard2 />
-
-                  <span>Card</span>
-                </button>
-                <button className="flex items-center gap-x-2 rounded-md border border-[#6571ff] px-4 py-1 text-[#6571ff]">
-                  <FaMoneyCheckDollar />
-
-                  <span>Check</span>
-                </button>
-                <button className="flex items-center gap-x-2 rounded-md border border-[#6571ff] px-4 py-1 text-[#6571ff]">
-                  <GiMoneyStack />
-
-                  <span>Cash</span>
-                </button>
+                {paymentMethods.map((method, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCheckedMethod(method.method)}
+                    className={`flex items-center gap-x-2 rounded-md border border-[#6571ff] px-4 py-1 capitalize ${checkedMethod === method.method ? "bg-[#6571ff] text-white" : "bg-white text-[#6571ff]"}`}
+                  >
+                    {method.icon}
+                    <span>{method.method}</span>
+                  </button>
+                ))}
               </div>
             </div>
 

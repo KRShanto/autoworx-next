@@ -18,8 +18,15 @@ import { CiCreditCard2 } from "react-icons/ci";
 import { FaMoneyCheckDollar } from "react-icons/fa6";
 import { GiMoneyStack } from "react-icons/gi";
 
+export const paymentMethods = [
+  { method: "card", icon: <CiCreditCard2 /> },
+  { method: "cash", icon: <FaMoneyCheckDollar /> },
+  { method: "check", icon: <GiMoneyStack /> },
+];
+
 export default function NewRefund() {
   const [open, setOpen] = useState(false);
+  const [checkedMethod, setCheckedMethod] = useState<string>("card");
 
   async function handleSubmit(data: FormData) {}
 
@@ -47,21 +54,16 @@ export default function NewRefund() {
             <div>
               <p className="mb-1 px-2 font-medium">Method</p>
               <div className="flex items-center gap-4">
-                <button className="flex items-center gap-x-2 rounded-md border border-[#6571ff] px-4 py-1 text-[#6571ff]">
-                  <CiCreditCard2 />
-
-                  <span>Card</span>
-                </button>
-                <button className="flex items-center gap-x-2 rounded-md border border-[#6571ff] px-4 py-1 text-[#6571ff]">
-                  <FaMoneyCheckDollar />
-
-                  <span>Check</span>
-                </button>
-                <button className="flex items-center gap-x-2 rounded-md border border-[#6571ff] px-4 py-1 text-[#6571ff]">
-                  <GiMoneyStack />
-
-                  <span>Cash</span>
-                </button>
+                {paymentMethods.map((method, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCheckedMethod(method.method)}
+                    className={`flex items-center gap-x-2 rounded-md border border-[#6571ff] px-4 py-1 capitalize ${checkedMethod === method.method ? "bg-[#6571ff] text-white" : "bg-white text-[#6571ff]"}`}
+                  >
+                    {method.icon}
+                    <span>{method.method}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
