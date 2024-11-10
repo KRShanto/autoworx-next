@@ -1,18 +1,16 @@
 "use server";
 import { auth } from "@/app/auth";
-// import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { defaultColumnWithColor } from "@/lib/defaultColumns";
 import { AuthSession } from "@/types/auth";
 
-// Insert default columns when creating a new company
 const insertDefaultColumns = async (type: string) => {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
-  // Filter columns by type (sales or shop)
-  const columnsForType = defaultColumnWithColor.filter((column) => column.type === type);
+  const columnsForType = defaultColumnWithColor.filter(
+    (column) => column.type === type,
+  );
 
-  // Add companyId to each column
   const columnsWithCompany = columnsForType.map((column) => ({
     ...column,
     companyId,
@@ -26,8 +24,10 @@ const insertDefaultColumns = async (type: string) => {
 
 // Fetch all columns by type
 export const getColumnsByType = async (type: string) => {
+  const session = (await auth()) as AuthSession;
+  const companyId = session.user.companyId;
   let columns = await db.column.findMany({
-    where: { type },
+    where: { type, companyId: companyId },
     orderBy: { order: "asc" },
   });
 
@@ -43,7 +43,6 @@ export const getColumnsByType = async (type: string) => {
   return columns;
 };
 
-// Create a new column with type and automatically set the correct order
 export const createColumn = async (
   title: string,
   type: string,
@@ -66,8 +65,8 @@ export const createColumn = async (
       type,
       order: newOrder,
       companyId,
-      textColor: textColor || null,
-      bgColor: bgColor || null,
+      textColor: textColor ?? undefined,
+      bgColor: bgColor ?? undefined,
     },
   });
 };
@@ -100,10 +99,9 @@ export const updateColumnOrder = async (
   const updatePromises = reorderedColumns.map(({ id, order }) =>
     db.column.update({
       where: { id },
-      data: { order }, // Update each column's order
+      data: { order },
     }),
   );
 
-  // Wait for all updates to complete
   await Promise.all(updatePromises);
 };
