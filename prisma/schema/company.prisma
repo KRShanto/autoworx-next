@@ -64,6 +64,7 @@ model Company {
     RequestEstimateReceived RequestEstimate[]         @relation("ReceiverCompany")
     Column                  Column[]
     ClockInOut              ClockInOut[]
+    Holiday                 Holiday[]
 }
 
 // create model that will handle multiple companies join and collaboration
@@ -86,6 +87,15 @@ model CalendarSettings {
     dayEnd    String
     weekend1  String   @default("Saturday")
     weekend2  String   @default("Sunday")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+    company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model Holiday {
+    id        Int      @id @default(autoincrement())
+    companyId Int      @map("company_id")
+    date      DateTime
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
     company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
