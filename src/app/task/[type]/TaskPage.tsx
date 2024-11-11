@@ -2,7 +2,7 @@
 import DnDWrapper from "@/components/DnDWrapper";
 import { CalendarType } from "@/types/calendar";
 import { AppointmentFull, CalendarAppointment } from "@/types/db";
-import type { EmailTemplate } from "@prisma/client";
+import type { EmailTemplate, Holiday } from "@prisma/client";
 import { CalendarSettings, Client, Task, User, Vehicle } from "@prisma/client";
 import Calendar from "./Calendar/Calendar";
 import CalendarSidebar from "./CalendarSidebar/CalendarSidebar";
@@ -18,11 +18,13 @@ export default function TaskPage({
   appointments,
   templates,
   appointmentsFull,
+  holidays,
   user,
 }: {
   type: CalendarType;
   taskWithAssignedUsers: (Task & { assignedUsers: User[] })[];
   companyUsers: User[];
+  holidays: Holiday[];
   usersWithTasks: any; // TODO: Fix this type
   customers: Client[];
   vehicles: Vehicle[];
@@ -56,6 +58,7 @@ export default function TaskPage({
         vehicles={vehicles}
         settings={settings}
         appointments={appointments}
+        holidays={holidays}
         templates={templates}
         appointmentsFull={appointmentsFull}
         user={user}

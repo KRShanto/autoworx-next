@@ -15,7 +15,7 @@ export default function HolidayButton() {
 
   const [selectedMonth, setSelectedMonth] = useState<string>("");
 
-  const [selectedYear, setSelectedYear] = useState<number>(moment().year());
+  const [selectedYear, setSelectedYear] = useState<number>(0);
 
   const authUser = session as AuthSession;
   const handleClose = () => {
@@ -77,8 +77,14 @@ export default function HolidayButton() {
           setSelectedMonth(date.month.name);
           setSelectedYear(date.year);
         }}
-        onClose={() => setSelectedMonth("")}
-        onOpen={() => setSelectedMonth(moment().format("MMMM"))}
+        onClose={() => {
+          setSelectedMonth("");
+          setSelectedYear(0);
+        }}
+        onOpen={() => {
+          setSelectedMonth(moment().format("MMMM"));
+          setSelectedYear(moment().year());
+        }}
         render={
           <button className="app-shadow rounded-md bg-[#006D77] px-3 py-2 font-semibold text-white">
             Set Holiday

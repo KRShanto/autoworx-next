@@ -1,5 +1,6 @@
 "use server";
 import { db } from "@/lib/db";
+import { revalidatePath } from "next/cache";
 
 type THolidays = {
   year: number;
@@ -46,6 +47,7 @@ export async function createHoliday(
         year: selectedYear,
       },
     });
+    revalidatePath("/task/month");
     return {
       status: 200,
       success: true,
