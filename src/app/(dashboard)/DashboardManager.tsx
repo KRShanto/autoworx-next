@@ -56,17 +56,11 @@ const DashboardManager = ({
             </span>
           </div>
           <div className="space-y-3">
-            <ChartData
-              heading="Leads coming in"
-              subHeading="/month"
-              number={567}
-            />
-            <ChartData heading="Leads Converted" number={767} />
-            <ChartData
-              heading="Conversion Rate"
-              subHeading="Leads Converted/Total Leads"
-              number={435}
-            />
+            <div className="space-y-3">
+              <ChartData heading="Total Jobs" number={567} />
+              <ChartData heading="Ongoing Jobs" number={435} />
+              <ChartData heading="Completed Jobs" number={767} />
+            </div>
           </div>
         </div>
       </div>
