@@ -37,6 +37,8 @@ model InventoryProductHistory {
     product   InventoryProduct            @relation(fields: [productId], references: [id], onDelete: Cascade)
     invoice   Invoice?                    @relation(fields: [invoiceId], references: [id])
     vendor    Vendor?                     @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+    companyId Int                         @map("company_id")
+    company   Company                     @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 enum InventoryProductHistoryType {

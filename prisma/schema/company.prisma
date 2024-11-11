@@ -65,6 +65,7 @@ model Company {
     Column                  Column[]
     ClockInOut              ClockInOut[]
     Holiday                 Holiday[]
+    InventoryProductHistory InventoryProductHistory[]
 }
 
 // create model that will handle multiple companies join and collaboration
