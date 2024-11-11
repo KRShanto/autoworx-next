@@ -96,6 +96,8 @@ model Holiday {
     id        Int      @id @default(autoincrement())
     companyId Int      @map("company_id")
     date      DateTime
+    month     String
+    year      Int
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
     company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)

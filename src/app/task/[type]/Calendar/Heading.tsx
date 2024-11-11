@@ -9,6 +9,7 @@ import { Suspense } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { NewAppointment } from "../components/appointment/NewAppointment";
 import Settings from "../components/appointment/Settings";
+import HolidayButton from "./HolidayButton";
 
 const ALLOWED_ROLES_FOR_NEW_APPOINTMENT = ["Admin", "Manager", "Sales"];
 
@@ -71,6 +72,8 @@ export default function Heading({
 
       {/* Calendar options */}
       <div className="flex items-center gap-3">
+        {/* holiday set */}
+        <HolidayButton />
         {/* Highlight day's date in Month section */}
         <Link
           className="app-shadow rounded-md p-2 text-[#797979]"
