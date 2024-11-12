@@ -20,8 +20,6 @@ const Dashboard = ({
   appointments: any;
   pendingLeaveRequests: (LeaveRequest & { user: User })[];
 }) => {
-  const { open } = usePopupStore();
-
   const { data } = useServerGetInterval(getAdminInfo, 5000);
 
   return (
