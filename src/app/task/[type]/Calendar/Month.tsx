@@ -14,14 +14,15 @@ import type {
   CalendarAppointment,
   CalendarTask,
 } from "@/types/db";
-import type {
-  CalendarSettings,
-  Client,
-  EmailTemplate,
-  Holiday,
-  Task,
-  User,
-  Vehicle,
+import {
+  EmployeeType,
+  type CalendarSettings,
+  type Client,
+  type EmailTemplate,
+  type Holiday,
+  type Task,
+  type User,
+  type Vehicle,
 } from "@prisma/client";
 import moment from "moment";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -30,6 +31,8 @@ import { FaPen } from "react-icons/fa6";
 import { assignAppointmentDate } from "../../../../actions/appointment/assignAppointmentDate";
 import { dragTask } from "../../../../actions/task/dragTask";
 import HolidayDeleteConfirmation from "./HolidayDeleteConfiramtion";
+import { useSession } from "next-auth/react";
+import { AuthSession } from "@/types/auth";
 
 function useMonth() {
   const searchParams = useSearchParams();
@@ -61,6 +64,12 @@ export default function Month({
   templates: EmailTemplate[];
 }) {
   const router = useRouter();
+
+  const { data: session } = useSession();
+
+  const isAdmin =
+    (session as AuthSession)?.user.employeeType === EmployeeType.Admin;
+
   const [{ canDrop, isOver }, dropRef] = useDrop({
     accept: ["task", "tag", "appointment"],
     drop: (item, monitor) => {
@@ -430,7 +439,9 @@ export default function Month({
                       )}
                     >
                       <span>Holiday</span>
-                      <HolidayDeleteConfirmation holidayId={holiday.id} />
+                      {isAdmin && (
+                        <HolidayDeleteConfirmation holidayId={holiday.id} />
+                      )}
                     </div>
                   ))}
                 </div>
