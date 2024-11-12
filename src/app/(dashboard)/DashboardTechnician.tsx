@@ -65,24 +65,24 @@ const DashboardTechnician = ({
   );
 
   return (
-    <div className="flex items-start gap-x-4">
+    <div className="flex h-full items-start gap-x-4">
       {/* col 1 */}
-      <div className="w-[30%] space-y-4">
+      <div className="h-full w-[30%] space-y-4">
         {/* Current Projects */}
         <CurrentProjects />
       </div>
 
       {/* col 2 */}
-      <div className="w-[25%] space-y-4">
+      <div className="flex h-full w-[25%] flex-col justify-around space-y-4">
         {/* task list */}
         <Tasks tasks={tasks} companyUsers={companyUsers} />
         {/* appointments */}
         <Appointments appointments={appointments} />
       </div>
       {/* col 3 */}
-      <div className="w-[45%] space-y-4">
+      <div className="h-full w-[45%] space-y-4">
         {/* attendance buttons */}
-        <div className="flex justify-between gap-x-2 rounded-md p-4 shadow-lg xl:p-8">
+        <div className="flex h-[20%] justify-between gap-x-2 rounded-md p-4 shadow-lg xl:p-8">
           <div>
             <button
               onClick={async () => {
@@ -186,9 +186,9 @@ const DashboardTechnician = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-2">
+        <div className="#grid #grid-cols-2 flex h-[75%]">
           {/* <!--col 1 --> */}
-          <div>
+          <div className="flex h-full w-1/2 flex-col justify-around">
             {/* Performance */}
             <div className="rounded-md p-4 shadow-lg 2xl:px-6">
               <div className="mb-8 flex items-center justify-between">
@@ -217,10 +217,10 @@ const DashboardTechnician = ({
             </div>
           </div>
           {/* col 2 */}
-          <div>
+          <div className="h-full w-1/2">
             {" "}
             {/* recent messages */}
-            <RecentMessages />
+            <RecentMessages fullHeight={true} />
           </div>
         </div>
       </div>

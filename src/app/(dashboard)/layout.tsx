@@ -7,7 +7,7 @@ type Props = {
 
 const layout = ({ children }: Props) => {
   return (
-    <div className="p-8">
+    <div className="h-[98%] p-8">
       <div className="mb-4">
         <Title>Dashboard</Title>
       </div>

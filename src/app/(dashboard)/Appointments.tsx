@@ -17,7 +17,7 @@ const Appointments = ({ appointments, fullHeight }: any) => {
           <AppointmentDetails appointment={appointment} key={idx} />
         ))}
         {appointments.length === 0 && (
-          <span className="self-center text-center">
+          <span className="self-center text-center my-auto">
             You have no upcoming appointments
           </span>
         )}

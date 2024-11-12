@@ -1,5 +1,7 @@
 "use client";
+import { getAdminInfo } from "@/actions/dashboard/data/getAdminInfo";
 import Title from "@/components/Title";
+import { useServerGetInterval } from "@/hooks/useServerGet";
 import { usePopupStore } from "@/stores/popup";
 import { LeaveRequest, Task as TaskType, User } from "@prisma/client";
 import { FaExternalLinkAlt } from "react-icons/fa";
@@ -7,8 +9,6 @@ import Appointments from "./Appointments";
 import ChartData from "./ChartData";
 import EmployeeLeaveRequests from "./EmployeeLeaveRequests";
 import Tasks from "./Tasks";
-import { useServerGetInterval } from "@/hooks/useServerGet";
-import { getAdminInfo } from "@/actions/dashboard/data/getAdminInfo";
 
 const DashboardManager = ({
   tasks = [],
@@ -24,11 +24,10 @@ const DashboardManager = ({
   const { open } = usePopupStore();
   const { data } = useServerGetInterval(getAdminInfo, 5000);
 
-
   return (
-    <div className="flex items-start gap-x-2 2xl:gap-x-8">
+    <div className="flex h-full items-start gap-x-2 2xl:gap-x-8">
       {/* col 1 */}
-      <div className="w-[20%] space-y-3">
+      <div className="flex h-full w-[20%] flex-col justify-around space-y-3">
         {/* sales pipeline */}
         <div className="rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
@@ -61,23 +60,23 @@ const DashboardManager = ({
           </div>
           <div className="space-y-3">
             <div className="space-y-3">
-            <ChartData
-              heading="Total Jobs"
-              number={data?.totalJobs?.jobs}
-              isPositive={data?.totalJobs?.growth?.isPositive}
-              rate={data?.totalJobs?.growth?.rate}
-            />
-            <ChartData
-              heading="Ongoing Jobs"
-              number={data?.ongoingJobs?.ongoingJobs}
-              noRate
-            />
-            <ChartData
-              heading="Completed Jobs"
-              number={data?.completedJobs?.completedJobs}
-              isPositive={data?.completedJobs?.growth?.isPositive}
-              rate={data?.completedJobs?.growth?.rate}
-            />
+              <ChartData
+                heading="Total Jobs"
+                number={data?.totalJobs?.jobs}
+                isPositive={data?.totalJobs?.growth?.isPositive}
+                rate={data?.totalJobs?.growth?.rate}
+              />
+              <ChartData
+                heading="Ongoing Jobs"
+                number={data?.ongoingJobs?.ongoingJobs}
+                noRate
+              />
+              <ChartData
+                heading="Completed Jobs"
+                number={data?.completedJobs?.completedJobs}
+                isPositive={data?.completedJobs?.growth?.isPositive}
+                rate={data?.completedJobs?.growth?.rate}
+              />
             </div>
           </div>
         </div>
@@ -94,7 +93,7 @@ const DashboardManager = ({
         <Appointments appointments={appointments} fullHeight />
       </div>
       {/* col 4*/}
-      <div className="w-[40%] space-y-4">
+      <div className="flex h-full w-[40%] flex-col justify-around space-y-4">
         <div className="flex items-start gap-4">
           {/* Revenue */}
           <div className="w-1/2 rounded-md p-4 shadow-lg 2xl:px-6">
@@ -105,20 +104,20 @@ const DashboardManager = ({
               </span>
             </div>
             <div className="space-y-3">
-            <ChartData
-              heading="Current Revenue"
-              dollarSign={true}
-              number={data?.revenue?.revenue}
-              isPositive={data?.revenue?.growth?.isPositive}
-              rate={data?.revenue?.growth?.rate}
-            />
-            <ChartData
-              heading="Expected Revenue"
-              dollarSign={true}
-              number={data?.expectedRevenue?.revenue}
-              isPositive={data?.expectedRevenue?.growth?.isPositive}
-              rate={data?.expectedRevenue?.growth?.rate}
-            />
+              <ChartData
+                heading="Current Revenue"
+                dollarSign={true}
+                number={data?.revenue?.revenue}
+                isPositive={data?.revenue?.growth?.isPositive}
+                rate={data?.revenue?.growth?.rate}
+              />
+              <ChartData
+                heading="Expected Revenue"
+                dollarSign={true}
+                number={data?.expectedRevenue?.revenue}
+                isPositive={data?.expectedRevenue?.growth?.isPositive}
+                rate={data?.expectedRevenue?.growth?.rate}
+              />
             </div>
           </div>
           {/* Inventory */}
@@ -130,19 +129,19 @@ const DashboardManager = ({
               </span>
             </div>
             <div className="space-y-3">
-            <ChartData
-              heading="Total Value"
-              dollarSign={true}
-              number={data?.inventory?.totalValue}
-              noRate
-            />
-            <ChartData
-              heading="Current Monthly Total"
-              number={data?.inventory?.currentMonthTotal}
-              dollarSign={true}
-              isPositive={data?.inventory?.growth?.isPositive}
-              rate={data?.inventory?.growth?.rate}
-            />
+              <ChartData
+                heading="Total Value"
+                dollarSign={true}
+                number={data?.inventory?.totalValue}
+                noRate
+              />
+              <ChartData
+                heading="Current Monthly Total"
+                number={data?.inventory?.currentMonthTotal}
+                dollarSign={true}
+                isPositive={data?.inventory?.growth?.isPositive}
+                rate={data?.inventory?.growth?.rate}
+              />
             </div>
           </div>
         </div>
@@ -155,13 +154,7 @@ const DashboardManager = ({
             </span>
           </div>
           <div className="space-y-3">
-            <ChartData
-              heading="Previous Month Payout"
-              number={567}
-              dollarSign
-            />
             <ChartData heading="Current Month Payout" number={767} dollarSign />
-            <ChartData heading="YTD Payout" number={435} dollarSign />
           </div>
         </div>
         {/* employee leave request */}
