@@ -84,6 +84,7 @@ export async function newPayment({
       // create a new history entry
       await db.inventoryProductHistory.create({
         data: {
+          companyId,
           productId: product.id,
           date: new Date(date),
           quantity: product.quantity,

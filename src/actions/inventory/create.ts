@@ -45,6 +45,7 @@ export async function createProduct(
     // create a history record
     await db.inventoryProductHistory.create({
       data: {
+        companyId,
         productId: newProduct.id,
         date: new Date(),
         quantity: newProduct.quantity || 1,

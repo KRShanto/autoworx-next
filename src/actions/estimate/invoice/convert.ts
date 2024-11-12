@@ -1,10 +1,12 @@
 "use server";
 
+import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { revalidatePath } from "next/cache";
 
 export async function convertInvoice(id: string): Promise<ServerAction> {
+  const companyId = await getCompanyId();
   const invoice = await db.invoice.findUnique({ where: { id } });
 
   if (!invoice) {
@@ -56,6 +58,7 @@ export async function convertInvoice(id: string): Promise<ServerAction> {
       // create a new history entry
       await db.inventoryProductHistory.create({
         data: {
+          companyId,
           productId: product.id,
           date: new Date(),
           quantity: product.quantity,
