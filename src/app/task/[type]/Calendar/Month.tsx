@@ -29,8 +29,7 @@ import { useDrop } from "react-dnd";
 import { FaPen } from "react-icons/fa6";
 import { assignAppointmentDate } from "../../../../actions/appointment/assignAppointmentDate";
 import { dragTask } from "../../../../actions/task/dragTask";
-import { SiDask } from "react-icons/si";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import HolidayDeleteConfirmation from "./HolidayDeleteConfiramtion";
 
 function useMonth() {
   const searchParams = useSearchParams();
@@ -424,14 +423,14 @@ export default function Month({
                     <div
                       key={holiday.id}
                       className={cn(
-                        "app-shadow absolute left-1/2 flex -translate-x-1/2 items-center gap-x-2 rounded-md !bg-[#006D77] px-3 py-1.5 text-left text-lg font-semibold text-white",
+                        "app-shadow absolute left-1/2 z-10 flex -translate-x-1/2 items-center gap-x-2 rounded-md !bg-[#006D77] px-3 py-1.5 text-left text-lg font-semibold text-white",
                         cell[1].length || cell[2].length
                           ? "-bottom-12"
                           : "-bottom-24",
                       )}
                     >
                       <span>Holiday</span>
-                      <RiDeleteBin6Line size={20} className="cursor-pointer" />
+                      <HolidayDeleteConfirmation holidayId={holiday.id} />
                     </div>
                   ))}
                 </div>

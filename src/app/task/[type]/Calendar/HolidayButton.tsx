@@ -2,7 +2,7 @@ import { createHoliday } from "@/actions/task/createHoliday";
 import getHoliday from "@/actions/task/getHoliday";
 import { AuthSession } from "@/types/auth";
 import { useSession } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import toast from "react-hot-toast";
 import DatePicker, { DateObject, DatePickerRef } from "react-multi-date-picker";
 import DatePanel from "react-multi-date-picker/plugins/date_panel";
@@ -13,19 +13,26 @@ export default function HolidayButton() {
   const datePickerRef = useRef<DatePickerRef>(null);
   const [values, setValues] = useState<DateObject[]>([]);
 
+  const [loading, setLoading] = useState(false);
+
+  const [pending, startTransition] = useTransition();
+
   const [selectedMonth, setSelectedMonth] = useState<string>("");
 
   const [selectedYear, setSelectedYear] = useState<number>(0);
 
   const authUser = session as AuthSession;
+
   const handleClose = () => {
     datePickerRef.current?.closeCalendar();
   };
 
   useEffect(() => {
     const fetchHolidays = async () => {
+      setLoading(true);
       const companyId = authUser?.user?.companyId;
       const holidays = await getHoliday(companyId, selectedMonth, selectedYear);
+      setLoading(false);
       setValues(holidays.map((holiday) => new DateObject(holiday.date)));
     };
     fetchHolidays();
@@ -53,6 +60,7 @@ export default function HolidayButton() {
           selectedYear,
         );
         if (response.status === 200) {
+          handleClose();
           toast.success("Holiday set successfully");
           console.log(totalHolidays);
         }
@@ -93,8 +101,9 @@ export default function HolidayButton() {
       >
         <div className="flex w-full items-center gap-x-3 border-t p-5">
           <button
-            onClick={handleAddHoliday}
-            className="rounded-md border px-3 py-1.5"
+            disabled={pending || loading}
+            onClick={() => startTransition(handleAddHoliday)}
+            className="rounded-md border px-3 py-1.5 disabled:bg-gray-300"
           >
             Apply
           </button>
