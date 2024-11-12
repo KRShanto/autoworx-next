@@ -3,6 +3,137 @@ import { usePaymentFilterStore } from "@/stores/paymentFilter";
 import moment from "moment";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import ManageRefund from "./ManageRefund";
+import NewRefund from "./NewRefund";
+
+const datas = [
+  {
+    invoice: 12345,
+    customerName: "John Doe",
+    vehicleInfo: "Year Make Model",
+    transactionDate: "3rd July, 2024",
+    amount: 324,
+    method: "Paypal",
+    refunded: false,
+  },
+  {
+    invoice: 12345,
+    customerName: "John Doe",
+    vehicleInfo: "Year Make Model",
+    transactionDate: "3rd July, 2024",
+    amount: 324,
+    method: "Paypal",
+    refunded: true,
+  },
+  {
+    invoice: 12345,
+    customerName: "John Doe",
+    vehicleInfo: "Year Make Model",
+    transactionDate: "3rd July, 2024",
+    amount: 324,
+    method: "Paypal",
+    refunded: false,
+  },
+  {
+    invoice: 12345,
+    customerName: "John Doe",
+    vehicleInfo: "Year Make Model",
+    transactionDate: "3rd July, 2024",
+    amount: 324,
+    method: "Paypal",
+    refunded: true,
+  },
+  {
+    invoice: 12345,
+    customerName: "John Doe",
+    vehicleInfo: "Year Make Model",
+    transactionDate: "3rd July, 2024",
+    amount: 324,
+    method: "Paypal",
+    refunded: false,
+  },
+  {
+    invoice: 12345,
+    customerName: "John Doe",
+    vehicleInfo: "Year Make Model",
+    transactionDate: "3rd July, 2024",
+    amount: 324,
+    method: "Paypal",
+    refunded: false,
+  },
+  {
+    invoice: 12345,
+    customerName: "John Doe",
+    vehicleInfo: "Year Make Model",
+    transactionDate: "3rd July, 2024",
+    amount: 324,
+    method: "Paypal",
+    refunded: false,
+  },
+  {
+    invoice: 12345,
+    customerName: "John Doe",
+    vehicleInfo: "Year Make Model",
+    transactionDate: "3rd July, 2024",
+    amount: 324,
+    method: "Paypal",
+    refunded: false,
+  },
+  {
+    invoice: 12345,
+    customerName: "John Doe",
+    vehicleInfo: "Year Make Model",
+    transactionDate: "3rd July, 2024",
+    amount: 324,
+    method: "Paypal",
+    refunded: false,
+  },
+  {
+    invoice: 12345,
+    customerName: "John Doe",
+    vehicleInfo: "Year Make Model",
+    transactionDate: "3rd July, 2024",
+    amount: 324,
+    method: "Paypal",
+    refunded: false,
+  },
+  {
+    invoice: 12345,
+    customerName: "John Doe",
+    vehicleInfo: "Year Make Model",
+    transactionDate: "3rd July, 2024",
+    amount: 324,
+    method: "Paypal",
+    refunded: false,
+  },
+  {
+    invoice: 12345,
+    customerName: "John Doe",
+    vehicleInfo: "Year Make Model",
+    transactionDate: "3rd July, 2024",
+    amount: 324,
+    method: "Paypal",
+    refunded: false,
+  },
+  {
+    invoice: 12345,
+    customerName: "John Doe",
+    vehicleInfo: "Year Make Model",
+    transactionDate: "3rd July, 2024",
+    amount: 324,
+    method: "Paypal",
+    refunded: false,
+  },
+  {
+    invoice: 12345,
+    customerName: "John Doe",
+    vehicleInfo: "Year Make Model",
+    transactionDate: "3rd July, 2024",
+    amount: 324,
+    method: "Paypal",
+    refunded: false,
+  },
+];
 
 export default function PaymentTable({ data }: { data: ReturnPayment[] }) {
   const { search, dateRange, amount, paidStatus, paymentMethod } =
@@ -76,37 +207,42 @@ export default function PaymentTable({ data }: { data: ReturnPayment[] }) {
             <th className="border-b px-4 py-2 text-left">Transaction Date</th>
             <th className="border-b px-4 py-2 text-left">Amount</th>
             <th className="border-b px-4 py-2 text-left">Method</th>
+            <th className="border-b px-4 py-2 text-left">Method</th>
           </tr>
         </thead>
 
         <tbody>
-          {filteredData.map((item, index) => (
+          {datas.map((item, index) => (
             <tr
               key={index}
               className={index % 2 === 0 ? "bg-white" : "bg-[#EEF4FF]"}
             >
               <td className="border-b px-4 py-2">
                 <Link
-                  href={`/estimate/view/${item.invoiceId}`}
+                  href={`/estimate/view/${item.invoice}`}
                   className="text-blue-500 hover:underline"
                 >
-                  {item.invoiceId}
+                  {item.invoice}
                 </Link>
               </td>
               <td className="border-b px-4 py-2">
                 <Link
-                  href={`/client/${item.client.id}`}
+                  href={`/client/${item.customerName}`}
                   className="text-blue-500 hover:underline"
                 >
-                  {item.client.name}
+                  {item.customerName}
                 </Link>
               </td>
-              <td className="border-b px-4 py-2">{item.vehicle}</td>
+              <td className="border-b px-4 py-2">{item.vehicleInfo}</td>
               <td className="border-b px-4 py-2">
-                {moment(item.date).format("YYYY-MM-DD")}
+                {item.transactionDate}
+                {/* {moment(item.date).format("YYYY-MM-DD")} */}
               </td>
               <td className="border-b px-4 py-2">${item.amount}</td>
               <td className="border-b px-4 py-2">{item.method}</td>
+              <td className="border-b px-4 py-2">
+                {item.refunded ? <ManageRefund /> : <NewRefund />}
+              </td>
             </tr>
           ))}
         </tbody>

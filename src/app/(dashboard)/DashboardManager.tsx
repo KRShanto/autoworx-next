@@ -7,6 +7,8 @@ import Appointments from "./Appointments";
 import ChartData from "./ChartData";
 import EmployeeLeaveRequests from "./EmployeeLeaveRequests";
 import Tasks from "./Tasks";
+import { useServerGetInterval } from "@/hooks/useServerGet";
+import { getAdminInfo } from "@/actions/dashboard/data/getAdminInfo";
 
 const DashboardManager = ({
   tasks = [],
@@ -20,6 +22,8 @@ const DashboardManager = ({
   pendingLeaveRequests: (LeaveRequest & { user: User })[];
 }) => {
   const { open } = usePopupStore();
+  const { data } = useServerGetInterval(getAdminInfo, 5000);
+
 
   return (
     <div className="flex items-start gap-x-2 2xl:gap-x-8">
@@ -56,17 +60,25 @@ const DashboardManager = ({
             </span>
           </div>
           <div className="space-y-3">
+            <div className="space-y-3">
             <ChartData
-              heading="Leads coming in"
-              subHeading="/month"
-              number={567}
+              heading="Total Jobs"
+              number={data?.totalJobs?.jobs}
+              isPositive={data?.totalJobs?.growth?.isPositive}
+              rate={data?.totalJobs?.growth?.rate}
             />
-            <ChartData heading="Leads Converted" number={767} />
             <ChartData
-              heading="Conversion Rate"
-              subHeading="Leads Converted/Total Leads"
-              number={435}
+              heading="Ongoing Jobs"
+              number={data?.ongoingJobs?.ongoingJobs}
+              noRate
             />
+            <ChartData
+              heading="Completed Jobs"
+              number={data?.completedJobs?.completedJobs}
+              isPositive={data?.completedJobs?.growth?.isPositive}
+              rate={data?.completedJobs?.growth?.rate}
+            />
+            </div>
           </div>
         </div>
       </div>
@@ -93,16 +105,20 @@ const DashboardManager = ({
               </span>
             </div>
             <div className="space-y-3">
-              <ChartData
-                heading="Current Value"
-                number={567}
-                dollarSign={true}
-              />
-              <ChartData
-                heading="Current Monthly Total"
-                number={767}
-                dollarSign={true}
-              />
+            <ChartData
+              heading="Current Revenue"
+              dollarSign={true}
+              number={data?.revenue?.revenue}
+              isPositive={data?.revenue?.growth?.isPositive}
+              rate={data?.revenue?.growth?.rate}
+            />
+            <ChartData
+              heading="Expected Revenue"
+              dollarSign={true}
+              number={data?.expectedRevenue?.revenue}
+              isPositive={data?.expectedRevenue?.growth?.isPositive}
+              rate={data?.expectedRevenue?.growth?.rate}
+            />
             </div>
           </div>
           {/* Inventory */}
@@ -114,16 +130,19 @@ const DashboardManager = ({
               </span>
             </div>
             <div className="space-y-3">
-              <ChartData
-                heading="Current Value"
-                number={567}
-                dollarSign={true}
-              />
-              <ChartData
-                heading="Current Monthly Total"
-                number={767}
-                dollarSign={true}
-              />
+            <ChartData
+              heading="Total Value"
+              dollarSign={true}
+              number={data?.inventory?.totalValue}
+              noRate
+            />
+            <ChartData
+              heading="Current Monthly Total"
+              number={data?.inventory?.currentMonthTotal}
+              dollarSign={true}
+              isPositive={data?.inventory?.growth?.isPositive}
+              rate={data?.inventory?.growth?.rate}
+            />
             </div>
           </div>
         </div>

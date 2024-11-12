@@ -15,9 +15,9 @@ model Company {
     state                   String?
     zip                     String?
     image                   String?
-    businessVisibility      Boolean?                  @default(false) @map("business_visibility")
-    phoneVisibility         Boolean?                  @default(false) @map("phone_visibility")
-    addressVisibility       Boolean?                  @default(false) @map("address_visibility")
+    businessVisibility      Boolean?                  @default(true) @map("business_visibility")
+    phoneVisibility         Boolean?                  @default(true) @map("phone_visibility")
+    addressVisibility       Boolean?                  @default(true) @map("address_visibility")
     tax                     Decimal?                  @default(0)
     currency                String?                   @default("USD")
     terms                   String?
