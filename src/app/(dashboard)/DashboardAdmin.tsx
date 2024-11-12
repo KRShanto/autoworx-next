@@ -25,9 +25,9 @@ const Dashboard = ({
   const { data } = useServerGetInterval(getAdminInfo, 5000);
 
   return (
-    <div className="flex items-start gap-x-2 xl:gap-x-8">
+    <div className="flex h-full items-start gap-x-2 xl:gap-x-8">
       {/* col 1 */}
-      <div className="w-[23%] space-y-4">
+      <div className="flex h-full w-[23%] flex-col justify-around space-y-4">
         {/* sales pipeline */}
         <div className="rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
@@ -81,7 +81,7 @@ const Dashboard = ({
         </div>
       </div>
       {/* col 2 */}
-      <div className="w-[23%] space-y-4">
+      <div className="flex h-full w-[23%] flex-col justify-around space-y-4">
         {/* Revenue */}
         <div className="rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
@@ -140,13 +140,7 @@ const Dashboard = ({
             </span>
           </div>
           <div className="#px-4">
-            <ChartData
-              heading="Previous Month Payout"
-              number={567}
-              dollarSign
-            />
             <ChartData heading="Current Month Payout" number={767} dollarSign />
-            <ChartData heading="YTD Payout" number={435} dollarSign />
           </div>
         </div>
       </div>

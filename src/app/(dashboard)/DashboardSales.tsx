@@ -17,7 +17,7 @@ const Dashboard = ({
   appointments: any;
 }) => {
   return (
-    <div className="flex items-start gap-x-2 xl:gap-x-8">
+    <div className="flex h-full items-start gap-x-2 xl:gap-x-8">
       {/* col 1 */}
       <div className="w-[25%] space-y-4">
         {/* task list */}
@@ -30,42 +30,24 @@ const Dashboard = ({
         <Appointments fullHeight appointments={appointments} fu />
       </div>
       {/* col 3 */}
-      <div className="w-[20%] space-y-4">
+      <div className="h-full w-[20%] space-y-4">
         {/* Performance */}
-        <div className="rounded-md p-4 shadow-lg 2xl:px-6">
+        <div className="h-full rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
             <span className="text-xl font-bold">Performance</span>{" "}
             <span>
               <FaExternalLinkAlt />
             </span>
           </div>
-          <div className="space-y-3">
+          <div className="flex h-[80%] flex-col justify-around space-y-3">
             <ChartData
               heading="Leads coming in"
               subHeading="/month"
               number={567}
-              columnView
-              largeChart
             />
-            <ChartData
-              heading="Leads Converted"
-              number={767}
-              columnView
-              largeChart
-            />
-            <ChartData
-              heading="Win/Loss Rate"
-              number={435}
-              columnView
-              largeChart
-            />
-            <ChartData
-              heading="Employee Pay"
-              number={435}
-              dollarSign
-              columnView
-              largeChart
-            />
+            <ChartData heading="Leads Converted" number={767} />
+            <ChartData heading="Win/Loss Rate" number={435} />
+            <ChartData heading="Employee Pay" number={435} dollarSign />
           </div>
         </div>
       </div>

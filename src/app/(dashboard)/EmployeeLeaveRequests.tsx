@@ -16,7 +16,7 @@ const EmployeeLeaveRequests = ({
 }) => {
   return (
     <div
-      className={`flex flex-col rounded-md p-6 shadow-lg ${fullHeight ? "h-[82vh]" : "h-[38vh]"}`}
+      className={`flex flex-col rounded-md p-6 shadow-lg ${fullHeight ? "h-[82vh]" : "h-[35vh]"}`}
     >
       <div className="mb-8 flex items-center justify-between">
         <span className="text-xl font-bold">Employee Leave Request</span>{" "}
@@ -28,7 +28,7 @@ const EmployeeLeaveRequests = ({
         {pendingLeaveRequests.map((leaveRequest, idx) => (
           <EmployeeLeaveRequest key={idx} leaveRequest={leaveRequest} />
         ))}
-        {[0].length === 0 && (
+        {pendingLeaveRequests.length === 0 && (
           <div className="flex flex-1 items-center justify-center self-center text-center">
             <span>No Employee Leave Requests</span>
           </div>
