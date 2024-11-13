@@ -6,6 +6,8 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 import { stopBreak, takeBreak } from "@/actions/dashboard/break";
 import { clockIn } from "@/actions/dashboard/clockIn";
 import { clockOut } from "@/actions/dashboard/clockOut";
+import { fetchRecentMessages } from "@/actions/dashboard/technician/recentMessages";
+import { useServerGet } from "@/hooks/useServerGet";
 import { successToast } from "@/lib/toast";
 import { useCallback } from "react";
 import Appointments from "./Appointments";
@@ -51,6 +53,9 @@ const DashboardTechnician = ({
   lastClockInOut: (ClockInOut & { ClockBreak: ClockBreak[] }) | null;
 }) => {
   const { open } = usePopupStore();
+
+  const data = useServerGet(fetchRecentMessages);
+  // console.log("🚀 ~ messages:", messages);
 
   const validBreak = useCallback(
     function (lastClockInOut: ClockInOut & { ClockBreak: ClockBreak[] }) {
@@ -220,7 +225,7 @@ const DashboardTechnician = ({
           <div className="h-full w-1/2">
             {" "}
             {/* recent messages */}
-            <RecentMessages fullHeight={true} />
+            <RecentMessages fullHeight={true} messages={data.data} />
           </div>
         </div>
       </div>

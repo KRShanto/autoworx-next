@@ -1,7 +1,16 @@
+import { useServerGet } from "@/hooks/useServerGet";
+import getUser from "@/lib/getUser";
 import Image from "next/image";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import { auth } from "../auth";
 
-const RecentMessages = ({ fullHeight = false }: { fullHeight?: boolean }) => {
+const RecentMessages = ({
+  messages = [],
+  fullHeight = false,
+}: {
+  fullHeight?: boolean;
+}) => {
+  const { data: user } = useServerGet(getUser);
   return (
     <div
       className={`"flex ${fullHeight ? "h-full" : "h-[82vh]"} shadow-lg" flex-col rounded-md p-6`}
@@ -18,11 +27,11 @@ const RecentMessages = ({ fullHeight = false }: { fullHeight?: boolean }) => {
           type="text"
           placeholder="Search messages"
         />
-        <div className="custom-scrollbar #justify-center flex h-[90%] flex-1 flex-col items-center space-y-4 self-center">
-          {new Array(10).fill(0).map((_, idx) => (
-            <Message key={idx} />
+        <div className="custom-scrollbar #justify-center flex h-[90%] w-full flex-1 flex-col items-center space-y-4 self-center">
+          {messages?.map((msg, idx) => (
+            <Message message={msg} key={idx} user={user} />
           ))}
-          {[0].length === 0 && (
+          {messages?.length === 0 && (
             <span className="text-center">You have no recent messages</span>
           )}
         </div>
@@ -31,16 +40,17 @@ const RecentMessages = ({ fullHeight = false }: { fullHeight?: boolean }) => {
   );
 };
 
-const Message = () => {
+const Message = ({ message, user }) => {
   return (
-    <div className="flex flex-col gap-x-2 rounded border p-2 px-2 xl:flex-row xl:items-start">
+    <div className="flex w-full flex-col gap-x-2 rounded border p-2 px-2 xl:flex-row xl:items-start">
       <Image width={60} height={60} src="/images/default.png" alt="" />
       <div>
-        <p className="font-semibold">John Doe</p>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum
-          libero suscipit modi ex officia. Blanditiis.
+        <p className="font-semibold">
+          {user.id === message.from.id
+            ? message.to.firstName
+            : message.from.firstName}
         </p>
+        <p>{message.message}</p>
       </div>
     </div>
   );
