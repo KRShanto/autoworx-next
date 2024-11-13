@@ -18,7 +18,7 @@ const RecentMessages = ({
     <div
       className={`"flex ${fullHeight ? "h-full" : "h-[82vh]"} shadow-lg" flex-col rounded-md p-6`}
     >
-      <div className="mb-4 flex h-[15%] items-center justify-between">
+      <div className="mb-4 flex h-[5%] items-center justify-between">
         <span className="text-xl font-bold">Recent Messages</span>{" "}
         <Link href="/communication/internal">
           <FaExternalLinkAlt />
@@ -26,7 +26,7 @@ const RecentMessages = ({
       </div>
       <div className="#custom-scrollbar flex h-[85%] flex-1 flex-col text-sm">
         <input
-          className="mb-4 h-[10%] w-full rounded border border-[#03A7A2] px-4 py-2"
+          className="mb-4 h-[7%] w-full rounded border border-[#03A7A2] px-4 py-2"
           type="text"
           placeholder="Search messages"
         />
@@ -35,7 +35,9 @@ const RecentMessages = ({
             <Message message={msg} key={idx} user={user as User} />
           ))}
           {messages?.length === 0 && (
-            <span className="text-center">You have no recent messages</span>
+            <div className="my-auto text-center">
+              You have no recent messages
+            </div>
           )}
         </div>
       </div>
