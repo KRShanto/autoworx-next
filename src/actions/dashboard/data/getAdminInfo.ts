@@ -10,6 +10,9 @@ import {
   currentMonthStart,
 } from "./lib";
 
+/**
+ * Get admin information including total jobs, ongoing jobs, completed jobs, revenue, expected revenue, and inventory.
+ */
 export async function getAdminInfo() {
   const totalJobs = await getTotalJobs();
   const ongoingJobs = await getOngoingJobs();
@@ -28,10 +31,13 @@ export async function getAdminInfo() {
   };
 }
 
+/**
+ * Get total jobs for the current and previous months.
+ */
 async function getTotalJobs() {
   const companyId = await getCompanyId();
 
-  const techniciansCount = await db.technician.count({
+  const currentMonthJobs = await db.technician.count({
     where: {
       companyId,
       createdAt: {
@@ -41,7 +47,7 @@ async function getTotalJobs() {
     },
   });
 
-  const techniciansPrevMonth = await db.technician.count({
+  const previousMonthJobs = await db.technician.count({
     where: {
       companyId,
       createdAt: {
@@ -52,14 +58,18 @@ async function getTotalJobs() {
   });
 
   return {
-    jobs: techniciansCount,
-    growth: growthRate(techniciansCount, techniciansPrevMonth),
+    jobs: currentMonthJobs,
+    growth: growthRate(currentMonthJobs, previousMonthJobs),
   };
 }
 
+/**
+ * Get ongoing jobs for the current month.
+ */
 async function getOngoingJobs() {
   const companyId = await getCompanyId();
-  const ongoingJobs = await db.technician.count({
+
+  const ongoingJobsCount = await db.technician.count({
     where: {
       companyId,
       status: "In Progress",
@@ -71,14 +81,17 @@ async function getOngoingJobs() {
   });
 
   return {
-    ongoingJobs,
+    ongoingJobs: ongoingJobsCount,
   };
 }
 
+/**
+ * Get completed jobs for the current and previous months.
+ */
 async function getCompletedJobs() {
   const companyId = await getCompanyId();
 
-  const completedJobs = await db.technician.count({
+  const currentMonthCompletedJobs = await db.technician.count({
     where: {
       companyId,
       status: "Completed",
@@ -88,7 +101,8 @@ async function getCompletedJobs() {
       },
     },
   });
-  const completedJobsPrevMonth = await db.technician.count({
+
+  const previousMonthCompletedJobs = await db.technician.count({
     where: {
       companyId,
       status: "Completed",
@@ -100,15 +114,18 @@ async function getCompletedJobs() {
   });
 
   return {
-    completedJobs,
-    growth: growthRate(completedJobs, completedJobsPrevMonth),
+    completedJobs: currentMonthCompletedJobs,
+    growth: growthRate(currentMonthCompletedJobs, previousMonthCompletedJobs),
   };
 }
 
+/**
+ * Get revenue for the current and previous months.
+ */
 async function getRevenue() {
   const companyId = await getCompanyId();
 
-  const invoices = await db.invoice.findMany({
+  const currentMonthInvoices = await db.invoice.findMany({
     where: {
       companyId,
       column: {
@@ -122,12 +139,12 @@ async function getRevenue() {
     },
   });
 
-  const revenue = invoices.reduce(
+  const currentMonthRevenue = currentMonthInvoices.reduce(
     (acc, invoice) => acc + (invoice.profit || 0),
     0,
   );
 
-  const invoicesPrevMonth = await db.invoice.findMany({
+  const previousMonthInvoices = await db.invoice.findMany({
     where: {
       companyId,
       type: "Invoice",
@@ -141,21 +158,24 @@ async function getRevenue() {
     },
   });
 
-  const revenuePrevMonth = invoicesPrevMonth.reduce(
+  const previousMonthRevenue = previousMonthInvoices.reduce(
     (acc, invoice) => acc + (invoice.profit || 0),
     0,
   );
 
   return {
-    revenue,
-    growth: growthRate(revenue, revenuePrevMonth),
+    revenue: currentMonthRevenue,
+    growth: growthRate(currentMonthRevenue, previousMonthRevenue),
   };
 }
 
+/**
+ * Get expected revenue for the current and previous months.
+ */
 async function getExpectedRevenue() {
   const companyId = await getCompanyId();
 
-  const invoices = await db.invoice.findMany({
+  const currentMonthInvoices = await db.invoice.findMany({
     where: {
       companyId,
       type: "Invoice",
@@ -166,12 +186,12 @@ async function getExpectedRevenue() {
     },
   });
 
-  const revenue = invoices.reduce(
+  const currentMonthExpectedRevenue = currentMonthInvoices.reduce(
     (acc, invoice) => acc + (invoice.profit || 0),
     0,
   );
 
-  const invoicesPrevMonth = await db.invoice.findMany({
+  const previousMonthInvoices = await db.invoice.findMany({
     where: {
       companyId,
       type: "Invoice",
@@ -182,33 +202,39 @@ async function getExpectedRevenue() {
     },
   });
 
-  const revenuePrevMonth = invoicesPrevMonth.reduce(
+  const previousMonthExpectedRevenue = previousMonthInvoices.reduce(
     (acc, invoice) => acc + (invoice.profit || 0),
     0,
   );
 
   return {
-    revenue,
-    growth: growthRate(revenue, revenuePrevMonth),
+    revenue: currentMonthExpectedRevenue,
+    growth: growthRate(
+      currentMonthExpectedRevenue,
+      previousMonthExpectedRevenue,
+    ),
   };
 }
 
+/**
+ * Get inventory information including total value, current month total, and growth rate.
+ */
 async function getInventory() {
   const companyId = await getCompanyId();
 
-  const inventory = await db.inventoryProduct.findMany({
+  const inventoryProducts = await db.inventoryProduct.findMany({
     where: {
       type: "Product",
       companyId,
     },
   });
 
-  const totalValue = inventory.reduce(
+  const totalInventoryValue = inventoryProducts.reduce(
     (acc, product) => acc + Number(product.price),
     0,
   );
 
-  const inventoryHistoryCurrentMonth =
+  const currentMonthInventoryHistory =
     await db.inventoryProductHistory.findMany({
       where: {
         companyId,
@@ -223,32 +249,34 @@ async function getInventory() {
       },
     });
 
-  const inventoryHistoryPrevMonth = await db.inventoryProductHistory.findMany({
-    where: {
-      companyId,
-      type: "Purchase",
-      createdAt: {
-        gte: previousMonthStart,
-        lte: previousMonthEnd,
+  const previousMonthInventoryHistory =
+    await db.inventoryProductHistory.findMany({
+      where: {
+        companyId,
+        type: "Purchase",
+        createdAt: {
+          gte: previousMonthStart,
+          lte: previousMonthEnd,
+        },
+        product: {
+          type: "Product",
+        },
       },
-      product: {
-        type: "Product",
-      },
-    },
-  });
+    });
 
-  const inventoryCostCurrentMonth = inventoryHistoryCurrentMonth.reduce(
+  const currentMonthInventoryCost = currentMonthInventoryHistory.reduce(
     (acc, history) => acc + Number(history.price),
     0,
   );
-  const inventoryCostPrevMonth = inventoryHistoryPrevMonth.reduce(
+
+  const previousMonthInventoryCost = previousMonthInventoryHistory.reduce(
     (acc, history) => acc + Number(history.price),
     0,
   );
 
   return {
-    totalValue,
-    currentMonthTotal: inventoryCostCurrentMonth,
-    growth: growthRate(inventoryCostCurrentMonth, inventoryCostPrevMonth),
+    totalValue: totalInventoryValue,
+    currentMonthTotal: currentMonthInventoryCost,
+    growth: growthRate(currentMonthInventoryCost, previousMonthInventoryCost),
   };
 }
