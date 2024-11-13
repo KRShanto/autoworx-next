@@ -7,19 +7,26 @@ import toast from "react-hot-toast";
 import DatePicker, { DateObject, DatePickerRef } from "react-multi-date-picker";
 import DatePanel from "react-multi-date-picker/plugins/date_panel";
 import moment from "moment";
+import getWeekendsOfMonth from "@/utils/getWeekendsOfMonth";
+import { getCalenderSettings } from "@/actions/task/getCalendarSettings";
+import { CalendarSettings } from "@prisma/client";
 
 export default function HolidayButton() {
   const { data: session } = useSession();
   const datePickerRef = useRef<DatePickerRef>(null);
   const [values, setValues] = useState<DateObject[]>([]);
 
+  const [weekends, setWeekends] = useState<DateObject[]>([]);
+
   const [loading, setLoading] = useState(false);
 
   const [pending, startTransition] = useTransition();
 
-  const [selectedMonth, setSelectedMonth] = useState<string>("");
+  const [selectedMonth, setSelectedMonth] = useState<string>(
+    moment().format("MMMM"),
+  );
 
-  const [selectedYear, setSelectedYear] = useState<number>(0);
+  const [selectedYear, setSelectedYear] = useState<number>(moment().year());
 
   const authUser = session as AuthSession;
 
@@ -27,15 +34,55 @@ export default function HolidayButton() {
     datePickerRef.current?.closeCalendar();
   };
 
+  const companyId = authUser?.user?.companyId;
+
+  // use  effect for find weekends this month
+  // useEffect(() => {}, []);
+
+  // date fetch for get all holidays by month and year
   useEffect(() => {
     const fetchHolidays = async () => {
       setLoading(true);
-      const companyId = authUser?.user?.companyId;
       const holidays = await getHoliday(companyId, selectedMonth, selectedYear);
+
       setLoading(false);
-      setValues(holidays.map((holiday) => new DateObject(holiday.date)));
+      const dateObjectHoliday = holidays.map(
+        (holiday) => new DateObject(holiday.date),
+      );
+      setValues(dateObjectHoliday);
     };
     fetchHolidays();
+  }, [selectedMonth, selectedYear]);
+
+  // data fetch for calender settings
+  useEffect(() => {
+    const fetchCalenderSettings = async () => {
+      const calendarSettings = await getCalenderSettings(companyId);
+      const weekendOne =
+        calendarSettings &&
+        getWeekendsOfMonth(
+          calendarSettings?.weekend1,
+          selectedMonth,
+          selectedYear,
+        );
+      const weekendTwo =
+        calendarSettings &&
+        getWeekendsOfMonth(
+          calendarSettings?.weekend2,
+          selectedMonth,
+          selectedYear,
+        );
+
+      const totalWeekends =
+        weekendOne && weekendTwo && weekendOne.concat(weekendTwo);
+
+      const dateObjectWeekends = totalWeekends
+        ? totalWeekends.map((date) => new DateObject(date) as DateObject)
+        : [];
+      setValues((prevValues) => [...prevValues, ...dateObjectWeekends]);
+      setWeekends(dateObjectWeekends);
+    };
+    fetchCalenderSettings();
   }, [selectedMonth, selectedYear]);
 
   //   const handleOpen = () => {
@@ -46,14 +93,21 @@ export default function HolidayButton() {
     try {
       if (values.length > 0) {
         // Add holiday logic here
-        const totalHolidays = values.map((date) => {
-          return {
-            year: date.year,
-            month: date.month.name,
-            companyId: authUser.user.companyId,
-            date: new Date(date.format("YYYY-MM-DD") as string).toISOString(),
-          };
-        });
+        const totalHolidays = values
+          .filter((date) => {
+            return !weekends.find(
+              (weekend) =>
+                weekend.format("YYYY-MM-DD") === date.format("YYYY-MM-DD"),
+            );
+          })
+          .map((date) => {
+            return {
+              year: date.year,
+              month: date.month.name,
+              companyId: authUser.user.companyId,
+              date: new Date(date.format("YYYY-MM-DD") as string).toISOString(),
+            };
+          });
         const response = await createHoliday(
           totalHolidays,
           selectedMonth,
@@ -87,7 +141,7 @@ export default function HolidayButton() {
         }}
         onClose={() => {
           setSelectedMonth("");
-          setSelectedYear(0);
+          setSelectedYear(moment().year());
         }}
         onOpen={() => {
           setSelectedMonth(moment().format("MMMM"));

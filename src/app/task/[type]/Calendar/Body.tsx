@@ -22,7 +22,7 @@ export default function Body({
   type: CalendarType;
   tasks: CalendarTask[];
   companyUsers: User[];
-  holidays: Holiday[];
+  holidays: Partial<Holiday>[];
   tasksWithoutTime: Task[];
   appointments: CalendarAppointment[];
   appointmentsFull: AppointmentFull[];

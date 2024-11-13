@@ -26,7 +26,7 @@ export default function Calender({
   tasksWithoutTime: Task[];
   customers: Client[];
   vehicles: Vehicle[];
-  holidays: Holiday[];
+  holidays: Partial<Holiday>[];
   settings: CalendarSettings;
   appointments: CalendarAppointment[];
   appointmentsFull: AppointmentFull[];

@@ -5,10 +5,11 @@ import { db } from "@/lib/db";
 import { AuthSession } from "@/types/auth";
 import { CalendarType } from "@/types/calendar";
 import { AppointmentFull } from "@/types/db";
-import { CalendarSettings, User } from "@prisma/client";
+import { CalendarSettings, Holiday, User } from "@prisma/client";
 import { Metadata } from "next";
 import TaskPage from "./TaskPage";
 import moment from "moment";
+import getWeekendsOfMonth from "@/utils/getWeekendsOfMonth";
 
 export const metadata: Metadata = {
   title: "Task and Activity Management",
@@ -268,6 +269,31 @@ export default async function Page({
     },
   });
 
+  // weekends add with holidays
+  const calenderSettings = await db.calendarSettings.findFirst({
+    where: {
+      companyId,
+    },
+  });
+
+  const weekendOne = getWeekendsOfMonth(
+    calenderSettings?.weekend1!,
+    getMonth,
+    getYear,
+  );
+  const weekendTwo = getWeekendsOfMonth(
+    calenderSettings?.weekend2!,
+    getMonth,
+    getYear,
+  );
+
+  const totalOfWeekends = weekendOne.concat(weekendTwo).map((weekend) => ({
+    companyId,
+    date: moment(weekend).toISOString(),
+    month: getMonth,
+    year: getYear,
+  }));
+
   return (
     <>
       <Title>Task and Activity Management</Title>
@@ -288,7 +314,7 @@ export default async function Page({
           customers={customers}
           vehicles={vehicles}
           settings={settings}
-          holidays={holidays}
+          holidays={holidays.concat(totalOfWeekends as any[])}
           appointments={calendarAppointments!}
           templates={emailTemplates}
           appointmentsFull={appointmentsFull}

@@ -24,7 +24,7 @@ export default function TaskPage({
   type: CalendarType;
   taskWithAssignedUsers: (Task & { assignedUsers: User[] })[];
   companyUsers: User[];
-  holidays: Holiday[];
+  holidays: Partial<Holiday>[];
   usersWithTasks: any; // TODO: Fix this type
   customers: Client[];
   vehicles: Vehicle[];

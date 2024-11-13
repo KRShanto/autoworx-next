@@ -56,7 +56,7 @@ export default function Month({
   companyUsers: User[];
   tasksWithoutTime: Task[];
   appointments: CalendarAppointment[];
-  holidays: Holiday[];
+  holidays: Partial<Holiday>[];
   appointmentsFull: AppointmentFull[];
   customers: Client[];
   vehicles: Vehicle[];
@@ -95,7 +95,7 @@ export default function Month({
     Date | null,
     CalendarTask[],
     CalendarAppointment[],
-    Holiday[],
+    Partial<Holiday>[],
   ][] = [];
 
   // Generate the dates to display
@@ -439,7 +439,7 @@ export default function Month({
                       )}
                     >
                       <span>Holiday</span>
-                      {isAdmin && (
+                      {isAdmin && holiday?.id && (
                         <HolidayDeleteConfirmation holidayId={holiday.id} />
                       )}
                     </div>
