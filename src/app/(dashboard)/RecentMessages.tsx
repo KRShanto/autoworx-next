@@ -3,6 +3,7 @@ import { useServerGet } from "@/hooks/useServerGet";
 import getUser from "@/lib/getUser";
 import { User } from "@prisma/client";
 import Image from "next/image";
+import Link from "next/link";
 import { FaExternalLinkAlt } from "react-icons/fa";
 
 const RecentMessages = ({
@@ -19,9 +20,9 @@ const RecentMessages = ({
     >
       <div className="mb-4 flex h-[15%] items-center justify-between">
         <span className="text-xl font-bold">Recent Messages</span>{" "}
-        <span>
+        <Link href="/communication/internal">
           <FaExternalLinkAlt />
-        </span>
+        </Link>
       </div>
       <div className="#custom-scrollbar flex h-[85%] flex-1 flex-col text-sm">
         <input

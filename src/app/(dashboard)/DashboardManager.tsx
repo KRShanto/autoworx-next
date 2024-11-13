@@ -4,6 +4,7 @@ import Title from "@/components/Title";
 import { useServerGetInterval } from "@/hooks/useServerGet";
 import { usePopupStore } from "@/stores/popup";
 import { LeaveRequest, Task as TaskType, User } from "@prisma/client";
+import Link from "next/link";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import Appointments from "./Appointments";
 import ChartData from "./ChartData";
@@ -32,9 +33,9 @@ const DashboardManager = ({
         <div className="rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
             <span className="text-xl font-bold">Sales Pipeline</span>{" "}
-            <span>
+            <Link href="/pipeline/sales?view=pipelines">
               <FaExternalLinkAlt />
-            </span>
+            </Link>
           </div>
           <div className="space-y-3">
             <ChartData
@@ -54,9 +55,9 @@ const DashboardManager = ({
         <div className="rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
             <span className="text-xl font-bold">Shop Pipeline</span>{" "}
-            <span>
+            <Link href="/pipeline/shop?view=pipelines">
               <FaExternalLinkAlt />
-            </span>
+            </Link>
           </div>
           <div className="space-y-3">
             <div className="space-y-3">
@@ -99,9 +100,9 @@ const DashboardManager = ({
           <div className="w-1/2 rounded-md p-4 shadow-lg 2xl:px-6">
             <div className="mb-8 flex items-center justify-between">
               <span className="text-xl font-bold">Revenue</span>{" "}
-              <span>
-                <FaExternalLinkAlt />
-              </span>
+              <Link href="/reporting/revenue">
+              <FaExternalLinkAlt />
+            </Link>
             </div>
             <div className="space-y-3">
               <ChartData
@@ -124,9 +125,9 @@ const DashboardManager = ({
           <div className="w-1/2 rounded-md p-4 shadow-lg 2xl:px-6">
             <div className="mb-8 flex items-center justify-between">
               <span className="text-xl font-bold">Inventory</span>{" "}
-              <span>
-                <FaExternalLinkAlt />
-              </span>
+              <Link href="/reporting/inventory">
+              <FaExternalLinkAlt />
+            </Link>
             </div>
             <div className="space-y-3">
               <ChartData
@@ -149,9 +150,9 @@ const DashboardManager = ({
         <div className="rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
             <span className="text-xl font-bold">Employee Payout</span>{" "}
-            <span>
+            <Link href="/reporting/workforce">
               <FaExternalLinkAlt />
-            </span>
+            </Link>
           </div>
           <div className="space-y-3">
             <ChartData heading="Current Month Payout" number={767} dollarSign />
