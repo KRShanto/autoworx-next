@@ -2,15 +2,13 @@
 
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
-import moment from "moment";
-
-const currentMonthStart = moment().startOf("month").toDate();
-const currentMonthEnd = moment().endOf("month").toDate();
-const previousMonthStart = moment()
-  .subtract(1, "months")
-  .startOf("month")
-  .toDate();
-const previousMonthEnd = moment().subtract(1, "months").endOf("month").toDate();
+import {
+  growthRate,
+  previousMonthEnd,
+  previousMonthStart,
+  currentMonthEnd,
+  currentMonthStart,
+} from "./lib";
 
 export async function getAdminInfo() {
   const totalJobs = await getTotalJobs();
@@ -252,21 +250,5 @@ async function getInventory() {
     totalValue,
     currentMonthTotal: inventoryCostCurrentMonth,
     growth: growthRate(inventoryCostCurrentMonth, inventoryCostPrevMonth),
-  };
-}
-
-function growthRate(current: number, previous: number) {
-  let rate;
-  if (previous === 0) {
-    rate = current > 0 ? 100 : 0;
-  } else {
-    rate = Math.round(((current - previous) / previous) * 100);
-  }
-
-  const isPositive = rate >= 0;
-
-  return {
-    rate,
-    isPositive,
   };
 }
