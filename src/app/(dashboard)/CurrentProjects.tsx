@@ -10,7 +10,7 @@ const CurrentProjects = ({ projects = [] }: { projects: CurrentProject[] }) => {
     <div className="flex h-[82vh] flex-col rounded-md p-6 shadow-lg">
       <div className="mb-8 flex items-center justify-between">
         <span className="text-xl font-bold">Current Projects</span>{" "}
-        <Link href="/task/day">
+        <Link href="/pipeline/shop">
           <FaExternalLinkAlt />
         </Link>
       </div>

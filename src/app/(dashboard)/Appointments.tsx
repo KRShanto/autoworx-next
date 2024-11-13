@@ -1,4 +1,5 @@
 import moment from "moment";
+import Link from "next/link";
 import { FaExternalLinkAlt } from "react-icons/fa";
 
 const Appointments = ({ appointments, fullHeight }: any) => {
@@ -8,16 +9,16 @@ const Appointments = ({ appointments, fullHeight }: any) => {
     >
       <div className="mb-8 flex items-center justify-between">
         <span className="text-xl font-bold">Appointments</span>{" "}
-        <span>
+        <Link href="/task/day">
           <FaExternalLinkAlt />
-        </span>
+        </Link>
       </div>
       <div className="custom-scrollbar flex flex-1 flex-col space-y-4 overflow-x-hidden">
         {appointments.map((appointment: any, idx: any) => (
           <AppointmentDetails appointment={appointment} key={idx} />
         ))}
         {appointments.length === 0 && (
-          <span className="self-center text-center my-auto">
+          <span className="my-auto self-center text-center">
             You have no upcoming appointments
           </span>
         )}

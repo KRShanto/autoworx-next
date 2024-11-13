@@ -1,13 +1,13 @@
 "use client";
 
+import { EmployeeType } from "@prisma/client";
 import { Session } from "next-auth";
 import { redirect, usePathname } from "next/navigation";
+import MobileNav from "./mobile-responsive/MobileNav";
 import PopupState from "./PopupState";
+import PrivateRoute from "./PrivateRoute";
 import SideNavbar from "./SideNavbar";
 import TopNavbar from "./TopNavbar";
-import MobileNav from "./mobile-responsive/MobileNav";
-import PrivateRoute from "./PrivateRoute";
-import { EmployeeType } from "@prisma/client";
 
 const navList = [
   {
@@ -42,7 +42,7 @@ const navList = [
         link: "/pipeline/shop",
       },
       {
-        title: "Seles Pipeline",
+        title: "Sales Pipeline",
         link: "/pipeline/sales",
       },
     ],

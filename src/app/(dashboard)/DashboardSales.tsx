@@ -1,6 +1,7 @@
 "use client";
 import Title from "@/components/Title";
 import { Task as TaskType, User } from "@prisma/client";
+import Link from "next/link";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import Appointments from "./Appointments";
 import ChartData from "./ChartData";
@@ -35,9 +36,9 @@ const Dashboard = ({
         <div className="h-full rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
             <span className="text-xl font-bold">Performance</span>{" "}
-            <span>
+            <Link href="/reporting/workforce">
               <FaExternalLinkAlt />
-            </span>
+            </Link>
           </div>
           <div className="flex h-[80%] flex-col justify-around space-y-3">
             <ChartData

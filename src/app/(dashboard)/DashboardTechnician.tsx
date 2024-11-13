@@ -10,6 +10,7 @@ import { getTechnicianInfo } from "@/actions/dashboard/data/getTechnicianInfo";
 import { fetchRecentMessages } from "@/actions/dashboard/technician/recentMessages";
 import { useServerGet, useServerGetInterval } from "@/hooks/useServerGet";
 import { successToast } from "@/lib/toast";
+import Link from "next/link";
 import { useCallback } from "react";
 import Appointments from "./Appointments";
 import ChartData from "./ChartData";
@@ -242,9 +243,9 @@ const DashboardTechnician = ({
             <div className="rounded-md p-4 shadow-lg xl:p-6">
               <div className="mb-8 flex items-center justify-between">
                 <span className="text-xl font-bold">Monthly Payout</span>{" "}
-                <span>
+                <Link href="/reporting/workforce">
                   <FaExternalLinkAlt />
-                </span>
+                </Link>
               </div>
               <div className="space-y-3">
                 <ChartData
