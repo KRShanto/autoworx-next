@@ -3,9 +3,7 @@ import { errorToast, successToast } from "@/lib/toast";
 import formatDateToReadable from "@/utils/formatDate";
 import { LeaveRequest, User } from "@prisma/client";
 import React from "react";
-import { FaExternalLinkAlt } from "react-icons/fa";
-
-type Props = {};
+import EmployeeLeaveRequestsModal from "./EmployeeLeaveRequestsModal";
 
 const EmployeeLeaveRequests = ({
   pendingLeaveRequests = [],
@@ -19,10 +17,10 @@ const EmployeeLeaveRequests = ({
       className={`flex flex-col rounded-md p-6 shadow-lg ${fullHeight ? "h-[82vh]" : "h-[35vh]"}`}
     >
       <div className="mb-8 flex items-center justify-between">
-        <span className="text-xl font-bold">Employee Leave Request</span>{" "}
-        <span>
-          <FaExternalLinkAlt />
-        </span>
+        <span className="text-xl font-bold">Employee Leave Request</span>
+        <EmployeeLeaveRequestsModal
+          pendingLeaveRequests={pendingLeaveRequests}
+        />
       </div>
       <div className="custom-scrollbar flex flex-1 flex-col space-y-4">
         {pendingLeaveRequests.map((leaveRequest, idx) => (
@@ -38,7 +36,7 @@ const EmployeeLeaveRequests = ({
   );
 };
 
-const EmployeeLeaveRequest = ({
+export const EmployeeLeaveRequest = ({
   leaveRequest,
 }: {
   leaveRequest: LeaveRequest & { user: User };
