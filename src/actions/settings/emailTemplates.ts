@@ -69,19 +69,21 @@ export const updateEmailTemplate = async (
 };
 
 const companyTaxUpdatesTSchema = z.object({
-  tax: z.string().transform((val) => {
+  tax: z.union([z.string(), z.number()]).transform((val) => {
     return new Prisma.Decimal(val);
   }),
   currency: z.string().min(1, "Currency is required"),
 });
 
-export const updateTaxCurrency = async (
-  data: z.infer<typeof companyTaxUpdatesTSchema>,
-) => {
+export const updateTaxCurrency = async (data: {
+  tax: string | number;
+  currency: string;
+}) => {
   const dataValidation = companyTaxUpdatesTSchema.safeParse(data);
 
   if (!dataValidation.success) {
     console.log("Update tax policy error", dataValidation.error);
+    throw new Error("Invalid input data");
   }
 
   const validatedData = dataValidation.data;
@@ -129,15 +131,16 @@ export const updateTermsPolicy = async (
   }
 };
 
-export const getCompanyTermsAndPolicy = async (): Promise<{
+export const getCompanyTermsAndPolicyTax = async (): Promise<{
   terms: string;
   policy: string;
+  tax: Prisma.Decimal;
 }> => {
   try {
     const companyId = await getCompanyId();
     const companyData = await db.company.findUnique({
       where: { id: companyId },
-      select: { terms: true, policy: true },
+      select: { terms: true, policy: true, tax: true },
     });
 
     if (!companyData) {
@@ -147,6 +150,7 @@ export const getCompanyTermsAndPolicy = async (): Promise<{
     return {
       terms: companyData.terms ?? "",
       policy: companyData.policy ?? "",
+      tax: companyData.tax ?? new Prisma.Decimal(0),
     };
   } catch (error) {
     console.error("Error fetching company terms and policy:", error);
