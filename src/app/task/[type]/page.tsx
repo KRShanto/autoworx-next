@@ -8,12 +8,19 @@ import { AppointmentFull } from "@/types/db";
 import { CalendarSettings, User } from "@prisma/client";
 import { Metadata } from "next";
 import TaskPage from "./TaskPage";
+import moment from "moment";
 
 export const metadata: Metadata = {
   title: "Task and Activity Management",
 };
 
-export default async function Page({ params }: { params: { type: string } }) {
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: { type: string };
+  searchParams: { month: string };
+}) {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
   let user = (await db.user.findFirst({
@@ -24,6 +31,24 @@ export default async function Page({ params }: { params: { type: string } }) {
   const calendarAppointments = [];
   let appointments;
   let tasks;
+
+  // get selected month
+  const getMonth = searchParams.month
+    ? moment(searchParams.month, "YYYY-MM").format("MMMM")
+    : moment().format("MMMM");
+
+  // get selected year
+  const getYear = searchParams.month
+    ? moment(searchParams.month, "YYYY-MM").year()
+    : moment().year();
+
+  const holidays = await db.holiday.findMany({
+    where: {
+      companyId: companyId,
+      month: getMonth,
+      year: getYear,
+    },
+  });
 
   if (user.employeeType == "Admin" || user.employeeType == "Manager") {
     // only admin and manager can see all appointments
@@ -36,7 +61,7 @@ export default async function Page({ params }: { params: { type: string } }) {
     // where startTime, endTime, and date are not null
     tasks = await db.task.findMany({
       where: {
-        companyId
+        companyId,
       },
     });
   } else {
@@ -69,8 +94,6 @@ export default async function Page({ params }: { params: { type: string } }) {
         ],
       },
     });
-
-
   }
 
   // aggregating assigned users data
@@ -265,6 +288,7 @@ export default async function Page({ params }: { params: { type: string } }) {
           customers={customers}
           vehicles={vehicles}
           settings={settings}
+          holidays={holidays}
           appointments={calendarAppointments!}
           templates={emailTemplates}
           appointmentsFull={appointmentsFull}
