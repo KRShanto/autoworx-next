@@ -14,13 +14,15 @@ import type {
   CalendarAppointment,
   CalendarTask,
 } from "@/types/db";
-import type {
-  CalendarSettings,
-  Client,
-  EmailTemplate,
-  Task,
-  User,
-  Vehicle,
+import {
+  EmployeeType,
+  type CalendarSettings,
+  type Client,
+  type EmailTemplate,
+  type Holiday,
+  type Task,
+  type User,
+  type Vehicle,
 } from "@prisma/client";
 import moment from "moment";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -28,6 +30,9 @@ import { useDrop } from "react-dnd";
 import { FaPen } from "react-icons/fa6";
 import { assignAppointmentDate } from "../../../../actions/appointment/assignAppointmentDate";
 import { dragTask } from "../../../../actions/task/dragTask";
+import HolidayDeleteConfirmation from "./HolidayDeleteConfiramtion";
+import { useSession } from "next-auth/react";
+import { AuthSession } from "@/types/auth";
 
 function useMonth() {
   const searchParams = useSearchParams();
@@ -41,6 +46,7 @@ export default function Month({
   tasksWithoutTime,
   appointments,
   appointmentsFull,
+  holidays,
   customers,
   vehicles,
   settings,
@@ -50,6 +56,7 @@ export default function Month({
   companyUsers: User[];
   tasksWithoutTime: Task[];
   appointments: CalendarAppointment[];
+  holidays: Holiday[];
   appointmentsFull: AppointmentFull[];
   customers: Client[];
   vehicles: Vehicle[];
@@ -57,6 +64,12 @@ export default function Month({
   templates: EmailTemplate[];
 }) {
   const router = useRouter();
+
+  const { data: session } = useSession();
+
+  const isAdmin =
+    (session as AuthSession)?.user.employeeType === EmployeeType.Admin;
+
   const [{ canDrop, isOver }, dropRef] = useDrop({
     accept: ["task", "tag", "appointment"],
     drop: (item, monitor) => {
@@ -78,12 +91,17 @@ export default function Month({
   const endOfMonth = moment(month).endOf("month").toDate();
 
   // Initialize an array to hold the dates
-  const dates: [Date | null, CalendarTask[], CalendarAppointment[]][] = [];
+  const dates: [
+    Date | null,
+    CalendarTask[],
+    CalendarAppointment[],
+    Holiday[],
+  ][] = [];
 
   // Generate the dates to display
   let currentDate = startOfMonth;
   while (currentDate.getDay() !== 0) {
-    dates.push([null, [], []]); // Filling initial empty days
+    dates.push([null, [], [], []]); // Filling initial empty days
     currentDate = moment(currentDate).subtract(1, "days").toDate();
   }
   currentDate = startOfMonth; // Reset to the start of the month
@@ -91,16 +109,17 @@ export default function Month({
   while (currentDate <= endOfMonth) {
     const tasks = getTasks(currentDate);
     const appointments = getAppointments(currentDate);
-    dates.push([currentDate, tasks, appointments]);
+    const holidays = getHolidays(currentDate);
+    dates.push([currentDate, tasks, appointments, holidays]);
     currentDate = moment(currentDate).add(1, "days").toDate();
   }
 
   while (dates.length % 7 !== 0) {
-    dates.push([null, [], []]); // Filling remaining empty days
+    dates.push([null, [], [], []]); // Filling remaining empty days
   }
 
   while (dates.length < 35) {
-    dates.push([null, [], []]); // Ensure 5 rows of 7 days means 35 days
+    dates.push([null, [], [], []]); // Ensure 5 rows of 7 days means 35 days
   }
   function getTasks(date: Date) {
     return tasks.filter(
@@ -117,6 +136,15 @@ export default function Month({
         new Date(appointment.date!).getFullYear() === date.getFullYear() &&
         new Date(appointment.date!).getMonth() === date.getMonth() &&
         new Date(appointment.date!).getDate() === date.getDate(),
+    );
+  }
+
+  function getHolidays(date: Date) {
+    return holidays.filter(
+      (holiday) =>
+        new Date(holiday.date!).getFullYear() === date.getFullYear() &&
+        new Date(holiday.date!).getMonth() === date.getMonth() &&
+        new Date(holiday.date!).getDate() === date.getDate(),
     );
   }
 
@@ -187,6 +215,9 @@ export default function Month({
     }
   }
 
+  const handleRedirectToDay = (date: string) => {
+    router.push(`/task/day?date=${moment(date).format("YYYY-MM-DD")}`);
+  };
   return (
     <div
       className="mt-3 h-[90.8%] border-l border-t border-neutral-200"
@@ -211,7 +242,7 @@ export default function Month({
             <TooltipTrigger
               type="button"
               className={cn(
-                "relative flex h-full flex-col items-end gap-2 border-b border-r border-neutral-200 p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
+                "relative flex h-full cursor-default flex-col items-end gap-2 border-b border-r border-neutral-200 p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
                 today.getFullYear() === cell[0]?.getFullYear() &&
                   today.getMonth() === cell[0]?.getMonth() &&
                   today.getDate() === cell[0]?.getDate()
@@ -223,10 +254,11 @@ export default function Month({
                   cell[0] &&
                   event.target instanceof Node &&
                   event.currentTarget.contains(event.target)
-                )
-                  router.push(
-                    `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`,
-                  );
+                ) {
+                  // router.push(
+                  //   `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`,
+                  // );
+                }
               }}
               onDrop={(event) =>
                 handleDrop(
@@ -248,7 +280,10 @@ export default function Month({
                       return (
                         <Tooltip key={i}>
                           <TooltipTrigger asChild>
-                            <div className="h-10 max-h-10 rounded border-2 border-gray-300 text-sm text-slate-500">
+                            <div
+                              onClick={() => handleRedirectToDay(cell[0])}
+                              className="h-10 max-h-10 cursor-pointer rounded border-2 border-gray-300 text-sm text-slate-500"
+                            >
                               {appointment.title}
                             </div>
                           </TooltipTrigger>
@@ -336,7 +371,8 @@ export default function Month({
                     <Tooltip key={i}>
                       <TooltipTrigger asChild>
                         <div
-                          className="h-2 max-h-[33.33%] rounded"
+                          onClick={() => handleRedirectToDay(cell[0])}
+                          className="h-2 max-h-[33.33%] cursor-pointer rounded"
                           style={{
                             backgroundColor: TASK_COLOR[task.priority],
                           }}
@@ -391,6 +427,23 @@ export default function Month({
                       +{cell[1].length - 3} more...
                     </button>
                   )}
+                  {/* TODO: holiday button will be add */}
+                  {cell[3].map((holiday: Holiday) => (
+                    <div
+                      key={holiday.id}
+                      className={cn(
+                        "app-shadow absolute left-1/2 z-10 flex -translate-x-1/2 items-center gap-x-2 rounded-md !bg-[#006D77] px-3 py-1.5 text-left text-lg font-semibold text-white",
+                        cell[1].length || cell[2].length
+                          ? "-bottom-12"
+                          : "-bottom-24",
+                      )}
+                    >
+                      <span>Holiday</span>
+                      {isAdmin && (
+                        <HolidayDeleteConfirmation holidayId={holiday.id} />
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </TooltipTrigger>

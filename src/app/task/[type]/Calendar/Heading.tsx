@@ -1,6 +1,12 @@
 import { CalendarType } from "@/types/calendar";
 import type { EmailTemplate } from "@prisma/client";
-import { CalendarSettings, Client, User, Vehicle } from "@prisma/client";
+import {
+  CalendarSettings,
+  Client,
+  EmployeeType,
+  User,
+  Vehicle,
+} from "@prisma/client";
 import { sentenceCase } from "change-case";
 import moment, { Moment } from "moment";
 import Link from "next/link";
@@ -9,8 +15,13 @@ import { Suspense } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { NewAppointment } from "../components/appointment/NewAppointment";
 import Settings from "../components/appointment/Settings";
+import dynamic from "next/dynamic";
 
 const ALLOWED_ROLES_FOR_NEW_APPOINTMENT = ["Admin", "Manager", "Sales"];
+
+const HolidayButton = dynamic(() => import("./HolidayButton.tsx"), {
+  ssr: false,
+});
 
 function DisplayDate({ type }: { type: CalendarType }) {
   const searchParams = useSearchParams();
@@ -60,6 +71,8 @@ export default function Heading({
   const weekend1 = settings ? settings.weekend1 : null;
   const weekend2 = settings ? settings.weekend2 : null;
 
+  const isAdmin = user.employeeType === EmployeeType.Admin;
+
   return (
     <div className="flex items-center justify-between">
       {/* Month name */}
@@ -71,6 +84,8 @@ export default function Heading({
 
       {/* Calendar options */}
       <div className="flex items-center gap-3">
+        {/* holiday set */}
+        {isAdmin && <HolidayButton />}
         {/* Highlight day's date in Month section */}
         <Link
           className="app-shadow rounded-md p-2 text-[#797979]"
