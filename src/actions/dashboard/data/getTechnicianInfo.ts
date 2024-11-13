@@ -4,11 +4,11 @@ import { auth } from "@/app/auth";
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import {
+  currentMonthEnd,
+  currentMonthStart,
   growthRate,
   previousMonthEnd,
   previousMonthStart,
-  currentMonthEnd,
-  currentMonthStart,
 } from "./lib";
 
 /**
@@ -29,6 +29,15 @@ export async function getTechnicianInfo() {
 /**
  * Get current projects for the technician.
  */
+export interface CurrentProject {
+  id: string;
+  services: {
+    name: string | undefined;
+    due: Date | null;
+  }[];
+  yearMakeModel: string;
+  totalPayout: number;
+}
 async function getCurrentProjects() {
   const { companyId, userId } = await getEssentials();
 

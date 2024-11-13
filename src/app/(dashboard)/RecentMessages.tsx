@@ -1,13 +1,15 @@
+import { FullMessage } from "@/actions/dashboard/technician/recentMessages";
 import { useServerGet } from "@/hooks/useServerGet";
 import getUser from "@/lib/getUser";
+import { User } from "@prisma/client";
 import Image from "next/image";
 import { FaExternalLinkAlt } from "react-icons/fa";
-import { auth } from "../auth";
 
 const RecentMessages = ({
   messages = [],
   fullHeight = false,
 }: {
+  messages?: FullMessage[] | [];
   fullHeight?: boolean;
 }) => {
   const { data: user } = useServerGet(getUser);
@@ -29,7 +31,7 @@ const RecentMessages = ({
         />
         <div className="custom-scrollbar #justify-center flex h-[90%] w-full flex-1 flex-col items-center space-y-4 self-center">
           {messages?.map((msg, idx) => (
-            <Message message={msg} key={idx} user={user} />
+            <Message message={msg} key={idx} user={user as User} />
           ))}
           {messages?.length === 0 && (
             <span className="text-center">You have no recent messages</span>
@@ -40,15 +42,23 @@ const RecentMessages = ({
   );
 };
 
-const Message = ({ message, user }) => {
+const Message = ({ message, user }: { message: FullMessage; user: User }) => {
   return (
     <div className="flex w-full flex-col gap-x-2 rounded border p-2 px-2 xl:flex-row xl:items-start">
-      <Image width={60} height={60} src="/images/default.png" alt="" />
+      <Image
+        width={60}
+        height={60}
+        src={
+          message?.from?.image ? message?.from?.image : "/images/default.png"
+        }
+        alt=""
+      />
       <div>
         <p className="font-semibold">
-          {user.id === message.from.id
-            ? message.to.firstName
-            : message.from.firstName}
+          {user.id === message?.from?.id
+            ? (message?.to?.firstName || "") + (message?.to?.lastName || "")
+            : (message?.from?.firstName || "") +
+              (message?.from?.lastName || "")}
         </p>
         <p>{message.message}</p>
       </div>

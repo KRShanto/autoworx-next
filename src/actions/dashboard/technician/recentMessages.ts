@@ -1,3 +1,4 @@
+"use server"
 import { db } from "@/lib/db";
 import getUser from "@/lib/getUser";
 import {
@@ -7,7 +8,7 @@ import {
   User as PrismaUser,
 } from "@prisma/client";
 
-interface FullMessage {
+export interface FullMessage {
   id: number;
   to: PrismaUser | null; // Modified to include user object instead of ID
   from: PrismaUser | null; // Modified to include user object instead of ID

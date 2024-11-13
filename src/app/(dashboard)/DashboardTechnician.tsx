@@ -6,8 +6,9 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 import { stopBreak, takeBreak } from "@/actions/dashboard/break";
 import { clockIn } from "@/actions/dashboard/clockIn";
 import { clockOut } from "@/actions/dashboard/clockOut";
+import { getTechnicianInfo } from "@/actions/dashboard/data/getTechnicianInfo";
 import { fetchRecentMessages } from "@/actions/dashboard/technician/recentMessages";
-import { useServerGet } from "@/hooks/useServerGet";
+import { useServerGet, useServerGetInterval } from "@/hooks/useServerGet";
 import { successToast } from "@/lib/toast";
 import { useCallback } from "react";
 import Appointments from "./Appointments";
@@ -53,8 +54,9 @@ const DashboardTechnician = ({
   lastClockInOut: (ClockInOut & { ClockBreak: ClockBreak[] }) | null;
 }) => {
   const { open } = usePopupStore();
+  const { data: dashboardInfo } = useServerGetInterval(getTechnicianInfo, 5000);
 
-  const data = useServerGet(fetchRecentMessages);
+  const { data: messages } = useServerGet(fetchRecentMessages);
   // console.log("🚀 ~ messages:", messages);
 
   const validBreak = useCallback(
@@ -74,7 +76,7 @@ const DashboardTechnician = ({
       {/* col 1 */}
       <div className="h-full w-[30%] space-y-4">
         {/* Current Projects */}
-        <CurrentProjects />
+        <CurrentProjects projects={dashboardInfo?.currentProjects || []} />
       </div>
 
       {/* col 2 */}
@@ -203,9 +205,38 @@ const DashboardTechnician = ({
                 </span>
               </div>
               <div className="space-y-3">
-                <ChartData heading="Total Jobs" number={567} />
-                <ChartData heading="On-time Completion Rate" number={767} />
-                <ChartData heading="Job Return Rate" number={435} />
+                <ChartData
+                  heading="Total Jobs"
+                  number={dashboardInfo?.performance?.totalJobs?.count}
+                  isPositive={
+                    dashboardInfo?.performance?.totalJobs?.growth?.isPositive
+                  }
+                  rate={dashboardInfo?.performance?.totalJobs?.growth?.rate}
+                />
+                <ChartData
+                  heading="On-time Completion Rate"
+                  number={
+                    dashboardInfo?.performance?.onTimeCompletionRate?.rate
+                  }
+                  isPositive={
+                    dashboardInfo?.performance?.onTimeCompletionRate?.growth
+                      ?.isPositive
+                  }
+                  rate={
+                    dashboardInfo?.performance?.onTimeCompletionRate?.growth
+                      ?.rate
+                  }
+                  isNumberPercent
+                />
+                <ChartData
+                  heading="Jobs Return Rate"
+                  number={dashboardInfo?.performance?.redoJobs?.count}
+                  isPositive={
+                    dashboardInfo?.performance?.redoJobs?.growth?.isPositive
+                  }
+                  rate={dashboardInfo?.performance?.redoJobs?.growth?.rate}
+                  isNumberPercent
+                />
               </div>
             </div>
             <div className="rounded-md p-4 shadow-lg xl:p-6">
@@ -216,8 +247,17 @@ const DashboardTechnician = ({
                 </span>
               </div>
               <div className="space-y-3">
-                <ChartData heading="Current Payout" number={567} />
-                <ChartData heading="Projected Payout" number={767} />
+                <ChartData
+                  heading="Total Payout"
+                  number={dashboardInfo?.monthlyPayout?.totalPayout}
+                  isPositive={dashboardInfo?.monthlyPayout?.growth?.isPositive}
+                  rate={dashboardInfo?.monthlyPayout?.growth?.rate}
+                />
+                <ChartData
+                  heading="Expected Payout"
+                  number={dashboardInfo?.monthlyPayout?.pendingPayout}
+                  noRate
+                />
               </div>
             </div>
           </div>
@@ -225,7 +265,7 @@ const DashboardTechnician = ({
           <div className="h-full w-1/2">
             {" "}
             {/* recent messages */}
-            <RecentMessages fullHeight={true} messages={data.data} />
+            <RecentMessages fullHeight={true} messages={messages || []} />
           </div>
         </div>
       </div>
