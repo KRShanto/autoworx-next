@@ -159,15 +159,14 @@ export default function Table({ data }: { data: InvoiceData[] }) {
                   className="block h-full w-full"
                 >
                   <p
-                    className="rounded-md text-left "
+                    className="rounded-md text-left"
                     style={{
                       backgroundColor: data.bgColor,
                       color: data.textColor,
                     }}
                   >
-                    {data.status||""}
+                    {data.status || ""}
                   </p>
-                  
                 </Link>
               </td>
               <td className="flex items-center gap-3 px-4 py-2">
