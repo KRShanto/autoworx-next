@@ -9,7 +9,6 @@ import DatePanel from "react-multi-date-picker/plugins/date_panel";
 import moment from "moment";
 import getWeekendsOfMonth from "@/utils/getWeekendsOfMonth";
 import { getCalenderSettings } from "@/actions/task/getCalendarSettings";
-import { CalendarSettings } from "@prisma/client";
 
 export default function HolidayButton() {
   const { data: session } = useSession();
@@ -91,23 +90,23 @@ export default function HolidayButton() {
 
   const handleAddHoliday = async () => {
     try {
-      if (values.length > 0) {
+      const totalHolidays = values
+        .filter((date) => {
+          return !weekends.find(
+            (weekend) =>
+              weekend.format("YYYY-MM-DD") === date.format("YYYY-MM-DD"),
+          );
+        })
+        .map((date) => {
+          return {
+            year: date.year,
+            month: date.month.name,
+            companyId: authUser.user.companyId,
+            date: new Date(date.format("YYYY-MM-DD") as string).toISOString(),
+          };
+        });
+      if (Array.isArray(totalHolidays)) {
         // Add holiday logic here
-        const totalHolidays = values
-          .filter((date) => {
-            return !weekends.find(
-              (weekend) =>
-                weekend.format("YYYY-MM-DD") === date.format("YYYY-MM-DD"),
-            );
-          })
-          .map((date) => {
-            return {
-              year: date.year,
-              month: date.month.name,
-              companyId: authUser.user.companyId,
-              date: new Date(date.format("YYYY-MM-DD") as string).toISOString(),
-            };
-          });
         const response = await createHoliday(
           totalHolidays,
           selectedMonth,

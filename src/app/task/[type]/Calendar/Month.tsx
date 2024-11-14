@@ -432,7 +432,8 @@ export default function Month({
                     <div
                       key={holiday.id}
                       className={cn(
-                        "app-shadow absolute left-1/2 z-10 flex -translate-x-1/2 items-center gap-x-2 rounded-md !bg-[#006D77] px-3 py-1.5 text-left text-lg font-semibold text-white",
+                        "app-shadow absolute left-1/2 flex -translate-x-1/2 items-center gap-x-2 rounded-md !bg-[#006D77] px-3 py-1.5 text-left text-lg font-semibold text-white",
+                        holiday?.id ? "z-20" : "z-10",
                         cell[1].length || cell[2].length
                           ? "-bottom-12"
                           : "-bottom-24",

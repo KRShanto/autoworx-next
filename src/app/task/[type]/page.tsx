@@ -287,12 +287,19 @@ export default async function Page({
     getYear,
   );
 
-  const totalOfWeekends = weekendOne.concat(weekendTwo).map((weekend) => ({
+  const reduceDuplicatesWeekends =
+    calenderSettings?.weekend1 === calenderSettings?.weekend2
+      ? weekendOne
+      : weekendOne.concat(weekendTwo);
+
+  const weekends = reduceDuplicatesWeekends.map((weekend) => ({
     companyId,
     date: moment(weekend).toISOString(),
     month: getMonth,
     year: getYear,
   }));
+
+  const totalOfWeekendsAndHolidays = holidays.concat(weekends as any[]);
 
   return (
     <>
@@ -314,7 +321,7 @@ export default async function Page({
           customers={customers}
           vehicles={vehicles}
           settings={settings}
-          holidays={holidays.concat(totalOfWeekends as any[])}
+          holidays={totalOfWeekendsAndHolidays}
           appointments={calendarAppointments!}
           templates={emailTemplates}
           appointmentsFull={appointmentsFull}
