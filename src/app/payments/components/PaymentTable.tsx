@@ -212,36 +212,41 @@ export default function PaymentTable({ data }: { data: ReturnPayment[] }) {
         </thead>
 
         <tbody>
-          {datas.map((item, index) => (
+          {data.map((item, index) => (
             <tr
               key={index}
               className={index % 2 === 0 ? "bg-white" : "bg-[#EEF4FF]"}
             >
               <td className="border-b px-4 py-2">
                 <Link
-                  href={`/estimate/view/${item.invoice}`}
+                  href={`/estimate/view/${item.invoiceId}`}
                   className="text-blue-500 hover:underline"
                 >
-                  {item.invoice}
+                  {item.invoiceId}
                 </Link>
               </td>
               <td className="border-b px-4 py-2">
                 <Link
-                  href={`/client/${item.customerName}`}
+                  href={`/client/${item?.client?.id && item?.client?.id !== undefined ? item?.client?.id : ""}`}
                   className="text-blue-500 hover:underline"
                 >
-                  {item.customerName}
+                  {item?.client?.name && item?.client?.name !== undefined
+                    ? item?.client?.name
+                    : "- - -"}
                 </Link>
               </td>
-              <td className="border-b px-4 py-2">{item.vehicleInfo}</td>
               <td className="border-b px-4 py-2">
-                {item.transactionDate}
-                {/* {moment(item.date).format("YYYY-MM-DD")} */}
+                {item?.vehicle && item?.vehicle !== undefined
+                  ? item?.vehicle
+                  : "- - -"}
+              </td>
+              <td className="border-b px-4 py-2">
+                {moment(item.date).format("YYYY-MM-DD")}
               </td>
               <td className="border-b px-4 py-2">${item.amount}</td>
               <td className="border-b px-4 py-2">{item.method}</td>
               <td className="border-b px-4 py-2">
-                {item.refunded ? <ManageRefund /> : <NewRefund />}
+                {item.paid ? <ManageRefund /> : <NewRefund />}
               </td>
             </tr>
           ))}
