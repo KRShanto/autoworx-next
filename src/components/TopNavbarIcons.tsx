@@ -1,5 +1,6 @@
 "use client";
 import { signOut } from "next-auth/react";
+import { env } from "next-runtime-env";
 import { IoMdLogOut } from "react-icons/io";
 
 export default function TopNavbarIcons() {
@@ -81,7 +82,7 @@ export default function TopNavbarIcons() {
         />
       </svg>
       <button
-        onClick={() => signOut()}
+        onClick={() => signOut({ callbackUrl: env("NEXT_PUBLIC_APP_URL") })}
         className="bg-white text-2xl text-[#6571FF]"
       >
         <IoMdLogOut />
