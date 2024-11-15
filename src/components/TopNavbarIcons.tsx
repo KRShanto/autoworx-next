@@ -86,10 +86,13 @@ export default function TopNavbarIcons() {
       <button
         onClick={() => {
           signOut({
-            callbackUrl:
-              env("NEXT_PUBLIC_APP_URL") + "/login" ||
-              "https://autoworx.link/login",
+            redirect: false,
           });
+          router.push(
+            env("NEXT_PUBLIC_APP_URL")
+              ? env("NEXT_PUBLIC_APP_URL") + "/login"
+              : "https://autoworx.link/login",
+          );
         }}
         className="bg-white text-2xl text-[#6571FF]"
       >
