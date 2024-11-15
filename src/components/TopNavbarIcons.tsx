@@ -82,7 +82,9 @@ export default function TopNavbarIcons() {
         />
       </svg>
       <button
-        onClick={() => signOut({ callbackUrl: env("NEXT_PUBLIC_APP_URL") })}
+        onClick={() =>
+          signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+        }
         className="bg-white text-2xl text-[#6571FF]"
       >
         <IoMdLogOut />
