@@ -36,8 +36,6 @@ export function SelectVehicle({
     }
   }, [vehicle]);
 
-  console.log("vehicleList", vehicle);
-
   // Select vehicle when client changes
   // Select the first vehicle that belongs to the client
   // If there are no vehicles, set vehicle to null
@@ -60,7 +58,7 @@ export function SelectVehicle({
       <input type="hidden" name={name} value={vehicle?.id ?? ""} />
 
       <Selector
-        disabledDropdown={(clientId && !vehicle?.fromRequest) ? false : true}
+        disabledDropdown={clientId && !vehicle?.fromRequest ? false : true}
         label={(vehicle: Vehicle | null) =>
           vehicle ? vehicle.model || `Vehicle ${vehicle.id}` : "Vehicle"
         }

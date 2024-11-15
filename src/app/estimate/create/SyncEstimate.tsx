@@ -37,6 +37,8 @@ export default function SyncEstimate({
         }),
       );
 
+      console.log("I'm going to change the labor!");
+
       useEstimateCreateStore.setState({
         invoiceId: invoice.id,
         subtotal: parseFloat(invoice.subtotal?.toString() || "0"),
@@ -64,7 +66,7 @@ export default function SyncEstimate({
     }
 
     setEstimateState();
-  }, [invoice, items, photos, tasks, payment]);
+  }, []);
 
   return null;
 }

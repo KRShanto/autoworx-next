@@ -72,62 +72,37 @@ export default function LaborCreate() {
       return;
     }
 
-    if (addToCannedLabor) {
-      const res = await newLabor({
-        name,
-        categoryId: category?.id,
-        tags,
-        notes,
-        hours: hours || 1,
-        charge: charge || 0,
-        discount: discount || 0,
-      });
+    const res = await newLabor({
+      name,
+      categoryId: category?.id,
+      tags,
+      notes,
+      hours: hours || 1,
+      charge: charge || 0,
+      discount: discount || 0,
+      cannedLabor: addToCannedLabor,
+    });
 
-      if (res.type === "success") {
-        // Change the service where itemId is the same
-        useEstimateCreateStore.setState((state) => {
-          const items = state.items.map((item) => {
-            if (item.id === itemId) {
-              return {
-                ...item,
-                labor: res.data,
-              };
-            }
-            return item;
-          });
-          return { items };
-        });
+    if (res.type === "success") {
+      console.log("Labor has been created", res.data);
 
-        // Add to listsStore
-        useListsStore.setState((state) => {
-          return { labors: [...state.labors, res.data] };
-        });
-
-        close();
-      }
-    } else {
       // Change the service where itemId is the same
-      // @ts-ignore
       useEstimateCreateStore.setState((state) => {
         const items = state.items.map((item) => {
           if (item.id === itemId) {
             return {
               ...item,
-              labor: {
-                name,
-                categoryId: category?.id,
-                tags,
-                notes,
-                hours,
-                charge,
-                discount,
-                addToCannedLabor,
-              },
+              labor: res.data,
             };
           }
           return item;
         });
         return { items };
+      });
+
+      // Add to listsStore
+      useListsStore.setState((state) => {
+        return { labors: [...state.labors, res.data] };
       });
 
       close();

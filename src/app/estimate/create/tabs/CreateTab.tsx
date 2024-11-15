@@ -8,7 +8,7 @@ import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useListsStore } from "@/stores/lists";
 import { create } from "mutative";
 import { nanoid } from "nanoid";
-import React, { Fragment, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { HiOutlinePlusCircle, HiOutlineXCircle } from "react-icons/hi2";
 
 export function CreateTab() {
@@ -18,8 +18,6 @@ export function CreateTab() {
   const services = useListsStore((x) => x.services);
   const materials = useListsStore((x) => x.materials);
   const labors = useListsStore((x) => x.labors);
-
-  console.log("from create", { items });
 
   // dropdown state
   const [dropdownsOpen, setDropdownsOpen] = useState({

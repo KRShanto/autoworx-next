@@ -6,6 +6,7 @@ import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import Close from "./CloseEstimate";
 import SelectCategory from "@/components/Lists/SelectCategory";
+import { create } from "mutative";
 
 export default function ServiceCreate() {
   const { close, data } = useEstimatePopupStore();
@@ -44,18 +45,27 @@ export default function ServiceCreate() {
 
     if (res.type === "success") {
       // Change the service where itemId is the same
-      useEstimateCreateStore.setState((state) => {
-        const items = state.items.map((item) => {
-          if (item.id === itemId) {
-            return {
-              ...item,
-              service: res.data,
-            };
-          }
-          return item;
-        });
-        return { items };
-      });
+      // useEstimateCreateStore.setState((state) => {
+      //   const items = state.items.map((item) => {
+      //     if (item.id === itemId) {
+      //       return {
+      //         ...item,
+      //         service: res.data,
+      //       };
+      //     }
+      //     return item;
+      //   });
+      //   return { items };
+      // });
+      const i = useEstimateCreateStore
+        .getState()
+        .items.findIndex((item) => item.id === itemId);
+
+      useEstimateCreateStore.setState((x) =>
+        create(x, (x) => {
+          x.items[i].service = res.data;
+        }),
+      );
 
       // Add to listsStore
       useListsStore.setState((state) => {

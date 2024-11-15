@@ -40,8 +40,6 @@ export function SelectStatus({
       setStatus(value);
     }
   }, [value]);
-  console.log("value", value);
-  console.log("status from select", status);
 
   useEffect(() => {
     if (status) {

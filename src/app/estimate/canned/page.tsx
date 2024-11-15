@@ -1,4 +1,3 @@
-
 import { AuthSession } from "@/types/auth";
 import Header from "../Header";
 import { auth } from "@/app/auth";
@@ -13,7 +12,7 @@ export default async function CannedPage() {
   const companyId = session.user.companyId;
 
   const labors = await db.labor.findMany({
-    where: { companyId },
+    where: { companyId, cannedLabor: true },
     include: { category: true },
   });
 

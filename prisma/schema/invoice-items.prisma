@@ -29,21 +29,22 @@ enum InvoiceItemMaterialType {
 // Service itself is an independant model, So one service can be in multiple invoices.
 // And if you want to fetch services for a client, you need to fetch all invoices and then all invoice items and then you'll get services.
 model Service {
-    id                     Int           @id @default(autoincrement())
-    createdAt              DateTime      @default(now()) @map("created_at")
-    updatedAt              DateTime      @default(now()) @updatedAt @map("updated_at")
+    id                     Int              @id @default(autoincrement())
+    createdAt              DateTime         @default(now()) @map("created_at")
+    updatedAt              DateTime         @default(now()) @updatedAt @map("updated_at")
     name                   String
     description            String?
-    fromRequest            Boolean?      @default(false) @map("from_request")
-    fromRequestedCompanyId Int?          @map("from_requested_company_id")
-    categoryId             Int?          @map("category_id")
-    companyId              Int           @map("company_id")
-    company                Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-    category               Category?     @relation(fields: [categoryId], references: [id])
+    fromRequest            Boolean?         @default(false) @map("from_request")
+    fromRequestedCompanyId Int?             @map("from_requested_company_id")
+    categoryId             Int?             @map("category_id")
+    companyId              Int              @map("company_id")
+    company                Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    category               Category?        @relation(fields: [categoryId], references: [id])
     invoiceItems           InvoiceItem[]
     Technician             Technician[]
-    requestEstimate RequestEstimate? @relation("Service")
+    requestEstimate        RequestEstimate? @relation("Service")
     InvoiceRedo            InvoiceRedo[]
+
     @@index([companyId], name: "fk_services_company")
 }
 
@@ -96,6 +97,7 @@ model Labor {
     charge       Decimal? // per hour
     discount     Decimal?
     companyId    Int           @map("company_id")
+    cannedLabor  Boolean?      @default(false) @map("canned_labor")
     createdAt    DateTime      @default(now()) @map("created_at")
     updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
     company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
