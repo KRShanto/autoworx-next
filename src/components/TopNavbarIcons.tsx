@@ -1,9 +1,11 @@
 "use client";
 import { signOut } from "next-auth/react";
 import { env } from "next-runtime-env";
+import { useRouter } from "next/navigation";
 import { IoMdLogOut } from "react-icons/io";
 
 export default function TopNavbarIcons() {
+  const router = useRouter();
   return (
     <div className="flex items-center gap-x-4">
       <svg
@@ -82,7 +84,13 @@ export default function TopNavbarIcons() {
         />
       </svg>
       <button
-        onClick={() => signOut({ callbackUrl: env("NEXT_PUBLIC_APP_URL") })}
+        onClick={() => {
+          signOut({
+            callbackUrl:
+              env("NEXT_PUBLIC_APP_URL") + "/login" ||
+              "https://autoworx.link/login",
+          });
+        }}
         className="bg-white text-2xl text-[#6571FF]"
       >
         <IoMdLogOut />
