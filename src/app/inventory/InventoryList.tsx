@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import ProductTable from "./ProductTable";
 import SearchFilter from "./SearchFilter";
 import Sidebar from "./Sidebar";
+import { useEffect } from "react";
 
 export default function InventoryList({
   products,
@@ -20,7 +21,13 @@ export default function InventoryList({
 }) {
   const router = useRouter();
   const search = useSearchParams();
-  const view = search.get("view") || "products";
+  const view = search.get("view") ?? "products";
+
+  useEffect(() => {
+    if (!search.get("view")) {
+      router.push("/inventory?view=products");
+    }
+  }, [search, router]);
 
   return (
     <Tabs
