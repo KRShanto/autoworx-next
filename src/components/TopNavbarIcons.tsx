@@ -84,9 +84,16 @@ export default function TopNavbarIcons() {
         />
       </svg>
       <button
-        onClick={() =>
-          signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
-        }
+        onClick={() => {
+          signOut({
+            redirect: false,
+          });
+          router.push(
+            env("NEXT_PUBLIC_APP_URL")
+              ? env("NEXT_PUBLIC_APP_URL") + "/login"
+              : "https://autoworx.link/login",
+          );
+        }}
         className="bg-white text-2xl text-[#6571FF]"
       >
         <IoMdLogOut />
