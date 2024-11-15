@@ -1,11 +1,8 @@
 "use client";
 
-import {
-  HiChatBubbleOvalLeftEllipsis,
-  HiMiniArrowUpTray,
-  HiPrinter,
-} from "react-icons/hi2";
 import { cn } from "@/lib/cn";
+import { useRouter, useSearchParams } from "next/navigation";
+import { HiChatBubbleOvalLeftEllipsis } from "react-icons/hi2";
 import DeleteEstimateButton from "./DeleteEstimateButton";
 
 const btnCN = cn(
@@ -13,9 +10,19 @@ const btnCN = cn(
 );
 
 export function CreateEstimateActionsButtons() {
+  const clientId = useSearchParams().get("clientId");
+  const router = useRouter();
+
   return (
     <div className="flex flex-wrap items-stretch gap-3">
-      <button className={btnCN}>
+      <button
+        onClick={() => {
+          if (clientId) {
+            router.push(`/communication/client?clientId=${clientId}`);
+          }
+        }}
+        className={btnCN}
+      >
         <HiChatBubbleOvalLeftEllipsis />
         Message
       </button>
