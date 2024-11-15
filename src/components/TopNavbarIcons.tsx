@@ -1,9 +1,11 @@
 "use client";
 import { signOut } from "next-auth/react";
 import { env } from "next-runtime-env";
+import { useRouter } from "next/navigation";
 import { IoMdLogOut } from "react-icons/io";
 
 export default function TopNavbarIcons() {
+  const router = useRouter();
   return (
     <div className="flex items-center gap-x-4">
       <svg
