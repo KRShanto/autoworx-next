@@ -208,34 +208,38 @@ const DashboardTechnician = ({
               <div className="space-y-3">
                 <ChartData
                   heading="Total Jobs"
-                  number={dashboardInfo?.performance?.totalJobs?.count}
+                  number={dashboardInfo?.performance?.totalJobs?.count || 0}
                   isPositive={
-                    dashboardInfo?.performance?.totalJobs?.growth?.isPositive
+                    dashboardInfo?.performance?.totalJobs?.growth?.isPositive ||
+                    false
                   }
-                  rate={dashboardInfo?.performance?.totalJobs?.growth?.rate}
+                  rate={
+                    dashboardInfo?.performance?.totalJobs?.growth?.rate || 0
+                  }
                 />
                 <ChartData
                   heading="On-time Completion Rate"
                   number={
-                    dashboardInfo?.performance?.onTimeCompletionRate?.rate
+                    dashboardInfo?.performance?.onTimeCompletionRate?.rate || 0
                   }
                   isPositive={
                     dashboardInfo?.performance?.onTimeCompletionRate?.growth
-                      ?.isPositive
+                      ?.isPositive || false
                   }
                   rate={
                     dashboardInfo?.performance?.onTimeCompletionRate?.growth
-                      ?.rate
+                      ?.rate || 0
                   }
                   isNumberPercent
                 />
                 <ChartData
                   heading="Jobs Return Rate"
-                  number={dashboardInfo?.performance?.redoJobs?.count}
+                  number={dashboardInfo?.performance?.redoJobs?.count || 0}
                   isPositive={
-                    dashboardInfo?.performance?.redoJobs?.growth?.isPositive
+                    dashboardInfo?.performance?.redoJobs?.growth?.isPositive ||
+                    false
                   }
-                  rate={dashboardInfo?.performance?.redoJobs?.growth?.rate}
+                  rate={dashboardInfo?.performance?.redoJobs?.growth?.rate || 0}
                   isNumberPercent
                 />
               </div>
@@ -250,13 +254,15 @@ const DashboardTechnician = ({
               <div className="space-y-3">
                 <ChartData
                   heading="Total Payout"
-                  number={dashboardInfo?.monthlyPayout?.totalPayout}
-                  isPositive={dashboardInfo?.monthlyPayout?.growth?.isPositive}
-                  rate={dashboardInfo?.monthlyPayout?.growth?.rate}
+                  number={dashboardInfo?.monthlyPayout?.totalPayout || 0}
+                  isPositive={
+                    dashboardInfo?.monthlyPayout?.growth?.isPositive || false
+                  }
+                  rate={dashboardInfo?.monthlyPayout?.growth?.rate || 0}
                 />
                 <ChartData
                   heading="Expected Payout"
-                  number={dashboardInfo?.monthlyPayout?.pendingPayout}
+                  number={dashboardInfo?.monthlyPayout?.pendingPayout || 0}
                   noRate
                 />
               </div>
