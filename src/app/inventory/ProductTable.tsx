@@ -55,7 +55,7 @@ export default function ProductTable({
   }, []);
 
   return (
-    <div className="h-full overflow-x-auto">
+    <div className="h-[95%] overflow-auto">
       <table className="w-full">
         <thead className="bg-white">
           <tr className="h-10 border-b">
