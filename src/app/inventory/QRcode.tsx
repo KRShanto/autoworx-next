@@ -1,38 +1,33 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import { FaPrint } from "react-icons/fa";
+import { useReactToPrint } from "react-to-print";
 
 export default function QRcode({ imgUrl }: { imgUrl: string }) {
-  const handlePrint = () => {
-    const printWindow = window.open("", "_blank");
-    printWindow?.document.write(`
-      <html>
-        <head>
-          <title>Print QR Code</title>
-          <style>
-            body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-            img { width: 500px; height: 500px; }
-          </style>
-        </head>
-        <body>
-          <img src="${imgUrl}" alt="qr code" />
-        </body>
-      </html>
-    `);
-    printWindow?.document.close();
-    printWindow?.focus();
-    printWindow?.print();
-    printWindow?.close();
-  };
+  const contentRef = useRef<HTMLImageElement>(null);
+  const reactToPrintFn = useReactToPrint({
+    content: () => contentRef.current,
+  });
 
   return (
-    <button
-      className="mx-auto mt-3 flex w-fit items-center gap-1 rounded-md border border-slate-400 p-1 px-3"
-      onClick={handlePrint}
-    >
-      <FaPrint className="text-sm" />
-      Print
-    </button>
+    <div>
+      <div className="hidden">
+        <img
+          ref={contentRef}
+          src={imgUrl}
+          alt="qr code"
+          className="mx-auto my-auto aspect-square w-[500px]"
+        />
+      </div>
+      <button
+        className="mx-auto mt-3 flex w-fit items-center gap-1 rounded-md border border-slate-400 p-1 px-3"
+        onClick={reactToPrintFn}
+      >
+        <FaPrint className="text-sm" />
+        Print
+      </button>
+    </div>
   );
 }

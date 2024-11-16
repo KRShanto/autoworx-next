@@ -5,8 +5,9 @@ import getUser from "@/lib/getUser";
 import { AuthSession } from "@/types/auth";
 import { env } from "next-runtime-env";
 import QRCode from "qrcode";
-import React from "react";
+import React, { useRef } from "react";
 import { FaCircleExclamation, FaPrint } from "react-icons/fa6";
+import { useReactToPrint } from "react-to-print";
 import { auth } from "../auth";
 import QRcode from "./QRcode";
 import ReplenishProductForm from "./ReplenishProductForm";
@@ -145,14 +146,12 @@ export default async function Sidebar({ productId }: { productId: number }) {
                         />
                       )}
                     </div>
-                    {/* <a
+                    {/* <button
                       className="mx-auto mt-3 flex w-fit items-center gap-1 rounded-md border border-slate-400 p-1 px-3"
-                      href={imgUrl!}
-                      download={`${product && product.name} Qrcode.png`}
                     >
                       <FaPrint className="text-sm" />
                       Print
-                    </a> */}
+                    </button> */}
                     <QRcode imgUrl={imgUrl!} />
                   </div>
                 </div>
