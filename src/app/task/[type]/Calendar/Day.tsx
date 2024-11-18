@@ -25,7 +25,7 @@ import DayTask from "../components/day/DayTask";
 
 export function useDate() {
   const searchParams = useSearchParams();
-  const date = moment(searchParams.get("date"), moment.HTML5_FMT.DATE);
+  const date = moment.utc(searchParams.get("date"), moment.HTML5_FMT.DATE);
   return date.isValid() ? date : moment();
 }
 
@@ -120,7 +120,8 @@ export default function Day({
         .filter((event: CalendarTask | CalendarAppointment) => {
           // return today's tasks
           // also filter by month and year
-          const taskDate = moment(event.date);
+          const taskDate = moment.utc(event.date);
+
           return (
             taskDate.date() === date.date() &&
             taskDate.month() === date.month() &&
@@ -160,10 +161,6 @@ export default function Day({
       );
       const oldTask = tasks.find((task) => task.id === taskId);
       if (taskFoundWithoutTime) {
-        console.log(
-          "🚀 ~ handleDrop ~ taskFoundWithoutTime:",
-          taskFoundWithoutTime,
-        );
         // Add task to database
         await updateTask({
           id: taskFoundWithoutTime.id,
@@ -299,6 +296,7 @@ export default function Day({
 
       {/* Tasks */}
       {sortedEvents.map((event, index) => {
+        console.log("🚀 ~ {sortedEvents.map ~ event:", event);
         const eventStartTime = moment(event.startTime, "HH:mm");
         const eventEndTime = moment(event.endTime, "HH:mm");
 

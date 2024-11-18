@@ -179,6 +179,13 @@ export default function ItemSelector<T>({
                 className="absolute -right-2 -top-2"
                 type="button"
                 onClick={() => {
+                  if (searchRef?.current?.value) searchRef.current.value = "";
+
+                  if (onSearch) {
+                    const results = onSearch("");
+                    setItemIist(results);
+                  }
+
                   onDelete && onDelete();
                   setSelected(null);
                 }}
@@ -205,6 +212,8 @@ export default function ItemSelector<T>({
                 placeholder="Search"
                 className="w-full rounded-md border-2 border-slate-400 p-1 pl-6 pr-10 focus:outline-none"
                 onChange={(e) => {
+                  console.log("🚀 ~ search:", e.target.value);
+
                   if (onSearch) {
                     const search = e.target.value;
                     const results = onSearch(search);
