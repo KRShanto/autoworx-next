@@ -236,15 +236,17 @@ export default function LaborCreate() {
         />
       </div>
 
-      <div className="ml-5 flex items-center gap-5">
-        <input
-          id="check"
-          type="checkbox"
-          checked={addToCannedLabor}
-          onChange={(e) => setAddToCannedLabor(e.target.checked)}
-        />
-        <label htmlFor="check">Add to Canned Labor</label>
-      </div>
+      {!data.edit && (
+        <div className="ml-3 flex items-center gap-5">
+          <input
+            id="check"
+            type="checkbox"
+            checked={addToCannedLabor}
+            onChange={(e) => setAddToCannedLabor(e.target.checked)}
+          />
+          <label htmlFor="check">Add to Canned Labor</label>
+        </div>
+      )}
 
       <div className="flex justify-center gap-5">
         <Close />
