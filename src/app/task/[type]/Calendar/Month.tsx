@@ -40,6 +40,29 @@ function useMonth() {
   return (month.isValid() ? month : moment().startOf("month")).toDate();
 }
 
+function rotatedDays(startDay: number) {
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  // Rotate the daysOfWeek array based on the selected start day
+  const rotatedDays = daysOfWeek
+    .slice(startDay)
+    .concat(daysOfWeek.slice(0, startDay));
+  return rotatedDays;
+}
+
+function getDayNumber(dayName: string) {
+  const dayNumber = moment().day(dayName).day(); // `day()` accepts the day name
+  return isNaN(dayNumber) ? -1 : dayNumber;
+}
+
 export default function Month({
   tasks,
   companyUsers,
@@ -100,10 +123,14 @@ export default function Month({
 
   // Generate the dates to display
   let currentDate = startOfMonth;
-  while (currentDate.getDay() !== 0) {
-    dates.push([null, [], [], []]); // Filling initial empty days
-    currentDate = moment(currentDate).subtract(1, "days").toDate();
+  const startDay = getDayNumber(settings.weekStart);
+
+  const offset = (currentDate.getDay() - startDay + 7) % 7;
+
+  for (let i = 0; i < offset; i++) {
+    dates.push([null, [], [], []]);
   }
+
   currentDate = startOfMonth; // Reset to the start of the month
 
   while (currentDate <= endOfMonth) {
@@ -121,6 +148,7 @@ export default function Month({
   while (dates.length < 35) {
     dates.push([null, [], [], []]); // Ensure 5 rows of 7 days means 35 days
   }
+
   function getTasks(date: Date) {
     return tasks.filter(
       (task) =>
@@ -148,16 +176,8 @@ export default function Month({
     );
   }
 
-  const cells = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    ...dates,
-  ];
+  const cells = [...rotatedDays(startDay), ...dates];
+
 
   async function handleDrop(event: React.DragEvent, date: string) {
     // 10 am

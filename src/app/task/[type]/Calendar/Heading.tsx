@@ -156,6 +156,7 @@ export default function Heading({
 
         {/* New Appointment button */}
         {ALLOWED_ROLES_FOR_NEW_APPOINTMENT.includes(user.employeeType) && (
+          // TODO: template time set dynamic
           <NewAppointment
             settings={settings}
             employees={employees}
