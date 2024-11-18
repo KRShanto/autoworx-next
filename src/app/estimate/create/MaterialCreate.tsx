@@ -344,14 +344,16 @@ export default function MaterialCreate() {
         />
       </div>
 
-      <label className="ml-5 flex items-center gap-2">
-        <input
-          type="checkbox"
-          checked={addToInventory}
-          onChange={(e) => setAddToInventory(e.target.checked)}
-        />
-        <span>Add to Inventory</span>
-      </label>
+      {!data.edit && (
+        <label className="ml-5 flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={addToInventory}
+            onChange={(e) => setAddToInventory(e.target.checked)}
+          />
+          <span>Add to Inventory</span>
+        </label>
+      )}
 
       <div className="flex justify-center gap-5">
         <Close />
