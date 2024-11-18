@@ -101,8 +101,8 @@ const DashboardManager = ({
             <div className="mb-8 flex items-center justify-between">
               <span className="text-xl font-bold">Revenue</span>{" "}
               <Link href="/reporting/revenue">
-              <FaExternalLinkAlt />
-            </Link>
+                <FaExternalLinkAlt />
+              </Link>
             </div>
             <div className="space-y-3">
               <ChartData
@@ -126,8 +126,8 @@ const DashboardManager = ({
             <div className="mb-8 flex items-center justify-between">
               <span className="text-xl font-bold">Inventory</span>{" "}
               <Link href="/reporting/inventory">
-              <FaExternalLinkAlt />
-            </Link>
+                <FaExternalLinkAlt />
+              </Link>
             </div>
             <div className="space-y-3">
               <ChartData
@@ -155,7 +155,13 @@ const DashboardManager = ({
             </Link>
           </div>
           <div className="space-y-3">
-            <ChartData heading="Current Month Payout" number={767} dollarSign />
+            <ChartData
+              heading="Current Month Payout"
+              number={data?.employeePayout?.currentMonthTotal}
+              dollarSign
+              isPositive={data?.employeePayout?.growth?.isPositive}
+              rate={data?.employeePayout?.growth?.rate}
+            />
           </div>
         </div>
         {/* employee leave request */}
