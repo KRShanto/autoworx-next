@@ -30,7 +30,7 @@ const ChartData = ({
       </div>
       {!noRate && (
         <div className="flex items-center gap-4">
-          {isPositive ? (
+          {isPositive  ? (
             <div className="text-[#4DB6AC]">
               <FaCaretUp />
             </div>

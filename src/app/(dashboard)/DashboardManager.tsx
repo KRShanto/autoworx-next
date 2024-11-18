@@ -63,20 +63,20 @@ const DashboardManager = ({
             <div className="space-y-3">
               <ChartData
                 heading="Total Jobs"
-                number={data?.totalJobs?.jobs}
-                isPositive={data?.totalJobs?.growth?.isPositive}
-                rate={data?.totalJobs?.growth?.rate}
+                number={data?.totalJobs?.jobs || 0}
+                isPositive={data?.totalJobs?.growth?.isPositive || false}
+                rate={data?.totalJobs?.growth?.rate || 0}
               />
               <ChartData
                 heading="Ongoing Jobs"
-                number={data?.ongoingJobs?.ongoingJobs}
+                number={data?.ongoingJobs?.ongoingJobs || 0}
                 noRate
               />
               <ChartData
                 heading="Completed Jobs"
-                number={data?.completedJobs?.completedJobs}
-                isPositive={data?.completedJobs?.growth?.isPositive}
-                rate={data?.completedJobs?.growth?.rate}
+                number={data?.completedJobs?.completedJobs || 0}
+                isPositive={data?.completedJobs?.growth?.isPositive || false}
+                rate={data?.completedJobs?.growth?.rate || 0}
               />
             </div>
           </div>
@@ -108,16 +108,16 @@ const DashboardManager = ({
               <ChartData
                 heading="Current Revenue"
                 dollarSign={true}
-                number={data?.revenue?.revenue}
-                isPositive={data?.revenue?.growth?.isPositive}
-                rate={data?.revenue?.growth?.rate}
+                number={data?.revenue?.revenue || 0}
+                isPositive={data?.revenue?.growth?.isPositive || false}
+                rate={data?.revenue?.growth?.rate || 0}
               />
               <ChartData
                 heading="Expected Revenue"
                 dollarSign={true}
-                number={data?.expectedRevenue?.revenue}
-                isPositive={data?.expectedRevenue?.growth?.isPositive}
-                rate={data?.expectedRevenue?.growth?.rate}
+                number={data?.expectedRevenue?.revenue || 0}
+                isPositive={data?.expectedRevenue?.growth?.isPositive || false}
+                rate={data?.expectedRevenue?.growth?.rate || 0}
               />
             </div>
           </div>
@@ -133,15 +133,15 @@ const DashboardManager = ({
               <ChartData
                 heading="Total Value"
                 dollarSign={true}
-                number={data?.inventory?.totalValue}
+                number={data?.inventory?.totalValue || 0}
                 noRate
               />
               <ChartData
                 heading="Current Monthly Total"
-                number={data?.inventory?.currentMonthTotal}
+                number={data?.inventory?.currentMonthTotal || 0}
                 dollarSign={true}
-                isPositive={data?.inventory?.growth?.isPositive}
-                rate={data?.inventory?.growth?.rate}
+                isPositive={data?.inventory?.growth?.isPositive || false}
+                rate={data?.inventory?.growth?.rate || 0}
               />
             </div>
           </div>
