@@ -1,10 +1,18 @@
 import { SlimInput } from "@/components/SlimInput";
 import React, { useState } from "react";
 
-const DiscountInput = () => {
-  const [discountType, setDiscountType] = useState("$");
+interface DiscountInputProps {
+  defaultDiscountType?: string;
+  defaultDiscountValue?: string;
+}
 
-  const handleRadioChange = (e: any) => {
+const DiscountInput = ({
+  defaultDiscountType = "$",
+  defaultDiscountValue = "",
+}: DiscountInputProps) => {
+  const [discountType, setDiscountType] = useState(defaultDiscountType);
+
+  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDiscountType(e.target.value);
   };
 
@@ -14,6 +22,7 @@ const DiscountInput = () => {
         name="discountValue"
         label="Discount"
         style={{ width: "150px" }}
+        defaultValue={defaultDiscountValue}
       />
       <div className="flex flex-col items-center">
         <p className="mb-2">$</p>
@@ -21,7 +30,7 @@ const DiscountInput = () => {
           name="discountType"
           type="radio"
           value="$"
-          checked={discountType === "$"}
+          checked={discountType === "Fixed" || discountType === "$"}
           onChange={handleRadioChange}
           className="mb-2"
         />
@@ -32,7 +41,7 @@ const DiscountInput = () => {
           name="discountType"
           type="radio"
           value="%"
-          checked={discountType === "%"}
+          checked={discountType === "Percentage" || discountType === "%"}
           onChange={handleRadioChange}
           className="mb-2"
         />
@@ -41,8 +50,13 @@ const DiscountInput = () => {
   );
 };
 
-const CouponCode = () => {
-  const [code, setCode] = useState(["", "", "", "", "", ""]);
+interface CouponCodeProps {
+  defaultValue?: string;
+}
+const CouponCode = ({ defaultValue = "      " }: CouponCodeProps) => {
+  const [code, setCode] = useState(
+    defaultValue.padEnd(6, "").split("").slice(0, 6),
+  );
 
   const generateCode = () => {
     const newCode = Array.from({ length: 6 }, () =>

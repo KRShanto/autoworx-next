@@ -14,7 +14,7 @@ const CouponQRCode = ({ showQr, coupon }: CouponQRCodeProps) => {
 
   useEffect(() => {
     if (showQr) {
-      const couponUrl = "https://github.com/Md-AbdullahAl-Noman"; // TODO Replace with your coupon URL
+      const couponUrl = `${window.location.origin}/greetings`; // TODO Replace with your coupon URL
       QRCode.toDataURL(couponUrl)
         .then((url) => {
           setQrCodeUrl(url);
