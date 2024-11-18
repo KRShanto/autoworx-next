@@ -24,7 +24,7 @@ const CouponQRCode = ({ showQr, coupon }: CouponQRCodeProps) => {
         });
     }
   }, [showQr, coupon]);
-
+  const discountSign = coupon.discountType === "Fixed" ? "$" : "%";
   return (
     <div className="flex h-full flex-col">
       <div className="flex flex-col gap-4">
@@ -44,7 +44,10 @@ const CouponQRCode = ({ showQr, coupon }: CouponQRCodeProps) => {
         {/*  coupon details or content */}
         <div>Coupon Name: {coupon ? coupon.name : ""}</div>
         <div>Coupon Code: {coupon.code}</div>
-        <div>Discount: {Number(coupon.discount)}</div>
+        <div>
+          Discount: {Number(coupon.discount)}
+          {discountSign}
+        </div>
         <div>Start Date: {moment(coupon.startDate).format("DD/MM/YYYY")}</div>
         <div>End Date: {moment(coupon.endDate).format("DD/MM/YYYY")}</div>
         <div>Numer of Times Activated: {coupon.redemptions}</div>

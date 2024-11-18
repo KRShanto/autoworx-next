@@ -110,6 +110,7 @@ const CuponComponet = ({ coupons, setCoupons }: CouponTableProps) => {
                   </td>
                   <td className="border-b border-gray-200 px-4 py-2">
                     {Number(coupon.discount)}
+                    {coupon.discountType === "Fixed" ? "$" : "%"}
                   </td>
                   <td className="border-b border-gray-200 px-4 py-2">
                     {moment(coupon.startDate).format("DD/MM/YYYY")}
