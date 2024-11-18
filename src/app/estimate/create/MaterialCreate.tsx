@@ -295,7 +295,7 @@ export default function MaterialCreate() {
           type="number"
           id="qt"
           value={quantity}
-          onChange={(e) => setQuantity(parseInt(e.target.value))}
+          onChange={(e) => setQuantity(parseFloat(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
           placeholder="0"
         />
@@ -309,7 +309,7 @@ export default function MaterialCreate() {
           type="number"
           id="price"
           value={cost}
-          onChange={(e) => setCost(parseInt(e.target.value as any))}
+          onChange={(e) => setCost(parseFloat(e.target.value as any))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
           placeholder="0"
           disabled={data.edit}
@@ -324,7 +324,7 @@ export default function MaterialCreate() {
           type="number"
           id="sell"
           value={sell}
-          onChange={(e) => setSell(parseInt(e.target.value))}
+          onChange={(e) => setSell(parseFloat(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
           placeholder="0"
         />
@@ -338,7 +338,7 @@ export default function MaterialCreate() {
           type="number"
           id="discount"
           value={discount}
-          onChange={(e) => setDiscount(parseInt(e.target.value))}
+          onChange={(e) => setDiscount(parseFloat(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
           placeholder="0"
         />
