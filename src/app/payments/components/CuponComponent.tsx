@@ -37,6 +37,8 @@ const CuponComponet = ({ coupons, setCoupons }: CouponTableProps) => {
     setCoupons(
       (prevCoupons) => prevCoupons?.filter((c) => c.id !== coupon.id) || null,
     );
+    setSelectedCoupon(null);
+    setShowQr(false);
   };
   const handleUpdate = (updatedCoupon: Coupon) => {
     setCoupons(
