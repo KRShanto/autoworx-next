@@ -152,12 +152,13 @@ export function SelectTags({
                   key={tag.id}
                   onClick={() => {
                     setTags((tags) => [...tags, tag]);
-                    setDropdownsOpen && setDropdownsOpen({
-                      SERVICE: [-1, -1],
-                      MATERIAL: [-1, -1],
-                      LABOR: [-1, -1],
-                      TAG: [-1, -1],
-                    });
+                    setDropdownsOpen &&
+                      setDropdownsOpen({
+                        SERVICE: [-1, -1],
+                        MATERIAL: [-1, -1],
+                        LABOR: [-1, -1],
+                        TAG: [-1, -1],
+                      });
                     setOpen(false);
                   }}
                   className="mx-4 cursor-pointer"
@@ -174,6 +175,14 @@ export function SelectTags({
           <QuickAddForm
             onSuccess={(tag) => {
               setTags((tags) => [...tags, tag]);
+              setDropdownsOpen &&
+                setDropdownsOpen({
+                  SERVICE: [-1, -1],
+                  MATERIAL: [-1, -1],
+                  LABOR: [-1, -1],
+                  TAG: [-1, -1],
+                });
+              setOpen(false);
             }}
             setPickerOpen={setPickerOpen}
             selectedColor={selectedColor}
