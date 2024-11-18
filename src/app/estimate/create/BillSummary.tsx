@@ -151,7 +151,7 @@ export function BillSummary() {
               }
               className="w-[100px] rounded-md bg-slate-500 px-2 py-1 text-xs text-white"
             />
-            {title === "deposit" && (
+            {/* {title === "deposit" && (
               <DepositCreate
                 deposit={deposit}
                 method={depositMethod}
@@ -160,7 +160,7 @@ export function BillSummary() {
                 depositNotes={depositNotes}
                 setDepositNotes={setDepositNotes}
               />
-            )}
+            )} */}
           </div>
         ))}
       </div>

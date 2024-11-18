@@ -77,9 +77,9 @@ export default function LaborCreate() {
       categoryId: category?.id,
       tags,
       notes,
-      hours: hours || 1,
-      charge: charge || 0,
-      discount: discount || 0,
+      hours: hours ?? 0,
+      charge: charge ?? 0,
+      discount: discount ?? 0,
       cannedLabor: addToCannedLabor,
     });
 
@@ -202,9 +202,9 @@ export default function LaborCreate() {
           type="number"
           id="hours"
           value={hours}
-          onChange={(e) => setHours(parseInt(e.target.value))}
+          onChange={(e) => setHours(parseFloat(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
-          placeholder="1"
+          placeholder="0"
         />
       </div>
 
@@ -236,15 +236,17 @@ export default function LaborCreate() {
         />
       </div>
 
-      <div className="ml-5 flex items-center gap-5">
-        <input
-          id="check"
-          type="checkbox"
-          checked={addToCannedLabor}
-          onChange={(e) => setAddToCannedLabor(e.target.checked)}
-        />
-        <label htmlFor="check">Add to Canned Labor</label>
-      </div>
+      {!data.edit && (
+        <div className="ml-3 flex items-center gap-5">
+          <input
+            id="check"
+            type="checkbox"
+            checked={addToCannedLabor}
+            onChange={(e) => setAddToCannedLabor(e.target.checked)}
+          />
+          <label htmlFor="check">Add to Canned Labor</label>
+        </div>
+      )}
 
       <div className="flex justify-center gap-5">
         <Close />

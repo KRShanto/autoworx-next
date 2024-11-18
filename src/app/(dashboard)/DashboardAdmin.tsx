@@ -139,7 +139,13 @@ const Dashboard = ({
             </Link>
           </div>
           <div className="#px-4">
-            <ChartData heading="Current Month Payout" number={767} dollarSign />
+            <ChartData
+              heading="Current Month Payout"
+              number={data?.employeePayout?.currentMonthTotal}
+              dollarSign
+              isPositive={data?.employeePayout?.growth?.isPositive}
+              rate={data?.employeePayout?.growth?.rate}
+            />
           </div>
         </div>
       </div>

@@ -20,6 +20,7 @@ export async function getAdminInfo() {
   const revenue = await getRevenue();
   const expectedRevenue = await getExpectedRevenue();
   const inventory = await getInventory();
+  const employeePayout = await getEmployeePayout();
 
   return {
     totalJobs,
@@ -28,6 +29,7 @@ export async function getAdminInfo() {
     revenue,
     expectedRevenue,
     inventory,
+    employeePayout,
   };
 }
 
@@ -278,5 +280,46 @@ async function getInventory() {
     totalValue: totalInventoryValue,
     currentMonthTotal: currentMonthInventoryCost,
     growth: growthRate(currentMonthInventoryCost, previousMonthInventoryCost),
+  };
+}
+
+async function getEmployeePayout() {
+  const companyId = await getCompanyId();
+
+  const currentMonthPayout = await db.technician.findMany({
+    where: {
+      companyId,
+      date: {
+        gte: currentMonthStart,
+        lte: currentMonthEnd,
+      },
+      status: "Complete",
+    },
+  });
+
+  const previousMonthPayout = await db.technician.findMany({
+    where: {
+      companyId,
+      date: {
+        gte: previousMonthStart,
+        lte: previousMonthEnd,
+      },
+      status: "Complete",
+    },
+  });
+
+  const currentMonthPayoutTotal = currentMonthPayout.reduce(
+    (acc, technician) => acc + Number(technician.amount),
+    0,
+  );
+
+  const previousMonthPayoutTotal = previousMonthPayout.reduce(
+    (acc, technician) => acc + Number(technician.amount),
+    0,
+  );
+
+  return {
+    currentMonthTotal: currentMonthPayoutTotal,
+    growth: growthRate(currentMonthPayoutTotal, previousMonthPayoutTotal),
   };
 }

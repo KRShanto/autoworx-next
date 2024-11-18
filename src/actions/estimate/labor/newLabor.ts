@@ -38,7 +38,6 @@ export async function newLabor({
       charge,
       discount,
       companyId,
-      cannedLabor,
     },
   });
 
