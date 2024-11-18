@@ -30,7 +30,7 @@ export default function Header({
     if (!id) setInvoiceId(customAlphabet("1234567890", 10)());
   }, [id]);
 
-  console.log({ vehicle, client });
+  // console.log({ vehicle, client });
 
   useEffect(() => {
     if (clientOpenDropdown && (vehicleOpenDropdown || statusOpenDropdown)) {
