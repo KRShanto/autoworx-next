@@ -25,8 +25,7 @@ export default function Create() {
           return (
             acc +
             (material && material.sell
-              ? parseFloat(material.sell.toString()) * material.quantity! -
-                parseFloat(material.discount?.toString()!)
+              ? parseFloat(material.sell.toString()) * material.quantity!
               : 0)
           );
         }, 0);
@@ -70,8 +69,7 @@ export default function Create() {
                             ${" "}
                             {material.sell
                               ? parseFloat(material.sell.toString()) *
-                                  material.quantity! -
-                                parseFloat(material.discount?.toString()!)
+                                material.quantity!
                               : 0}
                           </p>
                         </div>
