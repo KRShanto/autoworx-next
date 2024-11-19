@@ -85,7 +85,6 @@ export default function ItemSelector<T>({
     }
   }, [item.materials]);
 
-
   return (
     <div
       onClick={(e) => {
@@ -227,7 +226,7 @@ export default function ItemSelector<T>({
             </div>
 
             <div className="mb-5 max-h-[calc(100vh-60vh)] overflow-y-auto">
-              {itemIist.map((item, i) => (
+              {itemIist.slice(0, 4).map((item, i) => (
                 <button
                   className="mx-auto my-1 flex w-[95%] cursor-pointer items-center justify-between gap-1 rounded-md border border-[#6571FF] p-1 text-[#6571FF] hover:bg-gray-100"
                   key={i}
