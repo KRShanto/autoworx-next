@@ -106,7 +106,25 @@ export default function MaterialCreate() {
           if (item.id === itemId) {
             const materials = item.materials.map((material, i) => {
               if (i === materialIndex) {
-                return res.data;
+                return {
+                  id: res.data.id,
+                  name,
+                  categoryId: category?.id || null,
+                  vendorId: vendor?.id || null,
+                  tags,
+                  notes,
+                  quantity: quantity || 0,
+                  cost: Number(cost || 0) as any,
+                  sell: Number(sell || 0) as any,
+                  discount: Number(discount || 0) as any,
+                  addToInventory,
+                  companyId: res.data.companyId,
+                  createdAt: res.data.createdAt,
+                  productId: res.data.productId,
+                  invoiceId: res.data.invoiceId,
+                  invoiceItemId: res.data.invoiceItemId,
+                  updatedAt: res.data.updatedAt,
+                };
               }
               return material;
             });
@@ -295,7 +313,7 @@ export default function MaterialCreate() {
           type="number"
           id="qt"
           value={quantity}
-          onChange={(e) => setQuantity(parseInt(e.target.value))}
+          onChange={(e) => setQuantity(parseFloat(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
           placeholder="0"
         />
@@ -309,7 +327,7 @@ export default function MaterialCreate() {
           type="number"
           id="price"
           value={cost}
-          onChange={(e) => setCost(parseInt(e.target.value as any))}
+          onChange={(e) => setCost(parseFloat(e.target.value as any))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
           placeholder="0"
           disabled={data.edit}
@@ -324,7 +342,7 @@ export default function MaterialCreate() {
           type="number"
           id="sell"
           value={sell}
-          onChange={(e) => setSell(parseInt(e.target.value))}
+          onChange={(e) => setSell(parseFloat(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
           placeholder="0"
         />
@@ -338,20 +356,22 @@ export default function MaterialCreate() {
           type="number"
           id="discount"
           value={discount}
-          onChange={(e) => setDiscount(parseInt(e.target.value))}
+          onChange={(e) => setDiscount(parseFloat(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
           placeholder="0"
         />
       </div>
 
-      <label className="ml-5 flex items-center gap-2">
-        <input
-          type="checkbox"
-          checked={addToInventory}
-          onChange={(e) => setAddToInventory(e.target.checked)}
-        />
-        <span>Add to Inventory</span>
-      </label>
+      {!data.edit && (
+        <label className="ml-5 flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={addToInventory}
+            onChange={(e) => setAddToInventory(e.target.checked)}
+          />
+          <span>Add to Inventory</span>
+        </label>
+      )}
 
       <div className="flex justify-center gap-5">
         <Close />

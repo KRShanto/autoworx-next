@@ -4,6 +4,10 @@ import NewCoupon from "./NewCoupon";
 import QrCodeForCoupon from "./QrCodeForCoupon";
 import { Coupon } from "@prisma/client";
 import moment from "moment";
+import { CiEdit } from "react-icons/ci";
+import { FaTimes } from "react-icons/fa";
+import EditCoupon from "./EditCoupon";
+import { deleteCoupon } from "@/actions/coupon/new";
 
 // Define the props for the CouponTable component
 interface CouponTableProps {
@@ -15,12 +19,35 @@ interface CouponTableProps {
 const CuponComponet = ({ coupons, setCoupons }: CouponTableProps) => {
   const [showQr, setShowQr] = useState(false);
   const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   const handleCouponQr = (coupon: Coupon) => {
     setSelectedCoupon(coupon);
     setShowQr(true);
   };
+  const handleEdit = (e: React.MouseEvent, coupon: Coupon) => {
+    e.stopPropagation();
+    setSelectedCoupon(coupon);
+    setIsEditOpen(true);
+  };
 
+  const handleDelete = async (e: React.MouseEvent, coupon: Coupon) => {
+    e.stopPropagation();
+    await deleteCoupon(coupon.id);
+    setCoupons(
+      (prevCoupons) => prevCoupons?.filter((c) => c.id !== coupon.id) || null,
+    );
+    setSelectedCoupon(null);
+    setShowQr(false);
+  };
+  const handleUpdate = (updatedCoupon: Coupon) => {
+    setCoupons(
+      (prevCoupons) =>
+        prevCoupons?.map((coupon) =>
+          coupon.id === updatedCoupon.id ? updatedCoupon : coupon,
+        ) || null,
+    );
+  };
   return (
     <div className="flex w-full gap-4">
       {/* first half */}
@@ -57,6 +84,9 @@ const CuponComponet = ({ coupons, setCoupons }: CouponTableProps) => {
                 <th className="border-b border-gray-200 px-4 py-2 text-left text-gray-600">
                   Redemption Count
                 </th>
+                <th className="border-b border-gray-200 px-4 py-2 text-left text-gray-600">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -82,6 +112,7 @@ const CuponComponet = ({ coupons, setCoupons }: CouponTableProps) => {
                   </td>
                   <td className="border-b border-gray-200 px-4 py-2">
                     {Number(coupon.discount)}
+                    {coupon.discountType === "Fixed" ? "$" : "%"}
                   </td>
                   <td className="border-b border-gray-200 px-4 py-2">
                     {moment(coupon.startDate).format("DD/MM/YYYY")}
@@ -91,6 +122,22 @@ const CuponComponet = ({ coupons, setCoupons }: CouponTableProps) => {
                   </td>
                   <td className="border-b border-gray-200 px-4 py-2">
                     {coupon.redemptions}
+                  </td>
+                  <td className="border-b border-gray-200 px-4 py-2">
+                    <div className="flex gap-3">
+                      <button
+                        className="text-left text-2xl text-blue-600"
+                        onClick={(e) => handleEdit(e, coupon)}
+                      >
+                        <CiEdit />
+                      </button>
+                      <button
+                        className="text-left text-2xl text-red-400"
+                        onClick={(e) => handleDelete(e, coupon)}
+                      >
+                        <FaTimes onClick={(e) => handleDelete(e, coupon)} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -110,6 +157,13 @@ const CuponComponet = ({ coupons, setCoupons }: CouponTableProps) => {
           )}
         </div>
       </div>
+      {isEditOpen && selectedCoupon && (
+        <EditCoupon
+          coupon={selectedCoupon}
+          onUpdate={handleUpdate}
+          onClose={() => setIsEditOpen(false)}
+        />
+      )}
     </div>
   );
 };

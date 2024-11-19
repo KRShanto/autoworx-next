@@ -153,6 +153,7 @@ export default function Week({
 
   const weekStart = settings?.weekStart || "Sunday";
   const parentRef = useRef<HTMLDivElement>(null);
+  const clientTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   // Get the days of the week based on the weekStart
   const days = useMemo(() => {
@@ -180,7 +181,12 @@ export default function Week({
           <span className="text-[17px] font-semibold">{day.dayName}</span>
           <div className="space-x-1 text-sm font-normal">
             <span>{date.getDate()}</span>
-            <span>{date.toLocaleDateString("en-US", { month: "short" })}</span>
+            <span>
+              {date.toLocaleString("en-US", {
+                timeZone: clientTimezone,
+                month: "short",
+              })}
+            </span>
           </div>
         </div>
       );

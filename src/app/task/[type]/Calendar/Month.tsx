@@ -9,6 +9,7 @@ import {
 import { cn } from "@/lib/cn";
 import { TASK_COLOR } from "@/lib/consts";
 import { usePopupStore } from "@/stores/popup";
+import { AuthSession } from "@/types/auth";
 import type {
   AppointmentFull,
   CalendarAppointment,
@@ -25,14 +26,13 @@ import {
   type Vehicle,
 } from "@prisma/client";
 import moment from "moment";
+import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDrop } from "react-dnd";
 import { FaPen } from "react-icons/fa6";
 import { assignAppointmentDate } from "../../../../actions/appointment/assignAppointmentDate";
 import { dragTask } from "../../../../actions/task/dragTask";
 import HolidayDeleteConfirmation from "./HolidayDeleteConfiramtion";
-import { useSession } from "next-auth/react";
-import { AuthSession } from "@/types/auth";
 
 function useMonth() {
   const searchParams = useSearchParams();
@@ -238,6 +238,8 @@ export default function Month({
   const handleRedirectToDay = (date: string) => {
     router.push(`/task/day?date=${moment(date).format("YYYY-MM-DD")}`);
   };
+  const clientTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   return (
     <div
       className="mt-3 h-[90.8%] border-l border-t border-neutral-200"
@@ -250,7 +252,7 @@ export default function Month({
             key={i}
             className="flex w-full items-center justify-center border-b border-r border-neutral-200 p-2 text-[17px] font-bold text-[#797979] max-[1300px]:text-[15px] max-[1150px]:text-[12px]"
           >
-            {cell.toLocaleString()}
+            {cell.toLocaleString("en-US", { timeZone: clientTimezone })}
           </div>
         ))}
       </div>
