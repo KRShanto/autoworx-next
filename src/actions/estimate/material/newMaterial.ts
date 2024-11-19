@@ -34,6 +34,7 @@ export async function newMaterial({
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
   let newMaterial: Material | InventoryProduct | null = null;
+  let newMaterialTags: { tag: Tag }[] = [];
 
   if (addToInventory) {
     const res = await createProduct({
@@ -67,27 +68,46 @@ export async function newMaterial({
     });
   }
 
-  // create material tags
-  // TODO: skip this for now
-  // if (tags && newMaterial) {
-  //   await Promise.all(
-  //     tags.map((tag) =>
-  //       db.materialTag.create({
-  //         data: {
-  //           materialId: newMaterial.id,
-  //           tagId: tag.id,
-  //         },
-  //       }),
-  //     ),
-  //   );
-  // }
+  // create inventory tags
+  if (tags && newMaterial) {
+    if (addToInventory) {
+      await Promise.all(
+        tags.map((tag) =>
+          db.inventoryProductTag.create({
+            data: {
+              inventoryId: newMaterial.id,
+              tagId: tag.id,
+            },
+          }),
+        ),
+      );
 
-  const newMaterialTags = await db.materialTag.findMany({
-    where: {
-      materialId: newMaterial?.id,
-    },
-    include: { tag: true },
-  });
+      newMaterialTags = await db.inventoryProductTag.findMany({
+        where: {
+          inventoryId: newMaterial?.id,
+        },
+        include: { tag: true },
+      });
+    } else {
+      await Promise.all(
+        tags.map((tag) =>
+          db.materialTag.create({
+            data: {
+              materialId: newMaterial.id,
+              tagId: tag.id,
+            },
+          }),
+        ),
+      );
+
+      newMaterialTags = await db.materialTag.findMany({
+        where: {
+          materialId: newMaterial?.id,
+        },
+        include: { tag: true },
+      });
+    }
+  }
 
   revalidatePath("/estimate")
 

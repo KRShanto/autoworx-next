@@ -121,11 +121,12 @@ model Tag {
     companyId Int      @map("company_id")
     company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-    items       ItemTag[]
-    materials   MaterialTag[]
-    labors      LaborTag[]
-    Client      Client[]
-    InvoiceTags InvoiceTags[]
+    items               ItemTag[]
+    materials           MaterialTag[]
+    labors              LaborTag[]
+    Client              Client[]
+    InvoiceTags         InvoiceTags[]
+    InventoryProductTag InventoryProductTag[]
 }
 
 // Many to many relation between Item and Tag.
