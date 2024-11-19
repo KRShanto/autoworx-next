@@ -85,7 +85,6 @@ export default function ItemSelector<T>({
     }
   }, [item.materials]);
 
-  console.log("dropdownsopen", dropdownsOpen);
 
   return (
     <div
@@ -112,6 +111,7 @@ export default function ItemSelector<T>({
             LABOR: type === "LABOR" ? [...index] : [-1, -1],
             TAG: [-1, -1],
           });
+
           // setDropdownsOpen({
           //   SERVICE: type === "SERVICE" ? [...index] : -1,
           //   MATERIAL: type === "MATERIAL" ? [...index] : -1,
@@ -226,8 +226,8 @@ export default function ItemSelector<T>({
               </button>
             </div>
 
-            <div className="mb-5">
-              {itemIist.slice(0, 4).map((item, i) => (
+            <div className="mb-5 max-h-[calc(100vh-60vh)] overflow-y-auto">
+              {itemIist.map((item, i) => (
                 <button
                   className="mx-auto my-1 flex w-[95%] cursor-pointer items-center justify-between gap-1 rounded-md border border-[#6571FF] p-1 text-[#6571FF] hover:bg-gray-100"
                   key={i}
@@ -251,12 +251,19 @@ export default function ItemSelector<T>({
             <div className="border-t-2 border-slate-400 p-2">
               <button
                 type="button"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   openPopup(type, {
                     itemId: item.id,
                     materialIndex,
                   });
                   setOpen(false);
+                  setDropdownsOpen({
+                    SERVICE: [-1, -1],
+                    MATERIAL: [-1, -1],
+                    LABOR: [-1, -1],
+                    TAG: [-1, -1],
+                  });
                 }}
               >
                 + New {label}

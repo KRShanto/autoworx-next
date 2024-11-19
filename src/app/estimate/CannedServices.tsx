@@ -1,4 +1,6 @@
 "use client";
+import { deleteService } from "@/actions/estimate/service/deleteService";
+import { updateService } from "@/actions/estimate/service/updateService";
 import NewVehicle from "@/components/Lists/NewVehicle";
 import SelectCategory from "@/components/Lists/SelectCategory";
 import { cn } from "@/lib/cn";
@@ -8,12 +10,10 @@ import { Category, Service, Vehicle } from "@prisma/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { RiEditFill } from "react-icons/ri";
 import NewLabor from "./NewLabor";
 import NewService from "./NewService";
-import { updateService } from "@/actions/estimate/service/updateService";
-import { IoMdCheckmarkCircleOutline } from "react-icons/io";
-import { deleteService } from "@/actions/estimate/service/deleteService";
 
 export default function CannedServices({
   services,
@@ -63,7 +63,9 @@ const ServiceComponent = ({
   service: Service & { category?: Category };
 }) => {
   const [isEdit, setIsEdit] = useState(false);
-  const [category, setCategory] = useState<Category | null>(null);
+  const [category, setCategory] = useState<Category | null>(
+    service?.category || null,
+  );
   const { categories } = useListsStore();
   const { currentSelectedCategoryId } = useEstimateCreateStore();
   const [categoryOpen, setCategoryOpen] = useState(false);
