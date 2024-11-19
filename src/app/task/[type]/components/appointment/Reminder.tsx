@@ -56,7 +56,7 @@ export function Reminder({
   const [time, setTime] = useState<string>("");
   const [dateInput, setDateInput] = useState<string>("");
   const templates = useListsStore((x) => x.templates);
-
+  console.log(startTime, date);
   useEffect(() => {
     setOpenConfirmation(false);
   }, [openReminder]);
@@ -112,6 +112,8 @@ export function Reminder({
               vehicleModel={vehicle?.model!}
               setTemplate={setConfirmationTemplate}
               setOpenTemplate={setOpenConfirmation}
+              date={date}
+              startTime={startTime}
             />
           }
           items={templates.filter(
@@ -180,6 +182,8 @@ export function Reminder({
               vehicleModel={vehicle?.model!}
               setTemplate={setReminderTemplate}
               setOpenTemplate={setOpenReminder}
+              date={date}
+              startTime={startTime}
             />
           }
           items={templates.filter(

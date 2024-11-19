@@ -17,6 +17,7 @@ import { useFormErrorStore } from "@/stores/form-error";
 import { addTemplate } from "../../actions/appointment/addTemplate";
 import { EmailTemplate, EmailTemplateType } from "@prisma/client";
 import { useListsStore } from "@/stores/lists";
+import moment from "moment";
 
 export default function NewTemplate({
   type,
@@ -24,12 +25,16 @@ export default function NewTemplate({
   vehicleModel,
   setTemplate,
   setOpenTemplate,
+  startTime,
+  date,
 }: {
   type: EmailTemplateType;
   clientName: string;
   vehicleModel: string;
   setTemplate: React.Dispatch<React.SetStateAction<EmailTemplate | null>>;
   setOpenTemplate: React.Dispatch<React.SetStateAction<boolean>>;
+  startTime: string;
+  date: string;
 }) {
   const [open, setOpen] = useState(false);
   const { showError } = useFormErrorStore();
@@ -40,10 +45,15 @@ export default function NewTemplate({
   const [message, setMessage] = useState("");
 
   useEffect(() => {
+    const appointmentDate = moment(`${date}T${startTime}:00`).format(
+      "dddd, MMMM DD, h:mm A",
+    );
+    // const dayName = moment(date).format("dddd");
+    // const month = moment(date).format("MMMM DD");
     setMessage(
       `Hi ${clientName},
     
-This is a friendly reminder that you have an upcoming appointment on Wednesday, May 8 at 12:30 PM EDT.
+This is a friendly reminder that you have an upcoming appointment on ${appointmentDate} EDT.
   
 Location
 TC CUSTOMS ATLANTA
@@ -53,7 +63,7 @@ NORCROSS GA 30093
 Vehicle
 ${vehicleModel}`,
     );
-  }, [clientName, vehicleModel]);
+  }, [clientName, vehicleModel, date, startTime]);
 
   async function handleSubmit(data: FormData) {
     const res = await addTemplate({ subject, message, type });
