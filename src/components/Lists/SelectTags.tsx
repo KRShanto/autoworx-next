@@ -72,7 +72,6 @@ export function SelectTags({
         onOpenChange={(open) => {
           // !open && setOpen && setOpen(open);
         }}
-        onCloseAutoFocus={(e) => e.preventDefault()}
       >
         {tags.map((tag, i) => (
           <div
