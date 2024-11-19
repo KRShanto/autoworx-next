@@ -1,4 +1,6 @@
 "use client";
+import { deleteLabor } from "@/actions/estimate/labor/deleteLabor";
+import { updateLabor } from "@/actions/estimate/labor/updateLabor";
 import NewVehicle from "@/components/Lists/NewVehicle";
 import SelectCategory from "@/components/Lists/SelectCategory";
 import { cn } from "@/lib/cn";
@@ -9,11 +11,9 @@ import { setHours } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { RiEditFill } from "react-icons/ri";
 import NewLabor from "./NewLabor";
-import { IoMdCheckmarkCircleOutline } from "react-icons/io";
-import { updateLabor } from "@/actions/estimate/labor/updateLabor";
-import { deleteLabor } from "@/actions/estimate/labor/deleteLabor";
 
 export default function CannedLabor({
   labors,
@@ -32,6 +32,7 @@ export default function CannedLabor({
               + Add Labor
             </button>
           }
+          isCanned={true}
         />
       </div>
       {/* TODO: make it scrollable */}

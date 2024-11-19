@@ -148,7 +148,7 @@ export default function Selector<T>({
           </div>
 
           {/* Display list of items */}
-          <div className="mb-5 max-h-40 overflow-y-auto">
+          <div className="mb-5 flex max-h-40 flex-col overflow-y-auto">
             {filteredItems.map((item, index) => {
               if (clickabled) {
                 return (
