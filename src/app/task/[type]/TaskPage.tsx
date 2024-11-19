@@ -47,7 +47,7 @@ export default function TaskPage({
     <DnDWrapper id="task">
       <CalendarSidebar
         usersWithTasks={usersWithTasks}
-        tasks={tasksWithoutTime}
+        tasks={tasksWithoutTime.concat(calendarTasks)}
       />
       <Calendar
         type={type}
