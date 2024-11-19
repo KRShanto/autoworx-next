@@ -123,8 +123,9 @@ export default function Month({
 
   // Generate the dates to display
   let currentDate = startOfMonth;
-  const startDay = getDayNumber(settings.weekStart);
+  const startDay = settings?.weekStart ? getDayNumber(settings?.weekStart) : 0;
 
+  // check total offset date for this month
   const offset = (currentDate.getDay() - startDay + 7) % 7;
 
   for (let i = 0; i < offset; i++) {
@@ -177,7 +178,6 @@ export default function Month({
   }
 
   const cells = [...rotatedDays(startDay), ...dates];
-
 
   async function handleDrop(event: React.DragEvent, date: string) {
     // 10 am

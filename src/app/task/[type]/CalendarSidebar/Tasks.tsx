@@ -1,5 +1,4 @@
-import { usePopupStore } from "../../../../stores/popup";
-import { Appointment, Task, User } from "@prisma/client";
+import { Task, User } from "@prisma/client";
 import TaskComponent from "./Task";
 import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
 import { MinimizeButton } from "./MinimiseButton";
@@ -14,7 +13,6 @@ export default function Tasks({
   users: User[];
 }) {
   const minimized = useCalendarSidebarStore((x) => x.minimized);
-
   return (
     <div
       className={cn(
