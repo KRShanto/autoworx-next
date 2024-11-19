@@ -107,7 +107,7 @@ export default function Selector<T>({
   }
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen} className="w-full">
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <div className="#md:basis-96 basis-full">
         <DropdownMenuTrigger
           disabled={disabledDropdown}
