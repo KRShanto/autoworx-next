@@ -46,7 +46,7 @@ export default function List({
           type="text"
           placeholder="Search here... company name or admin name"
           name="searchTerm"
-          className="my-3 mr-2 w-full rounded-md border-none p-2 text-[12px] text-[#797979] max-[1822px]:w-full"
+          className="my-3 mr-2 w-full rounded-md border-2 border-[#006D77] p-2 text-[12px] text-[#797979] max-[1822px]:w-full"
         />
       </form>
 

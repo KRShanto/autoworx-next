@@ -25,6 +25,7 @@ export default function Collaboration({
   const [selectedUsersList, setSelectedUsersList] = useState<User[]>([]);
   const [companyName, setCompanyName] = useState<string | null>(null);
   const [companyAdmins, setCompanyAdmins] = useState(companyWithAdmin);
+
   return (
     <div className="mt-5 flex gap-5">
       <List
