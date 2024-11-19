@@ -41,13 +41,23 @@ const DashboardManager = ({
             <ChartData
               heading="Leads coming in"
               subHeading="/month"
-              number={567}
+              number={0}
+              isPositive={false}
+              rate={0}
             />
-            <ChartData heading="Leads Converted" number={767} />
+            <ChartData
+              heading="Leads Converted"
+              number={0}
+              isPositive={false}
+              rate={0}
+            />
             <ChartData
               heading="Conversion Rate"
               subHeading="Leads Converted/Total Leads"
-              number={435}
+              number={0}
+              isPositive={false}
+              rate={0}
+              isNumberPercent
             />
           </div>
         </div>
