@@ -23,6 +23,7 @@ export interface TaskType {
 }
 
 export async function createTask(task: TaskType): Promise<ServerAction> {
+  console.log("🚀 ~ createTask ~ task:", task);
   try {
     const session = (await auth()) as AuthSession;
     let taskData = {

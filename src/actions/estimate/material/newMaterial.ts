@@ -41,7 +41,7 @@ export async function newMaterial({
       vendorId,
       description: notes,
       quantity: quantity || 1,
-      price: sell || 0,
+      price: cost || 0,
       type: "Product",
     });
 

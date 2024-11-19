@@ -70,14 +70,26 @@ export function CreateTab() {
                               )
                             }
                             onSearch={(search) => {
-                              const filteredServices = services.filter(
-                                (service) =>
-                                  service.name
-                                    .toLowerCase()
-                                    .includes(search.toLowerCase()),
+                              console.log(
+                                "🚀 ~ {Object.keys ~ search:",
+                                search,
                               );
+                              if (search) {
+                                const filteredServices = services.filter(
+                                  (service) =>
+                                    service.name
+                                      .toLowerCase()
+                                      .includes(search.toLowerCase()),
+                                );
 
-                              return filteredServices;
+                                return filteredServices;
+                              } else {
+                                console.log(
+                                  "🚀 ~ {Object.keys ~ search:",
+                                  services,
+                                );
+                                return services;
+                              }
                             }}
                             onDelete={() =>
                               useEstimateCreateStore.setState((x) => {

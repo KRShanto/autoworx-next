@@ -106,7 +106,25 @@ export default function MaterialCreate() {
           if (item.id === itemId) {
             const materials = item.materials.map((material, i) => {
               if (i === materialIndex) {
-                return res.data;
+                return {
+                  id: res.data.id,
+                  name,
+                  categoryId: category?.id || null,
+                  vendorId: vendor?.id || null,
+                  tags,
+                  notes,
+                  quantity: quantity || 0,
+                  cost: Number(cost || 0) as any,
+                  sell: Number(sell || 0) as any,
+                  discount: Number(discount || 0) as any,
+                  addToInventory,
+                  companyId: res.data.companyId,
+                  createdAt: res.data.createdAt,
+                  productId: res.data.productId,
+                  invoiceId: res.data.invoiceId,
+                  invoiceItemId: res.data.invoiceItemId,
+                  updatedAt: res.data.updatedAt,
+                };
               }
               return material;
             });
@@ -344,14 +362,16 @@ export default function MaterialCreate() {
         />
       </div>
 
-      <label className="ml-5 flex items-center gap-2">
-        <input
-          type="checkbox"
-          checked={addToInventory}
-          onChange={(e) => setAddToInventory(e.target.checked)}
-        />
-        <span>Add to Inventory</span>
-      </label>
+      {!data.edit && (
+        <label className="ml-5 flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={addToInventory}
+            onChange={(e) => setAddToInventory(e.target.checked)}
+          />
+          <span>Add to Inventory</span>
+        </label>
+      )}
 
       <div className="flex justify-center gap-5">
         <Close />

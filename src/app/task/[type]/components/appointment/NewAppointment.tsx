@@ -332,7 +332,7 @@ export function NewAppointment({
                   rootClassName="grow"
                   type="date"
                   value={date ?? ""}
-                  required={false}
+                  required
                   onChange={(event) => setDate(event.currentTarget.value)}
                 />
 
@@ -344,6 +344,7 @@ export function NewAppointment({
                       document.getElementById("timer-parent")!
                     }
                     use12Hours
+                    required
                     format="h:mm a"
                     className="rounded-md border border-gray-500 p-1 placeholder-slate-800"
                     needConfirm={false}

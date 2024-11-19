@@ -6,9 +6,9 @@ import { AuthSession } from "@/types/auth";
 import { CalendarType } from "@/types/calendar";
 import { AppointmentFull } from "@/types/db";
 import { CalendarSettings, User } from "@prisma/client";
+import moment from "moment";
 import { Metadata } from "next";
 import TaskPage from "./TaskPage";
-import moment from "moment";
 
 export const metadata: Metadata = {
   title: "Task and Activity Management",
@@ -186,6 +186,7 @@ export default async function Page({
         companyId,
       },
     });
+    console.log("🚀 ~ tasks:", tasks);
 
     usersWithTasks.push({
       ...user,
