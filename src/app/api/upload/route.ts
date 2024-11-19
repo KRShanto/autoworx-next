@@ -19,7 +19,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const formData = await req.formData();
     const photos = formData.getAll("photos") as File[];
     for (const photo of photos) {
-      const fileName = `${nanoid()}-${photo.name}`;
+      const imagesNameSplit = photo.name.split(".")
+      const imageFormate = imagesNameSplit[imagesNameSplit.length - 1];
+      const fileName = `${nanoid()}-AWX-image.${imageFormate}`;
       const filePath = path.join(uploadsDir, fileName);
       fileNames.push(fileName);
 
