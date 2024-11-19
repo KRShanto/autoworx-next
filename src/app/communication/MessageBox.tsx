@@ -27,14 +27,12 @@ export default function MessageBox({
   setMessages,
   fromGroup,
   group,
-  setGroupsList,
-  companyName,
+  setGroupsList
 }: {
   user?: User; // TODO: type this
   setUsersList?: React.Dispatch<React.SetStateAction<any[]>>;
   setGroupsList?: React.Dispatch<React.SetStateAction<any[]>>;
   messages: (TMessage & { attachment: Attachment | null })[];
-  companyName?: string | null;
   totalMessageBox: number;
   setMessages: React.Dispatch<React.SetStateAction<any[]>>;
   fromGroup?: boolean;
@@ -49,9 +47,12 @@ export default function MessageBox({
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
   const [showAttachment, setShowAttachment] = useState(false);
   const pathname = usePathname();
+
   const isEstimateAttachmentShow = pathname.includes(
     "/communication/collaboration",
   );
+
+  console.log({ receiverUser });
 
   useEffect(() => {
     if (messageBoxRef.current) {
@@ -239,8 +240,10 @@ export default function MessageBox({
               {fromGroup
                 ? group?.name
                 : `${receiverUser?.firstName} ${receiverUser?.lastName}`}
-              {companyName && (
-                <span className="text-sm font-light">{companyName}</span>
+              {receiverUser?.companyName && (
+                <span className="text-sm font-light">
+                  {receiverUser?.companyName}
+                </span>
               )}
             </p>
           </div>

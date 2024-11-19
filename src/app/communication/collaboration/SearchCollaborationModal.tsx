@@ -72,7 +72,9 @@ export default function SearchCollaborationModal({
         return prevAdmin.map((admin) => {
           if (admin.companyId === companyId) {
             return { ...admin, isConnected: true };
-          } else admin;
+          } else {
+            return admin;
+          };
         });
       });
       if (result.success) {
@@ -85,6 +87,8 @@ export default function SearchCollaborationModal({
       errorToast(err.message);
     }
   }
+
+  console.log({ companyAdmins });
 
   async function handleSubmit(event?: React.ChangeEvent<HTMLInputElement>) {
     // event && event.preventDefault();

@@ -9,14 +9,12 @@ type TProps = {
   user: any;
   setUsersList: React.Dispatch<SetStateAction<any[]>>;
   totalMessageBoxLength: number;
-  companyName?: string | null;
 };
 
 export default function UserMessageBox({
   user,
   setUsersList,
   totalMessageBoxLength,
-  companyName,
 }: TProps) {
   const [messages, setMessages] = useState<any[]>([]);
   const { data: session } = useSession();
@@ -60,8 +58,8 @@ export default function UserMessageBox({
         }: {
           from: number;
           message: string;
-            attachment: Partial<Attachment>;
-            requestEstimate: RequestEstimate | null;
+          attachment: Partial<Attachment>;
+          requestEstimate: RequestEstimate | null;
         }) => {
           if (from !== parseInt(session?.user?.id!)) {
             const newMessage = {
@@ -85,7 +83,6 @@ export default function UserMessageBox({
   return (
     <MessageBox
       user={user}
-      companyName={companyName}
       setUsersList={setUsersList}
       messages={messages}
       setMessages={setMessages}

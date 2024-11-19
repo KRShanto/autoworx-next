@@ -6,14 +6,12 @@ import SearchCollaborationModal from "./SearchCollaborationModal";
 export default function List({
   companyAdmins,
   setSelectedUsersList,
-  setCompanyName,
   companies,
   setCompanyAdmins,
 }: {
   companyAdmins: Partial<User>[];
   setCompanyAdmins: React.Dispatch<React.SetStateAction<Partial<User>[]>>;
   setSelectedUsersList: React.Dispatch<React.SetStateAction<any[]>>;
-  setCompanyName: React.Dispatch<React.SetStateAction<string | null>>;
   companies: (Company & { users: User[] })[];
 }) {
   const [selectedCompany, setSelectedCompany] = useState<any>(null); // TODO: type this
@@ -97,13 +95,15 @@ export default function List({
                           key={user.id}
                           className="flex min-h-[61px] w-full items-center gap-2 rounded-md bg-[#F2F2F2] p-1"
                           onClick={() => {
-                            setCompanyName(company.name);
                             // add this user to the list (if not already in it)
                             setSelectedUsersList((usersList) => {
                               if (usersList.find((u) => u.id === user.id)) {
                                 return usersList;
                               }
-                              return [...usersList, user];
+                              return [
+                                ...usersList,
+                                { ...user, companyName: company.name },
+                              ];
                             });
                           }}
                         >

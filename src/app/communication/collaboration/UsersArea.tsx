@@ -8,9 +8,7 @@ export default function UsersArea({
   selectedUsersList,
   setSelectedUsersList,
   totalMessageBoxLength,
-  companyName
 }: {
-  companyName: string | null;
   previousMessages: (Message & { attachment: Attachment | null })[];
   currentUser: NextAuthUser;
   selectedUsersList: any[];
@@ -24,17 +22,18 @@ export default function UsersArea({
         totalMessageBoxLength > 1 ? "grid-cols-2" : "grid-cols-1",
       )}
     >
-      {selectedUsersList.map((user) => {
-        return (
-          <UserMessageBox
-            key={user.id}
-            user={user}
-            companyName={companyName}
-            setUsersList={setSelectedUsersList}
-            totalMessageBoxLength={totalMessageBoxLength}
-          />
-        );
-      })}
+      {selectedUsersList &&
+        selectedUsersList?.length > 0 &&
+        selectedUsersList.map((user) => {
+          return (
+            <UserMessageBox
+              key={user.id}
+              user={user}
+              setUsersList={setSelectedUsersList}
+              totalMessageBoxLength={totalMessageBoxLength}
+            />
+          );
+        })}
 
       {totalMessageBoxLength === 3 && (
         <div

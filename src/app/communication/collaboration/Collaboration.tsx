@@ -23,9 +23,8 @@ export default function Collaboration({
   messages: (DbMessage & { attachment: Attachment | null })[];
 }) {
   const [selectedUsersList, setSelectedUsersList] = useState<User[]>([]);
-  const [companyName, setCompanyName] = useState<string | null>(null);
   const [companyAdmins, setCompanyAdmins] = useState(companyWithAdmin);
-
+  console.log("selectedUsersList", selectedUsersList);
   return (
     <div className="mt-5 flex gap-5">
       <List
@@ -33,10 +32,8 @@ export default function Collaboration({
         setCompanyAdmins={setCompanyAdmins}
         companies={companies}
         setSelectedUsersList={setSelectedUsersList}
-        setCompanyName={setCompanyName}
       />
       <UsersArea
-        companyName={companyName}
         previousMessages={messages}
         currentUser={currentUser}
         totalMessageBoxLength={selectedUsersList.length}
