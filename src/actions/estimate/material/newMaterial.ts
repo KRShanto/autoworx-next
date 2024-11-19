@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
 import { InventoryProduct, Material, Tag } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 export async function newMaterial({
   name,
@@ -87,6 +88,8 @@ export async function newMaterial({
     },
     include: { tag: true },
   });
+
+  revalidatePath("/estimate")
 
   return {
     type: "success",
