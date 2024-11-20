@@ -157,3 +157,23 @@ export const getCompanyTermsAndPolicyTax = async (): Promise<{
     throw error;
   }
 };
+
+export const getCompanyTaxCurrency = async (): Promise<{ tax: number }> => {
+  try {
+    const companyId = await getCompanyId();
+    const companyData = await db.company.findUnique({
+      where: { id: companyId },
+      select: { tax: true },
+    });
+    if (!companyData) {
+      throw new Error("Company not found");
+    }
+
+    return {
+      tax: companyData.tax ? companyData.tax.toNumber() : 0,
+    };
+  } catch (error) {
+    console.error("Error fetching company tax:", error);
+    throw error;
+  }
+};
