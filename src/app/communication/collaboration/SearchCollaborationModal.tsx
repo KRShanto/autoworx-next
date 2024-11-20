@@ -15,6 +15,7 @@ import { FaPlus } from "react-icons/fa";
 import { errorToast, successToast } from "@/lib/toast";
 import { connectWithCompany } from "@/actions/settings/myNetwork";
 import SearchBox from "./SearchBox";
+import { searchCompanyQuery } from "@/actions/communication/collaboration/searchQuery";
 
 type TProps = {
   companyAdmins: Partial<
@@ -56,6 +57,7 @@ export default function SearchCollaborationModal({
   useEffect(() => {
     if (inputRef?.current) {
       inputRef.current.focus();
+      handleSubmit();
     }
   }, [openUserList]);
 
@@ -70,7 +72,9 @@ export default function SearchCollaborationModal({
         return prevAdmin.map((admin) => {
           if (admin.companyId === companyId) {
             return { ...admin, isConnected: true };
-          } else admin;
+          } else {
+            return admin;
+          };
         });
       });
       if (result.success) {
@@ -80,6 +84,30 @@ export default function SearchCollaborationModal({
       }
     } catch (err: any) {
       setError(err.message);
+      errorToast(err.message);
+    }
+  }
+
+  async function handleSubmit(event?: React.ChangeEvent<HTMLInputElement>) {
+    // event && event.preventDefault();
+    try {
+      const inputValue = event?.target?.value || "";
+      const response = await searchCompanyQuery(inputValue?.trim());
+      if (response.success) {
+        const updateCompanyAdmins = response.data
+          .map((company) => {
+            return company.users.map((user) => {
+              return {
+                ...user,
+                companyName: company.name,
+                isConnected: companies.some((c) => c.id === user.companyId),
+              };
+            });
+          })
+          .flat();
+        setCompanyAdmins(updateCompanyAdmins);
+      }
+    } catch (err: any) {
       errorToast(err.message);
     }
   }
@@ -101,6 +129,7 @@ export default function SearchCollaborationModal({
               <div className="h-fit w-full space-y-4 rounded-md border border-gray-500 p-4">
                 {/* Search box */}
                 <SearchBox
+                  onSearch={handleSubmit}
                   setCompanyAdmins={setCompanyAdmins}
                   companies={companies}
                   ref={inputRef}
@@ -115,13 +144,18 @@ export default function SearchCollaborationModal({
                         key={user?.id}
                         className="flex w-full cursor-pointer items-center justify-between space-x-2 p-1"
                       >
-                        <Avatar photo={user?.image} width={60} height={60} />
-                        <div className="flex flex-col overflow-hidden">
+                        <Avatar
+                          className="flex-shrink-0"
+                          photo={user?.image}
+                          width={60}
+                          height={60}
+                        />
+                        <div className="flex w-full flex-col overflow-hidden">
                           <div className="flex items-center space-x-8">
-                            <p className="text-sm font-bold text-[#797979]">
+                            <p className="flex-shrink-0 text-sm font-bold text-[#797979]">
                               {user?.firstName} {user?.lastName}
                             </p>
-                            <p className="text-sm font-bold capitalize text-[#006D77]">
+                            <p className="flex-shrink-0 text-sm font-bold capitalize text-[#006D77]">
                               {user?.companyName}
                             </p>
                           </div>
@@ -131,7 +165,7 @@ export default function SearchCollaborationModal({
                             <p>{user?.email}</p>
                           </div>
                         </div>
-                        <div>
+                        <div className="flex-shrink-0">
                           {!user?.isConnected && (
                             <button
                               onClick={() =>
