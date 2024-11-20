@@ -52,8 +52,6 @@ export default function MessageBox({
     "/communication/collaboration",
   );
 
-  console.log({ receiverUser });
-
   useEffect(() => {
     if (messageBoxRef.current) {
       messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;

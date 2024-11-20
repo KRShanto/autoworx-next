@@ -24,7 +24,6 @@ export default function Collaboration({
 }) {
   const [selectedUsersList, setSelectedUsersList] = useState<User[]>([]);
   const [companyAdmins, setCompanyAdmins] = useState(companyWithAdmin);
-  console.log("selectedUsersList", selectedUsersList);
   return (
     <div className="mt-5 flex gap-5">
       <List

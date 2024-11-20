@@ -88,8 +88,6 @@ export default function SearchCollaborationModal({
     }
   }
 
-  console.log({ companyAdmins });
-
   async function handleSubmit(event?: React.ChangeEvent<HTMLInputElement>) {
     // event && event.preventDefault();
     try {

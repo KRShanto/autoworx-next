@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
 import { Attachment, Message } from "@prisma/client";
 import { User as NextAuthUser } from "next-auth";
-import UserMessageBox from "../internal/UserMessageBox";
+import UserMessageBox from "./UserMessageBox";
 
 export default function UsersArea({
   currentUser,
