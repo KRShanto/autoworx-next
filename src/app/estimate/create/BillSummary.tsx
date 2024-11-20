@@ -10,6 +10,8 @@ import { RotatingLines } from "react-loader-spinner";
 import { useListsStore } from "@/stores/lists";
 import { usePathname } from "next/navigation";
 import { getTotalPayment } from "@/actions/payment/getTotalPayment";
+import { getCompanyTaxCurrency } from "@/actions/settings/emailTemplates";
+
 
 export function BillSummary() {
   const { items, subtotal, discount, grandTotal, tax, deposit, due, coupon } =
@@ -71,14 +73,11 @@ export function BillSummary() {
   }, [items]);
 
   useEffect(() => {
-    let newGrandTotal = subtotal;
+    let netAmount = subtotal - discount;
 
+    let newGrandTotal = netAmount;
     if (tax > 0) {
-      newGrandTotal += subtotal * (tax / 100);
-    }
-
-    if (discount > 0) {
-      newGrandTotal -= discount;
+      newGrandTotal += netAmount * (tax / 100);
     }
 
     setGrandTotal(newGrandTotal);
@@ -122,7 +121,21 @@ export function BillSummary() {
 
     fetchTotalPayment();
   }, [invoiceId, setDeposit]);
-  console.log(deposit);
+  
+ useEffect(() => {
+    async function fetchTax() {
+      const tax = await getCompanyTaxCurrency();
+      setTax(tax.tax);
+    }
+
+    fetchTax();
+
+ },[setTax]);
+
+
+    fetchTotalPayment();
+  }, [invoiceId, setDeposit]);
+  
   return (
     <>
       <div className="space-y-2 p-2">
@@ -167,7 +180,7 @@ export function BillSummary() {
 
       <div className="space-y-1 rounded-md bg-[#006d77] p-2 px-4 text-sm text-white">
         <dl className="flex justify-between">
-          <dt>Grand Total</dt> <dd>${grandTotal}</dd>
+          <dt>Grand Total</dt> <dd>${subtotal}</dd>
         </dl>
 
         {/* Coupon code */}

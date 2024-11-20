@@ -54,9 +54,12 @@ export default function MaterialCreate() {
       setQuantity(
         data.material.quantity === 0 ? undefined : data.material.quantity,
       );
-      setCost(data.material.cost);
-      setSell(data.material.sell || data.material.cost);
-      setDiscount(data.material.discount);
+      const costValue = parseFloat(data.material.cost);
+      setCost(costValue === 0 ? undefined : costValue);
+      const sellValue = parseFloat(data.material.sell || data.material.cost);
+      setSell(sellValue === 0 ? undefined : sellValue);
+      const discountValue = parseFloat(data.material.discount);
+      setDiscount(discountValue === 0 ? undefined : discountValue);
       setAddToInventory(data.material.addToInventory || false);
     } else {
       setName("");
@@ -171,7 +174,7 @@ export default function MaterialCreate() {
                 quantity: quantity || 0,
                 cost: cost || 0,
                 sell: sell || 0,
-                discount: discount || 0,
+                discount: discount ?? 0,
                 addToInventory,
               };
             }
@@ -202,6 +205,10 @@ export default function MaterialCreate() {
       setVendorOpen(false);
     }
   }, [categoryOpen, vendorOpen, tagsOpen]);
+
+  // console.log("MaterialCreates", sell);
+  // console.log("MaterialCreateDiscount", discount);
+  // console.log("MaterialCreateQuantity", quantity);
   return (
     <div className="flex flex-col gap-2 p-5">
       <h3 className="w-full text-xl font-semibold">
@@ -326,8 +333,10 @@ export default function MaterialCreate() {
         <input
           type="number"
           id="price"
-          value={cost}
-          onChange={(e) => setCost(parseFloat(e.target.value as any))}
+          value={cost ?? ""}
+          onChange={(e) =>
+            setCost(e.target.value ? parseFloat(e.target.value) : undefined)
+          }
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
           placeholder="0"
           disabled={data.edit}
@@ -341,8 +350,10 @@ export default function MaterialCreate() {
         <input
           type="number"
           id="sell"
-          value={sell}
-          onChange={(e) => setSell(parseFloat(e.target.value))}
+          value={sell ?? ""}
+          onChange={(e) =>
+            setSell(e.target.value ? parseFloat(e.target.value) : undefined)
+          }
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
           placeholder="0"
         />
@@ -355,7 +366,7 @@ export default function MaterialCreate() {
         <input
           type="number"
           id="discount"
-          value={discount}
+          value={discount ?? ""}
           onChange={(e) => setDiscount(parseFloat(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
           placeholder="0"
