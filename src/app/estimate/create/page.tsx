@@ -10,8 +10,13 @@ import { CreateTab } from "./tabs/CreateTab";
 import { AttachmentTab } from "./tabs/AttachmentTab";
 import Header from "./Header";
 import ConvertButton from "./ConvertButton";
-import { InvoiceType, Labor, Material, Tag } from "@prisma/client";
-import { GoFileCode } from "react-icons/go";
+import {
+  InventoryProduct,
+  InvoiceType,
+  Labor,
+  Material,
+  Tag,
+} from "@prisma/client";
 import EstimateLogo from "@/components/EstimateLogo";
 import PaymentTab from "./tabs/PaymentTab";
 
@@ -32,9 +37,9 @@ export default async function Page({
   const paymentMethods = await db.paymentMethod.findMany({
     where: { companyId },
   });
-  const products = await db.inventoryProduct.findMany({
+  const products = (await db.inventoryProduct.findMany({
     where: { companyId, type: "Product" },
-  });
+  })) as (InventoryProduct & { tags: Tag[] })[];
 
   // TODO: try to improve this query
   const materials = (await db.material.findMany({
@@ -44,6 +49,13 @@ export default async function Page({
   const labors = (await db.labor.findMany({
     where: { companyId },
   })) as (Labor & { tags: Tag[] })[];
+
+  const productTags = await db.inventoryProductTag.findMany({
+    where: {
+      inventoryId: { in: products.map((product) => product.id) },
+    },
+    include: { tag: true },
+  });
 
   const materialTags = await db.materialTag.findMany({
     where: {
@@ -59,6 +71,11 @@ export default async function Page({
     include: { tag: true },
   });
 
+  products.forEach((product) => {
+    product.tags = productTags
+      .filter((productTag) => productTag.inventoryId === product.id)
+      .map((productTag) => productTag.tag);
+  });
   materials.forEach((material) => {
     material.tags = materialTags
       .filter((materialTag) => materialTag.materialId === material.id)
@@ -69,7 +86,7 @@ export default async function Page({
     ...products.map((product) => ({
       ...product,
       cost: product.price,
-      tags: [],
+      tags: product.tags,
       productId: product.id,
     })),
   );

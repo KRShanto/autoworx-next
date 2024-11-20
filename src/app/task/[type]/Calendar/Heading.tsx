@@ -40,12 +40,12 @@ function getNextValidDate(
   weekend2: string,
 ): Moment {
   let nextDate = moment(date);
-  while (
-    nextDate.format("dddd") === weekend1 ||
-    nextDate.format("dddd") === weekend2
-  ) {
-    nextDate.add(direction, "days");
-  }
+  // while (
+  //   nextDate.format("dddd") === weekend1 ||
+  //   nextDate.format("dddd") === weekend2
+  // ) {
+  //   nextDate.add(direction, "days");
+  // }
   return nextDate;
 }
 
@@ -110,6 +110,7 @@ export default function Heading({
               weekend1 ? weekend1 : "",
               weekend2 ? weekend2 : "",
             );
+            console.log(validDate.format(moment.HTML5_FMT[q.toUpperCase() as Uppercase<typeof q>]));
             router.push(
               `/task/${type}?${q}=${(date.isValid() ? validDate : moment()).format(moment.HTML5_FMT[q.toUpperCase() as Uppercase<typeof q>])}`,
             );

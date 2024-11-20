@@ -1,19 +1,16 @@
 "use client";
-import NewVehicle from "@/components/Lists/NewVehicle";
+import { deleteLabor } from "@/actions/estimate/labor/deleteLabor";
+import { updateLabor } from "@/actions/estimate/labor/updateLabor";
 import SelectCategory from "@/components/Lists/SelectCategory";
 import { cn } from "@/lib/cn";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { useListsStore } from "@/stores/lists";
-import { Category, Labor, Vehicle } from "@prisma/client";
-import { setHours } from "date-fns";
-import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { Category, Labor } from "@prisma/client";
+import { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { RiEditFill } from "react-icons/ri";
 import NewLabor from "./NewLabor";
-import { IoMdCheckmarkCircleOutline } from "react-icons/io";
-import { updateLabor } from "@/actions/estimate/labor/updateLabor";
-import { deleteLabor } from "@/actions/estimate/labor/deleteLabor";
 
 export default function CannedLabor({
   labors,
@@ -32,6 +29,7 @@ export default function CannedLabor({
               + Add Labor
             </button>
           }
+          isCanned={true}
         />
       </div>
       {/* TODO: make it scrollable */}
@@ -63,7 +61,9 @@ const LaborComponent = ({
   labor: Labor & { category?: Category };
 }) => {
   const [isEdit, setIsEdit] = useState(false);
-  const [category, setCategory] = useState<Category | null>(null);
+  const [category, setCategory] = useState<Category | null>(
+    labor?.category || null,
+  );
   const { categories } = useListsStore();
   const { currentSelectedCategoryId } = useEstimateCreateStore();
   const [categoryOpen, setCategoryOpen] = useState(false);

@@ -22,8 +22,10 @@ import Close from "./create/CloseEstimate";
 
 export default function NewLabor({
   newButton,
+  isCanned = false,
 }: {
   newButton?: React.ReactNode;
+  isCanned?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const { categories } = useListsStore();
@@ -92,6 +94,7 @@ export default function NewLabor({
       hours: hours || 1,
       charge: charge || 0,
       discount: discount || 0,
+      cannedLabor: isCanned,
     });
 
     if (res.type === "success") {
@@ -117,6 +120,13 @@ export default function NewLabor({
       close();
       setOpen(false);
     }
+    setName("");
+    setCategory(null);
+    setTags([]);
+    setNotes("");
+    setHours(undefined);
+    setCharge(undefined);
+    setDiscount(undefined);
   }
 
   async function handleEdit() {
