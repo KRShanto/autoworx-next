@@ -20,6 +20,16 @@ model InventoryProduct {
     InventoryProductHistory InventoryProductHistory[]
     // InvoiceItemMaterial     InvoiceItemMaterial[]
     Material                Material[]
+    InventoryProductTag     InventoryProductTag[]
+}
+
+model InventoryProductTag {
+    inventoryId Int              @map("inventory_id")
+    tagId       Int              @map("tag_id")
+    inventory   InventoryProduct @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+    tag         Tag              @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+    @@id([inventoryId, tagId])
 }
 
 model InventoryProductHistory {

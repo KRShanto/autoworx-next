@@ -229,12 +229,47 @@ export async function updateInvoice(
     const labor = item.labor;
     const tags = item.tags;
 
+    let laborId;
+    // delete existing labors
+    if (labor) {
+      const existingLabor = await db.labor.findUnique({
+        where: {
+          id: labor.id,
+        },
+      });
+
+      if (existingLabor) {
+        await db.labor.delete({
+          where: {
+            id: labor.id,
+          },
+        });
+      }
+    }
+
+    // create new labor
+    if (labor) {
+      const newLabor = await db.labor.create({
+        data: {
+          name: labor.name,
+          categoryId: labor.categoryId,
+          notes: labor.notes,
+          hours: labor.hours,
+          charge: labor.charge,
+          discount: labor.discount,
+          companyId,
+        },
+      });
+
+      laborId = newLabor.id;
+    }
+
     // create new items
     const invoiceItem = await db.invoiceItem.create({
       data: {
         invoiceId: data.id,
         serviceId: service?.id,
-        laborId: labor?.id,
+        laborId,
       },
     });
 

@@ -70,10 +70,7 @@ export function CreateTab() {
                               )
                             }
                             onSearch={(search) => {
-                              console.log(
-                                "🚀 ~ {Object.keys ~ search:",
-                                search,
-                              );
+
                               if (search) {
                                 const filteredServices = services.filter(
                                   (service) =>
@@ -84,10 +81,7 @@ export function CreateTab() {
 
                                 return filteredServices;
                               } else {
-                                console.log(
-                                  "🚀 ~ {Object.keys ~ search:",
-                                  services,
-                                );
+
                                 return services;
                               }
                             }}
@@ -160,13 +154,17 @@ export function CreateTab() {
                                   });
                                 }}
                                 onSearch={(search) => {
-                                  const filteredMaterials = materials.filter(
-                                    (material) =>
-                                      material.name
-                                        .toLowerCase()
-                                        .includes(search.toLowerCase()),
-                                  );
-                                  return filteredMaterials;
+                                  if (search){
+                                    const filteredMaterials = materials.filter(
+                                      (material) =>
+                                        material.name
+                                          .toLowerCase()
+                                          .includes(search.toLowerCase()),
+                                    );
+                                    return filteredMaterials;
+                                  }else{
+                                    return materials
+                                  }
                                 }}
                                 index={[i, j]}
                                 dropdownsOpen={dropdownsOpen}
@@ -226,13 +224,17 @@ export function CreateTab() {
                               });
                             }}
                             onSearch={(search) => {
-                              const filteredLabors = labors.filter((labor) =>
-                                labor.name
-                                  .toLowerCase()
-                                  .includes(search.toLowerCase()),
-                              );
+                              if (search){
+                                const filteredLabors = labors.filter((labor) =>
+                                  labor.name
+                                    .toLowerCase()
+                                    .includes(search.toLowerCase()),
+                                );
 
-                              return filteredLabors;
+                                return filteredLabors;
+                              }else{
+                                return labors
+                              }
                             }}
                             onDelete={() =>
                               useEstimateCreateStore.setState((x) => {

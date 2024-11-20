@@ -30,17 +30,18 @@ const ChartData = ({
       </div>
       {!noRate && (
         <div className="flex items-center gap-4">
-          {isPositive  ? (
-            <div className="text-[#4DB6AC]">
-              <FaCaretUp />
-            </div>
-          ) : (
-            <div className="text-red-500">
-              <FaCaretDown />
-            </div>
-          )}
+          {rate != 0 &&
+            (isPositive ? (
+              <div className="text-[#4DB6AC]">
+                <FaCaretUp />
+              </div>
+            ) : (
+              <div className="text-red-500">
+                <FaCaretDown />
+              </div>
+            ))}
           <div
-            className={`text-2xl font-bold ${isPositive ? "text-[#4DB6AC]" : "text-red-500"}`}
+            className={`text-2xl font-bold ${rate !== 0 && (isPositive ? "text-[#4DB6AC]" : "text-red-500")}`}
           >
             {rate}%
           </div>

@@ -9,20 +9,13 @@ import { checkCouponCode } from "@/actions/coupon/checkCouponCode";
 import { RotatingLines } from "react-loader-spinner";
 import { useListsStore } from "@/stores/lists";
 import { usePathname } from "next/navigation";
+import { getTotalPayment } from "@/actions/payment/getTotalPayment";
+import { getCompanyTaxCurrency } from "@/actions/settings/emailTemplates";
+
 
 export function BillSummary() {
-  const {
-    items,
-    subtotal,
-    discount,
-    grandTotal,
-    tax,
-    deposit,
-    due,
-    depositMethod,
-    depositNotes,
-    coupon,
-  } = useEstimateCreateStore();
+  const { items, subtotal, discount, grandTotal, tax, deposit, due, coupon } =
+    useEstimateCreateStore();
   const {
     setSubtotal,
     setDiscount,
@@ -30,9 +23,8 @@ export function BillSummary() {
     setTax,
     setDeposit,
     setDue,
-    setDepositMethod,
-    setDepositNotes,
     setCoupon,
+    invoiceId,
   } = useEstimateCreateStore();
   const { client } = useListsStore();
   const [couponInput, setCouponInput] = useState("");
@@ -41,7 +33,7 @@ export function BillSummary() {
 
   useEffect(() => {
     let newServicesTotal = 0;
-    let newDiscountTotal = discount;
+    let newDiscountTotal = 0;
 
     items.forEach((item) => {
       const { service, materials, labor } = item;
@@ -53,8 +45,7 @@ export function BillSummary() {
         return (
           acc +
           (material && material.sell
-            ? parseFloat(material.sell.toString()) * material.quantity! -
-              parseFloat(material.discount?.toString()!)
+            ? parseFloat(material.sell.toString()) * material.quantity!
             : 0)
         );
       }, 0);
@@ -63,7 +54,7 @@ export function BillSummary() {
         return (
           acc +
           (material && material.discount
-            ? parseFloat(material.discount.toString())
+            ? parseFloat(material.discount.toString()) * material.quantity!
             : 0)
         );
       }, 0);
@@ -82,14 +73,11 @@ export function BillSummary() {
   }, [items]);
 
   useEffect(() => {
-    let newGrandTotal = subtotal;
+    let netAmount = subtotal - discount;
 
+    let newGrandTotal = netAmount;
     if (tax > 0) {
-      newGrandTotal += subtotal * (tax / 100);
-    }
-
-    if (discount > 0) {
-      newGrandTotal -= discount;
+      newGrandTotal += netAmount * (tax / 100);
     }
 
     setGrandTotal(newGrandTotal);
@@ -123,7 +111,31 @@ export function BillSummary() {
 
     setCouponLoading(false);
   }
+  useEffect(() => {
+    async function fetchTotalPayment() {
+      if (invoiceId) {
+        const totalPayment = await getTotalPayment(invoiceId);
+        setDeposit(totalPayment);
+      }
+    }
 
+    fetchTotalPayment();
+  }, [invoiceId, setDeposit]);
+  
+ useEffect(() => {
+    async function fetchTax() {
+      const tax = await getCompanyTaxCurrency();
+      setTax(tax.tax);
+    }
+
+    fetchTax();
+
+ },[setTax]);
+
+
+    fetchTotalPayment();
+  }, [invoiceId, setDeposit]);
+  
   return (
     <>
       <div className="space-y-2 p-2">
@@ -150,6 +162,7 @@ export function BillSummary() {
                 setData(e.target.value)
               }
               className="w-[100px] rounded-md bg-slate-500 px-2 py-1 text-xs text-white"
+              readOnly={title === "deposit"}
             />
             {/* {title === "deposit" && (
               <DepositCreate
@@ -167,7 +180,7 @@ export function BillSummary() {
 
       <div className="space-y-1 rounded-md bg-[#006d77] p-2 px-4 text-sm text-white">
         <dl className="flex justify-between">
-          <dt>Grand Total</dt> <dd>${grandTotal}</dd>
+          <dt>Grand Total</dt> <dd>${subtotal}</dd>
         </dl>
 
         {/* Coupon code */}
