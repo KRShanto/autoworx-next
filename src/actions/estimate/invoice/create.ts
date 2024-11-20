@@ -152,11 +152,29 @@ export async function createInvoice({
     const labor = item.labor;
     const tags = item.tags;
 
+    // Create new labor
+    let laborId;
+    if (labor) {
+      const newLabor = await db.labor.create({
+        data: {
+          name: labor.name,
+          categoryId: labor.categoryId,
+          notes: labor.notes,
+          hours: labor.hours,
+          charge: labor.charge,
+          discount: labor.discount,
+          companyId,
+        },
+      });
+
+      laborId = newLabor.id;
+    }
+
     const invoiceItem = await db.invoiceItem.create({
       data: {
         invoiceId: invoice.id,
         serviceId: service?.id,
-        laborId: labor?.id,
+        laborId: laborId,
       },
     });
 

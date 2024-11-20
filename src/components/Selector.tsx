@@ -108,7 +108,7 @@ export default function Selector<T>({
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className="basis-full md:basis-96">
+      <div className="#md:basis-96 basis-full">
         <DropdownMenuTrigger
           disabled={disabledDropdown}
           onClick={() => setIsOpen(true)}
@@ -148,7 +148,7 @@ export default function Selector<T>({
           </div>
 
           {/* Display list of items */}
-          <div className="mb-5 max-h-40 overflow-y-auto">
+          <div className="mb-5 flex max-h-40 flex-col overflow-y-auto">
             {filteredItems.map((item, index) => {
               if (clickabled) {
                 return (
