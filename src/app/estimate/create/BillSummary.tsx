@@ -131,10 +131,6 @@ export function BillSummary() {
     fetchTax();
 
  },[setTax]);
-
-
-    fetchTotalPayment();
-  }, [invoiceId, setDeposit]);
   
   return (
     <>
