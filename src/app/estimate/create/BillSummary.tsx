@@ -12,6 +12,7 @@ import { usePathname } from "next/navigation";
 import { getTotalPayment } from "@/actions/payment/getTotalPayment";
 import { getCompanyTaxCurrency } from "@/actions/settings/emailTemplates";
 
+
 export function BillSummary() {
   const { items, subtotal, discount, grandTotal, tax, deposit, due, coupon } =
     useEstimateCreateStore();
@@ -130,7 +131,7 @@ export function BillSummary() {
     fetchTax();
 
  },[setTax]);
-
+  
   return (
     <>
       <div className="space-y-2 p-2">
