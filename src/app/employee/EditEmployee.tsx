@@ -217,7 +217,7 @@ export default function EditEmployee({ employee }: { employee: User }) {
                 required={false}
               />
               <SlimInput
-                name="commission%"
+                name="commission"
                 defaultValue={Number(employee.commission!)}
                 required={false}
               />
