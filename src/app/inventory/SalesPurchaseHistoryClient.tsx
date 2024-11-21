@@ -188,12 +188,14 @@ function Table({
                 </td>
               ) : (
                 <td className="text-center">
-                  <Link
-                    href={`/estimate/edit/${history.invoiceId}`}
-                    className="flex items-center justify-center text-[#6571FF]"
-                  >
-                    <FaEdit />
-                  </Link>
+                  {history.invoiceId && (
+                    <Link
+                      href={`/estimate/edit/${history.invoiceId}`}
+                      className="flex items-center justify-center text-[#6571FF]"
+                    >
+                      <FaEdit />
+                    </Link>
+                  )}
                 </td>
               ))}
           </tr>
