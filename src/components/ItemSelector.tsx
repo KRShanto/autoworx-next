@@ -127,7 +127,8 @@ export default function ItemSelector<T>({
             <button
               className="absolute -right-2 -top-2"
               type="button"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setSelected(null);
                 onDelete && onDelete();
               }}

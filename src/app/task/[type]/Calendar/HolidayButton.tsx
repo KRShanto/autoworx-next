@@ -42,7 +42,7 @@ export default function HolidayButton() {
   //     datePickerRef.current?.openCalendar();
   //   };
 
-  const handleAddHoliday = async () => {
+  const handleAddHoliday = async (fromMonthChange: boolean = false) => {
     try {
       if (values.length > 0) {
         // Add holiday logic here
@@ -60,12 +60,12 @@ export default function HolidayButton() {
           selectedYear,
         );
         if (response.status === 200) {
-          handleClose();
-          toast.success("Holiday set successfully");
-          console.log(totalHolidays);
+          // handleClose();
+          !fromMonthChange && toast.success("Holiday set successfully");
         }
       } else {
-        toast.error("Please select at least one holiday date.");
+        !fromMonthChange &&
+          toast.error("Please select at least one holiday date.");
       }
     } catch (err) {
       console.error(err);
@@ -82,6 +82,8 @@ export default function HolidayButton() {
         value={values}
         onChange={(dates) => setValues(dates)}
         onMonthChange={(date) => {
+          console.log("month change");
+          handleAddHoliday(true);
           setSelectedMonth(date.month.name);
           setSelectedYear(date.year);
         }}
@@ -103,7 +105,7 @@ export default function HolidayButton() {
           <button
             disabled={pending || loading}
             onClick={() => startTransition(handleAddHoliday)}
-            className="rounded-md border px-3 py-1.5 disabled:bg-gray-300"
+            className="rounded-md border bg-green-100 px-3 py-1.5 disabled:bg-gray-300"
           >
             Apply
           </button>
@@ -116,7 +118,7 @@ export default function HolidayButton() {
           </button>
           <button
             onClick={handleClose}
-            className="rounded-md border bg-red-500 px-3 py-1.5 text-white"
+            className="rounded-md border bg-red-400 px-3 py-1.5 text-white"
           >
             Close
           </button>
