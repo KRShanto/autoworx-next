@@ -171,31 +171,31 @@ function Table({
               )}
             </td>
             {(user?.employeeType === "Admin" ||
-            user?.employeeType === "Manager") && (type === "Purchase" ? (
-              <td className="text-center">
-                <EditHistory
-                  historyId={history.id}
-                  productId={product?.id!}
-                  date={history.date!}
-                  vendor={history.vendor}
-                  quantity={history.quantity}
-                  price={Number(history.price)}
-                  unit={product?.unit!}
-                  lot={product?.lot!}
-                  notes={history.notes!}
-                />
-              </td>
-            ) : (
-              <td className="text-center">
-                <Link
-                  href={`/estimate/edit/${history.invoiceId}`}
-                  className="text-[#6571FF]"
-                >
-                  <FaEdit />
-                </Link>
-              </td>
-            ))}
-           
+              user?.employeeType === "Manager") &&
+              (type === "Purchase" ? (
+                <td className="text-center">
+                  <EditHistory
+                    historyId={history.id}
+                    productId={product?.id!}
+                    date={history.date!}
+                    vendor={history.vendor}
+                    quantity={history.quantity}
+                    price={Number(history.price)}
+                    unit={product?.unit!}
+                    lot={product?.lot!}
+                    notes={history.notes!}
+                  />
+                </td>
+              ) : (
+                <td className="text-center">
+                  <Link
+                    href={`/estimate/edit/${history.invoiceId}`}
+                    className="flex items-center justify-center text-[#6571FF]"
+                  >
+                    <FaEdit />
+                  </Link>
+                </td>
+              ))}
           </tr>
         ))}
       </tbody>
