@@ -21,8 +21,8 @@ interface Column {
 }
 
 const Page = (props: Props) => {
-  const searchParam=useSearchParams();
-  const activeView =searchParam.get('view') ?? "workOrders";
+  const searchParam = useSearchParams();
+  const activeView = searchParam.get("view") ?? "workOrders";
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
   const [currentUser, setCurrentUser] = useState<SessionUserType>();
 
@@ -30,7 +30,7 @@ const Page = (props: Props) => {
 
   useEffect(() => {
     const fetchShopColumns = async () => {
-      const columns = await getColumnsByType("shop");
+      const columns = await getColumnsByType(columnType);
       setPipelineColumns(columns);
     };
 

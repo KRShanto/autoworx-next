@@ -22,6 +22,7 @@ import { EmployeeSelector } from "./EmployeeSelector";
 import { EmployeeTagSelector } from "./EmployeeTagSelector";
 import ServiceSelector from "./ServiceSelector";
 import TaskForm from "./TaskForm";
+import Image from "next/image";
 //dummy services
 
 //interfaces
@@ -98,7 +99,7 @@ type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
 export default function Pipelines({
   pipelinesTitle: pipelineType,
   columns,
-}: Readonly<PipelinesProps>) {
+}: PipelinesProps) {
   const [pipelineData, setPipelineData] = useState<PipelineData[]>([]);
   const [invoices, setInvoices] = useState<InvoiceWithRelations[]>([]);
 
@@ -187,9 +188,7 @@ export default function Pipelines({
       let updatedPipelineData = columns.map((column) => ({
         id: column.id,
         title: column.title,
-        leads: transformedLeads.filter(
-          (lead) => lead.columnId=== column.id,
-        ),
+        leads: transformedLeads.filter((lead) => lead.columnId === column.id),
       }));
 
       console.log("Current user:", currentUser);
@@ -660,9 +659,9 @@ export default function Pipelines({
                                     href={`/estimate/view/${lead.invoiceId}`}
                                     className="group relative"
                                   >
-                                    <img
+                                    <Image
                                       src="/icons/invoice.png"
-                                      alt=""
+                                      alt="invoice icon"
                                       width={12}
                                       height={12}
                                       style={{ marginBottom: "0px" }}
