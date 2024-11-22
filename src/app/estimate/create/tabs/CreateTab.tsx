@@ -70,7 +70,6 @@ export function CreateTab() {
                               )
                             }
                             onSearch={(search) => {
-
                               if (search) {
                                 const filteredServices = services.filter(
                                   (service) =>
@@ -81,7 +80,6 @@ export function CreateTab() {
 
                                 return filteredServices;
                               } else {
-
                                 return services;
                               }
                             }}
@@ -104,9 +102,97 @@ export function CreateTab() {
                         </td>
                       );
                     case "materials":
-                      return item?.materials?.length > 0 ? (
+                      return item.materials.length >= 0 ? (
                         <td className="relative">
-                          {item.materials.map((material, j) => (
+                          {item.materials.length > 0 &&
+                            item.materials.map((material, j) => (
+                              <div
+                                className={cn("mt-2.5", j === 0 && "mt-0")}
+                                key={`material-${j}`}
+                              >
+                                <ItemSelector
+                                  key={`material-${j}`}
+                                  type="MATERIAL"
+                                  label="Materials/Parts"
+                                  item={item}
+                                  list={materials}
+                                  display="name"
+                                  alwaysShowDeleteButton={
+                                    item.materials.length > 1 && j > 0
+                                  }
+                                  materialIndex={j}
+                                  onDelete={() => {
+                                    console.log("calling delete material");
+                                    removeMaterial({
+                                      itemIndex: i,
+                                      materialIndex: j,
+                                    });
+                                  }}
+                                  onEdit={() =>
+                                    open("MATERIAL", {
+                                      itemId: item.id,
+                                      edit: true,
+                                      material,
+                                      materialIndex: j,
+                                    })
+                                  }
+                                  onSelect={(material) => {
+                                    useEstimateCreateStore.setState((x) =>
+                                      create(x, (x) => {
+                                        x.items[i].materials[j] = {
+                                          ...material,
+                                          quantity: 0,
+                                        };
+                                      }),
+                                    );
+
+                                    open("MATERIAL", {
+                                      itemId: item.id,
+                                      edit: true,
+                                      material,
+                                      materialIndex: j,
+                                    });
+                                  }}
+                                  onSearch={(search) => {
+                                    if (search) {
+                                      const filteredMaterials =
+                                        materials.filter((material) =>
+                                          material.name
+                                            .toLowerCase()
+                                            .includes(search.toLowerCase()),
+                                        );
+                                      return filteredMaterials;
+                                    } else {
+                                      return materials;
+                                    }
+                                  }}
+                                  index={[i, j]}
+                                  dropdownsOpen={dropdownsOpen}
+                                  setDropdownsOpen={setDropdownsOpen}
+                                />
+
+                                {/* Check if this is the last material */}
+                                {/* Add new material button */}
+                                {j === item.materials.length - 1 ? (
+                                  <button
+                                    type="button"
+                                    className="absolute flex items-center gap-1 text-sm text-[#6571FF]"
+                                    onClick={() => {
+                                      useEstimateCreateStore.setState((x) =>
+                                        create(x, (x) => {
+                                          x.items[i].materials.push(null);
+                                        }),
+                                      );
+                                    }}
+                                  >
+                                    <HiOutlinePlusCircle size="1.2em" /> Add
+                                    More
+                                  </button>
+                                ) : null}
+                              </div>
+                            ))}
+
+                          {item.materials.length == 0 && (
                             <div
                               className={cn("mt-2.5", j === 0 && "mt-0")}
                               key={`material-${j}`}
@@ -122,20 +208,14 @@ export function CreateTab() {
                                   item.materials.length > 1 && j > 0
                                 }
                                 materialIndex={j}
-                                onDelete={() =>
+                                onDelete={() => {
+                                  console.log("calling delete material");
                                   removeMaterial({
                                     itemIndex: i,
                                     materialIndex: j,
-                                  })
-                                }
-                                onEdit={() =>
-                                  open("MATERIAL", {
-                                    itemId: item.id,
-                                    edit: true,
-                                    material,
-                                    materialIndex: j,
-                                  })
-                                }
+                                  });
+                                }}
+                                // onEdit={() => {}}
                                 onSelect={(material) => {
                                   useEstimateCreateStore.setState((x) =>
                                     create(x, (x) => {
@@ -154,7 +234,7 @@ export function CreateTab() {
                                   });
                                 }}
                                 onSearch={(search) => {
-                                  if (search){
+                                  if (search) {
                                     const filteredMaterials = materials.filter(
                                       (material) =>
                                         material.name
@@ -162,8 +242,8 @@ export function CreateTab() {
                                           .includes(search.toLowerCase()),
                                     );
                                     return filteredMaterials;
-                                  }else{
-                                    return materials
+                                  } else {
+                                    return materials;
                                   }
                                 }}
                                 index={[i, j]}
@@ -189,7 +269,7 @@ export function CreateTab() {
                                 </button>
                               ) : null}
                             </div>
-                          ))}
+                          )}
                         </td>
                       ) : (
                         <td></td>
@@ -224,7 +304,7 @@ export function CreateTab() {
                               });
                             }}
                             onSearch={(search) => {
-                              if (search){
+                              if (search) {
                                 const filteredLabors = labors.filter((labor) =>
                                   labor.name
                                     .toLowerCase()
@@ -232,8 +312,8 @@ export function CreateTab() {
                                 );
 
                                 return filteredLabors;
-                              }else{
-                                return labors
+                              } else {
+                                return labors;
                               }
                             }}
                             onDelete={() =>

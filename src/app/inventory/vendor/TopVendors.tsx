@@ -1,7 +1,10 @@
+import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import React from "react";
 
 export default async function TopVendors() {
+  const companyId = await getCompanyId();
+
   const vendors = await db.vendor.findMany({
     select: {
       inventoryProducts: true,
@@ -9,6 +12,7 @@ export default async function TopVendors() {
       name: true,
       companyName: true,
     },
+    where: { companyId },
   });
 
   // sum up the total inventory products price * quantity for each vendor

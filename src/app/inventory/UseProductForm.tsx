@@ -12,7 +12,7 @@ import {
 import FormError from "@/components/FormError";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useProduct as productUse } from "../../actions/inventory/useProduct";
 import Selector from "@/components/Selector";
 import { InventoryProductType } from "@prisma/client";
@@ -47,8 +47,14 @@ export default function UseProductForm({
 
     if (res.type === "success") {
       setOpen(false);
+      setInvoiceId(null);
     }
   }
+
+  // Whenever `open` changes, set `invoiceId` to null
+  useEffect(() => {
+    setInvoiceId(null);
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

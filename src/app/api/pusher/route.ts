@@ -29,7 +29,6 @@ export async function POST(req: Request) {
       throw new Error("Missing some argument for message");
     }
     let channel = `user-${userId}`;
-    console.log({ requestEstimate });
     let messageData: TMessageDate = {
       from: userId,
       to,
@@ -68,6 +67,7 @@ export async function POST(req: Request) {
     // send the raw message to the room
     pusher.trigger(channel, "message", {
       groupId: type === sendType.Group ? to : null,
+      to: type !== sendType.Group ? to : null,
       from: userId,
       message,
       attachment: attachmentFile

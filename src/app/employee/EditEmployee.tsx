@@ -14,15 +14,15 @@ import { useRef, useState } from "react";
 import { RiEditFill } from "react-icons/ri";
 import { RxAvatar } from "react-icons/rx";
 
-import SelectEmployeeType from "./SelectEmployeeType";
+import { updateEmployee } from "@/actions/employee/update";
+import { getCompany } from "@/actions/settings/getCompany";
+import { useServerGet } from "@/hooks/useServerGet";
+import { DEFAULT_IMAGE_URL } from "@/lib/consts";
+import { useFormErrorStore } from "@/stores/form-error";
 import { EmployeeType, User } from "@prisma/client";
 import moment from "moment";
-import { useServerGet } from "@/hooks/useServerGet";
-import { getCompany } from "@/actions/settings/getCompany";
-import { useFormErrorStore } from "@/stores/form-error";
-import { updateEmployee } from "@/actions/employee/update";
-import { DEFAULT_IMAGE_URL } from "@/lib/consts";
 import { FaPen } from "react-icons/fa";
+import SelectEmployeeType from "./SelectEmployeeType";
 
 export default function EditEmployee({ employee }: { employee: User }) {
   const [open, setOpen] = useState(false);
@@ -114,7 +114,7 @@ export default function EditEmployee({ employee }: { employee: User }) {
           <div className="mt-8 flex items-center justify-between">
             <h1 className="text-2xl font-bold">Edit Employee</h1>
 
-            {profilePic ? (
+            {newProfilePic || profilePic ? (
               <label
                 className="relative cursor-pointer"
                 htmlFor="profilePicture"
@@ -160,6 +160,7 @@ export default function EditEmployee({ employee }: { employee: User }) {
                   accept="image/*"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
+
                     if (file) {
                       setNewProfilePic(file);
                     }
@@ -217,7 +218,7 @@ export default function EditEmployee({ employee }: { employee: User }) {
                 required={false}
               />
               <SlimInput
-                name="commission%"
+                name="commission"
                 defaultValue={Number(employee.commission!)}
                 required={false}
               />

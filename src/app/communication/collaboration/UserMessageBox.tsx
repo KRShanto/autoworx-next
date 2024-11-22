@@ -28,7 +28,7 @@ export default function UserMessageBox({
       const userMessages = findUserMessage.filter(
         (m) => m.from === user.id || m.to === user.id,
       );
-      console.log("userMessages", userMessages);
+
       setMessages(
         userMessages.map((m) => {
           return {
@@ -51,17 +51,22 @@ export default function UserMessageBox({
       .bind(
         "message",
         ({
+          to,
           from,
           message,
           attachment,
           requestEstimate,
         }: {
+          to: number;
           from: number;
           message: string;
           attachment: Partial<Attachment>;
           requestEstimate: RequestEstimate | null;
         }) => {
-          if (from !== parseInt(session?.user?.id!)) {
+          if (
+            from !== parseInt(session?.user?.id!) &&
+            to === parseInt(session?.user?.id!)
+          ) {
             const newMessage = {
               message,
               sender: "CLIENT",
@@ -78,7 +83,7 @@ export default function UserMessageBox({
     return () => {
       channel.unbind("message");
     };
-  }, [user]);
+  }, [user, session?.user?.id]);
 
   return (
     <MessageBox
