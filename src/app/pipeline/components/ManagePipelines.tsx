@@ -169,6 +169,7 @@ export default function ManagePipelines({
 
     onSave(localColumns);
     onClose();
+    //hard reload
     window.location.reload();
   };
 
