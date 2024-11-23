@@ -1,6 +1,7 @@
 import Avatar from "@/components/Avatar";
 import { Client, Source, Tag } from "@prisma/client";
 import React from "react";
+import EditClient from "./EditClient";
 
 export default function ClientInformation({
   client,
@@ -11,7 +12,10 @@ export default function ClientInformation({
     <div className="mb-3 w-full p-2">
       <h3 className="text-lg font-semibold">Client Details</h3>
       <div className="rounded-md border border-gray-200 p-3">
-        <div className="relative flex w-full items-center rounded">
+        <div className="relative flex w-full items-center rounded pt-8">
+          <div className="absolute right-3 top-1">
+            <EditClient client={client} />
+          </div>
           <div className="mr-3 flex flex-col items-center">
             <Avatar photo={client.photo} width={200} height={200} />
           </div>
