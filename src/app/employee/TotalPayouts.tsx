@@ -4,6 +4,7 @@ import {
   calculatePreviousMonthEarnings,
   calculate2ndPreviousMonthEarnings,
   calculateTotalEarnings,
+  calculateCurrentMonthEarnings,
 } from "@/lib/payout";
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
@@ -16,10 +17,10 @@ export default async function TotalPayouts() {
     },
   });
 
-  const previousMonthEarnings = calculatePreviousMonthEarnings(
+  const currentMonthEarnings = calculateCurrentMonthEarnings(
     technicians as any,
   );
-  const secondPreviousMonthEarnings = calculate2ndPreviousMonthEarnings(
+  const previousMonthEarnings = calculatePreviousMonthEarnings(
     technicians as any,
   );
   const totalEarnings = calculateTotalEarnings(technicians as any);
@@ -27,11 +28,10 @@ export default async function TotalPayouts() {
   // Calculate the percentage change with checks
   let percentageChange = "N/A";
   let increased = false;
-  if (secondPreviousMonthEarnings !== 0) {
-    const earningsDifference =
-      previousMonthEarnings - secondPreviousMonthEarnings;
+  if (previousMonthEarnings !== 0) {
+    const earningsDifference = currentMonthEarnings - previousMonthEarnings;
     percentageChange = (
-      (earningsDifference / secondPreviousMonthEarnings) *
+      (earningsDifference / previousMonthEarnings) *
       100
     ).toFixed(2);
     increased = earningsDifference > 0;
@@ -41,7 +41,7 @@ export default async function TotalPayouts() {
     <div className="flex items-center gap-x-8">
       <HorizontalPayoutCard
         title="Monthly Payout"
-        amount={previousMonthEarnings}
+        amount={currentMonthEarnings}
         percentage={`${percentageChange}%`}
         increased={increased}
       />
