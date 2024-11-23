@@ -186,7 +186,6 @@ export default async function Page({
         companyId,
       },
     });
-    console.log("🚀 ~ tasks:", tasks);
 
     usersWithTasks.push({
       ...user,

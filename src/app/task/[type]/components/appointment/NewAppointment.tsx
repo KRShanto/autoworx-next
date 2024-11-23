@@ -29,7 +29,6 @@ import type {
 import { TimePicker } from "antd";
 import moment from "moment";
 import { customAlphabet } from "nanoid";
-import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import {
   FaChevronLeft,

@@ -2,6 +2,7 @@
 "use client";
 import { getEmployees } from "@/actions/employee/get";
 import { updateInvoiceStatus } from "@/actions/estimate/invoice/updateInvoiceStatus";
+import getDataForNewAppointment from "@/actions/pipelines/getDataForNewAppointment";
 import {
   getWorkOrders,
   updateAssignedTo,
@@ -10,6 +11,7 @@ import {
   removeInvoiceTag,
   saveInvoiceTag,
 } from "@/actions/pipelines/invoiceTag";
+import { useServerGet } from "@/hooks/useServerGet";
 import SessionUserType from "@/types/sessionUserType";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { EmployeeType, Prisma, Tag, Task, User } from "@prisma/client";
@@ -20,6 +22,7 @@ import { IoAddCircleOutline } from "react-icons/io5";
 import { PiWechatLogoLight } from "react-icons/pi";
 import { EmployeeSelector } from "./EmployeeSelector";
 import { EmployeeTagSelector } from "./EmployeeTagSelector";
+import { NewAppointment_Pipeline } from "./NewAppointment_Pipeline";
 import ServiceSelector from "./ServiceSelector";
 import TaskForm from "./TaskForm";
 //dummy services
@@ -187,9 +190,7 @@ export default function Pipelines({
       let updatedPipelineData = columns.map((column) => ({
         id: column.id,
         title: column.title,
-        leads: transformedLeads.filter(
-          (lead) => lead.columnId=== column.id,
-        ),
+        leads: transformedLeads.filter((lead) => lead.columnId === column.id),
       }));
 
       console.log("Current user:", currentUser);
@@ -484,6 +485,7 @@ export default function Pipelines({
                     style={{ maxHeight: "70vh" }}
                   >
                     {item.leads.map((lead, leadIndex) => {
+                      console.log("🚀 ~ {item.leads.map ~ lead:", lead);
                       const key = `${categoryIndex}-${leadIndex}`;
 
                       const isDropdownOpen =
@@ -671,12 +673,12 @@ export default function Pipelines({
                                       View Work Order
                                     </span>
                                   </Link>
-                                  <Link href="/" className="group relative">
-                                    <CiCalendar size={18} />
-                                    <span className="invisible absolute bottom-full left-16 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
-                                      Create Appointment
-                                    </span>
-                                  </Link>
+                                  {lead?.clientId && (
+                                    <NewAppointment_Pipeline
+                                      clientId={lead.clientId}
+                                      // vehicleId={lead?.vehicleId}
+                                    />
+                                  )}
                                 </div>
                                 <div className="group relative">
                                   <TaskForm
