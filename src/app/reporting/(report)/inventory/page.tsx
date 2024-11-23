@@ -12,6 +12,7 @@ import moment from "moment";
 import CalculationContainer from "./CalculationContainer";
 import { Suspense } from "react";
 import InventoryTableRow from "./InventoryTableRow";
+import FilterHeader from "./FilterHeader";
 type TProps = {
   searchParams: {
     category?: string;
@@ -54,10 +55,7 @@ const filterMultipleSliders: TSliderData[] = [
   },
 ];
 
-const ProductType = {
-  supply: "Supply",
-  product: "Product",
-};
+
 
 export default async function InventoryReportPage({ searchParams }: TProps) {
   const filterOR = [];
@@ -105,31 +103,7 @@ export default async function InventoryReportPage({ searchParams }: TProps) {
         <CalculationContainer />
       </Suspense>
       {/* filter section */}
-      <div className="flex w-full items-center justify-between gap-x-3">
-        <div className="flex flex-1 items-center space-x-4">
-          <FilterBySearchBox searchText={searchParams.search as string} />
-          <FilterByDateRange
-            startDate={decodeURIComponent(searchParams.startDate as string)}
-            endDate={decodeURIComponent(searchParams.endDate as string)}
-          />
-        </div>
-        <div className="flex items-center space-x-4">
-          <FilterByMultiple
-            searchParamsValue={searchParams}
-            filterSliders={filterMultipleSliders}
-          />
-          <FilterBySelection
-            selectedItem={searchParams?.category as string}
-            items={Object.values(ProductType)}
-            type="category"
-          />
-          <FilterBySelection
-            selectedItem={searchParams?.service as string}
-            items={["washing", "changing wheel", "full service"]}
-            type="service"
-          />
-        </div>
-      </div>
+      <FilterHeader searchParams={searchParams} filterMultipleSliders={filterMultipleSliders} />
       {/* Table */}
       <div>
         <table className="w-full shadow-md">

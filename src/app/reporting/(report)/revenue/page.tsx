@@ -9,6 +9,7 @@ import { db } from "@/lib/db";
 import RevenueTableRow from "./RevenueTableRow";
 import moment from "moment";
 import { Prisma } from "@prisma/client";
+import FilterHeader from "./FilterHeader";
 
 type TProps = {
   searchParams: {
@@ -23,7 +24,7 @@ type TProps = {
   };
 };
 
-type TSliderData = {
+export type TSliderData = {
   id: number;
   min: number;
   max: number;
@@ -288,31 +289,12 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
         <Calculation content="REVENUE" amount={totalFilteredProfit} />
       </div>
       {/* filter section */}
-      <div className="flex w-full items-center justify-between gap-x-3">
-        <div className="flex flex-1 items-center space-x-4">
-          <FilterBySearchBox searchText={searchParams.search as string} />
-          <FilterByDateRange
-            startDate={decodeURIComponent(searchParams.startDate as string)}
-            endDate={decodeURIComponent(searchParams.endDate as string)}
-          />
-        </div>
-        <div className="flex items-center space-x-4">
-          <FilterByMultiple
-            searchParamsValue={searchParams}
-            filterSliders={filterMultipleSliders}
-          />
-          <FilterBySelection
-            selectedItem={searchParams?.category as string}
-            items={getCategory}
-            type="category"
-          />
-          <FilterBySelection
-            selectedItem={searchParams?.service as string}
-            items={getService}
-            type="service"
-          />
-        </div>
-      </div>
+      <FilterHeader
+        searchParams={searchParams}
+        filterMultipleSliders={filterMultipleSliders}
+        getCategory={getCategory}
+        getService={getService}
+      />
       {/* table */}
       <div>
         <table className="w-full shadow-md">
