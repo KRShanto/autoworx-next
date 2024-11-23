@@ -1,12 +1,12 @@
 "use client";
 import { cn } from "@/lib/cn";
-import { Appointment, Invoice, Status, Vehicle } from "@prisma/client";
+import { Appointment, Column, Invoice, Status, Vehicle } from "@prisma/client";
 import Link from "next/link";
 
 const OrderList = ({
   vehicle,
 }: {
-  vehicle: Vehicle & { invoices: (Invoice & { status: Status })[] };
+  vehicle: Vehicle & { invoices: (Invoice & { column: Column })[] };
 }) => {
   return (
     <div className="app-shadow h-full w-full rounded-lg bg-white p-4">
@@ -40,7 +40,15 @@ const OrderList = ({
                   {invoice.grandTotal as any}
                 </td>
                 <td className="px-4 py-2 text-left 2xl:px-10">
-                  {invoice.status?.name}
+                  <p
+                    style={{
+                      color: invoice.column.textColor!,
+                      backgroundColor: invoice.column.bgColor!,
+                    }}
+                    className="w-fit rounded-md px-2 py-1"
+                  >
+                    {invoice.column.title}
+                  </p>
                 </td>
               </tr>
             ))}
