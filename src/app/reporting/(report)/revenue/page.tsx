@@ -97,14 +97,6 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
               }
             : undefined,
       },
-      client: {
-        OR: searchParams.search
-          ? [
-              { firstName: { contains: searchParams.search?.trim() } },
-              { lastName: { contains: searchParams.search?.trim() } },
-            ]
-          : undefined,
-      },
       OR: filterOR.length > 0 ? filterOR : undefined,
     },
     include: {
@@ -144,17 +136,33 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
     categoriesPromise,
   ]);
 
+  const filteredInvoices =
+    searchParams?.search && invoices
+      ? invoices.filter((invoice) => {
+          if (!invoice.client && !invoice.id) {
+            return false;
+          }
+          const fullName = `${invoice?.client!.firstName} ${invoice?.client?.lastName}`;
+          return (
+            fullName
+              .toLowerCase()
+              .includes(searchParams?.search?.trim()?.toLowerCase() || "") ||
+            invoice.id.toString().includes(searchParams?.search?.trim() || "")
+          );
+        })
+      : invoices;
+
   const getService = services.map((service) => service.name);
   const getCategory = categories.map((category) => category.name);
 
   const maxPrice = Math.max(
-    ...invoices.map((invoice) => Number(invoice.grandTotal)),
+    ...filteredInvoices.map((invoice) => Number(invoice.grandTotal)),
   );
 
   let maxCost = 0;
   let maxProfit = 0;
 
-  const filteredInvoice = invoices.filter((invoice) => {
+  const filteredInvoice = filteredInvoices.filter((invoice) => {
     const { costPrice, profitPrice } = invoice.invoiceItems.reduce(
       (
         acc,

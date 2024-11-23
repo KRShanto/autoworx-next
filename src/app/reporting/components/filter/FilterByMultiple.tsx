@@ -132,6 +132,7 @@ export default function FilterByMultiple({
         <div ref={dropdownRef} className="absolute top-10 space-y-3 rounded-md border border-black bg-white p-4 shadow-lg hover:z-10">
           {range.map((slider) => (
             <SliderRange
+              
               key={slider.id}
               onValueChange={(value) => handleValueChange(slider.type, value)}
               min={slider.min}

@@ -33,11 +33,11 @@ export default function SliderRange({
             <Slider.Range className="absolute h-full rounded-full bg-[#66738C]" />
           </Slider.Track>
           <Slider.Thumb
-            className="block h-3 w-3 rounded-[10px] bg-white shadow-[0_2px_10px] focus:outline-none"
+            className="block h-3 w-3 cursor-pointer rounded-[10px] bg-white shadow-[0_2px_10px] focus:outline-none"
             aria-label="Volume"
           />
           <Slider.Thumb
-            className="block h-3 w-3 rounded-[10px] bg-white shadow-[0_2px_10px] focus:outline-none"
+            className="block h-3 w-3 cursor-pointer rounded-[10px] bg-white shadow-[0_2px_10px] focus:outline-none"
             aria-label="Volume2"
           />
         </Slider.Root>
