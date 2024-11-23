@@ -16,8 +16,8 @@ export default function EmployeeInformation({
   return (
     <div className="my-8 flex w-full justify-between gap-5 px-4">
       <div className="relative flex w-full items-center rounded border border-gray-300 bg-white p-3 pt-10">
-        <div className="absolute right-3 top-3">
-          <EditEmployee employee={employee} />
+        <div className="absolute left-3 top-1">
+          <EditEmployee employee={employee} settingIcon />
         </div>
         <div className="mr-3 flex flex-col items-center">
           <Avatar photo={employee.image} width={100} height={100} />
