@@ -5,7 +5,6 @@ import ManagePipelines from "./ManagePipelines";
 import { useRouter } from "next/navigation";
 import { EmployeeType } from "@prisma/client";
 import SessionUserType from "@/types/sessionUserType";
-
 interface UserTypes {
   id: number;
   email: string;
@@ -44,16 +43,10 @@ export default function Header({
   const router = useRouter();
 
   const [isPipelineManaged, setPipelineManaged] = useState(false);
-  const [currentColumns, setCurrentColumns] = useState<Column[]>(columns);
 
   const handleSaveColumns = (updatedColumns: Column[]) => {
-    setCurrentColumns(updatedColumns);
     onColumnsUpdate({ columns: updatedColumns });
   };
-
-  useEffect(() => {
-    setCurrentColumns(columns);
-  }, [columns]);
 
   const onToggleView = (view: string) => {
     router.push(`?view=${view}`);
@@ -100,7 +93,7 @@ export default function Header({
 
       {isPipelineManaged && (
         <ManagePipelines
-          columns={currentColumns}
+          columns={columns}
           onSave={handleSaveColumns}
           onClose={() => setPipelineManaged(false)}
           pipelineType={type}
