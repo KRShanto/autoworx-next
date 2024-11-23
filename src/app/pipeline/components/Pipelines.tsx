@@ -15,6 +15,7 @@ import { useServerGet } from "@/hooks/useServerGet";
 import SessionUserType from "@/types/sessionUserType";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { EmployeeType, Prisma, Tag, Task, User } from "@prisma/client";
+import Image from "next/image";
 import Link from "next/link";
 import { SetStateAction, useEffect, useState } from "react";
 import { CiCalendar } from "react-icons/ci";
@@ -26,7 +27,6 @@ import { EmployeeTagSelector } from "./EmployeeTagSelector";
 import { NewAppointment_Pipeline } from "./NewAppointment_Pipeline";
 import ServiceSelector from "./ServiceSelector";
 import TaskForm from "./TaskForm";
-import Image from "next/image";
 //dummy services
 
 //interfaces
@@ -43,6 +43,7 @@ interface Lead {
   phone: string;
   clientId: number | null;
   vehicle: string;
+  vehicleId: number | null;
   services: {
     completed: string[];
     incomplete: string[];
@@ -176,6 +177,7 @@ export default function Pipelines({
           clientId: invoice.clientId,
           vehicle:
             `${invoice.vehicle?.year ?? ""} ${invoice.vehicle?.make ?? ""} ${invoice.vehicle?.model ?? ""}`.trim(),
+          vehicleId: invoice.vehicleId,
           workOrderStatus: invoice.workOrderStatus ?? "Pending",
           services: {
             completed: completedServices,
@@ -669,10 +671,10 @@ export default function Pipelines({
                                       View Work Order
                                     </span>
                                   </Link>
-                                  {lead?.clientId && (
+                                  {lead?.clientId && lead?.vehicleId && (
                                     <NewAppointment_Pipeline
                                       clientId={lead.clientId}
-                                      // vehicleId={lead?.vehicleId}
+                                      vehicleId={lead?.vehicleId}
                                     />
                                   )}
                                 </div>
