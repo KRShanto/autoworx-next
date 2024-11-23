@@ -16,16 +16,18 @@ type TProps = {
     service?: string;
   };
   filterMultipleSliders: TSliderData[];
+  getCategory: string[];
 };
 
-const ProductType = {
-  supply: "Supply",
-  product: "Product",
-};
+// const ProductType = {
+//   supply: "Supply",
+//   product: "Product",
+// };
 
 export default function FilterHeader({
   searchParams,
   filterMultipleSliders,
+  getCategory,
 }: TProps) {
   const [activeModal, setActiveModal] = useState({
     dateRange: false,
@@ -79,14 +81,14 @@ export default function FilterHeader({
         />
         <FilterBySelection
           selectedItem={searchParams?.category as string}
-          items={Object.values(ProductType)}
+          items={getCategory}
           type="category"
           activeModal={activeModal}
           closeModal={closeModal}
           modalName="category"
           toggleModal={toggleModal}
         />
-        <FilterBySelection
+        {/* <FilterBySelection
           selectedItem={searchParams?.service as string}
           items={["washing", "changing wheel", "full service"]}
           type="service"
@@ -94,7 +96,7 @@ export default function FilterHeader({
           closeModal={closeModal}
           modalName="service"
           toggleModal={toggleModal}
-        />
+        /> */}
       </div>
     </div>
   );

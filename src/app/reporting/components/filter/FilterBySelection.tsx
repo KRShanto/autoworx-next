@@ -85,7 +85,7 @@ export default function FilterBySelection({
             <button
               onClick={() => handleSelection(item)}
               key={item}
-              className={`text-md flex items-center gap-2 hover:text-blue-600 ${
+              className={`text-md flex items-center gap-2 text-start hover:text-blue-600 ${
                 item === selectedItem ? "text-blue-600" : "text-gray-400"
               }`}
             >
