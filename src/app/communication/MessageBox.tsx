@@ -27,7 +27,7 @@ export default function MessageBox({
   setMessages,
   fromGroup,
   group,
-  setGroupsList
+  setGroupsList,
 }: {
   user?: User; // TODO: type this
   setUsersList?: React.Dispatch<React.SetStateAction<any[]>>;
@@ -304,6 +304,7 @@ export default function MessageBox({
           return (
             <Message
               key={index}
+              fromGroup={fromGroup}
               message={message}
               onDownload={handleDownload}
             />

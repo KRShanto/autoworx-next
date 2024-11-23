@@ -10,9 +10,10 @@ import Link from "next/link";
 
 type TProps = {
   message: TMessage;
+  fromGroup: boolean | undefined;
   onDownload: (attachment: string) => void;
 };
-export default function Message({ message, onDownload }: TProps) {
+export default function Message({ message, fromGroup, onDownload }: TProps) {
   const [senderInfo, setSenderInfo] = useState<User | null>(null);
   useEffect(() => {
     if (message.userId) {
@@ -32,13 +33,12 @@ export default function Message({ message, onDownload }: TProps) {
       )}
     >
       <div className="flex items-start gap-2 p-1">
-        {message.sender === "CLIENT" &&
-          (message?.attachment || message?.requestEstimate) && (
-            <div>
-              <Avatar photo={senderInfo?.image} width={40} height={40} />
-              <p className="text-center text-[10px]">{senderInfo?.firstName}</p>
-            </div>
-          )}
+        {message.sender === "CLIENT" && fromGroup && (
+          <div>
+            <Avatar photo={senderInfo?.image} width={40} height={40} />
+            <p className="text-center text-[10px]">{senderInfo?.firstName}</p>
+          </div>
+        )}
         <div
           className={cn(
             "flex flex-col space-y-3",
@@ -69,9 +69,9 @@ export default function Message({ message, onDownload }: TProps) {
                 <Image
                   src={`/api/images/${message.attachment.fileUrl}`}
                   alt=""
-                  className="rounded-sm"
-                  width={300}
-                  height={300}
+                  className="aspect-auto rounded-sm border"
+                  width={200}
+                  height={200}
                 />
               ) : (
                 <div className="min-h-16 space-y-1 rounded-md bg-[#006D77] px-5 py-2 text-white">
