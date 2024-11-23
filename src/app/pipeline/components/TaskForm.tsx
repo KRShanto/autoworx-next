@@ -37,6 +37,7 @@ export default function TaskForm({
   const [priority, setPriority] = useState<Priority>("Low");
   const [time, setTime] = useState<{ startTime: string; endTime: string }>();
   const [tasks, setTasks] = useState<Task[]>(previousTasks);
+  const [date, setDate] = useState<string>("");
 
   const handleSave = async () => {
     // save task
@@ -48,6 +49,8 @@ export default function TaskForm({
       startTime: time?.startTime,
       endTime: time?.endTime,
       invoiceId,
+      date: date ? new Date(date).toISOString() : undefined,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
 
     if (res.type === "success") {
@@ -138,15 +141,26 @@ export default function TaskForm({
           </div>
 
           <div id="timer-parent" className="mb-4 flex flex-col">
-            <label htmlFor="time">Time</label>
-            <TimePicker.RangePicker
-              id="time"
-              onChange={onChange}
-              getPopupContainer={() => document.getElementById("timer-parent")!}
-              use12Hours
-              format="h:mm a"
-              className="mt-2 rounded-md border-2 border-gray-500 p-1 placeholder-slate-800"
-            />
+          <label htmlFor="time">Time</label>
+            <div className="flex items-center space-x-2">
+              <input
+                id="time"
+                onChange={(e) => setDate(e.target.value)}
+                className="mt-2 w-full rounded-md border-2 border-gray-500 p-0.5 placeholder-slate-800"
+                type="date"
+              />
+              <TimePicker.RangePicker
+                id="time"
+                onChange={onChange}
+                getPopupContainer={() =>
+                  document.getElementById("timer-parent")!
+                }
+                use12Hours
+                format="h:mm a"
+                className="mt-2 w-full rounded-md border-2 border-gray-500 p-1 placeholder-slate-800"
+                needConfirm={false}
+              />
+            </div>
           </div>
 
           <div className="mb-4 flex flex-col">

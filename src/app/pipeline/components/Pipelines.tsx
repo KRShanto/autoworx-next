@@ -18,10 +18,12 @@ import { SetStateAction, useEffect, useState } from "react";
 import { CiCalendar } from "react-icons/ci";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { PiWechatLogoLight } from "react-icons/pi";
+import { TbInvoice } from "react-icons/tb";
 import { EmployeeSelector } from "./EmployeeSelector";
 import { EmployeeTagSelector } from "./EmployeeTagSelector";
 import ServiceSelector from "./ServiceSelector";
 import TaskForm from "./TaskForm";
+import Image from "next/image";
 //dummy services
 
 //interfaces
@@ -98,7 +100,7 @@ type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
 export default function Pipelines({
   pipelinesTitle: pipelineType,
   columns,
-}: Readonly<PipelinesProps>) {
+}: PipelinesProps) {
   const [pipelineData, setPipelineData] = useState<PipelineData[]>([]);
   const [invoices, setInvoices] = useState<InvoiceWithRelations[]>([]);
 
@@ -187,9 +189,7 @@ export default function Pipelines({
       let updatedPipelineData = columns.map((column) => ({
         id: column.id,
         title: column.title,
-        leads: transformedLeads.filter(
-          (lead) => lead.columnId=== column.id,
-        ),
+        leads: transformedLeads.filter((lead) => lead.columnId === column.id),
       }));
 
       console.log("Current user:", currentUser);
@@ -570,7 +570,7 @@ export default function Pipelines({
                                   >
                                     {invoiceTag.tag.name}
                                     <div
-                                      className="ml-1 text-xs text-white"
+                                      className="ml-1 cursor-pointer text-xs text-white"
                                       onClick={() =>
                                         handleTagRemove(
                                           categoryIndex,
@@ -660,13 +660,7 @@ export default function Pipelines({
                                     href={`/estimate/view/${lead.invoiceId}`}
                                     className="group relative"
                                   >
-                                    <img
-                                      src="/icons/invoice.png"
-                                      alt=""
-                                      width={12}
-                                      height={12}
-                                      style={{ marginBottom: "0px" }}
-                                    />
+                                    <TbInvoice size={18} />
                                     <span className="invisible absolute bottom-full left-14 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
                                       View Work Order
                                     </span>

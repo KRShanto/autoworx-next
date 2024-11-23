@@ -5,6 +5,7 @@ import Filter from "./Filter";
 import { useServerGet } from "@/hooks/useServerGet";
 import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
 import { useEstimateFilterStore } from "@/stores/estimate-filter";
+import { usePipelineFilterStore } from "@/stores/PipelineFilterStore";
 
 type Props = {
   type: string;
@@ -13,17 +14,33 @@ type Props = {
 const WorkOrders = ({ type }: Props) => {
   const { data: invoices } = useServerGet(getWorkOrders);
   const { search } = useEstimateFilterStore();
+  const { dateRange, status, service } = usePipelineFilterStore();
 
-  const filteredInvoices = invoices?.filter(
-    (invoice) =>
+  const filteredInvoices = invoices?.filter((invoice) => {
+    const matchesSearch =
       invoice.client?.firstName.toLowerCase().includes(search.toLowerCase()) ||
       invoice.client?.lastName?.toLowerCase().includes(search.toLowerCase()) ||
       invoice.vehicle?.make?.toLowerCase().includes(search.toLowerCase()) ||
       invoice.vehicle?.model?.toLowerCase().includes(search.toLowerCase()) ||
       invoice.invoiceItems.some((item) =>
         item.service?.name.toLowerCase().includes(search.toLowerCase()),
-      ),
-  );
+      );
+
+    const matchesStatus = status ? invoice.column?.title === status : true;
+
+    const matchesDateRange =
+      dateRange[0] && dateRange[1]
+        ? new Date(invoice.createdAt) >= dateRange[0] &&
+          new Date(invoice.createdAt) <= dateRange[1]
+        : true;
+
+    const matchesService = service
+      ? invoice.invoiceItems.some((item) => item.service?.name === service)
+      : true;
+
+    return matchesSearch && matchesStatus && matchesDateRange && matchesService;
+  });
+
   return (
     <div className="space-y-8">
       <Filter pipelineType={type} />
