@@ -32,7 +32,7 @@ const Page = (props: Props) => {
 
   useEffect(() => {
     const fetchShopColumns = async () => {
-      const columns = await getColumnsByType("shop");
+      const columns = await getColumnsByType(columnType);
       setPipelineColumns(columns);
     };
 

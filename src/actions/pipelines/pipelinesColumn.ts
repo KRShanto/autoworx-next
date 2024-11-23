@@ -3,6 +3,7 @@ import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { defaultColumnWithColor } from "@/lib/defaultColumns";
 import { AuthSession } from "@/types/auth";
+import { revalidatePath } from "next/cache";
 
 const insertDefaultColumns = async (type: string) => {
   const session = (await auth()) as AuthSession;
@@ -79,10 +80,12 @@ export const updateColumn = async (
   textColor?: string,
   bgColor?: string,
 ) => {
-  return await db.column.update({
+   await db.column.update({
     where: { id },
     data: { title, type, order, textColor, bgColor },
+    
   });
+  revalidatePath("/pipeline/shop");
 };
 
 // Delete a column

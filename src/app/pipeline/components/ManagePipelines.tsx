@@ -12,6 +12,7 @@ import {
 } from "@/actions/pipelines/pipelinesColumn";
 import { toast } from "react-hot-toast";
 import { INVOICE_COLORS } from "@/lib/consts";
+import { useRouter } from "next/navigation";
 interface Column {
   id: number | null;
   title: string;
@@ -28,10 +29,6 @@ interface ManagePipelinesModalProps {
   onClose: () => void;
   pipelineType: string;
 }
-const getRandomColor = () => {
-  const randomIndex = Math.floor(Math.random() * INVOICE_COLORS.length);
-  return INVOICE_COLORS[randomIndex];
-};
 
 const ItemType = "COLUMN";
 
@@ -56,6 +53,7 @@ export default function ManagePipelines({
   );
   const [deletedColumns, setDeletedColumns] = useState<Column[]>([]);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     if (localColumns.length > columns.length) {
@@ -171,6 +169,8 @@ export default function ManagePipelines({
 
     onSave(localColumns);
     onClose();
+    //hard reload
+    window.location.reload();
   };
 
   const saveColumnsOrderToBackend = async (updatedColumns: Column[]) => {
@@ -189,8 +189,14 @@ export default function ManagePipelines({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div className="w-180 rounded-lg bg-white p-6">
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+        onClick={onClose}
+      >
+        <div
+          className="w-180 rounded-lg bg-white p-6"
+          onClick={(e) => e.stopPropagation()}
+        >
           <h2 className="mb-4 text-lg font-semibold">Edit Pipeline</h2>
           <div className="flex flex-col items-center justify-center">
             {localColumns.map((column, index) => (
