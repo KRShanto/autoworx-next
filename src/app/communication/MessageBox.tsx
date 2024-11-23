@@ -45,8 +45,13 @@ export default function MessageBox({
   const [openSettings, setOpenSettings] = useState(false);
   const { data: session } = useSession();
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [multiAttachmentFile, setMultiAttachmentFile] = useState<File[] | null>(
+    null,
+  );
   const [showAttachment, setShowAttachment] = useState(false);
   const pathname = usePathname();
+
+  console.log({ multiAttachmentFile });
 
   const isEstimateAttachmentShow = pathname.includes(
     "/communication/collaboration",
@@ -66,9 +71,11 @@ export default function MessageBox({
 
       let attachmentFileUrl = null;
 
-      if (attachmentFile) {
+      if (multiAttachmentFile && multiAttachmentFile?.length > 0) {
         const formData = new FormData();
-        formData.append("photos", attachmentFile);
+        multiAttachmentFile.forEach((photo) => {
+          formData.append("photos", photo);
+        });
         const uploadRes = await fetch("/api/upload", {
           method: "POST",
           body: formData,
@@ -80,7 +87,7 @@ export default function MessageBox({
         }
 
         const json = await uploadRes.json();
-        attachmentFileUrl = json.data[0];
+        attachmentFileUrl = json.data;
       }
 
       const res = await fetch("/api/pusher", {
@@ -92,29 +99,34 @@ export default function MessageBox({
           to: fromGroup ? group?.id : receiverUser?.id,
           type: fromGroup ? sendType.Group : sendType.User,
           message,
-          attachmentFile: attachmentFile
-            ? {
-                fileName: attachmentFile?.name,
-                fileType: attachmentFile?.type,
-                fileUrl: attachmentFileUrl,
-                fileSize: attachmentFile?.size,
-              }
-            : null,
+          attachmentFiles:
+            attachmentFileUrl && attachmentFileUrl.length > 0
+              ? (attachmentFileUrl as string[]).map((fileUrl, urlIndex) => {
+                  const findFileIntoMultiFile = multiAttachmentFile?.find(
+                    (_, fileIndex) => fileIndex === urlIndex,
+                  );
+                  return {
+                    fileName: findFileIntoMultiFile?.name,
+                    fileType: findFileIntoMultiFile?.type,
+                    fileUrl: fileUrl,
+                    fileSize: findFileIntoMultiFile?.size,
+                  };
+                })
+              : null,
         }),
       });
 
       const json = await res.json();
-
       if (json.success) {
         const newMessage: TMessage = {
           // userId: parseInt(session?.user?.id!),
           message,
           sender: "USER",
-          attachment: json.attachment,
+          attachment: json.attachments,
         };
         setMessages((messages) => [...messages, newMessage]);
         setMessage("");
-        setAttachmentFile(null);
+        setMultiAttachmentFile(null);
       } else {
         toast.error(json.message);
       }
@@ -169,6 +181,7 @@ export default function MessageBox({
     const file = event?.target?.files?.[0];
     setAttachmentFile(file!);
     setShowAttachment(false);
+    setMultiAttachmentFile(Array.from(event.target.files!).map((file) => file));
   };
 
   const handleDownload = async (fileUrl: string | null) => {
@@ -187,6 +200,13 @@ export default function MessageBox({
   const handleBack = () => {
     setUsersList && setUsersList([]);
     setGroupsList && setGroupsList([]);
+  };
+
+  const handleRemoveAttachment = (fileName: string) => {
+    setMultiAttachmentFile(
+      (multiFiles) =>
+        multiFiles && multiFiles?.filter((file) => file?.name !== fileName),
+    );
   };
 
   return (
@@ -313,34 +333,48 @@ export default function MessageBox({
       </div>
 
       {/* attachments */}
-      {attachmentFile && (
-        <div className="h-32 bg-[#D9D9D9]">
-          <div className="p-4">
-            <div className="relative w-fit">
-              <TiDeleteOutline
-                onClick={() => setAttachmentFile(null)}
-                className="absolute -right-2 -top-2 cursor-pointer rounded-full bg-white"
-                size={20}
-              />
-              {attachmentFile.type.includes("image") ? (
-                <Image
-                  src={URL.createObjectURL(attachmentFile)}
-                  alt=""
-                  className="rounded-sm"
-                  width={100}
-                  height={100}
-                />
-              ) : (
-                <div className="space-y-1 rounded-md bg-[#006D77] px-5 py-2 text-white">
-                  <p>{attachmentFile.name}</p>
-                  <p>
-                    file size:{" "}
-                    {(attachmentFile.size / 1024 / 1024).toPrecision(2)} MB
-                  </p>
+      {multiAttachmentFile && multiAttachmentFile.length > 0 && (
+        <div className="relative h-32 bg-[#D9D9D9]">
+          <TiDeleteOutline
+            onClick={() => setMultiAttachmentFile(null)}
+            className="absolute right-2 top-2 cursor-pointer rounded-full text-red-500"
+            size={40}
+          />
+          <div className="grid grid-cols-10 items-start space-x-3 overflow-x-auto p-4">
+            {multiAttachmentFile?.map((attachmentFile) => {
+              return (
+                <div key={attachmentFile.name}>
+                  <div key={attachmentFile.name} className="relative w-fit">
+                    <TiDeleteOutline
+                      onClick={() =>
+                        handleRemoveAttachment(attachmentFile.name)
+                      }
+                      className="absolute -right-2 -top-2 cursor-pointer rounded-full bg-white"
+                      size={20}
+                    />
+                    {attachmentFile.type.includes("image") ? (
+                      <Image
+                        src={URL.createObjectURL(attachmentFile)}
+                        alt=""
+                        className="rounded-sm"
+                        width={100}
+                        height={100}
+                      />
+                    ) : (
+                      <div className="space-y-1 rounded-md bg-[#006D77] px-5 py-2 text-white">
+                        <p>{attachmentFile.name}</p>
+                        <p>
+                          file size:{" "}
+                          {(attachmentFile.size / 1024 / 1024).toPrecision(2)}{" "}
+                          MB
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <p className="line-clamp-2 text-sm">{attachmentFile.name}</p>
                 </div>
-              )}
-            </div>
-            <p className="text-sm">{attachmentFile.name}</p>
+              );
+            })}
           </div>
         </div>
       )}
@@ -382,6 +416,7 @@ export default function MessageBox({
           alt="attachment"
         />
         <input
+          multiple
           accept="*"
           ref={attachmentRef}
           onChange={handleAttachment}

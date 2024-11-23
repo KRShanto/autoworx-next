@@ -14,6 +14,7 @@ type TProps = {
   onDownload: (attachment: string) => void;
 };
 export default function Message({ message, fromGroup, onDownload }: TProps) {
+  console.log("message", message);
   const [senderInfo, setSenderInfo] = useState<User | null>(null);
   useEffect(() => {
     if (message.userId) {
@@ -58,38 +59,45 @@ export default function Message({ message, fromGroup, onDownload }: TProps) {
             </p>
           )}
 
-          {message.attachment && (
-            <div
-              className={cn(
-                "flex items-center justify-center",
-                message.sender === "CLIENT" ? "flex-row" : "flex-row-reverse",
-              )}
-            >
-              {message.attachment.fileType.includes("image") ? (
-                <Image
-                  src={`/api/images/${message.attachment.fileUrl}`}
-                  alt=""
-                  className="aspect-auto rounded-sm border"
-                  width={200}
-                  height={200}
-                />
-              ) : (
-                <div className="min-h-16 space-y-1 rounded-md bg-[#006D77] px-5 py-2 text-white">
-                  <p>{message.attachment.fileName}</p>
-                  <p>file size: {message.attachment.fileSize}</p>
-                </div>
-              )}
-              <button onClick={() => onDownload(message?.attachment?.fileUrl!)}>
-                <IoCloudDownloadOutline
-                  size={30}
+          {message.attachment &&
+            message.attachment.length > 0 &&
+            message.attachment.map((attachment) => {
+              return (
+                <div
+                  key={attachment.fileName}
                   className={cn(
-                    "cursor-pointer",
-                    message.sender === "CLIENT" ? "ml-6" : "mr-6",
+                    "flex items-center justify-center",
+                    message.sender === "CLIENT"
+                      ? "flex-row"
+                      : "flex-row-reverse",
                   )}
-                />
-              </button>
-            </div>
-          )}
+                >
+                  {attachment.fileType.includes("image") ? (
+                    <Image
+                      src={`/api/images/${attachment.fileUrl}`}
+                      alt=""
+                      className="aspect-auto rounded-sm border"
+                      width={200}
+                      height={200}
+                    />
+                  ) : (
+                    <div className="min-h-16 space-y-1 rounded-md bg-[#006D77] px-5 py-2 text-white">
+                      <p>{attachment.fileName}</p>
+                      <p>file size: {attachment.fileSize}</p>
+                    </div>
+                  )}
+                  <button onClick={() => onDownload(attachment?.fileUrl!)}>
+                    <IoCloudDownloadOutline
+                      size={30}
+                      className={cn(
+                        "cursor-pointer",
+                        message.sender === "CLIENT" ? "ml-6" : "mr-6",
+                      )}
+                    />
+                  </button>
+                </div>
+              );
+            })}
 
           {message.requestEstimate && (
             <Link
