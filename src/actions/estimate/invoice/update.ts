@@ -167,7 +167,7 @@ export async function updateInvoice(
       clientId: data.clientId,
       vehicleId: data.vehicleId,
       profit: data.grandTotal - totalCost,
-      columnId: data.columnId,
+      columnId: data.columnId ?? null,
       subtotal: data.subtotal,
       discount: data.discount,
       tax: data.tax,

@@ -20,9 +20,6 @@ const SelectComponent = ({
   onChange,
 }: SelectProps) => {
  
-
-
- 
   return (
     <div className="px-4">
       <div className="my-2">{label} : </div>

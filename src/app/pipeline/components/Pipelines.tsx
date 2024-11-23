@@ -508,7 +508,7 @@ export default function Pipelines({
                               {...provided.dragHandleProps}
                               ref={provided.innerRef}
                               key={lead.invoiceId}
-                              className="max-w-auto relative mx-1 my-1 h-fit rounded-xl border bg-white p-1"
+                              className="max-w-auto relative mx-1 my-1 h-fit animate-none rounded-xl border bg-white p-1 duration-300"
                             >
                               <div className="flex items-center justify-between">
                                 <h3 className="font-inter overflow-auto pb-2 font-semibold text-black">
