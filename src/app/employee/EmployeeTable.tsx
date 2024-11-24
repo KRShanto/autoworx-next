@@ -16,8 +16,8 @@ export default function EmployeeTable({ employees }: { employees: User[] }) {
     const filtered = employees.filter((employee) => {
       const isWithinDateRange =
         dateRange[0] && dateRange[1]
-          ? moment(employee.joinDate).isSameOrAfter(dateRange[0], "day") &&
-            moment(employee.joinDate).isSameOrBefore(dateRange[1], "day")
+          ? moment.utc(employee.joinDate).isSameOrAfter(dateRange[0], "day") &&
+            moment.utc(employee.joinDate).isSameOrBefore(dateRange[1], "day")
           : true;
 
       const isTypeMatch =
@@ -94,9 +94,9 @@ export default function EmployeeTable({ employees }: { employees: User[] }) {
                   className="block h-full w-full"
                   href={`/employee/${employee.id}`}
                 >
-                  {moment(employee.joinDate || employee.createdAt).format(
-                    "MM/DD/YYYY",
-                  )}
+                  {moment
+                    .utc(employee.joinDate || employee.createdAt)
+                    .format("MM/DD/YYYY")}
                 </Link>
               </td>
               <td className="border-b px-4 py-2 text-center">

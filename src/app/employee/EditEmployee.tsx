@@ -245,7 +245,8 @@ export default function EditEmployee({
                 rootClassName="grow"
                 type="date"
                 required={false}
-                defaultValue={moment(employee.joinDate)
+                defaultValue={moment
+                  .utc(employee.joinDate)
                   .utc()
                   .format("YYYY-MM-DD")}
               />

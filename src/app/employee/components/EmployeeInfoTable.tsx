@@ -104,11 +104,11 @@ export default function EmployeeInfoTable({
                 {row.invoice?.vehicle?.make} {row.invoice?.vehicle?.model}
               </td>
               <td className="border-b px-4 py-2 text-left">
-                {moment(Number(row.date)).format("DD.MM.YYYY")}
+                {moment.utc(Number(row.date)).format("DD.MM.YYYY")}
               </td>
               <td className="border-b px-4 py-2 text-left">
                 {row.dateClosed
-                  ? moment(Number(row.dateClosed)).format("DD.MM.YYYY")
+                  ? moment.utc(Number(row.dateClosed)).format("DD.MM.YYYY")
                   : "-"}
               </td>
               <td className="backdrop border-b px-4 py-2 text-left">
