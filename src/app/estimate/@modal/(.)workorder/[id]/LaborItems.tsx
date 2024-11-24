@@ -65,7 +65,7 @@ export default function LaborItems({
           setTechnicians={setTechnicians}
         />
 
-        {technicians.map((technician, index) => (
+        {technicians.map((technician) => (
           <button
             key={technician.id}
             className="flex items-center justify-evenly space-x-1 text-nowrap rounded-full border bg-[#6571FF] px-3 py-0.5"

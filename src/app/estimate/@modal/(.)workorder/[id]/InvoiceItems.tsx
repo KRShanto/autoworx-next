@@ -7,21 +7,33 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import LaborItems from "./LaborItems";
 import ReDoModal from "./ReDoModal";
 
-export function InvoiceItems({
-  items,
-}: {
+type TProps = {
   items: Awaited<
     ReturnType<
       typeof db.invoiceItem.findMany<{
         include: {
-          service: true;
+          service: {
+            include: {
+              Technician: {
+                include: {
+                  user: {
+                    select: {
+                      firstName: true;
+                    };
+                  };
+                };
+              };
+            };
+          };
           materials: true;
           labor: true;
         };
       }>
     >
   >;
-}) {
+};
+
+export function InvoiceItems({ items }: TProps) {
   const [openService, setOpenService] = useState<number | null>(null);
   return items.map((item) => {
     if (!item.service) return null;
@@ -32,15 +44,19 @@ export function InvoiceItems({
       >
         <div
           className={cn(
-            "flex w-full justify-between text-[#6571FF]",
+            "flex w-full cursor-pointer justify-between text-[#6571FF]",
             openService && "border-b py-2",
           )}
+          onClick={() =>
+            setOpenService(openService === item.id ? null : item.id)
+          }
         >
           <p className="px-5">{item.service.name}</p>
           <div className="mr-5 flex items-center space-x-3">
             <ReDoModal
               invoiceId={item?.invoiceId as string}
               serviceId={item?.serviceId as number}
+              technicians={item.service.Technician}
             />
             <button
               type="button"

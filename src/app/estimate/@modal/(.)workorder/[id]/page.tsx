@@ -16,7 +16,19 @@ export default async function WorkOrderPage({
       company: true,
       invoiceItems: {
         include: {
-          service: true,
+          service: {
+            include: {
+              Technician: {
+                include: {
+                  user: {
+                    select: {
+                      firstName: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
           materials: true,
           labor: true,
         },
@@ -84,8 +96,8 @@ export default async function WorkOrderPage({
               <p
                 className="max-w-32 rounded-md px-2 py-[1px] text-xs font-semibold"
                 style={{
-                  color: invoice.column?.textColor||undefined,
-                  backgroundColor: invoice.column?.bgColor||undefined,
+                  color: invoice.column?.textColor || undefined,
+                  backgroundColor: invoice.column?.bgColor || undefined,
                 }}
               >
                 {invoice.column?.title}
