@@ -2,11 +2,15 @@
 
 import NewCustomer from "@/components/Lists/NewCustomer";
 import { useClientFilterStore } from "@/stores/clientFilter";
-import React from "react";
+import React, { useEffect } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 
 export default function Header() {
   const { setFilter } = useClientFilterStore();
+
+  useEffect(() => {
+    setFilter({ search: "" });
+  }, []);
 
   return (
     <div className="flex items-center justify-between">

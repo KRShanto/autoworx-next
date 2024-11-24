@@ -1,6 +1,3 @@
-import React from "react";
-import PayoutCard from "./PayoutCard";
-import { EmployeeWorkInfo } from "./employeeWorkInfoType";
 import {
   calculate2ndPreviousMonthEarnings,
   calculateCurrentMonthEarnings,
@@ -8,6 +5,9 @@ import {
   calculateTotalEarnings,
   History,
 } from "@/lib/payout";
+import React from "react";
+import PayoutCard from "./PayoutCard";
+import { EmployeeWorkInfo } from "./employeeWorkInfoType";
 
 export default function Payout({ info }: { info: EmployeeWorkInfo }) {
   // get how much money the employee has made last month
@@ -21,15 +21,15 @@ export default function Payout({ info }: { info: EmployeeWorkInfo }) {
   const totalEarnings = calculateTotalEarnings(info as History[]);
 
   // Calculate the percentage change with checks
-  let previousMonthPercentageChange = "N/A";
-  let currentMonthPercentageChange = "N/A";
+  let previousMonthPercentageChange = 0;
+  let currentMonthPercentageChange = 0;
   let previousMonthIncreased = false;
   let currentMonthIncreased = false;
 
   if (secondPreviousMonthEarnings !== 0) {
     const earningsDifference =
       previousMonthEarnings - secondPreviousMonthEarnings;
-    previousMonthPercentageChange = (
+    previousMonthPercentageChange = +(
       (earningsDifference / secondPreviousMonthEarnings) *
       100
     ).toFixed(2);
@@ -38,7 +38,7 @@ export default function Payout({ info }: { info: EmployeeWorkInfo }) {
 
   if (previousMonthEarnings !== 0) {
     const earningsDifference = currentMonthEarnings - previousMonthEarnings;
-    currentMonthPercentageChange = (
+    currentMonthPercentageChange = +(
       (earningsDifference / previousMonthEarnings) *
       100
     ).toFixed(2);
@@ -50,13 +50,13 @@ export default function Payout({ info }: { info: EmployeeWorkInfo }) {
       <PayoutCard
         title="Previous Month Payout"
         amount={previousMonthEarnings}
-        percentage={`${previousMonthPercentageChange}%`}
+        percentage={previousMonthPercentageChange}
         increased={previousMonthIncreased}
       />
       <PayoutCard
         title="Current Month Payout"
         amount={currentMonthEarnings}
-        percentage={`${currentMonthPercentageChange}%`}
+        percentage={currentMonthPercentageChange}
         increased={currentMonthIncreased}
       />
       <PayoutCard title="YTD Payout" amount={totalEarnings} />
