@@ -20,13 +20,14 @@ export default function Collaboration({
   companyWithAdmin: Partial<User>[];
   companies: (Company & { users: User[] })[];
   currentUser: NextAuthUser;
-  messages: (DbMessage & { attachment: Attachment | null })[];
+  messages: (DbMessage & { attachment: Attachment[] | null })[];
 }) {
   const [selectedUsersList, setSelectedUsersList] = useState<User[]>([]);
   const [companyAdmins, setCompanyAdmins] = useState(companyWithAdmin);
   return (
     <div className="mt-5 flex gap-5">
       <List
+        selectedUsersList={selectedUsersList}
         companyAdmins={companyAdmins}
         setCompanyAdmins={setCompanyAdmins}
         companies={companies}

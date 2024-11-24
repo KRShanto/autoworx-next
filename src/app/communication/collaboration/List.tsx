@@ -2,18 +2,23 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { Company, User } from "@prisma/client";
 import SearchCollaborationModal from "./SearchCollaborationModal";
+import { cn } from "@/lib/cn";
 
-export default function List({
-  companyAdmins,
-  setSelectedUsersList,
-  companies,
-  setCompanyAdmins,
-}: {
+type TProps = {
   companyAdmins: Partial<User>[];
   setCompanyAdmins: React.Dispatch<React.SetStateAction<Partial<User>[]>>;
   setSelectedUsersList: React.Dispatch<React.SetStateAction<any[]>>;
   companies: (Company & { users: User[] })[];
-}) {
+  selectedUsersList: User[];
+};
+
+export default function List({
+  selectedUsersList,
+  companyAdmins,
+  setSelectedUsersList,
+  companies,
+  setCompanyAdmins,
+}: TProps) {
   const [selectedCompany, setSelectedCompany] = useState<any>(null); // TODO: type this
   const [searchTerm, setSearchTerm] = useState("");
   return (
@@ -90,13 +95,20 @@ export default function List({
 
                   <div className="flex flex-col items-center gap-1">
                     {company.users.map((user: User) => {
+                      const isSelectedUser = !!selectedUsersList.find(
+                        (u) => u.id === user.id,
+                      );
                       return (
                         <button
                           key={user.id}
-                          className="flex min-h-[61px] w-full items-center gap-2 rounded-md bg-[#F2F2F2] p-1"
+                          className={cn(
+                            "flex min-h-[61px] w-full items-center gap-2 rounded-md bg-[#F2F2F2] p-1 hover:bg-gray-300",
+                            isSelectedUser && "bg-[#2C2C54] hover:bg-stone-400",
+                          )}
                           onClick={() => {
                             // add this user to the list (if not already in it)
                             setSelectedUsersList((usersList) => {
+                              if (usersList.length >= 4) return usersList;
                               if (usersList.find((u) => u.id === user.id)) {
                                 return usersList;
                               }
@@ -119,7 +131,12 @@ export default function List({
                             className="rounded-full max-[1400px]:h-[40px] max-[1400px]:w-[40px]"
                           />
                           <div className="flex flex-col">
-                            <p className="text-[12px] font-bold text-[#797979]">
+                            <p
+                              className={cn(
+                                "text-[12px] font-bold text-[#797979]",
+                                isSelectedUser && "text-white",
+                              )}
+                            >
                               {user.firstName} {user.lastName}
                             </p>
                           </div>

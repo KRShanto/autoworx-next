@@ -9,7 +9,7 @@ export default function UsersArea({
   setSelectedUsersList,
   totalMessageBoxLength,
 }: {
-  previousMessages: (Message & { attachment: Attachment | null })[];
+  previousMessages: (Message & { attachment: Attachment[] | null })[];
   currentUser: NextAuthUser;
   selectedUsersList: any[];
   setSelectedUsersList: React.Dispatch<React.SetStateAction<any[]>>;
