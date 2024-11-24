@@ -8,6 +8,7 @@ model Company {
     businessId              String?                   @map("business_id")
     businessType            String?                   @map("business_type")
     phone                   String?
+    email                   String?
     industry                String?
     website                 String?
     address                 String?

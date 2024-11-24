@@ -35,6 +35,7 @@ export default function BusinessForm({ company }: TProps) {
     businessType: company.businessType || "",
     businessPhone: company.phone || "",
     industrySpecialization: company.industry || "",
+    businessEmail: company.email ?? "",
     businessWebsite: company.website || "",
     companyAddress: company.address || "",
     city: company.city || "",
@@ -85,6 +86,7 @@ export default function BusinessForm({ company }: TProps) {
         businessId: businessSettings.businessRegistrationIDNumber,
         businessType: businessSettings.businessType,
         phone: businessSettings.businessPhone,
+        email: businessSettings.businessEmail,
         industry: businessSettings.industrySpecialization,
         website: businessSettings.businessWebsite,
         address: businessSettings.companyAddress,
@@ -148,7 +150,7 @@ export default function BusinessForm({ company }: TProps) {
             type="number"
           />
         </div>
-        {/* industry and website */}
+        {/* industry and email */}
         <div className="grid grid-cols-2 gap-x-8">
           <SlimInput
             required={false}
@@ -157,6 +159,15 @@ export default function BusinessForm({ company }: TProps) {
             label="Industry/Specialization"
             name="industrySpecialization"
           />
+          <SlimInput
+            required={false}
+            value={businessSettings.businessEmail}
+            onChange={handleChange}
+            label="Business Email*"
+            name="businessEmail"
+          />
+        </div>
+        <div className="grid grid-cols-1">
           <SlimInput
             required={false}
             value={businessSettings.businessWebsite}
