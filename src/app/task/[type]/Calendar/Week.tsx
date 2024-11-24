@@ -35,7 +35,7 @@ import DraggableTaskTooltip from "../components/day/draggable/DraggableTaskToolt
 
 function useWeek() {
   const searchParams = useSearchParams();
-  const week = moment(searchParams.get("week"), moment.HTML5_FMT.WEEK);
+  const week = moment.utc(searchParams.get("week"), moment.HTML5_FMT.WEEK);
   return week.isValid() ? week : moment();
 }
 
@@ -220,11 +220,11 @@ export default function Week({
       })),
     ]
       .filter((task) => {
-        const taskDate = moment(task.date as any);
+        const taskDate = moment.utc(task.date as any);
         return taskDate.isBetween(startOfWeek, endOfWeek, "day", "[]");
       })
       .map((event) => {
-        const taskDate = moment(event.date as any);
+        const taskDate = moment.utc(event.date as any);
         const taskDayName = taskDate.format("dddd");
         const weekStartDayName = startOfWeek.format("dddd");
         const findTaskDayIndex = days.findIndex(

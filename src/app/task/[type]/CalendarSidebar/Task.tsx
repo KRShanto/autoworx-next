@@ -30,7 +30,7 @@ export default function TaskComponent({ task }: { task: Task }) {
   };
 
   const existingDate = task?.date
-    ? moment(task?.date).format("YYYY-MM-DD")
+    ? moment.utc(task?.date).format("YYYY-MM-DD")
     : queryDate.format("YYYY-MM-DD");
 
   const handleDragEnd = () => {
