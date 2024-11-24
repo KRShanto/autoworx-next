@@ -12,9 +12,14 @@ type TProps = {
   message: TMessage;
   fromGroup: boolean | undefined;
   onDownload: (attachment: string) => void;
+  setIsImageLoaded: React.Dispatch<React.SetStateAction<boolean>>;
 };
-export default function Message({ message, fromGroup, onDownload }: TProps) {
-  console.log("message", message);
+export default function Message({
+  message,
+  fromGroup,
+  onDownload,
+  setIsImageLoaded,
+}: TProps) {
   const [senderInfo, setSenderInfo] = useState<User | null>(null);
   useEffect(() => {
     if (message.userId) {
@@ -46,22 +51,14 @@ export default function Message({ message, fromGroup, onDownload }: TProps) {
             message.sender === "CLIENT" ? "items-start" : "items-end",
           )}
         >
-          {message.message && (
-            <p
-              className={cn(
-                "max-w-[220px] rounded-xl p-2 text-base",
-                message.sender === "CLIENT"
-                  ? "bg-[#D9D9D9] text-slate-800"
-                  : "bg-[#006D77] text-white",
-              )}
-            >
-              {message.message}
-            </p>
-          )}
-
           {message.attachment &&
             message.attachment.length > 0 &&
-            message.attachment.map((attachment) => {
+            message.attachment.map((attachment, index) => {
+              const handleLoad = () => {
+                if (message?.attachment?.length! - 1 === index) {
+                  setIsImageLoaded(true);
+                }
+              };
               return (
                 <div
                   key={attachment.fileName}
@@ -73,13 +70,18 @@ export default function Message({ message, fromGroup, onDownload }: TProps) {
                   )}
                 >
                   {attachment.fileType.includes("image") ? (
-                    <Image
-                      src={`/api/images/${attachment.fileUrl}`}
-                      alt=""
-                      className="aspect-auto rounded-sm border"
-                      width={200}
-                      height={200}
-                    />
+                    <Link href={`/communication/photo/${attachment.fileUrl}`}>
+                      <Image
+                        src={`/api/images/${attachment.fileUrl}`}
+                        alt=""
+                        // placeholder="blur"
+                        // blurDataURL=""
+                        className="aspect-auto cursor-pointer rounded-sm border"
+                        onLoad={handleLoad}
+                        width={200}
+                        height={200}
+                      />
+                    </Link>
                   ) : (
                     <div className="min-h-16 space-y-1 rounded-md bg-[#006D77] px-5 py-2 text-white">
                       <p>{attachment.fileName}</p>
@@ -98,6 +100,19 @@ export default function Message({ message, fromGroup, onDownload }: TProps) {
                 </div>
               );
             })}
+
+          {message.message && (
+            <p
+              className={cn(
+                "max-w-[220px] rounded-xl p-2 text-base",
+                message.sender === "CLIENT"
+                  ? "bg-[#D9D9D9] text-slate-800"
+                  : "bg-[#006D77] text-white",
+              )}
+            >
+              {message.message}
+            </p>
+          )}
 
           {message.requestEstimate && (
             <Link

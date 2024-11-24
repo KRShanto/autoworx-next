@@ -44,14 +44,13 @@ export default function MessageBox({
   const messageBoxRef = useRef<HTMLDivElement>(null);
   const [openSettings, setOpenSettings] = useState(false);
   const { data: session } = useSession();
-  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
   const [multiAttachmentFile, setMultiAttachmentFile] = useState<File[] | null>(
     null,
   );
   const [showAttachment, setShowAttachment] = useState(false);
   const pathname = usePathname();
 
-  console.log({ multiAttachmentFile });
+  const [isImageLoaded, setIsImageLoaded] = useState(false)
 
   const isEstimateAttachmentShow = pathname.includes(
     "/communication/collaboration",
@@ -61,13 +60,14 @@ export default function MessageBox({
     if (messageBoxRef.current) {
       messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
       // messageBoxRef.current.scrollIntoView({ behavior: "smooth" });
+      setIsImageLoaded(false);
     }
-  }, [messages]);
+  }, [messages, isImageLoaded]);
 
   async function handleSendMessage(e: any) {
     e.preventDefault();
     try {
-      if (!message && !attachmentFile) return;
+      if (!message && !multiAttachmentFile) return;
 
       let attachmentFileUrl = null;
 
@@ -178,10 +178,9 @@ export default function MessageBox({
   };
 
   const handleAttachment = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event?.target?.files?.[0];
-    setAttachmentFile(file!);
+    const files = Array.from(event.target.files!).map((file) => file);
     setShowAttachment(false);
-    setMultiAttachmentFile(Array.from(event.target.files!).map((file) => file));
+    setMultiAttachmentFile(files);
   };
 
   const handleDownload = async (fileUrl: string | null) => {
@@ -327,6 +326,7 @@ export default function MessageBox({
               fromGroup={fromGroup}
               message={message}
               onDownload={handleDownload}
+              setIsImageLoaded={setIsImageLoaded}
             />
           );
         })}
@@ -355,6 +355,7 @@ export default function MessageBox({
                     {attachmentFile.type.includes("image") ? (
                       <Image
                         src={URL.createObjectURL(attachmentFile)}
+                        // placeholder="blur"
                         alt=""
                         className="rounded-sm"
                         width={100}

@@ -260,13 +260,18 @@ const InvoiceComponent = ({
               </h2>
               {invoice.photos.map(async (x) => {
                 return (
-                  <div key={x.id} className="relative aspect-square">
+                  <Link
+                    href={`/estimate/photo/${x.photo}`}
+                    key={x.id}
+                    className="relative aspect-square"
+                  >
                     <Image
                       src={`/api/images/${x.photo}`}
                       alt="attachment"
                       fill
+                      className="cursor-pointer"
                     />
-                  </div>
+                  </Link>
                 );
               })}
             </div>
