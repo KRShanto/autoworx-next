@@ -3,7 +3,7 @@ import React from "react";
 interface PayoutCardProps {
   title: string;
   amount: number;
-  percentage?: string;
+  percentage?: number;
   increased?: boolean;
   customStyles?: string;
 }
@@ -11,7 +11,7 @@ interface PayoutCardProps {
 const HorizontalPayoutCard = ({
   title,
   amount,
-  percentage,
+  percentage = 0,
   increased,
   customStyles,
 }: PayoutCardProps) => {
@@ -23,15 +23,18 @@ const HorizontalPayoutCard = ({
       <div className="font-inter text-2xl font-semibold text-gray-500">
         ${amount}
       </div>
-      {percentage && (
+      {percentage != 0 && (
         <div
           className="font-inter text-sm font-semibold"
           style={{
             color: increased ? "#2DCE89" : "#F56565",
           }}
         >
-          {percentage}
+          {percentage}%
         </div>
+      )}
+      {percentage == 0 && (
+        <div className="font-inter text-4xl font-semibold">-</div>
       )}
     </div>
   );

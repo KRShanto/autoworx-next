@@ -1,13 +1,14 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import Header from "../components/Header";
-import WorkOrders from "../components/WorkOrders";
-import Pipelines from "../components/Pipelines";
 import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
-import { getCompanyUser } from "@/actions/user/getCompanyUser";
+import { useEffect, useState } from "react";
+import Header from "../components/Header";
+import Pipelines from "../components/Pipelines";
+import WorkOrders from "../components/WorkOrders";
 
+import { useServerGet } from "@/hooks/useServerGet";
 import SessionUserType from "@/types/sessionUserType";
 import { useSearchParams } from "next/navigation";
+import getDataForNewAppointment from "@/actions/pipelines/getDataForNewAppointment";
 
 type Props = {
   searchParams?: { view?: string };
@@ -25,6 +26,7 @@ const Page = (props: Props) => {
   const activeView = searchParam.get("view") ?? "workOrders";
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
   const [currentUser, setCurrentUser] = useState<SessionUserType>();
+
 
   const columnType = "shop";
 
@@ -64,7 +66,7 @@ const Page = (props: Props) => {
         currentUser={currentUser}
       />
       {activeView === "pipelines" ? (
-        <Pipelines pipelinesTitle={type} columns={pipelineColumns} />
+        <Pipelines pipelinesTitle={type} columns={pipelineColumns}  />
       ) : (
         <WorkOrders type={columnType} />
       )}

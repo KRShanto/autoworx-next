@@ -22,9 +22,17 @@ import { useFormErrorStore } from "@/stores/form-error";
 import { EmployeeType, User } from "@prisma/client";
 import moment from "moment";
 import { FaPen } from "react-icons/fa";
+import { FaPenToSquare } from "react-icons/fa6";
+import { IoMdSettings } from "react-icons/io";
 import SelectEmployeeType from "./SelectEmployeeType";
 
-export default function EditEmployee({ employee }: { employee: User }) {
+export default function EditEmployee({
+  employee,
+  settingIcon = false,
+}: {
+  employee: User;
+  settingIcon?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [employeeTypeOpen, setEmployeeTypeOpen] = useState(false);
   const [profilePic, setProfilePic] = useState<string | null>(
@@ -103,8 +111,10 @@ export default function EditEmployee({ employee }: { employee: User }) {
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <button className="text-[#6571FF]">
-            <RiEditFill />
+          <button
+            className={`${settingIcon ? "text-gray-600" : ""} text-[#6571FF]"`}
+          >
+            {settingIcon ? <IoMdSettings /> : <FaPenToSquare />}
           </button>
         </DialogTrigger>
         <DialogContent
