@@ -26,6 +26,13 @@ export default async function Page() {
       createdAt: true,
       employeeType: true,
       phone: true,
+      commission: true,
+      address: true,
+      city: true,
+      state: true,
+      zip: true,
+      companyName: true,
+      image: true,
     },
   });
 
