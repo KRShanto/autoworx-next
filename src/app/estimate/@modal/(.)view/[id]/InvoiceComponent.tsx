@@ -24,13 +24,14 @@ import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaPrint, FaRegFile, FaShare } from "react-icons/fa";
 import { FaRegShareFromSquare } from "react-icons/fa6";
 import { HiXMark } from "react-icons/hi2";
 import { useReactToPrint } from "react-to-print";
 import { InvoiceItems } from "./InvoiceItems";
 import PDFComponent from "./PDFComponent";
+import { getCompany } from "@/actions/settings/getCompany";
 
 const InvoiceComponent = ({
   id,
@@ -60,11 +61,22 @@ const InvoiceComponent = ({
     content: () => componentRef.current,
   });
 
+  const [companyDetails, setCompanyDetails] = useState<Company | null>(null);
+
   const handleEmail = () => {
     sendInvoiceEmail({ invoiceId: invoice.id });
     // close the dialog
     router.back();
   };
+
+  useEffect(() => {
+    const getCompanyDetails = async () => {
+      const companyDetailsnow = await getCompany();
+      setCompanyDetails(companyDetailsnow);
+    };
+    getCompanyDetails();
+    // console.log(companyDetails);
+  }, []);
 
   return (
     <div>
@@ -121,13 +133,26 @@ const InvoiceComponent = ({
             </div>
             <div className="flex items-center justify-between">
               <div className="flex aspect-square w-32 items-center justify-center bg-slate-500 text-center font-bold text-white">
-                Logo
+                {companyDetails?.image ? (
+                  <Image
+                    src={`/api/images/${companyDetails.image}`}
+                    alt="company logo"
+                    width={128}
+                    height={128}
+                    // className="object-contain"
+                  />
+                ) : (
+                  "Logo"
+                )}
               </div>
               <div className="text-right text-xs">
                 <h2 className="font-bold">Contact Information:</h2>
-                <p>Full Address</p>
-                <p>Mobile Number</p>
-                <p>Email</p>
+                <p>
+                  {companyDetails?.address} {companyDetails?.city}{" "}
+                  {companyDetails?.state} {companyDetails?.zip}
+                </p>
+                <p>{companyDetails?.phone}</p>
+                <p>{companyDetails?.website}</p>
               </div>
             </div>
             <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground print:hidden">

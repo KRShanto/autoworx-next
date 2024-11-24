@@ -55,10 +55,11 @@ export function SelectStatus({
   const filteredShopStatus = statusList.filter(
     (status) => status.type === "shop",
   );
-  async function handleDelete(id: number) {
+  async function handleDelete(id: number, event: React.MouseEvent) {
+    event.stopPropagation();
     const res = await deleteColumn(id);
 
-    if (res.type === "success") {
+    if (res) {
       useListsStore.setState(({ statuses }) => ({
         statuses: statuses.filter((status) => status.id !== id),
       }));
@@ -71,6 +72,7 @@ export function SelectStatus({
     // alert("outside click");
     setOpen && setOpen(false);
   });
+  const restrictedColumns = ["Pending", "In Progress", "Completed"];
   return (
     <div>
       <input type="hidden" name={name} value={status?.title ?? ""} />
@@ -135,12 +137,14 @@ export function SelectStatus({
                 }}
               >
                 {statusItem.title}
-                <button
-                  className="text-lg text-[#66738C]"
-                  onClick={() => handleDelete(statusItem.id)}
-                >
-                  <IoMdClose />
-                </button>
+                {!restrictedColumns.includes(statusItem.title) && (
+                  <button
+                    className="text-lg text-[#66738C]"
+                    onClick={(event) => handleDelete(statusItem.id, event)}
+                  >
+                    <IoMdClose />
+                  </button>
+                )}
               </div>
             ))}
           </div>

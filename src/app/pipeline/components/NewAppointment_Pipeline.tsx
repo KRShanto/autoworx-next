@@ -37,12 +37,18 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { TbBell, TbCalendar } from "react-icons/tb";
-import { addAppointment } from "../../../../../actions/appointment/addAppointment";
-import { Reminder } from "./Reminder";
+
 // @ts-ignore
+import { addAppointment } from "@/actions/appointment/addAppointment";
+import getDataForNewAppointment from "@/actions/pipelines/getDataForNewAppointment";
+import { Reminder } from "@/app/task/[type]/components/appointment/Reminder";
 import Avatar from "@/components/Avatar";
+import { SyncLists } from "@/components/SyncLists";
+import { useServerGet } from "@/hooks/useServerGet";
+import { useEstimateCreateStore } from "@/stores/estimate-create";
 import dayjs from "dayjs";
 import { usePathname, useRouter } from "next/navigation";
+import { CiCalendar } from "react-icons/ci";
 import { IoCloseSharp } from "react-icons/io5";
 
 enum Tab {
@@ -50,15 +56,27 @@ enum Tab {
   Reminder = 1,
 }
 
-export function NewAppointment({
-  settings,
-  employees,
-  templates,
+export function NewAppointment_Pipeline({
+  clientId,
+  vehicleId,
+  // settings,
+  // employees,
+  // templates,
 }: {
-  settings: CalendarSettings;
-  employees: User[];
-  templates: EmailTemplate[];
+  clientId: number;
+  vehicleId: number;
+  // settings: CalendarSettings;
+  // employees: User[];
+  // templates: EmailTemplate[];
 }) {
+  // fetching necessary data to implement New Appointment
+  const { data: newAppointmentData } = useServerGet(
+    getDataForNewAppointment,
+    clientId,
+    vehicleId,
+  );
+
+  
   const { popup, open, close } = usePopupStore();
   const { showError } = useFormErrorStore();
   const setOpen = useCallback(
@@ -78,15 +96,18 @@ export function NewAppointment({
   const [endTime, setEndTime] = useState<string | undefined>();
   const [allDay, setAllDay] = useState(false);
 
-  const [client, setClient] = useState<Client | null>(null);
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const [client, setClient] = useState<Client | null>(
+    newAppointmentData?.client ? newAppointmentData.client : null,
+  );
+  const [vehicle, setVehicle] = useState<Vehicle | null>(
+    newAppointmentData?.vehicle ? newAppointmentData.vehicle : null,
+  );
   const [draft, setDraft] = useState<string | null>(null);
   const [draftEstimates, setDraftEstimates] = useState<string[]>([]);
   const [assignedUsers, setAssignedUsers] = useState<User[]>([]);
 
   const [addSalesPersonOpen, setAddSalesPersonOpen] = useState(false);
-  const [employeesToDisplay, setEmployeesToDisplay] =
-    useState<User[]>(employees);
+  const [employeesToDisplay, setEmployeesToDisplay] = useState<User[]>();
 
   const [times, setTimes] = useState<{ time: string; date: string }[]>([]);
   const [confirmationTemplate, setConfirmationTemplate] =
@@ -111,13 +132,36 @@ export function NewAppointment({
 
   const handleSearch = (search: string) => {
     setEmployeesToDisplay(
-      employees.filter((employee) =>
+      newAppointmentData?.employees?.filter((employee: any) =>
         `${employee.firstName} ${employee.lastName}`
           .toLowerCase()
           .includes(search.toLowerCase()),
       ),
     );
   };
+
+  const { reset } = useEstimateCreateStore();
+  let data = useListsStore();
+
+  useEffect(() => {
+    useListsStore.setState({
+      ...data,
+      customers: newAppointmentData?.customers,
+      vehicles: newAppointmentData?.vehicles,
+      employees: newAppointmentData?.employees,
+      templates: newAppointmentData?.templates,
+      estimates: newAppointmentData?.estimates,
+    });
+  }, [newAppointmentData]);
+
+  useEffect(() => {
+    if (newAppointmentData?.client) {
+      setClient(newAppointmentData?.client);
+    }
+    if (newAppointmentData?.vehicle) {
+      setVehicle(newAppointmentData?.vehicle);
+    }
+  }, [newAppointmentData]);
 
   useEffect(() => {
     if (popup !== "ADD_TASK") {
@@ -133,15 +177,16 @@ export function NewAppointment({
 
   // Change start and end time based on settings
   useEffect(() => {
-    if (allDay && settings) {
-      setStartTime(settings.dayStart);
-      setEndTime(settings.dayEnd);
+    if (allDay && newAppointmentData?.settings) {
+      setStartTime(newAppointmentData?.settings.dayStart);
+      setEndTime(newAppointmentData?.settings.dayEnd);
     }
-  }, [allDay, settings]);
+  }, [allDay, newAppointmentData?.settings]);
 
   useEffect(() => {
-    if (templates) useListsStore.setState({ templates });
-  }, [templates]);
+    if (newAppointmentData?.templates)
+      useListsStore.setState({ templates: newAppointmentData?.templates });
+  }, [newAppointmentData?.templates]);
 
   useEffect(() => {
     if (estimates) {
@@ -272,14 +317,21 @@ export function NewAppointment({
     openReminder,
   ]);
   return (
-    <div className="newAppointment">
+    <>
+      {/* <SyncLists
+        customers={newAppointmentData?.customers}
+        vehicles={newAppointmentData?.vehicles}
+        employees={newAppointmentData?.employees}
+        templates={newAppointmentData?.templates}
+        estimates={newAppointmentData?.estimates}
+      /> */}
       <Dialog open={popup === "ADD_TASK"} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <button
-            type="button"
-            className="app-shadow rounded-md bg-[#6571FF] p-2 text-xs text-white sm:text-sm"
-          >
-            New Appointment
+          <button className="group relative">
+            <CiCalendar size={18} />
+            <span className="invisible absolute bottom-full left-16 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
+              Create Appointment
+            </span>
           </button>
         </DialogTrigger>
         <DialogContent
@@ -427,7 +479,7 @@ export function NewAppointment({
                   </div>
 
                   {employeesToDisplay
-                    .filter(
+                    ?.filter(
                       (employee) =>
                         !assignedUsers.includes(employee) &&
                         employee.employeeType == "Sales",
@@ -589,7 +641,7 @@ export function NewAppointment({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
 

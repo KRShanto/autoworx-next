@@ -1,13 +1,13 @@
 "use client";
 
+import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
+import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
+import { useServerGet } from "@/hooks/useServerGet";
+import { usePipelineFilterStore } from "@/stores/PipelineFilterStore";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useEffect, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import Select from "./Select";
-import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
-import { useServerGet } from "@/hooks/useServerGet";
-import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
-import { usePipelineFilterStore } from "@/stores/PipelineFilterStore";
 interface DropdownProps {
   pipelineType: string;
 }
@@ -16,7 +16,7 @@ const DropdownMenuDemo = ({ pipelineType }: DropdownProps) => {
   const [columnStatus, setColumnStatus] = useState<
     { id: number; title: string; type: string }[]
   >([]);
-  const { setFilter, status } = usePipelineFilterStore();
+  const { setFilter, status, service, dateRange } = usePipelineFilterStore();
   useEffect(() => {
     const fetchShopColumns = async () => {
       const columns = await getColumnsByType(pipelineType);
@@ -72,6 +72,7 @@ const DropdownMenuDemo = ({ pipelineType }: DropdownProps) => {
               onChange={(value) =>
                 setFilter({ status: value === "All" ? "" : value })
               }
+              value={status}
             />
 
             <Select
@@ -83,6 +84,7 @@ const DropdownMenuDemo = ({ pipelineType }: DropdownProps) => {
               onChange={(value) =>
                 setFilter({ service: value === "All" ? "" : value })
               }
+              value={service}
             />
           </div>
         </DropdownMenu.Content>

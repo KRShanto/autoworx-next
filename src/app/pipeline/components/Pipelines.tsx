@@ -2,6 +2,7 @@
 "use client";
 import { getEmployees } from "@/actions/employee/get";
 import { updateInvoiceStatus } from "@/actions/estimate/invoice/updateInvoiceStatus";
+import getDataForNewAppointment from "@/actions/pipelines/getDataForNewAppointment";
 import {
   getWorkOrders,
   updateAssignedTo,
@@ -10,9 +11,11 @@ import {
   removeInvoiceTag,
   saveInvoiceTag,
 } from "@/actions/pipelines/invoiceTag";
+import { useServerGet } from "@/hooks/useServerGet";
 import SessionUserType from "@/types/sessionUserType";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { EmployeeType, Prisma, Tag, Task, User } from "@prisma/client";
+import Image from "next/image";
 import Link from "next/link";
 import { SetStateAction, useEffect, useState } from "react";
 import { CiCalendar } from "react-icons/ci";
@@ -21,9 +24,9 @@ import { PiWechatLogoLight } from "react-icons/pi";
 import { TbInvoice } from "react-icons/tb";
 import { EmployeeSelector } from "./EmployeeSelector";
 import { EmployeeTagSelector } from "./EmployeeTagSelector";
+import { NewAppointment_Pipeline } from "./NewAppointment_Pipeline";
 import ServiceSelector from "./ServiceSelector";
 import TaskForm from "./TaskForm";
-import Image from "next/image";
 //dummy services
 
 //interfaces
@@ -40,6 +43,7 @@ interface Lead {
   phone: string;
   clientId: number | null;
   vehicle: string;
+  vehicleId: number | null;
   services: {
     completed: string[];
     incomplete: string[];
@@ -173,6 +177,7 @@ export default function Pipelines({
           clientId: invoice.clientId,
           vehicle:
             `${invoice.vehicle?.year ?? ""} ${invoice.vehicle?.make ?? ""} ${invoice.vehicle?.model ?? ""}`.trim(),
+          vehicleId: invoice.vehicleId,
           workOrderStatus: invoice.workOrderStatus ?? "Pending",
           services: {
             completed: completedServices,
@@ -484,6 +489,7 @@ export default function Pipelines({
                     style={{ maxHeight: "70vh" }}
                   >
                     {item.leads.map((lead, leadIndex) => {
+                      console.log("🚀 ~ {item.leads.map ~ lead:", lead);
                       const key = `${categoryIndex}-${leadIndex}`;
 
                       const isDropdownOpen =
@@ -508,7 +514,7 @@ export default function Pipelines({
                               {...provided.dragHandleProps}
                               ref={provided.innerRef}
                               key={lead.invoiceId}
-                              className="max-w-auto relative mx-1 my-1 h-fit rounded-xl border bg-white p-1"
+                              className="max-w-auto relative mx-1 my-1 h-fit animate-none rounded-xl border bg-white p-1 duration-300"
                             >
                               <div className="flex items-center justify-between">
                                 <h3 className="font-inter overflow-auto pb-2 font-semibold text-black">
@@ -665,12 +671,12 @@ export default function Pipelines({
                                       View Work Order
                                     </span>
                                   </Link>
-                                  <Link href="/" className="group relative">
-                                    <CiCalendar size={18} />
-                                    <span className="invisible absolute bottom-full left-16 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
-                                      Create Appointment
-                                    </span>
-                                  </Link>
+                                  {lead?.clientId && lead?.vehicleId && (
+                                    <NewAppointment_Pipeline
+                                      clientId={lead.clientId}
+                                      vehicleId={lead?.vehicleId}
+                                    />
+                                  )}
                                 </div>
                                 <div className="group relative">
                                   <TaskForm

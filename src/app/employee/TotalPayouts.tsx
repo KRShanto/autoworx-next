@@ -1,13 +1,13 @@
-import React from "react";
-import HorizontalPayoutCard from "./components/HorizontalPayoutCard";
-import {
-  calculatePreviousMonthEarnings,
-  calculate2ndPreviousMonthEarnings,
-  calculateTotalEarnings,
-  calculateCurrentMonthEarnings,
-} from "@/lib/payout";
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
+import {
+  calculate2ndPreviousMonthEarnings,
+  calculateCurrentMonthEarnings,
+  calculatePreviousMonthEarnings,
+  calculateTotalEarnings,
+} from "@/lib/payout";
+import React from "react";
+import HorizontalPayoutCard from "./components/HorizontalPayoutCard";
 
 export default async function TotalPayouts() {
   const companyId = await getCompanyId();
@@ -26,11 +26,11 @@ export default async function TotalPayouts() {
   const totalEarnings = calculateTotalEarnings(technicians as any);
 
   // Calculate the percentage change with checks
-  let percentageChange = "N/A";
+  let percentageChange = 0;
   let increased = false;
   if (previousMonthEarnings !== 0) {
     const earningsDifference = currentMonthEarnings - previousMonthEarnings;
-    percentageChange = (
+    percentageChange = +(
       (earningsDifference / previousMonthEarnings) *
       100
     ).toFixed(2);
@@ -42,7 +42,7 @@ export default async function TotalPayouts() {
       <HorizontalPayoutCard
         title="Monthly Payout"
         amount={currentMonthEarnings}
-        percentage={`${percentageChange}%`}
+        percentage={percentageChange}
         increased={increased}
       />
       <HorizontalPayoutCard title="YTD Payout" amount={totalEarnings} />
