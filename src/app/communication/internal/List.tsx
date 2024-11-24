@@ -178,7 +178,8 @@ export default function List({
                 onClick={() => {
                   // add this user to the list (if not already in it)
                   setGroupsList((groupList: any) => {
-                    if (groupList.length >= 4) return groupList;
+                    if (groupList.length + usersList.length >= 4)
+                      return groupList;
                     if (groupList.find((g: Group) => g?.id === group.id)) {
                       return groupList;
                     }
@@ -239,7 +240,8 @@ export default function List({
                 onClick={() => {
                   // add this user to the list (if not already in it)
                   setUsersList((usersList) => {
-                    if (usersList.length >= 4) return usersList;
+                    if (usersList.length + groupsList.length >= 4)
+                      return usersList;
                     if (usersList.find((u) => u.id === user.id)) {
                       return usersList;
                     }
