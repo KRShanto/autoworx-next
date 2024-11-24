@@ -6,135 +6,6 @@ import { useEffect, useState } from "react";
 import ManageRefund from "./ManageRefund";
 import NewRefund from "./NewRefund";
 
-const datas = [
-  {
-    invoice: 12345,
-    customerName: "John Doe",
-    vehicleInfo: "Year Make Model",
-    transactionDate: "3rd July, 2024",
-    amount: 324,
-    method: "Paypal",
-    refunded: false,
-  },
-  {
-    invoice: 12345,
-    customerName: "John Doe",
-    vehicleInfo: "Year Make Model",
-    transactionDate: "3rd July, 2024",
-    amount: 324,
-    method: "Paypal",
-    refunded: true,
-  },
-  {
-    invoice: 12345,
-    customerName: "John Doe",
-    vehicleInfo: "Year Make Model",
-    transactionDate: "3rd July, 2024",
-    amount: 324,
-    method: "Paypal",
-    refunded: false,
-  },
-  {
-    invoice: 12345,
-    customerName: "John Doe",
-    vehicleInfo: "Year Make Model",
-    transactionDate: "3rd July, 2024",
-    amount: 324,
-    method: "Paypal",
-    refunded: true,
-  },
-  {
-    invoice: 12345,
-    customerName: "John Doe",
-    vehicleInfo: "Year Make Model",
-    transactionDate: "3rd July, 2024",
-    amount: 324,
-    method: "Paypal",
-    refunded: false,
-  },
-  {
-    invoice: 12345,
-    customerName: "John Doe",
-    vehicleInfo: "Year Make Model",
-    transactionDate: "3rd July, 2024",
-    amount: 324,
-    method: "Paypal",
-    refunded: false,
-  },
-  {
-    invoice: 12345,
-    customerName: "John Doe",
-    vehicleInfo: "Year Make Model",
-    transactionDate: "3rd July, 2024",
-    amount: 324,
-    method: "Paypal",
-    refunded: false,
-  },
-  {
-    invoice: 12345,
-    customerName: "John Doe",
-    vehicleInfo: "Year Make Model",
-    transactionDate: "3rd July, 2024",
-    amount: 324,
-    method: "Paypal",
-    refunded: false,
-  },
-  {
-    invoice: 12345,
-    customerName: "John Doe",
-    vehicleInfo: "Year Make Model",
-    transactionDate: "3rd July, 2024",
-    amount: 324,
-    method: "Paypal",
-    refunded: false,
-  },
-  {
-    invoice: 12345,
-    customerName: "John Doe",
-    vehicleInfo: "Year Make Model",
-    transactionDate: "3rd July, 2024",
-    amount: 324,
-    method: "Paypal",
-    refunded: false,
-  },
-  {
-    invoice: 12345,
-    customerName: "John Doe",
-    vehicleInfo: "Year Make Model",
-    transactionDate: "3rd July, 2024",
-    amount: 324,
-    method: "Paypal",
-    refunded: false,
-  },
-  {
-    invoice: 12345,
-    customerName: "John Doe",
-    vehicleInfo: "Year Make Model",
-    transactionDate: "3rd July, 2024",
-    amount: 324,
-    method: "Paypal",
-    refunded: false,
-  },
-  {
-    invoice: 12345,
-    customerName: "John Doe",
-    vehicleInfo: "Year Make Model",
-    transactionDate: "3rd July, 2024",
-    amount: 324,
-    method: "Paypal",
-    refunded: false,
-  },
-  {
-    invoice: 12345,
-    customerName: "John Doe",
-    vehicleInfo: "Year Make Model",
-    transactionDate: "3rd July, 2024",
-    amount: 324,
-    method: "Paypal",
-    refunded: false,
-  },
-];
-
 export default function PaymentTable({ data }: { data: ReturnPayment[] }) {
   const { search, dateRange, amount, paidStatus, paymentMethod } =
     usePaymentFilterStore();
@@ -207,12 +78,13 @@ export default function PaymentTable({ data }: { data: ReturnPayment[] }) {
             <th className="border-b px-4 py-2 text-left">Transaction Date</th>
             <th className="border-b px-4 py-2 text-left">Amount</th>
             <th className="border-b px-4 py-2 text-left">Method</th>
-            <th className="border-b px-4 py-2 text-left">Method</th>
+            {/* TODO: skip for now. */}
+            {/* <th className="border-b px-4 py-2 text-left">Refund</th> */}
           </tr>
         </thead>
 
         <tbody>
-          {data.map((item, index) => (
+          {filteredData.map((item, index) => (
             <tr
               key={index}
               className={index % 2 === 0 ? "bg-white" : "bg-[#EEF4FF]"}
@@ -220,7 +92,7 @@ export default function PaymentTable({ data }: { data: ReturnPayment[] }) {
               <td className="border-b px-4 py-2">
                 <Link
                   href={`/estimate/view/${item.invoiceId}`}
-                  className="text-blue-500 hover:underline"
+                  className="text-blue-500"
                 >
                   {item.invoiceId}
                 </Link>
@@ -228,7 +100,7 @@ export default function PaymentTable({ data }: { data: ReturnPayment[] }) {
               <td className="border-b px-4 py-2">
                 <Link
                   href={`/client/${item?.client?.id && item?.client?.id !== undefined ? item?.client?.id : ""}`}
-                  className="text-blue-500 hover:underline"
+                  className="text-blue-500"
                 >
                   {item?.client?.name && item?.client?.name !== undefined
                     ? item?.client?.name
@@ -241,13 +113,14 @@ export default function PaymentTable({ data }: { data: ReturnPayment[] }) {
                   : "- - -"}
               </td>
               <td className="border-b px-4 py-2">
-                {moment(item.date).format("YYYY-MM-DD")}
+                {moment.utc(item.date).format("YYYY-MM-DD")}
               </td>
               <td className="border-b px-4 py-2">${item.amount}</td>
               <td className="border-b px-4 py-2">{item.method}</td>
-              <td className="border-b px-4 py-2">
+              {/* TODO: skip for now. */}
+              {/* <td className="border-b px-4 py-2">
                 {item.paid ? <ManageRefund /> : <NewRefund />}
-              </td>
+              </td> */}
             </tr>
           ))}
         </tbody>
