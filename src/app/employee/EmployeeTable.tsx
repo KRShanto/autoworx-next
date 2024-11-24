@@ -94,7 +94,9 @@ export default function EmployeeTable({ employees }: { employees: User[] }) {
                   className="block h-full w-full"
                   href={`/employee/${employee.id}`}
                 >
-                  {moment(employee.joinDate).format("MM/DD/YYYY")}
+                  {moment(employee.joinDate || employee.createdAt).format(
+                    "MM/DD/YYYY",
+                  )}
                 </Link>
               </td>
               <td className="border-b px-4 py-2 text-center">
