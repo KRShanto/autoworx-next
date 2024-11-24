@@ -1,26 +1,26 @@
 "use server";
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
-import { defaultColumnWithColor } from "@/lib/defaultColumns";
 import { AuthSession } from "@/types/auth";
+import { revalidatePath } from "next/cache";
 
-const insertDefaultColumns = async (type: string) => {
-  const session = (await auth()) as AuthSession;
-  const companyId = session.user.companyId;
-  const columnsForType = defaultColumnWithColor.filter(
-    (column) => column.type === type,
-  );
+// const insertDefaultColumns = async (type: string) => {
+//   const session = (await auth()) as AuthSession;
+//   const companyId = session.user.companyId;
+//   const columnsForType = defaultColumnWithColor.filter(
+//     (column) => column.type === type,
+//   );
 
-  const columnsWithCompany = columnsForType.map((column) => ({
-    ...column,
-    companyId,
-  }));
+//   const columnsWithCompany = columnsForType.map((column) => ({
+//     ...column,
+//     companyId,
+//   }));
 
-  await db.column.createMany({
-    data: columnsWithCompany,
-    skipDuplicates: true,
-  });
-};
+//   await db.column.createMany({
+//     data: columnsWithCompany,
+//     skipDuplicates: true,
+//   });
+// };
 
 // Fetch all columns by type
 export const getColumnsByType = async (type: string) => {
@@ -31,14 +31,13 @@ export const getColumnsByType = async (type: string) => {
     orderBy: { order: "asc" },
   });
 
-  // If no columns exist, insert default columns and fetch them again
-  if (columns.length === 0) {
-    await insertDefaultColumns(type);
-    columns = await db.column.findMany({
-      where: { type },
-      orderBy: { order: "asc" },
-    });
-  }
+  // if (columns.length === 0) {
+  //   await insertDefaultColumns(type);
+  //   columns = await db.column.findMany({
+  //     where: { type },
+  //     orderBy: { order: "asc" },
+  //   });
+  // }
 
   return columns;
 };
@@ -79,19 +78,28 @@ export const updateColumn = async (
   textColor?: string,
   bgColor?: string,
 ) => {
-  return await db.column.update({
+  await db.column.update({
     where: { id },
     data: { title, type, order, textColor, bgColor },
   });
+  revalidatePath("/pipeline/shop");
 };
 
 // Delete a column
 export const deleteColumn = async (id: number) => {
+  //update the invoice which column is deleted
+  await db.invoice.updateMany({
+    where: { columnId: id },
+    data: {
+      columnId: null,
+    },
+  });
+
   return await db.column.delete({
     where: { id },
   });
 };
-
+revalidatePath("/estimate");
 // Update the order of multiple columns
 export const updateColumnOrder = async (
   reorderedColumns: { id: number; order: number }[],

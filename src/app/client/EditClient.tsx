@@ -1,5 +1,7 @@
 "use client";
 
+import { deleteSource } from "@/actions/source/deleteSource";
+import { getSources } from "@/actions/source/getSources";
 import {
   Dialog,
   DialogClose,
@@ -8,27 +10,30 @@ import {
   DialogTrigger,
 } from "@/components/Dialog";
 import FormError from "@/components/FormError";
+import NewClientSource from "@/components/Lists/NewClientSource";
 import SelectClientSource from "@/components/Lists/SelectClientSource";
 import { SelectClientTags } from "@/components/Lists/SelectClientTags";
 import { SlimInput } from "@/components/SlimInput";
+import { DEFAULT_IMAGE_URL } from "@/lib/consts";
+import { useFormErrorStore } from "@/stores/form-error";
+import { Client, Source, Tag } from "@prisma/client";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
+import { FaPen, FaPenToSquare } from "react-icons/fa6";
+import { IoMdSettings } from "react-icons/io";
 import { RxAvatar } from "react-icons/rx";
-import NewClientSource from "@/components/Lists/NewClientSource";
-import { Client, Source, Tag } from "@prisma/client";
-import { getSources } from "@/actions/source/getSources";
-import { deleteSource } from "@/actions/source/deleteSource";
-import { useFormErrorStore } from "@/stores/form-error";
-import { FaPenToSquare } from "react-icons/fa6";
-import { FaPen } from "react-icons/fa6";
 import { editClient } from "../../actions/client/edit";
-import { DEFAULT_IMAGE_URL } from "@/lib/consts";
-import Image from "next/image";
 
 export default function EditCustomer({
   client,
+  settingIcon = false,
 }: {
-  client: Client & { tag: Tag | null; source: Source | null };
+  client: Client & {
+    tag: Tag | null;
+    source: Source | null;
+  };
+  settingIcon?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [clientSource, setClientSource] = useState<Source | null>(
@@ -138,8 +143,8 @@ export default function EditCustomer({
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <button className="text-xs text-[#6571FF]">
-            <FaPenToSquare />
+          <button className={`${settingIcon ? "text-gray-600" : ""} text-[#6571FF]"`}>
+            {settingIcon ? <IoMdSettings /> : <FaPenToSquare />}
           </button>
         </DialogTrigger>
 
@@ -147,20 +152,18 @@ export default function EditCustomer({
           <div className="mt-8 flex items-center justify-between">
             <h1 className="text-2xl font-bold">Edit Client</h1>
 
-            {profilePic ? (
+            {newProfilePic || profilePic ? (
               <label
                 className="relative cursor-pointer"
                 htmlFor="profilePicture"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <Image
+                <img
                   src={
                     newProfilePic
                       ? URL.createObjectURL(newProfilePic)
                       : `/api/images/${profilePic}`
                   }
-                  width={80}
-                  height={80}
                   alt="profile"
                   className="h-20 w-20 rounded-full border border-slate-400 hover:border-dashed hover:opacity-80"
                 />

@@ -1,9 +1,10 @@
-import Image from "next/image";
-import Payout from "./Payout";
-import { IoMdSettings } from "react-icons/io";
-import { User } from "@prisma/client";
-import { EmployeeWorkInfo } from "./employeeWorkInfoType";
 import Avatar from "@/components/Avatar";
+import { User } from "@prisma/client";
+import Image from "next/image";
+import { IoMdSettings } from "react-icons/io";
+import EditEmployee from "../EditEmployee";
+import { EmployeeWorkInfo } from "./employeeWorkInfoType";
+import Payout from "./Payout";
 
 export default function EmployeeInformation({
   employee,
@@ -13,12 +14,10 @@ export default function EmployeeInformation({
   info: EmployeeWorkInfo;
 }) {
   return (
-    <div className="mb-8 mt-5 flex w-full justify-between gap-5 px-4">
-      <div className="relative flex w-full items-center rounded border border-gray-300 bg-white p-3">
-        <div className="absolute left-3 top-3">
-          <button>
-            <IoMdSettings />
-          </button>
+    <div className="my-8 flex w-full justify-between gap-5 px-4">
+      <div className="relative flex w-full items-center rounded border border-gray-300 bg-white p-3 pt-10">
+        <div className="absolute left-3 top-1">
+          <EditEmployee employee={employee} settingIcon />
         </div>
         <div className="mr-3 flex flex-col items-center">
           <Avatar photo={employee.image} width={100} height={100} />

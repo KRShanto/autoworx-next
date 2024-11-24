@@ -1,29 +1,22 @@
 "use client";
 
-import { CheckCircleOutlined } from "@ant-design/icons";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import React, { useEffect, useState } from "react";
-import {
-  FaChevronCircleDown,
-  FaChevronDown,
-  FaHamburger,
-} from "react-icons/fa";
-import { PiDotFill } from "react-icons/pi";
-import Select from "./Select";
 import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
-import { useServerGet } from "@/hooks/useServerGet";
 import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
-
+import { useServerGet } from "@/hooks/useServerGet";
+import { usePipelineFilterStore } from "@/stores/PipelineFilterStore";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { useEffect, useState } from "react";
+import { FaChevronDown } from "react-icons/fa";
+import Select from "./Select";
 interface DropdownProps {
   pipelineType: string;
 }
-const DropdownMenuDemo = ({pipelineType}: DropdownProps) => {
-  const [bookmarksChecked, setBookmarksChecked] = React.useState(true);
-  const [urlsChecked, setUrlsChecked] = React.useState(false);
-  const [person, setPerson] = React.useState("pedro");
+const DropdownMenuDemo = ({ pipelineType }: DropdownProps) => {
   const { data: invoices } = useServerGet(getWorkOrders);
-  const [columnStatus, setColumnStatus] = useState<{ id: number; title: string; type: string }[]>([]);
-
+  const [columnStatus, setColumnStatus] = useState<
+    { id: number; title: string; type: string }[]
+  >([]);
+  const { setFilter, status, service, dateRange } = usePipelineFilterStore();
   useEffect(() => {
     const fetchShopColumns = async () => {
       const columns = await getColumnsByType(pipelineType);
@@ -32,6 +25,21 @@ const DropdownMenuDemo = ({pipelineType}: DropdownProps) => {
     fetchShopColumns();
   }, [pipelineType]);
 
+  const uniqueServices = new Set<string>();
+  invoices?.forEach((invoice) => {
+    invoice.invoiceItems.forEach((item) => {
+      if (item.service?.name) {
+        uniqueServices.add(item.service.name);
+      }
+    });
+  });
+
+  // Convert the Set back to an array
+  const serviceItems = Array.from(uniqueServices).map((serviceName, index) => ({
+    id: `service-${index}`,
+    value: serviceName,
+    label: serviceName,
+  }));
 
   return (
     <DropdownMenu.Root>
@@ -53,26 +61,30 @@ const DropdownMenuDemo = ({pipelineType}: DropdownProps) => {
           <div className="flex flex-col gap-y-2">
             <Select
               label="Status"
-              items={columnStatus.map((column) => ({
-                id: column.id,
-                value: column.title,
-                label: column.title,
-              }))}
+              items={[
+                { id: "all", value: "All", label: "All" },
+                ...columnStatus.map((column) => ({
+                  id: column.id,
+                  value: column.title,
+                  label: column.title,
+                })),
+              ]}
+              onChange={(value) =>
+                setFilter({ status: value === "All" ? "" : value })
+              }
+              value={status}
             />
 
             <Select
               label="Services"
-              items={
-                invoices
-                  ? invoices.flatMap((invoice) =>
-                      invoice.invoiceItems.map((item) => ({
-                        id: `${invoice.id}-${item.id}`,
-                        value: `${item.service?.name} (${invoice.id}-${item.id})`, // unique value
-                        label: item.service?.name || "",
-                      })),
-                    )
-                  : []
+              items={[
+                { id: "all", value: "All", label: "All" },
+                ...serviceItems,
+              ]}
+              onChange={(value) =>
+                setFilter({ service: value === "All" ? "" : value })
               }
+              value={service}
             />
           </div>
         </DropdownMenu.Content>

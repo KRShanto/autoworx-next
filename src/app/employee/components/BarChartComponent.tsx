@@ -56,7 +56,7 @@ const BarChartComponent: React.FC<BarChartComponentProps> = ({
   title,
   boldTitle = false,
   noYLabel = false,
-  data,
+  data = [],
 }) => {
   return (
     <div
@@ -71,7 +71,7 @@ const BarChartComponent: React.FC<BarChartComponentProps> = ({
       </h2>
       <ResponsiveContainer width="90%" height={height}>
         <BarChart
-          data={data || demoData}
+          data={data?.length > 0 ? data : demoData}
           margin={{
             top: 55,
             bottom: 5,
