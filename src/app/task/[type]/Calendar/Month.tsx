@@ -36,7 +36,7 @@ import HolidayDeleteConfirmation from "./HolidayDeleteConfiramtion";
 
 function useMonth() {
   const searchParams = useSearchParams();
-  const month = moment(searchParams.get("month"), moment.HTML5_FMT.MONTH);
+  const month = moment.utc(searchParams.get("month"), moment.HTML5_FMT.MONTH);
   return (month.isValid() ? month : moment().startOf("month")).toDate();
 }
 
@@ -150,13 +150,21 @@ export default function Month({
     dates.push([null, [], [], []]); // Ensure 5 rows of 7 days means 35 days
   }
 
+  // function getTasks(date: Date) {
+  //   return tasks.filter(
+  //     (task) =>
+  //       new Date(task.date).getFullYear() === date.getFullYear() &&
+  //       new Date(task.date).getMonth() === date.getMonth() &&
+  //       new Date(task.date).getDate() === date.getDate(),
+  //   );
+  // }
+
   function getTasks(date: Date) {
-    return tasks.filter(
-      (task) =>
-        new Date(task.date).getFullYear() === date.getFullYear() &&
-        new Date(task.date).getMonth() === date.getMonth() &&
-        new Date(task.date).getDate() === date.getDate(),
-    );
+    const targetDate = moment.utc(date);
+    return tasks.filter((task) => {
+      const taskDate = moment.utc(task.date);
+      return taskDate.isSame(targetDate, "day");
+    });
   }
 
   function getAppointments(date: Date) {
