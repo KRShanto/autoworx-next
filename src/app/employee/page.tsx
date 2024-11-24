@@ -15,9 +15,25 @@ export default async function Page() {
   const employees = await db.user.findMany({
     where: {
       companyId,
-      role: "employee",
     },
-    // TODO don't fetch password
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      joinDate: true,
+      createdAt: true,
+      employeeType: true,
+      phone: true,
+      commission: true,
+      address: true,
+      city: true,
+      state: true,
+      zip: true,
+      companyName: true,
+      image: true,
+    },
   });
 
   return (
@@ -40,7 +56,7 @@ export default async function Page() {
 
       <EmployeeFilter />
 
-      <EmployeeTable employees={employees} />
+      <EmployeeTable employees={employees as any} />
     </div>
   );
 }

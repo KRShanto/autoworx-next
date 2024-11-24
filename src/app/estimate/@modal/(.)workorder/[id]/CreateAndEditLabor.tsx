@@ -68,8 +68,8 @@ export default function CreateAndEditLabor({
   useEffect(() => {
     if (technician) {
       const { amount, date, due, note, priority, userId } = technician;
-      const formattedDate = moment(date).format("YYYY-MM-DD");
-      const formattedDue = moment(due).format("YYYY-MM-DD");
+      const formattedDate = moment.utc(date).format("YYYY-MM-DD");
+      const formattedDue = moment.utc(due).format("YYYY-MM-DD");
       setInputValues({
         date: formattedDate,
         due: formattedDue,

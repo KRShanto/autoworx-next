@@ -165,7 +165,7 @@ function Table({
               ${parseFloat(history.price?.toString() || "0") * history.quantity}
             </td>
             <td className="text-center">
-              {moment(history.date).format(
+              {moment.utc(history.date).format(
                 // date.month.year
                 "DD.MM.YYYY",
               )}
