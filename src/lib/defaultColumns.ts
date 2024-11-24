@@ -1,4 +1,3 @@
-
 export const defaultSalesColumn = [
   {
     title: "New Leads",
@@ -53,19 +52,20 @@ export const defaultShopColumn = [
     textColor: "#F57F17", // Dark Yellow Text
   },
   {
-    title: "Completed",
-    type: "shop",
-    order: 1,
-    bgColor: "#C8E6C9", // Light Green Background
-    textColor: "#2E7D32", // Dark Green Text
-  },
-  {
     title: "In Progress",
     type: "shop",
-    order: 2,
+    order: 1,
     bgColor: "#BBDEFB", // Light Blue Background
     textColor: "#1565C0", // Blue Text
   },
+  {
+    title: "Completed",
+    type: "shop",
+    order: 2,
+    bgColor: "#C8E6C9", // Light Green Background
+    textColor: "#2E7D32", // Dark Green Text
+  },
+
   {
     title: "Re-Dos",
     type: "shop",
