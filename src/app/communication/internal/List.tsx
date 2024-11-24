@@ -15,6 +15,8 @@ export default function List({
   setUsersList,
   groups,
   setGroupsList,
+  groupsList,
+  usersList,
   className,
 }: {
   users: User[];
@@ -24,6 +26,8 @@ export default function List({
   >;
   groups: (Group & { users: User[] })[] | [];
   className?: string;
+  groupsList: (Group & { users: User[] })[];
+  usersList: User[];
 }) {
   // const [usersStore, setUsersStore] = useState(users);
   // const [groupsStore, setGroupsStore] = useState(groups);
@@ -163,10 +167,14 @@ export default function List({
             group.name.toLowerCase().includes(searchTerm.toLowerCase()),
           )
           .map((group) => {
+            const isSelectedGroup = !!groupsList.find((g) => g.id === group.id);
             return (
               <button
                 key={group.id}
-                className="flex items-center gap-2 rounded-md border border-[#006D77] bg-[#F2F2F2] p-2 sm:border-0"
+                className={cn(
+                  "flex items-center gap-2 rounded-md border border-[#006D77] bg-[#F2F2F2] p-2 hover:bg-gray-300 sm:border-0",
+                  isSelectedGroup && "bg-[#006D77]",
+                )}
                 onClick={() => {
                   // add this user to the list (if not already in it)
                   setGroupsList((groupList: any) => {
@@ -196,7 +204,12 @@ export default function List({
                   })}
                 </div>
                 <div className="flex flex-col">
-                  <p className="text-[14px] font-bold text-[#797979]">
+                  <p
+                    className={cn(
+                      "text-[14px] font-bold text-[#797979]",
+                      isSelectedGroup && "text-white hover:text-[#797979]",
+                    )}
+                  >
                     {group.name}
                   </p>
                 </div>
@@ -215,10 +228,14 @@ export default function List({
               user.phone?.toLowerCase().includes(searchTerm.toLowerCase()),
           )
           .map((user) => {
+            const isSelectedUser = !!usersList.find((u) => u.id === user.id);
             return (
               <button
                 key={user.id}
-                className="flex items-center gap-2 rounded-md border border-[#006D77] bg-[#F2F2F2] p-2 sm:border-0"
+                className={cn(
+                  `flex items-center gap-2 rounded-md border border-[#006D77] bg-[#F2F2F2] p-2 hover:bg-gray-300 sm:border-0`,
+                  isSelectedUser && "bg-[#006D77]",
+                )}
                 onClick={() => {
                   // add this user to the list (if not already in it)
                   setUsersList((usersList) => {
@@ -232,7 +249,12 @@ export default function List({
               >
                 <Avatar photo={user.image} width={60} height={60} />
                 <div className="flex flex-col">
-                  <p className="text-[14px] font-bold text-[#797979]">
+                  <p
+                    className={cn(
+                      "text-[14px] font-bold text-[#797979]",
+                      isSelectedUser && "text-[#F2F2F2] hover:text-[#797979]",
+                    )}
+                  >
                     {user.firstName} {user.lastName}
                   </p>
                 </div>
