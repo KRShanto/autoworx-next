@@ -20,7 +20,7 @@ interface Column {
 }
 
 const Page = (props: Props) => {
-  const searchParam=useSearchParams();
+  const searchParam = useSearchParams();
   const activeView = searchParam.get("view") ?? "workOrders";
   const columnType = "sales";
 
@@ -29,7 +29,7 @@ const Page = (props: Props) => {
 
   useEffect(() => {
     const fetchShopColumns = async () => {
-      const columns = await getColumnsByType("sales");
+      const columns = await getColumnsByType(columnType);
       setPipelineColumns(columns);
     };
 

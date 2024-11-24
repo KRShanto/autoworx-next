@@ -52,7 +52,7 @@ export default function ClientInformation({
               <label className="mr-6 block w-20 text-gray-600">Address</label>
               <input
                 type="text"
-                value={client.address!}
+                value={`${client.address} ${client.city} ${client.state} ${client.zip}`}
                 readOnly
                 className="block w-full rounded border border-gray-200 px-4 py-2 text-gray-600"
               />
