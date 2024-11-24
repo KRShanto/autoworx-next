@@ -106,7 +106,7 @@ export default async function Page({
                         {(history.product.price as any) * history.quantity}
                       </td>
                       <td className="px-10 text-left">
-                        {moment(history.createdAt).format(
+                        {moment.utc(history.createdAt).format(
                           // date.month.year
                           "DD.MM.YYYY",
                         )}

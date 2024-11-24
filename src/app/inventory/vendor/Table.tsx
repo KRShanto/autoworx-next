@@ -56,7 +56,7 @@ export default function Table({
               <td className="text-nowrap px-10 text-left">{vendor.phone}</td>
               <td className="px-10 text-left">{vendor.website}</td>
               <td className="px-10 text-left">
-                {moment(vendor.createdAt).format("DD MMM YYYY, hh:mm A")}
+                {moment.utc(vendor.createdAt).format("DD MMM YYYY, hh:mm A")}
               </td>
               <td className="mt-2 flex gap-3 px-10">
                 <EditVendor
