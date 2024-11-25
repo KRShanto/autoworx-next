@@ -109,7 +109,7 @@ export async function newMaterial({
     }
   }
 
-  revalidatePath("/estimate")
+  revalidatePath("/estimate");
 
   return {
     type: "success",

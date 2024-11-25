@@ -1,8 +1,6 @@
 "use client";
-import { getTechnicians } from "@/actions/estimate/technician/getTechnicians";
 import { DialogContent, DialogFooter } from "@/components/Dialog";
 import { Dialog } from "@/components/Dialog";
-import { useServerGet } from "@/hooks/useServerGet";
 import { Technician } from "@prisma/client";
 import { useState, useTransition } from "react";
 import RedoTechnician from "./RedoTechnician";
@@ -13,6 +11,7 @@ import { createInvoiceRedo } from "@/actions/estimate/labor/createInvoiceRedo";
 type TProps = {
   invoiceId: string;
   serviceId: number;
+  technicians: (Technician & { user: { firstName: string } })[];
 };
 
 type TRedoTechnicianInfo = {
@@ -22,37 +21,22 @@ type TRedoTechnicianInfo = {
   notes: string;
 };
 
-export default function ReDoModal({ invoiceId, serviceId }: TProps) {
+export default function ReDoModal({
+  invoiceId,
+  serviceId,
+  technicians,
+}: TProps) {
   const [open, setOpen] = useState(false);
   const [redoTechnicians, setRedoTechnicians] = useState<TRedoTechnicianInfo[]>(
     [],
   );
   const [pending, startTransition] = useTransition();
 
-  const [reload, setReload] = useState(false);
-
-  const { data, error } = useServerGet<{
-    technicians: (Technician & { name: string })[];
-    isWorkCompleted: boolean;
-  }>(
-    async () => {
-      const technicians = await getTechnicians({
-        invoiceId,
-        serviceId,
-      });
-      const completedWork = technicians.filter(
-        (technician: Technician) => technician.status?.trim() === "Complete",
-      );
-      const isWorkCompleted = completedWork.length === 0 ? false : true;
-      return {
-        isWorkCompleted,
-        technicians,
-      };
-    },
-    invoiceId,
-    serviceId,
-    reload,
+  const completedWork = technicians.filter(
+    (technician: Technician) => technician.status?.trim() === "Complete",
   );
+  const isWorkCompleted =
+    completedWork.length === technicians.length ? true : false;
 
   const handleRedoTechnician = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -96,7 +80,6 @@ export default function ReDoModal({ invoiceId, serviceId }: TProps) {
         setRedoTechnicians([]);
         setOpen(false);
         toast.success("save redo technicians successfully");
-        setReload((prev) => !prev);
       }
     } catch (err) {
       toast.error("Failed to save redo technicians");
@@ -105,7 +88,7 @@ export default function ReDoModal({ invoiceId, serviceId }: TProps) {
 
   return (
     <>
-      {data?.isWorkCompleted && (
+      {isWorkCompleted && (
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -117,9 +100,6 @@ export default function ReDoModal({ invoiceId, serviceId }: TProps) {
       <Dialog open={open} onOpenChange={() => setOpen((prev) => !prev)}>
         <DialogContent>
           <div className="space-y-3 rounded-md bg-white">
-            {error && (
-              <p className="p-1 text-center text-red-400">{error.message}</p>
-            )}
             <div className="mx-10 my-5">
               <div>
                 <h3 className="text-xl font-bold">Service 1</h3>
@@ -134,9 +114,9 @@ export default function ReDoModal({ invoiceId, serviceId }: TProps) {
                 </div>
                 <div className="space-y-3">
                   {/* input - 1 */}
-                  {data?.technicians &&
-                    data.technicians?.length > 0 &&
-                    data.technicians.map((technician) => (
+                  {technicians &&
+                    technicians?.length > 0 &&
+                    technicians.map((technician) => (
                       <RedoTechnician
                         key={technician.id}
                         technician={technician}

@@ -9,7 +9,7 @@ model Message {
     createdAt  DateTime    @default(now()) @map("created_at")
     updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
     group      Group?      @relation(fields: [groupId], references: [id])
-    attachment Attachment?
+    attachment Attachment[]
     requestEstimate           RequestEstimate?   @relation("Message", fields: [requestEstimateId], references: [id])
 
     @@index([to], name: "fk_messages_to")
@@ -23,7 +23,7 @@ model Attachment {
     fileType  String // File type (e.g., 'image/png', 'application/pdf')
     fileUrl   String // File storage path or URL
     fileSize  String
-    messageId Int      @unique // Foreign key to Message model, enforces one-to-one relationship
+    messageId Int       // Foreign key to Message model, enforces one-to-one relationship
     message   Message  @relation(fields: [messageId], references: [id])
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt @map("updated_at")

@@ -4,8 +4,8 @@ import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { Priority } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 import { updateWorkOrderStatus } from "./updateWorkOrderStatus";
+import { revalidatePath } from "next/cache";
 import moment from "moment";
 
 type TechnicianInput = {
@@ -56,6 +56,8 @@ export async function addTechnician(
     });
 
     await updateWorkOrderStatus(payload.invoiceId);
+    revalidatePath("/estimate/workorder");
+    revalidatePath("/employee");
 
     return {
       type: "success",

@@ -282,15 +282,20 @@ const InvoiceComponent = ({
               <h2 className="col-span-full text-3xl font-bold uppercase text-slate-500">
                 Attachments
               </h2>
-              {invoice.photos.map(async (x) => {
+              {invoice.photos.map((x) => {
                 return (
-                  <div key={x.id} className="relative aspect-square">
+                  <Link
+                    href={`/estimate/photo/${x.photo}`}
+                    key={x.id}
+                    className="relative aspect-square"
+                  >
                     <Image
                       src={`/api/images/${x.photo}`}
                       alt="attachment"
                       fill
+                      className="cursor-pointer"
                     />
-                  </div>
+                  </Link>
                 );
               })}
             </div>

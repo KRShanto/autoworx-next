@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { Priority, Technician } from "@prisma/client";
+import { Priority } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { updateWorkOrderStatus } from "./updateWorkOrderStatus";
 
@@ -50,7 +50,8 @@ export const updateTechnician = async (
     });
 
     await updateWorkOrderStatus(payload.invoiceId);
-
+    revalidatePath("/estimate/workorder");
+    revalidatePath("/employee");
     return {
       type: "success",
       data: {

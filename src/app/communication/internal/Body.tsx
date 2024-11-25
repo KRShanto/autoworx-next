@@ -22,6 +22,7 @@ export default function Body({
     [],
   );
 
+  // for mobile responsive
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 600) {
@@ -40,13 +41,14 @@ export default function Body({
   }, [usersList.length]);
 
   const totalLengthOfUsersAndGroups = usersList.length + groupsList.length;
-  console.log(totalLengthOfUsersAndGroups);
   return (
     <>
       <List
         className={cn(totalLengthOfUsersAndGroups === 0 ? "block" : "hidden")}
         groups={groups}
         users={users}
+        groupsList={groupsList}
+        usersList={usersList}
         setUsersList={setUsersList}
         setGroupsList={
           setGroupsList as React.Dispatch<

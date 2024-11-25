@@ -4,7 +4,7 @@ import { InvoiceType } from "@prisma/client";
 export async function fetchAndTransformData(
   type: InvoiceType,
   companyId: number,
-  searchParams: { startDate?: string; endDate?: string; status?: string }
+  searchParams: { startDate?: string; endDate?: string; status?: string },
 ) {
   const { startDate, endDate, status } = searchParams;
 
@@ -50,6 +50,6 @@ export async function fetchAndTransformData(
         textColor: status?.textColor || "",
         bgColor: status?.bgColor || "",
       };
-    })
+    }),
   );
 }

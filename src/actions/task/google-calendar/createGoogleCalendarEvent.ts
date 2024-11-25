@@ -6,7 +6,6 @@ import { env } from "next-runtime-env";
 import { cookies } from "next/headers";
 import { TaskType } from "../createTask";
 
-
 // Function to insert event into Google Calendar
 async function createGoogleCalendarEvent(
   task: TaskType | AppointmentToAdd | AppointmentToUpdate,

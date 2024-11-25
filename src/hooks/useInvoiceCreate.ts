@@ -30,7 +30,6 @@ export function useInvoiceCreate(type: InvoiceType) {
     reset: resetEstimateCreate,
   } = useEstimateCreateStore();
   const { client, vehicle, status, reset: resetLists } = useListsStore();
-  
 
   const pathaname = usePathname();
 

@@ -8,11 +8,9 @@ import { getLastClockInOutForUser } from "./clockIn";
 export async function takeBreak({
   clockInOutId,
   breakStart,
-
 }: {
   clockInOutId: number;
   breakStart: Date;
-
 }) {
   try {
     await getUser();

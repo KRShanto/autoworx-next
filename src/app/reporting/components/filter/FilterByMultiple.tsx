@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SliderRange from "./SliderRange";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { TFilterModalState } from "../../(report)/revenue/FilterHeader";
 
 type TFilterData = {
   id: number;
@@ -14,13 +15,22 @@ type TFilterData = {
 
 type TProps = {
   filterSliders: TFilterData[];
-  searchParamsValue: Record<string, string>;
+  searchParamsValue?: Record<string, string>;
+  modalName: string;
+  closeModal: (modalName: string) => void;
+  toggleModal: (modalName: string) => void;
+  activeModal: TFilterModalState;
 };
 export default function FilterByMultiple({
   filterSliders,
   searchParamsValue,
+  modalName,
+  closeModal,
+  toggleModal,
+  activeModal,
 }: TProps) {
-  const [show, setShow] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
   const router = useRouter();
 
@@ -46,6 +56,23 @@ export default function FilterByMultiple({
       return rangeObj;
     });
     setRange(updatedRangeFromSearchParams);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        closeModal(modalName);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const handleValueChange = (type: string, value: [number, number]) => {
@@ -77,7 +104,7 @@ export default function FilterByMultiple({
     });
     const newPathname = `${pathname}?${searchParams.toString()}`;
     router.replace(newPathname, { scroll: false });
-    setShow(false);
+    closeModal(modalName);
   };
 
   const handleClearAllRange = () => {
@@ -88,22 +115,24 @@ export default function FilterByMultiple({
     });
     const newPathname = `${pathname}?${searchParams.toString()}`;
     router.replace(newPathname, { scroll: false });
-    setShow(false);
+    closeModal(modalName);
     setRange(filterSliders.map((filter) => ({ ...filter, value: null })));
   };
 
   return (
     <div className="relative">
       <button
-        onClick={() => setShow((prev) => !prev)}
+        ref={buttonRef}
+        onClick={() => toggleModal(modalName)}
         className="flex max-w-80 items-center gap-2 rounded-sm border border-gray-400 p-1 px-5 text-sm text-gray-400 hover:border-blue-600"
       >
         <span>Filter</span>
       </button>
-      {show && (
-        <div className="absolute top-10 space-y-3 rounded-md border border-black bg-white p-4 shadow-lg hover:z-10">
+      {activeModal[modalName as keyof TFilterModalState] && (
+        <div ref={dropdownRef} className="absolute top-10 space-y-3 rounded-md border border-black bg-white p-4 shadow-lg hover:z-10">
           {range.map((slider) => (
             <SliderRange
+              
               key={slider.id}
               onValueChange={(value) => handleValueChange(slider.type, value)}
               min={slider.min}

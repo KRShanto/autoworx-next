@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import { auth } from "@/app/auth";
 import { AuthSession } from "@/types/auth";
 import { User } from "@prisma/client";
@@ -12,5 +12,5 @@ export default async function getUser() {
       id: +session.user.id,
     },
   })) as User;
-  return user
+  return user;
 }

@@ -1,15 +1,15 @@
 import Calculation from "../../components/Calculation";
-import FilterBySearchBox from "../../components/filter/FilterBySearchBox";
-import FilterByDateRange from "../../components/filter/FilterByDateRange";
+
 import { cn } from "@/lib/cn";
 import { getClientsData } from "../../data";
-import FilterBySelection from "../../components/filter/FilterBySelection";
+
 import Analytics from "./Analytics";
-import FilterByMultiple from "../../components/filter/FilterByMultiple";
+
 import { db } from "@/lib/db";
 import { formatDate } from "@/utils/taskAndActivity";
 import moment from "moment";
 import { Suspense } from "react";
+import FilterHeader from "./FilterHeader";
 type TProps = {
   searchParams: {
     category?: string;
@@ -119,31 +119,10 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
   return (
     <div className="space-y-5">
       {/* filter section */}
-      <div className="flex w-full items-center justify-between gap-x-3">
-        <div className="flex flex-1 items-center space-x-4">
-          <FilterBySearchBox searchText={searchParams.search as string} />
-          <FilterByDateRange
-            startDate={decodeURIComponent(searchParams?.startDate as string)}
-            endDate={decodeURIComponent(searchParams?.endDate as string)}
-          />
-        </div>
-        <div className="flex items-center space-x-4">
-          <FilterByMultiple
-            searchParamsValue={searchParams}
-            filterSliders={filterMultipleSliders}
-          />
-          <FilterBySelection
-            selectedItem={searchParams?.category as string}
-            items={["product", "parts", "wheel"]}
-            type="category"
-          />
-          <FilterBySelection
-            selectedItem={searchParams?.service as string}
-            items={["washing", "changing wheel", "full service"]}
-            type="service"
-          />
-        </div>
-      </div>
+      <FilterHeader
+        filterMultipleSliders={filterMultipleSliders}
+        searchParams={searchParams}
+      />
       <div className="my-7 grid grid-cols-5 gap-4">
         <Calculation content="AVERAGE VALUE" amount={averageValue} />
         <Calculation content="OUTSTANDING PAYMENT" amount={totalDue} />

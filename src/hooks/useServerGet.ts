@@ -49,11 +49,6 @@ export function useServerGet<T>(
   return { data, loading, error, setData, setLoading, setError };
 }
 
-
-
-
-
-
 export function useServerGetInterval<T>(
   fn: (...args: any) => Promise<T>,
   interval: number = 5000, // New interval parameter with a default of 5 seconds
