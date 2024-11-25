@@ -151,7 +151,7 @@ export default function SearchCollaborationModal({
                           height={60}
                         />
                         <div className="flex w-full flex-wrap items-start gap-x-4 overflow-hidden">
-                          <div className="flex flex-col items-start">
+                          <div className="mb-1 flex flex-col items-start">
                             <p className="text-sm font-bold text-[#797979]">
                               {user?.firstName} {user?.lastName}
                             </p>

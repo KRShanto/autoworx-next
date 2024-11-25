@@ -44,28 +44,22 @@ export default function HolidayButton() {
 
   const handleAddHoliday = async (fromMonthChange: boolean = false) => {
     try {
-      if (values.length > 0) {
-        // Add holiday logic here
-        const totalHolidays = values.map((date) => {
-          return {
-            year: date.year,
-            month: date.month.name,
-            companyId: authUser.user.companyId,
-            date: new Date(date.format("YYYY-MM-DD") as string).toISOString(),
-          };
-        });
-        const response = await createHoliday(
-          totalHolidays,
-          selectedMonth,
-          selectedYear,
-        );
-        if (response.status === 200) {
-          // handleClose();
-          !fromMonthChange && toast.success("Holiday set successfully");
-        }
-      } else {
-        !fromMonthChange &&
-          toast.error("Please select at least one holiday date.");
+      const totalHolidays = values.map((date) => {
+        return {
+          year: date.year,
+          month: date.month.name,
+          companyId: authUser.user.companyId,
+          date: new Date(date.format("YYYY-MM-DD") as string).toISOString(),
+        };
+      });
+      const response = await createHoliday(
+        totalHolidays,
+        selectedMonth,
+        selectedYear,
+      );
+      if (response.status === 200) {
+        // handleClose();
+        !fromMonthChange && toast.success("Holiday set successfully");
       }
     } catch (err) {
       console.error(err);
