@@ -127,11 +127,13 @@ export default async function Page() {
       />
     );
   } else if (user.employeeType === "Other") {
+    let lastClockInOut = await getLastClockInOutForUser();
     return (
       <DashboardOther
         tasks={tasks}
         companyUsers={companyUsers}
         appointments={calendarAppointments}
+        lastClockInOut={lastClockInOut}
       />
     );
   }
