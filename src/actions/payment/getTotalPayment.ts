@@ -2,7 +2,7 @@
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 
- export async function getTotalPayment(invoiceId: string): Promise<number> {
+export async function getTotalPayment(invoiceId: string): Promise<number> {
   const companyId = await getCompanyId();
   const payments = await db.payment.findMany({
     where: {

@@ -41,7 +41,6 @@ export async function addTechnician(
     });
 
     await updateWorkOrderStatus(payload.invoiceId);
-    
 
     return {
       type: "success",

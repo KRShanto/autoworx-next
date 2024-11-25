@@ -1,7 +1,10 @@
 "use server";
 import { db } from "@/lib/db";
 
-export async function updateInvoiceStatus(invoiceId: string, newStatusId: number) {
+export async function updateInvoiceStatus(
+  invoiceId: string,
+  newStatusId: number,
+) {
   try {
     await db.invoice.update({
       where: { id: invoiceId },

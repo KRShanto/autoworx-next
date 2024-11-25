@@ -1,8 +1,6 @@
 "use client";
-import { getTechnicians } from "@/actions/estimate/technician/getTechnicians";
 import { DialogContent, DialogFooter } from "@/components/Dialog";
 import { Dialog } from "@/components/Dialog";
-import { useServerGet } from "@/hooks/useServerGet";
 import { Technician } from "@prisma/client";
 import { useState, useTransition } from "react";
 import RedoTechnician from "./RedoTechnician";

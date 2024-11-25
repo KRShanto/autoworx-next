@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       data: {
         clientName: clientFirstName + " " + clientLastName,
         clientEmail,
-        clientPhone,        
+        clientPhone,
         vehicleInfo,
         services,
         source,

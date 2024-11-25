@@ -31,7 +31,7 @@ const insertDefaultColumns = async (columnId: number, type: string) => {
     companyId: columnId,
   }));
 
- await db.column.createMany({
+  await db.column.createMany({
     data: columnsWithCompany,
     skipDuplicates: true,
   });

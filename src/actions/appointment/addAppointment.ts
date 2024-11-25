@@ -25,7 +25,7 @@ export interface AppointmentToAdd {
   confirmationEmailTemplateStatus?: boolean;
   reminderEmailTemplateStatus?: boolean;
   times?: { date: string; time: string }[];
-  timezone? : string;
+  timezone?: string;
 }
 
 export async function addAppointment(

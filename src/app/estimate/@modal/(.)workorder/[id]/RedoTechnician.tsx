@@ -1,3 +1,4 @@
+"use client";
 import { Technician } from "@prisma/client";
 import { useState } from "react";
 
