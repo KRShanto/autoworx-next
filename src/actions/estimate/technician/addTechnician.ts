@@ -6,6 +6,7 @@ import { ServerAction } from "@/types/action";
 import { Priority } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { updateWorkOrderStatus } from "./updateWorkOrderStatus";
+import moment from "moment";
 
 type TechnicianInput = {
   date: Date;
@@ -29,9 +30,22 @@ export async function addTechnician(
       return { type: "error", message: "Invalid payload" };
     }
 
+    // Ensure the date includes both date and time
+    const dateWithTime = new Date(payload.date);
+    const currentTime = new Date();
+    dateWithTime.setHours(
+      currentTime.getHours(),
+      currentTime.getMinutes(),
+      currentTime.getSeconds(),
+      currentTime.getMilliseconds(),
+    );
+
+    console.log("Date with time: ", dateWithTime);
+
     const newTechnician = await db.technician.create({
       data: {
         ...payload,
+        date: dateWithTime,
         companyId,
         dateClosed: payload.status === "Complete" ? new Date() : null,
       },

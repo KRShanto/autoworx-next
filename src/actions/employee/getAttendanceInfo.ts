@@ -61,9 +61,6 @@ export async function getAttendanceInfo(id: number) {
       },
     });
 
-    console.log("Current date: ", currentDate.format("YYYY-MM-DD"));
-    console.log("Holiday: ", holiday);
-
     // Check for weekend or holiday
     if (dayOfWeek === weekend1 || dayOfWeek === weekend2) {
       attInfo.push({
@@ -186,6 +183,5 @@ export async function getAttendanceInfo(id: number) {
     .reduce((total, day) => total + parseFloat(day.extraHours), 0)
     .toFixed(2);
 
-  // TODO: @bettercallsundim - The weekend isn't working. Kindly fix it.
   return { attInfo, absentDays, totalExtraHours };
 }
