@@ -75,7 +75,6 @@ const InvoiceComponent = ({
       setCompanyDetails(companyDetailsnow);
     };
     getCompanyDetails();
-    // console.log(companyDetails);
   }, []);
 
   return (
@@ -152,7 +151,7 @@ const InvoiceComponent = ({
                   {companyDetails?.state} {companyDetails?.zip}
                 </p>
                 <p>{companyDetails?.phone}</p>
-                <p>{companyDetails?.website}</p>
+                <p>{companyDetails?.email}</p>
               </div>
             </div>
             <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground print:hidden">

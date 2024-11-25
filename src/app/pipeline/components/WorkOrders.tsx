@@ -30,8 +30,11 @@ const WorkOrders = ({ type }: Props) => {
 
     const matchesDateRange =
       dateRange[0] && dateRange[1]
-        ? new Date(invoice.createdAt) >= dateRange[0] &&
-          new Date(invoice.createdAt) <= dateRange[1]
+        ? dateRange[0].toDateString() === dateRange[1].toDateString()
+          ? new Date(invoice.createdAt).toDateString() ===
+            dateRange[0].toDateString()
+          : new Date(invoice.createdAt) >= dateRange[0] &&
+            new Date(invoice.createdAt) <= dateRange[1]
         : true;
 
     const matchesService = service

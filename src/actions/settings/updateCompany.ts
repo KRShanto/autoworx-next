@@ -8,6 +8,7 @@ type TCompanyData = {
   businessId: string | null;
   businessType: string | null;
   phone: string | null;
+  email: string | null;
   industry: string | null;
   website: string | null;
   address: string | null;
@@ -26,6 +27,7 @@ export const updateCompany = async (
     businessId,
     businessType,
     phone,
+    email,
     industry,
     website,
     address,
@@ -44,6 +46,7 @@ export const updateCompany = async (
         businessId,
         businessType,
         phone,
+        email,
         industry,
         website,
         address,
