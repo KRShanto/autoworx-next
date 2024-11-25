@@ -17,6 +17,9 @@ export async function getEmployees({
       id: {
         not: excludeCurrentUser ? parseInt(session?.user?.id!) : undefined,
       },
+      employeeType: {
+        not: "Sales",
+      },
     },
   });
   return employees;
