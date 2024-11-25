@@ -162,7 +162,7 @@ export default function Month({
   function getTasks(date: Date) {
     const targetDate = moment.utc(date);
     return tasks.filter((task) => {
-      const taskDate = moment.utc(task.date);
+      const taskDate = moment(task.date);
       return taskDate.isSame(targetDate, "day");
     });
   }
