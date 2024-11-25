@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { InvoiceItems } from "./InvoiceItems";
 import moment from "moment";
 import SaveWorkOrderBtn from "../../(.)view/[id]/(..)(..)create-work-order/[id1]/SaveWorkOrderBtn";
+import Image from "next/image";
 
 export default async function WorkOrderPage({
   params: { id },
@@ -44,6 +45,10 @@ export default async function WorkOrderPage({
 
   if (!invoice) notFound();
 
+  const companyDetails = await db.company.findUnique({
+    where: { id: invoice.companyId },
+  });
+
   return (
     <InterceptedDialog>
       <DialogContent className="max-w-[740px]">
@@ -52,13 +57,26 @@ export default async function WorkOrderPage({
          */}
         <div className="flex items-center justify-between">
           <div className="flex aspect-square w-32 items-center justify-center bg-slate-500 text-center font-bold text-white">
-            Logo
+            {companyDetails?.image ? (
+              <Image
+                src={`/api/images/${companyDetails.image}`}
+                alt="company logo"
+                width={128}
+                height={128}
+                // className="object-contain"
+              />
+            ) : (
+              "Logo"
+            )}
           </div>
           <div className="text-right text-xs">
             <h2 className="font-bold">Contact Information:</h2>
-            <p>Full Address</p>
-            <p>Mobile Number</p>
-            <p>Email</p>
+            <p>
+              {companyDetails?.address} {companyDetails?.city}{" "}
+              {companyDetails?.state} {companyDetails?.zip}
+            </p>
+            <p>{companyDetails?.phone}</p>
+            <p>{companyDetails?.email}</p>
           </div>
         </div>
 
