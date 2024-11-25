@@ -12,10 +12,6 @@ import { useParams } from "next/navigation";
 import { useServerGet } from "@/hooks/useServerGet";
 import { getAttendanceInfo } from "@/actions/employee/getAttendanceInfo";
 
-// const onChange: DatePickerProps<Dayjs[]>["onChange"] = (date, dateString) => {
-//   // console.log(date, dateString);
-// };
-
 interface AttendanceData {
   clockedIn: string;
   clockedOut: string;
@@ -33,16 +29,6 @@ interface buttonInfo {
   metricLabel: string;
   content: string;
 }
-
-// const attendanceData: AttendanceData[] = [
-//   { clockedIn: "9:04AM", clockedOut: "5:00PM", hours: "8" },
-//   { clockedIn: "9:00AM", clockedOut: "5:00PM", hours: "8" },
-//   { clockedIn: "9:15AM", clockedOut: "5:00PM", hours: "7.75" },
-//   { clockedIn: "9:00AM", clockedOut: "5:00PM", hours: "8" },
-//   { clockedIn: "9:00AM", clockedOut: "5:00PM", hours: "8" },
-//   { clockedIn: "9:30AM", clockedOut: "5:00PM", hours: "7.5" },
-//   { clockedIn: "OFF", clockedOut: "OFF", hours: "0" },
-// ];
 
 const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 

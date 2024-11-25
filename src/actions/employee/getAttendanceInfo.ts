@@ -51,6 +51,19 @@ export async function getAttendanceInfo(id: number) {
     const weekend1 = calendarSettings.weekend1.toLowerCase();
     const weekend2 = calendarSettings.weekend2.toLowerCase();
 
+    // Fetch holiday for the current date
+    const holiday = await db.holiday.findFirst({
+      where: {
+        date: {
+          equals: new Date(currentDate.format("YYYY-MM-DD")),
+        },
+        companyId: company?.id,
+      },
+    });
+
+    console.log("Current date: ", currentDate.format("YYYY-MM-DD"));
+    console.log("Holiday: ", holiday);
+
     // Check for weekend or holiday
     if (dayOfWeek === weekend1 || dayOfWeek === weekend2) {
       attInfo.push({
@@ -59,6 +72,18 @@ export async function getAttendanceInfo(id: number) {
         clockedOut: "WEEKEND",
         hours: "WEEKEND",
         extraHours: "WEEKEND",
+      });
+      continue;
+    }
+
+    // Check if the day is a holiday
+    if (holiday) {
+      attInfo.push({
+        date: currentDate.toDate(),
+        clockedIn: "HOLIDAY",
+        clockedOut: "HOLIDAY",
+        hours: "HOLIDAY",
+        extraHours: "HOLIDAY",
       });
       continue;
     }
