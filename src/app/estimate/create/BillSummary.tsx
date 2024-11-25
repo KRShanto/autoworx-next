@@ -12,7 +12,6 @@ import { usePathname } from "next/navigation";
 import { getTotalPayment } from "@/actions/payment/getTotalPayment";
 import { getCompanyTaxCurrency } from "@/actions/settings/emailTemplates";
 
-
 export function BillSummary() {
   const { items, subtotal, discount, grandTotal, tax, deposit, due, coupon } =
     useEstimateCreateStore();
@@ -121,17 +120,16 @@ export function BillSummary() {
 
     fetchTotalPayment();
   }, [invoiceId, setDeposit]);
-  
- useEffect(() => {
+
+  useEffect(() => {
     async function fetchTax() {
       const tax = await getCompanyTaxCurrency();
       setTax(tax.tax);
     }
 
     fetchTax();
+  }, [setTax]);
 
- },[setTax]);
-  
   return (
     <>
       <div className="space-y-2 p-2">
@@ -160,16 +158,6 @@ export function BillSummary() {
               className="w-[100px] rounded-md bg-slate-500 px-2 py-1 text-xs text-white"
               readOnly={title === "deposit"}
             />
-            {/* {title === "deposit" && (
-              <DepositCreate
-                deposit={deposit}
-                method={depositMethod}
-                setDeposit={setDeposit}
-                setMethod={setDepositMethod}
-                depositNotes={depositNotes}
-                setDepositNotes={setDepositNotes}
-              />
-            )} */}
           </div>
         ))}
       </div>
