@@ -40,6 +40,7 @@ export const updateTechnician = async (
 
     await updateWorkOrderStatus(payload.invoiceId);
     revalidatePath("/estimate/workorder");
+    revalidatePath("/employee");
     return {
       type: "success",
       data: {

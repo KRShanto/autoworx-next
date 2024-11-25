@@ -283,7 +283,7 @@ const InvoiceComponent = ({
               <h2 className="col-span-full text-3xl font-bold uppercase text-slate-500">
                 Attachments
               </h2>
-              {invoice.photos.map(async (x) => {
+              {invoice.photos.map((x) => {
                 return (
                   <Link
                     href={`/estimate/photo/${x.photo}`}

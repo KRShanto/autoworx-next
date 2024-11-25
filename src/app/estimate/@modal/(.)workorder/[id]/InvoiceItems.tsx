@@ -53,11 +53,13 @@ export function InvoiceItems({ items }: TProps) {
         >
           <p className="px-5">{item.service.name}</p>
           <div className="mr-5 flex items-center space-x-3">
-            <ReDoModal
-              invoiceId={item?.invoiceId as string}
-              serviceId={item?.serviceId as number}
-              technicians={item.service.Technician}
-            />
+            {item.service.Technician && item.service.Technician.length > 1 && (
+              <ReDoModal
+                invoiceId={item?.invoiceId as string}
+                serviceId={item?.serviceId as number}
+                technicians={item.service.Technician}
+              />
+            )}
             <button
               type="button"
               onClick={() =>

@@ -80,7 +80,7 @@ export default function EmployeeInfoTable({
             <th className="border-b px-4 py-2 text-left">Date Closed</th>
             <th className="border-b px-4 py-2 text-left">Total Payout</th>
             <th className="border-b px-4 py-2 text-center">Status</th>
-            <th className="border-b px-4 py-2 text-center">Actions</th>
+            {/* <th className="border-b px-4 py-2 text-center">Actions</th> */}
           </tr>
         </thead>
         <tbody>
@@ -124,12 +124,12 @@ export default function EmployeeInfoTable({
                   {row.status}
                 </p>
               </td>
-              <td className="cursor-pointer border-b bg-white px-4 py-2 text-left">
+              {/* <td className="cursor-pointer border-b bg-white px-4 py-2 text-left">
                 <div className="flex items-center justify-center gap-2">
                   <EditOutlined className="cursor-pointer text-blue-600" />
                   <FaTimes className="cursor-pointer text-red-500" />
                 </div>
-              </td>
+              </td> */}
             </tr>
           ))}
         </tbody>

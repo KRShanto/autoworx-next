@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { Priority } from "@prisma/client";
 import { updateWorkOrderStatus } from "./updateWorkOrderStatus";
+import { revalidatePath } from "next/cache";
 
 type TechnicianInput = {
   date: Date;
@@ -41,6 +42,8 @@ export async function addTechnician(
     });
 
     await updateWorkOrderStatus(payload.invoiceId);
+    revalidatePath("/estimate/workorder");
+    revalidatePath("/employee");
 
     return {
       type: "success",
