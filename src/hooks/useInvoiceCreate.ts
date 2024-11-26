@@ -69,7 +69,6 @@ export function useInvoiceCreate(type: InvoiceType) {
         id: invoiceId,
         clientId: clientId ? clientId : undefined,
         vehicleId: vehicleId ? vehicleId : undefined,
-
         columnId: columnId ? columnId : undefined,
         subtotal,
         discount,
@@ -87,6 +86,7 @@ export function useInvoiceCreate(type: InvoiceType) {
         photos: photoPaths,
         items,
         tasks,
+        type,
       });
     } else {
       res = await createInvoice({
