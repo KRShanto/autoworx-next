@@ -48,6 +48,7 @@ model Invoice {
     assignedTo              User?                     @relation(name: "assignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
     column                  Column?                   @relation(fields: [columnId], references: [id], onDelete: SetNull)
     InvoiceRedo             InvoiceRedo[]
+    authorizedName          String?
 
     @@index([companyId], name: "fk_invoices_company")
 }
