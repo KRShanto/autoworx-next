@@ -57,7 +57,6 @@ const DashboardOther = ({
   appointments: any;
   lastClockInOut: (ClockInOut & { ClockBreak: ClockBreak[] }) | null;
 }) => {
-  console.log("🚀 ~ lastClockInOut:", lastClockInOut);
 
   const { open } = usePopupStore();
   const validBreak = useCallback(
