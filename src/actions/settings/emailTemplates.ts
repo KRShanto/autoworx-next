@@ -1,8 +1,10 @@
 "use server";
-import { db } from "@/lib/db";
-import { z } from "zod";
 import { getCompanyId } from "@/lib/companyId";
+import { db } from "@/lib/db";
+import getUser from "@/lib/getUser";
 import { CompanyEmailTemplate, Prisma } from "@prisma/client";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 const EmailTemplateSchema = z.object({
   subject: z.string().min(1, "Subject is required"),
@@ -42,8 +44,28 @@ export const getOrCreateEmailTemplate =
       throw error;
     }
   };
+
+export const getEmailTemplate =
+  async (): Promise<CompanyEmailTemplate | null> => {
+    try {
+      const companyId = await getCompanyId(); // Get the company ID
+      let template = await db.companyEmailTemplate.findFirst({
+        where: { companyId },
+      });
+
+      if (!template) {
+        return null;
+      }
+
+      return template;
+    } catch (error) {
+      console.error("Error fetching/creating email template:", error);
+      throw error;
+    }
+  };
+
 export const updateEmailTemplate = async (
-  id: number,
+  id: number | null,
   emailTemplateData: unknown,
 ) => {
   try {
@@ -51,16 +73,27 @@ export const updateEmailTemplate = async (
       EmailTemplateSchema,
       emailTemplateData,
     );
-    const companyId = await getCompanyId();
-    const updatedTemplate = await db.companyEmailTemplate.update({
-      where: { id },
-      data: {
-        subject: validatedData.subject,
-        message: validatedData.message,
-        companyId,
-      },
-    });
-
+    const user = await getUser();
+    let updatedTemplate;
+    if (id) {
+      updatedTemplate = await db.companyEmailTemplate.update({
+        where: { id },
+        data: {
+          subject: validatedData.subject,
+          message: validatedData.message,
+          companyId: user.companyId,
+        },
+      });
+    } else {
+      updatedTemplate = await db.companyEmailTemplate.create({
+        data: {
+          subject: validatedData.subject,
+          message: validatedData.message,
+          companyId: user.companyId,
+        },
+      });
+    }
+    revalidatePath("/estimate");
     return updatedTemplate;
   } catch (error: any) {
     console.error("Error updating email template:", error);
