@@ -5,6 +5,7 @@ import BarChartComponent from "./BarChartComponent";
 import { useParams } from "next/navigation";
 import { useServerGet } from "@/hooks/useServerGet";
 import { getPerformanceInfo } from "@/actions/employee/getPerformanceInfo";
+import { cn } from "@/lib/cn";
 
 interface AttendanceData {
   day: string;
@@ -23,6 +24,7 @@ interface MetricData {
   value: string;
   percentage: number;
   isPositive: boolean;
+  isZeroGrowth: boolean;
 }
 
 const arrayOfPerformanceWord = ["Average", "Return"];
@@ -32,7 +34,9 @@ export default function PerformanceTable() {
   const { data } = useServerGet(getPerformanceInfo, Number(params.id));
   const {
     averageJobTime,
+    averageJobTimeGrowthRate,
     returnWorkRate,
+    returnWorkRateGrowthRate,
     totalJobs,
     totalJobsCompletedOnTime,
     totalJobsCompletedLate,
@@ -50,14 +54,17 @@ export default function PerformanceTable() {
     {
       label: "Average Time to Complete a Job",
       value: Math.floor(averageJobTime || 0) + " hours",
-      percentage: 4,
-      isPositive: true,
+      percentage: averageJobTimeGrowthRate!,
+      isPositive: (averageJobTimeGrowthRate || 0) > 0,
+      isZeroGrowth: averageJobTimeGrowthRate === 0,
     },
     {
       label: "Return Work Rate by Service Category",
-      value: returnWorkRate + "%",
-      percentage: -4,
-      isPositive: false,
+      // value: returnWorkRate + "%",
+      value: Math.floor(returnWorkRate || 0) + "%",
+      percentage: returnWorkRateGrowthRate!,
+      isPositive: (returnWorkRateGrowthRate || 0) > 0,
+      isZeroGrowth: returnWorkRateGrowthRate === 0,
     },
   ];
 
@@ -100,18 +107,19 @@ export default function PerformanceTable() {
                 <div className="w-[80%] text-xl font-semibold text-gray-800">
                   {metric.value}
                 </div>
-                <div
-                  className={`flex items-center gap-1 text-sm font-medium ${metric.isPositive ? "text-green-500" : "text-red-500"}`}
-                >
-                  <div>
-                    {metric.isPositive ? (
-                      <IoMdArrowDropup />
-                    ) : (
-                      <IoMdArrowDropdown />
+                {!metric.isZeroGrowth && (
+                  <div
+                    className={cn(
+                      "font-inter text-xl font-semibold",
+                      metric.percentage ? "text-green-500" : "text-red-500",
                     )}
+                  >
+                    {metric.percentage}%
                   </div>
-                  <div>{Math.abs(metric.percentage)}%</div>
-                </div>
+                )}
+                {metric.isZeroGrowth && (
+                  <div className="font-inter text-4xl font-semibold">-</div>
+                )}
 
                 {infoIndex === index && (
                   <div

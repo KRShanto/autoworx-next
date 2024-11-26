@@ -139,7 +139,7 @@ export function SelectStatus({
                 {statusItem.title}
                 {!restrictedColumns.includes(statusItem.title) && (
                   <button
-                    className="text-lg text-[#66738C]"
+                    className="px-2 text-lg text-[#66738C] hover:text-gray-900"
                     onClick={(event) => handleDelete(statusItem.id, event)}
                   >
                     <IoMdClose />

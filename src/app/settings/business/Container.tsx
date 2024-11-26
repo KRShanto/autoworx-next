@@ -5,7 +5,7 @@ import { getCompany } from "@/actions/settings/getCompany";
 export default async function Container() {
   const company = await getCompany();
   return (
-    <div className="space-y-8 rounded-md p-8 shadow-md">
+    <div className="rounded-md p-8 pt-2 shadow-md">
       <BusinessForm company={company!} />
     </div>
   );
