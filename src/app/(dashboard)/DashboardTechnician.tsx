@@ -58,7 +58,6 @@ const DashboardTechnician = ({
   const { data: dashboardInfo } = useServerGetInterval(getTechnicianInfo, 5000);
 
   const { data: messages } = useServerGet(fetchRecentMessages);
-  // console.log("🚀 ~ messages:", messages);
 
   const validBreak = useCallback(
     function (lastClockInOut: ClockInOut & { ClockBreak: ClockBreak[] }) {
@@ -101,7 +100,7 @@ const DashboardTechnician = ({
                   }
                 }
               }}
-              className={`h-full rounded ${!lastClockInOut?.clockOut && lastClockInOut?.clockIn ? "bg-[#03A7A2]" : "bg-[#6571FF]"} ${lastClockInOut && lastClockInOut?.clockOut ? "cursor-pointer" : "cursor-default"} px-4 py-4 text-white xl:px-10`}
+              className={`h-full rounded ${!lastClockInOut?.clockOut && lastClockInOut?.clockIn ? "bg-[#03A7A2]" : "bg-[#6571FF]"} ${!lastClockInOut || lastClockInOut?.clockOut ? "cursor-pointer" : "cursor-default"} px-4 py-4 text-white xl:px-10`}
             >
               <span className="font-semibold xl:text-xl">
                 {!lastClockInOut?.clockOut && lastClockInOut?.clockIn
@@ -129,7 +128,7 @@ const DashboardTechnician = ({
                   }
                 }
               }}
-              className={`h-full rounded bg-[#6571FF] px-4 py-4 text-xl font-semibold text-white xl:px-10 ${!lastClockInOut || lastClockInOut?.clockOut ? "cursor-default" : "cursor-pointer"}`}
+              className={`h-full rounded bg-[#6571FF] px-4 py-4 text-xl font-semibold text-white xl:px-10 ${lastClockInOut && lastClockInOut?.clockIn && !lastClockInOut?.clockOut ? "cursor-pointer" : "cursor-default"}`}
             >
               <span className="font-semibold xl:text-xl">Clock-Out</span>
               <br />
@@ -137,8 +136,9 @@ const DashboardTechnician = ({
             </button>
           </div>
           <div>
-            {lastClockInOut?.ClockBreak[lastClockInOut.ClockBreak.length - 1]
-              ?.breakEnd === null || !lastClockInOut ? (
+            {lastClockInOut &&
+            lastClockInOut?.ClockBreak[lastClockInOut?.ClockBreak?.length - 1]
+              ?.breakEnd === null ? (
               <button
                 onClick={async () => {
                   if (lastClockInOut && validBreak(lastClockInOut)) {
@@ -161,7 +161,7 @@ const DashboardTechnician = ({
             ) : (
               <button
                 onClick={async () => {
-                  if (!lastClockInOut?.clockOut) {
+                  if (lastClockInOut && !lastClockInOut?.clockOut) {
                     const res = await takeBreak({
                       clockInOutId: lastClockInOut.id,
                       breakStart: new Date(),
@@ -171,12 +171,12 @@ const DashboardTechnician = ({
                     }
                   }
                 }}
-                className={`h-full rounded bg-[#6571FF] px-4 py-4 font-semibold text-white xl:px-10 xl:text-xl ${!lastClockInOut?.clockOut ? "cursor-pointer" : "cursor-default"}`}
+                className={`h-full rounded bg-[#6571FF] px-4 py-4 font-semibold text-white xl:px-10 xl:text-xl ${lastClockInOut && !lastClockInOut?.clockOut ? "cursor-pointer" : "cursor-default"}`}
               >
                 <span>Break</span> <br />
                 <div className="mt-1 flex flex-col">
-                  {!lastClockInOut.clockOut &&
-                    lastClockInOut.ClockBreak.slice(-3).map((Break, ind) => {
+                  {!lastClockInOut?.clockOut &&
+                    lastClockInOut?.ClockBreak.slice(-3).map((Break, ind) => {
                       return (
                         <span
                           key={ind}
