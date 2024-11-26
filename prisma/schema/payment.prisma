@@ -11,6 +11,11 @@ model Payment {
     type      PaymentType
     card      CardPayment?
     check     CheckPayment?
+    cash      CashPayment?
+    other     OtherPayment?
+    invoiceId String?       @map("invoice_id")
+    companyId Int           @map("company_id")
+    createdAt DateTime      @default(now()) @map("created_at")
     updatedAt DateTime      @default(now()) @updatedAt @map("updated_at")
     invoice   Invoice?      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
     Company   Company?      @relation(fields: [companyId], references: [id])
