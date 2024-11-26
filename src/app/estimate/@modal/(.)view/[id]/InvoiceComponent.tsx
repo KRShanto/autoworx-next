@@ -11,7 +11,7 @@ import {
   DialogOverlay,
   DialogPortal,
 } from "@/components/Dialog";
-import { successToast } from "@/lib/toast";
+import { errorToast, successToast } from "@/lib/toast";
 import {
   Column,
   Company,
@@ -74,8 +74,14 @@ const InvoiceComponent = ({
 
   const [companyDetails, setCompanyDetails] = useState<Company | null>(null);
 
-  const handleEmail = () => {
-    sendInvoiceEmail({ invoiceId: invoice.id });
+  const handleEmail = async () => {
+    let res = await sendInvoiceEmail({ invoiceId: invoice.id });
+    console.log("🚀 ~ handleEmail ~ res:", res);
+    if (!res?.success) {
+      errorToast(res?.message || "Error sharing invoice");
+      return;
+    }
+    successToast("Invoice sent successfully");
     // close the dialog
     router.back();
   };
@@ -392,7 +398,10 @@ const InvoiceComponent = ({
             >
               View Work Order
             </Link>
-            <button className="flex items-center justify-center gap-2 rounded-md bg-white py-2 text-[#6571FF]">
+            <button
+              onClick={handleEmail}
+              className="flex items-center justify-center gap-2 rounded-md bg-white py-2 text-[#6571FF]"
+            >
               Share Invoice
               <FaRegShareFromSquare />
             </button>
