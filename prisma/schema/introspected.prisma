@@ -1,0 +1,1168 @@
+model appointment {
+  id                                 Int               @id @default(autoincrement())
+  user_id                            Int
+  title                              String            @db.VarChar(100)
+  date                               DateTime?
+  start_time                         String?
+  end_time                           String?
+  company_id                         Int
+  customer_id                        Int?
+  vehicle_id                         Int?
+  draft_estimate                     String?
+  notes                              String?
+  confirmation_email_template_id     Int?
+  confirmation_email_template_status Boolean           @default(false)
+  reminder_email_template_id         Int?
+  reminder_email_template_status     Boolean           @default(false)
+  times                              Json?
+  created_at                         DateTime          @default(now())
+  updated_at                         DateTime          @default(now())
+  googleEventId                      String?
+  company                            company           @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Appointment_company_id_fkey")
+  client                             client?           @relation(fields: [customer_id], references: [id], map: "Appointment_customer_id_fkey")
+  user                               user              @relation(fields: [user_id], references: [id], map: "Appointment_user_id_fkey")
+  vehicle                            vehicle?          @relation(fields: [vehicle_id], references: [id], map: "Appointment_vehicle_id_fkey")
+  appointmentuser                    appointmentuser[]
+
+  @@index([customer_id], map: "Appointment_customer_id_fkey")
+  @@index([vehicle_id], map: "Appointment_vehicle_id_fkey")
+  @@index([company_id], map: "fk_tasks_company")
+  @@index([user_id], map: "fk_tasks_user")
+}
+
+model appointmentuser {
+  id             Int         @id @default(autoincrement())
+  appointment_id Int
+  user_id        Int
+  eventId        String      @db.VarChar(100)
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @default(now())
+  appointment    appointment @relation(fields: [appointment_id], references: [id], onDelete: Cascade, map: "AppointmentUser_appointment_id_fkey")
+  user           user        @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "AppointmentUser_user_id_fkey")
+
+  @@index([appointment_id], map: "AppointmentUser_appointment_id_fkey")
+  @@index([user_id], map: "AppointmentUser_user_id_fkey")
+}
+
+model attachment {
+  id         Int      @id @default(autoincrement())
+  fileName   String
+  fileType   String
+  fileUrl    String
+  fileSize   String
+  messageId  Int      @unique(map: "Attachment_messageId_key")
+  createdAt  DateTime @default(now())
+  updated_at DateTime @default(now())
+  message    message  @relation(fields: [messageId], references: [id], map: "Attachment_messageId_fkey")
+}
+
+model calendarsettings {
+  id         Int      @id @default(autoincrement())
+  company_id Int      @unique(map: "CalendarSettings_company_id_key")
+  weekStart  String
+  dayStart   String
+  dayEnd     String
+  weekend1   String   @default("Saturday")
+  weekend2   String   @default("Sunday")
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  company    company  @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "CalendarSettings_company_id_fkey")
+}
+
+model cardpayment {
+  id         Int                  @id @default(autoincrement())
+  paymentId  Int                  @unique(map: "CardPayment_paymentId_key")
+  creditCard String?
+  cardType   cardpayment_cardType
+  payment    payment              @relation(fields: [paymentId], references: [id], onDelete: Cascade, map: "CardPayment_paymentId_fkey")
+}
+
+model cashpayment {
+  id           Int     @id @default(autoincrement())
+  paymentId    Int     @unique(map: "CashPayment_paymentId_key")
+  receivedCash Float?
+  payment      payment @relation(fields: [paymentId], references: [id], onDelete: Cascade, map: "CashPayment_paymentId_fkey")
+}
+
+model category {
+  id               Int                @id @default(autoincrement())
+  name             String
+  company_id       Int
+  created_at       DateTime           @default(now())
+  updated_at       DateTime           @default(now())
+  company          company            @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Category_company_id_fkey")
+  inventoryproduct inventoryproduct[]
+  labor            labor[]
+  material         material[]
+  service          service[]
+
+  @@index([company_id], map: "Category_company_id_fkey")
+}
+
+model checkpayment {
+  id          Int     @id @default(autoincrement())
+  paymentId   Int     @unique(map: "CheckPayment_paymentId_key")
+  checkNumber String?
+  payment     payment @relation(fields: [paymentId], references: [id], onDelete: Cascade, map: "CheckPayment_paymentId_fkey")
+}
+
+model client {
+  id                        Int            @id @default(autoincrement())
+  first_name                String
+  last_name                 String?
+  mobile                    String?
+  email                     String?
+  address                   String?
+  city                      String?
+  state                     String?
+  zip                       String?
+  photo                     String         @default("/images/default.png")
+  source_id                 Int?
+  company_id                Int
+  created_at                DateTime       @default(now())
+  updated_at                DateTime       @default(now())
+  customer_company          String?
+  tag_id                    Int?
+  from_request              Boolean?       @default(false)
+  from_requested_company_id Int?
+  notes                     String?
+  appointment               appointment[]
+  company                   company        @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Client_company_id_fkey")
+  source                    source?        @relation(fields: [source_id], references: [id], map: "Client_source_id_fkey")
+  tag                       tag?           @relation(fields: [tag_id], references: [id], map: "Client_tag_id_fkey")
+  clientcoupon              clientcoupon[]
+  invoice                   invoice[]
+  task                      task[]
+  vehicle                   vehicle[]
+
+  @@index([source_id], map: "Client_source_id_fkey")
+  @@index([tag_id], map: "Client_tag_id_fkey")
+  @@index([company_id], map: "fk_customers_company")
+}
+
+model clientcoupon {
+  id         Int      @id @default(autoincrement())
+  coupon_id  Int
+  client_id  Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  client     client   @relation(fields: [client_id], references: [id], onDelete: Cascade, map: "ClientCoupon_client_id_fkey")
+  coupon     coupon   @relation(fields: [coupon_id], references: [id], onDelete: Cascade, map: "ClientCoupon_coupon_id_fkey")
+
+  @@index([client_id], map: "ClientCoupon_client_id_fkey")
+  @@index([coupon_id], map: "ClientCoupon_coupon_id_fkey")
+}
+
+model clockbreak {
+  id              Int        @id @default(autoincrement())
+  clock_in_out_id Int
+  break_start     DateTime
+  break_end       DateTime?
+  created_at      DateTime   @default(now())
+  updated_at      DateTime   @default(now())
+  clockinout      clockinout @relation(fields: [clock_in_out_id], references: [id], onDelete: Cascade, map: "ClockBreak_clock_in_out_id_fkey")
+
+  @@index([clock_in_out_id], map: "fk_clock_break_clock_in_out")
+}
+
+model clockinout {
+  id         Int          @id @default(autoincrement())
+  user_id    Int
+  company_id Int
+  clock_in   DateTime
+  clock_out  DateTime?
+  created_at DateTime     @default(now())
+  updated_at DateTime     @default(now())
+  clockbreak clockbreak[]
+  company    company      @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "ClockInOut_company_id_fkey")
+  user       user         @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "ClockInOut_user_id_fkey")
+
+  @@index([company_id], map: "fk_clock_in_out_company")
+  @@index([user_id], map: "fk_clock_in_out_user")
+}
+
+model column {
+  id         Int       @id @default(autoincrement())
+  title      String
+  type       String
+  bgColor    String?
+  company_id Int
+  order      Int
+  textColor  String?
+  company    company   @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Column_company_id_fkey")
+  invoice    invoice[]
+
+  @@index([company_id], map: "Column_company_id_fkey")
+}
+
+model company {
+  id                                                           Int                       @id @default(autoincrement())
+  name                                                         String
+  created_at                                                   DateTime                  @default(now())
+  updated_at                                                   DateTime                  @default(now())
+  address                                                      String?
+  business_id                                                  String?
+  business_type                                                String?
+  city                                                         String?
+  image                                                        String?
+  industry                                                     String?
+  phone                                                        String?
+  state                                                        String?
+  website                                                      String?
+  zip                                                          String?
+  address_visibility                                           Boolean?                  @default(true)
+  business_visibility                                          Boolean?                  @default(true)
+  companyLatitude                                              Float?
+  companyLongitude                                             Float?
+  currency                                                     String?                   @default("USD")
+  google_refresh_token                                         String?
+  phone_visibility                                             Boolean?                  @default(true)
+  policy                                                       String?
+  tax                                                          Decimal?                  @default(0.000000000000000000000000000000)
+  terms                                                        String?
+  zapierToken                                                  String?                   @unique(map: "Company_zapierToken_key") @db.VarChar(240)
+  appointment                                                  appointment[]
+  calendarsettings                                             calendarsettings?
+  category                                                     category[]
+  client                                                       client[]
+  clockinout                                                   clockinout[]
+  column                                                       column[]
+  companyemailtemplate                                         companyemailtemplate[]
+  companyjoin_companyjoin_companyOneIdTocompany                companyjoin[]             @relation("companyjoin_companyOneIdTocompany")
+  companyjoin_companyjoin_companyTwoIdTocompany                companyjoin[]             @relation("companyjoin_companyTwoIdTocompany")
+  coupon                                                       coupon[]
+  emailtemplate                                                emailtemplate[]
+  holiday                                                      holiday[]
+  inventoryproduct                                             inventoryproduct[]
+  inventoryproducthistory                                      inventoryproducthistory[]
+  invoice                                                      invoice[]
+  labor                                                        labor[]
+  lead                                                         lead[]
+  leaverequest                                                 leaverequest[]
+  material                                                     material[]
+  payment                                                      payment[]
+  paymentmethod                                                paymentmethod[]
+  permission                                                   permission[]
+  permissionformanager                                         permissionformanager[]
+  permissionforother                                           permissionforother[]
+  permissionforsales                                           permissionforsales[]
+  permissionfortechnician                                      permissionfortechnician[]
+  requestestimate_requestestimate_receiver_company_idTocompany requestestimate[]         @relation("requestestimate_receiver_company_idTocompany")
+  requestestimate_requestestimate_sender_company_idTocompany   requestestimate[]         @relation("requestestimate_sender_company_idTocompany")
+  service                                                      service[]
+  source                                                       source[]
+  status                                                       status[]
+  tag                                                          tag[]
+  task                                                         task[]
+  technician                                                   technician[]
+  user                                                         user[]
+  vehicle                                                      vehicle[]
+  vehiclecolor                                                 vehiclecolor[]
+  vendor                                                       vendor[]
+}
+
+model companyemailtemplate {
+  id         Int      @id @default(autoincrement())
+  subject    String
+  message    String?  @db.Text
+  company_id Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  company    company  @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "companyEmailTemplate_company_id_fkey")
+
+  @@index([company_id], map: "companyEmailTemplate_company_id_fkey")
+}
+
+model companyjoin {
+  id                                        Int      @id @default(autoincrement())
+  companyOneId                              Int
+  companyTwoId                              Int
+  created_at                                DateTime @default(now())
+  updated_at                                DateTime @default(now())
+  company_companyjoin_companyOneIdTocompany company  @relation("companyjoin_companyOneIdTocompany", fields: [companyOneId], references: [id], onDelete: Cascade, map: "CompanyJoin_companyOneId_fkey")
+  company_companyjoin_companyTwoIdTocompany company  @relation("companyjoin_companyTwoIdTocompany", fields: [companyTwoId], references: [id], onDelete: Cascade, map: "CompanyJoin_companyTwoId_fkey")
+
+  @@index([companyOneId], map: "CompanyJoin_companyOneId_fkey")
+  @@index([companyTwoId], map: "CompanyJoin_companyTwoId_fkey")
+}
+
+model coupon {
+  id           Int                 @id @default(autoincrement())
+  name         String
+  code         String
+  type         String
+  startDate    DateTime
+  endDate      DateTime
+  discount     Decimal
+  discountType coupon_discountType
+  status       coupon_status
+  redemptions  Int
+  company_id   Int
+  created_at   DateTime            @default(now())
+  updated_at   DateTime            @default(now())
+  clientcoupon clientcoupon[]
+  company      company             @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Coupon_company_id_fkey")
+
+  @@index([company_id], map: "Coupon_company_id_fkey")
+}
+
+model emailtemplate {
+  id         Int                @id @default(autoincrement())
+  subject    String
+  message    String?            @db.Text
+  type       emailtemplate_type
+  company_id Int
+  created_at DateTime           @default(now())
+  updated_at DateTime           @default(now())
+  company    company            @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "EmailTemplate_company_id_fkey")
+
+  @@index([company_id], map: "EmailTemplate_company_id_fkey")
+}
+
+model group {
+  id         Int       @id @default(autoincrement())
+  name       String
+  type       String    @default("Group")
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  message    message[]
+  user       user[]    @relation("usergroups")
+}
+
+model holiday {
+  id         Int      @id @default(autoincrement())
+  company_id Int
+  date       DateTime
+  month      String
+  year       Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  company    company  @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Holiday_company_id_fkey")
+
+  @@index([company_id], map: "Holiday_company_id_fkey")
+}
+
+model inventoryproduct {
+  id                      Int                       @id @default(autoincrement())
+  name                    String
+  description             String?
+  category_id             Int?
+  quantity                Int?                      @default(1)
+  price                   Decimal?                  @default(0.000000000000000000000000000000)
+  unit                    String?                   @default("pc")
+  lot                     String?
+  vendor_id               Int?
+  type                    inventoryproduct_type
+  receipt                 String?
+  low_inventory_alert     Int?
+  company_id              Int
+  created_at              DateTime                  @default(now())
+  updated_at              DateTime                  @default(now())
+  category                category?                 @relation(fields: [category_id], references: [id], map: "InventoryProduct_category_id_fkey")
+  company                 company                   @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "InventoryProduct_company_id_fkey")
+  vendor                  vendor?                   @relation(fields: [vendor_id], references: [id], map: "InventoryProduct_vendor_id_fkey")
+  inventoryproducthistory inventoryproducthistory[]
+  inventoryproducttag     inventoryproducttag[]
+  material                material[]
+
+  @@index([category_id], map: "InventoryProduct_category_id_fkey")
+  @@index([company_id], map: "InventoryProduct_company_id_fkey")
+  @@index([vendor_id], map: "InventoryProduct_vendor_id_fkey")
+}
+
+model inventoryproducthistory {
+  id               Int                          @id @default(autoincrement())
+  inventory_id     Int
+  price            Decimal?                     @default(0.000000000000000000000000000000)
+  quantity         Int
+  date             DateTime?                    @default(now())
+  notes            String?
+  type             inventoryproducthistory_type
+  invoice_id       String?
+  created_at       DateTime                     @default(now())
+  updated_at       DateTime                     @default(now())
+  vendor_id        Int?
+  company_id       Int
+  company          company                      @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "InventoryProductHistory_company_id_fkey")
+  inventoryproduct inventoryproduct             @relation(fields: [inventory_id], references: [id], onDelete: Cascade, map: "InventoryProductHistory_inventory_id_fkey")
+  invoice          invoice?                     @relation(fields: [invoice_id], references: [id], map: "InventoryProductHistory_invoice_id_fkey")
+  vendor           vendor?                      @relation(fields: [vendor_id], references: [id], map: "InventoryProductHistory_vendor_id_fkey")
+
+  @@index([company_id], map: "InventoryProductHistory_company_id_fkey")
+  @@index([inventory_id], map: "InventoryProductHistory_inventory_id_fkey")
+  @@index([invoice_id], map: "InventoryProductHistory_invoice_id_fkey")
+  @@index([vendor_id], map: "InventoryProductHistory_vendor_id_fkey")
+}
+
+model inventoryproducttag {
+  inventory_id     Int
+  tag_id           Int
+  inventoryproduct inventoryproduct @relation(fields: [inventory_id], references: [id], onDelete: Cascade, map: "InventoryProductTag_inventory_id_fkey")
+  tag              tag              @relation(fields: [tag_id], references: [id], onDelete: Cascade, map: "InventoryProductTag_tag_id_fkey")
+
+  @@id([inventory_id, tag_id])
+  @@index([tag_id], map: "InventoryProductTag_tag_id_fkey")
+}
+
+model invoice {
+  id                             String                    @id
+  created_at                     DateTime                  @default(now())
+  updated_at                     DateTime                  @default(now())
+  type                           invoice_type              @default(Invoice)
+  customer_id                    Int?
+  vehicle_id                     Int?
+  subtotal                       Decimal?                  @default(0.00) @db.Decimal(8, 2)
+  discount                       Decimal?                  @default(0.00) @db.Decimal(8, 2)
+  tax                            Decimal?                  @default(0.00) @db.Decimal(8, 2)
+  grand_total                    Decimal?                  @default(0.00) @db.Decimal(8, 2)
+  deposit                        Decimal?                  @default(0.00) @db.Decimal(8, 2)
+  deposit_notes                  String?                   @default("")
+  deposit_method                 String?                   @default("")
+  due                            Decimal?                  @default(0.00) @db.Decimal(8, 2)
+  status_id                      Int?
+  internalNotes                  String?
+  terms                          String?
+  policy                         String?
+  customerNotes                  String?
+  customerComments               String?
+  company_id                     Int
+  user_id                        Int?
+  work_order_status              String?                   @default("Pending")
+  assigned_to                    Int?
+  column_id                      Int?
+  from_request                   Boolean?                  @default(false)
+  from_requested_company_id      Int?
+  profit                         Int?                      @default(0)
+  request_estimate_id            Int?                      @unique(map: "Invoice_request_estimate_id_key")
+  inventoryproducthistory        inventoryproducthistory[]
+  user_invoice_assigned_toTouser user?                     @relation("invoice_assigned_toTouser", fields: [assigned_to], references: [id], map: "Invoice_assigned_to_fkey")
+  column                         column?                   @relation(fields: [column_id], references: [id], map: "Invoice_column_id_fkey")
+  company                        company                   @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Invoice_company_id_fkey")
+  client                         client?                   @relation(fields: [customer_id], references: [id], map: "Invoice_customer_id_fkey")
+  requestestimate                requestestimate?          @relation(fields: [request_estimate_id], references: [id], map: "Invoice_request_estimate_id_fkey")
+  status                         status?                   @relation(fields: [status_id], references: [id], map: "Invoice_status_id_fkey")
+  user_invoice_user_idTouser     user?                     @relation("invoice_user_idTouser", fields: [user_id], references: [id], map: "Invoice_user_id_fkey")
+  vehicle                        vehicle?                  @relation(fields: [vehicle_id], references: [id], map: "Invoice_vehicle_id_fkey")
+  invoiceitem                    invoiceitem[]
+  invoicephoto                   invoicephoto[]
+  invoiceredo                    invoiceredo[]
+  invoicetags                    invoicetags[]
+  material                       material[]
+  payment                        payment[]
+  task                           task[]
+  technician                     technician[]
+
+  @@index([assigned_to], map: "Invoice_assigned_to_fkey")
+  @@index([column_id], map: "Invoice_column_id_fkey")
+  @@index([customer_id], map: "Invoice_customer_id_fkey")
+  @@index([status_id], map: "Invoice_status_id_fkey")
+  @@index([user_id], map: "Invoice_user_id_fkey")
+  @@index([vehicle_id], map: "Invoice_vehicle_id_fkey")
+  @@index([company_id], map: "fk_invoices_company")
+}
+
+model invoiceitem {
+  id         Int        @id @default(autoincrement())
+  invoice_id String?
+  service_id Int?
+  labor_id   Int?
+  created_at DateTime   @default(now())
+  updated_at DateTime   @default(now())
+  invoice    invoice?   @relation(fields: [invoice_id], references: [id], onDelete: Cascade, map: "InvoiceItem_invoice_id_fkey")
+  labor      labor?     @relation(fields: [labor_id], references: [id], map: "InvoiceItem_labor_id_fkey")
+  service    service?   @relation(fields: [service_id], references: [id], map: "InvoiceItem_service_id_fkey")
+  itemtag    itemtag[]
+  material   material[]
+
+  @@index([invoice_id], map: "InvoiceItem_invoice_id_fkey")
+  @@index([labor_id], map: "InvoiceItem_labor_id_fkey")
+  @@index([service_id], map: "InvoiceItem_service_id_fkey")
+}
+
+model invoicephoto {
+  id         Int      @id @default(autoincrement())
+  invoice_id String
+  photo      String   @db.VarChar(1024)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  invoice    invoice  @relation(fields: [invoice_id], references: [id], onDelete: Cascade, map: "InvoicePhoto_invoice_id_fkey")
+
+  @@index([invoice_id], map: "fk_invoice_photos_invoice")
+}
+
+model invoiceredo {
+  id            Int        @id @default(autoincrement())
+  invoice_id    String
+  service_id    Int
+  technician_id Int
+  notes         String?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @default(now())
+  invoice       invoice    @relation(fields: [invoice_id], references: [id], onDelete: Cascade, map: "InvoiceRedo_invoice_id_fkey")
+  service       service    @relation(fields: [service_id], references: [id], map: "InvoiceRedo_service_id_fkey")
+  technician    technician @relation(fields: [technician_id], references: [id], map: "InvoiceRedo_technician_id_fkey")
+
+  @@index([invoice_id], map: "InvoiceRedo_invoice_id_fkey")
+  @@index([service_id], map: "InvoiceRedo_service_id_fkey")
+  @@index([technician_id], map: "InvoiceRedo_technician_id_fkey")
+}
+
+model invoicetags {
+  id         Int      @id @default(autoincrement())
+  invoice_id String
+  tag_id     Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  invoice    invoice  @relation(fields: [invoice_id], references: [id], onDelete: Cascade, map: "InvoiceTags_invoice_id_fkey")
+  tag        tag      @relation(fields: [tag_id], references: [id], onDelete: Cascade, map: "InvoiceTags_tag_id_fkey")
+
+  @@index([invoice_id], map: "fk_invoice_tags_invoice")
+  @@index([tag_id], map: "fk_invoice_tags_tag")
+}
+
+model itemtag {
+  itemId      Int
+  tagId       Int
+  invoiceitem invoiceitem @relation(fields: [itemId], references: [id], onDelete: Cascade, map: "ItemTag_itemId_fkey")
+  tag         tag         @relation(fields: [tagId], references: [id], onDelete: Cascade, map: "ItemTag_tagId_fkey")
+
+  @@id([itemId, tagId])
+  @@index([tagId], map: "ItemTag_tagId_fkey")
+}
+
+model labor {
+  id           Int           @id @default(autoincrement())
+  name         String
+  category_id  Int?
+  notes        String?
+  hours        Int?
+  charge       Decimal?
+  discount     Decimal?
+  company_id   Int
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @default(now())
+  canned_labor Boolean?      @default(false)
+  invoiceitem  invoiceitem[]
+  category     category?     @relation(fields: [category_id], references: [id], map: "Labor_category_id_fkey")
+  company      company       @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Labor_company_id_fkey")
+  labortag     labortag[]
+
+  @@index([category_id], map: "Labor_category_id_fkey")
+  @@index([company_id], map: "Labor_company_id_fkey")
+}
+
+model labortag {
+  labor_id Int
+  tag_id   Int
+  labor    labor @relation(fields: [labor_id], references: [id], onDelete: Cascade, map: "LaborTag_labor_id_fkey")
+  tag      tag   @relation(fields: [tag_id], references: [id], onDelete: Cascade, map: "LaborTag_tag_id_fkey")
+
+  @@id([labor_id, tag_id])
+  @@index([tag_id], map: "LaborTag_tag_id_fkey")
+}
+
+model lead {
+  id           Int      @id @default(autoincrement())
+  client_name  String
+  client_email String?
+  client_phone String?
+  vehicle_info String
+  services     String
+  source       String
+  comments     String?
+  company_id   Int
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now())
+  company      company  @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Lead_company_id_fkey")
+
+  @@index([company_id], map: "Lead_company_id_fkey")
+}
+
+model leaverequest {
+  id          Int                 @id @default(autoincrement())
+  user_id     Int
+  start_date  DateTime
+  end_date    DateTime
+  status      leaverequest_status
+  title       String
+  description String
+  company_id  Int
+  created_at  DateTime            @default(now())
+  updated_at  DateTime            @default(now())
+  company     company             @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "LeaveRequest_company_id_fkey")
+  user        user                @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "LeaveRequest_user_id_fkey")
+
+  @@index([company_id], map: "LeaveRequest_company_id_fkey")
+  @@index([user_id], map: "LeaveRequest_user_id_fkey")
+}
+
+model material {
+  id               Int               @id @default(autoincrement())
+  name             String
+  vendor_id        Int?
+  category_id      Int?
+  notes            String?
+  quantity         Int?
+  cost             Decimal?
+  sell             Decimal?
+  discount         Decimal?
+  company_id       Int
+  invoice_id       String?
+  invoice_item_id  Int?
+  product_id       Int?
+  created_at       DateTime          @default(now())
+  updated_at       DateTime          @default(now())
+  category         category?         @relation(fields: [category_id], references: [id], map: "Material_category_id_fkey")
+  company          company           @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Material_company_id_fkey")
+  invoice          invoice?          @relation(fields: [invoice_id], references: [id], map: "Material_invoice_id_fkey")
+  invoiceitem      invoiceitem?      @relation(fields: [invoice_item_id], references: [id], onDelete: Cascade, map: "Material_invoice_item_id_fkey")
+  inventoryproduct inventoryproduct? @relation(fields: [product_id], references: [id], map: "Material_product_id_fkey")
+  vendor           vendor?           @relation(fields: [vendor_id], references: [id], map: "Material_vendor_id_fkey")
+  materialtag      materialtag[]
+
+  @@index([category_id], map: "Material_category_id_fkey")
+  @@index([invoice_id], map: "Material_invoice_id_fkey")
+  @@index([invoice_item_id], map: "Material_invoice_item_id_fkey")
+  @@index([product_id], map: "Material_product_id_fkey")
+  @@index([vendor_id], map: "Material_vendor_id_fkey")
+  @@index([company_id], map: "fk_materials_company")
+}
+
+model materialtag {
+  material_id Int
+  tag_id      Int
+  material    material @relation(fields: [material_id], references: [id], onDelete: Cascade, map: "MaterialTag_material_id_fkey")
+  tag         tag      @relation(fields: [tag_id], references: [id], onDelete: Cascade, map: "MaterialTag_tag_id_fkey")
+
+  @@id([material_id, tag_id])
+  @@index([tag_id], map: "MaterialTag_tag_id_fkey")
+}
+
+model message {
+  id                  Int              @id @default(autoincrement())
+  to                  Int?
+  message             String
+  from                Int
+  group_id            Int?
+  created_at          DateTime         @default(now())
+  updated_at          DateTime         @default(now())
+  request_estimate_id Int?             @unique(map: "Message_request_estimate_id_key")
+  attachment          attachment?
+  group               group?           @relation(fields: [group_id], references: [id], map: "Message_group_id_fkey")
+  requestestimate     requestestimate? @relation(fields: [request_estimate_id], references: [id], map: "Message_request_estimate_id_fkey")
+
+  @@index([from], map: "fk_messages_from")
+  @@index([group_id], map: "fk_messages_group")
+  @@index([to], map: "fk_messages_to")
+}
+
+model notificationsettings {
+  id            Int      @id @default(autoincrement())
+  type          String   @unique(map: "NotificationSettings_type_key") @default("notification")
+  notifications Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+}
+
+model oauthtoken {
+  id            Int       @id @default(autoincrement())
+  user_id       Int       @unique(map: "OAuthToken_user_id_key")
+  provider      String
+  access_token  String
+  refresh_token String?
+  expires_in    DateTime?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @default(now())
+  user          user      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "OAuthToken_user_id_fkey")
+
+  @@index([user_id], map: "fk_oauth_tokens_user")
+}
+
+model otherpayment {
+  id              Int            @id @default(autoincrement())
+  paymentId       Int            @unique(map: "OtherPayment_paymentId_key")
+  paymentMethodId Int?
+  payment         payment        @relation(fields: [paymentId], references: [id], onDelete: Cascade, map: "OtherPayment_paymentId_fkey")
+  paymentmethod   paymentmethod? @relation(fields: [paymentMethodId], references: [id], onDelete: Cascade, map: "OtherPayment_paymentMethodId_fkey")
+
+  @@index([paymentMethodId], map: "OtherPayment_paymentMethodId_fkey")
+}
+
+model payment {
+  id           Int           @id @default(autoincrement())
+  date         DateTime?
+  notes        String?
+  amount       Decimal?
+  type         payment_type
+  invoice_id   String?
+  company_id   Int
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @default(now())
+  cardpayment  cardpayment?
+  cashpayment  cashpayment?
+  checkpayment checkpayment?
+  otherpayment otherpayment?
+  company      company       @relation(fields: [company_id], references: [id], map: "Payment_company_id_fkey")
+  invoice      invoice?      @relation(fields: [invoice_id], references: [id], onDelete: Cascade, map: "Payment_invoice_id_fkey")
+
+  @@index([company_id], map: "Payment_company_id_fkey")
+  @@index([invoice_id], map: "Payment_invoice_id_fkey")
+}
+
+model paymentmethod {
+  id           Int            @id @default(autoincrement())
+  name         String
+  company_id   Int
+  created_at   DateTime       @default(now())
+  updated_at   DateTime       @default(now())
+  otherpayment otherpayment[]
+  company      company        @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "PaymentMethod_company_id_fkey")
+
+  @@index([company_id], map: "PaymentMethod_company_id_fkey")
+}
+
+model permission {
+  id                              Int     @id @default(autoincrement())
+  user_id                         Int
+  company_id                      Int
+  communication_hub_internal      Boolean @default(false)
+  communication_hub_clients       Boolean @default(false)
+  communication_hub_collaboration Boolean @default(false)
+  estimates_invoices              Boolean @default(false)
+  calendar_task                   Boolean @default(false)
+  payments                        Boolean @default(false)
+  workforce_management            Boolean @default(false)
+  reporting                       Boolean @default(false)
+  inventory                       Boolean @default(false)
+  integrations                    Boolean @default(false)
+  sales_pipeline                  Boolean @default(false)
+  shop_pipeline                   Boolean @default(false)
+  business_settings               Boolean @default(false)
+  company                         company @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Permission_company_id_fkey")
+  user                            user    @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "Permission_user_id_fkey")
+
+  @@unique([user_id, company_id], map: "Permission_user_id_company_id_key")
+  @@index([company_id], map: "Permission_company_id_fkey")
+}
+
+model permissionformanager {
+  id                              Int     @id @default(autoincrement())
+  company_id                      Int
+  communication_hub_internal      Boolean @default(true)
+  communication_hub_clients       Boolean @default(true)
+  communication_hub_collaboration Boolean @default(true)
+  estimates_invoices              Boolean @default(true)
+  calendar_task                   Boolean @default(true)
+  payments                        Boolean @default(true)
+  workforce_management            Boolean @default(true)
+  reporting                       Boolean @default(true)
+  inventory                       Boolean @default(true)
+  integrations                    Boolean @default(false)
+  sales_pipeline                  Boolean @default(true)
+  shop_pipeline                   Boolean @default(true)
+  business_settings               Boolean @default(false)
+  company                         company @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "PermissionForManager_company_id_fkey")
+
+  @@index([company_id], map: "PermissionForManager_company_id_fkey")
+}
+
+model permissionforother {
+  id                              Int     @id @default(autoincrement())
+  company_id                      Int
+  communication_hub_internal      Boolean @default(false)
+  communication_hub_clients       Boolean @default(false)
+  communication_hub_collaboration Boolean @default(false)
+  estimates_invoices              Boolean @default(false)
+  calendar_task                   Boolean @default(false)
+  payments                        Boolean @default(false)
+  workforce_management            Boolean @default(false)
+  reporting                       Boolean @default(false)
+  inventory                       Boolean @default(false)
+  integrations                    Boolean @default(false)
+  sales_pipeline                  Boolean @default(false)
+  shop_pipeline                   Boolean @default(false)
+  business_settings               Boolean @default(false)
+  company                         company @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "PermissionForOther_company_id_fkey")
+
+  @@index([company_id], map: "PermissionForOther_company_id_fkey")
+}
+
+model permissionforsales {
+  id                              Int     @id @default(autoincrement())
+  company_id                      Int
+  communication_hub_internal      Boolean @default(true)
+  communication_hub_clients       Boolean @default(true)
+  communication_hub_collaboration Boolean @default(true)
+  estimates_invoices              Boolean @default(true)
+  calendar_task                   Boolean @default(true)
+  payments                        Boolean @default(false)
+  sales_pipeline                  Boolean @default(true)
+  workforce_management            Boolean @default(true)
+  reportingViewOnly               Boolean @default(true)
+  inventoryViewOnly               Boolean @default(true)
+  company                         company @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "PermissionForSales_company_id_fkey")
+
+  @@index([company_id], map: "PermissionForSales_company_id_fkey")
+}
+
+model permissionfortechnician {
+  id                         Int     @id @default(autoincrement())
+  company_id                 Int
+  communication_hub_internal Boolean @default(true)
+  calendar_task              Boolean @default(true)
+  shop_pipeline              Boolean @default(true)
+  workforce_management       Boolean @default(true)
+  reportingViewOnly          Boolean @default(true)
+  company                    company @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "PermissionForTechnician_company_id_fkey")
+
+  @@index([company_id], map: "PermissionForTechnician_company_id_fkey")
+}
+
+model requestestimate {
+  id                                                   Int      @id @default(autoincrement())
+  sender_id                                            Int
+  sender_company_id                                    Int
+  receiver_id                                          Int
+  receiver_company_id                                  Int
+  vehicle_id                                           Int      @unique(map: "RequestEstimate_vehicle_id_key")
+  service_id                                           Int      @unique(map: "RequestEstimate_service_id_key")
+  invoice_id                                           String
+  created_at                                           DateTime @default(now())
+  updated_at                                           DateTime @default(now())
+  invoice                                              invoice?
+  message                                              message?
+  company_requestestimate_receiver_company_idTocompany company  @relation("requestestimate_receiver_company_idTocompany", fields: [receiver_company_id], references: [id], onDelete: Cascade, map: "RequestEstimate_receiver_company_id_fkey")
+  user_requestestimate_receiver_idTouser               user     @relation("requestestimate_receiver_idTouser", fields: [receiver_id], references: [id], onDelete: Cascade, map: "RequestEstimate_receiver_id_fkey")
+  company_requestestimate_sender_company_idTocompany   company  @relation("requestestimate_sender_company_idTocompany", fields: [sender_company_id], references: [id], onDelete: Cascade, map: "RequestEstimate_sender_company_id_fkey")
+  user_requestestimate_sender_idTouser                 user     @relation("requestestimate_sender_idTouser", fields: [sender_id], references: [id], onDelete: Cascade, map: "RequestEstimate_sender_id_fkey")
+  service                                              service  @relation(fields: [service_id], references: [id], onDelete: Cascade, map: "RequestEstimate_service_id_fkey")
+  vehicle                                              vehicle  @relation(fields: [vehicle_id], references: [id], onDelete: Cascade, map: "RequestEstimate_vehicle_id_fkey")
+
+  @@index([receiver_company_id], map: "RequestEstimate_receiver_company_id_fkey")
+  @@index([receiver_id], map: "RequestEstimate_receiver_id_fkey")
+  @@index([sender_company_id], map: "RequestEstimate_sender_company_id_fkey")
+  @@index([sender_id], map: "RequestEstimate_sender_id_fkey")
+}
+
+model service {
+  id                        Int              @id @default(autoincrement())
+  created_at                DateTime         @default(now())
+  updated_at                DateTime         @default(now())
+  name                      String
+  description               String?
+  category_id               Int?
+  company_id                Int
+  from_request              Boolean?         @default(false)
+  from_requested_company_id Int?
+  invoiceitem               invoiceitem[]
+  invoiceredo               invoiceredo[]
+  requestestimate           requestestimate?
+  category                  category?        @relation(fields: [category_id], references: [id], map: "Service_category_id_fkey")
+  company                   company          @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Service_company_id_fkey")
+  technician                technician[]
+
+  @@index([category_id], map: "Service_category_id_fkey")
+  @@index([company_id], map: "fk_services_company")
+}
+
+model source {
+  id         Int      @id @default(autoincrement())
+  name       String
+  company_id Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  client     client[]
+  company    company  @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Source_company_id_fkey")
+
+  @@index([company_id], map: "Source_company_id_fkey")
+}
+
+model status {
+  id         Int       @id @default(autoincrement())
+  name       String
+  textColor  String
+  bgColor    String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  company_id Int
+  invoice    invoice[]
+  company    company   @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Status_company_id_fkey")
+
+  @@index([company_id], map: "Status_company_id_fkey")
+}
+
+model tag {
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  textColor           String
+  bgColor             String
+  created_at          DateTime              @default(now())
+  updated_at          DateTime              @default(now())
+  company_id          Int
+  client              client[]
+  inventoryproducttag inventoryproducttag[]
+  invoicetags         invoicetags[]
+  itemtag             itemtag[]
+  labortag            labortag[]
+  materialtag         materialtag[]
+  company             company               @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Tag_company_id_fkey")
+
+  @@index([company_id], map: "Tag_company_id_fkey")
+}
+
+model task {
+  id            Int           @id @default(autoincrement())
+  title         String        @db.VarChar(100)
+  description   String?
+  date          DateTime?
+  start_time    String?
+  end_time      String?
+  priority      task_priority
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @default(now())
+  user_id       Int
+  company_id    Int
+  invoice_id    String?
+  client_id     Int?
+  googleEventId String?
+  client        client?       @relation(fields: [client_id], references: [id], map: "Task_client_id_fkey")
+  company       company       @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Task_company_id_fkey")
+  invoice       invoice?      @relation(fields: [invoice_id], references: [id], map: "Task_invoice_id_fkey")
+  user          user          @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "Task_user_id_fkey")
+  taskuser      taskuser[]
+
+  @@index([client_id], map: "Task_client_id_fkey")
+  @@index([company_id], map: "Task_company_id_fkey")
+  @@index([invoice_id], map: "Task_invoice_id_fkey")
+  @@index([user_id], map: "Task_user_id_fkey")
+}
+
+model taskuser {
+  id         Int      @id @default(autoincrement())
+  task_id    Int
+  user_id    Int
+  eventId    String?  @db.VarChar(100)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  task       task     @relation(fields: [task_id], references: [id], onDelete: Cascade, map: "TaskUser_task_id_fkey")
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "TaskUser_user_id_fkey")
+
+  @@index([task_id], map: "TaskUser_task_id_fkey")
+  @@index([user_id], map: "TaskUser_user_id_fkey")
+}
+
+model technician {
+  id            Int                  @id @default(autoincrement())
+  user_id       Int
+  assigned_date DateTime?
+  date_closed   DateTime?
+  due           DateTime?            @default(now())
+  amount        Decimal?             @default(0.000000000000000000000000000000)
+  priority      technician_priority? @default(Low)
+  status        String?
+  new_note      String?
+  service_id    Int
+  invoice_id    String
+  company_id    Int
+  created_at    DateTime             @default(now())
+  updated_at    DateTime             @default(now())
+  invoiceredo   invoiceredo[]
+  company       company              @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Technician_company_id_fkey")
+  invoice       invoice              @relation(fields: [invoice_id], references: [id], onDelete: Cascade, map: "Technician_invoice_id_fkey")
+  service       service              @relation(fields: [service_id], references: [id], onDelete: Cascade, map: "Technician_service_id_fkey")
+  user          user                 @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "Technician_user_id_fkey")
+
+  @@index([company_id], map: "Technician_company_id_fkey")
+  @@index([invoice_id], map: "Technician_invoice_id_fkey")
+  @@index([service_id], map: "Technician_service_id_fkey")
+  @@index([user_id], map: "Technician_user_id_fkey")
+}
+
+model user {
+  id                                                Int               @id @default(autoincrement())
+  firstName                                         String
+  lastName                                          String?
+  email                                             String            @unique(map: "User_email_key")
+  email_verified_at                                 DateTime?
+  image                                             String            @default("/images/default.png")
+  password                                          String
+  provider                                          user_provider     @default(email)
+  timezone                                          String            @default("UTC")
+  phone                                             String?
+  address                                           String?
+  city                                              String?
+  state                                             String?
+  zip                                               String?
+  company_name                                      String?
+  commission                                        Decimal?          @default(0.000) @db.Decimal(10, 3)
+  role                                              user_role         @default(admin)
+  employeeType                                      user_employeeType @default(Admin)
+  join_date                                         DateTime?
+  company_id                                        Int
+  created_at                                        DateTime          @default(now())
+  updated_at                                        DateTime          @default(now())
+  appointment                                       appointment[]
+  appointmentuser                                   appointmentuser[]
+  clockinout                                        clockinout[]
+  invoice_invoice_assigned_toTouser                 invoice[]         @relation("invoice_assigned_toTouser")
+  invoice_invoice_user_idTouser                     invoice[]         @relation("invoice_user_idTouser")
+  leaverequest                                      leaverequest[]
+  oauthtoken                                        oauthtoken?
+  permission                                        permission[]
+  requestestimate_requestestimate_receiver_idTouser requestestimate[] @relation("requestestimate_receiver_idTouser")
+  requestestimate_requestestimate_sender_idTouser   requestestimate[] @relation("requestestimate_sender_idTouser")
+  task                                              task[]
+  taskuser                                          taskuser[]
+  technician                                        technician[]
+  company                                           company           @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "User_company_id_fkey")
+  group                                             group[]           @relation("usergroups")
+
+  @@index([company_id], map: "fk_users_company")
+}
+
+model vehicle {
+  id                        Int              @id @default(autoincrement())
+  year                      Int?
+  make                      String?
+  model                     String?
+  submodel                  String?
+  type                      String?
+  transmission              String?
+  engineSize                String?
+  license                   String?
+  vin                       String?
+  notes                     String?
+  color_id                  Int?
+  customer_id               Int?
+  company_id                Int
+  created_at                DateTime         @default(now())
+  updated_at                DateTime         @default(now())
+  from_request              Boolean?         @default(false)
+  from_requested_company_id Int?
+  appointment               appointment[]
+  invoice                   invoice[]
+  requestestimate           requestestimate?
+  vehiclecolor              vehiclecolor?    @relation(fields: [color_id], references: [id], map: "Vehicle_color_id_fkey")
+  company                   company          @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Vehicle_company_id_fkey")
+  client                    client?          @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "Vehicle_customer_id_fkey")
+
+  @@index([color_id], map: "Vehicle_color_id_fkey")
+  @@index([customer_id], map: "Vehicle_customer_id_fkey")
+  @@index([company_id], map: "fk_vehicles_company")
+}
+
+model vehiclecolor {
+  id         Int       @id @default(autoincrement())
+  name       String
+  company_id Int
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  vehicle    vehicle[]
+  company    company   @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "VehicleColor_company_id_fkey")
+
+  @@index([company_id], map: "VehicleColor_company_id_fkey")
+}
+
+model vendor {
+  id                      Int                       @id @default(autoincrement())
+  name                    String
+  website                 String?
+  email                   String?
+  phone                   String?
+  address                 String?
+  city                    String?
+  state                   String?
+  zip                     String?
+  companyName             String?
+  notes                   String?
+  company_id              Int
+  created_at              DateTime                  @default(now())
+  updated_at              DateTime                  @default(now())
+  inventoryproduct        inventoryproduct[]
+  inventoryproducthistory inventoryproducthistory[]
+  material                material[]
+  company                 company                   @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "Vendor_company_id_fkey")
+
+  @@index([company_id], map: "Vendor_company_id_fkey")
+}
+
+enum cardpayment_cardType {
+  MASTERCARD
+  VISA
+  AMEX
+  OTHER
+}
+
+enum emailtemplate_type {
+  Confirmation
+  Reminder
+}
+
+enum invoice_type {
+  Invoice
+  Estimate
+}
+
+enum leaverequest_status {
+  Pending
+  Approved
+  Rejected
+}
+
+enum payment_type {
+  CARD
+  CHECK
+  CASH
+  OTHER
+}
+
+enum inventoryproducthistory_type {
+  Purchase
+  Sale
+}
+
+enum task_priority {
+  Low
+  Medium
+  High
+}
+
+enum technician_priority {
+  Low
+  Medium
+  High
+}
+
+enum coupon_discountType {
+  Percentage
+  Fixed
+}
+
+enum user_provider {
+  google
+  apple
+  email
+}
+
+enum coupon_status {
+  Active
+  Expired
+}
+
+enum inventoryproduct_type {
+  Supply
+  Product
+}
+
+enum user_role {
+  admin
+  employee
+}
+
+enum user_employeeType {
+  Admin
+  Manager
+  Sales
+  Technician
+  Other
+}
