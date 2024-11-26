@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Message as TMessage } from "./internal/UsersArea";
 import { FiMessageCircle } from "react-icons/fi";
 import { IoIosArrowBack, IoMdSend, IoMdSettings } from "react-icons/io";
-import { TiDeleteOutline } from "react-icons/ti";
+import { TiDeleteOutline, TiPlusOutline } from "react-icons/ti";
 import { MdModeEdit } from "react-icons/md";
 import { sendType } from "@/types/Chat";
 import { Attachment, Group, User } from "@prisma/client";
@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 import { usePathname } from "next/navigation";
 import InvoiceEstimateModal from "./collaboration/InvoiceEstimateModal";
 import { getUserInGroup } from "@/actions/communication/internal/query";
+import GroupAddUsersModal from "./internal/GroupAddUsersModal";
 // import Message from "./Message";
 
 export default function MessageBox({
@@ -50,7 +51,7 @@ export default function MessageBox({
   const [showAttachment, setShowAttachment] = useState(false);
   const pathname = usePathname();
 
-  const [isImageLoaded, setIsImageLoaded] = useState(false)
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   const isEstimateAttachmentShow = pathname.includes(
     "/communication/collaboration",
@@ -303,6 +304,7 @@ export default function MessageBox({
                 />
               </div>
             ))}
+            <GroupAddUsersModal users={[]} />
           </div>
           <p>
             <TiDeleteOutline

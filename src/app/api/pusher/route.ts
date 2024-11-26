@@ -35,7 +35,6 @@ export async function POST(req: Request) {
       message,
       requestEstimateId: requestEstimate ? requestEstimate?.id : null,
     };
-    console.log({ messageData });
     // send a message for group
     if (type === sendType.Group) {
       const isUserInExistGroup = await db.group.findFirst({
@@ -70,21 +69,28 @@ export async function POST(req: Request) {
       data: messageData,
     });
 
-    let attachments = [];
+    let attachments = null;
     // attachment file upload
     if (attachmentFiles) {
-      for (const attachmentFile of attachmentFiles) {
-        const attachmentFromDB = await db.attachment.create({
-          data: {
-            messageId: createdMessage.id,
-            fileName: attachmentFile.fileName, // File name (e.g., 'image.png')
-            fileType: attachmentFile.fileType, // File type (e.g., 'image/png', 'application/pdf')
-            fileUrl: attachmentFile.fileUrl,
-            fileSize: `${(attachmentFile.fileSize / 1024 / 1024).toPrecision(2)} MB`,
+      const attachmentFromDB = await db.message.update({
+        where: {
+          id: createdMessage.id,
+        },
+        data: {
+          attachment: {
+            create: attachmentFiles.map((attachmentFile: any) => ({
+              fileName: attachmentFile.fileName, // File name (e.g., 'image.png')
+              fileType: attachmentFile.fileType, // File type (e.g., 'image/png', 'application/pdf')
+              fileUrl: attachmentFile.fileUrl,
+              fileSize: `${(attachmentFile.fileSize / 1024 / 1024).toPrecision(2)} MB`,
+            })),
           },
-        });
-        attachments.push(attachmentFromDB);
-      }
+        },
+        include: {
+          attachment: true,
+        },
+      });
+      attachments = attachmentFromDB.attachment;
     }
 
     // send the raw message to the room
