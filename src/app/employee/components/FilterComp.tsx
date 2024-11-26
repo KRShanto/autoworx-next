@@ -1,13 +1,16 @@
 "use client";
 
-import { SearchOutlined } from "@ant-design/icons";
-
 import DateRange from "../../../components/DateRange";
 import Filter from "./Filter";
 import Search from "./Search";
 import { useEmployeeWorkFilterStore } from "@/stores/employeeWorkFilter";
 
-export default function FilterComp() {
+type TProps = {
+  service: string[];
+  category: string[];
+};
+
+export default function FilterComp({ service, category }: TProps) {
   const { setFilter } = useEmployeeWorkFilterStore();
 
   return (
@@ -31,17 +34,29 @@ export default function FilterComp() {
 
       <div className="mr-4 flex gap-4">
         <div className="relative">
-          <select className="rounded border border-gray-300 p-2">
+          <select
+            onChange={(e) => setFilter({ category: e.target.value })}
+            className="rounded border border-gray-300 p-2"
+          >
             <option value="">Category</option>
-            <option value="option1">Option 1</option>
-            <option value="option2">Option 2</option>
+            {category.map((categoryName, index) => (
+              <option key={index} value={categoryName}>
+                {categoryName}
+              </option>
+            ))}
           </select>
         </div>
         <div className="relative">
-          <select className="rounded border border-gray-300 p-2">
+          <select
+            onChange={(e) => setFilter({ service: e.target.value })}
+            className="rounded border border-gray-300 p-2"
+          >
             <option value="">Service</option>
-            <option value="option1">Option 1</option>
-            <option value="option2">Option 2</option>
+            {service.map((serviceName, index) => (
+              <option key={index} value={serviceName}>
+                {serviceName}
+              </option>
+            ))}
           </select>
         </div>
       </div>

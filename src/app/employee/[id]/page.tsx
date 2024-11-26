@@ -19,6 +19,15 @@ export default async function Page({ params }: { params: { id: string } }) {
         include: {
           client: true,
           vehicle: true,
+          invoiceItems: {
+            include: {
+              service: {
+                include: {
+                  category: true,
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -28,7 +37,10 @@ export default async function Page({ params }: { params: { id: string } }) {
     <>
       <Header />
       <EmployeeInformation employee={employee} info={technicians} />
-      <EmployeeWorkInformation info={technicians} employeeType={employee.employeeType} />
+      <EmployeeWorkInformation
+        info={technicians}
+        employeeType={employee.employeeType}
+      />
     </>
   );
 }
