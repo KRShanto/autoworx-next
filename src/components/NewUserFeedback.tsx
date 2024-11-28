@@ -19,7 +19,7 @@ import { useScreenshot } from "use-react-screenshot";
 const base64ToFile = (base64: string, filename: string): File => {
   const arr = base64.split(",");
   const mimeMatch = arr[0]?.match(/:(.*?);/);
-  const mime = mimeMatch ? mimeMatch[1] : ""; // Provide a default value if `mimeMatch` is null
+  const mime = mimeMatch ? mimeMatch[1] : "";
   const bstr = atob(arr[1]);
   let n = bstr.length;
   const u8arr = new Uint8Array(n);
@@ -58,7 +58,7 @@ export default function NewUserFeedback({}: {}) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [image, takeScreenshot] = useScreenshot();
-  const [files, setFiles] = useState<File[] | []>([]); // State for attached files
+  const [files, setFiles] = useState<File[] | []>([]);
 
   const [isPending, startTransition] = useTransition();
 
@@ -76,16 +76,12 @@ export default function NewUserFeedback({}: {}) {
         : null;
       const uploadedFiles = files.length > 0 ? await uploadFiles(files) : [];
 
-      const photoUrls = uploadedScreenshot
-        ? [uploadedScreenshot[0], ...uploadedFiles]
-        : uploadedFiles;
-
       if (title && description) {
         const res = await newUserFeedback({
           title,
           description,
           snapshotImage: uploadedScreenshot ? uploadedScreenshot[0] : null,
-          attachments: photoUrls,
+          attachments: uploadedFiles,
         });
         if (res.success) {
           successToast("Feedback submitted successfully");

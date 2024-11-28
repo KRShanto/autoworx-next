@@ -2,8 +2,12 @@
 import { db } from "@/lib/db";
 import getUser from "@/lib/getUser";
 
-export async function newUserFeedback(data: any) {
-  console.log("🚀 ~ newUserFeedback ~ data:", data);
+export async function newUserFeedback(data: {
+  title: string;
+  description: string;
+  snapshotImage?: string;
+  attachments?: string[];
+}) {
   const user = await getUser();
   const feedback = await db.userFeedback.create({
     data: {
@@ -12,6 +16,11 @@ export async function newUserFeedback(data: any) {
       snapshotImage: data.snapshotImage,
       companyId: user.companyId,
       userId: user.id,
+      UserFeedbackAttachment: {
+        create: data?.attachments?.map((attachment: string) => ({
+          fileName: attachment,
+        })),
+      },
     },
   });
   return {
