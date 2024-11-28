@@ -97,6 +97,7 @@
     "slugify": "^1.6.6",
     "tailwind-merge": "^2.2.2",
     "twilio": "^5.3.1",
+    "use-react-screenshot": "^4.0.0",
     "webrtc-adapter": "^9.0.1",
     "zod": "^3.22.4",
     "zustand": "^4.5.2"
