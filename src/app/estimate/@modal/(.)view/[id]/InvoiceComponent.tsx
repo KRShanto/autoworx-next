@@ -285,8 +285,7 @@ const InvoiceComponent = ({
                   <div className="flex items-center gap-x-4">
                     <input
                       className="rounded-md border border-gray-300 px-2 py-1 text-sm"
-                      placeholder="John Doe"
-                      name="John Doe"
+                      placeholder="Your Name"
                       value={authorizedName}
                       onChange={(e) => setAuthorizedName(e.target.value)}
                     />
@@ -322,7 +321,7 @@ const InvoiceComponent = ({
 
                     <hr className="border-slate-500 bg-slate-500" />
                     <div className="flex items-center gap-x-4">
-                      <span className="rounded-md bg-[#6571ff] px-4 py-1 text-sm text-white">
+                      <span className="rounded-sm border border-[#6571ff] px-4 py-1 text-sm text-[#6571ff]">
                         Authorized
                       </span>
                       <button
