@@ -159,30 +159,68 @@ export default function Month({
   //   );
   // }
 
+  // function getTasks(date: Date) {
+  //   const targetDate = moment.utc(date);
+  //   return tasks.filter((task) => {
+  //     const taskDate = moment(task.date);
+  //     return taskDate.isSame(targetDate, "day");
+  //   });
+  // }
+
+  // function getAppointments(date: Date) {
+  //   return appointments.filter(
+  //     (appointment) =>
+  //       new Date(appointment.date!).getFullYear() === date.getFullYear() &&
+  //       new Date(appointment.date!).getMonth() === date.getMonth() &&
+  //       new Date(appointment.date!).getDate() === date.getDate(),
+  //   );
+  // }
+
+  // function getHolidays(date: Date) {
+  //   return holidays.filter(
+  //     (holiday) =>
+  //       new Date(holiday.date!).getFullYear() === date.getFullYear() &&
+  //       new Date(holiday.date!).getMonth() === date.getMonth() &&
+  //       new Date(holiday.date!).getDate() === date.getDate(),
+  //   );
+  // }
+
   function getTasks(date: Date) {
-    const targetDate = moment.utc(date);
     return tasks.filter((task) => {
-      const taskDate = moment(task.date);
-      return taskDate.isSame(targetDate, "day");
+      const taskDate = new Date(task.date);
+
+      // Normalize both dates to UTC for comparison
+      return (
+        taskDate.getUTCFullYear() === date.getUTCFullYear() &&
+        taskDate.getUTCMonth() === date.getUTCMonth() &&
+        taskDate.getUTCDate() === date.getUTCDate()
+      );
     });
   }
 
   function getAppointments(date: Date) {
-    return appointments.filter(
-      (appointment) =>
-        new Date(appointment.date!).getFullYear() === date.getFullYear() &&
-        new Date(appointment.date!).getMonth() === date.getMonth() &&
-        new Date(appointment.date!).getDate() === date.getDate(),
-    );
-  }
+    return appointments.filter((appointment) => {
+      const appointmentDate = new Date(appointment.date!);
 
+      // Normalize both dates to UTC for comparison
+      return (
+        appointmentDate.getUTCFullYear() === date.getUTCFullYear() &&
+        appointmentDate.getUTCMonth() === date.getUTCMonth() &&
+        appointmentDate.getUTCDate() === date.getUTCDate()
+      );
+    });
+  }
   function getHolidays(date: Date) {
-    return holidays.filter(
-      (holiday) =>
-        new Date(holiday.date!).getFullYear() === date.getFullYear() &&
-        new Date(holiday.date!).getMonth() === date.getMonth() &&
-        new Date(holiday.date!).getDate() === date.getDate(),
-    );
+    return holidays.filter((holiday) => {
+      const holidayDate = new Date(holiday.date!);
+
+      // Normalize both dates to UTC for comparison
+      return (
+        holidayDate.getUTCFullYear() === date.getUTCFullYear() &&
+        holidayDate.getUTCMonth() === date.getUTCMonth() &&
+        holidayDate.getUTCDate() === date.getUTCDate()
+      );
+    });
   }
 
   const cells = [...rotatedDays(startDay), ...dates];
