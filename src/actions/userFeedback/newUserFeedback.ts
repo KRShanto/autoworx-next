@@ -1,7 +1,14 @@
 "use server";
+import { ASANA_BASE_URL, USER_FEEDBACK_EMAILS } from "@/lib/consts";
 import { db } from "@/lib/db";
+import { sendEmail } from "@/lib/email";
 import getUser from "@/lib/getUser";
-import { UserFeedback, UserFeedbackAttachment } from "@prisma/client";
+import {
+  Company,
+  User,
+  UserFeedback,
+  UserFeedbackAttachment,
+} from "@prisma/client";
 import { env } from "next-runtime-env";
 
 export async function newUserFeedback(data: {
@@ -27,8 +34,12 @@ export async function newUserFeedback(data: {
     },
     include: {
       UserFeedbackAttachment: true,
+      user: true,
+      company: true,
     },
   });
+
+  await createAsanaTask(feedback);
 
   return {
     success: true,
@@ -36,8 +47,61 @@ export async function newUserFeedback(data: {
   };
 }
 
-export function generateFeedbackHTML(
-  feedback: UserFeedback & { UserFeedbackAttachment: UserFeedbackAttachment[] },
+// Create a new task in Asana
+async function createAsanaTask(
+  data: UserFeedback & {
+    UserFeedbackAttachment: UserFeedbackAttachment[];
+    user: User;
+    company: Company;
+  },
+) {
+  console.log("Creating Asana task...");
+
+  const res = await fetch(`${ASANA_BASE_URL}/tasks`, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${env("ASANA_PERSONAL_TOKEN")}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      data: {
+        custom_fields: {
+          // Priority: High
+          1208787743472524: "1208787743472527",
+          // User Reported Issue: True
+          1208863541738742: "1208863541738745",
+        },
+        name: data.whatHappened,
+        notes: `User Id: ${data.userId}\nUser Name: ${data.user.firstName}\nCompany Id: ${data.companyId}\nCompany Name: ${data.company.name}\n\nWhat Happened: ${data.whatHappened}\n\nWhat Was Expected: ${data.whatExpected}`,
+        projects: [
+          // Autoworx Software
+          "1208787725739116",
+        ],
+        workspace: `${env("ASANA_WORKSPACE")}`,
+      },
+    }),
+  });
+
+  const json = await res.json();
+  console.log("Asana task created:", json);
+
+  USER_FEEDBACK_EMAILS.forEach(async (email) => {
+    sendEmail({
+      from: "Autoworx",
+      to: email,
+      subject: `New User Feedback: ${data.user.firstName} ${data.user.lastName}`,
+      text: `A new user feedback has been submitted by ${data.user.firstName} ${data.user.lastName}.`,
+      html: (await generateFeedbackHTML(data)).fullHTML,
+    });
+  });
+}
+
+export async function generateFeedbackHTML(
+  feedback: UserFeedback & {
+    UserFeedbackAttachment: UserFeedbackAttachment[];
+    user: User;
+    company: Company;
+  },
 ) {
   const {
     whatHappened,
@@ -56,7 +120,35 @@ export function generateFeedbackHTML(
       ).join("")
     : "<li>No attachments</li>";
 
-  return `
+  const bodyHTML = `
+    <body>
+      <div>
+        <h1>User Feedback</h1>
+        <p><strong>User ID:</strong> ${userId}</p>
+        <p><strong>Username:</strong> ${feedback.user.firstName} ${feedback.user.lastName}</p>
+        <p><strong>Company ID:</strong> ${companyId}</p>
+        <p><strong>Company Name:</strong> ${feedback.company.name}</p>
+        <p><strong>Submitted On:</strong> ${new Date(createdAt).toLocaleString()}</p>
+
+        <h2>What Happened</h2>
+        <p>${whatHappened}</p>
+
+        <h2>What Was Expected</h2>
+        <p>${whatExpected}</p>
+
+        ${snapshotImage ? `<h2>Snapshot Image</h2><img src="${snapshotImage}" alt="Snapshot" style="max-width:100%;"/>` : ""}
+
+        <h2>Attachments</h2>
+        <div>
+          <ul>
+            ${attachmentsHTML}
+          </ul>
+        </div>
+      </div>
+    </body>
+  `;
+
+  const fullHTML = `
     <html>
       <head>
         <style>
@@ -94,29 +186,12 @@ export function generateFeedbackHTML(
           }
         </style>
       </head>
-      <body>
-        <div class="container">
-          <h1>User Feedback</h1>
-          <p><strong>User ID:</strong> ${userId}</p>
-          <p><strong>Company ID:</strong> ${companyId}</p>
-          <p><strong>Submitted On:</strong> ${new Date(createdAt).toLocaleString()}</p>
-
-          <h2>What Happened</h2>
-          <p>${whatHappened}</p>
-
-          <h2>What Was Expected</h2>
-          <p>${whatExpected}</p>
-
-          ${snapshotImage ? `<h2>Snapshot Image</h2><img src="${snapshotImage}" alt="Snapshot" style="max-width:100%;"/>` : ""}
-
-          <h2>Attachments</h2>
-          <div class="attachments">
-            <ul>
-              ${attachmentsHTML}
-            </ul>
-          </div>
-        </div>
-      </body>
+      ${bodyHTML}
     </html>
   `;
+
+  return {
+    fullHTML,
+    bodyHTML,
+  };
 }

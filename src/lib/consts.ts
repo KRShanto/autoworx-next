@@ -1,5 +1,7 @@
 export const MIN_PASSWORD_LENGTH = 6;
 export const DEFAULT_IMAGE_URL = "/images/default.png";
+export const ASANA_BASE_URL = "https://app.asana.com/api/1.0";
+export const USER_FEEDBACK_EMAILS = ["krshanto2005@gmail.com"];
 
 export const TASK_COLOR = {
   Low: "#6571FF",

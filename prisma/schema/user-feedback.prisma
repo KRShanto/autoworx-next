@@ -9,6 +9,7 @@ model UserFeedback {
     updatedAt              DateTime                 @default(now()) @updatedAt @map("updated_at")
     user                   User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
     UserFeedbackAttachment UserFeedbackAttachment[]
+    company                Company                  @relation(fields: [companyId], references: [id])
 }
 
 model UserFeedbackAttachment {
