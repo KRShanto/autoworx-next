@@ -30,9 +30,12 @@ interface AttendanceInfo {
   growthRateTotalExtraHours: GrowthRate;
   growthRateTotalHoursWorked: GrowthRate;
   growthRateTotalDaysWorked: GrowthRate;
-  totalTardiness: string; // Add this field
-  previousTotalTardiness: string; // Add this field
-  growthRateTotalTardiness: GrowthRate; // Add this field
+  totalTardiness: string;
+  previousTotalTardiness: string;
+  growthRateTotalTardiness: GrowthRate;
+  noShowRate: string; // Add this field
+  previousNoShowRate: string; // Add this field
+  growthRateNoShowRate: GrowthRate; // Add this field
 }
 
 export async function getAttendanceInfo(id: number): Promise<AttendanceInfo> {
@@ -325,7 +328,7 @@ export async function getAttendanceInfo(id: number): Promise<AttendanceInfo> {
       }
       return total;
     }, 0) / 60
-  ).toFixed(2); // Convert minutes to hours
+  ).toFixed(2);
 
   // Calculate total tardiness for the previous month
   const previousTotalTardiness = (
@@ -343,12 +346,43 @@ export async function getAttendanceInfo(id: number): Promise<AttendanceInfo> {
       }
       return total;
     }, 0) / 60
-  ).toFixed(2); // Convert minutes to hours
+  ).toFixed(2);
 
   // Calculate growth rate for tardiness
   const growthRateTotalTardiness = calculateGrowthRate(
     parseFloat(totalTardiness),
     parseFloat(previousTotalTardiness),
+  );
+
+  // Calculate total hours absent for the current month
+  const totalHoursAbsent = attInfoMonth
+    .filter((day) => day.clockedIn === "ABSENT")
+    .reduce((total, day) => total + standardWorkingHours, 0);
+
+  // Calculate total hours absent for the previous month
+  const previousTotalHoursAbsent = attInfoPrevMonth
+    .filter((day) => day.clockedIn === "ABSENT")
+    .reduce((total, day) => total + standardWorkingHours, 0);
+
+  // Calculate "No Show" rate for the current month
+  const noShowRate =
+    parseFloat(totalHoursWorked) > 0
+      ? ((totalHoursAbsent / parseFloat(totalHoursWorked)) * 100).toFixed(2)
+      : "0.00";
+
+  // Calculate "No Show" rate for the previous month
+  const previousNoShowRate =
+    parseFloat(previousTotalHoursWorked) > 0
+      ? (
+          (previousTotalHoursAbsent / parseFloat(previousTotalHoursWorked)) *
+          100
+        ).toFixed(2)
+      : "0.00";
+
+  // Calculate growth rate for "No Show" rate
+  const growthRateNoShowRate = calculateGrowthRate(
+    parseFloat(noShowRate),
+    parseFloat(previousNoShowRate),
   );
 
   console.log("Growths: ", {
@@ -357,6 +391,7 @@ export async function getAttendanceInfo(id: number): Promise<AttendanceInfo> {
     growthRateTotalHoursWorked,
     growthRateTotalDaysWorked,
     growthRateTotalTardiness,
+    growthRateNoShowRate,
   });
 
   return {
@@ -373,8 +408,11 @@ export async function getAttendanceInfo(id: number): Promise<AttendanceInfo> {
     growthRateTotalExtraHours,
     growthRateTotalHoursWorked,
     growthRateTotalDaysWorked,
-    totalTardiness, // Include this in the return object
-    previousTotalTardiness, // Include this in the return object
-    growthRateTotalTardiness, // Include this in the return object
+    totalTardiness,
+    previousTotalTardiness,
+    growthRateTotalTardiness,
+    noShowRate, // Include this in the return object
+    previousNoShowRate, // Include this in the return object
+    growthRateNoShowRate, // Include this in the return object
   };
 }

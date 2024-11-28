@@ -72,7 +72,12 @@ const Dashboard = () => {
       percentage: attendanceInfo?.growthRateTotalTardiness.rate!,
       isPositive: attendanceInfo?.growthRateTotalTardiness.isPositive!,
     },
-    { label: "No Show", value: "0 Days", percentage: "N/A", isPositive: false },
+    {
+      label: "No Show",
+      value: `${attendanceInfo?.noShowRate} %`,
+      percentage: attendanceInfo?.growthRateNoShowRate.rate!,
+      isPositive: attendanceInfo?.growthRateNoShowRate.isPositive!,
+    },
     {
       label: "Overtime",
       value: `${attendanceInfo?.totalExtraHours} Hours`,
