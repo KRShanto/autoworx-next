@@ -16,8 +16,6 @@ interface GrowthRate {
   rate: string;
   isPositive: boolean | null;
 }
-
-// Update the AttendanceInfo interface to use the GrowthRate type
 interface AttendanceInfo {
   attInfo: AttendanceRecord[];
   absentDays: number;
@@ -32,13 +30,11 @@ interface AttendanceInfo {
   growthRateTotalExtraHours: GrowthRate;
   growthRateTotalHoursWorked: GrowthRate;
   growthRateTotalDaysWorked: GrowthRate;
+  totalTardiness: string; // Add this field
+  previousTotalTardiness: string; // Add this field
+  growthRateTotalTardiness: GrowthRate; // Add this field
 }
 
-/**
- * Function to get attendance information for a specific user.
- * @param {number} id - The ID of the user.
- * @returns {Promise<AttendanceInfo>} - An object containing weekly and monthly attendance information.
- */
 export async function getAttendanceInfo(id: number): Promise<AttendanceInfo> {
   // Fetch company information
   const company = await getCompany();
@@ -313,11 +309,54 @@ export async function getAttendanceInfo(id: number): Promise<AttendanceInfo> {
     previousTotalDaysWorked,
   );
 
+  // Calculate total tardiness for the current month
+  const totalTardiness = (
+    user.Technician.reduce((total, technician) => {
+      if (technician.dateClosed && technician.due) {
+        const dateClosed = moment(technician.dateClosed);
+        const due = moment(technician.due);
+        if (
+          dateClosed.isSameOrAfter(startOfMonth) &&
+          dateClosed.isSameOrBefore(endOfMonth)
+        ) {
+          const tardiness = dateClosed.diff(due, "minutes");
+          return total + tardiness;
+        }
+      }
+      return total;
+    }, 0) / 60
+  ).toFixed(2); // Convert minutes to hours
+
+  // Calculate total tardiness for the previous month
+  const previousTotalTardiness = (
+    user.Technician.reduce((total, technician) => {
+      if (technician.dateClosed && technician.due) {
+        const dateClosed = moment(technician.dateClosed);
+        const due = moment(technician.due);
+        if (
+          dateClosed.isSameOrAfter(startOfPrevMonth) &&
+          dateClosed.isSameOrBefore(endOfPrevMonth)
+        ) {
+          const tardiness = dateClosed.diff(due, "minutes");
+          return total + tardiness;
+        }
+      }
+      return total;
+    }, 0) / 60
+  ).toFixed(2); // Convert minutes to hours
+
+  // Calculate growth rate for tardiness
+  const growthRateTotalTardiness = calculateGrowthRate(
+    parseFloat(totalTardiness),
+    parseFloat(previousTotalTardiness),
+  );
+
   console.log("Growths: ", {
     growthRateAbsentDays,
     growthRateTotalExtraHours,
     growthRateTotalHoursWorked,
     growthRateTotalDaysWorked,
+    growthRateTotalTardiness,
   });
 
   return {
@@ -334,5 +373,8 @@ export async function getAttendanceInfo(id: number): Promise<AttendanceInfo> {
     growthRateTotalExtraHours,
     growthRateTotalHoursWorked,
     growthRateTotalDaysWorked,
+    totalTardiness, // Include this in the return object
+    previousTotalTardiness, // Include this in the return object
+    growthRateTotalTardiness, // Include this in the return object
   };
 }

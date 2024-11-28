@@ -68,9 +68,9 @@ const Dashboard = () => {
     },
     {
       label: "Tardiness",
-      value: "0 Days",
-      percentage: "N/A",
-      isPositive: false,
+      value: `${attendanceInfo?.totalTardiness} Hours`,
+      percentage: attendanceInfo?.growthRateTotalTardiness.rate!,
+      isPositive: attendanceInfo?.growthRateTotalTardiness.isPositive!,
     },
     { label: "No Show", value: "0 Days", percentage: "N/A", isPositive: false },
     {
