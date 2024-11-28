@@ -55,8 +55,8 @@ const uploadFiles = async (files: File[]) => {
 
 export default function NewUserFeedback({}: {}) {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [whatHappened, setWhatHappened] = useState("");
+  const [whatExpected, setWhatExpected] = useState("");
   const [image, takeScreenshot] = useScreenshot();
   const [files, setFiles] = useState<File[] | []>([]);
 
@@ -76,10 +76,10 @@ export default function NewUserFeedback({}: {}) {
         : null;
       const uploadedFiles = files.length > 0 ? await uploadFiles(files) : [];
 
-      if (title && description) {
+      if (whatHappened && whatExpected) {
         const res = await newUserFeedback({
-          title,
-          description,
+          whatHappened,
+          whatExpected,
           snapshotImage: uploadedScreenshot ? uploadedScreenshot[0] : null,
           attachments: uploadedFiles,
         });
@@ -88,8 +88,8 @@ export default function NewUserFeedback({}: {}) {
         }
       }
 
-      setTitle("");
-      setDescription("");
+      setWhatHappened("");
+      setWhatExpected("");
       setFiles([]);
       setOpen(false);
     });
@@ -98,8 +98,8 @@ export default function NewUserFeedback({}: {}) {
   useEffect(() => {
     getImage();
 
-    setTitle("");
-    setDescription("");
+    setWhatHappened("");
+    setWhatExpected("");
     setFiles([]);
   }, [open]);
 
@@ -116,27 +116,27 @@ export default function NewUserFeedback({}: {}) {
         </DialogHeader>
         <form className="space-y-4 p-2">
           <div className="mb-4 flex flex-col">
-            <label htmlFor="title">Describe the Issue</label>
+            <label htmlFor="whatHappened">Describe the Issue</label>
             <input
               type="text"
-              name="title"
+              name="whatHappened"
               placeholder="Briefly explain the issue you faced."
               className="mt-2 rounded-md border border-gray-500 p-2 outline-none"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={whatHappened}
+              onChange={(e) => setWhatHappened(e.target.value)}
               autoFocus
               required
             />
           </div>
 
           <div className="mb-4 flex flex-col">
-            <label htmlFor="description">Expected Behavior</label>
+            <label htmlFor="whatExpected">Expected Behavior</label>
             <textarea
-              name="description"
+              name="whatExpected"
               placeholder="What did you expect to happen instead?"
               className="mt-2 rounded-md border border-gray-500 p-2 outline-none"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={whatExpected}
+              onChange={(e) => setWhatExpected(e.target.value)}
             />
           </div>
 
