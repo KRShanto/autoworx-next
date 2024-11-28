@@ -7,19 +7,19 @@ import {
 } from "@/components/Dialog";
 import { SlimInput } from "@/components/SlimInput";
 import React, { useEffect, useRef, useState } from "react";
-import { MdGroupAdd } from "react-icons/md";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 import { CiSearch } from "react-icons/ci";
 import { TiDeleteOutline, TiPlusOutline } from "react-icons/ti";
-import { Group, User } from "@prisma/client";
-import { createGroup } from "@/actions/communication/internal/creategroup";
-import { useSession } from "next-auth/react";
+import { User } from "@prisma/client";
 import Avatar from "@/components/Avatar";
 import { useDebounce } from "@/hooks/useDebounce";
 import { searchUsers } from "@/actions/communication/internal/searchUser";
+import { addUserInGroup } from "@/actions/communication/internal/addUserInGroup";
 
 type TProps = {
   users: User[];
+  groupId: number | undefined;
+  setGroupsList: React.Dispatch<React.SetStateAction<any[]>> | null;
 };
 
 type TContactListUser = {
@@ -27,16 +27,16 @@ type TContactListUser = {
   name: string;
 };
 
-export default function GroupAddUsersModal({ users }: TProps) {
+export default function AddUsersInGroupModal({
+  users,
+  groupId,
+  setGroupsList,
+}: TProps) {
   const [groupUsers, setGroupUsers] = useState(users);
-
-  const { data: session }: { data: any } = useSession();
 
   const [open, setOpen] = useState(false);
 
   const [openUserList, setOpenUserList] = useState(false);
-
-  const [groupName, setGroupName] = useState("");
 
   const [contactList, setContactList] = useState<Array<TContactListUser>>([]);
 
@@ -53,19 +53,22 @@ export default function GroupAddUsersModal({ users }: TProps) {
   useEffect(() => {
     if (!open) {
       setContactList([]);
-      setGroupName("");
-      setGroupUsers(users);
+      setGroupUsers([]);
       setOpenUserList(false);
       setError(null);
     }
   }, [open]);
 
   const getFindUsers = async (searchTerm?: string) => {
+    const withoutContactList = contactList.map((user) => ({
+      id: user.id,
+    }));
+    const alreadyAddedUsersInGroup = users.map((user) => ({
+      id: user.id,
+    }));
     const searchUsersResult = await searchUsers(
       searchTerm || "",
-      contactList.map((user) => ({
-        id: user.id,
-      })),
+      withoutContactList.concat(alreadyAddedUsersInGroup),
     );
     if (searchUsersResult.success) {
       setGroupUsers(searchUsersResult.data);
@@ -108,20 +111,28 @@ export default function GroupAddUsersModal({ users }: TProps) {
     );
   };
 
-  const handleCreateGroup = async () => {
-    if (contactList.length >= 2) {
+  const handleAddUserInGroup = async () => {
+    if (contactList.length !== 0 && groupId) {
       const usersInGroup = contactList.map((user) => ({
         id: user.id,
       }));
-      const response = await createGroup({
-        name: groupName,
-        users: [{ id: session?.user.id }, ...usersInGroup],
+      const response = await addUserInGroup({
+        groupId,
+        users: usersInGroup,
       });
       if (response.status === 200) {
         setOpen(false);
         setError("");
-        setGroupName("");
         setContactList([]);
+        setGroupsList &&
+          setGroupsList((groupList) =>
+            groupList.map((g) => {
+              if (g.id === groupId) {
+                return response.data;
+              }
+              return g;
+            }),
+          );
       } else {
         setError("Failed to create group.");
       }
@@ -129,6 +140,7 @@ export default function GroupAddUsersModal({ users }: TProps) {
       setError("At least 2 users are required to create a group.");
     }
   };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -164,19 +176,19 @@ export default function GroupAddUsersModal({ users }: TProps) {
                   {groupUsers.length > 0 ? (
                     groupUsers.map((user) => (
                       <div
-                        key={user.id}
+                        key={user?.id}
                         className="flex cursor-pointer items-center space-x-2 p-1"
                         onClick={() => handleAddContactList(user)}
                       >
-                        <Avatar photo={user.image} width={60} height={60} />
+                        <Avatar photo={user?.image} width={60} height={60} />
                         <div className="flex flex-col overflow-hidden">
                           <p className="text-sm font-bold">
-                            {user.firstName} {user.lastName}
+                            {user?.firstName} {user?.lastName}
                           </p>
 
                           <div className="flex items-center space-x-3 text-[10px]">
-                            {user.phone && <p>{user.phone}</p>}
-                            <p>{user.email}</p>
+                            {user?.phone && <p>{user?.phone}</p>}
+                            <p>{user?.email}</p>
                           </div>
                         </div>
                       </div>
@@ -232,7 +244,7 @@ export default function GroupAddUsersModal({ users }: TProps) {
             Cancel
           </DialogClose>
           <button
-            onClick={handleCreateGroup}
+            onClick={handleAddUserInGroup}
             className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
           >
             Add

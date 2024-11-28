@@ -2,16 +2,18 @@
 
 import { db } from "@/lib/db";
 import { getPusherInstance } from "@/lib/pusher/server";
-import { revalidatePath } from "next/cache";
 
-type TGroup = {
+type TCreateGroup = {
   name: string;
   users: { id: number }[];
 };
 
+
+
 const pusher = getPusherInstance();
 
-export const createGroup = async ({ name, users }: TGroup) => {
+// create a new group with user
+export const createGroup = async ({ name, users }: TCreateGroup) => {
   try {
     const groupData = await db.group.create({
       data: {
@@ -34,3 +36,5 @@ export const createGroup = async ({ name, users }: TGroup) => {
     throw err;
   }
 };
+
+

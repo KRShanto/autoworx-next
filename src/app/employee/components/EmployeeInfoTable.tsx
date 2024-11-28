@@ -1,12 +1,10 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { EditOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { EmployeeWorkInfo } from "./employeeWorkInfoType";
 import moment from "moment";
 import { WORK_ORDER_STATUS_COLOR } from "@/lib/consts";
-import { FaTimes } from "react-icons/fa";
 import { useEmployeeWorkFilterStore } from "@/stores/employeeWorkFilter";
 
 export default function EmployeeInfoTable({
