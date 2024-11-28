@@ -17,7 +17,7 @@ import toast from "react-hot-toast";
 import { usePathname } from "next/navigation";
 import InvoiceEstimateModal from "./collaboration/InvoiceEstimateModal";
 import { getUserInGroup } from "@/actions/communication/internal/query";
-import GroupAddUsersModal from "./internal/GroupAddUsersModal";
+import AddUsersInGroupModal from "./internal/AddUsersInGroupModal";
 // import Message from "./Message";
 
 export default function MessageBox({
@@ -208,7 +208,6 @@ export default function MessageBox({
         multiFiles && multiFiles?.filter((file) => file?.name !== fileName),
     );
   };
-
   return (
     <div
       className={cn(
@@ -304,7 +303,11 @@ export default function MessageBox({
                 />
               </div>
             ))}
-            <GroupAddUsersModal users={[]} />
+            <AddUsersInGroupModal
+              users={group?.users || []}
+              groupId={group?.id}
+              setGroupsList={setGroupsList || null}
+            />
           </div>
           <p>
             <TiDeleteOutline
