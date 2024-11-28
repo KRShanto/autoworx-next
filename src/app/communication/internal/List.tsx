@@ -1,10 +1,6 @@
 import { Group, User } from "@prisma/client";
 import CreateGroupModal from "./CreateGroupModal";
 import Avatar from "@/components/Avatar";
-// import { useDebounce } from "@/hooks/useDebounce";
-// import { searchUsers } from "@/actions/communication/internal/searchUser";
-// import { useEffect, useState } from "react";
-// import { searchGroups } from "@/actions/communication/internal/searchGroup";
 import { cn } from "@/lib/cn";
 import { useEffect, useState } from "react";
 import { pusher } from "@/lib/pusher/client";
@@ -29,12 +25,11 @@ export default function List({
   groupsList: (Group & { users: User[] })[];
   usersList: User[];
 }) {
-  // const [usersStore, setUsersStore] = useState(users);
-  // const [groupsStore, setGroupsStore] = useState(groups);
   const { data: session } = useSession();
   const [searchTerm, setSearchTerm] = useState("");
   const [sideBarGroupsLists, setSideBarGroupLists] = useState(groups);
 
+  // create new group for real time update
   useEffect(() => {
     let ignore = true;
     pusher
@@ -48,23 +43,24 @@ export default function List({
           groupId: number;
           usersIds: { id: number }[];
         }) => {
-          usersIds.forEach((userId) => {
-            if (userId.id === Number(session?.user?.id!)) {
-              const group = sideBarGroupsLists.find((g) => g.id === groupId);
-              if (!group) {
-                getGroupById(groupId, userId.id).then((groupFromDb) => {
-                  if (groupFromDb) {
-                    if (!ignore) {
-                      setSideBarGroupLists((prevGroups) => [
-                        ...prevGroups,
-                        groupFromDb,
-                      ]);
+          getGroupById(groupId, Number(session?.user?.id!)).then(
+            (groupFromDb) => {
+              if (groupFromDb) {
+                if (!ignore) {
+                  setSideBarGroupLists((prevGroups) => {
+                    const isExistInGroup = prevGroups.find(
+                      (g) => g.id === groupId,
+                    );
+                    if (!isExistInGroup) {
+                      return [...prevGroups, groupFromDb];
+                    } else {
+                      return prevGroups;
                     }
-                  }
-                });
+                  });
+                }
               }
-            }
-          });
+            },
+          );
         },
       );
     return () => {
@@ -73,69 +69,118 @@ export default function List({
     };
   }, []);
 
+  // delete member from group for real time update
   useEffect(() => {
-    // let ignore = true;
+    let ignore = true;
     pusher
       .subscribe("delete-group")
       .bind(
         "delete",
         ({ groupId, userId }: { groupId: number; userId: number }) => {
-          if (userId === Number(session?.user?.id!)) {
-            setSideBarGroupLists((prevSideBarGroupsLists) => {
-              const isAlreadyExistInGroup = prevSideBarGroupsLists.find(
-                (group) => group.id === groupId,
-              );
-              if (isAlreadyExistInGroup) {
-                return prevSideBarGroupsLists.filter(
-                  (group) => group.id !== groupId,
-                );
-              } else {
-                return prevSideBarGroupsLists;
-              }
-            });
-
-            setGroupsList((groupLists: any) => {
-              return groupLists.filter((group: any) => group.id !== groupId);
-            });
-          } else {
-            const removeGroupUser = (groupList: any) =>
-              groupList.map((g: any) => {
-                if (g.id === groupId) {
-                  return {
-                    ...g,
-                    users: g.users.filter((user: User) => user.id !== userId),
-                  };
+          getGroupById(groupId, Number(session?.user?.id!)).then(
+            (groupFromDb) => {
+              if (groupFromDb) {
+                if (!ignore) {
+                  setSideBarGroupLists((prevGroups) => {
+                    const isAlreadyExistInGroup = prevGroups.find(
+                      (group) => group.id === groupId,
+                    );
+                    if (isAlreadyExistInGroup) {
+                      return prevGroups.map((group) => {
+                        if (group.id === groupId) {
+                          return groupFromDb;
+                        } else {
+                          return group;
+                        }
+                      });
+                    } else {
+                      return prevGroups;
+                    }
+                  });
+                  setGroupsList((groupLists: any) => {
+                    return groupLists.map((group: any) => {
+                      if (group.id === groupId) {
+                        return groupFromDb;
+                      } else {
+                        return group;
+                      }
+                    });
+                  });
                 }
-                return g;
-              });
-            setGroupsList(removeGroupUser);
-            setSideBarGroupLists(removeGroupUser);
-          }
+              } else {
+                setSideBarGroupLists((prevGroups) => {
+                  const isAlreadyExistInGroup = prevGroups.find(
+                    (group) => group.id === groupId,
+                  );
+                  if (isAlreadyExistInGroup) {
+                    return prevGroups.filter((group) => group.id !== groupId);
+                  } else {
+                    return prevGroups;
+                  }
+                });
+                setGroupsList((groupLists: any) => {
+                  return groupLists.filter(
+                    (group: any) => group.id !== groupId,
+                  );
+                });
+              }
+            },
+          );
         },
       );
     return () => {
+      ignore = false;
       pusher.unbind("delete");
     };
   }, []);
 
-  // useEffect(() => {
-  //   setGroupsStore(groups);
-  // }, [groups]);
+  // add new member to group and update sidebar for real time update
+  useEffect(() => {
+    // "add-member-in-group", "add-member"
+    let ignore = true;
+    pusher
+      .subscribe("add-member-in-group")
+      .bind("add-member", ({ groupId }: { groupId: number }) => {
+        getGroupById(groupId, Number(session?.user?.id!)).then(
+          (groupFromDb) => {
+            if (groupFromDb) {
+              if (!ignore) {
+                setSideBarGroupLists((prevGroups) => {
+                  const isAlreadyExistInGroup = prevGroups.find(
+                    (group) => group.id === groupId,
+                  );
+                  if (isAlreadyExistInGroup) {
+                    return prevGroups.map((group) => {
+                      if (group.id === groupId) {
+                        return groupFromDb;
+                      } else {
+                        return group;
+                      }
+                    });
+                  } else {
+                    return [...prevGroups, groupFromDb];
+                  }
+                });
+                setGroupsList((groupLists: any) => {
+                  return groupLists.map((group: any) => {
+                    if (group.id === groupId) {
+                      return groupFromDb;
+                    } else {
+                      return group;
+                    }
+                  });
+                });
+              }
+            }
+          },
+        );
+      });
+    return () => {
+      ignore = false;
+      pusher.unbind("add-member");
+    };
+  }, []);
 
-  // const handleSearch = useDebounce(
-  //   async (event: React.ChangeEvent<HTMLInputElement>) => {
-  //     const searchTerm = event.target.value;
-  //     const searchUsersResult = await searchUsers(searchTerm);
-  //     const searchGroupsResult = await searchGroups(searchTerm);
-  //     if (searchUsersResult.success || searchGroupsResult.success) {
-  //       const foundedUsers = searchUsersResult.data;
-  //       const foundedGroups = searchGroupsResult.data;
-  //       setUsersStore(foundedUsers);
-  //       setGroupsStore(foundedGroups);
-  //     }
-  //   },
-  //   500,
-  // );
   return (
     <div
       className={cn(
@@ -193,16 +238,17 @@ export default function List({
                     group.users.length === 1 ? "grid-cols-1" : "grid-cols-2",
                   )}
                 >
-                  {group.users.slice(0, 4).map((user) => {
-                    return (
-                      <Avatar
-                        photo={user.image}
-                        width={40}
-                        height={40}
-                        key={user.id}
-                      />
-                    );
-                  })}
+                  {group.users.length > 0 &&
+                    group.users?.slice(0, 4).map((user) => {
+                      return (
+                        <Avatar
+                          photo={user?.image}
+                          width={40}
+                          height={40}
+                          key={user?.id}
+                        />
+                      );
+                    })}
                 </div>
                 <div className="flex flex-col">
                   <p
@@ -211,7 +257,7 @@ export default function List({
                       isSelectedGroup && "text-white hover:text-[#797979]",
                     )}
                   >
-                    {group.name}
+                    {group?.name}
                   </p>
                 </div>
               </button>
