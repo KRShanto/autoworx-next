@@ -1,11 +1,13 @@
 "use client";
-import { useEffect, useState } from "react";
-import { Input } from "antd";
 import {
+  getEmailTemplate,
   getOrCreateEmailTemplate,
   updateEmailTemplate,
 } from "@/actions/settings/emailTemplates";
+import { successToast } from "@/lib/toast";
 import { CompanyEmailTemplate } from "@prisma/client";
+import { Input } from "antd";
+import { useEffect, useState } from "react";
 
 interface EmailTemplate {
   subject: string;
@@ -20,21 +22,28 @@ export default function EstimateAndInvoicePage() {
 
   useEffect(() => {
     const fetchEmail = async () => {
-      const template = await getOrCreateEmailTemplate();
-      setEmailTemplate(template);
-      setNewSubject(template.subject);
-      setNewMessage(template.message ?? "");
+      const template = await getEmailTemplate();
+      if (template) {
+        setEmailTemplate(template);
+        setNewSubject(template.subject);
+        setNewMessage(template.message ?? "");
+      }
     };
 
     fetchEmail();
   }, []);
 
   const handleUpdate = async () => {
-    if (newSubject.trim() && newMessage.trim() && emailTemplate) {
-      const updatedTemplate = await updateEmailTemplate(emailTemplate.id, {
-        subject: newSubject,
-        message: newMessage,
-      });
+    if (newSubject.trim() && newMessage.trim()) {
+      const updatedTemplate = await updateEmailTemplate(
+        emailTemplate?.id || null,
+        {
+          subject: newSubject,
+          message: newMessage,
+        },
+      );
+
+      successToast("Email Template Updated Successfully");
 
       setEmailTemplate(updatedTemplate);
     }
@@ -47,11 +56,13 @@ export default function EstimateAndInvoicePage() {
           Edit Draft Email for Sharing Estimate/Invoice
         </h2>
         <div className="space-y-4 rounded-sm border bg-white p-5">
-          <Input
+          <input
             placeholder="Email Subject"
             value={newSubject}
-            onChange={(e) => setNewSubject(e.target.value)}
-            className="mb-4"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setNewSubject(e.target.value)
+            }
+            className="mb-4 w-full rounded-sm border border-gray-300 bg-white p-2 text-sm leading-6 outline-none"
           />
           <div className="mb-2 text-sm font-medium text-gray-500">
             The following message will be sent to the recipient when sharing an

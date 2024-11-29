@@ -12,10 +12,6 @@ import { useParams } from "next/navigation";
 import { useServerGet } from "@/hooks/useServerGet";
 import { getAttendanceInfo } from "@/actions/employee/getAttendanceInfo";
 
-// const onChange: DatePickerProps<Dayjs[]>["onChange"] = (date, dateString) => {
-//   // console.log(date, dateString);
-// };
-
 interface AttendanceData {
   clockedIn: string;
   clockedOut: string;
@@ -25,7 +21,7 @@ interface AttendanceData {
 interface MetricData {
   label: string;
   value: string;
-  percentage: number;
+  percentage: string | number;
   isPositive: boolean;
 }
 
@@ -33,16 +29,6 @@ interface buttonInfo {
   metricLabel: string;
   content: string;
 }
-
-// const attendanceData: AttendanceData[] = [
-//   { clockedIn: "9:04AM", clockedOut: "5:00PM", hours: "8" },
-//   { clockedIn: "9:00AM", clockedOut: "5:00PM", hours: "8" },
-//   { clockedIn: "9:15AM", clockedOut: "5:00PM", hours: "7.75" },
-//   { clockedIn: "9:00AM", clockedOut: "5:00PM", hours: "8" },
-//   { clockedIn: "9:00AM", clockedOut: "5:00PM", hours: "8" },
-//   { clockedIn: "9:30AM", clockedOut: "5:00PM", hours: "7.5" },
-//   { clockedIn: "OFF", clockedOut: "OFF", hours: "0" },
-// ];
 
 const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
@@ -77,14 +63,39 @@ const Dashboard = () => {
     {
       label: "Absenteeism",
       value: `${attendanceInfo?.absentDays} Days`,
-      percentage: 4,
-      isPositive: true,
+      percentage: attendanceInfo?.growthRateAbsentDays.rate!,
+      isPositive: attendanceInfo?.growthRateAbsentDays.isPositive!,
     },
-    { label: "Tardiness", value: "31 Days", percentage: -4, isPositive: false },
-    { label: "No Show", value: "13 Days", percentage: -14, isPositive: false },
-    { label: "Overtime", value: "13 Days", percentage: -14, isPositive: false },
-    { label: "Total Hours", value: "8 Days", percentage: 24, isPositive: true },
-    { label: "Total Days", value: "8 Days", percentage: 24, isPositive: true },
+    {
+      label: "Tardiness",
+      value: `${attendanceInfo?.totalTardiness} Hours`,
+      percentage: attendanceInfo?.growthRateTotalTardiness.rate!,
+      isPositive: attendanceInfo?.growthRateTotalTardiness.isPositive!,
+    },
+    {
+      label: "No Show",
+      value: `${attendanceInfo?.noShowRate} %`,
+      percentage: attendanceInfo?.growthRateNoShowRate.rate!,
+      isPositive: attendanceInfo?.growthRateNoShowRate.isPositive!,
+    },
+    {
+      label: "Overtime",
+      value: `${attendanceInfo?.totalExtraHours} Hours`,
+      percentage: attendanceInfo?.growthRateTotalExtraHours.rate!,
+      isPositive: attendanceInfo?.growthRateTotalExtraHours.isPositive!,
+    },
+    {
+      label: "Total Hours",
+      value: `${attendanceInfo?.totalHoursWorked} Hours`,
+      percentage: attendanceInfo?.growthRateTotalHoursWorked.rate!,
+      isPositive: attendanceInfo?.growthRateTotalHoursWorked.isPositive!,
+    },
+    {
+      label: "Total Days",
+      value: `${attendanceInfo?.totalDaysWorked} Days`,
+      percentage: attendanceInfo?.growthRateTotalDaysWorked.rate!,
+      isPositive: attendanceInfo?.growthRateTotalDaysWorked.isPositive!,
+    },
   ];
 
   // console.log("Attendance info: ", attendanceInfo);
@@ -166,7 +177,7 @@ const Dashboard = () => {
                       <IoMdArrowDropdown />
                     )}
                   </div>
-                  <div>{Math.abs(metric.percentage)}%</div>
+                  <div className="text-nowrap">{metric.percentage}</div>
                 </div>
 
                 {infoIndex === index && (

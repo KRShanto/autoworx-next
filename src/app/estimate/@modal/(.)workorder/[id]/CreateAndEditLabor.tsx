@@ -5,7 +5,6 @@ import {
   DialogContent,
   DialogFooter,
   DialogTrigger,
-  InterceptedDialog,
 } from "@/components/Dialog";
 import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
@@ -18,24 +17,25 @@ import {
 } from "react";
 import { Priority, Status, Technician, User } from "@prisma/client";
 import { addTechnician } from "../../../../../actions/estimate/technician/addTechnician";
-import { useRouter } from "next/navigation";
 import moment from "moment";
 import { updateTechnician } from "../../../../../actions/estimate/technician/updateTechnician";
 import { getEmployees } from "@/actions/employee/get";
-import { getTechnician } from "@/actions/estimate/technician/getTechnician";
-import { WORK_ORDER_STATUS_COLOR } from "@/lib/consts";
+
+type TProps = {
+  invoiceId: string;
+  serviceId: number;
+  technician?: Technician & { name: string };
+  setTechnicians: Dispatch<SetStateAction<(Technician & { name: string })[]>>;
+};
+
+type TStatus = "Pending" | "In Progress" | "Complete" | "Cancel";
 
 export default function CreateAndEditLabor({
   invoiceId,
   serviceId,
   technician,
   setTechnicians,
-}: {
-  invoiceId: string;
-  serviceId: number;
-  technician?: Technician & { name: string };
-  setTechnicians: Dispatch<SetStateAction<(Technician & { name: string })[]>>;
-}) {
+}: TProps) {
   const [open, setOpen] = useState(false);
   // const [statusOpenDropdown, setStatusOpenDropdown] = useState(false);
   const [priorityOpen, setPriorityOpen] = useState(false);
@@ -44,9 +44,7 @@ export default function CreateAndEditLabor({
   const [employeeList, setEmployeeList] = useState<User[]>([]);
 
   const [employee, setEmployee] = useState<User | null>(null);
-  const [status, setStatus] = useState<
-    "Pending" | "In Progress" | "Complete" | "Cancel"
-  >("Pending");
+  const [status, setStatus] = useState<TStatus>("Pending");
   const [error, setError] = useState<string | null>(null);
   const [inputValues, setInputValues] = useState({
     date: new Date().toISOString().split("T")[0],
@@ -67,9 +65,17 @@ export default function CreateAndEditLabor({
   // edit technician
   useEffect(() => {
     if (technician) {
-      const { amount, date, due, note, priority, userId } = technician;
-      const formattedDate = moment.utc(date).format("YYYY-MM-DD");
-      const formattedDue = moment.utc(due).format("YYYY-MM-DD");
+      const {
+        amount,
+        date,
+        due,
+        note,
+        priority,
+        userId,
+        status: technicianStatus,
+      } = technician;
+      const formattedDate = moment(date).format("YYYY-MM-DD");
+      const formattedDue = moment(due).format("YYYY-MM-DD");
       setInputValues({
         date: formattedDate,
         due: formattedDue,
@@ -78,6 +84,7 @@ export default function CreateAndEditLabor({
       });
       setPriority(priority as Priority);
       // TODO: set status
+      setStatus(technicianStatus as TStatus);
       setEmployee(employeeList.find((e) => e.id === userId) || null);
     }
   }, [technician, employeeList]);
@@ -106,7 +113,7 @@ export default function CreateAndEditLabor({
   };
 
   // form submit
-  const handleSubmit = async (event: MouseEvent) => {
+  const handleSubmit = async () => {
     setError(null);
 
     if (!employee) {
@@ -164,13 +171,30 @@ export default function CreateAndEditLabor({
   const date = moment(technician?.createdAt);
   const formattedDate = date.format("h:mmA Do MMMM YYYY");
 
+  // reset input value
+  const reset = () => {
+    setInputValues({
+      date: new Date().toISOString().split("T")[0],
+      due: "",
+      amount: "",
+      note: "",
+    });
+    setStatus("Pending");
+    setPriority("Low");
+    setError("");
+    setEmployee(null);
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {technician ? (
           <p className="text-white">{technician.name}</p>
         ) : (
-          <button className="rounded-full border border-[#6571FF] px-3 py-0.5">
+          <button
+            onClick={reset}
+            className="rounded-full border border-[#6571FF] px-3 py-0.5"
+          >
             + Add Labor
           </button>
         )}
@@ -187,9 +211,7 @@ export default function CreateAndEditLabor({
             <label>Assign To</label>
             <Selector
               label={(employee) =>
-                employee?.firstName
-                  ? `${employee.firstName} ${employee.lastName}`
-                  : "Employee"
+                employee?.firstName ? `${employee.firstName}` : "Employee"
               }
               newButton={<div></div>}
               items={employeeList}
@@ -273,14 +295,15 @@ export default function CreateAndEditLabor({
           <div>
             <div className="flex justify-between">
               <p className="text-left text-lg font-bold">Work Note</p>
-              <p className="text-right text-lg font-bold">Status</p>
+              {/* <p className="text-right text-lg font-bold">Status</p> */}
             </div>
             <div className="flex justify-between bg-blue-100 p-3">
               <div className="w-3/5 space-y-2">
                 <p>Date: {formattedDate}</p>
                 <p>{technician?.note || "No notes"}</p>
               </div>
-              <div>
+              {/* TODO: This section now doesn't need */}
+              {/* <div>
                 <p
                   className={`rounded-full px-2 py-1 text-white`}
                   style={{
@@ -290,7 +313,7 @@ export default function CreateAndEditLabor({
                 >
                   {technician?.status}
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
         )}

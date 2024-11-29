@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import { db } from "@/lib/db";
 import getUser from "@/lib/getUser";
 import {
@@ -17,7 +17,7 @@ export interface FullMessage {
   requestEstimateId: number | null;
   createdAt: Date;
   updatedAt: Date;
-  attachment: Attachment | null; // Including attachment if available
+  attachment: Attachment[] | null; // Including attachment if available
   group: Group | null; // Including group info if available
 }
 

@@ -9,6 +9,7 @@ import { db } from "@/lib/db";
 import RevenueTableRow from "./RevenueTableRow";
 import moment from "moment";
 import { Prisma } from "@prisma/client";
+import FilterHeader from "./FilterHeader";
 
 type TProps = {
   searchParams: {
@@ -23,7 +24,7 @@ type TProps = {
   };
 };
 
-type TSliderData = {
+export type TSliderData = {
   id: number;
   min: number;
   max: number;
@@ -96,14 +97,6 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
               }
             : undefined,
       },
-      client: {
-        OR: searchParams.search
-          ? [
-              { firstName: { contains: searchParams.search?.trim() } },
-              { lastName: { contains: searchParams.search?.trim() } },
-            ]
-          : undefined,
-      },
       OR: filterOR.length > 0 ? filterOR : undefined,
     },
     include: {
@@ -143,17 +136,33 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
     categoriesPromise,
   ]);
 
+  const filteredInvoices =
+    searchParams?.search && invoices
+      ? invoices.filter((invoice) => {
+          if (!invoice.client && !invoice.id) {
+            return false;
+          }
+          const fullName = `${invoice?.client!.firstName} ${invoice?.client?.lastName}`;
+          return (
+            fullName
+              .toLowerCase()
+              .includes(searchParams?.search?.trim()?.toLowerCase() || "") ||
+            invoice.id.toString().includes(searchParams?.search?.trim() || "")
+          );
+        })
+      : invoices;
+
   const getService = services.map((service) => service.name);
   const getCategory = categories.map((category) => category.name);
 
   const maxPrice = Math.max(
-    ...invoices.map((invoice) => Number(invoice.grandTotal)),
+    ...filteredInvoices.map((invoice) => Number(invoice.grandTotal)),
   );
 
   let maxCost = 0;
   let maxProfit = 0;
 
-  const filteredInvoice = invoices.filter((invoice) => {
+  const filteredInvoice = filteredInvoices.filter((invoice) => {
     const { costPrice, profitPrice } = invoice.invoiceItems.reduce(
       (
         acc,
@@ -288,31 +297,12 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
         <Calculation content="REVENUE" amount={totalFilteredProfit} />
       </div>
       {/* filter section */}
-      <div className="flex w-full items-center justify-between gap-x-3">
-        <div className="flex flex-1 items-center space-x-4">
-          <FilterBySearchBox searchText={searchParams.search as string} />
-          <FilterByDateRange
-            startDate={decodeURIComponent(searchParams.startDate as string)}
-            endDate={decodeURIComponent(searchParams.endDate as string)}
-          />
-        </div>
-        <div className="flex items-center space-x-4">
-          <FilterByMultiple
-            searchParamsValue={searchParams}
-            filterSliders={filterMultipleSliders}
-          />
-          <FilterBySelection
-            selectedItem={searchParams?.category as string}
-            items={getCategory}
-            type="category"
-          />
-          <FilterBySelection
-            selectedItem={searchParams?.service as string}
-            items={getService}
-            type="service"
-          />
-        </div>
-      </div>
+      <FilterHeader
+        searchParams={searchParams}
+        filterMultipleSliders={filterMultipleSliders}
+        getCategory={getCategory}
+        getService={getService}
+      />
       {/* table */}
       <div>
         <table className="w-full shadow-md">

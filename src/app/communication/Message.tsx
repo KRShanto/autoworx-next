@@ -10,9 +10,16 @@ import Link from "next/link";
 
 type TProps = {
   message: TMessage;
+  fromGroup: boolean | undefined;
   onDownload: (attachment: string) => void;
+  setIsImageLoaded: React.Dispatch<React.SetStateAction<boolean>>;
 };
-export default function Message({ message, onDownload }: TProps) {
+export default function Message({
+  message,
+  fromGroup,
+  onDownload,
+  setIsImageLoaded,
+}: TProps) {
   const [senderInfo, setSenderInfo] = useState<User | null>(null);
   useEffect(() => {
     if (message.userId) {
@@ -32,19 +39,68 @@ export default function Message({ message, onDownload }: TProps) {
       )}
     >
       <div className="flex items-start gap-2 p-1">
-        {message.sender === "CLIENT" &&
-          (message?.attachment || message?.requestEstimate) && (
-            <div>
-              <Avatar photo={senderInfo?.image} width={40} height={40} />
-              <p className="text-center text-[10px]">{senderInfo?.firstName}</p>
-            </div>
-          )}
+        {message.sender === "CLIENT" && fromGroup && (
+          <div>
+            <Avatar photo={senderInfo?.image} width={40} height={40} />
+            <p className="text-center text-[10px]">{senderInfo?.firstName}</p>
+          </div>
+        )}
         <div
           className={cn(
             "flex flex-col space-y-3",
             message.sender === "CLIENT" ? "items-start" : "items-end",
           )}
         >
+          {message.attachment &&
+            message.attachment.length > 0 &&
+            message.attachment.map((attachment, index) => {
+              const handleLoad = () => {
+                if (message?.attachment?.length! - 1 === index) {
+                  setIsImageLoaded(true);
+                }
+              };
+              return (
+                <div
+                  key={attachment.fileName}
+                  className={cn(
+                    "flex items-center justify-center",
+                    message.sender === "CLIENT"
+                      ? "flex-row"
+                      : "flex-row-reverse",
+                  )}
+                >
+                  {attachment.fileType.includes("image") ? (
+                    <Link href={`/communication/photo/${attachment.fileUrl}`}>
+                      <Image
+                        src={`/api/images/${attachment.fileUrl}`}
+                        alt=""
+                        // placeholder="blur"
+                        // blurDataURL=""
+                        className="aspect-auto cursor-pointer rounded-sm border"
+                        onLoad={handleLoad}
+                        width={200}
+                        height={200}
+                      />
+                    </Link>
+                  ) : (
+                    <div className="min-h-16 space-y-1 rounded-md bg-[#006D77] px-5 py-2 text-white">
+                      <p>{attachment.fileName}</p>
+                      <p>file size: {attachment.fileSize}</p>
+                    </div>
+                  )}
+                  <button onClick={() => onDownload(attachment?.fileUrl!)}>
+                    <IoCloudDownloadOutline
+                      size={30}
+                      className={cn(
+                        "cursor-pointer",
+                        message.sender === "CLIENT" ? "ml-6" : "mr-6",
+                      )}
+                    />
+                  </button>
+                </div>
+              );
+            })}
+
           {message.message && (
             <p
               className={cn(
@@ -56,39 +112,6 @@ export default function Message({ message, onDownload }: TProps) {
             >
               {message.message}
             </p>
-          )}
-
-          {message.attachment && (
-            <div
-              className={cn(
-                "flex items-center justify-center",
-                message.sender === "CLIENT" ? "flex-row" : "flex-row-reverse",
-              )}
-            >
-              {message.attachment.fileType.includes("image") ? (
-                <Image
-                  src={`/api/images/${message.attachment.fileUrl}`}
-                  alt=""
-                  className="rounded-sm"
-                  width={300}
-                  height={300}
-                />
-              ) : (
-                <div className="min-h-16 space-y-1 rounded-md bg-[#006D77] px-5 py-2 text-white">
-                  <p>{message.attachment.fileName}</p>
-                  <p>file size: {message.attachment.fileSize}</p>
-                </div>
-              )}
-              <button onClick={() => onDownload(message?.attachment?.fileUrl!)}>
-                <IoCloudDownloadOutline
-                  size={30}
-                  className={cn(
-                    "cursor-pointer",
-                    message.sender === "CLIENT" ? "ml-6" : "mr-6",
-                  )}
-                />
-              </button>
-            </div>
           )}
 
           {message.requestEstimate && (

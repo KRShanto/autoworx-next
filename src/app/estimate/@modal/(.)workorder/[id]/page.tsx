@@ -17,7 +17,19 @@ export default async function WorkOrderPage({
       company: true,
       invoiceItems: {
         include: {
-          service: true,
+          service: {
+            include: {
+              Technician: {
+                include: {
+                  user: {
+                    select: {
+                      firstName: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
           materials: true,
           labor: true,
         },

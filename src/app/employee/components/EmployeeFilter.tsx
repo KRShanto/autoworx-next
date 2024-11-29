@@ -32,7 +32,7 @@ export default function EmployeeFilter() {
           className="app-shadow rounded-md bg-white p-2 text-[#797979]"
           onChange={(e) => setFilter({ type: e.target.value as any })}
         >
-          {["All", "Sales", "Technician"].map((x) => (
+          {["All", "Sales", "Technician", "Manager", "Other"].map((x) => (
             <option key={x} value={x}>
               {x}
             </option>

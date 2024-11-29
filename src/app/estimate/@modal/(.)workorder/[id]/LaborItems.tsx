@@ -1,6 +1,6 @@
+'use client'
 import React, { useEffect, useState } from "react";
 import { TiDeleteOutline } from "react-icons/ti";
-import Link from "next/link";
 import { Technician } from "@prisma/client";
 import { getTechnicians } from "../../../../../actions/estimate/technician/getTechnicians";
 import { deleteTechnician } from "../../../../../actions/estimate/technician/deleteTechnician";
@@ -8,7 +8,7 @@ import CreateAndEditLabor from "./CreateAndEditLabor";
 
 // type TProps = {
 //   technicians: (Technician & { name: string })[];
-//   setTechnicians: Dispatc<SetStateAction<(Technician & { name: string })[]>>;
+//   setTechnicians: Dispatch<SetStateAction<(Technician & { name: string })[]>>;
 // };
 
 export default function LaborItems({
@@ -65,7 +65,7 @@ export default function LaborItems({
           setTechnicians={setTechnicians}
         />
 
-        {technicians.map((technician, index) => (
+        {technicians.map((technician) => (
           <button
             key={technician.id}
             className="flex items-center justify-evenly space-x-1 text-nowrap rounded-full border bg-[#6571FF] px-3 py-0.5"

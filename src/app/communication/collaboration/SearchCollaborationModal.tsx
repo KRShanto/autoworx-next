@@ -74,7 +74,7 @@ export default function SearchCollaborationModal({
             return { ...admin, isConnected: true };
           } else {
             return admin;
-          };
+          }
         });
       });
       if (result.success) {
@@ -150,20 +150,19 @@ export default function SearchCollaborationModal({
                           width={60}
                           height={60}
                         />
-                        <div className="flex w-full flex-col overflow-hidden">
-                          <div className="flex items-center space-x-8">
-                            <p className="flex-shrink-0 text-sm font-bold text-[#797979]">
+                        <div className="flex w-full flex-wrap items-start gap-x-4 overflow-hidden">
+                          <div className="mb-1 flex flex-col items-start">
+                            <p className="text-sm font-bold text-[#797979]">
                               {user?.firstName} {user?.lastName}
                             </p>
-                            <p className="flex-shrink-0 text-sm font-bold capitalize text-[#006D77]">
-                              {user?.companyName}
-                            </p>
+                            <div className="flex items-center text-[10px]">
+                              {user?.phone && <p>{user?.phone}</p>}
+                              <p>{user?.email}</p>
+                            </div>
                           </div>
-
-                          <div className="flex items-center space-x-3 text-[10px]">
-                            {user?.phone && <p>{user?.phone}</p>}
-                            <p>{user?.email}</p>
-                          </div>
+                          <p className="flex-shrink-0 text-sm font-bold capitalize text-[#006D77]">
+                            {user?.companyName}
+                          </p>
                         </div>
                         <div className="flex-shrink-0">
                           {!user?.isConnected && (

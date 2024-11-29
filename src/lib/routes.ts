@@ -57,7 +57,7 @@ export const NO_ACCESS_ROUTES = {
   // * client page
 
   "/client": {
-    notAccess: [ROLES.SALES,ROLES.TECHNICIAN, ROLES.OTHER],
+    notAccess: [ROLES.SALES, ROLES.TECHNICIAN, ROLES.OTHER],
   },
   //* employee page
   "/employee": {

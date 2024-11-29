@@ -3,7 +3,7 @@ import { createTask } from "@/actions/task/createTask";
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
-import { Labor, Material, Service, Tag } from "@prisma/client";
+import { InvoiceType, Labor, Material, Service, Tag } from "@prisma/client";
 import fs from "fs";
 import { revalidatePath } from "next/cache";
 
@@ -38,6 +38,7 @@ interface UpdateEstimateInput {
     tags: Tag[];
   }[];
   tasks: { id: undefined | number; task: string }[];
+  type: InvoiceType;
 }
 
 export async function updateInvoice(
@@ -181,6 +182,7 @@ export async function updateInvoice(
       policy: data.policy,
       customerNotes: data.customerNotes,
       customerComments: data.customerComments,
+      type: data.type,
     },
   });
 

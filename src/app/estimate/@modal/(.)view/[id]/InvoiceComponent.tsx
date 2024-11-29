@@ -1,10 +1,17 @@
 "use client";
 import {
+  authorizeInvoice,
+  deleteInvoiceAuthorize,
+} from "@/actions/estimate/invoice/authorize";
+import { sendInvoiceEmail } from "@/actions/estimate/invoice/sendInvoiceEmail";
+import { getCompany } from "@/actions/settings/getCompany";
+import {
   DialogClose,
   DialogContentBlank,
   DialogOverlay,
   DialogPortal,
 } from "@/components/Dialog";
+import { errorToast, successToast } from "@/lib/toast";
 import {
   Column,
   Company,
@@ -14,11 +21,9 @@ import {
   Labor,
   Material,
   Service,
-  Status,
   User,
   Vehicle,
 } from "@prisma/client";
-import { sendInvoiceEmail } from "@/actions/estimate/invoice/sendInvoiceEmail";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import moment from "moment";
 import Image from "next/image";
@@ -28,10 +33,12 @@ import { useEffect, useRef, useState } from "react";
 import { FaPrint, FaRegFile, FaShare } from "react-icons/fa";
 import { FaRegShareFromSquare } from "react-icons/fa6";
 import { HiXMark } from "react-icons/hi2";
+import { IoClose } from "react-icons/io5";
+import { MdEdit, MdOutlineDelete } from "react-icons/md";
+import { TiTick } from "react-icons/ti";
 import { useReactToPrint } from "react-to-print";
 import { InvoiceItems } from "./InvoiceItems";
 import PDFComponent from "./PDFComponent";
-import { getCompany } from "@/actions/settings/getCompany";
 
 const InvoiceComponent = ({
   id,
@@ -57,14 +64,24 @@ const InvoiceComponent = ({
 }) => {
   const router = useRouter();
   const componentRef = useRef(null);
+  const [showAuthorizedName, setShowAuthorizedName] = useState(false);
+  const [authorizedName, setAuthorizedName] = useState(
+    invoice?.authorizedName || "",
+  );
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
 
   const [companyDetails, setCompanyDetails] = useState<Company | null>(null);
 
-  const handleEmail = () => {
-    sendInvoiceEmail({ invoiceId: invoice.id });
+  const handleEmail = async () => {
+    let res = await sendInvoiceEmail({ invoiceId: invoice.id });
+    console.log("🚀 ~ handleEmail ~ res:", res);
+    if (!res?.success) {
+      errorToast(res?.message || "Error sharing invoice");
+      return;
+    }
+    successToast("Invoice sent successfully");
     // close the dialog
     router.back();
   };
@@ -263,9 +280,84 @@ const InvoiceComponent = ({
                   {invoice.user.firstName} {invoice.user.lastName}
                 </p>
               </div>
-              <button className="rounded bg-[#6571FF] px-8 text-white">
-                Authorize
-              </button>
+              <div>
+                {showAuthorizedName && (
+                  <div className="flex items-center gap-x-4">
+                    <input
+                      className="rounded-md border border-gray-300 px-2 py-1 text-sm"
+                      placeholder="Your Name"
+                      value={authorizedName}
+                      onChange={(e) => setAuthorizedName(e.target.value)}
+                    />
+
+                    <button
+                      onClick={async () => {
+                        const res = await authorizeInvoice(
+                          invoice.id,
+                          authorizedName,
+                        );
+                        if (res?.type === "success") {
+                          successToast("Invoice Authorized");
+                        }
+                        setShowAuthorizedName(false);
+                      }}
+                      className="text-lg text-green-500"
+                    >
+                      <TiTick />
+                    </button>
+                    <button
+                      className="text-lg text-red-500"
+                      onClick={() => setShowAuthorizedName(false)}
+                    >
+                      <IoClose />
+                    </button>
+                  </div>
+                )}
+                {invoice.authorizedName && !showAuthorizedName && (
+                  <div className="flex flex-col items-center gap-y-2">
+                    <span className="font-semibold italic">
+                      {invoice.authorizedName}
+                    </span>
+
+                    <hr className="border-slate-500 bg-slate-500" />
+                    <div className="flex items-center gap-x-4">
+                      <span className="rounded-sm border border-[#6571ff] px-4 py-1 text-sm text-[#6571ff]">
+                        Authorized
+                      </span>
+                      <button
+                        className="text-lg text-[#6571ff]"
+                        onClick={async () => {
+                          setShowAuthorizedName(true);
+                        }}
+                      >
+                        <MdEdit />
+                      </button>
+                      <button
+                        className="text-lg text-red-500"
+                        onClick={async () => {
+                          const res = await deleteInvoiceAuthorize(invoice.id);
+                          if (res?.type === "success") {
+                            successToast("Deleted Invoice Authorize");
+                          }
+                          setShowAuthorizedName(false);
+                        }}
+                      >
+                        <MdOutlineDelete />
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {!showAuthorizedName && !invoice.authorizedName && (
+                  <button
+                    onClick={() => {
+                      setShowAuthorizedName(true);
+                    }}
+                    className="rounded bg-[#6571FF] px-8 text-white"
+                  >
+                    Authorize
+                  </button>
+                )}
+              </div>
             </div>
             <p>Thank you for shopping with Autoworx</p>
           </div>
@@ -282,15 +374,20 @@ const InvoiceComponent = ({
               <h2 className="col-span-full text-3xl font-bold uppercase text-slate-500">
                 Attachments
               </h2>
-              {invoice.photos.map(async (x) => {
+              {invoice.photos.map((x) => {
                 return (
-                  <div key={x.id} className="relative aspect-square">
+                  <Link
+                    href={`/estimate/photo/${x.photo}`}
+                    key={x.id}
+                    className="relative aspect-square"
+                  >
                     <Image
                       src={`/api/images/${x.photo}`}
                       alt="attachment"
                       fill
+                      className="cursor-pointer"
                     />
-                  </div>
+                  </Link>
                 );
               })}
             </div>
@@ -300,7 +397,10 @@ const InvoiceComponent = ({
             >
               View Work Order
             </Link>
-            <button className="flex items-center justify-center gap-2 rounded-md bg-white py-2 text-[#6571FF]">
+            <button
+              onClick={handleEmail}
+              className="flex items-center justify-center gap-2 rounded-md bg-white py-2 text-[#6571FF]"
+            >
               Share Invoice
               <FaRegShareFromSquare />
             </button>

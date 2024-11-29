@@ -79,5 +79,3 @@ export const useListsStore = create<ListsStore>((set) => ({
       status: null,
     }),
 }));
-
-

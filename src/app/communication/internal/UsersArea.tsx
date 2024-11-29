@@ -9,7 +9,7 @@ import UserMessageBox from "./UserMessageBox";
 
 export interface MessageQue {
   user: number;
-  messages: (Message & { attachment: Attachment | null })[];
+  messages: (Message & { attachment: Attachment[] | null })[];
 }
 
 export interface TGroupMessage {
@@ -21,7 +21,7 @@ export interface Message {
   userId?: number;
   message: string;
   sender: "CLIENT" | "USER";
-  attachment?: Attachment | null;
+  attachment?: Attachment[] | null;
   requestEstimate?: RequestEstimate | null;
 }
 

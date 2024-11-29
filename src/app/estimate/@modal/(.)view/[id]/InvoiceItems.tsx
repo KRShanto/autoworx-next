@@ -43,7 +43,12 @@ export function InvoiceItems({
         key={item.id}
         className="rounded-md border border-[#6571FF] px-5 py-1"
       >
-        <div className="flex w-full justify-between text-[#6571FF]">
+        <div
+          onClick={() =>
+            setOpenService(openService === item.id ? null : item.id)
+          }
+          className="flex w-full cursor-pointer justify-between text-[#6571FF]"
+        >
           <p>{item.service.name}</p>
           <button
             type="button"

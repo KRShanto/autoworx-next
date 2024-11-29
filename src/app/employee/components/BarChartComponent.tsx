@@ -8,21 +8,6 @@ import {
   YAxis,
 } from "recharts";
 
-const demoData = [
-  {
-    category: "Category 1",
-    jobs: 4000,
-  },
-  {
-    category: "Category 2",
-    jobs: 3000,
-  },
-  {
-    category: "Category 3",
-    jobs: 2000,
-  },
-];
-
 const CustomBar = (props: any) => {
   const { x, y, width, height, fill } = props;
   return <rect x={x} y={y - 10} width={width} height={height} fill={fill} />;
@@ -71,7 +56,7 @@ const BarChartComponent: React.FC<BarChartComponentProps> = ({
       </h2>
       <ResponsiveContainer width="90%" height={height}>
         <BarChart
-          data={data?.length > 0 ? data : demoData}
+          data={data}
           margin={{
             top: 55,
             bottom: 5,

@@ -1,8 +1,9 @@
+"use client";
 import { Technician } from "@prisma/client";
 import { useState } from "react";
 
 type TProps = {
-  technician: Technician & { name: string };
+  technician: Technician & { user: { firstName: string } };
   onRedoTechnician: (
     event: React.ChangeEvent<HTMLInputElement>,
     technicianId: number,
@@ -33,7 +34,7 @@ export default function RedoTechnician({
           onChange={(event) => onRedoTechnician(event, technician?.id, notes)}
         />
         <p id="john" className="cursor-pointer text-center">
-          {technician.name}
+          {technician.user.firstName}
         </p>
       </label>
       <input
