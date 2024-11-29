@@ -78,7 +78,6 @@ export function SelectVehicle({
         selectedItem={vehicle}
         setSelectedItem={setVehicle}
         displayList={(item) => {
-          console.log("🚀 ~ item:", item);
           return (
             <p>{`${item.year?.toString()} ${item?.make} ${item?.model}`}</p>
           );
