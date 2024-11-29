@@ -6,9 +6,11 @@ import SalesPurchaseHistoryClient from "./SalesPurchaseHistoryClient";
 export default async function SalesPurchaseHistory({
   user,
   productId,
+  invoiceIds
 }: {
   user: User;
   productId: number | undefined;
+  invoiceIds: string[];
 }) {
   const product = productId
     ? await db.inventoryProduct.findUnique({
@@ -43,6 +45,7 @@ export default async function SalesPurchaseHistory({
       user={user}
       histories={histories}
       product={product!}
+      invoiceIds={invoiceIds}
     />
   );
 }

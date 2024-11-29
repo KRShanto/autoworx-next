@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/cn";
-import { AuthSession } from "@/types/auth";
 import {
   Client,
   InventoryProduct,
@@ -18,6 +17,7 @@ import { FaEdit } from "react-icons/fa";
 import { HiExternalLink } from "react-icons/hi";
 import { auth } from "../auth";
 import EditHistory from "./EditHistory";
+import EditProductForm from "./EditProductForm";
 
 enum Tab {
   Sales = "sales",
@@ -31,6 +31,7 @@ export default function SalesPurchaseHistoryClient({
   user,
   product,
   histories,
+  invoiceIds,
 }: {
   user: User;
   product?: InventoryProduct;
@@ -38,6 +39,7 @@ export default function SalesPurchaseHistoryClient({
     vendor: Vendor | null;
     client: Client | null;
   })[];
+  invoiceIds: string[];
 }) {
   const [tab, setTab] = useState<Tab>(Tab.Sales);
 
@@ -75,6 +77,7 @@ export default function SalesPurchaseHistoryClient({
               type="Sale"
               product={product}
               user={user}
+              invoiceIds={invoiceIds}
             />
           </Tabs.Content>
           <Tabs.Content value={Tab.Purchase}>
@@ -98,6 +101,7 @@ function Table({
   histories,
   type,
   product,
+  invoiceIds,
 }: {
   user: User;
   histories: (InventoryProductHistory & {
@@ -106,6 +110,7 @@ function Table({
   })[];
   type: InventoryProductHistoryType;
   product?: InventoryProduct;
+  invoiceIds?: string[];
 }) {
   return (
     <table className="w-full text-sm 2xl:text-base">
@@ -188,13 +193,21 @@ function Table({
                 </td>
               ) : (
                 <td className="text-center">
-                  {history.invoiceId && (
+                  {history.invoiceId ? (
                     <Link
                       href={`/estimate/edit/${history.invoiceId}`}
                       className="flex items-center justify-center text-[#6571FF]"
                     >
                       <FaEdit />
                     </Link>
+                  ) : (
+                    <EditProductForm
+                      history={history}
+                      invoiceIds={invoiceIds ? invoiceIds : []}
+                      productId={history.productId}
+                      productType={product?.type!}
+                      cost={parseInt(history?.price?.toString() || "0")}
+                    />
                   )}
                 </td>
               ))}
