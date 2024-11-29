@@ -3,10 +3,10 @@
 import Selector from "@/components/Selector";
 import { useListsStore } from "@/stores/lists";
 import { Vehicle } from "@prisma/client";
+import { useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NewVehicle from "./NewVehicle";
 import { SelectProps } from "./select-props";
-import { useSearchParams } from "next/navigation";
 
 export function SelectVehicle({
   name = "vehicleId",
@@ -60,7 +60,9 @@ export function SelectVehicle({
       <Selector
         disabledDropdown={clientId && !vehicle?.fromRequest ? false : true}
         label={(vehicle: Vehicle | null) =>
-          vehicle ? vehicle.model || `Vehicle ${vehicle.id}` : "Vehicle"
+          vehicle
+            ? `${vehicle.year?.toString()} ${vehicle?.make} ${vehicle?.model}`
+            : "Vehicle"
         }
         newButton={<NewVehicle />}
         items={vehicleList.filter((vehicle) => vehicle.clientId === +clientId!)}
@@ -75,7 +77,12 @@ export function SelectVehicle({
         ]}
         selectedItem={vehicle}
         setSelectedItem={setVehicle}
-        displayList={(item) => <p>{item.model}</p>}
+        displayList={(item) => {
+          console.log("🚀 ~ item:", item);
+          return (
+            <p>{`${item.year?.toString()} ${item?.make} ${item?.model}`}</p>
+          );
+        }}
       />
     </>
   );

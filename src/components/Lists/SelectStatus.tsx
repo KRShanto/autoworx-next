@@ -1,4 +1,8 @@
 "use client";
+import {
+  createColumn,
+  deleteColumn,
+} from "@/actions/pipelines/pipelinesColumn";
 import useOutsideClick from "@/hooks/useOutsideClick";
 import { INVOICE_COLORS } from "@/lib/consts";
 import { useFormErrorStore } from "@/stores/form-error";
@@ -17,10 +21,6 @@ import {
 import FormError from "../FormError";
 import Submit from "../Submit";
 import { SelectProps } from "./select-props";
-import {
-  createColumn,
-  deleteColumn,
-} from "@/actions/pipelines/pipelinesColumn";
 
 type SelectedColor = { textColor: string; bgColor: string } | null;
 
@@ -83,7 +83,7 @@ export function SelectStatus({
         }}
       >
         <DropdownMenuTrigger
-          className="flex h-10 items-center gap-2 rounded-md bg-slate-100 px-2 py-1"
+          className="flex h-10 items-center gap-2 rounded-md border-2 border-gray-400 bg-slate-100 px-4 py-1"
           style={{
             backgroundColor: status?.bgColor || undefined,
             color: status?.textColor || undefined,
