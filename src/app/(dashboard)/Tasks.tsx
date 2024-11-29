@@ -27,7 +27,7 @@ const Tasks = ({
           <FaExternalLinkAlt />
         </Link>
       </div>
-      <div className="custom-scrollbar flex flex-1 flex-col space-y-2 overflow-x-hidden">
+      <div className="custom-scrollbar my-2 flex flex-1 flex-col space-y-2 overflow-x-hidden">
         {tasks.map((task, idx) => (
           <Task key={idx} task={task} companyUsers={companyUsers} />
         ))}
@@ -36,9 +36,9 @@ const Tasks = ({
             <span>You have no upcoming tasks</span>
           </div>
         )}
-        <div className="mt-4 w-20 rounded-full">
-          <NewTask companyUsers={companyUsers} />
-        </div>
+      </div>
+      <div className="mt-auto w-20 rounded-full">
+        <NewTask companyUsers={companyUsers} />
       </div>
     </div>
   );
