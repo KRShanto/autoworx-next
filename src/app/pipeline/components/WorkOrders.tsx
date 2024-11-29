@@ -17,6 +17,7 @@ const WorkOrders = ({ type }: Props) => {
   const { dateRange, status, service } = usePipelineFilterStore();
 
   const filteredInvoices = invoices?.filter((invoice) => {
+    const mathcedType = invoice.type === "Invoice";
     const matchesSearch =
       invoice.client?.firstName.toLowerCase().includes(search.toLowerCase()) ||
       invoice.client?.lastName?.toLowerCase().includes(search.toLowerCase()) ||
@@ -30,18 +31,27 @@ const WorkOrders = ({ type }: Props) => {
 
     const matchesDateRange =
       dateRange[0] && dateRange[1]
-        ? dateRange[0].toDateString() === dateRange[1].toDateString()
-          ? new Date(invoice.createdAt).toDateString() ===
-            dateRange[0].toDateString()
-          : new Date(invoice.createdAt) >= dateRange[0] &&
-            new Date(invoice.createdAt) <= dateRange[1]
+        ? (() => {
+            const invoiceDate = new Date(invoice.createdAt);
+            const startDate = new Date(dateRange[0]);
+            const endDate = new Date(dateRange[1]);
+            endDate.setHours(23, 59, 59, 999); // Include the entire end day
+
+            return invoiceDate >= startDate && invoiceDate <= endDate;
+          })()
         : true;
 
     const matchesService = service
       ? invoice.invoiceItems.some((item) => item.service?.name === service)
       : true;
 
-    return matchesSearch && matchesStatus && matchesDateRange && matchesService;
+    return (
+      mathcedType &&
+      matchesSearch &&
+      matchesStatus &&
+      matchesDateRange &&
+      matchesService
+    );
   });
 
   return (
