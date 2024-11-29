@@ -136,13 +136,15 @@ export {
   DialogDescription,
 };
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
 export function InterceptedDialog({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
+  const pathname = usePathname();
 
+  const isEstimateEditRoute = pathname.includes("/estimate/edit");
   function close() {
     router.back();
   }
@@ -150,6 +152,12 @@ export function InterceptedDialog({ children }: { children: ReactNode }) {
   React.useEffect(() => {
     setOpen(true);
   }, []);
+
+  if (isEstimateEditRoute && open) {
+    setOpen(false);
+  }
+
+  console.log({ isEstimateEditRoute });
 
   return (
     <Dialog open={open} onOpenChange={close}>

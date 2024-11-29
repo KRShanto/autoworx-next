@@ -25,6 +25,7 @@ import {
   Vehicle,
 } from "@prisma/client";
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import { FaRegEdit } from "react-icons/fa";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
@@ -72,6 +73,10 @@ const InvoiceComponent = ({
     content: () => componentRef.current,
   });
 
+  const handleEdit = () => {
+    router.push(`/estimate/edit/${id}`);
+  };
+
   const [companyDetails, setCompanyDetails] = useState<Company | null>(null);
 
   const handleEmail = async () => {
@@ -105,6 +110,14 @@ const InvoiceComponent = ({
           >
             <div className="flex items-center justify-center print:hidden">
               <div className="flex items-center gap-3">
+                <button
+                  className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
+                  onClick={handleEdit}
+                >
+                  <FaRegEdit />
+                  Edit
+                </button>
+
                 <button
                   className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
                   onClick={handlePrint}
