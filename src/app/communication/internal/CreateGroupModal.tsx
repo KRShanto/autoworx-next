@@ -20,6 +20,9 @@ import { searchUsers } from "@/actions/communication/internal/searchUser";
 
 type TProps = {
   users: User[];
+  setSideBarGroupLists: React.Dispatch<
+    React.SetStateAction<Array<Group & { users: User[] }>>
+  >;
 };
 
 type TContactListUser = {
@@ -27,7 +30,10 @@ type TContactListUser = {
   name: string;
 };
 
-export default function CreateGroupModal({ users }: TProps) {
+export default function CreateGroupModal({
+  users,
+  setSideBarGroupLists,
+}: TProps) {
   const [groupUsers, setGroupUsers] = useState(users);
 
   const { data: session }: { data: any } = useSession();
@@ -122,6 +128,16 @@ export default function CreateGroupModal({ users }: TProps) {
         setError("");
         setGroupName("");
         setContactList([]);
+        setSideBarGroupLists((prevGroups) => {
+          const isExistInGroup = prevGroups.find(
+            (g) => g.id === response.data.id,
+          );
+          if (!isExistInGroup) {
+            return [...prevGroups, response.data];
+          } else {
+            return prevGroups;
+          }
+        });
       } else {
         setError("Failed to create group.");
       }
