@@ -21,6 +21,15 @@ import {
   createColumn,
   deleteColumn,
 } from "@/actions/pipelines/pipelinesColumn";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/Dialog";
 
 type SelectedColor = { textColor: string; bgColor: string } | null;
 
@@ -34,6 +43,8 @@ export function SelectStatus({
   const statusList = useListsStore((x) => x.statuses);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [statusToDelete, setStatusToDelete] = useState<number | null>(null);
 
   useEffect(() => {
     if (value) {
@@ -55,17 +66,19 @@ export function SelectStatus({
   const filteredShopStatus = statusList.filter(
     (status) => status.type === "shop",
   );
-  async function handleDelete(id: number, event: React.MouseEvent) {
+  async function handleDelete(event: React.MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
-    const res = await deleteColumn(id);
-
-    if (res) {
-      useListsStore.setState(({ statuses }) => ({
-        statuses: statuses.filter((status) => status.id !== id),
-      }));
-      if (status?.id === id) {
-        setStatus(null);
+    if (statusToDelete !== null) {
+      const res = await deleteColumn(statusToDelete);
+      if (res) {
+        useListsStore.setState(({ statuses }) => ({
+          statuses: statuses.filter((status) => status.id !== statusToDelete),
+        }));
+        if (status?.id === statusToDelete) {
+          setStatus(null);
+        }
       }
+      setDeleteConfirmOpen(false);
     }
   }
   useOutsideClick(() => {
@@ -73,6 +86,7 @@ export function SelectStatus({
     setOpen && setOpen(false);
   });
   const restrictedColumns = ["Pending", "In Progress", "Completed"];
+  console.log("Status to delete", statusToDelete);
   return (
     <div>
       <input type="hidden" name={name} value={status?.title ?? ""} />
@@ -140,7 +154,11 @@ export function SelectStatus({
                 {!restrictedColumns.includes(statusItem.title) && (
                   <button
                     className="px-2 text-lg text-[#66738C] hover:text-gray-900"
-                    onClick={(event) => handleDelete(statusItem.id, event)}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setStatusToDelete(statusItem.id);
+                      setDeleteConfirmOpen(true);
+                    }}
                   >
                     <IoMdClose />
                   </button>
@@ -186,6 +204,26 @@ export function SelectStatus({
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+      {/* Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Status</DialogTitle>
+          </DialogHeader>
+          <p>Are you sure you want to delete this status?</p>
+          <DialogFooter>
+            <DialogClose className="rounded-lg border-2 border-slate-400 p-2">
+              Cancel
+            </DialogClose>
+            <button
+              className="z-50 rounded-lg border bg-red-500 px-5 py-2 text-white hover:bg-red-600"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
