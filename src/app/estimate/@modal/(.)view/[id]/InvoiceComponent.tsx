@@ -21,6 +21,7 @@ import {
   Labor,
   Material,
   Service,
+  Technician,
   User,
   Vehicle,
 } from "@prisma/client";
@@ -54,7 +55,7 @@ const InvoiceComponent = ({
     company: Company;
     invoiceItems: (InvoiceItem & {
       materials: Material[] | [];
-      service: Service | null;
+      service: (Service & { Technician: Technician[] }) | null;
       invoice: Invoice | null;
       labor: Labor | null;
     })[];
@@ -98,6 +99,11 @@ const InvoiceComponent = ({
     };
     getCompanyDetails();
   }, []);
+
+  const isWorkOrderCreate = invoice.invoiceItems.some(
+    (items) =>
+      items.service?.Technician && items.service?.Technician?.length > 0,
+  );
 
   return (
     <div>
@@ -409,7 +415,7 @@ const InvoiceComponent = ({
               href={`/estimate/workorder/${id}`}
               className="rounded-md bg-[#6571FF] py-2 text-center text-white disabled:bg-gray-400"
             >
-              View Work Order
+              {isWorkOrderCreate ? "View Work Order" : "Create Work Order"}
             </Link>
             <button
               onClick={handleEmail}
