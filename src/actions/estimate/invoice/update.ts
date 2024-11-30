@@ -145,6 +145,15 @@ export async function updateInvoice(
     );
   }
 
+  if (data.columnId) {
+    const columnExists = await db.column.findUnique({
+      where: { id: data.columnId },
+    });
+
+    if (!columnExists) {
+      data.columnId = undefined;
+    }
+  }
   // re-calculating the profit
   const totalCost = data.items.reduce((acc, item) => {
     const materials = item.materials;
