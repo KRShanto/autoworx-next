@@ -1,13 +1,15 @@
 model InventoryProduct {
     id                      Int                       @id @default(autoincrement())
     name                    String
-    description             String?
+    description             String?                   @db.Text
     categoryId              Int?                      @map("category_id")
     quantity                Int?                      @default(1)
     price                   Decimal?                  @default(0)
     unit                    String?                   @default("pc")
     lot                     String?
     vendorId                Int?                      @map("vendor_id")
+    userId                  Int?                      @map("user_id")
+    User                    User?                     @relation(fields: [userId], references: [id], onDelete: SetNull)
     type                    InventoryProductType
     receipt                 String?
     lowInventoryAlert       Int?                      @map("low_inventory_alert")

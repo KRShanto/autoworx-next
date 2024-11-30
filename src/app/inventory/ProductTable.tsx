@@ -18,10 +18,15 @@ export default function ProductTable({
   products,
 }: {
   currentProductId: number | undefined;
-  products: (InventoryProduct & { category: Category; vendor: Vendor })[];
+  products: (InventoryProduct & {
+    category: Category;
+    vendor: Vendor;
+    User?: User;
+  })[];
 }) {
   const router = useRouter();
   const search = useSearchParams();
+  console.log("🚀 ~ search:", search.get("view"));
   async function getUserInfo() {
     getUser().then((user) => {
       setUser(user);
@@ -90,7 +95,9 @@ export default function ProductTable({
                 <p>{product.id}</p>
               </td>
               <td className="text-nowrap px-4 text-left 2xl:px-10">
-                {product.name}
+                {search.get("view") === "supplies"
+                  ? product?.User?.firstName
+                  : product.name}
               </td>
               <td className="text-nowrap px-4 text-left 2xl:px-10">
                 {product.category?.name}
