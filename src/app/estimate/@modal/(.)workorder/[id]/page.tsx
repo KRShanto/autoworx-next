@@ -3,8 +3,10 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { InvoiceItems } from "./InvoiceItems";
 import moment from "moment";
-import SaveWorkOrderBtn from "../../(.)view/[id]/(..)(..)create-work-order/[id1]/SaveWorkOrderBtn";
+import SaveWorkOrderBtn from "./SaveWorkOrderBtn";
 import Image from "next/image";
+import { getTechnicians } from "@/actions/estimate/technician/getTechnicians";
+import { SlimInput } from "@/components/SlimInput";
 
 export default async function WorkOrderPage({
   params: { id },
@@ -17,19 +19,7 @@ export default async function WorkOrderPage({
       company: true,
       invoiceItems: {
         include: {
-          service: {
-            include: {
-              Technician: {
-                include: {
-                  user: {
-                    select: {
-                      firstName: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
+          service: true,
           materials: true,
           labor: true,
         },
@@ -48,6 +38,8 @@ export default async function WorkOrderPage({
   const companyDetails = await db.company.findUnique({
     where: { id: invoice.companyId },
   });
+
+  const invoiceTechnicians = await getTechnicians({ invoiceId: invoice.id });
 
   return (
     <InterceptedDialog>
@@ -127,6 +119,7 @@ export default async function WorkOrderPage({
         <div className="space-y-2">
           <InvoiceItems
             items={JSON.parse(JSON.stringify(invoice.invoiceItems))}
+            invoiceTechnicians={invoiceTechnicians}
           />
         </div>
 

@@ -11,7 +11,7 @@ import { createInvoiceRedo } from "@/actions/estimate/labor/createInvoiceRedo";
 type TProps = {
   invoiceId: string;
   serviceId: number;
-  technicians: (Technician & { user: { firstName: string } })[];
+  technicians: (Technician & { name: string })[];
 };
 
 type TRedoTechnicianInfo = {

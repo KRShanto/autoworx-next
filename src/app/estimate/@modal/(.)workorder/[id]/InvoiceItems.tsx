@@ -6,25 +6,15 @@ import React, { useState } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import LaborItems from "./LaborItems";
 import ReDoModal from "./ReDoModal";
+import { Technician } from "@prisma/client";
 
 type TProps = {
+  invoiceTechnicians: (Technician & { name: string })[];
   items: Awaited<
     ReturnType<
       typeof db.invoiceItem.findMany<{
         include: {
-          service: {
-            include: {
-              Technician: {
-                include: {
-                  user: {
-                    select: {
-                      firstName: true;
-                    };
-                  };
-                };
-              };
-            };
-          };
+          service: true;
           materials: true;
           labor: true;
         };
@@ -33,7 +23,7 @@ type TProps = {
   >;
 };
 
-export function InvoiceItems({ items }: TProps) {
+export function InvoiceItems({ items, invoiceTechnicians }: TProps) {
   const [openService, setOpenService] = useState<number | null>(null);
   return items.map((item) => {
     if (!item.service) return null;
@@ -53,11 +43,11 @@ export function InvoiceItems({ items }: TProps) {
         >
           <p className="px-5">{item.service.name}</p>
           <div className="mr-5 flex items-center space-x-3">
-            {item.service.Technician && item.service.Technician.length > 1 && (
+            {invoiceTechnicians.length > 0 && (
               <ReDoModal
                 invoiceId={item?.invoiceId as string}
                 serviceId={item?.serviceId as number}
-                technicians={item.service.Technician}
+                technicians={invoiceTechnicians}
               />
             )}
             <button
