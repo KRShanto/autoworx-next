@@ -144,6 +144,7 @@ const InvoiceComponent = ({
                     }
                     fileName="Invoice.pdf"
                   >
+                    {/* @ts-ignore TODO */}
                     {({ blob, url, loading, error }) =>
                       loading ? (
                         "Loading PDF..."

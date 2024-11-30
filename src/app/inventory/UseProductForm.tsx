@@ -66,7 +66,9 @@ export default function UseProductForm({
 
       <DialogContent className="max-h-full w-[30rem] max-w-xl" form>
         <DialogHeader>
-          <DialogTitle>Use Product</DialogTitle>
+          <DialogTitle>
+            {productType === "Product" ? "Loss" : "Use"} Product
+          </DialogTitle>
         </DialogHeader>
 
         <FormError />

@@ -43,8 +43,8 @@ export default async function Sidebar({ productId }: { productId: number }) {
 
   const isWarningForQuantity =
     product && (product.quantity || 0) <= (product.lowInventoryAlert || 1);
-  
-  const invoiceIds = invoices.map((invoice) => invoice.id)
+
+  const invoiceIds = invoices.map((invoice) => invoice.id);
 
   return (
     <div className="mt-12 flex h-[88.5%] w-1/2 flex-col">
@@ -97,12 +97,9 @@ export default async function Sidebar({ productId }: { productId: number }) {
                   <span className="font-semibold">Type: </span>{" "}
                   {product && product.type}
                 </p>
-                <p className="mt-2 break-words">
+                <p className="mt-2">
                   <span className="font-semibold">Description: </span>{" "}
-                  {product &&
-                    (product?.description?.length || 0 > 200
-                      ? product?.description?.slice(0, 200) + "..."
-                      : product?.description)}
+                  {product && product.description}
                 </p>
               </div>
               {product && (
@@ -132,7 +129,6 @@ export default async function Sidebar({ productId }: { productId: number }) {
                         productId={productId}
                         invoiceIds={invoiceIds}
                         // @ts-ignore
-                        // TODO: Fix this
                         cost={lastHistory?.price}
                         productType={product.type}
                       />
