@@ -4,16 +4,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import Title from "@/components/Title";
 import { db } from "@/lib/db";
 import { AuthSession } from "@/types/auth";
-import { BillSummary } from "../../create/BillSummary";
-import Create from "../../create/Create";
-import { CreateTab } from "../../create/tabs/CreateTab";
-import { AttachmentTab } from "../../create/tabs/AttachmentTab";
-import Header from "../../create/Header";
-import ConvertButton from "../../create/ConvertButton";
+import { InventoryProduct, Labor, Material, Tag } from "@prisma/client";
 import { notFound } from "next/navigation";
-import SyncEstimate from "../../create/SyncEstimate";
 import { FaSave } from "react-icons/fa";
-import { Labor, Material, Tag } from "@prisma/client";
+import { BillSummary } from "../../create/BillSummary";
+import ConvertButton from "../../create/ConvertButton";
+import Create from "../../create/Create";
+import Header from "../../create/Header";
+import SyncEstimate from "../../create/SyncEstimate";
+import { AttachmentTab } from "../../create/tabs/AttachmentTab";
+import { CreateTab } from "../../create/tabs/CreateTab";
 import PaymentTab from "../../create/tabs/PaymentTab";
 
 export default async function Page({
@@ -103,11 +103,37 @@ export default async function Page({
     include: { tag: true },
   });
 
+  const products = (await db.inventoryProduct.findMany({
+    where: { companyId, type: "Product" },
+  })) as (InventoryProduct & { tags: Tag[] })[];
+
+  const productTags = await db.inventoryProductTag.findMany({
+    where: {
+      inventoryId: { in: products.map((product) => product.id) },
+    },
+    include: { tag: true },
+  });
+
+  products.forEach((product) => {
+    product.tags = productTags
+      .filter((productTag) => productTag.inventoryId === product.id)
+      .map((productTag) => productTag.tag);
+  });
   materials.forEach((material) => {
     material.tags = materialTags
       .filter((materialTag) => materialTag.materialId === material.id)
       .map((materialTag) => materialTag.tag);
   });
+
+  materials.push(
+    // @ts-ignore
+    ...products.map((product) => ({
+      ...product,
+      cost: product.price,
+      tags: product.tags,
+      productId: product.id,
+    })),
+  );
 
   labors.forEach((labor) => {
     labor.tags = laborTags
