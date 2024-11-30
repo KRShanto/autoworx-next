@@ -69,6 +69,9 @@ export default async function WorkOrderPage({
             </p>
             <p>{companyDetails?.phone}</p>
             <p>{companyDetails?.email}</p>
+            <div className="mt-2">
+              <SlimInput name="dueDate" label="Due Date" type="date" />
+            </div>
           </div>
         </div>
 
