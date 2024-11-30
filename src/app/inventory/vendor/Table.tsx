@@ -52,7 +52,9 @@ export default function Table({
               <td className="h-12 px-10 text-left">
                 <p>{vendor.id}</p>
               </td>
-              <td className="text-nowrap px-10 text-left">{vendor.name}</td>
+              <td className="text-nowrap px-10 text-left">
+                {vendor?.companyName || vendor.name}
+              </td>
               <td className="text-nowrap px-10 text-left">{vendor.phone}</td>
               <td className="px-10 text-left">{vendor.website}</td>
               <td className="px-10 text-left">

@@ -242,7 +242,9 @@ export default function MaterialCreate() {
         <label className="w-28 text-end text-sm">Vendor</label>
 
         <Selector
-          label={(vendor: Vendor | null) => (vendor ? vendor.name : "Vendor")}
+          label={(vendor: Vendor | null) =>
+            vendor ? vendor?.companyName || vendor?.name : "Vendor"
+          }
           newButton={
             <NewVendor
               button={
@@ -275,11 +277,17 @@ export default function MaterialCreate() {
           }
           items={vendors}
           onSearch={(search: string) =>
-            vendors.filter((vendor) =>
-              vendor.name.toLowerCase().includes(search.toLowerCase()),
+            vendors.filter(
+              (vendor) =>
+                vendor?.companyName
+                  ?.toLowerCase()
+                  ?.includes(search.toLowerCase()) ||
+                vendor.name.toLowerCase().includes(search.toLowerCase()),
             )
           }
-          displayList={(vendor: Vendor) => <p>{vendor.name}</p>}
+          displayList={(vendor: Vendor) => (
+            <p>{vendor?.companyName || vendor.name}</p>
+          )}
           openState={[vendorOpen, setVendorOpen]}
           selectedItem={vendor}
           setSelectedItem={setVendor}

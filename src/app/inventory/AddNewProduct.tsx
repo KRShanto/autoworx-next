@@ -15,11 +15,11 @@ import SelectCategory from "@/components/Lists/SelectCategory";
 import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
+import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
 import { Category, InventoryProductType, Vendor } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { createProduct } from "../../actions/inventory/create";
-import { useFormErrorStore } from "@/stores/form-error";
 
 export default function AddNewProduct() {
   const [open, setOpen] = useState(false);
@@ -122,10 +122,18 @@ export default function AddNewProduct() {
                     />
                   }
                   items={vendors}
-                  displayList={(vendor: Vendor) => <p>{vendor.name}</p>}
+                  displayList={(vendor: Vendor) => (
+                    <p>{vendor?.companyName || vendor.name}</p>
+                  )}
                   onSearch={(search: string) =>
-                    vendors.filter((vendor) =>
-                      vendor.name.toLowerCase().includes(search.toLowerCase()),
+                    vendors.filter(
+                      (vendor) =>
+                        vendor?.companyName
+                          ?.toLowerCase()
+                          ?.includes(search.toLowerCase()) ||
+                        vendor.name
+                          .toLowerCase()
+                          .includes(search.toLowerCase()),
                     )
                   }
                   openState={[vendorOpen, setVendorOpen]}

@@ -148,7 +148,11 @@ export default function EditProduct({ productData }: TProps) {
 
                 <Selector
                   label={(vendor: Vendor | null) =>
-                    vendor ? vendor.name || `Vendor ${vendor.id}` : "Vendor"
+                    vendor
+                      ? vendor?.companyName ||
+                        vendor.name ||
+                        `Vendor ${vendor.id}`
+                      : "Vendor"
                   }
                   newButton={
                     <NewVendor
@@ -168,11 +172,19 @@ export default function EditProduct({ productData }: TProps) {
                   }
                   items={vendors}
                   onSearch={(search: string) =>
-                    vendors.filter((vendor) =>
-                      vendor.name.toLowerCase().includes(search.toLowerCase()),
+                    vendors.filter(
+                      (vendor) =>
+                        vendor?.companyName
+                          ?.toLowerCase()
+                          ?.includes(search.toLowerCase()) ||
+                        vendor.name
+                          .toLowerCase()
+                          .includes(search.toLowerCase()),
                     )
                   }
-                  displayList={(vendor: Vendor) => <p>{vendor.name}</p>}
+                  displayList={(vendor: Vendor) => (
+                    <p>{vendor?.companyName || vendor.name}</p>
+                  )}
                   openState={[vendorOpen, setVendorOpen]}
                   selectedItem={vendor}
                   setSelectedItem={setVendor}

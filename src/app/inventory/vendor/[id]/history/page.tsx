@@ -90,7 +90,9 @@ export default async function Page({
                   <td className="h-12 px-10 text-left">
                     <p>{product.id}</p>
                   </td>
-                  <td className="text-nowrap px-10 text-left">{vendor.name}</td>
+                  <td className="text-nowrap px-10 text-left">
+                    {vendor?.companyName || vendor.name}
+                  </td>
                   <td className="text-nowrap px-10 text-left">
                     {product.price as any}
                   </td>
