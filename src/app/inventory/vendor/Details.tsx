@@ -13,7 +13,7 @@ export default function Details({ vendor }: { vendor: Vendor | undefined }) {
       ) : (
         <div className="flex flex-col gap-1 p-3 py-1 text-sm">
           <p>Contact Name: {vendor.name}</p>
-          <p>Company Name: {vendor.companyName}</p>
+          <p>Company Name: {vendor?.companyName}</p>
           <p>Phone: {vendor.phone}</p>
           <p>Email: {vendor.email}</p>
           <p>Address: {vendor.address}</p>

@@ -56,7 +56,7 @@ export default function SalesPurchaseHistoryClient({
                 : "border border-[#6571FF] text-[#6571FF]",
             )}
           >
-            Sales List
+            Use List
           </Tabs.Trigger>
           <Tabs.Trigger
             value={Tab.Purchase}

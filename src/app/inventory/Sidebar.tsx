@@ -97,9 +97,12 @@ export default async function Sidebar({ productId }: { productId: number }) {
                   <span className="font-semibold">Type: </span>{" "}
                   {product && product.type}
                 </p>
-                <p className="mt-2">
+                <p className="mt-2 break-words">
                   <span className="font-semibold">Description: </span>{" "}
-                  {product && product.description}
+                  {product &&
+                    (product?.description?.length || 0 > 200
+                      ? product?.description?.slice(0, 200) + "..."
+                      : product?.description)}
                 </p>
               </div>
               {product && (

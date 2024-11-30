@@ -25,7 +25,7 @@ export default async function TopVendors() {
       return {
         total,
         name: vendor.name,
-        companyName: vendor.companyName,
+        companyName: vendor?.companyName,
       };
     })
     .sort((a, b) => b.total - a.total)
@@ -41,7 +41,7 @@ export default async function TopVendors() {
           .map((vendor, i) => (
             <div key={i} className="flex items-center justify-between">
               <p className="text-sm">
-                {vendor.name}, {vendor.companyName}
+                {vendor.name}, {vendor?.companyName}
               </p>
               {/* progress bar */}
               <div className="h-2 w-[50%] rounded-md bg-gray-200">

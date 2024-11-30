@@ -10,14 +10,14 @@ import {
   DialogTrigger,
 } from "@/components/Dialog";
 import FormError from "@/components/FormError";
+import NewVendor from "@/components/Lists/NewVendor";
 import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { useState } from "react";
-import { Vendor } from "@prisma/client";
-import { replenish } from "../../actions/inventory/replenish";
 import { useListsStore } from "@/stores/lists";
-import NewVendor from "@/components/Lists/NewVendor";
+import { Vendor } from "@prisma/client";
+import { useState } from "react";
+import { replenish } from "../../actions/inventory/replenish";
 
 export default function ReplenishProductForm({
   productId,
@@ -81,7 +81,9 @@ export default function ReplenishProductForm({
 
             <Selector
               label={(vendor: Vendor | null) =>
-                vendor ? vendor.name || `Vendor ${vendor.id}` : "Vendor"
+                vendor
+                  ? vendor?.companyName || vendor?.name || `Vendor ${vendor.id}`
+                  : "Vendor"
               }
               newButton={
                 <NewVendor
@@ -96,11 +98,17 @@ export default function ReplenishProductForm({
                   }
                 />
               }
-              displayList={(vendor: Vendor) => <p>{vendor.name}</p>}
+              displayList={(vendor: Vendor) => (
+                <p>{vendor?.companyName || vendor.name}</p>
+              )}
               items={vendors}
               onSearch={(search: string) =>
-                vendors.filter((vendor) =>
-                  vendor.name.toLowerCase().includes(search.toLowerCase()),
+                vendors.filter(
+                  (vendor) =>
+                    vendor?.companyName
+                      ?.toLowerCase()
+                      ?.includes(search.toLowerCase()) ||
+                    vendor.name.toLowerCase().includes(search.toLowerCase()),
                 )
               }
               openState={[vendorOpen, setVendorOpen]}
