@@ -6,12 +6,16 @@ import moment from "moment";
 import SaveWorkOrderBtn from "./SaveWorkOrderBtn";
 import Image from "next/image";
 import { getTechnicians } from "@/actions/estimate/technician/getTechnicians";
-import { SlimInput } from "@/components/SlimInput";
+import DueDate from "./DueDateInput";
 
 export default async function WorkOrderPage({
   params: { id },
+  searchParams,
 }: {
   params: { id: string };
+  searchParams: {
+    dueDate: string | null;
+  };
 }) {
   const invoice = await db.invoice.findUnique({
     where: { id },
@@ -69,9 +73,10 @@ export default async function WorkOrderPage({
             </p>
             <p>{companyDetails?.phone}</p>
             <p>{companyDetails?.email}</p>
-            <div className="mt-2">
-              <SlimInput name="dueDate" label="Due Date" type="date" />
-            </div>
+            <DueDate
+              invoiceDueDate={invoice?.dueDate}
+              dueDateParams={searchParams.dueDate}
+            />
           </div>
         </div>
 
@@ -130,7 +135,10 @@ export default async function WorkOrderPage({
          * Submit
          */}
         <div className="flex">
-          <SaveWorkOrderBtn />
+          <SaveWorkOrderBtn
+            invoiceId={invoice.id}
+            dueDate={searchParams.dueDate}
+          />
         </div>
         <div>
           <p className="font-bold text-slate-500">{invoice.company.name}</p>
