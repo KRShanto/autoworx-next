@@ -51,7 +51,7 @@ export default async function WorkOrderPage({
           <div className="flex aspect-square w-32 items-center justify-center bg-slate-500 text-center font-bold text-white">
             {companyDetails?.image ? (
               <Image
-                src={`/api/images/${companyDetails.image}`}
+                src={companyDetails.image}
                 alt="company logo"
                 width={128}
                 height={128}

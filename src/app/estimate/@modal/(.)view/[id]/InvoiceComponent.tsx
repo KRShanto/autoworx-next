@@ -169,7 +169,7 @@ const InvoiceComponent = ({
               <div className="flex aspect-square w-32 items-center justify-center bg-slate-500 text-center font-bold text-white">
                 {companyDetails?.image ? (
                   <Image
-                    src={`/api/images/${companyDetails.image}`}
+                    src={companyDetails.image}
                     alt="company logo"
                     width={128}
                     height={128}
@@ -395,12 +395,12 @@ const InvoiceComponent = ({
               {invoice.photos.map((x) => {
                 return (
                   <Link
-                    href={`/estimate/photo/${x.photo}`}
+                    href={`/estimate/photo?url=${x.photo}`}
                     key={x.id}
                     className="relative aspect-square"
                   >
                     <Image
-                      src={`/api/images/${x.photo}`}
+                      src={x.photo}
                       alt="attachment"
                       fill
                       className="cursor-pointer"

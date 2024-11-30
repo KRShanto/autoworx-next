@@ -20,7 +20,7 @@ export default function BusinessForm({ company }: TProps) {
   useEffect(() => {
     const photoFiles = async () => {
       if (company.image) {
-        const url = `/api/images/${company.image}`;
+        const url = company.image;
         const filename = company.image.split("/").pop() || "image.jpg";
         const file = await fetchImageAsFile(url, filename);
         setImageSrc(file);

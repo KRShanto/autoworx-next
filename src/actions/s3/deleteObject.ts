@@ -12,7 +12,7 @@ export async function deleteObject(url: string) {
       Key: key,
     };
 
-    await s3Client.send(new DeleteObjectCommand(deleteParams));
+    return await s3Client.send(new DeleteObjectCommand(deleteParams));
   } catch (e) {
     console.error(e);
   }
