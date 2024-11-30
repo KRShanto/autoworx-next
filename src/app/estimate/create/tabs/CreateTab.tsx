@@ -53,7 +53,7 @@ export function CreateTab() {
                             type="SERVICE"
                             label="Service"
                             item={item}
-                            list={services}
+                            list={[...services].reverse()}
                             display="name"
                             onEdit={() =>
                               open("SERVICE", {
@@ -115,7 +115,7 @@ export function CreateTab() {
                                   type="MATERIAL"
                                   label="Materials/Parts"
                                   item={item}
-                                  list={materials}
+                                  list={[...materials].reverse()}
                                   display="name"
                                   alwaysShowDeleteButton={
                                     item.materials.length > 1 && j > 0
@@ -202,7 +202,7 @@ export function CreateTab() {
                                 type="MATERIAL"
                                 label="Materials/Parts"
                                 item={item}
-                                list={materials}
+                                list={[...materials].reverse()}
                                 display="name"
                                 alwaysShowDeleteButton={
                                   item.materials.length > 1 && j > 0
@@ -281,7 +281,7 @@ export function CreateTab() {
                             type="LABOR"
                             label="Labor"
                             item={item}
-                            list={labors}
+                            list={[...labors].reverse()}
                             display="name"
                             onEdit={() =>
                               open("LABOR", {

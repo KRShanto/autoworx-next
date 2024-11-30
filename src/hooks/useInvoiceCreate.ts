@@ -69,7 +69,7 @@ export function useInvoiceCreate(type: InvoiceType) {
         id: invoiceId,
         clientId: clientId ? clientId : undefined,
         vehicleId: vehicleId ? vehicleId : undefined,
-        columnId: columnId ? columnId : undefined,
+        columnId: columnId || undefined,
         subtotal,
         discount,
         tax,

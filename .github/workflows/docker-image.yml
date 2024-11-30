@@ -44,6 +44,8 @@ jobs:
             --build-arg TWILIO_SID=${{ secrets.TWILIO_SID }} \
             --build-arg TWILIO_TOKEN=${{ secrets.TWILIO_TOKEN }} \
             --build-arg TWILIO_PHONE=${{ secrets.TWILIO_PHONE }} \
+            --build-arg ASANA_PERSONAL_TOKEN=${{ secrets.ASANA_PERSONAL_TOKEN }} \
+            --build-arg ASANA_WORKSPACE=${{ secrets.ASANA_WORKSPACE }} \
             --platform linux/amd64 \
             .
 

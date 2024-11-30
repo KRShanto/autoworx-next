@@ -77,48 +77,35 @@ export default async function Page({
                 <th className="px-10 text-left">Quantity</th>
                 <th className="px-10 text-left">Total</th>
                 <th className="px-10 text-left">Date</th>
-                <th className="px-5 text-left">Invoice</th>
+                <th className="px-5 text-left">Receipt</th>
               </tr>
             </thead>
 
             <tbody>
               {vendor?.inventoryProducts.map((product, index) => (
-                <>
-                  {product.InventoryProductHistory.map((history) => (
-                    <tr
-                      key={history.id}
-                      className={cn(
-                        "py-3",
-                        index % 2 === 0 ? evenColor : oddColor,
-                      )}
-                    >
-                      <td className="h-12 px-10 text-left">
-                        <p>{product.id}</p>
-                      </td>
-                      <td className="text-nowrap px-10 text-left">
-                        {vendor.name}
-                      </td>
-                      <td className="text-nowrap px-10 text-left">
-                        {product.price as any}
-                      </td>
-                      <td className="px-10 text-left">{history.quantity}</td>
-                      <td className="px-10 text-left">
-                        {(history.product.price as any) * history.quantity}
-                      </td>
-                      <td className="px-10 text-left">
-                        {moment.utc(history.createdAt).format(
-                          // date.month.year
-                          "DD.MM.YYYY",
-                        )}
-                      </td>
-                      <td className="mt-2 flex gap-3 px-5">
-                        <Link href="#" className="mx-auto">
-                          <HiExternalLink />
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </>
+                <tr
+                  key={index}
+                  className={cn("py-3", index % 2 === 0 ? evenColor : oddColor)}
+                >
+                  <td className="h-12 px-10 text-left">
+                    <p>{product.id}</p>
+                  </td>
+                  <td className="text-nowrap px-10 text-left">{vendor.name}</td>
+                  <td className="text-nowrap px-10 text-left">
+                    {product.price as any}
+                  </td>
+                  <td className="px-10 text-left">{product.quantity}</td>
+                  <td className="px-10 text-left">
+                    {(product.price as any) * product.quantity!}
+                  </td>
+                  <td className="px-10 text-left">
+                    {moment.utc(product.createdAt).format(
+                      // date.month.year
+                      "DD.MM.YYYY",
+                    )}
+                  </td>
+                  <td className="mt-2 flex gap-3 px-5">{product.receipt}</td>
+                </tr>
               ))}
             </tbody>
           </table>
