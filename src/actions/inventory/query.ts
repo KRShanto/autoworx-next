@@ -20,3 +20,18 @@ export const getInventoryProductById = async <T>(
     throw err;
   }
 };
+
+export const getInventoryProductHistory = async <T>({
+  inventoryProductHistoryId,
+}: {
+  inventoryProductHistoryId: number;
+}) => {
+  try {
+    const getHistory = await db.inventoryProductHistory.findUnique({
+      where: { id: inventoryProductHistoryId },
+    });
+    return JSON.parse(JSON.stringify(getHistory)) as T;
+  } catch (err) {
+    throw err;
+  }
+};

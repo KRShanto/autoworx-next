@@ -96,6 +96,7 @@ const DateRange = ({
       {showPicker && (
         <div className="absolute z-10 w-[600px] border border-gray-300 bg-white p-4 shadow-lg">
           <DateRangePicker
+            inputRanges={[]}
             ranges={[tempRange]}
             onChange={handleSelect}
             moveRangeOnFirstSelection={false}
@@ -112,7 +113,7 @@ const DateRange = ({
               OK
             </button>
             <button onClick={handleCancel} className="rounded bg-gray-300 p-2">
-              Cancel
+              Clear
             </button>
           </div>
         </div>

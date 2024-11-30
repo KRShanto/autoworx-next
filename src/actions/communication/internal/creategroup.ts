@@ -8,8 +8,6 @@ type TCreateGroup = {
   users: { id: number }[];
 };
 
-
-
 const pusher = getPusherInstance();
 
 // create a new group with user
@@ -21,6 +19,9 @@ export const createGroup = async ({ name, users }: TCreateGroup) => {
         users: {
           connect: users,
         },
+      },
+      include: {
+        users: true,
       },
     });
 
@@ -36,5 +37,3 @@ export const createGroup = async ({ name, users }: TCreateGroup) => {
     throw err;
   }
 };
-
-

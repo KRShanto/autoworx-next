@@ -193,7 +193,10 @@ export default function List({
         <h2 className="font-bold text-[#795252] sm:text-[14px] sm:font-normal">
           User List
         </h2>
-        <CreateGroupModal users={users} />
+        <CreateGroupModal
+          users={users}
+          setSideBarGroupLists={setSideBarGroupLists}
+        />
       </div>
       {/* Search */}
       <div>

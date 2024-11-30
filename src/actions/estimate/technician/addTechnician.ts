@@ -57,6 +57,7 @@ export async function addTechnician(
 
     await updateWorkOrderStatus(payload.invoiceId);
     revalidatePath("/estimate/workorder");
+    revalidatePath("/estimate/view");
     revalidatePath("/employee");
 
     return {

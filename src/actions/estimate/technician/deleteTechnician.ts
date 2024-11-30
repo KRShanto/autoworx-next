@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { updateWorkOrderStatus } from "./updateWorkOrderStatus";
+import { revalidatePath } from "next/cache";
 
 export async function deleteTechnician({
   id,
@@ -18,6 +19,7 @@ export async function deleteTechnician({
   });
 
   await updateWorkOrderStatus(invoiceId);
+  revalidatePath("/estimate/view");
 
   return { type: "success" };
 }

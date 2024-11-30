@@ -21,10 +21,12 @@ import {
   Labor,
   Material,
   Service,
+  Technician,
   User,
   Vehicle,
 } from "@prisma/client";
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import { FaRegEdit } from "react-icons/fa";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
@@ -53,7 +55,7 @@ const InvoiceComponent = ({
     company: Company;
     invoiceItems: (InvoiceItem & {
       materials: Material[] | [];
-      service: Service | null;
+      service: (Service & { Technician: Technician[] }) | null;
       invoice: Invoice | null;
       labor: Labor | null;
     })[];
@@ -71,6 +73,10 @@ const InvoiceComponent = ({
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
+
+  const handleEdit = () => {
+    router.push(`/estimate/edit/${id}`);
+  };
 
   const [companyDetails, setCompanyDetails] = useState<Company | null>(null);
 
@@ -94,6 +100,11 @@ const InvoiceComponent = ({
     getCompanyDetails();
   }, []);
 
+  const isWorkOrderCreate = invoice.invoiceItems.some(
+    (items) =>
+      items.service?.Technician && items.service?.Technician?.length > 0,
+  );
+
   return (
     <div>
       <DialogPortal>
@@ -105,6 +116,14 @@ const InvoiceComponent = ({
           >
             <div className="flex items-center justify-center print:hidden">
               <div className="flex items-center gap-3">
+                <button
+                  className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
+                  onClick={handleEdit}
+                >
+                  <FaRegEdit />
+                  Edit
+                </button>
+
                 <button
                   className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
                   onClick={handlePrint}
@@ -395,7 +414,7 @@ const InvoiceComponent = ({
               href={`/estimate/workorder/${id}`}
               className="rounded-md bg-[#6571FF] py-2 text-center text-white disabled:bg-gray-400"
             >
-              View Work Order
+              {isWorkOrderCreate ? "View Work Order" : "Create Work Order"}
             </Link>
             <button
               onClick={handleEmail}

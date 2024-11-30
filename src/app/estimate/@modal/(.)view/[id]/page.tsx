@@ -16,7 +16,11 @@ export default async function ViewEstimate({
       company: true,
       invoiceItems: {
         include: {
-          service: true,
+          service: {
+            include: {
+              Technician: true,
+            },
+          },
           materials: true,
           labor: true,
         },
@@ -40,6 +44,7 @@ export default async function ViewEstimate({
         where: { id: invoice.vehicleId },
       })
     : null;
+
 
   return (
     <InterceptedDialog>
