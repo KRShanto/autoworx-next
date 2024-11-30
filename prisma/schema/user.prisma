@@ -3,44 +3,45 @@
 // When user registers, they have to create a company. So, every new user is an admin.
 // After that, they can add employees to the company.
 model User {
-    id                Int               @id @default(autoincrement())
+    id                Int                @id @default(autoincrement())
     firstName         String
     lastName          String?
-    email             String            @unique
-    emailVerifiedAt   DateTime?         @map("email_verified_at")
-    image             String            @default("/images/default.png")
+    email             String             @unique
+    emailVerifiedAt   DateTime?          @map("email_verified_at")
+    image             String             @default("/images/default.png")
     password          String
-    provider          Provider          @default(email)
-    timezone          String            @default("UTC")
+    provider          Provider           @default(email)
+    timezone          String             @default("UTC")
     phone             String?
     address           String?
     city              String?
     state             String?
     zip               String?
-    companyName       String?           @map("company_name")
-    commission        Decimal?          @default(0) @db.Decimal(10, 3)
-    role              Role              @default(admin)
-    employeeType      EmployeeType      @default(Admin)
-    joinDate          DateTime?         @map("join_date")
-    companyId         Int               @map("company_id")
-    createdAt         DateTime          @default(now()) @map("created_at")
-    updatedAt         DateTime          @default(now()) @updatedAt @map("updated_at")
-    company           Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-    groups            Group[]           @relation("UserGroups")
+    companyName       String?            @map("company_name")
+    commission        Decimal?           @default(0) @db.Decimal(10, 3)
+    role              Role               @default(admin)
+    employeeType      EmployeeType       @default(Admin)
+    joinDate          DateTime?          @map("join_date")
+    companyId         Int                @map("company_id")
+    createdAt         DateTime           @default(now()) @map("created_at")
+    updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at")
+    company           Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    groups            Group[]            @relation("UserGroups")
     tasks             Task[]
     taskUsers         TaskUser[]
     appointments      Appointment[]
     appointmentUsers  AppointmentUser[]
-    invoices          Invoice[]         @relation("user")
+    invoices          Invoice[]          @relation("user")
     Technician        Technician[]
     permissions       Permission[]
-    assignedInvoices  Invoice[]         @relation("assignedTo")
+    assignedInvoices  Invoice[]          @relation("assignedTo")
     LeaveRequest      LeaveRequest[]
-    sentEstimates     RequestEstimate[] @relation("Sender")
-    receivedEstimates RequestEstimate[] @relation("Receiver")
+    sentEstimates     RequestEstimate[]  @relation("Sender")
+    receivedEstimates RequestEstimate[]  @relation("Receiver")
     OAuthToken        OAuthToken?
     ClockInOut        ClockInOut[]
     UserFeedback      UserFeedback[]
+    inventoryProducts InventoryProduct[]
 
     @@index([companyId], name: "fk_users_company")
 }

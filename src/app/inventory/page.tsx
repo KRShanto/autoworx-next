@@ -23,6 +23,7 @@ export default async function Page({
     include: {
       category: true,
       vendor: true,
+      User: true,
     },
   });
 
