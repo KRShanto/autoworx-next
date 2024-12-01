@@ -143,7 +143,9 @@ export default function EditCustomer({
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <button className={`${settingIcon ? "text-gray-600" : ""} text-[#6571FF]"`}>
+          <button
+            className={`${settingIcon ? "text-gray-600" : ""} text-[#6571FF]"`}
+          >
             {settingIcon ? <IoMdSettings /> : <FaPenToSquare />}
           </button>
         </DialogTrigger>
@@ -162,7 +164,7 @@ export default function EditCustomer({
                   src={
                     newProfilePic
                       ? URL.createObjectURL(newProfilePic)
-                      : `/api/images/${profilePic}`
+                      : profilePic || ""
                   }
                   alt="profile"
                   className="h-20 w-20 rounded-full border border-slate-400 hover:border-dashed hover:opacity-80"

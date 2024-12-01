@@ -78,9 +78,7 @@ export default function List({
                   >
                     <Image
                       src={
-                        company.image
-                          ? `/api/images/${company.image!}`
-                          : "/icons/business.png"
+                        company.image ? company.image : "/icons/business.png"
                       }
                       alt={company.name}
                       width={50}
@@ -123,7 +121,7 @@ export default function List({
                             src={
                               user.image?.includes("default.png")
                                 ? user.image
-                                : `/api/images/${user.image!}`
+                                : user.image
                             }
                             alt={user.firstName}
                             width={50}
@@ -155,11 +153,7 @@ export default function List({
                 onClick={() => setSelectedCompany(company)}
               >
                 <Image
-                  src={
-                    company.image
-                      ? `/api/images/${company.image!}`
-                      : "/icons/business.png"
-                  }
+                  src={company.image ? company.image : "/icons/business.png"}
                   alt={company.name}
                   width={50}
                   height={50}

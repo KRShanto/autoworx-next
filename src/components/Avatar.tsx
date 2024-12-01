@@ -27,7 +27,7 @@ export default function Avatar({
             ? "/images/default.png"
             : photo.includes("/images/default.png")
               ? "/images/default.png"
-              : `/api/images/${photo}`
+              : photo
         }
         alt="User Image"
         className={"rounded-full object-fill"}

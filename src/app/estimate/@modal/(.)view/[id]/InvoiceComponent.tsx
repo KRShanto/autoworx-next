@@ -47,6 +47,7 @@ const InvoiceComponent = ({
   clientId,
   invoice,
   vehicle,
+  invoiceTechnicians,
 }: {
   id: string;
   clientId: any;
@@ -55,7 +56,7 @@ const InvoiceComponent = ({
     company: Company;
     invoiceItems: (InvoiceItem & {
       materials: Material[] | [];
-      service: (Service & { Technician: Technician[] }) | null;
+      service: Service | null;
       invoice: Invoice | null;
       labor: Labor | null;
     })[];
@@ -63,6 +64,7 @@ const InvoiceComponent = ({
     user: User;
   };
   vehicle: Vehicle | null;
+  invoiceTechnicians: Technician[];
 }) => {
   const router = useRouter();
   const componentRef = useRef(null);
@@ -82,7 +84,7 @@ const InvoiceComponent = ({
 
   const handleEmail = async () => {
     let res = await sendInvoiceEmail({ invoiceId: invoice.id });
-    console.log("🚀 ~ handleEmail ~ res:", res);
+
     if (!res?.success) {
       errorToast(res?.message || "Error sharing invoice");
       return;
@@ -100,10 +102,7 @@ const InvoiceComponent = ({
     getCompanyDetails();
   }, []);
 
-  const isWorkOrderCreate = invoice.invoiceItems.some(
-    (items) =>
-      items.service?.Technician && items.service?.Technician?.length > 0,
-  );
+  const isWorkOrderCreate = invoiceTechnicians.length > 0 ? true : false;
 
   return (
     <div>
@@ -171,7 +170,7 @@ const InvoiceComponent = ({
               <div className="flex aspect-square w-32 items-center justify-center bg-slate-500 text-center font-bold text-white">
                 {companyDetails?.image ? (
                   <Image
-                    src={`/api/images/${companyDetails.image}`}
+                    src={companyDetails.image}
                     alt="company logo"
                     width={128}
                     height={128}
@@ -397,12 +396,12 @@ const InvoiceComponent = ({
               {invoice.photos.map((x) => {
                 return (
                   <Link
-                    href={`/estimate/photo/${x.photo}`}
+                    href={`/estimate/photo?url=${x.photo}`}
                     key={x.id}
                     className="relative aspect-square"
                   >
                     <Image
-                      src={`/api/images/${x.photo}`}
+                      src={x.photo}
                       alt="attachment"
                       fill
                       className="cursor-pointer"

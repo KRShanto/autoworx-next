@@ -6,8 +6,8 @@ export const getTechnicians = async ({
   invoiceId,
   serviceId,
 }: {
-  invoiceId: string;
-  serviceId: number;
+  invoiceId?: string;
+  serviceId?: number;
 }) => {
   try {
     const technicians = (await db.technician.findMany({

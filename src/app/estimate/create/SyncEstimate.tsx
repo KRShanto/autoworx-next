@@ -31,7 +31,7 @@ export default function SyncEstimate({
     async function setEstimateState() {
       const photoFiles = await Promise.all(
         photos.map(async (photo) => {
-          const url = `/api/images/${photo.photo}`;
+          const url = photo.photo;
           const filename = photo.photo.split("/").pop() || "image.jpg";
           return await fetchImageAsFile(url, filename);
         }),
