@@ -6,7 +6,7 @@ import Link from "next/link";
 import React from "react";
 import { FaExternalLinkAlt, FaRegCheckCircle } from "react-icons/fa";
 import { MdOutlineEdit } from "react-icons/md";
-import NewTask from "../task/[type]/components/task/NewTask";
+import NewTask from "../../../task/[type]/components/task/NewTask";
 
 const Tasks = ({
   tasks,

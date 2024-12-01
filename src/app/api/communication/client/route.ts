@@ -210,7 +210,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       process.env.GMAIL_CLIENT_SECRET,
       `${env("NEXT_PUBLIC_APP_URL")}/communication/client/auth`,
     );
-    // let refreshToken = (cookies().get("gmail_refresh_token")?.value || "") as string;
 
     const company = await db.company.findFirst({
       where: { id: client.companyId },

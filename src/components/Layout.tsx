@@ -111,7 +111,12 @@ export default function Layout({
   const pathname = usePathname();
 
   // Check if the user is logged in
-  if (!session && pathname !== "/login" && pathname !== "/register")
+  if (
+    !session &&
+    pathname !== "/login" &&
+    pathname !== "/register" &&
+    pathname !== "/"
+  )
     redirect("/login");
 
   // Don't show the navbar if the user is on the login or register page

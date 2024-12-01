@@ -4,11 +4,11 @@ import { db } from "@/lib/db";
 import getUser from "@/lib/getUser";
 import { AuthSession } from "@/types/auth";
 import { auth } from "../auth";
-import DashboardAdmin from "./DashboardAdmin";
-import DashboardManager from "./DashboardManager";
-import DashboardOther from "./DashboardOther";
-import DashboardSales from "./DashboardSales";
-import DashboardTechnician from "./DashboardTechnician";
+import DashboardAdmin from "./components/dashboard/DashboardAdmin";
+import DashboardManager from "./components/dashboard/DashboardManager";
+import DashboardOther from "./components/dashboard/DashboardOther";
+import DashboardSales from "./components/dashboard/DashboardSales";
+import DashboardTechnician from "./components/dashboard/DashboardTechnician";
 
 let dashboard_view = ["ADMIN", "OTHER", "SALES", "TECHNICIAN"];
 

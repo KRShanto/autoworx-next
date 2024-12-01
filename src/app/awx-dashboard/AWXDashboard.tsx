@@ -4,7 +4,7 @@ import { Company } from "@prisma/client";
 import Image from "next/image";
 import React, { useState } from "react";
 import { FaExternalLinkAlt } from "react-icons/fa";
-import ChartData from "../(dashboard)/ChartData";
+import ChartData from "../(home)/components/dashboard/ChartData";
 import { ComapnyStat, ICompany } from "./page";
 
 type Props = {
