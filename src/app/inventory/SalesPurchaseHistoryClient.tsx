@@ -142,13 +142,17 @@ function Table({
             {product?.type === "Product" && (
               <>
                 {type === "Sale" ? (
-                  <td className="text-center text-[#6571FF]">
-                    {history.invoiceId && (
-                      <Link href={`/estimate/view/${history.invoiceId}`}>
-                        {history.invoiceId}
-                      </Link>
-                    )}
-                  </td>
+                  history.invoiceId ? (
+                    <td className="text-center text-[#6571FF]">
+                      {history.invoiceId && (
+                        <Link href={`/estimate/view/${history.invoiceId}`}>
+                          {history.invoiceId}
+                        </Link>
+                      )}
+                    </td>
+                  ) : (
+                    <p className="text-center text-red-500">--- Loss ---</p>
+                  )
                 ) : (
                   <td className="text-center text-[#6571FF]">
                     <p>{product && product.receipt}</p>
