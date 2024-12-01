@@ -1,5 +1,5 @@
-'use client'
-import React, { useEffect, useState } from "react";
+"use client";
+import React, { useEffect, useState, useTransition } from "react";
 import { TiDeleteOutline } from "react-icons/ti";
 import { Technician } from "@prisma/client";
 import { getTechnicians } from "../../../../../actions/estimate/technician/getTechnicians";
@@ -22,6 +22,7 @@ export default function LaborItems({
     (Technician & { name: string })[]
   >([]);
   const [error, setError] = useState("");
+  const [pending, startTransition] = useTransition();
 
   useEffect(() => {
     const fetchTechnicians = async () => {
@@ -35,7 +36,7 @@ export default function LaborItems({
         setError(err.message);
       }
     };
-    fetchTechnicians(); 
+    fetchTechnicians();
   }, [invoiceId, serviceId]);
 
   const handleTechnicianDelete = async (technicianId: number) => {
@@ -76,10 +77,14 @@ export default function LaborItems({
               technician={technician}
               setTechnicians={setTechnicians}
             />
-            <TiDeleteOutline
-              onClick={() => handleTechnicianDelete(technician.id)}
-              className="text-xl text-white"
-            />
+            <button
+              disabled={pending}
+              onClick={() =>
+                startTransition(() => handleTechnicianDelete(technician.id))
+              }
+            >
+              <TiDeleteOutline className="text-xl text-white" />
+            </button>
           </button>
         ))}
       </div>

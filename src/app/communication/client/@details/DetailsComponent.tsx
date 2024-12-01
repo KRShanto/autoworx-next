@@ -92,7 +92,7 @@ export default function DetailsComponent({
                   ? "/images/default.png"
                   : client.photo.includes("/images/default.png")
                     ? "/images/default.png"
-                    : `/api/images/${client.photo}`
+                    : client.photo
               }
               alt="client"
               width={50}

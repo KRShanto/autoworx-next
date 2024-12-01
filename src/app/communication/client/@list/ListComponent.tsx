@@ -64,7 +64,7 @@ export default function ListComponent({
                     ? "/images/default.png"
                     : client.photo.includes("/images/default.png")
                       ? "/images/default.png"
-                      : `/api/images/${client.photo}`
+                      : client.photo
                 }
                 alt={client.firstName + " " + client.lastName}
                 width={60}

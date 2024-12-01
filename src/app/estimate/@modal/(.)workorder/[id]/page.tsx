@@ -3,13 +3,19 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { InvoiceItems } from "./InvoiceItems";
 import moment from "moment";
-import SaveWorkOrderBtn from "../../(.)view/[id]/(..)(..)create-work-order/[id1]/SaveWorkOrderBtn";
+import SaveWorkOrderBtn from "./SaveWorkOrderBtn";
 import Image from "next/image";
+import { getTechnicians } from "@/actions/estimate/technician/getTechnicians";
+import DueDate from "./DueDateInput";
 
 export default async function WorkOrderPage({
   params: { id },
+  searchParams,
 }: {
   params: { id: string };
+  searchParams: {
+    dueDate: string | null;
+  };
 }) {
   const invoice = await db.invoice.findUnique({
     where: { id },
@@ -17,19 +23,7 @@ export default async function WorkOrderPage({
       company: true,
       invoiceItems: {
         include: {
-          service: {
-            include: {
-              Technician: {
-                include: {
-                  user: {
-                    select: {
-                      firstName: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
+          service: true,
           materials: true,
           labor: true,
         },
@@ -49,6 +43,8 @@ export default async function WorkOrderPage({
     where: { id: invoice.companyId },
   });
 
+  const invoiceTechnicians = await getTechnicians({ invoiceId: invoice.id });
+
   return (
     <InterceptedDialog>
       <DialogContent className="max-w-[740px]">
@@ -59,7 +55,7 @@ export default async function WorkOrderPage({
           <div className="flex aspect-square w-32 items-center justify-center bg-slate-500 text-center font-bold text-white">
             {companyDetails?.image ? (
               <Image
-                src={`/api/images/${companyDetails.image}`}
+                src={companyDetails.image}
                 alt="company logo"
                 width={128}
                 height={128}
@@ -77,6 +73,10 @@ export default async function WorkOrderPage({
             </p>
             <p>{companyDetails?.phone}</p>
             <p>{companyDetails?.email}</p>
+            <DueDate
+              invoiceDueDate={invoice?.dueDate}
+              dueDateParams={searchParams.dueDate}
+            />
           </div>
         </div>
 
@@ -127,6 +127,7 @@ export default async function WorkOrderPage({
         <div className="space-y-2">
           <InvoiceItems
             items={JSON.parse(JSON.stringify(invoice.invoiceItems))}
+            invoiceTechnicians={invoiceTechnicians}
           />
         </div>
 
@@ -134,7 +135,10 @@ export default async function WorkOrderPage({
          * Submit
          */}
         <div className="flex">
-          <SaveWorkOrderBtn />
+          <SaveWorkOrderBtn
+            invoiceId={invoice.id}
+            dueDate={searchParams.dueDate}
+          />
         </div>
         <div>
           <p className="font-bold text-slate-500">{invoice.company.name}</p>

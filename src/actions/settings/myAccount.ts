@@ -33,6 +33,8 @@ export async function editMyAccountInfo({
     const session = (await auth()) as AuthSession;
     const userId = session.user.id;
 
+    console.log("edit profile", { image });
+
     const user = await db.user.update({
       where: {
         id: +userId,

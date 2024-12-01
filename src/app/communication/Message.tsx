@@ -70,9 +70,11 @@ export default function Message({
                   )}
                 >
                   {attachment.fileType.includes("image") ? (
-                    <Link href={`/communication/photo/${attachment.fileUrl}`}>
+                    <Link
+                      href={`/communication/photo?url=${attachment.fileUrl}`}
+                    >
                       <Image
-                        src={`/api/images/${attachment.fileUrl}`}
+                        src={attachment.fileUrl}
                         alt=""
                         // placeholder="blur"
                         // blurDataURL=""

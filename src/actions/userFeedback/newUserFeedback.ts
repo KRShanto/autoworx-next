@@ -116,7 +116,7 @@ export async function generateFeedbackHTML(
   const attachmentsHTML = UserFeedbackAttachment?.length
     ? UserFeedbackAttachment.map(
         (attachment) =>
-          `<li><img src="${env("NEXT_PUBLIC_APP_URL")}/api/images/${attachment.fileName}" alt="Attachment" style="max-width: 100%; margin-bottom: 10px;"/></li>`,
+          `<li><img src="${attachment.fileName}" alt="Attachment" style="max-width: 100%; margin-bottom: 10px;"/></li>`,
       ).join("")
     : "<li>No attachments</li>";
 

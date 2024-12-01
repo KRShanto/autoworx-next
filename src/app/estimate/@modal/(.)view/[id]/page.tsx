@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 
 import InvoiceComponent from "./InvoiceComponent";
+import { getTechnicians } from "@/actions/estimate/technician/getTechnicians";
 
 export default async function ViewEstimate({
   params: { id },
@@ -44,7 +45,8 @@ export default async function ViewEstimate({
         where: { id: invoice.vehicleId },
       })
     : null;
-
+  
+const invoiceTechnicians = await getTechnicians({ invoiceId: invoice.id });
 
   return (
     <InterceptedDialog>
@@ -55,6 +57,7 @@ export default async function ViewEstimate({
           invoice={invoice}
           clientId={clientId}
           vehicle={vehicle}
+          invoiceTechnicians={invoiceTechnicians}
         />
       )}
     </InterceptedDialog>

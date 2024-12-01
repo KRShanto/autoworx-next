@@ -3,8 +3,6 @@ import { cn } from "@/lib/cn";
 import { db } from "@/lib/db";
 import moment from "moment";
 import Link from "next/link";
-import React from "react";
-import { HiExternalLink } from "react-icons/hi";
 import { IoIosArrowBack } from "react-icons/io";
 
 const evenColor = "bg-white";
@@ -15,46 +13,30 @@ export default async function Page({
 }: {
   params: { id: string };
 }) {
-  const vendor = await db.vendor.findUnique({
-    where: { id: parseInt(id) },
+  const histories = await db.inventoryProductHistory.findMany({
+    where: {
+      vendorId: parseInt(id),
+      type: "Purchase",
+    },
     include: {
-      inventoryProducts: {
-        include: {
-          InventoryProductHistory: {
-            include: {
-              product: true,
-            },
-          },
-        },
-      },
+      product: true,
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 
-  const totalPurchaseAmount = vendor?.inventoryProducts.reduce(
-    (acc, product) => {
-      return (
-        acc +
-        product.InventoryProductHistory.filter(
-          (h) => h.type === "Purchase",
-        ).reduce((acc, history) => {
-          return acc + (history.product.price as any) * history.quantity;
-        }, 0)
-      );
+  const vendor = await db.vendor.findUnique({
+    where: {
+      id: parseInt(id),
     },
-    0,
-  );
+  });
 
-  const totalAmountSpent = vendor?.inventoryProducts.reduce((acc, product) => {
-    return (
-      acc +
-      product.InventoryProductHistory.filter((h) => h.type === "Sale").reduce(
-        (acc, history) => {
-          return acc + (history.product.price as any) * history.quantity;
-        },
-        0,
-      )
-    );
+  const totalPurchaseAmount = histories.reduce((acc, history) => {
+    return acc + (history.product.price as any) * history.quantity;
   }, 0);
+
+  const totalAmountSpent = 0;
 
   return (
     <div className="h-full">
@@ -82,31 +64,30 @@ export default async function Page({
             </thead>
 
             <tbody>
-              {vendor?.inventoryProducts.map((product, index) => (
+              {histories.map((history, index) => (
                 <tr
-                  key={index}
+                  key={history.id}
                   className={cn("py-3", index % 2 === 0 ? evenColor : oddColor)}
                 >
                   <td className="h-12 px-10 text-left">
-                    <p>{product.id}</p>
+                    <p>{history.id}</p>
                   </td>
                   <td className="text-nowrap px-10 text-left">
-                    {vendor?.companyName || vendor.name}
+                    {history.product.name}
                   </td>
                   <td className="text-nowrap px-10 text-left">
-                    {product.price as any}
+                    {Number(history.price)}
                   </td>
-                  <td className="px-10 text-left">{product.quantity}</td>
+                  <td className="px-10 text-left">{history.quantity}</td>
                   <td className="px-10 text-left">
-                    {(product.price as any) * product.quantity!}
+                    {Number(history.price) * history.quantity}
                   </td>
                   <td className="px-10 text-left">
-                    {moment.utc(product.createdAt).format(
-                      // date.month.year
-                      "DD.MM.YYYY",
-                    )}
+                    {moment.utc(history.createdAt).format("DD.MM.YYYY")}
                   </td>
-                  <td className="mt-2 flex gap-3 px-5">{product.receipt}</td>
+                  <td className="mt-2 flex gap-3 px-5">
+                    {history.product.receipt}
+                  </td>
                 </tr>
               ))}
             </tbody>

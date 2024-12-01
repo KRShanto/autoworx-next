@@ -134,7 +134,7 @@ export default function EditEmployee({
                   src={
                     newProfilePic
                       ? URL.createObjectURL(newProfilePic)
-                      : `/api/images/${profilePic}`
+                      : profilePic || ""
                   }
                   alt="profile"
                   className="h-20 w-20 rounded-full border border-slate-400 hover:border-dashed hover:opacity-80"

@@ -10,7 +10,7 @@ import { errorToast, successToast } from "@/lib/toast";
 import { User } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState, useTransition } from "react";
 
 const MyAccount = ({ user }: { user: User }) => {
   const [profilePic, setProfilePic] = useState<File | null>(null);
@@ -30,6 +30,8 @@ const MyAccount = ({ user }: { user: User }) => {
   const [currentPw, setCurrentPw] = useState("");
   const [newPw, setNewPw] = useState("");
   const [confirmNewPw, setConfirmNewPw] = useState("");
+
+  const [pending, startTransition] = useTransition();
 
   // leave request
   const [leaveRequest, setLeaveRequest] = useState({
@@ -66,34 +68,43 @@ const MyAccount = ({ user }: { user: User }) => {
     }
   };
 
-  const uploadProfilePic = useCallback(
-    async function () {
-      if (profilePic) {
-        const formData = new FormData();
-        formData.append("photos", profilePic);
+  const uploadProfilePic = async function () {
+    if (profilePic) {
+      const formData = new FormData();
+      formData.append("photos", profilePic);
 
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-        if (!res.ok) {
-          return;
-        }
-
-        const json = await res.json();
-        setUserInfo({
-          ...userInfo,
-          image: json.data[0],
-        });
+      if (!res.ok) {
+        return;
       }
-    },
-    [profilePic],
-  );
 
-  useEffect(() => {
-    if (profilePic) uploadProfilePic();
-  }, [profilePic]);
+      const json = await res.json();
+      return json.data[0];
+    }
+  };
+
+  // useEffect(() => {
+  //   if (profilePic) uploadProfilePic();
+  // }, [profilePic]);
+
+  const handleUserInfoSave = async () => {
+    const imageUrl = await uploadProfilePic();
+    let result = await editMyAccountInfo({
+      ...userInfo,
+      image: imageUrl,
+    });
+    setUserInfo({
+      ...userInfo,
+      image: imageUrl,
+    });
+    if (result?.success) {
+      successToast("Account details updated successfully");
+    }
+  };
 
   return (
     <div className="h-full w-[80%] overflow-y-auto p-8">
@@ -128,7 +139,7 @@ const MyAccount = ({ user }: { user: User }) => {
                       ? URL.createObjectURL(profilePic)
                       : userInfo?.image === "/images/default.png"
                         ? "/images/default.png"
-                        : `/api/images/${userInfo?.image}`
+                        : userInfo?.image
                   }
                   alt=""
                   className="h-full w-full shrink-0 rounded-full object-cover"
@@ -245,13 +256,9 @@ const MyAccount = ({ user }: { user: User }) => {
               </div>
               <div className="text-right">
                 <button
-                  onClick={async () => {
-                    let result = await editMyAccountInfo(userInfo);
-                    if (result?.success) {
-                      successToast("Account details updated successfully");
-                    }
-                  }}
-                  className="ml-auto mt-4 rounded-md bg-[#6571FF] px-4 py-1 text-white"
+                  disabled={pending}
+                  onClick={() => startTransition(handleUserInfoSave)}
+                  className="ml-auto mt-4 rounded-md bg-[#6571FF] px-4 py-1 text-white disabled:bg-gray-400"
                 >
                   Save
                 </button>

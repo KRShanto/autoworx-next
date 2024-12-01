@@ -18,6 +18,7 @@ model Invoice {
     due                     Decimal?                  @default(0) @db.Decimal(8, 2)
     statusId                Int?                      @map("status_id")
     internalNotes           String?
+    dueDate                 String?
     terms                   String?
     policy                  String?
     customerNotes           String?
