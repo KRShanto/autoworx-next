@@ -18,6 +18,7 @@ import { HiExternalLink } from "react-icons/hi";
 import { auth } from "../auth";
 import EditHistory from "./EditHistory";
 import EditProductForm from "./EditProductForm";
+import { useSearchParams } from "next/navigation";
 
 enum Tab {
   Sales = "sales",
@@ -43,6 +44,11 @@ export default function SalesPurchaseHistoryClient({
 }) {
   const [tab, setTab] = useState<Tab>(Tab.Sales);
 
+  const searchParams = useSearchParams();
+
+  // console.log("Search params: ", searchParams.get("view"));
+  const view = searchParams.get("view");
+
   return (
     <div className="app-shadow mt-4 h-[63%] w-full overflow-y-auto rounded-lg bg-white p-4">
       <Tabs.Root value={tab} onValueChange={(value) => setTab(value as Tab)}>
@@ -56,7 +62,8 @@ export default function SalesPurchaseHistoryClient({
                 : "border border-[#6571FF] text-[#6571FF]",
             )}
           >
-            Use List
+            {/* Use List */}
+            {view === "products" ? "Sales List" : "Use List"}
           </Tabs.Trigger>
           <Tabs.Trigger
             value={Tab.Purchase}
