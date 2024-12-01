@@ -266,6 +266,8 @@ const PDFComponent = ({
   clientId,
   invoice,
   vehicle,
+  companyDetails,
+  authorizedName,
 }: {
   id: string;
   clientId: any;
@@ -282,6 +284,8 @@ const PDFComponent = ({
     user: User;
   };
   vehicle: Vehicle | null;
+  companyDetails: Company | null;
+  authorizedName: string;
 }) => {
   return (
     <Document>
@@ -292,7 +296,7 @@ const PDFComponent = ({
         <View style={styles.header}>
           <View style={styles.logo}>
             <Image
-              src="https://png.pngtree.com/png-vector/20220807/ourmid/pngtree-man-avatar-wearing-gray-suit-png-image_6102786.png"
+              src={`/api/images/${companyDetails?.image}`}
               style={{
                 width: 100,
                 height: 100,
@@ -303,9 +307,13 @@ const PDFComponent = ({
           </View>
           <View style={styles.textRight}>
             <Text style={styles.boldText}>Contact Information:</Text>
-            <Text>Full Address</Text>
-            <Text>Mobile Number</Text>
-            <Text>Email</Text>
+            <Text>
+              {" "}
+              {companyDetails?.address}, {companyDetails?.city},{" "}
+              {companyDetails?.state}, {companyDetails?.zip}
+            </Text>
+            <Text>{companyDetails?.phone}</Text>
+            <Text>{companyDetails?.email}</Text>
           </View>
         </View>
 
@@ -376,7 +384,39 @@ const PDFComponent = ({
           <Text>{invoice.policy}</Text>
         </View>
 
-        <Text style={{ textAlign: "center", marginTop: 30 }}>
+        <View style={styles.header}>
+          <View style={{ marginTop: 20 }}>
+            <Text
+              style={[styles.boldText, styles.fontSize10, { marginBottom: 2 }]}
+            >
+              {invoice.company.name}
+            </Text>
+            <Text style={styles.fontSize10}>
+              {invoice.user.firstName} {invoice.user.lastName}
+            </Text>
+          </View>
+          {
+            authorizedName && (<View style={{ marginTop: 20 }}>
+              <Text style={[styles.boldText, styles.fontSize10]}>
+                {authorizedName || ""}
+              </Text>
+              <Text
+                style={[
+                  styles.fontSize10,
+                  {
+                    color: "#6571FF",
+                    // border: "3px solid #6571FF",
+                    padding: "4px 2px",
+                  },
+                ]}
+              >
+                Authorized
+              </Text>
+            </View>)
+          }
+        </View>
+
+        <Text style={{ textAlign: "center", marginTop: "auto" }}>
           Thank you for shopping with Autoworx
         </Text>
       </Page>

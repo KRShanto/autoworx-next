@@ -25,14 +25,13 @@ import {
   User,
   Vehicle,
 } from "@prisma/client";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { FaRegEdit } from "react-icons/fa";
+import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { FaPrint, FaRegFile, FaShare } from "react-icons/fa";
+import { FaPrint, FaRegEdit, FaRegFile, FaShare } from "react-icons/fa";
 import { FaRegShareFromSquare } from "react-icons/fa6";
 import { HiXMark } from "react-icons/hi2";
 import { IoClose } from "react-icons/io5";
@@ -41,6 +40,7 @@ import { TiTick } from "react-icons/ti";
 import { useReactToPrint } from "react-to-print";
 import { InvoiceItems } from "./InvoiceItems";
 import PDFComponent from "./PDFComponent";
+import { useEstimateNavigationStore } from "@/stores/estimateNavigationStore";
 
 const InvoiceComponent = ({
   id,
@@ -84,7 +84,6 @@ const InvoiceComponent = ({
 
   const handleEmail = async () => {
     let res = await sendInvoiceEmail({ invoiceId: invoice.id });
-
     if (!res?.success) {
       errorToast(res?.message || "Error sharing invoice");
       return;
@@ -103,6 +102,8 @@ const InvoiceComponent = ({
   }, []);
 
   const isWorkOrderCreate = invoiceTechnicians.length > 0 ? true : false;
+
+  const type = useEstimateNavigationStore((state) => state.type);
 
   return (
     <div>
@@ -139,6 +140,8 @@ const InvoiceComponent = ({
                         invoice={invoice}
                         clientId={clientId}
                         vehicle={vehicle}
+                        companyDetails={companyDetails}
+                        authorizedName={authorizedName}
                       />
                     }
                     fileName="Invoice.pdf"
@@ -167,7 +170,7 @@ const InvoiceComponent = ({
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <div className="flex aspect-square w-32 items-center justify-center bg-slate-500 text-center font-bold text-white">
+              <div className="flex aspect-square w-32 items-center justify-center border border-slate-300 text-center font-bold text-white">
                 {companyDetails?.image ? (
                   <Image
                     src={companyDetails.image}
@@ -203,7 +206,7 @@ const InvoiceComponent = ({
             <div className="flex">
               <div className="grid grow grid-cols-3 gap-4 text-xs">
                 <h1 className="col-span-full text-3xl font-bold uppercase text-slate-500">
-                  Estimate
+                  {type?.toUpperCase()}
                 </h1>
                 <div>
                   <h2 className="font-bold text-slate-500">Estimate To:</h2>
@@ -320,12 +323,12 @@ const InvoiceComponent = ({
                         }
                         setShowAuthorizedName(false);
                       }}
-                      className="text-lg text-green-500"
+                      className="text-lg text-green-500 print:hidden"
                     >
                       <TiTick />
                     </button>
                     <button
-                      className="text-lg text-red-500"
+                      className="text-lg text-red-500 print:hidden"
                       onClick={() => setShowAuthorizedName(false)}
                     >
                       <IoClose />
@@ -344,7 +347,7 @@ const InvoiceComponent = ({
                         Authorized
                       </span>
                       <button
-                        className="text-lg text-[#6571ff]"
+                        className="text-lg text-[#6571ff] print:hidden"
                         onClick={async () => {
                           setShowAuthorizedName(true);
                         }}
@@ -352,7 +355,7 @@ const InvoiceComponent = ({
                         <MdEdit />
                       </button>
                       <button
-                        className="text-lg text-red-500"
+                        className="text-lg text-red-500 print:hidden"
                         onClick={async () => {
                           const res = await deleteInvoiceAuthorize(invoice.id);
                           if (res?.type === "success") {
@@ -371,7 +374,7 @@ const InvoiceComponent = ({
                     onClick={() => {
                       setShowAuthorizedName(true);
                     }}
-                    className="rounded bg-[#6571FF] px-8 text-white"
+                    className="rounded bg-[#6571FF] px-8 text-white print:hidden"
                   >
                     Authorize
                   </button>
@@ -386,6 +389,8 @@ const InvoiceComponent = ({
               invoice={invoice}
               clientId={clientId}
               vehicle={vehicle}
+              companyDetails={companyDetails}
+              authorizedName={authorizedName}
             />
           </PDFViewer> */}
           <div className="flex h-[90vh] w-[394px] shrink grow-0 flex-col gap-4 print:hidden">
