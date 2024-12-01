@@ -30,7 +30,7 @@ import { FaRegEdit } from "react-icons/fa";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaPrint, FaRegFile, FaShare } from "react-icons/fa";
 import { FaRegShareFromSquare } from "react-icons/fa6";
@@ -41,6 +41,7 @@ import { TiTick } from "react-icons/ti";
 import { useReactToPrint } from "react-to-print";
 import { InvoiceItems } from "./InvoiceItems";
 import PDFComponent from "./PDFComponent";
+import { useEstimateNavigationStore } from "@/stores/estimateNavigationStore";
 
 const InvoiceComponent = ({
   id,
@@ -103,6 +104,8 @@ const InvoiceComponent = ({
   }, []);
 
   const isWorkOrderCreate = invoiceTechnicians.length > 0 ? true : false;
+
+  const type = useEstimateNavigationStore((state) => state.type);
 
   return (
     <div>
@@ -203,7 +206,7 @@ const InvoiceComponent = ({
             <div className="flex">
               <div className="grid grow grid-cols-3 gap-4 text-xs">
                 <h1 className="col-span-full text-3xl font-bold uppercase text-slate-500">
-                  Estimate
+                  {type?.toUpperCase()}
                 </h1>
                 <div>
                   <h2 className="font-bold text-slate-500">Estimate To:</h2>

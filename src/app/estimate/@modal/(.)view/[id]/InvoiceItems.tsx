@@ -29,7 +29,7 @@ export function InvoiceItems({
         acc +
         (material && material.sell
           ? parseFloat(material.sell.toString()) * material.quantity! -
-            parseFloat(material.discount?.toString()!)
+            parseFloat(material.discount?.toString() ?? "0")
           : 0)
       );
     }, 0);
@@ -77,7 +77,7 @@ export function InvoiceItems({
                         {material.sell
                           ? parseFloat(material.sell.toString()) *
                               material.quantity! -
-                            parseFloat(material.discount?.toString()!)
+                            parseFloat(material.discount?.toString() ?? "0")
                           : 0}
                       </p>
                     </div>

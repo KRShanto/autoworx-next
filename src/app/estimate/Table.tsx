@@ -50,9 +50,7 @@ export default function Table({ data }: { data: InvoiceData[] }) {
       }
       return true;
     });
-    console.log("Filterstatus", filteredStatus);
-    console.log("Status of store in table", status);
-    console.log("Data actual", data);
+
     const filteredDate = filteredStatus.filter((row) => {
       if (dateRange) {
         const [start, end] = dateRange;

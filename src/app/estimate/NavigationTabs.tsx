@@ -4,6 +4,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useEstimateNavigationStore } from "@/stores/estimateNavigationStore";
 
 interface NavigationsTabProps {
   activeTab: string;
@@ -14,32 +15,40 @@ export default function NavigationTabs({
   children,
 }: Readonly<NavigationsTabProps>) {
   const router = useRouter();
+  const setType = useEstimateNavigationStore((state) => state.setType);
+  const resetType = useEstimateNavigationStore((state) => state.resetType);
+ 
   useEffect(() => {
     // Prefetch the dashboard page
     router.prefetch("/estimate/canned");
     router.prefetch("/estimate/invoices");
     router.prefetch("/estimate");
   }, [router]);
+  const handleCannedClick = () => {
+    resetType(); // or another appropriate value
+    router.push("/estimate/canned");
+  };
 
+  const handleInvoiceClick = () => {
+    setType("invoice");
+    router.push("/estimate/invoices");
+  };
+
+  const handleEstimateClick = () => {
+    setType("estimate");
+    router.push("/estimate");
+  };
+  
   return (
     <Tabs defaultValue={activeTab} className="mt-5">
       <TabsList>
-        <TabsTrigger
-          value="c-canned"
-          onClick={() => router.push("/estimate/canned")}
-        >
+        <TabsTrigger value="c-canned" onClick={handleCannedClick}>
           Canned
         </TabsTrigger>
-        <TabsTrigger
-          value="b-invoice"
-          onClick={() => router.push("/estimate/invoices")}
-        >
+        <TabsTrigger value="b-invoice" onClick={handleInvoiceClick}>
           Invoices
         </TabsTrigger>
-        <TabsTrigger
-          value="a-estimate"
-          onClick={() => router.push("/estimate")}
-        >
+        <TabsTrigger value="a-estimate" onClick={handleEstimateClick}>
           Estimates
         </TabsTrigger>
       </TabsList>
