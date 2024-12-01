@@ -170,7 +170,7 @@ const InvoiceComponent = ({
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <div className="flex aspect-square w-32 items-center justify-center border border-slate-300 text-center font-bold text-white">
+              <div className="flex aspect-square w-32 items-center justify-center text-center font-bold text-white">
                 {companyDetails?.image ? (
                   <Image
                     src={companyDetails.image}
