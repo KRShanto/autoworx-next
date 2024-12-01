@@ -6,6 +6,7 @@ import { useServerGet } from "@/hooks/useServerGet";
 import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
 import { useEstimateFilterStore } from "@/stores/estimate-filter";
 import { usePipelineFilterStore } from "@/stores/PipelineFilterStore";
+import moment from "moment";
 
 type Props = {
   type: string;
@@ -32,12 +33,17 @@ const WorkOrders = ({ type }: Props) => {
     const matchesDateRange =
       dateRange[0] && dateRange[1]
         ? (() => {
-            const invoiceDate = new Date(invoice.createdAt);
+            const invoiceDate = invoice.dueDate
+              ? new Date(invoice.dueDate)
+              : null;
             const startDate = new Date(dateRange[0]);
             const endDate = new Date(dateRange[1]);
             endDate.setHours(23, 59, 59, 999); // Include the entire end day
 
-            return invoiceDate >= startDate && invoiceDate <= endDate;
+            // return invoiceDate >= startDate && invoiceDate <= endDate;
+            return invoiceDate
+              ? invoiceDate >= startDate && invoiceDate <= endDate
+              : false;
           })()
         : true;
 
@@ -81,7 +87,14 @@ const WorkOrders = ({ type }: Props) => {
                 const serviceString = invoice.invoiceItems
                   .map((item) => item.service?.name)
                   .join(", ");
-                const timeCreated = invoice.createdAt.toDateString();
+                // const timeCreated = invoice.createdAt.toDateString();
+                // const dueDate = invoice.dueDate;
+                const timeCreated = moment(invoice.createdAt).format(
+                  "MM/DD/YYYY",
+                );
+                const dueDate = invoice.dueDate
+                  ? moment(invoice.dueDate).format("MM/DD/YYYY")
+                  : null;
 
                 return (
                   <tr
@@ -136,7 +149,9 @@ const WorkOrders = ({ type }: Props) => {
                       <Link
                         href={`/estimate/workorder/${id}`}
                         className="block h-full w-full"
-                      ></Link>
+                      >
+                        {dueDate}
+                      </Link>
                     </td>
                     <td className="border-b px-4 py-2 text-left">
                       <Link
