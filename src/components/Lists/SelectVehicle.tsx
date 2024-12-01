@@ -40,7 +40,7 @@ export function SelectVehicle({
   // Select the first vehicle that belongs to the client
   // If there are no vehicles, set vehicle to null
   useEffect(() => {
-    if (clientId) {
+    if (clientId && !vehicle) {
       // console.log("vehicle list", vehicleList);
       const clientVehicles = vehicleList.filter(
         (vehicle) => vehicle.clientId === +clientId,
