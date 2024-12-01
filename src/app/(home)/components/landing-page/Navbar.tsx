@@ -1,0 +1,73 @@
+import Image from "next/image";
+import Logo1 from "./Logo1.svg";
+import Logo2 from "./Logo2.svg";
+import Link from "next/link";
+
+const links = [
+  {
+    title: "Home",
+    link: "/",
+  },
+  {
+    title: "Solutions",
+    link: "#solutions",
+  },
+  {
+    title: "Data Migration",
+    link: "#data",
+  },
+  {
+    title: "pricing",
+    link: "#pricing",
+  },
+  {
+    title: "contact us",
+    link: "#contact",
+  },
+];
+
+export default function Navbar() {
+  return (
+    <nav className="flex items-center justify-between border p-3 px-[15rem]">
+      <Link className="flex gap-5" href="/">
+        <Image src={Logo1} alt="Logo1" width={40} height={50} />
+        <Image src={Logo2} alt="Logo2" width={200} height={50} />
+      </Link>
+
+      <div className="flex items-center gap-5">
+        <div className="flex gap-5">
+          {links.map((link) => (
+            <Link key={link.title} href={link.link} className="uppercase">
+              {link.title}
+            </Link>
+          ))}
+        </div>
+
+        <Link
+          href="/"
+          className="rounded-2xl p-3 px-7 uppercase text-white"
+          style={{
+            background: "linear-gradient(90deg, #03A7A2 0%, #26AADF 100%)",
+          }}
+        >
+          Request a Demo
+        </Link>
+
+        <Link
+          href="/login"
+          className="rounded-2xl border-2 p-2 px-3 uppercase"
+          style={{
+            backgroundColor: "transparent",
+            borderImage: "linear-gradient(90deg, #03A7A2 0%, #26AADF 100%) 1",
+            color: "transparent",
+            backgroundImage: "linear-gradient(90deg, #03A7A2 0%, #26AADF 100%)",
+            backgroundClip: "text",
+            WebkitBackgroundClip: "text",
+          }}
+        >
+          Login
+        </Link>
+      </div>
+    </nav>
+  );
+}

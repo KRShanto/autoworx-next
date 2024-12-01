@@ -119,13 +119,13 @@ export default function Layout({
   )
     redirect("/login");
 
-  // Don't show the navbar if the user is on the login or register page
-  if (pathname === "/login" || pathname === "/register")
-    return (
-      <main className="relative h-[93vh] bg-[#F8F9FA] p-2 px-4">
-        {children}
-      </main>
-    );
+  // Don't show the navbar if the user is on the login or register page or in the home page but not logged in
+  if (
+    pathname === "/login" ||
+    pathname === "/register" ||
+    (pathname === "/" && !session)
+  )
+    return <main>{children}</main>;
 
   return (
     <div className="w-full overflow-y-hidden">
