@@ -13,6 +13,8 @@ const config: Config = {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "custom-gradient-lp":
+          "linear-gradient(90deg, #26AADF 0%, #03A7A2 100%)",
       },
       colors: {
         border: "hsl(var(--border))",
@@ -48,11 +50,22 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+
+        "landing-bg-color": "#F6FDFF",
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      animation: {
+        "landingpage-left-animation": "move-left 20s linear infinite",
+      },
+      keyframes: {
+        "move-left": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-100%)" },
+        },
       },
     },
   },

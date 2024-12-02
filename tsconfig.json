@@ -30,6 +30,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "jest.config.ts"
-  ],
+, "src/app/(home)/components/first"  ],
   "exclude": ["node_modules"]
 }

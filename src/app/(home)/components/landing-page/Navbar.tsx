@@ -55,17 +55,13 @@ export default function Navbar() {
 
         <Link
           href="/login"
-          className="rounded-2xl border-2 p-2 px-3 uppercase"
-          style={{
-            backgroundColor: "transparent",
-            borderImage: "linear-gradient(90deg, #03A7A2 0%, #26AADF 100%) 1",
-            color: "transparent",
-            backgroundImage: "linear-gradient(90deg, #03A7A2 0%, #26AADF 100%)",
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-          }}
+          className="bg-custom-gradient-lp rounded-2xl p-[1px]"
         >
-          Login
+          <button className="rounded-2xl bg-white px-4 py-3 uppercase">
+            <span className="bg-custom-gradient-lp bg-clip-text  text-transparent">
+              Contact Us
+            </span>
+          </button>
         </Link>
       </div>
     </nav>
