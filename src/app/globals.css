@@ -351,3 +351,8 @@ html body[data-scroll-locked] {
   scrollbar-width: thin; /* Thin scrollbar */
   scrollbar-color: #808080 #e0e0e0; /* Gray thumb and light gray track */
 }
+
+button {
+  @apply active:scale-95;
+  transition: transform 0.2s ease-in-out;
+}
