@@ -11,6 +11,7 @@ import { Check } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
+import { FaRegCircleCheck } from "react-icons/fa6";
 
 export default function Last() {
   return (
@@ -26,7 +27,9 @@ function FAQSection() {
   return (
     <div className="bg-[#bde7f1] py-16">
       <div className="container mx-auto px-4">
-        <h2 className="mb-12 text-4xl font-bold text-[#00B8D4]">FAQs</h2>
+        <h2 className="mb-12 text-center text-4xl font-bold text-[#00B8D4]">
+          FAQs
+        </h2>
 
         <div className="mx-auto max-w-3xl">
           <Accordion type="single" collapsible className="space-y-4">
@@ -134,40 +137,40 @@ function PricingPlans() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="flex flex-wrap items-start justify-center gap-x-6">
         {/* Basic Plan */}
-        <Card className="bg-[#024B5A] text-white">
+        <Card className="w-[23%] bg-[#024B5A] text-white">
           <CardHeader>
-            <CardTitle className="text-[#00B8D4]">Basic</CardTitle>
+            <CardTitle className="text-2xl text-[#00B8D4]">Basic</CardTitle>
             <div className="text-4xl font-bold">$299</div>
           </CardHeader>
           <CardContent>
-            <Button className="mb-6 w-full bg-white text-black hover:bg-gray-100">
+            <Button className="mb-6 w-full bg-white font-medium text-[#00B8D4] hover:bg-gray-100">
               GET STARTED
             </Button>
             <ul className="space-y-4">
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#00B8D4]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 text-white" />
                 <span>SMS & Email</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#00B8D4]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 text-white" />
                 <span>Sales Pipeline</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#00B8D4]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 text-white" />
                 <span>Reporting & Analytics</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#00B8D4]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 text-white" />
                 <span>Estimates & Invoicing</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#00B8D4]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 text-white" />
                 <span>Workflows, Inventory</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#00B8D4]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 text-white" />
                 <span>Payments (CARFAX, Employee Timesheets)</span>
               </li>
             </ul>
@@ -175,46 +178,46 @@ function PricingPlans() {
         </Card>
 
         {/* Shop Plan */}
-        <Card className="bg-[#024B5A] text-white">
+        <Card className="w-[20%] bg-[#024B5A] text-white">
           <CardHeader>
-            <CardTitle className="text-[#00B8D4]">Shop</CardTitle>
+            <CardTitle className="text-2xl text-[#00B8D4]">Shop</CardTitle>
             <div className="text-4xl font-bold">$499</div>
           </CardHeader>
           <CardContent>
-            <Button className="mb-6 w-full bg-white text-black hover:bg-gray-100">
+            <Button className="mb-6 w-full bg-white font-medium text-[#00B8D4] hover:bg-gray-100">
               GET STARTED
             </Button>
             <ul className="space-y-4">
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#00B8D4]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 text-white" />
                 <span>Inspections</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#00B8D4]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 text-white" />
                 <span>Unlimited SMS & Email</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#00B8D4]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 text-white" />
                 <span>Sales Pipeline</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#00B8D4]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 text-white" />
                 <span>Reporting & Analytics</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#00B8D4]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 text-white" />
                 <span>Estimates & Invoicing</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#00B8D4]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 text-white" />
                 <span>Custom Workflows</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#00B8D4]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 text-white" />
                 <span>Inventory</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#00B8D4]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 shrink-0 text-white" />
                 <span>
                   Payments (E-signatures, Mobile App for Technicians & Sales
                   Staff, Vehicle Lookup, CARFAX, QuickBooks Integrations,
@@ -226,50 +229,61 @@ function PricingPlans() {
         </Card>
 
         {/* Enterprise Plan */}
-        <Card className="bg-[#024B5A] text-white">
+        <Card className="w-[20%] bg-[#024B5A] text-white">
           <CardHeader>
-            <CardTitle className="text-[#B042FF]">Enterprise</CardTitle>
+            <CardTitle className="text-2xl text-[#B042FF]">
+              Enterprise
+            </CardTitle>
             <div className="text-4xl font-bold">$699</div>
           </CardHeader>
           <CardContent>
-            <Button className="mb-6 w-full bg-white text-black hover:bg-gray-100">
+            <Button className="mb-6 w-full bg-white font-medium text-[#00B8D4] hover:bg-gray-100">
               GET STARTED
             </Button>
             <ul className="space-y-4">
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#B042FF]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 shrink-0 text-white" />
+
                 <span>Labor Guides</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#B042FF]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 shrink-0 text-white" />
+
                 <span>Inspections</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#B042FF]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 shrink-0 text-white" />
+
                 <span>Unlimited SMS & Email</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#B042FF]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 shrink-0 text-white" />
+
                 <span>Custom Sales Pipelines</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#B042FF]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 shrink-0 text-white" />
+
                 <span>Reporting & Analytics</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#B042FF]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 shrink-0 text-white" />
+
                 <span>Estimates & Invoicing</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#B042FF]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 shrink-0 text-white" />
+
                 <span>Custom Workflows</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#B042FF]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 shrink-0 text-white" />
+
                 <span>Inventory</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-[#B042FF]" />
+              <li className="flex items-start gap-2">
+                <FaRegCircleCheck className="h-5 w-5 shrink-0 text-white" />
+
                 <span>
                   Payments (E-signatures, Mobile App for Technicians & Sales
                   Staff, Vehicle Lookup, CARFAX, QuickBooks Integrations,
@@ -281,12 +295,12 @@ function PricingPlans() {
         </Card>
 
         {/* Custom Plan */}
-        <Card className="bg-[#024B5A] text-white">
+        <Card className="w-[20%] bg-[#024B5A] text-white">
           <CardHeader>
-            <CardTitle className="text-[#FFB342]">Custom</CardTitle>
+            <CardTitle className="text-2xl text-[#FFB342]">Custom</CardTitle>
           </CardHeader>
           <CardContent>
-            <Button className="mb-6 w-full bg-[#00B8D4] text-white hover:bg-[#00A0B8]">
+            <Button className="mb-6 w-full border-4 border-[#00B8D4] bg-[#024B5A] text-white">
               REQUEST A QUOTE
             </Button>
             <div className="mt-4">
