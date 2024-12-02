@@ -10,15 +10,20 @@ type TProps = {
     ratings: number;
   };
 };
+
 export default function TestimonialCard({ testimonial }: TProps) {
   const { imageUrl, content, ratings } = testimonial || {};
   return (
-    <div>
-      <div>
-        <Image src={imageUrl} alt="person image" width={100} height={100} />
+    <div className="h-[593px] w-[443px] rounded-xl bg-white shadow-lg">
+      <div className="relative mx-auto -mt-[93px] flex size-[196px] items-center justify-center overflow-hidden rounded-full">
+        <Image src={imageUrl} alt="person image" fill />
       </div>
-      <p>{content}</p>
-      <Ratings ratings={ratings} />
+      <div className="flex flex-col items-center justify-center">
+        <p className="px-16 py-8 text-center text-xl font-normal leading-9">
+          {content}
+        </p>
+        <Ratings ratings={ratings} />
+      </div>
     </div>
   );
 }

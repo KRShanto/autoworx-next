@@ -331,3 +331,42 @@ html body[data-scroll-locked] {
   scrollbar-width: thin; /* Thin scrollbar */
   scrollbar-color: #808080 #e0e0e0; /* Gray thumb and light gray track */
 }
+
+/* landing page css */
+.text-gradient {
+  @apply bg-gradient-to-r from-[#26AADF] to-[#01A79E] bg-clip-text text-transparent;
+}
+
+.carousel-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  /* width: 80%; */
+  margin: auto;
+  /* overflow: hidden; */
+}
+
+.carousel {
+  display: flex;
+  gap: 1rem;
+  transition: transform 0.5s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.testimonial.active {
+  transform: scale(1);
+  z-index: 1;
+}
+
+.inactive-left {
+  transform: scale(0.8) translateX(180px);
+  opacity: 0.5;
+  z-index: 0;
+}
+.inactive-right {
+  transform: scale(0.8) translateX(-180px);
+  opacity: 0.5;
+  z-index: 0;
+}
