@@ -10,9 +10,9 @@ export default function LandingPage() {
   return (
     <div style={chakra_petch.style} className="text-black">
       <Navbar />
-      {/* <First /> */}
+      <First />
       <Middle />
-      {/* <Last /> */}
+      <Last />
     </div>
   );
 }
