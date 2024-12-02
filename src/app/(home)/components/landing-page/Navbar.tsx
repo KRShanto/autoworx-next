@@ -1,6 +1,4 @@
 import Image from "next/image";
-import Logo1 from "./Logo1.svg";
-import Logo2 from "./Logo2.svg";
 import Link from "next/link";
 
 const links = [
@@ -30,8 +28,8 @@ export default function Navbar() {
   return (
     <nav className="flex items-center justify-between border p-3 px-[15rem]">
       <Link className="flex gap-5" href="/">
-        <Image src={Logo1} alt="Logo1" width={40} height={50} />
-        <Image src={Logo2} alt="Logo2" width={200} height={50} />
+        <Image src="/landing/Logo1.svg" alt="Logo1" width={40} height={50} />
+        <Image src="/landing/Logo2.svg" alt="Logo2" width={200} height={50} />
       </Link>
 
       <div className="flex items-center gap-5">
@@ -55,17 +53,13 @@ export default function Navbar() {
 
         <Link
           href="/login"
-          className="rounded-2xl border-2 p-2 px-3 uppercase"
-          style={{
-            backgroundColor: "transparent",
-            borderImage: "linear-gradient(90deg, #03A7A2 0%, #26AADF 100%) 1",
-            color: "transparent",
-            backgroundImage: "linear-gradient(90deg, #03A7A2 0%, #26AADF 100%)",
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-          }}
+          className="rounded-2xl bg-custom-gradient-lp p-[1px]"
         >
-          Login
+          <button className="rounded-2xl bg-white px-4 py-3 uppercase">
+            <span className="bg-custom-gradient-lp bg-clip-text text-transparent">
+              Login
+            </span>
+          </button>
         </Link>
       </div>
     </nav>
