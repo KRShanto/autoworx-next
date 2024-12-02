@@ -1,6 +1,5 @@
 import React from "react";
 import Image from "next/image";
-import firstContactPhoto from "./assets/firstContact.svg";
 
 export function FirstContact() {
   return (
@@ -22,10 +21,10 @@ export function FirstContact() {
               business grow with a tool built for the automotive industry.
             </p>
             <div className="mt-8 flex gap-4">
-              <button className="bg-custom-gradient-lp flex items-center rounded-lg px-8 py-3 uppercase text-white hover:opacity-90">
+              <button className="flex items-center rounded-lg bg-custom-gradient-lp px-8 py-3 uppercase text-white hover:opacity-90">
                 Request A Demo
               </button>
-              <div className="bg-custom-gradient-lp inline-block rounded-lg p-[2px]">
+              <div className="inline-block rounded-lg bg-custom-gradient-lp p-[2px]">
                 <button className="rounded-lg bg-white px-8 py-3 uppercase">
                   <span className="bg-custom-gradient-lp bg-clip-text font-semibold text-transparent">
                     Contact Us
@@ -36,9 +35,11 @@ export function FirstContact() {
           </div>
           <div className="relative w-full">
             <Image
-              src={firstContactPhoto}
+              src="/landing/firstContact.svg"
               alt="Automotive Workshop"
               className="w-full rounded-sm"
+              width={600}
+              height={450}
             />
           </div>
         </div>

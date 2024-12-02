@@ -1,14 +1,12 @@
 import React from "react";
 import { SolutionCard } from "./SolutionCard";
-import image1 from "./assets/image1.png";
-import image2 from "./assets/image2.png";
 import { DecorativeDivider } from "./Devider";
 
 const solutions = [
   {
     category: "Quick Quotes & Invoices",
 
-    imageSrc: image1,
+    imageSrc: "/landing/image1.png",
     features: [
       "Instant Quotes: Create accurate quotes in just a few clicks with automatic cost calculations for parts, labor, and service.",
       "One-Click Invoice Conversion: Seamlessly convert accepted quotes into invoices, leading to faster client profiles.",
@@ -18,7 +16,7 @@ const solutions = [
   {
     category: "Calendar & Task Management",
 
-    imageSrc: image2,
+    imageSrc: "/landing/image2.png",
     features: [
       "Centralized Scheduling: View client appointments, team availability, and workspace utilization with daily, weekly, or monthly views.",
       "Automated Reminders: Send clients reminders to reduce no-shows, with easy drag-&-drop rescheduling.",
@@ -28,7 +26,7 @@ const solutions = [
   {
     category: "Workforce & Contractor Management",
 
-    imageSrc: image1,
+    imageSrc: "/landing/image1.png",
     features: [
       "Job Assignments & Alerts: Assign jobs, set deadlines, and notify team members automatically.",
       "Time & Performance Tracking: Monitor time tracking, team productivity, and productivity insights with easy access to detailed performance reports.",
@@ -38,7 +36,7 @@ const solutions = [
   {
     category: "Inventory Tracking",
 
-    imageSrc: image2,
+    imageSrc: "/landing/image2.png",
     features: [
       "Real-Time Stock Management: Track parts and supplies, receive low stock alerts, and simplify reordering.",
       "Mobile Scan for Quick Updates: Use mobile scanning to log inventory use instantly.",
@@ -52,7 +50,7 @@ export function SolutionsSection() {
     <section className="bg-gray-50 px-4 py-16">
       <div className="mx-auto max-w-7xl">
         <div className="mb-12 text-center">
-          <p className="bg-custom-gradient-lp mb-4 bg-clip-text text-6xl font-bold text-transparent">
+          <p className="mb-4 bg-custom-gradient-lp bg-clip-text text-6xl font-bold text-transparent">
             The Solutions We Provide
           </p>
           <p className="mx-auto max-w-3xl text-3xl font-normal text-gray-900">

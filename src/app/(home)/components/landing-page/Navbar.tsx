@@ -1,6 +1,4 @@
 import Image from "next/image";
-import Logo1 from "./Logo1.svg";
-import Logo2 from "./Logo2.svg";
 import Link from "next/link";
 
 const links = [
@@ -30,8 +28,8 @@ export default function Navbar() {
   return (
     <nav className="flex items-center justify-between border p-3 px-[15rem]">
       <Link className="flex gap-5" href="/">
-        <Image src={Logo1} alt="Logo1" width={40} height={50} />
-        <Image src={Logo2} alt="Logo2" width={200} height={50} />
+        <Image src="/landing/Logo1.svg" alt="Logo1" width={40} height={50} />
+        <Image src="/landing/Logo2.svg" alt="Logo2" width={200} height={50} />
       </Link>
 
       <div className="flex items-center gap-5">

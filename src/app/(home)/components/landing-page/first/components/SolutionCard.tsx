@@ -14,7 +14,7 @@ export function SolutionCard({
   return (
     <div className="relative w-full">
       <div className="absolute -left-4 top-6 z-10 w-[200px]">
-        <div className="bg-custom-gradient-lp rounded-md px-2 py-2 text-center text-sm font-medium text-white">
+        <div className="rounded-md bg-custom-gradient-lp px-2 py-2 text-center text-sm font-medium text-white">
           {category}
         </div>
       </div>
@@ -24,6 +24,7 @@ export function SolutionCard({
             src={imageSrc}
             alt={category}
             className="h-full w-full object-cover"
+            layout="fill"
           />
         </div>
         <div className="p-6">
@@ -32,10 +33,7 @@ export function SolutionCard({
             {features.map((feature, index) => {
               const [title, description] = feature.split(":");
               return (
-                <li
-                  key={index}
-                  className="text-sm leading-relaxed text-black"
-                >
+                <li key={index} className="text-sm leading-relaxed text-black">
                   <span className="font-bold">{title}</span>: {description}
                 </li>
               );
