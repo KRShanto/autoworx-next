@@ -16,6 +16,7 @@ function generateAuthURL() {
   const scopes = [
     "https://www.googleapis.com/auth/gmail.readonly",
     "https://www.googleapis.com/auth/gmail.send",
+    "https://www.googleapis.com/auth/userinfo.email",
   ];
   const state = crypto.randomBytes(32).toString("hex");
   const authorizationUrl = oauth2Client.generateAuthUrl({

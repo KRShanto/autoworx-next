@@ -23,6 +23,7 @@ model Company {
     currency                String?                   @default("USD")
     terms                   String?
     policy                  String?
+    googleEmail             String?                   @map("google_email")
     googleRefreshToken      String?                   @map("google_refresh_token")
     createdAt               DateTime                  @default(now()) @map("created_at")
     updatedAt               DateTime                  @default(now()) @updatedAt @map("updated_at")
