@@ -8,19 +8,19 @@ const links = [
   },
   {
     title: "Solutions",
-    link: "#solutions",
+    link: "/#solutions",
   },
   {
     title: "Data Migration",
-    link: "#data",
+    link: "/#data",
   },
   {
     title: "pricing",
-    link: "#pricing",
+    link: "/#pricing",
   },
   {
     title: "contact us",
-    link: "#contact",
+    link: "/#contact",
   },
 ];
 
@@ -53,7 +53,7 @@ export default function Navbar() {
 
         <Link
           href="/login"
-          className="rounded-2xl bg-custom-gradient-lp p-[1px]"
+          className="bg-custom-gradient-lp rounded-2xl p-[1px]"
         >
           <button className="rounded-2xl bg-white px-4 py-3 uppercase">
             <span className="bg-custom-gradient-lp bg-clip-text text-transparent">

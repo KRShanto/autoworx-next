@@ -108,7 +108,7 @@ function PricingPlans() {
   const activeColor = "#01A79E2E";
   const [activePlan, setActivePlan] = useState("Monthly");
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className="container mx-auto px-4 py-16" id="pricing">
       <div className="mb-12 text-center">
         <h2 className="mb-4 text-4xl font-bold text-[#00B8D4]">Pricing Plan</h2>
         <p className="text-xl">Get started with Autoworx today!</p>
