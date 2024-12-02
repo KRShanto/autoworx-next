@@ -55,11 +55,11 @@ export default function Navbar() {
 
         <Link
           href="/login"
-          className="bg-custom-gradient-lp rounded-2xl p-[1px]"
+          className="rounded-2xl bg-custom-gradient-lp p-[1px]"
         >
           <button className="rounded-2xl bg-white px-4 py-3 uppercase">
-            <span className="bg-custom-gradient-lp bg-clip-text  text-transparent">
-              Contact Us
+            <span className="bg-custom-gradient-lp bg-clip-text text-transparent">
+              Login
             </span>
           </button>
         </Link>
