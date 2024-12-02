@@ -356,3 +356,8 @@ html body[data-scroll-locked] {
 .text-gradient {
   @apply bg-gradient-to-r from-[#26AADF] to-[#01A79E] bg-clip-text text-transparent;
 }
+
+button {
+  @apply active:scale-95;
+  transition: transform 0.2s ease-in-out;
+}
