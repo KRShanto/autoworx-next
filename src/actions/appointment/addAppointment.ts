@@ -163,7 +163,6 @@ export async function addAppointment(
         // send email
         if (client) {
           sendEmail({
-            from: "Autoworx",
             to: client.email || "",
             subject: confirmationSubject,
             text: confirmationMessage,
@@ -214,7 +213,6 @@ export async function addAppointment(
           cron.schedule(cronExpression, () => {
             if (client) {
               sendEmail({
-                from: "Autoworx",
                 to: client.email || "",
                 subject: reminderSubject,
                 text: reminderMessage,

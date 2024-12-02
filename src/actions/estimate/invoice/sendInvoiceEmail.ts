@@ -99,7 +99,6 @@ export async function sendInvoiceEmail({ invoiceId }: { invoiceId: string }) {
   `;
 
   await sendEmail({
-    from: "AutoWorx",
     to: invoice.client.email!,
     subject: variabledSubject,
     html: variabledBody,

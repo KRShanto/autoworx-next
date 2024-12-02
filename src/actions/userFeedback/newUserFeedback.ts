@@ -87,7 +87,6 @@ async function createAsanaTask(
 
   USER_FEEDBACK_EMAILS.forEach(async (email) => {
     sendEmail({
-      from: "Autoworx",
       to: email,
       subject: `New User Feedback: ${data.user.firstName} ${data.user.lastName}`,
       text: `A new user feedback has been submitted by ${data.user.firstName} ${data.user.lastName}.`,
