@@ -26,7 +26,7 @@ export default function Ratings({ ratings }: { ratings: number }) {
                 y2="48"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop stop-color="#26AADF" />
+                <stop stopColor="#26AADF" />
                 <stop offset="1" stop-color="#01A79E" />
               </linearGradient>
             </defs>

@@ -5,8 +5,8 @@ import Testimonials from "./Testimonials";
 export default function Middle() {
   return (
     <div className="bg-[#F6FDFF]">
-        <DataMigration />
-        <Testimonials />
+      <DataMigration />
+      <Testimonials />
     </div>
   );
 }

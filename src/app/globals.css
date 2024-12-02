@@ -341,6 +341,7 @@ html body[data-scroll-locked] {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   position: relative;
   /* width: 80%; */
   margin: auto;
@@ -349,10 +350,22 @@ html body[data-scroll-locked] {
 
 .carousel {
   display: flex;
-  gap: 1rem;
-  transition: transform 0.5s ease;
-  width: 100%;
   justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  position: relative;
+}
+
+.testimonial {
+  flex: 1;
+  background-color: #f4f4f4;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  min-width: 45%;
+  max-width: 45%;
 }
 
 .testimonial.active {
@@ -360,13 +373,35 @@ html body[data-scroll-locked] {
   z-index: 1;
 }
 
-.inactive-left {
-  transform: scale(0.8) translateX(180px);
+.testimonial.inactive {
+  transform: scale(0.8);
   opacity: 0.5;
   z-index: 0;
 }
-.inactive-right {
-  transform: scale(0.8) translateX(-180px);
-  opacity: 0.5;
-  z-index: 0;
+
+.nav-button {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #333;
+}
+
+.slider {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  background-color: #ccc;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.dot.active-dot {
+  background-color: #333;
 }

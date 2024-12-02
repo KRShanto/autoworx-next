@@ -9,7 +9,7 @@
   <path d="M229.668 20.7418L224.074 12.2794L218.455 20.7418H216.124L222.841 10.6188L216.493 0.957031H218.824L224.074 8.88269L229.291 0.957031H231.597L225.249 10.6188L232 20.7418H229.668Z" fill="black"/>
   <defs>
     <linearGradient id="paint0_linear_2_20" x1="116.696" y1="10.8536" x2="141.866" y2="10.8536" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#01A79E"/>
+      <stop stopColor="#01A79E"/>
       <stop offset="1" stop-color="#26AADF"/>
     </linearGradient>
   </defs>
