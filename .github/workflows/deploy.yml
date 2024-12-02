@@ -1,0 +1,54 @@
+name: Deploy production
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+      - name: Create .env file
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env
+          echo "NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }}" >> .env
+          echo "PUSHER_ID=${{ secrets.PUSHER_ID }}" >> .env
+          echo "PUSHER_KEY=${{ secrets.PUSHER_KEY }}" >> .env
+          echo "PUSHER_SECRET=${{ secrets.PUSHER_SECRET }}" >> .env
+          echo "PUSHER_CLUSTER=${{ secrets.PUSHER_CLUSTER }}" >> .env
+          echo "NEXT_PUBLIC_PUSHER_KEY=${{ secrets.NEXT_PUBLIC_PUSHER_KEY }}" >> .env
+          echo "NEXT_PUBLIC_PUSHER_CLUSTER=${{ secrets.NEXT_PUBLIC_PUSHER_CLUSTER }}" >> .env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+          echo "GMAIL_CLIENT_ID=${{ secrets.GMAIL_CLIENT_ID }}" >> .env
+          echo "GMAIL_CLIENT_SECRET=${{ secrets.GMAIL_CLIENT_SECRET }}" >> .env
+          echo "TWILIO_SID=${{ secrets.TWILIO_SID }}" >> .env
+          echo "TWILIO_TOKEN=${{ secrets.TWILIO_TOKEN }}" >> .env
+          echo "TWILIO_NUMBER=${{ secrets.TWILIO_PHONE }}" >> .env
+          echo "ASANA_PERSONAL_TOKEN=${{ secrets.ASANA_PERSONAL_TOKEN }}" >> .env
+          echo "ASANA_WORKSPACE=${{ secrets.ASANA_WORKSPACE }}" >> .env
+          echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> .env
+          echo "AWS_BUCKET_REGION=${{ secrets.AWS_BUCKET_REGION }}" >> .env
+          echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env
+          echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}" >> .env
+      - name: Build docker image
+        run: docker build -t krshanto/autworx-production-1 .
+      - name: Login to docker hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Push docker image
+        run: docker push krshanto/autworx-production-1:latest
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Pull image from docker hub
+        run: docker pull krshanto/autworx-production-1:latest
+      - name: Delete existing container
+        run: docker rm -f autworx-production-1
+      - name: Run the container
+        run: docker run -d -p 3000:3000 --name autworx-production-1 krshanto/autworx-production-1
