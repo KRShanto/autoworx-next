@@ -96,7 +96,7 @@ async function getCompletedJobs() {
   const currentMonthCompletedJobs = await db.technician.count({
     where: {
       companyId,
-      status: "Completed",
+      status: "Complete",
       createdAt: {
         gte: currentMonthStart,
         lte: currentMonthEnd,
@@ -107,7 +107,7 @@ async function getCompletedJobs() {
   const previousMonthCompletedJobs = await db.technician.count({
     where: {
       companyId,
-      status: "Completed",
+      status: "Complete",
       createdAt: {
         gte: previousMonthStart,
         lte: previousMonthEnd,
