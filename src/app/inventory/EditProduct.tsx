@@ -197,7 +197,7 @@ export default function EditProduct({ productData }: TProps) {
                 onChange={handleChange}
                 name="description"
                 required={false}
-                className="h-28 w-[95%] rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6"
+                className="h-28 w-[95%] rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6 border-slate-400"
                 value={product.description as string}
               />
 

@@ -92,7 +92,7 @@ const CouponCode = ({ defaultValue = "      " }: CouponCodeProps) => {
               maxLength={1}
               value={digit}
               onChange={(e) => handleChange(index, e.target.value)}
-              className="h-10 w-10 rounded border border-primary-foreground text-center"
+              className="h-10 w-10 rounded border border-primary-foreground border-slate-400 text-center"
             />
           ))}
         </div>
@@ -108,4 +108,4 @@ const CouponCode = ({ defaultValue = "      " }: CouponCodeProps) => {
   );
 };
 
-export { DiscountInput, CouponCode };
+export { CouponCode, DiscountInput };
