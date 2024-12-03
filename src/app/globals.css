@@ -392,6 +392,7 @@ button {
   justify-content: center;
   align-items: center;
   text-align: center;
+  /* transition: all cubic-bezier(1, 0, 0, 1) 0.8s; */
 }
 
 .testimonial-card h4 {
@@ -438,6 +439,6 @@ button {
   z-index: 1;
 }
 
-.hidden {
+.hidden-testimonial {
   display: none;
 }
