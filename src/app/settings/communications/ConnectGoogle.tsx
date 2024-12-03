@@ -47,12 +47,15 @@ const ConnectGoogle = async (props: Props) => {
     );
   } else {
     return (
-      <div className="flex gap-5">
-        <div className="flex items-center gap-2">
-          <span className="text-green-500">
-            <FaCheck />
-          </span>
-          <span className="text-[#6571FF]">Connected with Google</span>
+      <div className="flex items-center gap-5">
+        <div className="flex flex-col gap-2">
+          <p className="text-gray-500">{company?.googleEmail}</p>
+          <p className="flex items-center text-[#6571FF]">
+            <span className="mr-2 text-green-500">
+              <FaCheck />
+            </span>
+            <span> Connected with Google</span>
+          </p>
         </div>
 
         <Link
