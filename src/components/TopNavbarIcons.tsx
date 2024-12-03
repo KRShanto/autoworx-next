@@ -32,8 +32,8 @@ export default function TopNavbarIcons() {
           });
           router.push(
             env("NEXT_PUBLIC_APP_URL")
-              ? env("NEXT_PUBLIC_APP_URL") + "/login"
-              : "https://autoworx.link/login",
+              ? env("NEXT_PUBLIC_APP_URL") + "/"
+              : "https://autoworx.link/",
           );
         }}
         className="bg-white text-[1.7rem] font-bold text-[#6571FF]"
