@@ -361,3 +361,83 @@ button {
   @apply active:scale-95;
   transition: transform 0.2s ease-in-out;
 }
+
+.carousel-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px auto;
+}
+
+.carousel {
+  display: flex;
+  position: relative;
+  width: 94rem;
+  height: 60rem;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+}
+
+.testimonial-card {
+  position: absolute;
+  width: 443px;
+  height: 593px;
+  background: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.testimonial-card h4 {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #555;
+}
+
+.carousel-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #01a79e42;
+  transition: transform 0.2s ease-in-out;
+}
+
+.carousel-btn:hover {
+  transform: scale(1.2);
+}
+
+/* Positioning for the testimonials */
+.testimonial-card.left {
+  left: 0;
+  opacity: 0.5;
+  transform: scale(0.7);
+}
+
+.testimonial-card.right {
+  right: 0;
+  opacity: 0.5;
+  transform: scale(0.7);
+}
+
+.testimonial-card.visible-left {
+  opacity: 1;
+  transform: scale(1) translate3d(-230px, 4px, 10px) !important;
+  z-index: 1;
+}
+
+.testimonial-card.visible-right {
+  opacity: 1;
+  transform: scale(1) translate3d(230px, 4px, 10px) !important;
+  z-index: 1;
+}
+
+.hidden {
+  display: none;
+}

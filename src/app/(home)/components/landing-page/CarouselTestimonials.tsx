@@ -6,7 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "../ui/carousel.tsx";
-import TestimonialCard from "./TestimonialCard.tsx";
+import TestimonialCard from "./TestimonialCard";
 
 import Autoplay from "embla-carousel-autoplay";
 

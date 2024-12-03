@@ -27,7 +27,7 @@ export default function Ratings({ ratings }: { ratings: number }) {
                 gradientUnits="userSpaceOnUse"
               >
                 <stop stopColor="#26AADF" />
-                <stop offset="1" stop-color="#01A79E" />
+                <stop offset="1" stopColor="#01A79E" />
               </linearGradient>
             </defs>
           </svg>
