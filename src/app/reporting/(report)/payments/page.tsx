@@ -112,7 +112,9 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
     (acc, payment) => acc + Number(payment.amount),
     0,
   );
-  const averageValue = totalAmount / paymentInfo.length;
+
+  const averageValue =
+    totalAmount && paymentInfo.length ? totalAmount / paymentInfo.length : 0;
 
   // find the outstanding payment (total due)
   const totalDue = paymentInfo.reduce(
