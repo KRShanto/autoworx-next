@@ -13,7 +13,7 @@ const ConnectGoogle = (props: Props) => {
     let Cookie = await getCookies();
     if (Cookie) setCookie(Cookie.value);
   }
-  async function getAuthUrls(e) {
+  async function getAuthUrls(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     await generateAuthURL();
   }
