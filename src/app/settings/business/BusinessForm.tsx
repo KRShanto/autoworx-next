@@ -147,7 +147,6 @@ export default function BusinessForm({ company }: TProps) {
             onChange={handleChange}
             label="Business Phone*"
             name="businessPhone"
-            type="number"
           />
         </div>
         {/* industry and email */}

@@ -47,7 +47,7 @@ export default async function Page({
   })) as (Material & { tags: Tag[] })[];
 
   const labors = (await db.labor.findMany({
-    where: { companyId },
+    where: { companyId, cannedLabor: true },
   })) as (Labor & { tags: Tag[] })[];
 
   const productTags = await db.inventoryProductTag.findMany({

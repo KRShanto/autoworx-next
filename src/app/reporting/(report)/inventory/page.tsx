@@ -6,6 +6,8 @@ import CalculationContainer from "./CalculationContainer";
 import { Suspense } from "react";
 import InventoryTableRow from "./InventoryTableRow";
 import FilterHeader from "./FilterHeader";
+import { auth } from "@/app/auth";
+import { AuthSession } from "@/types/auth";
 type TProps = {
   searchParams: {
     category?: string;
@@ -49,6 +51,8 @@ const filterMultipleSliders: TSliderData[] = [
 ];
 
 export default async function InventoryReportPage({ searchParams }: TProps) {
+  const session = (await auth()) as AuthSession | null;
+
   const filterOR = [];
   if (searchParams.startDate && searchParams.endDate) {
     const formattedStartDate =
@@ -75,6 +79,7 @@ export default async function InventoryReportPage({ searchParams }: TProps) {
     where: {
       OR: filterOR.length ? filterOR : undefined,
       name: { contains: searchParams.search },
+      companyId: session?.user?.companyId,
       category: {
         name: searchParams?.category ? searchParams.category : undefined,
       },
