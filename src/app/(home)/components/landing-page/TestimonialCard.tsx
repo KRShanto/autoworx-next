@@ -24,13 +24,9 @@ export default function TestimonialCard({
   const { imageUrl, content, ratings } = testimonial || {};
   return (
     <motion.div
-      className={cn("h-[593px] w-[443px] rounded-xl bg-white shadow-lg")}
-      // initial={{ scale: 0.8, opacity: 0.5 }}
-      // animate={{
-      //   scale: index === currentIndex || index === currentIndex + 1 ? 1 : 0.8,
-      //   opacity: index === currentIndex || index === currentIndex + 1 ? 1 : 0.5,
-      // }}
-      // transition={{ duration: 0.5 }}
+      className={cn(
+        "h-[593px] w-[443px] select-none rounded-xl bg-white shadow-2xl",
+      )}
     >
       <div className="relative mx-auto -mt-[93px] flex size-[196px] items-center justify-center overflow-hidden rounded-full">
         <Image src={imageUrl} alt="person image" fill />
