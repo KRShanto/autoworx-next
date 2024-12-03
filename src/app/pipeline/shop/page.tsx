@@ -23,10 +23,10 @@ interface Column {
 
 const Page = (props: Props) => {
   const searchParam = useSearchParams();
-  const activeView = searchParam.get("view") ?? "workOrders";
+  const initialView = searchParam.get("view") ?? "workOrders";
+  const [activeView, setActiveView] = useState(initialView);
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
   const [currentUser, setCurrentUser] = useState<SessionUserType>();
-
 
   const columnType = "shop";
 
@@ -50,6 +50,11 @@ const Page = (props: Props) => {
     fetchUser();
   }, []);
 
+  useEffect(() => {
+    const newView = searchParam.get("view") ?? "workOrders";
+    setActiveView(newView);
+  }, [searchParam]);
+
   const handleColumnsUpdate = async ({ columns }: { columns: Column[] }) => {
     setPipelineColumns(columns);
   };
@@ -66,7 +71,7 @@ const Page = (props: Props) => {
         currentUser={currentUser}
       />
       {activeView === "pipelines" ? (
-        <Pipelines pipelinesTitle={type} columns={pipelineColumns}  />
+        <Pipelines pipelinesTitle={type} columns={pipelineColumns} />
       ) : (
         <WorkOrders type={columnType} />
       )}
