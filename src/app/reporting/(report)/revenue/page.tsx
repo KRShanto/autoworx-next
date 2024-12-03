@@ -10,6 +10,8 @@ import RevenueTableRow from "./RevenueTableRow";
 import moment from "moment";
 import { Prisma } from "@prisma/client";
 import FilterHeader from "./FilterHeader";
+import { auth } from "@/app/auth";
+import { AuthSession } from "@/types/auth";
 
 type TProps = {
   searchParams: {
@@ -57,6 +59,7 @@ export type TInvoice = Prisma.InvoiceGetPayload<{
 }>;
 
 export default async function RevenueReportPage({ searchParams }: TProps) {
+  const session = (await auth()) as AuthSession | null;
   const filterOR = [];
 
   if (searchParams.startDate && searchParams.endDate) {
@@ -82,6 +85,7 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
 
   const invoicesPromise = db.invoice.findMany({
     where: {
+      companyId: session?.user?.companyId,
       invoiceItems: {
         some:
           searchParams.category || searchParams.service

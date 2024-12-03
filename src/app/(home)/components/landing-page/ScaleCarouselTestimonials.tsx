@@ -65,7 +65,7 @@ export default function ScaleCarouselTestimonials() {
     if (diff === 1) return "visible-right";
     if (diff === total - 1) return "left";
     if (diff === 2) return "right";
-    return "hidden";
+    return "hidden-testimonial";
   };
 
   const onMouseover = () => {
