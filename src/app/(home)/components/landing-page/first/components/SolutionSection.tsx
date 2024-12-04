@@ -47,10 +47,10 @@ const solutions = [
 
 export function SolutionsSection() {
   return (
-    <section className="bg-gray-50 px-4 py-16">
+    <section className="bg-gray-50 px-4 py-16" id="solutions">
       <div className="mx-auto max-w-7xl">
         <div className="mb-12 text-center">
-          <p className="mb-4 bg-custom-gradient-lp bg-clip-text text-6xl font-bold text-transparent">
+          <p className="bg-custom-gradient-lp mb-4 bg-clip-text text-6xl font-bold text-transparent">
             The Solutions We Provide
           </p>
           <p className="mx-auto max-w-3xl text-3xl font-normal text-gray-900">

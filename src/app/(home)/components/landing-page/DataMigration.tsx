@@ -25,7 +25,7 @@ const services = [
 
 export default function DataMigration() {
   return (
-    <div className="mx-auto max-w-7xl">
+    <div className="mx-auto max-w-7xl" id="data">
       {/* title */}
       <div className="text-center">
         <h1 className="text-gradient text-[64px] font-bold">Data Migration</h1>

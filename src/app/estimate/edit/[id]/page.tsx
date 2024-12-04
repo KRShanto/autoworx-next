@@ -49,6 +49,7 @@ export default async function Page({
     where: { invoiceId: id },
     select: { service: true, materials: true, labor: true, id: true },
   });
+
   const itemTags = await db.itemTag.findMany({
     where: { itemId: { in: items.map((item) => item.id) } },
   });

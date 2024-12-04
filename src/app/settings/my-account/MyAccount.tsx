@@ -199,7 +199,6 @@ const MyAccount = ({ user }: { user: User }) => {
                 />
                 <SlimInput
                   name="phone"
-                  type="number"
                   value={userInfo?.phone || ""}
                   onChange={(e) => {
                     setUserInfo({
