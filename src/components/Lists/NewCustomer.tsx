@@ -1,5 +1,6 @@
 "use client";
 
+import { addCustomer } from "@/actions/client/add";
 import {
   Dialog,
   DialogClose,
@@ -11,16 +12,15 @@ import FormError from "@/components/FormError";
 import SelectClientSource from "@/components/Lists/SelectClientSource";
 import { SelectClientTags } from "@/components/Lists/SelectClientTags";
 import { SlimInput } from "@/components/SlimInput";
+import { useFormErrorStore } from "@/stores/form-error";
+import { useListsStore } from "@/stores/lists";
+import { Source, Tag } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { RxAvatar } from "react-icons/rx";
-import NewClientSource from "./NewClientSource";
-import { Source, Tag } from "@prisma/client";
-import { getSources } from "../../actions/source/getSources";
 import { deleteSource } from "../../actions/source/deleteSource";
-import { addCustomer } from "@/actions/client/add";
-import { useFormErrorStore } from "@/stores/form-error";
-import { useListsStore } from "@/stores/lists";
+import { getSources } from "../../actions/source/getSources";
+import NewClientSource from "./NewClientSource";
 
 export default function NewCustomer({
   buttonElement,
@@ -175,13 +175,13 @@ export default function NewCustomer({
 
           <div className="space-y-2 overflow-y-auto">
             <div className="flex items-center justify-between">
-              <SlimInput name="firstName" />
+              <SlimInput name="firstName" label="First Name *" />
               <SlimInput name="lastName" required={false} />
             </div>
 
             <div className="flex items-center justify-between">
-              <SlimInput name="email" />
-              <SlimInput name="mobile" required={false} />
+              <SlimInput name="email" label="Email *" />
+              <SlimInput name="mobile" label="Mobile" required={false} />
             </div>
 
             <div className="flex items-center justify-between">

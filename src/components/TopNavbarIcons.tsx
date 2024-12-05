@@ -26,15 +26,13 @@ export default function TopNavbarIcons() {
       </button>
 
       <button
-        onClick={() => {
-          signOut({
+        onClick={async() => {
+          await signOut({
             redirect: false,
           });
-          router.push(
-            env("NEXT_PUBLIC_APP_URL")
-              ? env("NEXT_PUBLIC_APP_URL") + "/login"
-              : "https://autoworx.link/login",
-          );
+          window.location.href = env("NEXT_PUBLIC_APP_URL")
+            ? env("NEXT_PUBLIC_APP_URL") + "/"
+            : "https://autoworx.link/";
         }}
         className="bg-white text-[1.7rem] font-bold text-[#6571FF]"
       >

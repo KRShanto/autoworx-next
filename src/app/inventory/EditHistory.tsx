@@ -151,7 +151,7 @@ export default function EditHistory({
                 <input
                   type="text"
                   name="price"
-                  className="w-full outline-none"
+                  className="w-full border-slate-400 outline-none"
                   id="price"
                   defaultValue={price}
                 />

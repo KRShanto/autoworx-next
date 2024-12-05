@@ -48,6 +48,7 @@ export default function UpdateTask() {
   const [date, setDate] = useState<string>(
     moment(task.date).format("YYYY-MM-DD"),
   );
+  console.log("🚀 ~ UpdateTask ~ date:", date);
 
   async function handleSubmit() {
     try {
@@ -60,13 +61,18 @@ export default function UpdateTask() {
           priority,
           startTime: time?.startTime,
           endTime: time?.endTime,
-          date: date ? new Date(date).toISOString() : new Date().toISOString(),
+          date: moment(date).isValid()
+            ? new Date(date).toISOString()
+            : undefined,
+          // date: moment(date).isValid()
+          //   ? new Date(date).toISOString()
+          //   : new Date().toISOString(),
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         },
       });
-      router.push(
-        `/task/day?date=${date ? date : moment().format("YYYY-MM-DD")}`,
-      );
+      // router.push(
+      //   `/task/day?date=${date ? date : moment().format("YYYY-MM-DD")}`,
+      // );
       close();
     } catch (err) {
       console.error(err);

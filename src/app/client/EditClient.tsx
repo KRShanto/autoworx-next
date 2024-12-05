@@ -214,7 +214,11 @@ export default function EditCustomer({
 
           <div className="space-y-2 overflow-y-auto">
             <div className="flex items-center justify-between">
-              <SlimInput name="firstName" defaultValue={client.firstName} />
+              <SlimInput
+                name="firstName"
+                label="First Name *"
+                defaultValue={client.firstName!}
+              />
               <SlimInput
                 name="lastName"
                 required={false}
@@ -223,9 +227,14 @@ export default function EditCustomer({
             </div>
 
             <div className="flex items-center justify-between">
-              <SlimInput name="email" defaultValue={client.email!} />
+              <SlimInput
+                name="email"
+                label="Email *"
+                defaultValue={client.email!}
+              />
               <SlimInput
                 name="mobile"
+                label="Mobile"
                 required={false}
                 defaultValue={client.mobile!}
               />

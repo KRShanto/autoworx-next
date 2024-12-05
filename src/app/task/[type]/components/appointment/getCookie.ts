@@ -30,6 +30,7 @@ export async function generateAuthURL() {
     include_granted_scopes: true,
     state: state,
   });
+  console.log("🚀 ~ generateAuthURL ~ authorizationUrl:", authorizationUrl);
 
-  return authorizationUrl;
+  return redirect(authorizationUrl);
 }

@@ -147,7 +147,7 @@ export default function AddNewProduct() {
               <textarea
                 name="description"
                 required={false}
-                className="h-28 w-[95%] rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6"
+                className="h-28 w-[95%] rounded-sm border border-primary-foreground border-slate-400 bg-white px-2 py-0.5 leading-6"
               />
               <div>
                 <div>
@@ -184,7 +184,7 @@ export default function AddNewProduct() {
                   <input
                     type="text"
                     name="price"
-                    className="w-full outline-none"
+                    className="w-full border-slate-400 outline-none"
                     id="price"
                   />
                 </div>
