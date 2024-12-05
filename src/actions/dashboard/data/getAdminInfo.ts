@@ -254,7 +254,7 @@ async function getInventory() {
   });
 
   const totalInventoryValue = inventoryProducts.reduce(
-    (acc, product) => acc + Number(product.price),
+    (acc, product) => acc + Number(product.price) * (product.quantity || 0),
     0,
   );
 
@@ -289,12 +289,12 @@ async function getInventory() {
     });
 
   const currentMonthInventoryCost = currentMonthInventoryHistory.reduce(
-    (acc, history) => acc + Number(history.price),
+    (acc, history) => acc + Number(history.price || 0) * history.quantity,
     0,
   );
 
   const previousMonthInventoryCost = previousMonthInventoryHistory.reduce(
-    (acc, history) => acc + Number(history.price),
+    (acc, history) => acc + Number(history.price) * history.quantity,
     0,
   );
 
