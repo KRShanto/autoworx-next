@@ -1,9 +1,9 @@
 import { getLastClockBreakForUser } from "@/actions/dashboard/break";
 import { getLastClockInOutForUser } from "@/actions/dashboard/clockIn";
+import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import getUser from "@/lib/getUser";
 import { AuthSession } from "@/types/auth";
-import { auth } from "@/app/auth";
 import DashboardAdmin from ".//DashboardAdmin";
 import DashboardManager from "./DashboardManager";
 import DashboardOther from "./DashboardOther";
@@ -107,6 +107,24 @@ export default async function Dashboard() {
       />
     );
   } else if (user.employeeType === "Sales") {
+    let tasks = await db.task.findMany({
+      where: {
+        companyId: user.companyId,
+        OR: [
+          {
+            taskUser: {
+              some: {
+                userId: +user.id,
+              },
+            },
+          },
+          {
+            userId: +user.id,
+          },
+        ],
+      },
+    });
+
     return (
       <DashboardSales
         tasks={tasks}
@@ -116,6 +134,23 @@ export default async function Dashboard() {
     );
   } else if (user.employeeType === "Technician") {
     let lastClockInOut = await getLastClockInOutForUser();
+    let tasks = await db.task.findMany({
+      where: {
+        companyId: user.companyId,
+        OR: [
+          {
+            taskUser: {
+              some: {
+                userId: +user.id,
+              },
+            },
+          },
+          {
+            userId: +user.id,
+          },
+        ],
+      },
+    });
     return (
       <DashboardTechnician
         tasks={tasks}
@@ -126,6 +161,24 @@ export default async function Dashboard() {
     );
   } else if (user.employeeType === "Other") {
     let lastClockInOut = await getLastClockInOutForUser();
+    let tasks = await db.task.findMany({
+      where: {
+        companyId: user.companyId,
+        OR: [
+          {
+            taskUser: {
+              some: {
+                userId: +user.id,
+              },
+            },
+          },
+          {
+            userId: +user.id,
+          },
+        ],
+      },
+    });
+    
     return (
       <DashboardOther
         tasks={tasks}
