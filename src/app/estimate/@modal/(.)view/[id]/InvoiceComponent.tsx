@@ -415,12 +415,14 @@ const InvoiceComponent = ({
                 );
               })}
             </div>
-            <Link
-              href={`/estimate/workorder/${id}`}
-              className="rounded-md bg-[#6571FF] py-2 text-center text-white disabled:bg-gray-400"
-            >
-              {isWorkOrderCreate ? "View Work Order" : "Create Work Order"}
-            </Link>
+            {type === "invoice" && (
+              <Link
+                href={`/estimate/workorder/${id}`}
+                className="rounded-md bg-[#6571FF] py-2 text-center text-white disabled:bg-gray-400"
+              >
+                {isWorkOrderCreate ? "View Work Order" : "Create Work Order"}
+              </Link>
+            )}
             <button
               onClick={handleEmail}
               className="flex items-center justify-center gap-2 rounded-md bg-white py-2 text-[#6571FF]"
