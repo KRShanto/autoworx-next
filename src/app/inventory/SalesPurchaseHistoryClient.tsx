@@ -12,13 +12,13 @@ import {
 import * as Tabs from "@radix-ui/react-tabs";
 import moment from "moment";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { HiExternalLink } from "react-icons/hi";
 import { auth } from "../auth";
 import EditHistory from "./EditHistory";
 import EditProductForm from "./EditProductForm";
-import { useSearchParams } from "next/navigation";
 
 enum Tab {
   Sales = "sales",
@@ -35,7 +35,7 @@ export default function SalesPurchaseHistoryClient({
   invoiceIds,
 }: {
   user: User;
-  product?: InventoryProduct;
+  product?: (InventoryProduct & { User: User | null }) | null | undefined;
   histories: (InventoryProductHistory & {
     vendor: Vendor | null;
     client: Client | null;
@@ -116,7 +116,7 @@ function Table({
     client: Client | null;
   })[];
   type: InventoryProductHistoryType;
-  product?: InventoryProduct;
+  product?: (InventoryProduct & { User: User | null }) | null | undefined;
   invoiceIds?: string[];
 }) {
   return (
@@ -168,11 +168,18 @@ function Table({
               </>
             )}
 
-            <td className="text-nowrap text-center">
-              {type === "Sale"
-                ? history.client?.firstName
-                : history.vendor?.name}
-            </td>
+            {product?.type === "Product" && (
+              <td className="text-nowrap text-center">
+                {type === "Sale"
+                  ? history.client?.firstName
+                  : history.vendor?.name}
+              </td>
+            )}
+            {product?.type === "Supply" && (
+              <td className="text-nowrap text-center">
+                {product?.User?.firstName}
+              </td>
+            )}
             <td className="text-nowrap text-center">
               ${history.price?.toString()}
             </td>

@@ -6,7 +6,7 @@ import SalesPurchaseHistoryClient from "./SalesPurchaseHistoryClient";
 export default async function SalesPurchaseHistory({
   user,
   productId,
-  invoiceIds
+  invoiceIds,
 }: {
   user: User;
   productId: number | undefined;
@@ -15,6 +15,7 @@ export default async function SalesPurchaseHistory({
   const product = productId
     ? await db.inventoryProduct.findUnique({
         where: { id: productId },
+        include: { User: true },
       })
     : undefined;
   // @ts-ignore
