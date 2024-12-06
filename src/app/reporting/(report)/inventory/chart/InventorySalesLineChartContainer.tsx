@@ -12,7 +12,8 @@ import {
 
 type TDays = {
   day: string;
-  sale: number;
+  sales: number;
+  purchase: number;
 }[];
 
 type TProps = {
@@ -39,7 +40,7 @@ export default function InventorySalesLineChartContainer({ days }: TProps) {
               </Label>
             </XAxis>
             <YAxis
-              dataKey="sale"
+              dataKey="sales"
               stroke="#fffff"
               tickCount={8}
               domain={[0, "dataMax"]}
@@ -50,7 +51,7 @@ export default function InventorySalesLineChartContainer({ days }: TProps) {
               verticalCoordinatesGenerator={() => []}
             />
             <Line
-              dataKey="sale"
+              dataKey="sales"
               stroke="#03A7A2"
               strokeWidth="4px"
               dot={false}
