@@ -24,6 +24,8 @@ function generateAuthURL() {
     scope: scopes,
     include_granted_scopes: true,
     state: state,
+    prompt: "consent",
+
   });
   return authorizationUrl;
 }
