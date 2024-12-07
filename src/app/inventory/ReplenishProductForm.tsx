@@ -124,12 +124,12 @@ export default function ReplenishProductForm({
               <label htmlFor="price" className="px-2 font-medium">
                 Price
               </label>
-              <div className="mt-1 flex gap-1 rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6">
+              <div className="#mt-1 flex gap-1 rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6">
                 <span className="text-lg">$</span>
                 <input
                   type="text"
                   name="price"
-                  className="w-full outline-none"
+                  className="w-full rounded-sm border border-slate-400 px-2 py-0.5 outline-none"
                   id="price"
                 />
               </div>
@@ -144,7 +144,7 @@ export default function ReplenishProductForm({
             <textarea
               id="notes"
               name="notes"
-              className="h-28 w-full rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6 outline-none"
+              className="h-28 w-full rounded-sm border border-primary-foreground border-slate-400 bg-white px-2 py-0.5 leading-6 outline-none"
             />
           </div>
         </div>

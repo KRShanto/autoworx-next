@@ -10,12 +10,12 @@ import {
   DialogTrigger,
 } from "@/components/Dialog";
 import FormError from "@/components/FormError";
+import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
+import { InventoryProductType } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { useProduct as productUse } from "../../actions/inventory/useProduct";
-import Selector from "@/components/Selector";
-import { InventoryProductType } from "@prisma/client";
 
 export default function UseProductForm({
   productId,
@@ -107,7 +107,7 @@ export default function UseProductForm({
               id="notes"
               name="notes"
               required={false}
-              className="h-28 w-full rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6 outline-none"
+              className="h-28 w-full rounded-sm border border-primary-foreground border-slate-400 bg-white px-2 py-0.5 leading-6 outline-none"
             />
           </div>
         </div>
