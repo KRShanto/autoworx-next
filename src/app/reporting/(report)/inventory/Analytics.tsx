@@ -33,14 +33,14 @@ export default async function Analytics({ leftChart, rightChart }: TProps) {
   // inventory data fetch
   const inventoryProducts = await db.inventoryProduct.findMany({
     where: {
-      AND: [
-        {
-          createdAt: {
+      InventoryProductHistory: {
+        every: {
+          date: {
             gte: new Date(`${formattedLast30Days}T00:00:00.000Z`), // Start of the day
             lte: new Date(`${formattedToday}T23:59:59.999Z`), // End of the day
           },
         },
-      ],
+      },
     },
     select: {
       category: true,
@@ -90,7 +90,6 @@ export default async function Analytics({ leftChart, rightChart }: TProps) {
         (history.type as InventoryProductHistoryType) === "Purchase" &&
         daysSalesOrPurchasesObj[day as any]
       ) {
-        console.log(history);
         daysSalesOrPurchasesObj[day as any].purchase +=
           history.quantity * Number(history.price);
       }
