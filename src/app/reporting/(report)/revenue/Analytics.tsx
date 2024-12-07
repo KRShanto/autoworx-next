@@ -25,14 +25,18 @@ export default async function Analytics() {
     include: {
       invoiceItems: {
         include: {
-          materials: true,
+          materials: {
+            include: {
+              category: true,
+            },
+          },
           labor: true,
         },
       },
     },
   });
 
-  const days = Array.from({ length: 31 }, (_, i) => {
+  const daysProfit = Array.from({ length: 31 }, (_, i) => {
     let day = moment().subtract(i, "days").format("MMM Do, YYYY");
     return last30DaysInvoice.reduce(
       (acc, invoice) => {
@@ -47,12 +51,13 @@ export default async function Analytics() {
             }>,
           ) => {
             const materialCostPrice = cur.materials.reduce(
-              (acc, cur) => acc + Number(cur?.cost) * Number(cur?.quantity),
+              (acc, cur) =>
+                acc + Number(cur?.cost || 0) * Number(cur?.quantity || 0),
               0,
             );
             // labor cost price is assumed to be per hour
             const laborCostPrice =
-              Number(cur.labor?.charge) * cur?.labor?.hours!;
+              Number(cur.labor?.charge || 0) * cur?.labor?.hours! || 0;
             const costPrice = materialCostPrice + laborCostPrice;
             const formattedDate = moment(invoice.createdAt).format(
               "MMM Do, YYYY",
@@ -78,26 +83,62 @@ export default async function Analytics() {
     );
   }).reverse();
 
-  const data = [
-    {
-      categoryName: "Jan",
-      salePrice: 500,
-    },
-    {
-      categoryName: "Feb",
-      salePrice: 400,
-    },
-    {
-      categoryName: "Mar",
-      salePrice: 500,
-    },
-  ];
+  const categoryByCalculation: {
+    categoryName: string;
+    salePrice: number;
+  }[] = [];
+
+  last30DaysInvoice.forEach((invoice) => {
+    invoice.invoiceItems.reduce(
+      (
+        acc,
+        cur: Prisma.InvoiceItemGetPayload<{
+          include: {
+            materials: {
+              include: {
+                category: true;
+              };
+            };
+            labor: true;
+          };
+        }>,
+      ) => {
+        const materialCostPrice = cur.materials.reduce(
+          (acc, cur) =>
+            acc + Number(cur?.cost || 0) * Number(cur?.quantity || 0),
+          0,
+        );
+        // labor cost price is assumed to be per hour
+        const laborCostPrice =
+          Number(cur.labor?.charge || 0) * cur?.labor?.hours! || 0;
+        const costPrice = materialCostPrice + laborCostPrice;
+        cur.materials.forEach((material, i) => {
+          const categoryIndex = categoryByCalculation.findIndex(
+            (category) => category.categoryName === material.category?.name,
+          );
+
+          if (categoryIndex === -1) {
+            categoryByCalculation.push({
+              categoryName: material.category?.name!,
+              salePrice: acc + Number(invoice.grandTotal || 0) - costPrice,
+            });
+          } else {
+            categoryByCalculation[categoryIndex].salePrice +=
+              acc + Number(invoice.grandTotal || 0) - costPrice;
+          }
+        });
+        return acc + Number(invoice.grandTotal) - costPrice;
+      },
+      0,
+    );
+  });
+
   return (
     <div className="rounded-lg border p-6">
       <h1 className="py-4 text-4xl font-bold">Analytics</h1>
       <div className="mx-10 grid grid-cols-2 space-x-20">
-        <RevenueBarChartContainer data={data} />
-        <RevenueLineChartContainer days={days} />
+        <RevenueBarChartContainer data={categoryByCalculation} />
+        <RevenueLineChartContainer days={daysProfit} />
       </div>
     </div>
   );

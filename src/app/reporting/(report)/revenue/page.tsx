@@ -178,11 +178,13 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
         }>,
       ) => {
         const materialCostPrice = cur.materials.reduce(
-          (acc, cur) => acc + Number(cur?.cost) * Number(cur?.quantity),
+          (acc, cur) =>
+            acc + Number(cur?.cost || 0) * Number(cur?.quantity || 0),
           0,
         );
         // labor cost price is assumed to be per hour
-        const laborCostPrice = Number(cur.labor?.charge) * cur?.labor?.hours!;
+        const laborCostPrice =
+          Number(cur.labor?.charge || 0) * cur?.labor?.hours! || 0;
         const costPrice = materialCostPrice + laborCostPrice;
         acc.costPrice = costPrice;
         acc.profitPrice = Number(invoice.grandTotal) - acc.costPrice;
@@ -261,7 +263,7 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
   );
 
   const totalWeekProfit = weeklyInvoices.reduce(
-    (total, invoice) => total + (invoice.profit || 0),
+    (total, invoice) => total + ((invoice as any).profitPrice || 0),
     0,
   );
 
@@ -276,19 +278,19 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
   );
 
   const totalMonthProfit = monthlyInvoices.reduce(
-    (total, invoice) => total + (invoice.profit || 0),
+    (total, invoice) => total + ((invoice as any).profitPrice || 0),
     0,
   );
 
   // Calculate the all time profit (Invoice has a `profit` field)
   const totalProfit = filteredInvoice.reduce(
-    (total, invoice) => total + (invoice.profit || 0),
+    (total, invoice) => total + ((invoice as any).profitPrice || 0),
     0,
   );
 
   // profit for the filtered invoices
   const totalFilteredProfit = filteredInvoice.reduce(
-    (total, invoice) => total + (invoice.profit || 0),
+    (total, invoice) => total + ((invoice as any).profitPrice || 0),
     0,
   );
 

@@ -13,6 +13,7 @@ import {
 type TDays = {
   day: string;
   purchase: number;
+  sales: number;
 }[];
 
 type TProps = {
