@@ -32,6 +32,7 @@ export default function UpdateTask() {
     task: CalendarTask;
   };
 
+
   const router = useRouter();
 
   const [showUsers, setShowUsers] = useState(false);
@@ -48,7 +49,6 @@ export default function UpdateTask() {
   const [date, setDate] = useState<string>(
     moment(task.date).format("YYYY-MM-DD"),
   );
-  console.log("🚀 ~ UpdateTask ~ date:", date);
 
   async function handleSubmit() {
     try {

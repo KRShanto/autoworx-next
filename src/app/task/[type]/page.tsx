@@ -52,16 +52,44 @@ export default async function Page({
 
   if (user.employeeType == "Admin" || user.employeeType == "Manager") {
     // only admin and manager can see all appointments
+    // appointments = await db.appointment.findMany({
+    //   where: {
+    //     companyId,
+    //   },
+    // });
+    // Get all the tasks for the company
+    // where startTime, endTime, and date are not null
+    // tasks = await db.task.findMany({
+    //   where: {
+    //     companyId,
+    //   },
+    // });
     appointments = await db.appointment.findMany({
       where: {
         companyId,
+        appointmentUsers: {
+          some: {
+            userId: +user.id,
+          },
+        },
       },
     });
-    // Get all the tasks for the company
-    // where startTime, endTime, and date are not null
+
     tasks = await db.task.findMany({
       where: {
         companyId,
+        OR: [
+          {
+            taskUser: {
+              some: {
+                userId: +user.id,
+              },
+            },
+          },
+          {
+            userId: +user.id,
+          },
+        ],
       },
     });
   } else {
