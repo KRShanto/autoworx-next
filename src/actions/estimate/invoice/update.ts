@@ -151,7 +151,7 @@ export async function updateInvoice(
     });
 
     if (column) {
-      data.type = column.title === "In Progress" ? "Invoice" : "Estimate";
+      data.type = column.title === "In Progress" ? "Invoice" : data.type;
     } else {
       data.columnId = undefined;
       data.type = "Estimate";
