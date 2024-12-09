@@ -57,7 +57,6 @@ const DashboardOther = ({
   appointments: any;
   lastClockInOut: (ClockInOut & { ClockBreak: ClockBreak[] }) | null;
 }) => {
-
   const { open } = usePopupStore();
   const validBreak = useCallback(
     function (lastClockInOut: ClockInOut & { ClockBreak: ClockBreak[] }) {
@@ -72,22 +71,22 @@ const DashboardOther = ({
   );
 
   return (
-    <div className="flex items-start gap-x-4">
+    <div className="flex flex-col gap-x-4 gap-y-8 lg:flex-row lg:items-start">
       {/* col 1 */}
-      <div className="w-[30%] space-y-4">
+      <div className="space-y-4 lg:w-[30%]">
         {/* recent messages */}
         <RecentMessages />
       </div>
 
       {/* col 2 */}
-      <div className="w-[30%] space-y-4">
+      <div className="space-y-4 lg:w-[30%]">
         {/* appointments */}
         <Appointments appointments={appointments} />
         {/* task list */}
         <Tasks tasks={tasks} companyUsers={companyUsers} />
       </div>
       {/* col 3 */}
-      <div className="w-[40%] space-y-4">
+      <div className="order-first space-y-4 lg:order-none lg:w-[40%]">
         {/* attendance buttons */}
         <div className="flex h-[20%] justify-between gap-x-2 rounded-md p-4 shadow-lg xl:p-8">
           <div>

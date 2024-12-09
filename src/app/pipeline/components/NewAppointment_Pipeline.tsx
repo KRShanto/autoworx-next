@@ -76,7 +76,6 @@ export function NewAppointment_Pipeline({
     vehicleId,
   );
 
-  
   const { popup, open, close } = usePopupStore();
   const { showError } = useFormErrorStore();
   const setOpen = useCallback(
@@ -343,12 +342,12 @@ export function NewAppointment_Pipeline({
             <DialogTitle>New Appointment</DialogTitle>
 
             {/* Options */}
-            <div className="flex items-center justify-self-center rounded-full bg-primary p-1">
+            <div className="flex items-center justify-self-center rounded-full bg-gray-300 p-1">
               <button
                 type="button"
                 className={cn(
                   "rounded-full px-4 py-1 font-semibold",
-                  tab === Tab.Schedule && "bg-background",
+                  tab === Tab.Schedule && "bg-white",
                 )}
                 onClick={() => setTab(Tab.Schedule)}
               >
@@ -360,7 +359,7 @@ export function NewAppointment_Pipeline({
                 type="button"
                 className={cn(
                   "rounded-full px-4 py-1 font-semibold",
-                  tab === Tab.Reminder && "bg-background",
+                  tab === Tab.Reminder && "bg-white",
                 )}
                 onClick={() => setTab(Tab.Reminder)}
               >
