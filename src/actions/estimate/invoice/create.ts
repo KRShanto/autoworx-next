@@ -100,6 +100,20 @@ export async function createInvoice({
     }
   }
 
+  if (finalColumnId) {
+    const column = await db.column.findUnique({
+      where: {
+        id: finalColumnId,
+      },
+    });
+
+    if (column) {
+      type = column.title === "In Progress" ? "Invoice" : "Estimate";
+    } else {
+      throw new Error("Column not found to create inovice convertions");
+    }
+  }
+
   // calculate the total cost. This is the sum of all the costs of the materials and labor
   const totalCost = items.reduce((acc, item) => {
     const materialCostPrice = item.materials.reduce(
