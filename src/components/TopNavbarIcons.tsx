@@ -6,7 +6,7 @@ import { FaRegUser } from "react-icons/fa";
 import { HiOutlineChatBubbleLeftRight } from "react-icons/hi2";
 import { IoMdLogOut, IoMdNotificationsOutline } from "react-icons/io";
 import { IoChatbubblesOutline, IoNotificationsOutline } from "react-icons/io5";
-import { LuUser2 } from "react-icons/lu";
+import { LuUser } from "react-icons/lu";
 import { MdOutlineNotifications } from "react-icons/md";
 import NewUserFeedback from "./NewUserFeedback";
 
@@ -22,11 +22,11 @@ export default function TopNavbarIcons() {
         <HiOutlineChatBubbleLeftRight />
       </button>
       <button className="bg-white text-[1.7rem] font-bold text-[#6571FF]">
-        <LuUser2 />
+        <LuUser />
       </button>
 
       <button
-        onClick={async() => {
+        onClick={async () => {
           await signOut({
             redirect: false,
           });

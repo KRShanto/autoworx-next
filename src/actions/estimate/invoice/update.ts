@@ -146,12 +146,15 @@ export async function updateInvoice(
   }
 
   if (data.columnId) {
-    const columnExists = await db.column.findUnique({
+    const column = await db.column.findUnique({
       where: { id: data.columnId },
     });
 
-    if (!columnExists) {
+    if (column) {
+      data.type = column.title === "In Progress" ? "Invoice" : "Estimate";
+    } else {
       data.columnId = undefined;
+      data.type = "Estimate";
     }
   }
   // re-calculating the profit
