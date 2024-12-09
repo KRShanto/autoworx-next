@@ -3,7 +3,7 @@ import TopNavbarIcons from "./TopNavbarIcons";
 
 export default function TopNavbar() {
   return (
-    <div className="flex h-[7vh] items-center justify-between p-5 pr-10">
+    <div className="hidden h-[7vh] items-center justify-between p-5 pr-10 md:flex">
       <form className="flex items-center">
         <div className="">
           {/* TEMP */}
