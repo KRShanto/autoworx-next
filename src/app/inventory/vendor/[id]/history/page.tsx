@@ -1,3 +1,4 @@
+import EditVendor from "@/components/Lists/EditVendor";
 import Title from "@/components/Title";
 import { cn } from "@/lib/cn";
 import { db } from "@/lib/db";
@@ -119,8 +120,15 @@ export default async function Page({
           </div>
 
           <div className="app-shadow mt-5 w-full rounded-lg bg-white p-5">
-            <h3 className="text-xl font-bold">Vendor Details</h3>
-
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-bold">Vendor Details</h3>
+              <EditVendor
+                button={
+                  <button className="rounded-sm border-2 px-4 py-1">Edit</button>
+                }
+                vendor={vendor!}
+              />
+            </div>
             <div className="flex flex-col gap-1 p-3">
               <p>Contact Name: {vendor?.name}</p>
               <p>Company Name: {vendor?.companyName}</p>
