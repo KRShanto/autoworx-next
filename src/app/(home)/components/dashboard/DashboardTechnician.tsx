@@ -72,22 +72,22 @@ const DashboardTechnician = ({
   );
 
   return (
-    <div className="flex h-full items-start gap-x-4">
+    <div className="flex h-full flex-col gap-x-4 gap-y-8 lg:flex-row lg:items-start">
       {/* col 1 */}
-      <div className="h-full w-[30%] space-y-4">
+      <div className="h-full space-y-4 lg:w-[30%]">
         {/* Current Projects */}
         <CurrentProjects projects={dashboardInfo?.currentProjects || []} />
       </div>
 
       {/* col 2 */}
-      <div className="flex h-full w-[25%] flex-col justify-around space-y-4">
+      <div className="flex h-full flex-col justify-around space-y-4 lg:w-[25%]">
         {/* task list */}
         <Tasks tasks={tasks} companyUsers={companyUsers} />
         {/* appointments */}
         <Appointments appointments={appointments} />
       </div>
       {/* col 3 */}
-      <div className="h-full w-[45%] space-y-4">
+      <div className="order-first h-full space-y-4 lg:order-none lg:w-[45%]">
         {/* attendance buttons */}
         <div className="flex h-[20%] justify-between gap-x-2 rounded-md p-4 shadow-lg xl:p-8">
           <div>

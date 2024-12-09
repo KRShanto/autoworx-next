@@ -26,9 +26,9 @@ const DashboardManager = ({
   const { data } = useServerGetInterval(getAdminInfo, 5000);
 
   return (
-    <div className="flex h-full items-start gap-x-2 2xl:gap-x-8">
+    <div className="flex h-full flex-col gap-x-2 lg:flex-row lg:items-start 2xl:gap-x-8">
       {/* col 1 */}
-      <div className="flex h-full w-[20%] flex-col justify-around space-y-3">
+      <div className="order-1 flex h-full flex-col justify-around space-y-3 lg:w-[20%]">
         {/* sales pipeline */}
         <div className="rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
@@ -93,18 +93,18 @@ const DashboardManager = ({
         </div>
       </div>
       {/* col 2 */}
-      <div className="w-[20%] space-y-3">
+      <div className="order-4 space-y-3 lg:order-2 lg:w-[20%]">
         {/* task list */}
         <Tasks tasks={tasks} companyUsers={companyUsers} fullHeight />
       </div>
 
       {/* col 3 */}
-      <div className="w-[20%] space-y-4">
+      <div className="order-3 space-y-4 lg:w-[20%]">
         {/* appointments */}
         <Appointments appointments={appointments} fullHeight />
       </div>
       {/* col 4*/}
-      <div className="flex h-full w-[40%] flex-col justify-around space-y-4">
+      <div className="order-2 flex h-full flex-col justify-around space-y-4 lg:order-4 lg:w-[40%]">
         <div className="flex items-start gap-4">
           {/* Revenue */}
           <div className="w-1/2 rounded-md p-4 shadow-lg 2xl:px-6">

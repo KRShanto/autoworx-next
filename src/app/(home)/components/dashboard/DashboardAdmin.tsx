@@ -24,9 +24,9 @@ const Dashboard = ({
   const { data } = useServerGetInterval(getAdminInfo, 5000);
 
   return (
-    <div className="flex h-full items-start gap-x-2 xl:gap-x-8">
+    <div className="flex h-full flex-col gap-x-2 lg:flex-row lg:items-start xl:gap-x-8">
       {/* col 1 */}
-      <div className="flex h-full w-[23%] flex-col justify-around space-y-4">
+      <div className="flex h-full w-full flex-col justify-around space-y-4 lg:w-[23%]">
         {/* sales pipeline */}
         <div className="rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
@@ -39,17 +39,20 @@ const Dashboard = ({
             <ChartData
               heading="Leads coming in"
               subHeading="/month"
-              number={ 0}
+              number={0}
               isPositive={false}
               rate={0}
             />
-            <ChartData heading="Leads Converted"   number={ 0}
+            <ChartData
+              heading="Leads Converted"
+              number={0}
               isPositive={false}
-              rate={0}/>
+              rate={0}
+            />
             <ChartData
               heading="Conversion Rate"
               subHeading="Leads Converted/Total Leads"
-              number={ 0}
+              number={0}
               isPositive={false}
               rate={0}
               isNumberPercent
@@ -86,7 +89,7 @@ const Dashboard = ({
         </div>
       </div>
       {/* col 2 */}
-      <div className="flex h-full w-[23%] flex-col justify-around space-y-4">
+      <div className="flex h-full w-full flex-col justify-around space-y-4 lg:w-[23%]">
         {/* Revenue */}
         <div className="rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
@@ -157,12 +160,12 @@ const Dashboard = ({
       </div>
 
       {/* col 3 */}
-      <div className="w-[23%] space-y-4">
+      <div className="w-full space-y-4 lg:w-[23%]">
         {/* appointments */}
         <Appointments appointments={appointments} fullHeight />
       </div>
       {/* col 4*/}
-      <div className="w-[30%] space-y-4">
+      <div className="w-full space-y-4 lg:w-[30%]">
         {/* task list */}
         <Tasks tasks={tasks} companyUsers={companyUsers} />
         {/* employee leave request */}
