@@ -2,7 +2,7 @@
 "use client";
 import { getEmployees } from "@/actions/employee/get";
 import { updateInvoiceStatus } from "@/actions/estimate/invoice/updateInvoiceStatus";
-import getDataForNewAppointment from "@/actions/pipelines/getDataForNewAppointment";
+
 import {
   getWorkOrders,
   updateAssignedTo,
@@ -27,80 +27,14 @@ import { EmployeeTagSelector } from "./EmployeeTagSelector";
 import { NewAppointment_Pipeline } from "./NewAppointment_Pipeline";
 import ServiceSelector from "./ServiceSelector";
 import TaskForm from "./TaskForm";
-//dummy services
-
-//interfaces
-
-interface Employee {
-  id: number;
-  firstName: string;
-  lastName: string | null;
-}
-interface Lead {
-  invoiceId: string;
-  name: string;
-  email: string;
-  phone: string;
-  clientId: number | null;
-  vehicle: string;
-  vehicleId: number | null;
-  services: {
-    completed: string[];
-    incomplete: string[];
-  };
-  createdAt: string;
-  workOrderStatus?: string;
-  tags: InvoiceTag[];
-
-  tasks?: Task[];
-  assignedTo: User | Employee | null;
-  columnId: number | null;
-}
-interface InvoiceTag {
-  id: number;
-  tag: Tag;
-}
-interface PipelineData {
-  id: number | null;
-  title: string;
-  leads: Lead[];
-}
-
-type Column = {
-  id: number | null;
-  title: string;
-  type: string;
-};
+import {Lead,Employee, Column,PipelineData,InvoiceWithRelations } from "@/types/invoiceLead";
 
 interface PipelinesProps {
   pipelinesTitle: string;
   columns?: Column[];
 }
 
-type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
-  include: {
-    client: true;
-    vehicle: true;
-    invoiceItems: {
-      include: {
-        service: {
-          include: {
-            Technician: true;
-          };
-        };
-      };
-    };
-    tags: {
-      select: {
-        id: true;
-        tag: true;
-      };
-    };
-    tasks: true;
-    assignedTo: true;
-    column: true;
-  };
-}>;
+
 export default function Pipelines({
   pipelinesTitle: pipelineType,
   columns,
