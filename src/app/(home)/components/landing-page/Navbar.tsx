@@ -1,6 +1,4 @@
 import Image from "next/image";
-import Logo1 from "./Logo1.svg";
-import Logo2 from "./Logo2.svg";
 import Link from "next/link";
 
 const links = [
@@ -10,19 +8,19 @@ const links = [
   },
   {
     title: "Solutions",
-    link: "#solutions",
+    link: "/#solutions",
   },
   {
     title: "Data Migration",
-    link: "#data",
+    link: "/#data",
   },
   {
     title: "pricing",
-    link: "#pricing",
+    link: "/#pricing",
   },
   {
     title: "contact us",
-    link: "#contact",
+    link: "/#contact",
   },
 ];
 
@@ -30,8 +28,8 @@ export default function Navbar() {
   return (
     <nav className="flex items-center justify-between border p-3 px-[15rem]">
       <Link className="flex gap-5" href="/">
-        <Image src={Logo1} alt="Logo1" width={40} height={50} />
-        <Image src={Logo2} alt="Logo2" width={200} height={50} />
+        <Image src="/landing/Logo1.svg" alt="Logo1" width={40} height={50} />
+        <Image src="/landing/Logo2.svg" alt="Logo2" width={200} height={50} />
       </Link>
 
       <div className="flex items-center gap-5">
@@ -58,8 +56,8 @@ export default function Navbar() {
           className="bg-custom-gradient-lp rounded-2xl p-[1px]"
         >
           <button className="rounded-2xl bg-white px-4 py-3 uppercase">
-            <span className="bg-custom-gradient-lp bg-clip-text  text-transparent">
-              Contact Us
+            <span className="bg-custom-gradient-lp bg-clip-text text-transparent">
+              Login
             </span>
           </button>
         </Link>

@@ -96,7 +96,7 @@ async function getCompletedJobs() {
   const currentMonthCompletedJobs = await db.technician.count({
     where: {
       companyId,
-      status: "Completed",
+      status: "Complete",
       createdAt: {
         gte: currentMonthStart,
         lte: currentMonthEnd,
@@ -107,7 +107,7 @@ async function getCompletedJobs() {
   const previousMonthCompletedJobs = await db.technician.count({
     where: {
       companyId,
-      status: "Completed",
+      status: "Complete",
       createdAt: {
         gte: previousMonthStart,
         lte: previousMonthEnd,
@@ -142,7 +142,7 @@ async function getRevenue() {
   });
 
   const currentMonthRevenue = currentMonthInvoices.reduce(
-    (acc, invoice) => acc + (invoice.profit || 0),
+    (acc, invoice) => acc + Number(invoice.grandTotal || 0),
     0,
   );
 
@@ -161,7 +161,7 @@ async function getRevenue() {
   });
 
   const previousMonthRevenue = previousMonthInvoices.reduce(
-    (acc, invoice) => acc + (invoice.profit || 0),
+    (acc, invoice) => acc + (Number(invoice.grandTotal) || 0),
     0,
   );
 
@@ -181,6 +181,12 @@ async function getExpectedRevenue() {
     where: {
       companyId,
       type: "Invoice",
+      column: {
+        // title not Delivered
+        title: {
+          not: "Delivered",
+        },
+      },
       createdAt: {
         gte: currentMonthStart,
         lte: currentMonthEnd,
@@ -188,8 +194,14 @@ async function getExpectedRevenue() {
     },
   });
 
+  console.log("currentMonthInvoices", currentMonthInvoices);
+
+  // const currentMonthExpectedRevenue = currentMonthInvoices.reduce(
+  //   (acc, invoice) => acc + (invoice.profit || 0),
+  //   0,
+  // );
   const currentMonthExpectedRevenue = currentMonthInvoices.reduce(
-    (acc, invoice) => acc + (invoice.profit || 0),
+    (acc, invoice) => acc + (Number(invoice.grandTotal) || 0),
     0,
   );
 
@@ -197,6 +209,11 @@ async function getExpectedRevenue() {
     where: {
       companyId,
       type: "Invoice",
+      column: {
+        title: {
+          not: "Delivered",
+        },
+      },
       createdAt: {
         gte: previousMonthStart,
         lte: previousMonthEnd,
@@ -204,8 +221,13 @@ async function getExpectedRevenue() {
     },
   });
 
+  // const previousMonthExpectedRevenue = previousMonthInvoices.reduce(
+  //   (acc, invoice) => acc + (invoice.profit || 0),
+  //   0,
+  // );
+
   const previousMonthExpectedRevenue = previousMonthInvoices.reduce(
-    (acc, invoice) => acc + (invoice.profit || 0),
+    (acc, invoice) => acc + (Number(invoice.grandTotal) || 0),
     0,
   );
 
@@ -232,7 +254,7 @@ async function getInventory() {
   });
 
   const totalInventoryValue = inventoryProducts.reduce(
-    (acc, product) => acc + Number(product.price),
+    (acc, product) => acc + Number(product.price) * (product.quantity || 0),
     0,
   );
 
@@ -267,12 +289,12 @@ async function getInventory() {
     });
 
   const currentMonthInventoryCost = currentMonthInventoryHistory.reduce(
-    (acc, history) => acc + Number(history.price),
+    (acc, history) => acc + Number(history.price || 0) * history.quantity,
     0,
   );
 
   const previousMonthInventoryCost = previousMonthInventoryHistory.reduce(
-    (acc, history) => acc + Number(history.price),
+    (acc, history) => acc + Number(history.price) * history.quantity,
     0,
   );
 

@@ -1,14 +1,14 @@
 "use client";
+import {
+  getCompanyTermsAndPolicyTax,
+  updateTaxCurrency,
+  updateTermsPolicy,
+} from "@/actions/settings/emailTemplates";
 import { SlimInput } from "@/components/SlimInput";
+import { Prisma } from "@prisma/client";
 import { Select } from "antd";
 import { useEffect, useState } from "react";
 import EmailTemplates from "./EmailTemplates";
-import {
-  updateTaxCurrency,
-  updateTermsPolicy,
-  getCompanyTermsAndPolicyTax,
-} from "@/actions/settings/emailTemplates";
-import { Prisma } from "@prisma/client";
 
 interface CurrencyData {
   Code: string;
@@ -138,7 +138,7 @@ export default function EstimateAndInvoicePage() {
               <label className="block">
                 <div className="mb-1 px-2 font-medium">Terms & Conditions</div>
                 <textarea
-                  className="h-60 w-full resize-none rounded-sm border border-primary-foreground bg-white px-2 py-0.5 text-sm leading-6 outline-none"
+                  className="h-60 w-full resize-none rounded-sm border border-primary-foreground border-slate-400 bg-white px-2 py-0.5 text-sm leading-6 outline-none"
                   name="terms"
                   value={termPolicy && termPolicy.terms ? termPolicy.terms : ""}
                   onChange={(e) =>
@@ -149,7 +149,7 @@ export default function EstimateAndInvoicePage() {
               <label className="block">
                 <div className="mb-1 px-2 font-medium">Policy</div>
                 <textarea
-                  className="h-60 w-full resize-none rounded-sm border border-primary-foreground bg-white px-2 py-0.5 text-sm leading-6 outline-none"
+                  className="h-60 w-full resize-none rounded-sm border border-primary-foreground border-slate-400 bg-white px-2 py-0.5 text-sm leading-6 outline-none"
                   name="policy"
                   value={termPolicy?.policy}
                   onChange={(e) =>

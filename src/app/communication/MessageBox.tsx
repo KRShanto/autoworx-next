@@ -185,7 +185,7 @@ export default function MessageBox({
   };
 
   const handleDownload = async (fileUrl: string | null) => {
-    const response = await fetch(`/api/download/${fileUrl}`);
+    const response = await fetch(fileUrl as string);
     const responseBlob = await response.blob();
     const blobURL = URL.createObjectURL(responseBlob);
     const link = document.createElement("a");

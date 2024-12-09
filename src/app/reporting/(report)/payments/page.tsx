@@ -10,6 +10,8 @@ import { formatDate } from "@/utils/taskAndActivity";
 import moment from "moment";
 import { Suspense } from "react";
 import FilterHeader from "./FilterHeader";
+import { auth } from "@/app/auth";
+import { AuthSession } from "@/types/auth";
 type TProps = {
   searchParams: {
     category?: string;
@@ -50,6 +52,7 @@ const filterMultipleSliders: TSliderData[] = [
 ];
 export default async function PaymentReportPage({ searchParams }: TProps) {
   const filterOR = [];
+  const session = (await auth()) as AuthSession | null;
   if (searchParams.search) {
     filterOR.push({ invoiceId: { contains: searchParams.search?.trim() } });
   } else if (searchParams.startDate && searchParams.endDate) {
@@ -76,6 +79,7 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
   const paymentInfo = await db.payment.findMany({
     where: {
       OR: filterOR.length ? filterOR : undefined,
+      companyId: session?.user?.companyId,
       invoice: {
         client: {
           OR: searchParams.search
@@ -108,7 +112,9 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
     (acc, payment) => acc + Number(payment.amount),
     0,
   );
-  const averageValue = totalAmount / paymentInfo.length;
+
+  const averageValue =
+    totalAmount && paymentInfo.length ? totalAmount / paymentInfo.length : 0;
 
   // find the outstanding payment (total due)
   const totalDue = paymentInfo.reduce(

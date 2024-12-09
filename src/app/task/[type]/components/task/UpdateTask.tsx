@@ -32,6 +32,7 @@ export default function UpdateTask() {
     task: CalendarTask;
   };
 
+
   const router = useRouter();
 
   const [showUsers, setShowUsers] = useState(false);
@@ -60,13 +61,18 @@ export default function UpdateTask() {
           priority,
           startTime: time?.startTime,
           endTime: time?.endTime,
-          date: date ? new Date(date).toISOString() : new Date().toISOString(),
+          date: moment(date).isValid()
+            ? new Date(date).toISOString()
+            : undefined,
+          // date: moment(date).isValid()
+          //   ? new Date(date).toISOString()
+          //   : new Date().toISOString(),
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         },
       });
-      router.push(
-        `/task/day?date=${date ? date : moment().format("YYYY-MM-DD")}`,
-      );
+      // router.push(
+      //   `/task/day?date=${date ? date : moment().format("YYYY-MM-DD")}`,
+      // );
       close();
     } catch (err) {
       console.error(err);

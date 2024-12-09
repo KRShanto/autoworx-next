@@ -28,8 +28,10 @@ export async function generateAuthURL() {
     access_type: "offline",
     scope: scopes,
     include_granted_scopes: true,
+    prompt: "consent",
+
     state: state,
   });
 
-  return authorizationUrl;
+  return redirect(authorizationUrl);
 }

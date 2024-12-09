@@ -1,9 +1,7 @@
-import { getLastClockBreakForUser } from "@/actions/dashboard/break";
 import { getLastClockInOutForUser } from "@/actions/dashboard/clockIn";
 import { db } from "@/lib/db";
 import getUser from "@/lib/getUser";
-import { AuthSession } from "@/types/auth";
-import { auth } from "@/app/auth";
+import { User } from "@prisma/client";
 import DashboardAdmin from ".//DashboardAdmin";
 import DashboardManager from "./DashboardManager";
 import DashboardOther from "./DashboardOther";
@@ -12,12 +10,81 @@ import DashboardTechnician from "./DashboardTechnician";
 
 export default async function Dashboard() {
   const user = await getUser();
+  let tasks;
+  if (user.employeeType == "Admin" || user.employeeType == "Manager") {
+    // tasks = await db.task.findMany({
+    //   where: {
+    //     companyId: user.companyId,
+    //   },
+    // });
+    tasks = await db.task.findMany({
+      where: {
+        companyId: user.companyId,
+        OR: [
+          {
+            taskUser: {
+              some: {
+                userId: +user.id,
+              },
+            },
+          },
+          { userId: +user.id },
+        ],
+      },
+    });
+  } else {
+    tasks = await db.task.findMany({
+      where: {
+        companyId: user.companyId,
+        OR: [
+          {
+            taskUser: {
+              some: {
+                userId: +user.id,
+              },
+            },
+          },
+          {
+            userId: +user.id,
+          },
+        ],
+      },
+    });
+  }
 
-  const tasks = await db.task.findMany({
-    where: {
-      companyId: user.companyId,
-    },
-  });
+  // Tasks with assigned users
+  // Here we will store both the task and the assigned users
+  const taskWithAssignedUsers = [];
+
+  // Loop through all the tasks
+  for (const task of tasks) {
+    let assignedUsers: User[] = [];
+
+    // Get the assigned users for the task
+    const taskUsers = (await db.taskUser.findMany({
+      where: {
+        taskId: task.id,
+      },
+    })) as any;
+
+    // Get the user details for the assigned users
+    for (const taskUser of taskUsers) {
+      const user = (await db.user.findUnique({
+        where: {
+          id: taskUser.userId,
+        },
+      })) as User;
+
+      // Add the user to the assigned users array
+      assignedUsers.push(user);
+    }
+
+    // Add the task and the assigned users to the array
+    taskWithAssignedUsers.push({
+      ...task,
+      assignedUsers,
+    });
+  }
 
   const companyUsers = await db.user.findMany({
     where: {
@@ -91,7 +158,7 @@ export default async function Dashboard() {
   if (user.employeeType === "Admin") {
     return (
       <DashboardAdmin
-        tasks={tasks}
+        tasks={taskWithAssignedUsers}
         companyUsers={companyUsers}
         appointments={calendarAppointments}
         pendingLeaveRequests={filteredLeaveRequests}
@@ -100,7 +167,7 @@ export default async function Dashboard() {
   } else if (user.employeeType === "Manager") {
     return (
       <DashboardManager
-        tasks={tasks}
+        tasks={taskWithAssignedUsers}
         companyUsers={companyUsers}
         appointments={calendarAppointments}
         pendingLeaveRequests={filteredLeaveRequests}
@@ -109,16 +176,17 @@ export default async function Dashboard() {
   } else if (user.employeeType === "Sales") {
     return (
       <DashboardSales
-        tasks={tasks}
+        tasks={taskWithAssignedUsers}
         companyUsers={companyUsers}
         appointments={calendarAppointments}
       />
     );
   } else if (user.employeeType === "Technician") {
     let lastClockInOut = await getLastClockInOutForUser();
+
     return (
       <DashboardTechnician
-        tasks={tasks}
+        tasks={taskWithAssignedUsers}
         companyUsers={companyUsers}
         appointments={calendarAppointments}
         lastClockInOut={lastClockInOut}
@@ -126,9 +194,10 @@ export default async function Dashboard() {
     );
   } else if (user.employeeType === "Other") {
     let lastClockInOut = await getLastClockInOutForUser();
+
     return (
       <DashboardOther
-        tasks={tasks}
+        tasks={taskWithAssignedUsers}
         companyUsers={companyUsers}
         appointments={calendarAppointments}
         lastClockInOut={lastClockInOut}

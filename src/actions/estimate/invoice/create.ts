@@ -107,6 +107,7 @@ export async function createInvoice({
       0,
     );
     const laborCostPrice = Number(item.labor?.charge) * item?.labor?.hours!;
+
     return acc + materialCostPrice + laborCostPrice;
   }, 0);
 

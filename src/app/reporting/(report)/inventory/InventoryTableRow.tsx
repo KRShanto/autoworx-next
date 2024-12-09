@@ -42,6 +42,12 @@ export default function InventoryTableRow({ productInfo, index }: TProps) {
     averageSales > averageCost
       ? (((averageSales - averageCost) / averageCost) * 100).toFixed(2)
       : 0;
+  let redirectUrl = "";
+  if (productInfo.type === "Product") {
+    redirectUrl = `/inventory?view=products&productId=${productInfo.id}`;
+  } else if (productInfo.type === "Supply") {
+    redirectUrl = `/inventory?view=supplies&productId=${productInfo.id}`;
+  }
   return (
     <tr
       key={productInfo.id}
@@ -51,7 +57,7 @@ export default function InventoryTableRow({ productInfo, index }: TProps) {
       )}
     >
       <td className="border-b px-4 py-2 text-center">
-        <Link className="text-blue-500" href={`/client/${productInfo.id}`}>
+        <Link className="text-blue-500" href={redirectUrl}>
           {productInfo.id}
         </Link>
       </td>
