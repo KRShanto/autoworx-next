@@ -108,7 +108,7 @@ export async function createInvoice({
     });
 
     if (column) {
-      type = column.title === "In Progress" ? "Invoice" : "Estimate";
+      type = column.title === "In Progress" ? "Invoice" : type;
     } else {
       throw new Error("Column not found to create inovice convertions");
     }

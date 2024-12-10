@@ -8,6 +8,12 @@ import WorkOrders from "../components/WorkOrders";
 
 import SessionUserType from "@/types/sessionUserType";
 import { useSearchParams } from "next/navigation";
+import { getCompanyId } from "@/lib/companyId";
+import { getLeads } from "@/actions/pipelines/getLeads";
+
+import { Lead } from "@prisma/client";
+import { SalesPipelineData, SalesLead } from "@/types/invoiceLead";
+import SalesPipeline from "../components/SalesPipeline";
 type Props = {
   searchParams?: { view?: string };
 };
@@ -26,6 +32,8 @@ const Page = (props: Props) => {
 
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
   const [currentUser, setCurrentUser] = useState<SessionUserType>();
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [pipelineData, setPipelineData] = useState<SalesPipelineData[]>([]);
 
   useEffect(() => {
     const fetchShopColumns = async () => {
@@ -48,7 +56,41 @@ const Page = (props: Props) => {
     fetchUser();
   }, []);
 
+  useEffect(() => {
+    const fetchLeads = async () => {
+      const responseLead = await getLeads();
+      setLeads(responseLead);
+    };
+
+    fetchLeads();
+  }, []);
   // console.warn(usersType);
+  console.log("leads", leads);
+
+  useEffect(() => {
+    if (leads && pipelineColumns) {
+      const transformedLeads: SalesLead[] = leads.map((lead) => ({
+        leadId: lead.id,
+        name: lead.clientName ?? "".trim(),
+        email: lead.clientEmail ?? "",
+        phone: lead.clientPhone ?? "",
+        vehicle: lead.vehicleInfo ?? "".trim(),
+        services: lead.services,
+        source: lead.source,
+        comments: lead.comments,
+        createdAt: new Date(lead.createdAt).toDateString(),
+        companyId: lead.companyId,
+      }));
+
+      const updatedPipelineData = pipelineColumns.map((column) => ({
+        id: column.id,
+        title: column.title,
+        leads: column.title === "New Leads" ? transformedLeads : [],
+      }));
+
+      setPipelineData(updatedPipelineData);
+    }
+  }, [leads, pipelineColumns]);
   const handleColumnsUpdate = async ({ columns }: { columns: Column[] }) => {
     setPipelineColumns(columns);
   };
@@ -66,7 +108,10 @@ const Page = (props: Props) => {
       />
 
       {activeView === "pipelines" ? (
-        <Pipelines pipelinesTitle={type} columns={pipelineColumns} />
+        <SalesPipeline
+          pipelinesTitle={type}
+          salesPipelineDataProp={pipelineData}
+        />
       ) : (
         <WorkOrders type={columnType} />
       )}

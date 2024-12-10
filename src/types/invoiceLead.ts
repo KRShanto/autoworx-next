@@ -15,7 +15,8 @@ export type Column = {
   title: string;
   type: string;
 };
-export interface Lead {
+export interface ShopLead {
+  
   invoiceId: string;
   name: string;
   email: string;
@@ -35,11 +36,31 @@ export interface Lead {
   assignedTo: User | Employee | null;
   columnId: number | null;
 }
+export interface SalesLead {
 
-export interface PipelineData {
+  leadId: number,
+  name: string,
+  email: string|null,
+  phone: string|null,
+  vehicle: string,
+  services: string,
+  source:string,
+  comments:string|null,
+  createdAt: string,
+  companyId: number,
+  
+}
+
+// export type Lead = ShopLead | SalesLead;
+export interface ShopPipelineData {
   id: number | null;
   title: string;
-  leads: Lead[];
+  leads: ShopLead[];
+}
+export interface SalesPipelineData {
+  id: number | null;
+  title: string;
+  leads: SalesLead[];
 }
 
 export type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
