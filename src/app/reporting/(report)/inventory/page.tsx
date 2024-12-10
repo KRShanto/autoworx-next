@@ -114,14 +114,14 @@ export default async function InventoryReportPage({ searchParams }: TProps) {
         <table className="w-full shadow-md">
           <thead className="bg-white">
             <tr className="h-10 border-b">
-              <th className="border-b px-4 py-2 text-center">Product #</th>
-              <th className="border-b px-4 py-2 text-center">Name </th>
-              <th className="border-b px-4 py-2 text-center">Average Cost</th>
-              <th className="border-b px-4 py-2 text-center">Average Sell</th>
-              <th className="border-b px-4 py-2 text-center">Stock Qty.</th>
-              <th className="border-b px-4 py-2 text-center">Qty. Sold</th>
-              <th className="border-b px-4 py-2 text-center">Type</th>
-              <th className="border-b px-4 py-2 text-center">ROI Average</th>
+              <th className="border-b px-4 py-2 text-left">Product #</th>
+              <th className="border-b px-4 py-2 text-left">Name </th>
+              <th className="border-b px-4 py-2 text-left">Average Cost</th>
+              <th className="border-b px-4 py-2 text-left">Average Sell</th>
+              <th className="border-b px-4 py-2 text-left">Stock Qty.</th>
+              <th className="border-b px-4 py-2 text-left">Qty. Sold</th>
+              <th className="border-b px-4 py-2 text-left">Type</th>
+              <th className="border-b px-4 py-2 text-left">ROI Average</th>
             </tr>
           </thead>
 
