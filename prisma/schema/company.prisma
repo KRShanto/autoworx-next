@@ -137,7 +137,9 @@ model Lead {
     createdAt   DateTime @default(now()) @map("created_at")
     updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
     company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-}
+    columnId    Int?     @map("column_id")
+    column      Column?  @relation(fields: [columnId], references: [id], onDelete: Cascade)
+}   
 
 model LeaveRequest {
     id          Int                @id @default(autoincrement())

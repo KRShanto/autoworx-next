@@ -2,23 +2,17 @@
 "use client";
 import { getEmployees } from "@/actions/employee/get";
 import { updateInvoiceStatus } from "@/actions/estimate/invoice/updateInvoiceStatus";
-import getDataForNewAppointment from "@/actions/pipelines/getDataForNewAppointment";
-import {
-  getWorkOrders,
-  updateAssignedTo,
-} from "@/actions/pipelines/getWorkOrders";
+
+import { updateAssignedTo } from "@/actions/pipelines/getWorkOrders";
 import {
   removeInvoiceTag,
   saveInvoiceTag,
 } from "@/actions/pipelines/invoiceTag";
-import { useServerGet } from "@/hooks/useServerGet";
-import SessionUserType from "@/types/sessionUserType";
+import { Column, Employee, ShopPipelineData } from "@/types/invoiceLead";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
-import { EmployeeType, Prisma, Tag, Task, User } from "@prisma/client";
-import Image from "next/image";
+import { Tag, User } from "@prisma/client";
 import Link from "next/link";
 import { SetStateAction, useEffect, useState } from "react";
-import { CiCalendar } from "react-icons/ci";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { PiWechatLogoLight } from "react-icons/pi";
 import { TbInvoice } from "react-icons/tb";
@@ -27,193 +21,35 @@ import { EmployeeTagSelector } from "./EmployeeTagSelector";
 import { NewAppointment_Pipeline } from "./NewAppointment_Pipeline";
 import ServiceSelector from "./ServiceSelector";
 import TaskForm from "./TaskForm";
-//dummy services
-
-//interfaces
-
-interface Employee {
-  id: number;
-  firstName: string;
-  lastName: string | null;
-}
-interface Lead {
-  invoiceId: string;
-  name: string;
-  email: string;
-  phone: string;
-  clientId: number | null;
-  vehicle: string;
-  vehicleId: number | null;
-  services: {
-    completed: string[];
-    incomplete: string[];
-  };
-  createdAt: string;
-  workOrderStatus?: string;
-  tags: InvoiceTag[];
-
-  tasks?: Task[];
-  assignedTo: User | Employee | null;
-  columnId: number | null;
-}
-interface InvoiceTag {
-  id: number;
-  tag: Tag;
-}
-interface PipelineData {
-  id: number | null;
-  title: string;
-  leads: Lead[];
-}
-
-type Column = {
-  id: number | null;
-  title: string;
-  type: string;
-};
 
 interface PipelinesProps {
   pipelinesTitle: string;
   columns?: Column[];
+  shopPipelineDataProp: ShopPipelineData[];
 }
 
-type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
-  include: {
-    client: true;
-    vehicle: true;
-    invoiceItems: {
-      include: {
-        service: {
-          include: {
-            Technician: true;
-          };
-        };
-      };
-    };
-    tags: {
-      select: {
-        id: true;
-        tag: true;
-      };
-    };
-    tasks: true;
-    assignedTo: true;
-    column: true;
-  };
-}>;
 export default function Pipelines({
   pipelinesTitle: pipelineType,
   columns,
+  shopPipelineDataProp,
 }: PipelinesProps) {
-  const [pipelineData, setPipelineData] = useState<PipelineData[]>([]);
-  const [invoices, setInvoices] = useState<InvoiceWithRelations[]>([]);
-
+  const [pipelineData, setPipelineData] =
+    useState<ShopPipelineData[]>(shopPipelineDataProp);
   const [companyUsers, setCompanyUsers] = useState<User[]>([]);
-  const [currentUser, setCurrentUser] = useState<SessionUserType>();
-  const servicesOfCurrentUser: any = [];
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const response = await fetch("/api/getUser");
-      if (response.ok) {
-        const data = await response.json();
-        setCurrentUser(data);
-      }
-    };
-    fetchUser();
-  }, []);
+    setPipelineData(shopPipelineDataProp);
+  }, [shopPipelineDataProp]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const fetchedInvoices = await getWorkOrders();
-        setInvoices(fetchedInvoices);
-        const fetchedCompanyUsers = await getEmployees({
-          excludeCurrentUser: true,
-        });
-        setCompanyUsers(fetchedCompanyUsers);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    if (invoices && columns) {
-      const transformedLeads: Lead[] = invoices.map((invoice) => {
-        const completedServices: string[] = [];
-        const incompleteServices: string[] = [];
-
-        invoice.invoiceItems.forEach((item) => {
-          const technicians = item.service?.Technician || [];
-
-          const statuses = technicians.map((tech) =>
-            tech.status?.toLowerCase(),
-          );
-          servicesOfCurrentUser.push(
-            ...technicians.filter(
-              (tech) => tech.userId === Number(currentUser?.id),
-            ),
-          );
-          console.log("The services of currentUser:", servicesOfCurrentUser);
-          const isServiceComplete = statuses.every(
-            (status) => status === "complete",
-          );
-
-          if (isServiceComplete) {
-            completedServices.push(item.service?.name ?? "");
-          } else {
-            incompleteServices.push(item.service?.name ?? "");
-          }
-        });
-        const columnStatusId = invoice.columnId;
-
-        return {
-          invoiceId: invoice.id,
-          name: `${invoice.client?.firstName ?? ""} ${invoice.client?.lastName ?? ""}`.trim(),
-          email: invoice.client?.email ?? "",
-          phone: invoice.client?.mobile ?? "",
-          clientId: invoice.clientId,
-          vehicle:
-            `${invoice.vehicle?.year ?? ""} ${invoice.vehicle?.make ?? ""} ${invoice.vehicle?.model ?? ""}`.trim(),
-          vehicleId: invoice.vehicleId,
-          workOrderStatus: invoice.workOrderStatus ?? "Pending",
-          services: {
-            completed: completedServices,
-            incomplete: incompleteServices,
-          },
-          tags: invoice.tags.map((tag) => ({ id: tag.id, tag: tag.tag })),
-          tasks: invoice.tasks,
-          assignedTo: invoice.assignedTo,
-          createdAt: new Date(invoice.createdAt).toDateString(),
-          columnId: columnStatusId,
-        };
+    const fetchCompanyUsers = async () => {
+      const fetchedCompanyUsers = await getEmployees({
+        excludeCurrentUser: true,
       });
-
-      let updatedPipelineData = columns.map((column) => ({
-        id: column.id,
-        title: column.title,
-        leads: transformedLeads.filter((lead) => lead.columnId === column.id),
-      }));
-
-      console.log("Current user:", currentUser);
-
-      // Only filter for technicians
-      if (currentUser?.employeeType === "Technician") {
-        updatedPipelineData = updatedPipelineData.map((column) => ({
-          ...column,
-          leads: column.leads.filter((lead) =>
-            servicesOfCurrentUser.some(
-              (service: any) => lead.invoiceId === service.invoiceId,
-            ),
-          ),
-        }));
-      }
-
-      setPipelineData(updatedPipelineData);
-    }
-  }, [invoices, columns, currentUser]);
+      setCompanyUsers(fetchedCompanyUsers);
+    };
+    fetchCompanyUsers();
+  }, []);
 
   const [selectedEmployees, setSelectedEmployees] = useState<{
     [key: string]: Employee | null;

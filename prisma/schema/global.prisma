@@ -54,4 +54,5 @@ model Column {
 
     company  Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
     invoices Invoice[]
+    lead     Lead[] 
 }
