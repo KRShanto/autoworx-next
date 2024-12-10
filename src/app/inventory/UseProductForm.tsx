@@ -64,7 +64,7 @@ export default function UseProductForm({
         </button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-full w-[30rem] max-w-xl" form>
+      <DialogContent className="max-h-full w-[96%] max-w-xl md:w-[30rem]" form>
         <DialogHeader>
           <DialogTitle>
             {productType === "Product" ? "Loss" : "Use"} Product

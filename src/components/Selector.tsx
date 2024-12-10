@@ -127,7 +127,7 @@ export default function Selector<T>({
         <DropdownMenuContent
           align="start"
           sideOffset={-40}
-          className="z-50 w-full rounded-lg border-2 border-slate-400 bg-white"
+          className="z-50 w-[300px] rounded-lg border-2 border-slate-400 bg-white md:w-full"
           style={{
             minWidth: "var(--radix-popper-anchor-width)",
             // maxWidth: "var(--radix-popper-anchor-width)",

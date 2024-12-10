@@ -116,7 +116,7 @@ export default function EditProduct({ productData }: TProps) {
           <CiEdit />
         </DialogTrigger>
         <DialogContent
-          className="max-h-full max-w-xl grid-rows-[auto,1fr,auto]"
+          className="max-h-[80%] w-[96%] max-w-xl grid-rows-[auto,1fr,auto]"
           form
         >
           <DialogHeader>
@@ -130,7 +130,7 @@ export default function EditProduct({ productData }: TProps) {
 
           <FormError />
 
-          <div className="grid grid-cols-2 gap-5 overflow-y-auto">
+          <div className="grid-cols-2 gap-5 overflow-y-auto md:grid">
             <div>
               <SelectCategory
                 categoryData={category}
@@ -197,7 +197,7 @@ export default function EditProduct({ productData }: TProps) {
                 onChange={handleChange}
                 name="description"
                 required={false}
-                className="h-28 w-[95%] rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6 border-slate-400"
+                className="h-28 w-[95%] rounded-sm border border-primary-foreground border-slate-400 bg-white px-2 py-0.5 leading-6"
                 value={product.description as string}
               />
 
@@ -229,7 +229,7 @@ export default function EditProduct({ productData }: TProps) {
               </div>
             </div>
 
-            <div className="col-span-3 mt-5 flex w-[90%] gap-5">
+            <div className="col-span-3 mt-5 flex w-[90%] flex-wrap gap-5 md:flex-nowrap">
               <SlimInput
                 onChange={handleChange}
                 value={product.price as number}
@@ -260,7 +260,7 @@ export default function EditProduct({ productData }: TProps) {
                 required={false}
               />
             </div>
-            <div className="rounded-md bg-[#6571FF5E] p-2">
+            <div className="mt-5 rounded-md bg-[#6571FF5E] p-2 md:mt-0">
               <p className="font-semibold">Quantity for Low Inventory</p>
               <i className="text-xs">(Leave blank to disable notifications)</i>
               <SlimInput

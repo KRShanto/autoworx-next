@@ -102,13 +102,11 @@ export default async function WorkforceReportPage({ searchParams }: TProps) {
         <table className="w-full shadow-md">
           <thead className="bg-white">
             <tr className="h-10 border-b">
-              <th className="border-b px-4 py-2 text-center">Employee</th>
-              <th className="border-b px-4 py-2 text-center">Employee Type </th>
-              <th className="border-b px-4 py-2 text-center">Total Payout</th>
-              <th className="border-b px-4 py-2 text-center">Attendance</th>
-              <th className="border-b px-4 py-2 text-center">
-                # Jobs Completed
-              </th>
+              <th className="border-b px-4 py-2 text-left">Employee</th>
+              <th className="border-b px-4 py-2 text-left">Employee Type </th>
+              <th className="border-b px-4 py-2 text-left">Total Payout</th>
+              <th className="border-b px-4 py-2 text-left">Attendance</th>
+              <th className="border-b px-4 py-2 text-left"># Jobs Completed</th>
             </tr>
           </thead>
 
@@ -144,16 +142,16 @@ export default async function WorkforceReportPage({ searchParams }: TProps) {
                     index % 2 === 0 ? "bg-white" : "bg-blue-100",
                   )}
                 >
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     {employee.firstName} {employee.lastName}
                   </td>
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     {employee.employeeType}
                   </td>
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     ${totalPayout}
                   </td>
-                  <td className="border-b px-4 py-2 text-center"></td>
+                  <td className="border-b px-4 py-2 text-left"></td>
                   <td className={cn("border-b px-4 py-2 text-center")}>
                     {jobsCompleted}
                   </td>

@@ -56,20 +56,20 @@ export default function InventoryTableRow({ productInfo, index }: TProps) {
         index % 2 === 0 ? "bg-white" : "bg-blue-100",
       )}
     >
-      <td className="border-b px-4 py-2 text-center">
+      <td className="border-b px-4 py-2 text-left">
         <Link className="text-blue-500" href={redirectUrl}>
           {productInfo.id}
         </Link>
       </td>
-      <td className="border-b px-4 py-2 text-center">{productInfo.name}</td>
-      <td className="border-b px-4 py-2 text-center">{averageCost}</td>
-      <td className="border-b px-4 py-2 text-center">
+      <td className="border-b px-4 py-2 text-left">{productInfo.name}</td>
+      <td className="border-b px-4 py-2 text-left">{averageCost}</td>
+      <td className="border-b px-4 py-2 text-left">
         {averageSales.toFixed()}
       </td>
-      <td className="border-b px-4 py-2 text-center">{productInfo.quantity}</td>
-      <td className="border-b px-4 py-2 text-center">{quantitySold}</td>
-      <td className="border-b px-4 py-2 text-center">{productInfo.type}</td>
-      <td className="border-b px-4 py-2 text-center">{ReturnAndInvestment}%</td>
+      <td className="border-b px-4 py-2 text-left">{productInfo.quantity}</td>
+      <td className="border-b px-4 py-2 text-left">{quantitySold}</td>
+      <td className="border-b px-4 py-2 text-left">{productInfo.type}</td>
+      <td className="border-b px-4 py-2 text-left">{ReturnAndInvestment}%</td>
     </tr>
   );
 }

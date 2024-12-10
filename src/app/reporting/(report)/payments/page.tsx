@@ -140,13 +140,13 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
         <table className="w-full shadow-md">
           <thead className="bg-white">
             <tr className="h-10 border-b">
-              <th className="border-b px-4 py-2 text-center">Date</th>
-              <th className="border-b px-4 py-2 text-center">Invoice # </th>
-              <th className="border-b px-4 py-2 text-center">Client Name</th>
-              <th className="border-b px-4 py-2 text-center">Vehicle Info</th>
-              <th className="border-b px-4 py-2 text-center">Payment Method</th>
-              <th className="border-b px-4 py-2 text-center">Total Amount</th>
-              <th className="border-b px-4 py-2 text-center">Status</th>
+              <th className="border-b px-4 py-2 text-left">Date</th>
+              <th className="border-b px-4 py-2 text-left">Invoice # </th>
+              <th className="border-b px-4 py-2 text-left">Client Name</th>
+              <th className="border-b px-4 py-2 text-left">Vehicle Info</th>
+              <th className="border-b px-4 py-2 text-left">Payment Method</th>
+              <th className="border-b px-4 py-2 text-left">Total Amount</th>
+              <th className="border-b px-4 py-2 text-left">Status</th>
             </tr>
           </thead>
 
@@ -162,30 +162,30 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
                     index % 2 === 0 ? "bg-white" : "bg-blue-100",
                   )}
                 >
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     {payment?.date && formatDate(payment.date)}
                   </td>
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     {payment.invoiceId}
                   </td>
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     {payment.invoice?.client?.firstName}{" "}
                     {payment.invoice?.client?.lastName}
                   </td>
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     {payment.invoice?.vehicle?.year} -{" "}
                     {payment.invoice?.vehicle?.make} -{" "}
                     {payment.invoice?.vehicle?.model}
                   </td>
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     {payment.type}
                   </td>
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     {Number(payment.amount)}
                   </td>
                   <td
                     className={cn(
-                      `border-b px-4 py-2 text-center`,
+                      `border-b px-4 py-2 text-left`,
                       paymentStatus === "due" && "text-red-500",
                       paymentStatus === "paid" && "text-green-500",
                     )}

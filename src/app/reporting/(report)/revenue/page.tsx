@@ -314,13 +314,13 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
         <table className="w-full shadow-md">
           <thead className="bg-white">
             <tr className="h-10 border-b">
-              <th className="border-b px-4 py-2 text-center">Customer</th>
-              <th className="border-b px-4 py-2 text-center">Vehicle Info </th>
-              <th className="border-b px-4 py-2 text-center">Invoice #</th>
-              <th className="border-b px-4 py-2 text-center">Date Delivered</th>
-              <th className="border-b px-4 py-2 text-center">Price</th>
-              <th className="border-b px-4 py-2 text-center">Cost</th>
-              <th className="border-b px-4 py-2 text-center">Profit</th>
+              <th className="border-b px-4 py-2 text-left">Customer</th>
+              <th className="border-b px-4 py-2 text-left">Vehicle Info </th>
+              <th className="border-b px-4 py-2 text-left">Invoice #</th>
+              <th className="border-b px-4 py-2 text-left">Date Delivered</th>
+              <th className="border-b px-4 py-2 text-left">Price</th>
+              <th className="border-b px-4 py-2 text-left">Cost</th>
+              <th className="border-b px-4 py-2 text-left">Profit</th>
             </tr>
           </thead>
 
