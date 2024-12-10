@@ -134,7 +134,7 @@ export default function Layout({
       <div className="sm:ml-[5%]">
         <TopNavbar />
         <PopupState />
-        <main className="relative h-[93vh] overflow-y-auto bg-[#F8F9FA] sm:p-2 sm:px-4">
+        <main className="relative overflow-y-auto bg-[#F8F9FA] sm:p-2 sm:px-4 md:h-[93vh]">
           <PrivateRoute session={session}>{children}</PrivateRoute>
         </main>
       </div>

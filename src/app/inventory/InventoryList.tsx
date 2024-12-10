@@ -32,7 +32,7 @@ export default function InventoryList({
   return (
     <Tabs
       value={view}
-      className="col-start-1 mt-3 flex h-[93%] min-h-0 w-1/2 flex-col overflow-clip text-xs 2xl:text-base"
+      className="col-start-1 mt-3 flex h-[93%] min-h-0 w-full flex-col overflow-clip text-xs md:w-1/2 2xl:text-base"
     >
       <TabsList>
         {/* TODO: comment this for now. */}

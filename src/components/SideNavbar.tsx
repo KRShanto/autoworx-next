@@ -39,7 +39,7 @@ export default function SideNavbar({ navList }: TProps) {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <nav className="fixed z-10 hidden h-screen w-[5%] flex-col items-center gap-8 overflow-y-auto bg-[#0C1427] px-2 py-12 sm:flex">
+      <nav className="fixed z-10 hidden h-screen flex-col items-center gap-8 overflow-y-auto bg-[#0C1427] px-2 py-12 sm:flex lg:w-[5%]">
         {/* logo */}
         <Link href="/">
           <Image
