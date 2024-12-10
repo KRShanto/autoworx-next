@@ -62,7 +62,11 @@ const Page = (props: Props) => {
       setLeads(responseLead);
     };
 
-    fetchLeads();
+    fetchLeads(); // initial fetch
+
+    const intervalId = setInterval(fetchLeads, 3000);
+
+    return () => clearInterval(intervalId);
   }, []);
   // console.warn(usersType);
   console.log("leads", leads);
