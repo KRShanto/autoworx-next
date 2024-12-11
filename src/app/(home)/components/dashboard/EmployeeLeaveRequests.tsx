@@ -13,24 +13,25 @@ const EmployeeLeaveRequests = ({
   fullHeight?: boolean;
 }) => {
   return (
-    <div
-      className={`flex flex-col rounded-md p-6 shadow-lg ${fullHeight ? "h-[82vh]" : "h-[35vh]"}`}
-    >
-      <div className="mb-8 flex items-center justify-between">
-        <span className="text-xl font-bold">Employee Leave Request</span>
-        <EmployeeLeaveRequestsModal
-          pendingLeaveRequests={pendingLeaveRequests}
-        />
-      </div>
-      <div className="custom-scrollbar flex flex-1 flex-col space-y-4">
-        {pendingLeaveRequests.map((leaveRequest, idx) => (
-          <EmployeeLeaveRequest key={idx} leaveRequest={leaveRequest} />
-        ))}
-        {pendingLeaveRequests.length === 0 && (
-          <div className="flex flex-1 items-center justify-center self-center text-center">
-            <span>No Employee Leave Requests</span>
-          </div>
-        )}
+    <div className="h-full flex-1 overflow-y-auto shadow-md">
+      {" "}
+      <div className={`flex h-full flex-col rounded-md p-6 shadow-lg`}>
+        <div className="mb-8 flex items-center justify-between">
+          <span className="text-xl font-bold">Employee Leave Request</span>
+          <EmployeeLeaveRequestsModal
+            pendingLeaveRequests={pendingLeaveRequests}
+          />
+        </div>
+        <div className="custom-scrollbar flex flex-1 flex-col space-y-4">
+          {pendingLeaveRequests.map((leaveRequest, idx) => (
+            <EmployeeLeaveRequest key={idx} leaveRequest={leaveRequest} />
+          ))}
+          {pendingLeaveRequests.length === 0 && (
+            <div className="flex flex-1 items-center justify-center self-center text-center">
+              <span>No Employee Leave Requests</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
