@@ -25,8 +25,7 @@ export async function POST(request: NextRequest) {
 
     console.log("Body: ", body);
 
-    const clientFirstName = body.first_name;
-    const clientLastName = body.last_name;
+    const clientName = body.name;
     const clientEmail = body.email;
     const clientPhone = body.phone;
     const customerCountry = body.customer_country;
@@ -38,7 +37,7 @@ export async function POST(request: NextRequest) {
     const vehicleInfo = oppurtunity.split(")")[1].split("|")[0].trim();
     const services = oppurtunity.split(")")[1].split("|")[1].trim();
 
-    console.log("clientName", clientFirstName + " " + clientLastName);
+    console.log("clientName", clientName);
     console.log("clientEmail", clientEmail);
     console.log("clientPhone", clientPhone);
     console.log("vehicleInfo", vehicleInfo);
@@ -47,14 +46,14 @@ export async function POST(request: NextRequest) {
     console.log("oppurtunity", oppurtunity);
 
     // check if the required fields are provided
-    if (!clientFirstName || !vehicleInfo || !services || !source) {
+    if (!clientName || !vehicleInfo || !services || !source) {
       return Response.json({ error: "Invalid input" }, { status: 400 });
     }
 
     // Save the leads
     const newLead = await db.lead.create({
       data: {
-        clientName: clientFirstName + " " + clientLastName,
+        clientName,
         clientEmail,
         clientPhone,
         vehicleInfo,
@@ -68,8 +67,7 @@ export async function POST(request: NextRequest) {
     return Response.json(
       {
         id: newLead.id,
-        first_name: clientFirstName,
-        last_name: clientLastName,
+        name: clientName,
         email: clientEmail,
         phone: clientPhone,
         customer_country: customerCountry,

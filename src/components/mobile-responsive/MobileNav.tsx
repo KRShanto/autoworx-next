@@ -3,8 +3,11 @@ import { cn } from "@/lib/cn";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { HiOutlineBars3 } from "react-icons/hi2";
+import { HiOutlineBars3, HiXCircle } from "react-icons/hi2";
 import MobileNavList from "./MobileNavList";
+import { useRouter } from "next/navigation";
+import { env } from "next-runtime-env";
+import { signOut } from "next-auth/react";
 
 type TProps = {
   navList: {
@@ -22,6 +25,7 @@ type TProps = {
 
 export default function MobileNav({ navList }: TProps) {
   const [openNav, setOpenNav] = useState(false);
+  const router = useRouter();
   return (
     <div className="sm:hidden">
       <div className="flex h-[46px] items-center bg-[#0C1427] p-1.5">
@@ -51,7 +55,7 @@ export default function MobileNav({ navList }: TProps) {
         style={{ zIndex: 999 }}
       >
         {openNav && (
-          <div className="p-5">
+          <div className="flex flex-col p-5">
             <div className="flex justify-center">
               <Image
                 src={"/icons/navbar/mobile-nav-logo.svg"}
@@ -59,6 +63,12 @@ export default function MobileNav({ navList }: TProps) {
                 width={275}
                 height={275}
               />
+              <button
+                onClick={() => setOpenNav(false)}
+                className="absolute right-5 top-5 text-2xl text-white hover:text-gray-400"
+              >
+                <HiXCircle size={30} />
+              </button>
             </div>
             <ul className="mt-10 flex flex-col items-center justify-center gap-y-8">
               {navList.map((item, index) => {
@@ -71,6 +81,22 @@ export default function MobileNav({ navList }: TProps) {
                 );
               })}
             </ul>
+            <button
+              className="mx-auto mt-20 w-[120px] rounded-full border-2 py-2 text-xl text-white"
+              onClick={() => {
+                signOut({
+                  redirect: false,
+                });
+                router.push(
+                  env("NEXT_PUBLIC_APP_URL")
+                    ? env("NEXT_PUBLIC_APP_URL") + "/login"
+                    : "https://autoworx.link/login",
+                );
+                setOpenNav(false);
+              }}
+            >
+              Log Out
+            </button>
           </div>
         )}
       </div>
