@@ -511,10 +511,10 @@ export default function Pipelines({
                                     </span>
                                   </Link>
                                   <Link
-                                    href={`/estimate/view/${lead.invoiceId}`}
+                                    href={`/estimate/workorder/${lead.invoiceId}`}
                                     className="group relative"
                                   >
-                                    <TbInvoice size={18} />
+                                    <TbInvoice size={18} color="#94a3b8 " />
                                     <span className="invisible absolute bottom-full left-14 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
                                       View Work Order
                                     </span>
