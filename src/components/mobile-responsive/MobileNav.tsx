@@ -62,6 +62,7 @@ export default function MobileNav({ navList }: TProps) {
                 alt={"company logo"}
                 width={275}
                 height={275}
+                className="mt-7"
               />
               <button
                 onClick={() => setOpenNav(false)}

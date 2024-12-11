@@ -57,7 +57,7 @@ export default function SelectCategory({
   return (
     <div
       className={cn({
-        "flex items-center gap-2": labelPosition === "left",
+        "flex w-full items-center gap-2": labelPosition === "left",
       })}
     >
       {labelPosition !== "none" && (

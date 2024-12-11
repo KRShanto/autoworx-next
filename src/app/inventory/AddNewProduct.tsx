@@ -80,7 +80,7 @@ export default function AddNewProduct() {
           </button>
         </DialogTrigger>
         <DialogContent
-          className="max-h-full max-w-xl grid-rows-[auto,1fr,auto]"
+          className="max-h-[80%] max-w-[96%] grid-rows-[auto,1fr,auto] md:max-w-xl"
           form
         >
           <DialogHeader>
@@ -89,7 +89,7 @@ export default function AddNewProduct() {
 
           <FormError />
 
-          <div className="grid grid-cols-2 gap-5 overflow-y-auto">
+          <div className="grid-cols-2 gap-5 overflow-y-auto md:grid">
             <div>
               <SelectCategory
                 onCategoryChange={setCategory}
@@ -172,7 +172,7 @@ export default function AddNewProduct() {
                 </div>
               </div>
             </div>
-            <div className="col-span-3 mt-5 flex w-[90%] gap-5">
+            <div className="col-span-3 mt-5 flex w-[90%] flex-wrap gap-5 md:flex-nowrap">
               <SlimInput name="quantity" type="number" required={false} />
 
               <div>
@@ -196,7 +196,7 @@ export default function AddNewProduct() {
             <div>
               <SlimInput name="receipt" label="Receipt#" required={false} />
             </div>
-            <div className="rounded-md bg-[#6571FF5E] p-2">
+            <div className="mt-5 rounded-md bg-[#6571FF5E] p-2 md:mt-0">
               <p className="font-semibold">Quantity for Low Inventory</p>
               <i className="text-xs">(Leave blank to disable notifications)</i>
               <SlimInput

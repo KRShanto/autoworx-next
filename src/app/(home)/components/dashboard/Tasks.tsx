@@ -18,27 +18,29 @@ const Tasks = ({
   fullHeight?: boolean;
 }) => {
   return (
-    <div
-      className={`flex flex-col rounded-md p-6 shadow-lg ${fullHeight ? "h-[82vh]" : "h-[38vh]"}`}
-    >
-      <div className="mb-8 flex items-center justify-between">
-        <span className="text-xl font-bold">Task List</span>{" "}
-        <Link href="/task/day">
-          <FaExternalLinkAlt />
-        </Link>
-      </div>
-      <div className="custom-scrollbar my-2 flex flex-1 flex-col space-y-2 overflow-x-hidden">
-        {tasks.map((task, idx) => (
-          <Task key={idx} task={task} companyUsers={companyUsers} />
-        ))}
-        {tasks.length === 0 && (
-          <div className="flex flex-1 items-center justify-center self-center text-center">
-            <span>You have no upcoming tasks</span>
-          </div>
-        )}
-      </div>
-      <div className="mt-auto w-20 rounded-full">
-        <NewTask companyUsers={companyUsers} />
+    <div className="h-full flex-1 overflow-y-auto shadow-md">
+      <div
+        className={`flex h-full flex-col overflow-y-auto rounded-md p-6 shadow-lg`}
+      >
+        <div className="mb-8 flex items-center justify-between">
+          <span className="text-xl font-bold">Task List</span>{" "}
+          <Link href="/task/day">
+            <FaExternalLinkAlt />
+          </Link>
+        </div>
+        <div className="custom-scrollbar my-2 flex flex-1 flex-col space-y-2 overflow-x-hidden">
+          {tasks.map((task, idx) => (
+            <Task key={idx} task={task} companyUsers={companyUsers} />
+          ))}
+          {tasks.length === 0 && (
+            <div className="flex flex-1 items-center justify-center self-center text-center">
+              <span>You have no upcoming tasks</span>
+            </div>
+          )}
+        </div>
+        <div className="mt-auto w-20 rounded-full">
+          <NewTask companyUsers={companyUsers} />
+        </div>
       </div>
     </div>
   );

@@ -6,7 +6,10 @@ type TProps = {
   setPhotos: React.Dispatch<React.SetStateAction<File[]>>;
 };
 
-export default function InvoiceEstimateAttachment({photos, setPhotos}: TProps) {
+export default function InvoiceEstimateAttachment({
+  photos,
+  setPhotos,
+}: TProps) {
   return (
     <div className="relative flex w-full snap-x gap-6 overflow-x-auto py-2">
       <label className="grid aspect-square h-32 w-32 shrink-0 cursor-pointer snap-center content-center justify-items-center gap-2 rounded-md bg-gray-200 p-2 text-center">
@@ -14,10 +17,11 @@ export default function InvoiceEstimateAttachment({photos, setPhotos}: TProps) {
           type="file"
           hidden
           accept="image/*,video/*"
+          multiple
           onChange={(event) => {
-            const file = event.currentTarget.files?.[0];
-            if (!file) return;
-            setPhotos((prevPhotos) => [...prevPhotos, file]);
+            const files = event.currentTarget.files;
+            if (!files?.length) return;
+            setPhotos((prevPhotos) => [...prevPhotos, ...Array.from(files)]);
           }}
         />
         <svg

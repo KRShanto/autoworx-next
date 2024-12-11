@@ -74,7 +74,7 @@ const DashboardTechnician = ({
   return (
     <div className="flex h-full flex-col gap-x-4 gap-y-8 lg:flex-row lg:items-start">
       {/* col 1 */}
-      <div className="h-full space-y-4 lg:w-[30%]">
+      <div className="flex h-full flex-col justify-around space-y-4 lg:w-[30%]">
         {/* Current Projects */}
         <CurrentProjects projects={dashboardInfo?.currentProjects || []} />
       </div>
@@ -194,11 +194,11 @@ const DashboardTechnician = ({
           </div>
         </div>
 
-        <div className="#grid #grid-cols-2 flex h-[75%]">
+        <div className="#grid #grid-cols-2 flex h-[78%] gap-x-2">
           {/* <!--col 1 --> */}
           <div className="flex h-full w-1/2 flex-col justify-around">
             {/* Performance */}
-            <div className="rounded-md p-4 shadow-lg 2xl:px-6">
+            <div className="flex-1 rounded-md p-4 shadow-lg 2xl:px-6">
               <div className="mb-8 flex items-center justify-between">
                 <span className="text-xl font-bold">Performance</span>{" "}
                 <span>
@@ -244,7 +244,7 @@ const DashboardTechnician = ({
                 />
               </div>
             </div>
-            <div className="rounded-md p-4 shadow-lg xl:p-6">
+            <div className="flex-1 rounded-md p-4 shadow-lg xl:p-6">
               <div className="mb-8 flex items-center justify-between">
                 <span className="text-xl font-bold">Monthly Payout</span>{" "}
                 <Link href="/reporting/workforce">
@@ -269,10 +269,10 @@ const DashboardTechnician = ({
             </div>
           </div>
           {/* col 2 */}
-          <div className="h-full w-1/2">
+          <div className="flex h-full w-1/2 flex-col justify-around space-y-3">
             {" "}
             {/* recent messages */}
-            <RecentMessages fullHeight={true} messages={messages || []} />
+            <RecentMessages messages={messages || []} />
           </div>
         </div>
       </div>

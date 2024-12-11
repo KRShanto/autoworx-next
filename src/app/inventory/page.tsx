@@ -49,13 +49,13 @@ export default async function Page({
     <div className="h-full w-full">
       <SyncLists categories={categories} vendors={vendors} />
 
-      <header className="flex justify-between">
+      <header className="flex justify-between p-3 md:p-0">
         <Title>Inventory</Title>
         {(user?.employeeType === "Admin" ||
           user?.employeeType === "Manager") && <AddNewProduct />}
       </header>
 
-      <div className="flex h-full w-full justify-between gap-3">
+      <div className="flex h-full w-full flex-col justify-between gap-3 md:flex-wrap">
         <InventoryList
           products={products}
           supplies={supplies}
