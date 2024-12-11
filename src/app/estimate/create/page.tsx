@@ -97,6 +97,8 @@ export default async function Page({
       .map((laborTag) => laborTag.tag);
   });
 
+  
+
   return (
     <div className="-my-2 min-h-[93vh] gap-3 space-y-4 overflow-clip py-2 lg:grid lg:grid-cols-[1fr,24rem] lg:grid-rows-[auto,auto,1fr] lg:space-y-0">
       <Title>Estimate</Title>

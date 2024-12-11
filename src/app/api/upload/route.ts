@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 // import { pipeline } from "stream";
 // import { promisify } from "util";
 // import { nanoid } from "nanoid";
-import path from "path";
+
 // import { isImageFile } from "@/utils/isImageFile";
 import { getSignedURL } from "@/actions/s3/signedURL";
 import { deleteObject } from "@/actions/s3/deleteObject";
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const fileNames = [];
 
     // Ensure the uploads directory exists
-    const uploadsDir = path.join(process.cwd(), "images/uploads/");
+    // const uploadsDir = path.join(process.cwd(), "images/uploads/");
     // if (!fs.existsSync(uploadsDir)) {
     //   fs.mkdirSync(uploadsDir, { recursive: true });
     // }
@@ -46,10 +46,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         body: file,
       });
       if (upload.ok) {
-        console.log("File uploaded successfully");
-        console.log({ url });
         const uploadedUrl = url.split("?")[0];
-        console.log(`You can access the file at: ${uploadedUrl}`);
         fileNames.push(uploadedUrl);
       } else {
         console.error("Upload failed.");
