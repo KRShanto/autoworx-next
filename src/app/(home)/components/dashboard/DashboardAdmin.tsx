@@ -28,7 +28,7 @@ const Dashboard = ({
       {/* col 1 */}
       <div className="flex h-full w-full flex-col justify-around space-y-4 lg:w-[23%]">
         {/* sales pipeline */}
-        <div className="rounded-md p-4 shadow-lg 2xl:px-6">
+        <div className="flex-1 rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
             <span className="text-xl font-bold">Sales Pipeline</span>{" "}
             <Link href="/pipeline/sales?view=pipelines">
@@ -60,7 +60,7 @@ const Dashboard = ({
           </div>
         </div>
         {/* Shop pipeline */}
-        <div className="rounded-md p-4 shadow-lg 2xl:px-6">
+        <div className="flex-1 rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
             <span className="text-xl font-bold">Shop Pipeline</span>{" "}
             <Link href="/pipeline/shop?view=pipelines">
@@ -91,7 +91,7 @@ const Dashboard = ({
       {/* col 2 */}
       <div className="flex h-full w-full flex-col justify-around space-y-4 lg:w-[23%]">
         {/* Revenue */}
-        <div className="rounded-md p-4 shadow-lg 2xl:px-6">
+        <div className="flex-1 rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
             <span className="text-xl font-bold">Revenue</span>{" "}
             <Link href="/reporting/revenue">
@@ -116,7 +116,7 @@ const Dashboard = ({
           </div>
         </div>
         {/* Inventory */}
-        <div className="rounded-md p-4 shadow-lg 2xl:px-6">
+        <div className="flex-1 rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
             <span className="text-xl font-bold">Inventory</span>{" "}
             <Link href="/reporting/inventory">
@@ -140,7 +140,7 @@ const Dashboard = ({
           </div>
         </div>
         {/* Employee Payout */}
-        <div className="rounded-md p-4 shadow-lg 2xl:px-6">
+        <div className="flex-1 rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
             <span className="text-xl font-bold">Employee Payout</span>{" "}
             <Link href="/reporting/workforce">
@@ -160,15 +160,16 @@ const Dashboard = ({
       </div>
 
       {/* col 3 */}
-      <div className="w-full space-y-4 lg:w-[23%]">
+      <div className="flex h-full w-full flex-col space-y-4 lg:w-[23%]">
         {/* appointments */}
-        <Appointments appointments={appointments} fullHeight />
+        <div className="#h-full flex-1">
+          {" "}
+          <Appointments appointments={appointments} fullHeight />
+        </div>
       </div>
       {/* col 4*/}
-      <div className="w-full space-y-4 lg:w-[30%]">
-        {/* task list */}
+      <div className="flex h-full w-full flex-1 flex-col space-y-4 lg:w-[30%]">
         <Tasks tasks={tasks} companyUsers={companyUsers} />
-        {/* employee leave request */}
         <EmployeeLeaveRequests pendingLeaveRequests={pendingLeaveRequests} />
       </div>
     </div>

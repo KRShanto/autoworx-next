@@ -15,9 +15,7 @@ const RecentMessages = ({
 }) => {
   const { data: user } = useServerGet(getUser);
   return (
-    <div
-      className={`flex ${fullHeight ? "h-full" : "h-[82vh]"} flex-col rounded-md p-6 shadow-lg`}
-    >
+    <div className={`flex flex-1 flex-col rounded-md p-6 shadow-lg`}>
       <div className="mb-4 flex h-[5%] items-center justify-between">
         <span className="text-xl font-bold">Recent Messages</span>{" "}
         <Link href="/communication/internal">

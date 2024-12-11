@@ -30,7 +30,7 @@ const DashboardManager = ({
       {/* col 1 */}
       <div className="order-1 flex h-full flex-col justify-around space-y-3 lg:w-[20%]">
         {/* sales pipeline */}
-        <div className="rounded-md p-4 shadow-lg 2xl:px-6">
+        <div className="flex-1 rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
             <span className="text-xl font-bold">Sales Pipeline</span>{" "}
             <Link href="/pipeline/sales?view=pipelines">
@@ -62,7 +62,7 @@ const DashboardManager = ({
           </div>
         </div>
         {/* Shop pipeline */}
-        <div className="rounded-md p-4 shadow-lg 2xl:px-6">
+        <div className="flex-1 rounded-md p-4 shadow-lg 2xl:px-6">
           <div className="mb-8 flex items-center justify-between">
             <span className="text-xl font-bold">Shop Pipeline</span>{" "}
             <Link href="/pipeline/shop?view=pipelines">
@@ -93,13 +93,13 @@ const DashboardManager = ({
         </div>
       </div>
       {/* col 2 */}
-      <div className="order-4 space-y-3 lg:order-2 lg:w-[20%]">
+      <div className="order-4 flex h-full flex-col justify-around space-y-3 lg:order-2 lg:w-[20%]">
         {/* task list */}
-        <Tasks tasks={tasks} companyUsers={companyUsers} fullHeight />
+        <Tasks tasks={tasks} companyUsers={companyUsers} />
       </div>
 
       {/* col 3 */}
-      <div className="order-3 space-y-4 lg:w-[20%]">
+      <div className="order-3 flex h-full flex-col justify-around space-y-3 lg:w-[20%]">
         {/* appointments */}
         <Appointments appointments={appointments} fullHeight />
       </div>
