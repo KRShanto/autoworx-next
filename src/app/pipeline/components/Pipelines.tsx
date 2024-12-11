@@ -21,6 +21,7 @@ import { EmployeeTagSelector } from "./EmployeeTagSelector";
 import { NewAppointment_Pipeline } from "./NewAppointment_Pipeline";
 import ServiceSelector from "./ServiceSelector";
 import TaskForm from "./TaskForm";
+import toast from "react-hot-toast";
 
 interface PipelinesProps {
   pipelinesTitle: string;
@@ -266,6 +267,17 @@ export default function Pipelines({
     const destinationItems = [...destinationColumn.leads];
 
     const [removed] = sourceItems.splice(source.index, 1);
+
+    //check before moving to delivered if due balance is zero or not
+    if (destinationColumn.title === "Delivered") {
+      if (removed.dueBalance !== 0) {
+        toast.error("Please clear due balance before moving to delivered.");
+        // Revert the item back to its original position
+        sourceItems.splice(source.index, 0, removed);
+        return;
+      }
+    }
+
     destinationItems.splice(destination.index, 0, removed);
 
     const updatedData = pipelineData.map((column, index) => {

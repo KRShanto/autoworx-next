@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import ManagePipelines from "./ManagePipelines";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { EmployeeType } from "@prisma/client";
 import SessionUserType from "@/types/sessionUserType";
 interface UserTypes {
@@ -41,6 +41,7 @@ export default function Header({
   ...restProps
 }: Readonly<HeaderProps>) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const [isPipelineManaged, setPipelineManaged] = useState(false);
 
@@ -67,7 +68,9 @@ export default function Header({
             onClick={() => onToggleView("workOrders")}
             className={`mr-2 rounded border px-4 py-2 ${activeView === "workOrders" ? "bg-[#6571FF] text-white" : "border-[#6571FF] bg-white text-[#6571FF]"}`}
           >
-            Work Orders
+            {/* Work Orders */}
+
+            {pathname.includes("/sales") ? "Leads" : "Work Orders"}
           </button>
           <button
             onClick={() => onToggleView("pipelines")}

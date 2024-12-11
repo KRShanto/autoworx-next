@@ -6,6 +6,7 @@ import { IoAddCircleOutline } from "react-icons/io5";
 import { PiWechatLogoLight } from "react-icons/pi";
 import { TbInvoice } from "react-icons/tb";
 import { NewAppointment_Pipeline } from "./NewAppointment_Pipeline";
+import { CiCalendar } from "react-icons/ci";
 
 interface SalesPipelineProps {
   pipelinesTitle: string;
@@ -75,29 +76,25 @@ export default function SalesPipeline({
 
                             <div className="flex justify-between">
                               <div className="flex items-center gap-2">
-                                <Link
-                                  href={`/communication/client?clientId=${lead.leadId}`}
-                                  className="group relative"
-                                >
+                                <Link href="#" className="group relative">
                                   <PiWechatLogoLight size={18} />
                                   <span className="invisible absolute bottom-full left-14 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
                                     Communications
                                   </span>
                                 </Link>
-                                <Link
-                                  href={`/estimate/view/${lead.leadId}`}
-                                  className="group relative"
-                                >
+                                <Link href="#" className="group relative">
                                   <TbInvoice size={18} color="#94a3b8 " />
                                   <span className="invisible absolute bottom-full left-14 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
                                     View Work Order
                                   </span>
                                 </Link>
                                 {lead?.leadId && lead?.vehicle && (
-                                  <NewAppointment_Pipeline
-                                    clientId={undefined}
-                                    vehicleId={undefined}
-                                  />
+                                  <button className="group relative">
+                                    <CiCalendar size={18} />
+                                    <span className="invisible absolute bottom-full left-16 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
+                                      Create Appointment
+                                    </span>
+                                  </button>
                                 )}
                               </div>
                               <div className="group relative">

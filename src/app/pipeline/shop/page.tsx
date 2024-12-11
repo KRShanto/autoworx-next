@@ -95,6 +95,7 @@ const Page = (props: Props) => {
           }
         });
         const columnStatusId = invoice.columnId;
+        const dueBalance= Number(invoice.due);
 
         return {
           invoiceId: invoice.id,
@@ -115,6 +116,7 @@ const Page = (props: Props) => {
           assignedTo: invoice.assignedTo,
           createdAt: new Date(invoice.createdAt).toDateString(),
           columnId: columnStatusId,
+          dueBalance: dueBalance,
         };
       });
 
@@ -124,7 +126,7 @@ const Page = (props: Props) => {
         leads: transformedLeads.filter((lead) => lead.columnId === column.id),
       }));
 
-      console.log("Current user:", currentUser);
+      // console.log("Current user:", currentUser);
 
       // Only filter for technicians
       if (currentUser?.employeeType === "Technician") {

@@ -14,6 +14,7 @@ import { getLeads } from "@/actions/pipelines/getLeads";
 import { Lead } from "@prisma/client";
 import { SalesPipelineData, SalesLead } from "@/types/invoiceLead";
 import SalesPipeline from "../components/SalesPipeline";
+import Leads from "../components/Leads";
 type Props = {
   searchParams?: { view?: string };
 };
@@ -62,7 +63,11 @@ const Page = (props: Props) => {
       setLeads(responseLead);
     };
 
-    fetchLeads();
+    fetchLeads(); // initial fetch
+
+    const intervalId = setInterval(fetchLeads, 3000);
+
+    return () => clearInterval(intervalId);
   }, []);
   // console.warn(usersType);
   console.log("leads", leads);
@@ -113,7 +118,7 @@ const Page = (props: Props) => {
           salesPipelineDataProp={pipelineData}
         />
       ) : (
-        <WorkOrders type={columnType} />
+        <Leads type={columnType} />
       )}
     </div>
   );
