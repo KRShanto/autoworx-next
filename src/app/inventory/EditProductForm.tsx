@@ -112,7 +112,7 @@ export default function EditProductForm({
               id="notes"
               name="notes"
               required={false}
-              className="h-28 w-full rounded-sm border border-slate-400 border-primary-foreground bg-white px-2 py-0.5 leading-6 outline-none"
+              className="h-28 w-full rounded-sm border border-primary-foreground border-slate-400 bg-white px-2 py-0.5 leading-6 outline-none"
               defaultValue={history?.notes || ""}
             />
           </div>

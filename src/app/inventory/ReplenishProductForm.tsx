@@ -61,7 +61,10 @@ export default function ReplenishProductForm({
         </button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-full w-[30rem] max-w-xl" form>
+      <DialogContent
+        className="max-h-full w-[96%] max-w-xl overflow-y-auto md:w-[30rem]"
+        form
+      >
         <DialogHeader>
           <DialogTitle>Replenish Product</DialogTitle>
         </DialogHeader>
@@ -117,7 +120,7 @@ export default function ReplenishProductForm({
             />
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3 md:flex-nowrap">
             <SlimInput name="quantity" required={false} />
 
             <div>
