@@ -63,8 +63,8 @@ export function NewAppointment_Pipeline({
   // employees,
   // templates,
 }: {
-  clientId: number;
-  vehicleId: number;
+  clientId: number|undefined;
+  vehicleId: number|undefined;
   // settings: CalendarSettings;
   // employees: User[];
   // templates: EmailTemplate[];
