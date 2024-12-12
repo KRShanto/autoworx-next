@@ -21,6 +21,7 @@ import { EmployeeTagSelector } from "./EmployeeTagSelector";
 import { NewAppointment_Pipeline } from "./NewAppointment_Pipeline";
 import ServiceSelector from "./ServiceSelector";
 import TaskForm from "./TaskForm";
+import toast from "react-hot-toast";
 
 interface PipelinesProps {
   pipelinesTitle: string;
@@ -266,6 +267,17 @@ export default function Pipelines({
     const destinationItems = [...destinationColumn.leads];
 
     const [removed] = sourceItems.splice(source.index, 1);
+
+    //check before moving to delivered if due balance is zero or not
+    if (destinationColumn.title === "Delivered") {
+      if (removed.dueBalance !== 0) {
+        toast.error("Please clear due balance before moving to delivered.");
+        // Revert the item back to its original position
+        sourceItems.splice(source.index, 0, removed);
+        return;
+      }
+    }
+
     destinationItems.splice(destination.index, 0, removed);
 
     const updatedData = pipelineData.map((column, index) => {
@@ -499,10 +511,10 @@ export default function Pipelines({
                                     </span>
                                   </Link>
                                   <Link
-                                    href={`/estimate/view/${lead.invoiceId}`}
+                                    href={`/estimate/workorder/${lead.invoiceId}`}
                                     className="group relative"
                                   >
-                                    <TbInvoice size={18} />
+                                    <TbInvoice size={18} color="#94a3b8 " />
                                     <span className="invisible absolute bottom-full left-14 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
                                       View Work Order
                                     </span>

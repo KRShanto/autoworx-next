@@ -12,7 +12,6 @@ import getDataForNewAppointment from "@/actions/pipelines/getDataForNewAppointme
 import { User } from "@prisma/client";
 import {
   InvoiceWithRelations,
-  
   ShopLead,
   ShopPipelineData,
 } from "@/types/invoiceLead";
@@ -95,6 +94,7 @@ const Page = (props: Props) => {
           }
         });
         const columnStatusId = invoice.columnId;
+        const dueBalance = Number(invoice.due);
 
         return {
           invoiceId: invoice.id,
@@ -115,6 +115,7 @@ const Page = (props: Props) => {
           assignedTo: invoice.assignedTo,
           createdAt: new Date(invoice.createdAt).toDateString(),
           columnId: columnStatusId,
+          dueBalance: dueBalance,
         };
       });
 
@@ -124,7 +125,7 @@ const Page = (props: Props) => {
         leads: transformedLeads.filter((lead) => lead.columnId === column.id),
       }));
 
-      console.log("Current user:", currentUser);
+      // console.log("Current user:", currentUser);
 
       // Only filter for technicians
       if (currentUser?.employeeType === "Technician") {
@@ -173,6 +174,7 @@ const Page = (props: Props) => {
     setPipelineColumns(columns);
   };
   const type = "Shop Pipelines";
+  
 
   return (
     <div className="space-y-8">
@@ -186,12 +188,13 @@ const Page = (props: Props) => {
       />
       {activeView === "pipelines" ? (
         <Pipelines
+          key={activeView}
           pipelinesTitle={type}
           columns={pipelineColumns}
           shopPipelineDataProp={pipelineData}
         />
       ) : (
-        <WorkOrders type={columnType} />
+        <WorkOrders type={columnType} key={activeView} />
       )}
     </div>
   );

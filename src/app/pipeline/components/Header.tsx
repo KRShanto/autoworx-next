@@ -56,7 +56,7 @@ export default function Header({
   const hasManagePipelineAccess =
     currentUser?.employeeType === "Admin" ||
     currentUser?.employeeType === "Manager";
-
+  console.log("Active view of pipelines", activeView);
   return (
     <div className="flex items-center justify-between p-4" {...restProps}>
       <div className="flex items-center">
