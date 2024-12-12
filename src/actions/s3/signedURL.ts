@@ -55,7 +55,5 @@ export async function getSignedURL({
     { expiresIn: 60 }, // 60 seconds
   );
 
-  console.log({ success: url });
-
   return { success: { url } };
 }

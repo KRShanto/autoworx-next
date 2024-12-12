@@ -9,7 +9,6 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { PublicEnvScript } from "next-runtime-env";
 import { Session } from "next-auth";
-import { EmployeeType } from "@prisma/client";
 
 const inter = Inter({ subsets: ["latin"] });
 
