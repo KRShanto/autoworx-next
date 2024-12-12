@@ -25,6 +25,13 @@ export async function useProduct({
     include: { vendor: true },
   });
 
+  if (product!.quantity! < quantity) {
+    return {
+      type: "error",
+      message: "Insufficient quantity in inventory.",
+    };
+  }
+
   const newHistory = await db.inventoryProductHistory.create({
     data: {
       companyId,

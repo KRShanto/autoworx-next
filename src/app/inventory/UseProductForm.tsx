@@ -30,6 +30,7 @@ export default function UseProductForm({
 }) {
   const [open, setOpen] = useState(false);
   const [invoiceId, setInvoiceId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // TODO: Add validation for quantity
   async function handleSubmit(formData: FormData) {
@@ -48,12 +49,15 @@ export default function UseProductForm({
     if (res.type === "success") {
       setOpen(false);
       setInvoiceId(null);
+    } else {
+      setError(res.message || "An error occurred.");
     }
   }
 
-  // Whenever `open` changes, set `invoiceId` to null
+  // Whenever `open` changes, reset the states
   useEffect(() => {
     setInvoiceId(null);
+    setError(null);
   }, [open]);
 
   return (
@@ -71,7 +75,7 @@ export default function UseProductForm({
           </DialogTitle>
         </DialogHeader>
 
-        <FormError />
+        {error && <p className="ml-2 text-red-500">{error}</p>}
 
         <div className="grid grid-cols-2 gap-3 overflow-y-auto p-2">
           <SlimInput
