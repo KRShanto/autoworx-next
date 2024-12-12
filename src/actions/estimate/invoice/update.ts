@@ -45,6 +45,74 @@ export async function updateInvoice(
   data: UpdateEstimateInput,
 ): Promise<ServerAction> {
   const companyId = await getCompanyId();
+
+  // If updating to an Invoice, check inventory quantities
+  if (data.type === "Invoice") {
+    // Merge all the same products and sum the quantity
+    let materials: Material[] = [];
+
+    for (const item of data.items) {
+      if (item.materials) {
+        materials = [...materials, ...(item.materials as Material[])];
+      }
+    }
+
+    // Include products to get their names
+    const productIds = materials
+      .map((m) => m.productId)
+      .filter(Boolean) as number[];
+    const products = await db.inventoryProduct.findMany({
+      where: { id: { in: productIds } },
+    });
+
+    const productsWithQuantity = materials.reduce(
+      (acc: { id: number; quantity: number; name: string }[], material) => {
+        const productId = material.productId as number;
+        const existing = acc.find((p) => p.id === productId);
+
+        if (existing) {
+          if (material.quantity !== null) {
+            existing.quantity += material.quantity;
+          }
+        } else {
+          const productName =
+            products.find((p) => p.id === productId)?.name || "Product";
+          acc.push({
+            id: productId,
+            quantity: material.quantity || 0,
+            name: productName,
+          });
+        }
+
+        return acc;
+      },
+      [],
+    );
+
+    // Fetch inventory products
+    const inventoryProducts = await db.inventoryProduct.findMany({
+      where: {
+        id: { in: productsWithQuantity.map((p) => p.id) },
+      },
+    });
+
+    // Check inventory quantities
+    for (const product of productsWithQuantity) {
+      const inventoryProduct = inventoryProducts.find(
+        (ip) => ip.id === product.id,
+      );
+      if (
+        inventoryProduct &&
+        (inventoryProduct.quantity || 0) < product.quantity
+      ) {
+        return {
+          type: "error",
+          message: `Insufficient quantity of ${product.name} in inventory.`,
+        };
+      }
+    }
+  }
+
   const invoice = await db.invoice.findUnique({
     where: {
       id: data.id,

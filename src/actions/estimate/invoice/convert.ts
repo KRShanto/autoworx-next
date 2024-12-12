@@ -13,13 +13,6 @@ export async function convertInvoice(id: string): Promise<ServerAction> {
     return { type: "error", message: "Invoice not found" };
   }
 
-  await db.invoice.update({
-    where: { id },
-    data: {
-      type: invoice.type === "Estimate" ? "Invoice" : "Estimate",
-    },
-  });
-
   // get all the product materials
   const materials = await db.material.findMany({
     where: {
@@ -29,6 +22,7 @@ export async function convertInvoice(id: string): Promise<ServerAction> {
     },
     include: {
       vendor: true,
+      product: true, // Include the product to get its name
     },
   });
 
@@ -52,6 +46,46 @@ export async function convertInvoice(id: string): Promise<ServerAction> {
     },
     [],
   );
+
+  // If converting from Estimate to Invoice, check inventory quantities
+  if (invoice.type === "Estimate") {
+    // Fetch inventory products
+    const inventoryProducts = await db.inventoryProduct.findMany({
+      where: {
+        id: { in: productsWithQuantity.map((p) => p.id) },
+      },
+    });
+
+    // Check inventory quantities
+    for (const product of productsWithQuantity) {
+      const inventoryProduct = inventoryProducts.find(
+        (ip) => ip.id === product.id,
+      );
+
+      if (
+        inventoryProduct &&
+        (inventoryProduct.quantity || 0) < product.quantity
+      ) {
+        // Get the product name
+        const productName =
+          materials.find((m) => m.productId === product.id)?.product?.name ||
+          "Product";
+
+        return {
+          type: "error",
+          message: `Insufficient quantity of ${productName} in inventory.`,
+        };
+      }
+    }
+  }
+
+  // Now update the invoice type
+  await db.invoice.update({
+    where: { id },
+    data: {
+      type: invoice.type === "Estimate" ? "Invoice" : "Estimate",
+    },
+  });
 
   await Promise.all(
     productsWithQuantity.map(async (product) => {
@@ -87,9 +121,6 @@ export async function convertInvoice(id: string): Promise<ServerAction> {
       });
     }),
   );
-
-  // TODO
-  // revalidatePath("/estimate");
 
   return { type: "success", message: "Invoice converted" };
 }

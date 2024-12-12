@@ -46,21 +46,21 @@ export async function newPayment({
 }: PaymentData): Promise<ServerAction> {
   const companyId = await getCompanyId();
 
-  // get all the product materials
+  // Get all the product materials and include the product to get its name
   const materials = await db.material.findMany({
     where: {
       invoiceId,
-      // productId not null
       productId: { not: null },
     },
     include: {
       vendor: true,
+      product: true, // Include the product to get its name
     },
   });
 
-  // merge all the same products and sum the quantity
+  // Merge all the same products and sum the quantity
   const productsWithQuantity = materials.reduce(
-    (acc: { id: number; quantity: number }[], material) => {
+    (acc: { id: number; quantity: number; name: string }[], material) => {
       const product = acc.find((p) => p.id === material.productId);
 
       if (product) {
@@ -71,6 +71,7 @@ export async function newPayment({
         acc.push({
           id: material.productId as number,
           quantity: material.quantity || 0,
+          name: material.product?.name || "Product", // Store product name
         });
       }
 
@@ -78,6 +79,29 @@ export async function newPayment({
     },
     [],
   );
+
+  // Fetch inventory products
+  const inventoryProducts = await db.inventoryProduct.findMany({
+    where: {
+      id: { in: productsWithQuantity.map((p) => p.id) },
+    },
+  });
+
+  // Check inventory quantities
+  for (const product of productsWithQuantity) {
+    const inventoryProduct = inventoryProducts.find(
+      (ip) => ip.id === product.id,
+    );
+    if (
+      inventoryProduct &&
+      (inventoryProduct.quantity || 0) < product.quantity
+    ) {
+      return {
+        type: "error",
+        message: `Insufficient quantity of ${product.name} in inventory.`,
+      };
+    }
+  }
 
   await Promise.all(
     productsWithQuantity.map(async (product) => {

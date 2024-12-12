@@ -22,7 +22,7 @@ import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { useInvoiceCreate } from "@/hooks/useInvoiceCreate";
 import { usePathname, useRouter } from "next/navigation";
 import moment from "moment";
-import { updatePayment } from "../../../actions/payment/updatePayment";
+import toast from "react-hot-toast";
 
 function TabTrigger({
   value,
@@ -103,6 +103,12 @@ export default function MakePayment() {
     const res1 = await createInvoice();
     let res2;
 
+    if (res1.type === "error") {
+      toast.error(res1.message || "Error making payment");
+      setOpen(false);
+      return;
+    }
+
     //create payment each time you make payment
     res2 = await newPayment({
       invoiceId: res1.data.id,
@@ -123,6 +129,9 @@ export default function MakePayment() {
       setOpen(false);
       // Redirect to the index
       router.push("/estimate/invoices");
+    } else {
+      toast.error(res2.message || "Error making payment");
+      setOpen(false);
     }
   }
 

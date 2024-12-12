@@ -6,6 +6,7 @@ import Submit from "@/components/Submit";
 import { cn } from "@/lib/cn";
 import { useRouter } from "next/navigation";
 import { useInvoiceCreate } from "@/hooks/useInvoiceCreate";
+import toast from "react-hot-toast";
 
 export default function ConvertButton({
   text,
@@ -25,10 +26,14 @@ export default function ConvertButton({
     const res = await createInvoice();
     console.log("Responee", res);
 
-    if (type === "Estimate") {
-      router.push("/estimate");
+    if (res.type === "success") {
+      if (type === "Estimate") {
+        router.push("/estimate");
+      } else {
+        router.push("/estimate/invoices");
+      }
     } else {
-      router.push("/estimate/invoices");
+      toast.error(res.message || "Error converting invoice");
     }
   }
 
