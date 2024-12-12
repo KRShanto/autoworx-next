@@ -16,7 +16,6 @@ export type Column = {
   type: string;
 };
 export interface ShopLead {
-  
   invoiceId: string;
   name: string;
   email: string;
@@ -35,20 +34,19 @@ export interface ShopLead {
   tasks?: Task[];
   assignedTo: User | Employee | null;
   columnId: number | null;
+  dueBalance: number;
 }
 export interface SalesLead {
-
-  leadId: number,
-  name: string,
-  email: string|null,
-  phone: string|null,
-  vehicle: string,
-  services: string,
-  source:string,
-  comments:string|null,
-  createdAt: string,
-  companyId: number,
-  
+  leadId: number;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  vehicle: string;
+  services: string;
+  source: string;
+  comments: string | null;
+  createdAt: string;
+  companyId: number;
 }
 
 // export type Lead = ShopLead | SalesLead;
