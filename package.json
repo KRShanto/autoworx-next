@@ -74,7 +74,7 @@
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.13",
     "nprogress": "^0.2.0",
-    "prisma": "^5.22.0",
+    "prisma": "^5.15.0",
     "pusher": "^5.2.0",
     "pusher-js": "^8.4.0-rc2",
     "qr-scanner": "^1.4.2",
