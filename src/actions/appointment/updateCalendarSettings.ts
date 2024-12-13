@@ -6,6 +6,12 @@ import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
 import { revalidatePath } from "next/cache";
 
+/**
+ * Updates the calendar settings for a company.
+ *
+ * @param data - The new calendar settings.
+ * @returns A promise that resolves to a ServerAction indicating the result.
+ */
 export async function updateCalendarSettings(data: {
   weekStart: string;
   dayStart: string;
@@ -13,10 +19,11 @@ export async function updateCalendarSettings(data: {
   weekend1: string;
   weekend2: string;
 }): Promise<ServerAction> {
+  // Authenticate the user and get the session
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
 
-  // Create or Update the calendar settings
+  // Create or Update the calendar settings in the database
   const newCalendarSettings = await db.calendarSettings.upsert({
     where: {
       companyId,
@@ -38,7 +45,9 @@ export async function updateCalendarSettings(data: {
     },
   });
 
+  // Revalidate the path to update the cache
   revalidatePath("/task");
 
+  // Return a success action
   return { type: "success" };
 }

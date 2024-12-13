@@ -16,6 +16,7 @@ interface GrowthRate {
   rate: string;
   isPositive: boolean | null;
 }
+
 interface AttendanceInfo {
   attInfo: AttendanceRecord[];
   absentDays: number;
@@ -38,6 +39,12 @@ interface AttendanceInfo {
   growthRateNoShowRate: GrowthRate; // Add this field
 }
 
+/**
+ * Get attendance information for a user.
+ *
+ * @param id - The ID of the user.
+ * @returns An object containing various attendance metrics.
+ */
 export async function getAttendanceInfo(id: number): Promise<AttendanceInfo> {
   // Fetch company information
   const company = await getCompany();
@@ -80,7 +87,13 @@ export async function getAttendanceInfo(id: number): Promise<AttendanceInfo> {
   const now = moment(); // Current date and time
   const standardWorkingHours = 8; // Standard working hours per day
 
-  // Helper function to get attendance info for a given date range
+  /**
+   * Helper function to get attendance info for a given date range
+   *
+   * @param startDate - The start date of the range.
+   * @param endDate - The end date of the range.
+   * @returns An array of attendance records for the given date range.
+   */
   const getAttendanceInfoForRange = async (
     startDate: Moment,
     endDate: Moment,
@@ -180,7 +193,13 @@ export async function getAttendanceInfo(id: number): Promise<AttendanceInfo> {
     return attInfo;
   };
 
-  // Helper function to create an attendance record
+  /**
+   * Helper function to create an attendance record
+   *
+   * @param date - The date of the attendance record.
+   * @param status - The status of the attendance record.
+   * @returns An attendance record object.
+   */
   const createAttendanceRecord = (
     date: Moment,
     status: string,
@@ -281,7 +300,13 @@ export async function getAttendanceInfo(id: number): Promise<AttendanceInfo> {
       day.hours !== "-",
   ).length;
 
-  // Calculate growth rates
+  /**
+   * Helper function to calculate growth rates
+   *
+   * @param current - The current value.
+   * @param previous - The previous value.
+   * @returns An object containing the growth rate and whether it is positive.
+   */
   const calculateGrowthRate = (
     current: number,
     previous: number,

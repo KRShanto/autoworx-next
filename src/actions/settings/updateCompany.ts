@@ -1,5 +1,14 @@
 "use server";
 
+/**
+ * Updates the company information in the database.
+ *
+ * @param companyId - The ID of the company to be updated.
+ * @param companyData - The new company data to be saved.
+ * @returns An object containing the status and the updated company data.
+ * @throws Will throw an error if the update operation fails.
+ */
+
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 
@@ -37,6 +46,7 @@ export const updateCompany = async (
     image,
   } = companyData;
   try {
+    // Update the company information in the database
     const updatedCompany = await db.company.update({
       where: {
         id: companyId,
@@ -56,9 +66,12 @@ export const updateCompany = async (
         image,
       },
     });
+    // Revalidate the cache for the business settings page
     revalidatePath("/settings/business");
+    // Return success response with updated company data
     return { type: "success", data: updatedCompany };
   } catch (err: any) {
+    // Throw an error if the update operation fails
     throw new Error(err);
   }
 };

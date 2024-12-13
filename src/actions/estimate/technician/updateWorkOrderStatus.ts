@@ -4,17 +4,13 @@ import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 
 /**
- * Update the status of a work order
- * 1. First get the invoice from the given `id`
- * 2. Get all the technicians for that invoice
- * 3. Check the technician statuses
- * If all the technicians are complete, update the work order status to complete
- * If all the technicians are "Pending", update the work order status to pending
- * If any of the technicians are not complete, update the work order status to in progress
- * 4. Update the work order status
+ * Update the status of a work order based on the statuses of its technicians.
+ *
+ * @param id - The ID of the invoice to update.
+ * @returns A promise that resolves to a ServerAction indicating success or failure.
  */
-
 export async function updateWorkOrderStatus(id: string): Promise<ServerAction> {
+  // Fetch the invoice and its associated technicians from the database
   const invoice = await db.invoice.findUnique({
     where: { id },
     include: {
@@ -22,20 +18,25 @@ export async function updateWorkOrderStatus(id: string): Promise<ServerAction> {
     },
   });
 
+  // Get the list of technicians from the invoice
   const technicians = invoice?.technician;
 
+  // If there are no technicians, return a success message without updating the status
   if (!technicians) {
-    // No need to update the status if there are no technicians
     return { type: "success", message: "No technicians found" };
   }
 
+  // Check if all technicians have the status "Complete"
   const allComplete = technicians.every(
     (technician) => technician.status === "Complete",
   );
+
+  // Check if all technicians have the status "Pending"
   const allPending = technicians.every(
     (technician) => technician.status === "Pending",
   );
 
+  // Determine the new status of the work order based on the technicians' statuses
   let status = "In Progress";
   if (allComplete) {
     status = "Complete";
@@ -43,6 +44,7 @@ export async function updateWorkOrderStatus(id: string): Promise<ServerAction> {
     status = "Pending";
   }
 
+  // Update the work order status in the database
   await db.invoice.update({
     where: { id },
     data: {
@@ -50,5 +52,6 @@ export async function updateWorkOrderStatus(id: string): Promise<ServerAction> {
     },
   });
 
+  // Return a success message indicating the status was updated
   return { type: "success", message: "Work order status updated" };
 }

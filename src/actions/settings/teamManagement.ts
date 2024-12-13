@@ -1,5 +1,11 @@
 "use server";
 
+/**
+ * Fetches the list of users for team management.
+ *
+ * @returns A list of users with their basic information.
+ * @throws Will throw an error if the fetch operation fails.
+ */
 import { db } from "@/lib/db";
 import { getCompanyId } from "@/lib/companyId";
 import { create } from "zustand";
@@ -12,6 +18,7 @@ import {
 } from "@prisma/client";
 
 const prisma = new PrismaClient();
+
 export const teamManagementUser = async (): Promise<
   {
     id: number;
@@ -45,6 +52,12 @@ export const teamManagementUser = async (): Promise<
   }
 };
 
+/**
+ * Fetches the permissions for different roles.
+ *
+ * @returns An object containing permissions for different roles.
+ * @throws Will throw an error if the fetch operation fails.
+ */
 export const getPermissionsForRole = async () => {
   try {
     const companyId = await getCompanyId();
@@ -79,6 +92,15 @@ interface userRolePermission {
   isViewOnly?: boolean;
 }
 
+/**
+ * Updates the permission for a specific role.
+ *
+ * @param role - The role for which the permission is to be updated.
+ * @param moduleKey - The module key for the permission.
+ * @param value - The value of the permission.
+ * @param isViewOnly - Optional flag to indicate if the permission is view-only.
+ * @throws Will throw an error if the update operation fails.
+ */
 export const updatePermissionForRole = async ({
   role,
   moduleKey,
@@ -186,7 +208,14 @@ const getRoleModel = (role: string): string => {
   return roleModel;
 };
 
-// Fetch user permissions (role + user-specific overrides)
+/**
+ * Fetches the permissions for a specific user.
+ *
+ * @param userId - The ID of the user.
+ * @param role - The role of the user.
+ * @returns An object containing the merged permissions for the user.
+ * @throws Will throw an error if the fetch operation fails.
+ */
 export const getUserPermissions = async (userId: number, role: string) => {
   const roleModel = getRoleModel(role);
 
@@ -220,7 +249,13 @@ export const getUserPermissions = async (userId: number, role: string) => {
   }
 };
 
-// Save user permissions
+/**
+ * Saves the permissions for a specific user.
+ *
+ * @param userId - The ID of the user.
+ * @param newPermissions - The new permissions to be saved.
+ * @throws Will throw an error if the save operation fails.
+ */
 export const savePermissions = async (
   userId: number,
   newPermissions: object,

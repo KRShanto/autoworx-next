@@ -28,13 +28,21 @@ export interface AppointmentToAdd {
   timezone?: string;
 }
 
+/**
+ * Adds a new appointment to the database.
+ *
+ * @param appointment - The new appointment data.
+ * @returns A promise that resolves to a ServerAction indicating the result.
+ */
 export async function addAppointment(
   appointment: AppointmentToAdd,
 ): Promise<ServerAction> {
   try {
+    // Authenticate the user and get the session
     const session = (await auth()) as AuthSession;
     const companyId = session.user.companyId;
 
+    // Validate the title
     if (!appointment.title) {
       return {
         type: "error",
@@ -43,6 +51,7 @@ export async function addAppointment(
       };
     }
 
+    // Create a new appointment in the database
     let newAppointment = await db.appointment.create({
       data: {
         title: appointment.title,
@@ -64,7 +73,7 @@ export async function addAppointment(
       },
     });
 
-    // Loop the assigned users and add them to the Google Calendar
+    // Loop through the assigned users and add them to the Google Calendar
     for (const user of appointment.assignedUsers) {
       const assignedUser = await db.user.findUnique({
         where: {
@@ -74,7 +83,7 @@ export async function addAppointment(
 
       // TODO: Add the task to the user's Google Calendar
 
-      // Create the task user
+      // Create the task user in the database
       await db.appointmentUser.create({
         data: {
           appointmentId: newAppointment.id,
@@ -85,7 +94,7 @@ export async function addAppointment(
     }
 
     // TODO: use `createDraftEstimate` action
-    // Create draft estimate (if doesn't exist)
+    // Create draft estimate if it doesn't exist
     if (appointment.draftEstimate) {
       const draftEstimate = await db.invoice.findFirst({
         where: {
@@ -107,8 +116,10 @@ export async function addAppointment(
       }
     }
 
+    // Revalidate the path to update the cache
     revalidatePath("/task");
 
+    // Fetch the vehicle and client details
     const vehicle = await db.vehicle.findFirst({
       where: {
         id: appointment.vehicleId,
@@ -121,25 +132,26 @@ export async function addAppointment(
       },
     });
 
-    // get the confirmation email template
+    // Get the confirmation email template
     const confirmationEmailTemplate = await db.emailTemplate.findFirst({
       where: {
         id: appointment.confirmationEmailTemplateId,
       },
     });
 
-    // get the reminder email template
+    // Get the reminder email template
     const reminderEmailTemplate = await db.emailTemplate.findFirst({
       where: {
         id: appointment.reminderEmailTemplateId,
       },
     });
 
+    // Send the confirmation email if the template exists and status is true
     if (confirmationEmailTemplate) {
       let confirmationSubject = confirmationEmailTemplate?.subject || "";
       let confirmationMessage = confirmationEmailTemplate?.message || "";
 
-      // replace the placeholders: <VEHICLE>, <CLIENT>
+      // Replace the placeholders: <VEHICLE>, <CLIENT>
       confirmationSubject = confirmationSubject?.replace(
         "<VEHICLE>",
         vehicle ? vehicle.model! : "",
@@ -158,9 +170,8 @@ export async function addAppointment(
         client ? client.firstName + " " + client.lastName : "",
       );
 
-      // send the confirmation email
+      // Send the confirmation email
       if (appointment.confirmationEmailTemplateStatus) {
-        // send email
         if (client) {
           sendEmail({
             to: client.email || "",
@@ -171,11 +182,12 @@ export async function addAppointment(
       }
     }
 
+    // Schedule the reminder email if the template exists and status is true
     if (reminderEmailTemplate) {
       let reminderSubject = reminderEmailTemplate?.subject || "";
       let reminderMessage = reminderEmailTemplate?.message || "";
 
-      // replace the placeholders: <VEHICLE>, <CLIENT>
+      // Replace the placeholders: <VEHICLE>, <CLIENT>
       reminderSubject = reminderSubject?.replace(
         "<VEHICLE>",
         vehicle ? vehicle.model! : "",
@@ -204,12 +216,12 @@ export async function addAppointment(
         date.setHours(parseInt(splitTime[0]));
         date.setMinutes(parseInt(splitTime[1]));
 
-        // schedule the reminder email
+        // Schedule the reminder email
         if (appointment.reminderEmailTemplateStatus) {
-          // calculate the cron expression for the date and time
+          // Calculate the cron expression for the date and time
           const cronExpression = `${date.getMinutes()} ${date.getHours()} ${date.getDate()} ${date.getMonth() + 1} *`;
 
-          // schedule the email
+          // Schedule the email
           cron.schedule(cronExpression, () => {
             if (client) {
               sendEmail({
@@ -223,8 +235,7 @@ export async function addAppointment(
       }
     }
 
-    // if the appointment has date, start time and end time, then insert it in google calendar
-    // also need to check if google calendar token exists or not, if not, then no need of inserting
+    // Check if Google Calendar token exists and create Google Calendar event
     const cookie = await cookies();
     let googleCalendarToken = cookie.get("googleCalendarToken")?.value;
 
@@ -236,7 +247,7 @@ export async function addAppointment(
     ) {
       let event = await createGoogleCalendarEvent(appointment);
 
-      // if event is successfully created in google calendar, then save the event id in task model
+      // Save the event ID in the database if the event is successfully created in Google Calendar
       if (event && event.id) {
         newAppointment = await db.appointment.update({
           where: {
@@ -249,9 +260,11 @@ export async function addAppointment(
       }
     }
 
+    // Return a success action
     return { type: "success" };
   } catch (error) {
     console.log("🚀 ~ error:", error);
+    // Return an error action
     return { type: "error" };
   }
 }

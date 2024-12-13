@@ -4,9 +4,17 @@ import { db } from "@/lib/db";
 import { getCompany } from "../settings/getCompany";
 import moment from "moment";
 
+/**
+ * Get performance information for a technician.
+ *
+ * @param id - The ID of the technician.
+ * @returns An object containing various performance metrics.
+ */
 export async function getPerformanceInfo(id: number) {
+  // Fetch company information
   const company = await getCompany();
 
+  // Fetch user information along with related data
   const user = await db.user.findUnique({
     where: { id },
     include: {
@@ -39,6 +47,7 @@ export async function getPerformanceInfo(id: number) {
     },
   });
 
+  // Throw an error if user is not found
   if (!user) throw new Error("User not found");
 
   // Calculate the average time to complete a job
@@ -176,6 +185,7 @@ export async function getPerformanceInfo(id: number) {
     }, {}),
   ).map(([categoryName, count]) => ({ categoryName, count }));
 
+  // Return the calculated performance metrics
   return {
     averageJobTime,
     averageJobTimeGrowthRate,

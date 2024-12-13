@@ -5,6 +5,12 @@ import getUser from "@/lib/getUser";
 import { ServerAction } from "@/types/action";
 import { revalidatePath } from "next/cache";
 
+/**
+ * Authorizes an invoice by updating the authorized name.
+ * @param invoiceId - The ID of the invoice to authorize.
+ * @param authorizedName - The name of the person authorizing the invoice.
+ * @returns A promise that resolves to a ServerAction indicating success.
+ */
 export async function authorizeInvoice(
   invoiceId: string,
   authorizedName: string,
@@ -27,6 +33,11 @@ export async function authorizeInvoice(
   };
 }
 
+/**
+ * Deletes the authorization of an invoice by setting the authorized name to null.
+ * @param invoiceId - The ID of the invoice to delete authorization from.
+ * @returns A promise that resolves to a ServerAction indicating success.
+ */
 export async function deleteInvoiceAuthorize(invoiceId: string) {
   const user = await getUser();
   await db.invoice.update({

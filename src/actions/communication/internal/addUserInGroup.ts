@@ -9,9 +9,16 @@ type TAddGroupInUser = {
 };
 
 const pusher = getPusherInstance();
-// add new user in group
+
+/**
+ * Adds new users to a group and triggers a pusher event.
+ * @param groupId - The ID of the group.
+ * @param users - The users to be added to the group.
+ * @returns An object containing the status and the updated group data.
+ */
 export const addUserInGroup = async ({ groupId, users }: TAddGroupInUser) => {
   try {
+    // Update the group to connect the new users
     const groupData = await db.group.update({
       where: {
         id: groupId,
@@ -26,6 +33,7 @@ export const addUserInGroup = async ({ groupId, users }: TAddGroupInUser) => {
       },
     });
 
+    // Trigger a pusher event if the users were successfully added
     if (groupData) {
       pusher.trigger("add-member-in-group", "add-member", {
         groupId: groupData.id,
@@ -34,6 +42,7 @@ export const addUserInGroup = async ({ groupId, users }: TAddGroupInUser) => {
     }
     return { status: 200, data: groupData };
   } catch (err) {
+    // Handle any errors that occur during the process
     throw err;
   }
 };

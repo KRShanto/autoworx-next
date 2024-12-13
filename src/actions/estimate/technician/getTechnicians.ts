@@ -2,6 +2,12 @@
 import { db } from "@/lib/db";
 import { Technician } from "@prisma/client";
 
+/**
+ * Get a list of technicians based on the provided invoiceId and/or serviceId.
+ *
+ * @param params - An object containing the invoiceId and/or serviceId to filter technicians.
+ * @returns A promise that resolves to a list of technicians with their names.
+ */
 export const getTechnicians = async ({
   invoiceId,
   serviceId,
@@ -10,6 +16,7 @@ export const getTechnicians = async ({
   serviceId?: number;
 }) => {
   try {
+    // Fetch technicians from the database based on the provided invoiceId and/or serviceId
     const technicians = (await db.technician.findMany({
       where: {
         invoiceId,
@@ -17,7 +24,7 @@ export const getTechnicians = async ({
       },
     })) as (Technician & { name: string })[];
 
-    // find the users and merge them with the technicians
+    // Fetch users associated with the technicians
     const users = await db.user.findMany({
       where: {
         id: {
@@ -26,11 +33,13 @@ export const getTechnicians = async ({
       },
     });
 
+    // Merge user information with technicians to include their names
     technicians.forEach((technician) => {
       const user = users.find((user) => user.id === technician.userId);
       technician.name = `${user?.firstName || "Unknown"} ${user?.lastName || ""}`;
     });
 
+    // Return the list of technicians with their names
     return JSON.parse(JSON.stringify(technicians));
   } catch (err) {
     throw err;

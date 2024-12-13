@@ -4,6 +4,13 @@ import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { revalidatePath } from "next/cache";
 
+/**
+ * Assigns or unassigns tasks to a user.
+ *
+ * @param userId - The ID of the user.
+ * @param tasksToAssign - The list of tasks to assign or unassign.
+ * @returns A server action indicating success or error.
+ */
 export async function assignTask({
   userId,
   tasksToAssign,
@@ -14,6 +21,7 @@ export async function assignTask({
     assigned: boolean;
   }[];
 }): Promise<ServerAction> {
+  // Find the user by ID and include their tasks
   const user = await db.user.findUnique({
     where: {
       id: userId,
@@ -24,7 +32,7 @@ export async function assignTask({
   });
 
   for (const taskData of tasksToAssign) {
-    // Get the task
+    // Get the task by ID
     const task = await db.task.findUnique({
       where: {
         id: taskData.taskId,
@@ -33,17 +41,17 @@ export async function assignTask({
 
     const shouldAssign = taskData.assigned;
 
-    // get task users
+    // Get users assigned to the task
     const taskUsers = await db.taskUser.findMany({
       where: {
         taskId: task!.id,
       },
     });
 
-    // add or remove the user from the task
+    // Add or remove the user from the task
     if (shouldAssign) {
-      // check if the user is already assigned to the task
-      // if not, assign the user to the task
+      // Check if the user is already assigned to the task
+      // If not, assign the user to the task
       if (!taskUsers.some((taskUser) => taskUser.userId === user!.id)) {
         // TODO: add task to the google calendar
 
@@ -56,8 +64,8 @@ export async function assignTask({
         });
       }
     } else {
-      // check if the user is assigned to the task
-      // if yes, remove the user from the task
+      // Check if the user is assigned to the task
+      // If yes, remove the user from the task
       if (taskUsers.some((taskUser) => taskUser.userId === user!.id)) {
         // TODO: remove task from the google calendar
 
@@ -71,6 +79,7 @@ export async function assignTask({
     }
   }
 
+  // Revalidate the task path
   revalidatePath("/task");
 
   return {

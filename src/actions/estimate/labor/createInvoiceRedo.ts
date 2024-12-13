@@ -2,6 +2,16 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 
+/**
+ * Creates redo entries for technicians and updates their status.
+ *
+ * @param {Object[]} redoTechnicians - The list of technicians to create redo entries for.
+ * @param {string} redoTechnicians[].invoiceId - The invoice ID associated with the redo.
+ * @param {number} redoTechnicians[].serviceId - The service ID associated with the redo.
+ * @param {number} redoTechnicians[].technicianId - The technician ID to update.
+ * @param {string} redoTechnicians[].notes - Additional notes for the redo.
+ * @returns {Promise<Object>} The result of the operation.
+ */
 export const createInvoiceRedo = async (
   redoTechnicians: {
     invoiceId: string;
@@ -11,9 +21,11 @@ export const createInvoiceRedo = async (
   }[],
 ) => {
   try {
+    // Create redo entries and update technician status in a transaction
     await Promise.all(
       redoTechnicians.map(async (technicianInfo) => {
         await db.$transaction(async (prisma) => {
+          // Create a new redo entry for the technician
           await prisma.invoiceRedo.create({
             data: {
               invoiceId: technicianInfo.invoiceId,
@@ -22,6 +34,7 @@ export const createInvoiceRedo = async (
               notes: technicianInfo.notes,
             },
           });
+          // Update the status of the technician
           await prisma.technician.update({
             where: {
               id: technicianInfo.technicianId,
@@ -33,6 +46,7 @@ export const createInvoiceRedo = async (
         });
       }),
     );
+    // Revalidate the cache for the workorder path
     revalidatePath("/estimate/workorder");
     return {
       status: 200,

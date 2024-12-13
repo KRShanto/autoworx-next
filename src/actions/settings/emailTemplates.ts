@@ -11,6 +11,13 @@ const EmailTemplateSchema = z.object({
   message: z.string().min(1, "Message is required"),
 });
 
+/**
+ * Parses and validates data using a Zod schema.
+ * @param {z.ZodType<T>} schema - The Zod schema to use for validation.
+ * @param {unknown} data - The data to validate.
+ * @returns {T} - The validated data.
+ * @throws {Error} - If validation fails.
+ */
 const parsedSafeData = <T>(schema: z.ZodType<T>, data: unknown) => {
   const result = schema.safeParse(data);
   if (result.success) {
@@ -20,6 +27,11 @@ const parsedSafeData = <T>(schema: z.ZodType<T>, data: unknown) => {
   }
 };
 
+/**
+ * Retrieves or creates an email template for the current user's company.
+ * @returns {Promise<CompanyEmailTemplate>} - The email template.
+ * @throws {Error} - If there is an error fetching or creating the email template.
+ */
 export const getOrCreateEmailTemplate =
   async (): Promise<CompanyEmailTemplate> => {
     try {
@@ -45,6 +57,11 @@ export const getOrCreateEmailTemplate =
     }
   };
 
+/**
+ * Retrieves an email template for the current user's company.
+ * @returns {Promise<CompanyEmailTemplate | null>} - The email template or null if not found.
+ * @throws {Error} - If there is an error fetching the email template.
+ */
 export const getEmailTemplate =
   async (): Promise<CompanyEmailTemplate | null> => {
     try {
@@ -64,6 +81,13 @@ export const getEmailTemplate =
     }
   };
 
+/**
+ * Updates or creates an email template for the current user's company.
+ * @param {number | null} id - The ID of the email template to update, or null to create a new one.
+ * @param {unknown} emailTemplateData - The data for the email template.
+ * @returns {Promise<CompanyEmailTemplate>} - The updated or created email template.
+ * @throws {Error} - If there is an error updating or creating the email template.
+ */
 export const updateEmailTemplate = async (
   id: number | null,
   emailTemplateData: unknown,
@@ -108,6 +132,13 @@ const companyTaxUpdatesTSchema = z.object({
   currency: z.string().min(1, "Currency is required"),
 });
 
+/**
+ * Updates the tax and currency for the current user's company.
+ * @param {Object} data - The data for the tax and currency update.
+ * @param {string | number} data.tax - The tax value.
+ * @param {string} data.currency - The currency value.
+ * @throws {Error} - If there is an error updating the tax and currency.
+ */
 export const updateTaxCurrency = async (data: {
   tax: string | number;
   currency: string;
@@ -139,6 +170,14 @@ const companyUpdatesTermsPolicySchema = z.object({
   terms: z.string().min(1, "Terms is required").optional(),
   policy: z.string().min(1, "Policy is required").optional(),
 });
+
+/**
+ * Updates the terms and policy for the current user's company.
+ * @param {Object} data - The data for the terms and policy update.
+ * @param {string} [data.terms] - The terms value.
+ * @param {string} [data.policy] - The policy value.
+ * @throws {Error} - If there is an error updating the terms and policy.
+ */
 export const updateTermsPolicy = async (
   data: z.infer<typeof companyUpdatesTermsPolicySchema>,
 ) => {
@@ -164,6 +203,11 @@ export const updateTermsPolicy = async (
   }
 };
 
+/**
+ * Retrieves the terms, policy, and tax for the current user's company.
+ * @returns {Promise<{ terms: string; policy: string; tax: Prisma.Decimal }>} - The terms, policy, and tax.
+ * @throws {Error} - If there is an error fetching the terms, policy, or tax.
+ */
 export const getCompanyTermsAndPolicyTax = async (): Promise<{
   terms: string;
   policy: string;
@@ -191,6 +235,11 @@ export const getCompanyTermsAndPolicyTax = async (): Promise<{
   }
 };
 
+/**
+ * Retrieves the tax for the current user's company.
+ * @returns {Promise<{ tax: number }>} - The tax value.
+ * @throws {Error} - If there is an error fetching the tax.
+ */
 export const getCompanyTaxCurrency = async (): Promise<{ tax: number }> => {
   try {
     const companyId = await getCompanyId();

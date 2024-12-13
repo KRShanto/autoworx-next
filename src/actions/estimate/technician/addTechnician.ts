@@ -20,12 +20,19 @@ type TechnicianInput = {
   invoiceId: string;
 };
 
+/**
+ * Add a new technician and update the work order status.
+ *
+ * @param payload - The technician data to be added.
+ * @returns A promise that resolves to a ServerAction indicating success or failure.
+ */
 export async function addTechnician(
   payload: TechnicianInput,
 ): Promise<ServerAction> {
   const companyId = await getCompanyId();
 
   try {
+    // Validate the payload
     if (!payload) {
       return { type: "error", message: "Invalid payload" };
     }
@@ -42,6 +49,7 @@ export async function addTechnician(
 
     console.log("Date with time: ", dateWithTime);
 
+    // Create a new technician in the database
     const newTechnician = await db.technician.create({
       data: {
         ...payload,
@@ -51,15 +59,18 @@ export async function addTechnician(
       },
     });
 
+    // Fetch the user associated with the new technician
     const user = await db.user.findUnique({
       where: { id: newTechnician.userId },
     });
 
+    // Update the work order status after adding the technician
     await updateWorkOrderStatus(payload.invoiceId);
     revalidatePath("/estimate/workorder");
     revalidatePath("/estimate/view");
     revalidatePath("/employee");
 
+    // Return a success message with the new technician data
     return {
       type: "success",
       data: { ...newTechnician, name: user?.firstName + " " + user?.lastName },

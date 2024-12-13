@@ -8,6 +8,22 @@ import { AuthSession } from "@/types/auth";
 import { InventoryProduct, Material, Tag } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
+/**
+ * Creates a new material in the database.
+ *
+ * @param {Object} params - The parameters for creating the material.
+ * @param {string} params.name - The name of the new material.
+ * @param {number} [params.categoryId] - The category ID of the new material (optional).
+ * @param {number} [params.vendorId] - The vendor ID of the new material (optional).
+ * @param {Tag[]} [params.tags] - The tags for the new material (optional).
+ * @param {string} [params.notes] - The notes for the new material (optional).
+ * @param {number} [params.quantity] - The quantity of the new material (optional).
+ * @param {number} [params.cost] - The cost of the new material (optional).
+ * @param {number} [params.sell] - The sell price of the new material (optional).
+ * @param {number} [params.discount] - The discount on the new material (optional).
+ * @param {boolean} [params.addToInventory] - Whether to add the material to inventory (optional).
+ * @returns {Promise<ServerAction>} The result of the creation operation.
+ */
 export async function newMaterial({
   name,
   categoryId,
@@ -31,11 +47,13 @@ export async function newMaterial({
   discount?: number;
   addToInventory?: boolean;
 }): Promise<ServerAction> {
+  // Authenticate the user and get the session
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
   let newMaterial: Material | InventoryProduct | null = null;
   let newMaterialTags: { tag: Tag }[] = [];
 
+  // Create the material in the inventory if specified
   if (addToInventory) {
     const res = await createProduct({
       name,
@@ -53,6 +71,7 @@ export async function newMaterial({
       newMaterial = res.data;
     }
   } else {
+    // Create the material in the database
     newMaterial = await db.material.create({
       data: {
         name,
@@ -68,7 +87,7 @@ export async function newMaterial({
     });
   }
 
-  // create inventory tags
+  // Create tags for the new material
   if (tags && newMaterial) {
     if (addToInventory) {
       await Promise.all(
@@ -109,8 +128,10 @@ export async function newMaterial({
     }
   }
 
+  // Revalidate the cache for the "/estimate" path
   revalidatePath("/estimate");
 
+  // Return the result of the creation operation
   return {
     type: "success",
     data: {

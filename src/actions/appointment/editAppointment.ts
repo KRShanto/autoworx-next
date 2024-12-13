@@ -27,6 +27,13 @@ export interface AppointmentToUpdate {
   timezone?: string;
 }
 
+/**
+ * Edits an existing appointment.
+ *
+ * @param id - The ID of the appointment to edit.
+ * @param appointment - The new appointment data.
+ * @returns A promise that resolves to a ServerAction indicating the result.
+ */
 export async function editAppointment({
   id,
   appointment,
@@ -35,11 +42,12 @@ export async function editAppointment({
   appointment: AppointmentToUpdate;
 }): Promise<ServerAction> {
   try {
+    // Authenticate the user and get the session
     const session = (await auth()) as AuthSession;
     const companyId = session.user.companyId;
 
+    // Check if the draftEstimate is different from the existing one
     if (appointment.draftEstimate) {
-      // Check if the draftEstimate is same as the previous one
       const existingAppointment = await db.appointment.findUnique({
         where: {
           id,
@@ -47,7 +55,7 @@ export async function editAppointment({
       });
 
       if (existingAppointment?.draftEstimate !== appointment.draftEstimate) {
-        // Create draft estimate (if doesn't exist)
+        // Create draft estimate if it doesn't exist
         const draftEstimate = await db.invoice.findFirst({
           where: {
             id: appointment.draftEstimate,
@@ -69,7 +77,7 @@ export async function editAppointment({
       }
     }
 
-    // Update the appointment
+    // Update the appointment in the database
     let updatedAppointment = await db.appointment.update({
       where: {
         id,
@@ -92,7 +100,7 @@ export async function editAppointment({
       },
     });
 
-    // Loop the assigned users and add them to the Google Calendar
+    // Loop through the assigned users and add them to the Google Calendar
     for (const user of appointment.assignedUsers) {
       const assignedUser = await db.user.findUnique({
         where: {
@@ -102,7 +110,7 @@ export async function editAppointment({
 
       // TODO: Add the task to the user's Google Calendar
 
-      // Create the task user
+      // Create the task user in the database
       await db.appointmentUser.create({
         data: {
           appointmentId: id,
@@ -112,10 +120,10 @@ export async function editAppointment({
       });
     }
 
+    // Revalidate the path to update the cache
     revalidatePath("/task");
 
-    // if the appointment has date, start time and end time, then insert it in google calendar
-    // also need to check if google calendar token exists or not, if not, then no need of inserting
+    // Check if Google Calendar token exists and update or create Google Calendar event
     const cookie = await cookies();
     let googleCalendarToken = cookie.get("googleCalendarToken")?.value;
 
@@ -139,7 +147,7 @@ export async function editAppointment({
     ) {
       let event = await createGoogleCalendarEvent(appointment);
 
-      // if event is successfully created in google calendar, then save the event id in task model
+      // Save the event ID in the database if the event is successfully created in Google Calendar
       if (event && event.id) {
         await db.appointment.update({
           where: {
@@ -152,11 +160,13 @@ export async function editAppointment({
       }
     }
 
+    // Return a success action
     return {
       type: "success",
     };
   } catch (error) {
     console.log("🚀 ~ error:", error);
+    // Return an error action
     return {
       type: "error",
     };

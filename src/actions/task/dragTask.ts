@@ -15,7 +15,12 @@ type TTask = {
   timezone: string;
 };
 
-// TODO: later, use updateTask instead of dragTask
+/**
+ * Updates the task date and time when dragged.
+ *
+ * @param task - The task data with updated date and time.
+ * @returns A server action indicating success or error.
+ */
 export async function dragTask(task: TTask): Promise<ServerAction> {
   const oldTask = await db.task.findUnique({
     where: {
@@ -41,6 +46,12 @@ export async function dragTask(task: TTask): Promise<ServerAction> {
   };
 }
 
+/**
+ * Updates the task with new date and time, and syncs with Google Calendar.
+ *
+ * @param task - The task data with updated date and time.
+ * @returns A server action indicating success or error.
+ */
 export async function updateTask(task: TTask): Promise<ServerAction> {
   try {
     let updatedTask = await db.task.update({
@@ -56,8 +67,8 @@ export async function updateTask(task: TTask): Promise<ServerAction> {
 
     revalidatePath("/task");
 
-    // if the task has date, start time and end time, then insert it in google calendar
-    // also need to check if google calendar token exists or not, if not, then no need of inserting
+    // If the task has date, start time and end time, then insert it in Google Calendar
+    // Also need to check if Google Calendar token exists or not, if not, then no need of inserting
     const cookie = await cookies();
     let googleCalendarToken = cookie.get("googleCalendarToken")?.value;
 
@@ -107,7 +118,7 @@ export async function updateTask(task: TTask): Promise<ServerAction> {
 
       let event = await createGoogleCalendarEvent(taskForGoogleCalendar);
 
-      // if event is successfully created in google calendar, then save the event id in task model
+      // If event is successfully created in Google Calendar, then save the event ID in task model
       if (event && event.id) {
         await db.task.update({
           where: {

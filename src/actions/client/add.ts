@@ -14,6 +14,12 @@ const CustomerSchema = z.object({
   email: z.string().email().nullable(),
 });
 
+/**
+ * Adds a new customer to the database.
+ *
+ * @param data - The new customer data.
+ * @returns A promise that resolves to a ServerAction indicating the result.
+ */
 export async function addCustomer(data: {
   firstName: string;
   lastName?: string;
@@ -29,11 +35,14 @@ export async function addCustomer(data: {
   sourceId?: number;
 }): Promise<ServerAction> {
   try {
+    // Validate the data
     CustomerSchema.parse(data);
 
+    // Authenticate the user and get the session
     const session = (await auth()) as AuthSession;
     const companyId = session.user.companyId;
 
+    // Create a new customer in the database
     const newCustomer = await db.client.create({
       data: {
         ...data,
@@ -42,8 +51,10 @@ export async function addCustomer(data: {
       },
     });
 
+    // Revalidate the path to update the cache
     revalidatePath("/client");
 
+    // Return a success action with the new customer data
     return { type: "success", data: newCustomer };
   } catch (error: any) {
     console.log(error);

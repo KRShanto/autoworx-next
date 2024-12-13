@@ -22,6 +22,11 @@ const CreateProductInputSchema = z.object({
   lowInventoryAlert: z.number().optional(),
 });
 
+/**
+ * Create a new product in the inventory.
+ * @param {Object} data - The data for creating the product.
+ * @returns {Promise<ServerAction>} The result of the action.
+ */
 export async function createProduct(
   data: z.infer<typeof CreateProductInputSchema>,
 ): Promise<ServerAction> {
@@ -31,6 +36,7 @@ export async function createProduct(
 
     const companyId = await getCompanyId();
 
+    // Create the new product in the database
     const newProduct = await db.inventoryProduct.create({
       data: {
         ...validatedData,
@@ -39,13 +45,14 @@ export async function createProduct(
       },
     });
 
+    // Fetch the vendor if vendorId is provided
     const vendor = newProduct.vendorId
       ? await db.vendor.findUnique({
           where: { id: newProduct.vendorId },
         })
       : null;
 
-    // create a history record
+    // Create a history record for the new product
     await db.inventoryProductHistory.create({
       data: {
         companyId,
@@ -58,6 +65,7 @@ export async function createProduct(
       },
     });
 
+    // Revalidate the inventory path
     revalidatePath("/inventory");
 
     return {

@@ -8,6 +8,9 @@ import {
   User as PrismaUser,
 } from "@prisma/client";
 
+/**
+ * Interface representing a full message with additional details.
+ */
 export interface FullMessage {
   id: number;
   to: PrismaUser | null; // Modified to include user object instead of ID
@@ -21,6 +24,11 @@ export interface FullMessage {
   group: Group | null; // Including group info if available
 }
 
+/**
+ * Fetch recent messages for the current user.
+ *
+ * @returns An array of full messages with additional details.
+ */
 export const fetchRecentMessages = async (): Promise<FullMessage[]> => {
   try {
     const user = await getUser();

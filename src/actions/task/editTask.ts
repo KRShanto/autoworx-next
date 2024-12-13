@@ -24,6 +24,13 @@ interface TaskType {
   timezone: string;
 }
 
+/**
+ * Edits an existing task.
+ *
+ * @param id - The ID of the task to edit.
+ * @param task - The updated task data.
+ * @returns A server action indicating success or error.
+ */
 export async function editTask({
   id,
   task,
@@ -91,8 +98,8 @@ export async function editTask({
       },
     });
 
-    // if the task has date, start time and end time, then insert it in google calendar
-    // also need to check if google calendar token exists or not, if not, then no need of inserting
+    // If the task has date, start time and end time, then insert it in Google Calendar
+    // Also need to check if Google Calendar token exists or not, if not, then no need of inserting
     const cookie = await cookies();
     let googleCalendarToken = cookie.get("googleCalendarToken")?.value;
 
@@ -113,7 +120,7 @@ export async function editTask({
     ) {
       let event = await createGoogleCalendarEvent(task);
 
-      // if event is successfully created in google calendar, then save the event id in task model
+      // If event is successfully created in Google Calendar, then save the event ID in task model
       if (event && event.id) {
         await db.task.update({
           where: {

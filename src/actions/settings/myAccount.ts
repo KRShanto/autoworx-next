@@ -1,4 +1,19 @@
 "use server";
+
+/**
+ * Edits the account information of the current user.
+ *
+ * @param firstName - The new first name of the user.
+ * @param lastName - The new last name of the user.
+ * @param image - The new profile image of the user.
+ * @param phone - The new phone number of the user.
+ * @param address - The new address of the user.
+ * @param city - The new city of the user.
+ * @param state - The new state of the user.
+ * @param zip - The new zip code of the user.
+ * @returns An object indicating the success status of the operation.
+ * @throws Will throw an error if the update operation fails.
+ */
 import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
@@ -35,6 +50,7 @@ export async function editMyAccountInfo({
 
     console.log("edit profile", { image });
 
+    // Update the user information in the database
     const user = await db.user.update({
       where: {
         id: +userId,
@@ -51,6 +67,7 @@ export async function editMyAccountInfo({
       },
     });
 
+    // Revalidate the cache for the my-account settings page
     revalidatePath("/settings/my-account");
 
     return { success: true };
@@ -61,6 +78,16 @@ export async function editMyAccountInfo({
     };
   }
 }
+
+/**
+ * Changes the password of the current user.
+ *
+ * @param currentPassword - The current password of the user.
+ * @param newPassword - The new password to be set.
+ * @param confirmNewPassword - The confirmation of the new password.
+ * @returns An object indicating the success status of the operation.
+ * @throws Will throw an error if the update operation fails.
+ */
 export async function changePassword(
   currentPassword: string,
   newPassword: string,
@@ -82,6 +109,7 @@ export async function changePassword(
       throw new Error("User not found");
     }
 
+    // Compare the current password with the stored password
     let comparePassword = await bcrypt.compare(currentPassword, user.password);
 
     if (!comparePassword) {
@@ -92,6 +120,7 @@ export async function changePassword(
       throw new Error("Password don't match");
     }
 
+    // Hash the new password and update it in the database
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await db.user.update({
       where: {

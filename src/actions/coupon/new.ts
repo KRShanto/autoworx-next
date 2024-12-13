@@ -32,8 +32,13 @@ cron.schedule("0 0 * * *", async () => {
   });
 });
 
+/**
+ * Create a new coupon
+ * @param data - The data for the new coupon
+ * @returns The newly created coupon
+ */
 export async function newCoupon(data: NewCouponData) {
-  const companyId = await getCompanyId();
+  const companyId = await getCompanyId(); // Get the company ID
 
   const newCoupon = await db.coupon.create({
     data: {
@@ -50,14 +55,15 @@ export async function newCoupon(data: NewCouponData) {
     },
   });
 
-  revalidatePath("/payments");
+  revalidatePath("/payments"); // Revalidate the payments path
 
   return {
     type: "success",
     data: newCoupon,
   };
 }
-//update
+
+// Update coupon data interface
 interface UpdateCouponData {
   id: string;
   couponName: string;
@@ -69,8 +75,13 @@ interface UpdateCouponData {
   couponType: string;
 }
 
+/**
+ * Update an existing coupon
+ * @param data - The data for updating the coupon
+ * @returns The updated coupon
+ */
 export async function updateCoupon(data: UpdateCouponData) {
-  const companyId = await getCompanyId();
+  const companyId = await getCompanyId(); // Get the company ID
 
   const existingCoupon = await db.coupon.findUnique({
     where: { id: +data.id },
@@ -97,7 +108,7 @@ export async function updateCoupon(data: UpdateCouponData) {
     },
   });
 
-  revalidatePath("/payments");
+  revalidatePath("/payments"); // Revalidate the payments path
 
   return {
     type: "success",
@@ -105,9 +116,13 @@ export async function updateCoupon(data: UpdateCouponData) {
   };
 }
 
-//delete
+/**
+ * Delete a coupon
+ * @param couponId - The ID of the coupon to delete
+ * @returns A success message
+ */
 export const deleteCoupon = async (couponId: number) => {
-  const companyId = await getCompanyId();
+  const companyId = await getCompanyId(); // Get the company ID
   const existingCoupon = await db.coupon.findUnique({
     where: { id: +couponId },
   });
@@ -120,6 +135,6 @@ export const deleteCoupon = async (couponId: number) => {
   await db.coupon.delete({
     where: { id: +couponId },
   });
-  revalidatePath("/payments");
+  revalidatePath("/payments"); // Revalidate the payments path
   return { type: "success", message: "Coupon deleted successfully" };
 };

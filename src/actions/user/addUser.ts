@@ -7,6 +7,15 @@ import { AuthSession } from "@/types/auth";
 import bcrypt from "bcrypt";
 import { revalidatePath } from "next/cache";
 
+/**
+ * Adds a new user to the database.
+ * @param firstName - The first name of the user.
+ * @param lastName - The last name of the user.
+ * @param email - The email of the user.
+ * @param password - The password of the user.
+ * @param confirmPassword - The confirmation of the password.
+ * @returns An object containing the status of the action.
+ */
 export async function addUser({
   firstName,
   lastName,
@@ -28,9 +37,9 @@ export async function addUser({
     };
   }
 
-  const encPassword = await bcrypt.hash(password, 10);
-  const session = (await auth()) as AuthSession;
-  const companyId = session.user.companyId;
+  const encPassword = await bcrypt.hash(password, 10); // Encrypt the password
+  const session = (await auth()) as AuthSession; // Get the current session
+  const companyId = session.user.companyId; // Get the company ID from the session
 
   await db.user.create({
     data: {
@@ -43,6 +52,7 @@ export async function addUser({
     },
   });
 
+  // Revalidate paths to update the cache
   revalidatePath("/task");
   revalidatePath("/employee");
 

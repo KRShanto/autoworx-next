@@ -21,6 +21,12 @@ interface EmployeeData {
   profilePicture?: string;
 }
 
+/**
+ * Updates an employee's information in the database.
+ *
+ * @param {EmployeeData} data - The employee data to update.
+ * @returns {Promise<{type: string, message: string}>} - The result of the update operation.
+ */
 export async function updateEmployee({
   firstName,
   lastName,
@@ -36,7 +42,7 @@ export async function updateEmployee({
   type,
   profilePicture,
 }: EmployeeData) {
-  // Check if any field is missing
+  // Check if any required field is missing
   if (!firstName || !email) {
     return {
       type: "error",
@@ -44,7 +50,7 @@ export async function updateEmployee({
     };
   }
 
-  // Check if the email valid
+  // Check if the email is valid
   if (!EmailValidator.validate(email)) {
     return {
       type: "error",
@@ -52,7 +58,7 @@ export async function updateEmployee({
     };
   }
 
-  // update the employee
+  // Update the employee in the database
   await db.user.update({
     where: { email },
     data: {
@@ -72,6 +78,7 @@ export async function updateEmployee({
     },
   });
 
+  // Revalidate the employee page to reflect the changes
   revalidatePath("/employee");
 
   return {

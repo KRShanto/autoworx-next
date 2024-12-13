@@ -2,6 +2,12 @@
 
 import { db } from "@/lib/db";
 
+/**
+ * Save a tag for an invoice.
+ * @param invoiceId - The ID of the invoice.
+ * @param tagId - The ID of the tag.
+ * @returns The created invoice tag.
+ */
 export const saveInvoiceTag = async (invoiceId: string, tagId: number) => {
   try {
     const result = await db.invoiceTags.create({
@@ -17,6 +23,12 @@ export const saveInvoiceTag = async (invoiceId: string, tagId: number) => {
   }
 };
 
+/**
+ * Remove a tag from an invoice.
+ * @param invoiceId - The ID of the invoice.
+ * @param tagId - The ID of the tag.
+ * @returns The result of the deletion operation.
+ */
 export const removeInvoiceTag = async (invoiceId: string, tagId: number) => {
   try {
     const result = await db.invoiceTags.deleteMany({

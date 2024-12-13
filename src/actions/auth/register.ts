@@ -8,6 +8,7 @@ import { FormErrorType } from "@/types/form-errror";
 import bcrypt from "bcrypt";
 import * as EmailValidator from "email-validator";
 
+// Interface for the registration data
 interface RegisterData {
   firstName: string;
   lastName: string;
@@ -16,11 +17,13 @@ interface RegisterData {
   company: string;
 }
 
+// Interface for the response
 interface Response {
   success?: boolean;
   error?: FormErrorType;
 }
 
+// Function to insert default columns for a company
 const insertDefaultColumns = async (columnId: number, type: string) => {
   const columnsFortypes = defaultColumnWithColor.filter(
     (column) => column.type === type,
@@ -37,6 +40,7 @@ const insertDefaultColumns = async (columnId: number, type: string) => {
   });
 };
 
+// Function to register a new user and create a company
 export async function register({
   firstName,
   lastName,
@@ -51,26 +55,25 @@ export async function register({
     };
   }
 
-  // check if the user already created
+  // Check if the user already exists
   const user = await db.user.findUnique({
     where: { email },
   });
 
   if (user) {
     return {
-      // error: "User already exist!",
       error: { message: "User already exist!", field: "email" },
     };
   }
 
-  // check if the email is valid
+  // Check if the email is valid
   if (!EmailValidator.validate(email)) {
     return {
       error: { message: "Invalid email address", field: "email" },
     };
   }
 
-  // check if the password is long enough
+  // Check if the password is long enough
   if (password.length < MIN_PASSWORD_LENGTH) {
     return {
       error: {
@@ -80,7 +83,7 @@ export async function register({
     };
   }
 
-  // hash the password
+  // Hash the password
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
@@ -92,6 +95,7 @@ export async function register({
       },
     });
 
+    // Create the user
     await db.user.create({
       data: {
         firstName,
@@ -102,24 +106,25 @@ export async function register({
         companyId: newCompany.id,
       },
     });
-    //creating default permissions for the company users
+
+    // Create default permissions for the company users
     await Promise.all([
-      // create default permission for manager
+      // Create default permission for manager
       db.permissionForManager.create({
         data: { companyId: newCompany.id },
       }),
 
-      // create default permission for sales
+      // Create default permission for sales
       db.permissionForSales.create({
         data: { companyId: newCompany.id },
       }),
 
-      // create default permission for technician
+      // Create default permission for technician
       db.permissionForTechnician.create({
         data: { companyId: newCompany.id },
       }),
 
-      // create default permission for other
+      // Create default permission for other
       db.permissionForOther.create({
         data: { companyId: newCompany.id },
       }),
@@ -151,7 +156,6 @@ export async function register({
     console.error("The error: ", error);
 
     return {
-      // error: "A server side error occured",
       error: { message: "A server side error occured", field: "all" },
     };
   }

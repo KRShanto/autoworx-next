@@ -15,13 +15,16 @@ import {
 } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
+/**
+ * Creates a new invoice with the provided data.
+ * @param params - The data to create the invoice with.
+ * @returns A promise that resolves to a ServerAction indicating success or error.
+ */
 export async function createInvoice({
   invoiceId,
   type,
-
   clientId,
   vehicleId,
-
   subtotal,
   discount,
   tax,
@@ -30,26 +33,21 @@ export async function createInvoice({
   depositMethod,
   grandTotal,
   due,
-
   internalNotes,
   terms,
   policy,
   customerNotes,
   customerComments,
-
   photos,
   items,
   tasks,
-
   coupon,
   columnId,
 }: {
   invoiceId: string;
   type: InvoiceType;
-
   clientId?: number;
   vehicleId?: number;
-
   subtotal: number;
   discount: number;
   tax: number;
@@ -58,13 +56,11 @@ export async function createInvoice({
   depositMethod: string;
   grandTotal: number;
   due: number;
-
   internalNotes: string;
   terms: string;
   policy: string;
   customerNotes: string;
   customerComments: string;
-
   photos: string[];
   items: {
     service: Service | null;
@@ -72,20 +68,20 @@ export async function createInvoice({
     labor: Labor | null;
     tags: Tag[];
   }[];
-
   tasks: { id: undefined | number; task: string }[];
-
   coupon?: Coupon | null;
   columnId?: number;
 }): Promise<ServerAction> {
+  // Authenticate the user and get the session
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
+
+  // Determine the final column ID
   let finalColumnId = columnId;
   if (!finalColumnId) {
     const defaultColumnId = await db.column.findFirst({
       where: {
         title: "Pending",
-
         type: "shop",
         companyId,
       },
@@ -100,6 +96,7 @@ export async function createInvoice({
     }
   }
 
+  // Adjust the invoice type based on the column title
   if (finalColumnId) {
     const column = await db.column.findUnique({
       where: {
@@ -110,11 +107,11 @@ export async function createInvoice({
     if (column) {
       type = column.title === "In Progress" ? "Invoice" : type;
     } else {
-      throw new Error("Column not found to create inovice convertions");
+      throw new Error("Column not found to create invoice conversions");
     }
   }
 
-  // calculate the total cost. This is the sum of all the costs of the materials and labor
+  // Calculate the total cost of materials and labor
   const totalCost = items.reduce((acc, item) => {
     const materialCostPrice = item.materials.reduce(
       (acc, cur) => acc + Number(cur?.cost) * Number(cur?.quantity),
@@ -125,6 +122,7 @@ export async function createInvoice({
     return acc + materialCostPrice + laborCostPrice;
   }, 0);
 
+  // Create the invoice in the database
   const invoice = await db.invoice.create({
     data: {
       id: invoiceId,
@@ -151,7 +149,7 @@ export async function createInvoice({
     },
   });
 
-  // Upload photos
+  // Upload photos associated with the invoice
   photos.forEach(async (photo) => {
     await db.invoicePhoto.create({
       data: {
@@ -161,13 +159,14 @@ export async function createInvoice({
     });
   });
 
+  // Create items, materials, labor, and tags associated with the invoice
   items.forEach(async (item) => {
     const service = item.service;
     const materials = item.materials;
     const labor = item.labor;
     const tags = item.tags;
 
-    // Create new labor
+    // Create new labor entry if labor is provided
     let laborId;
     if (labor) {
       const newLabor = await db.labor.create({
@@ -185,6 +184,7 @@ export async function createInvoice({
       laborId = newLabor.id;
     }
 
+    // Create the invoice item
     const invoiceItem = await db.invoiceItem.create({
       data: {
         invoiceId: invoice.id,
@@ -193,7 +193,7 @@ export async function createInvoice({
       },
     });
 
-    // Create materials
+    // Create materials associated with the invoice item
     materials.forEach(async (material) => {
       if (!material) return;
 
@@ -215,6 +215,7 @@ export async function createInvoice({
       });
     });
 
+    // Create tags associated with the invoice item
     tags.forEach(async (tag) => {
       await db.itemTag.create({
         data: {
@@ -225,6 +226,7 @@ export async function createInvoice({
     });
   });
 
+  // Create tasks associated with the invoice
   tasks.forEach(async (task) => {
     if (!task) return;
 
@@ -240,7 +242,7 @@ export async function createInvoice({
     });
   });
 
-  // Update coupon
+  // Update the coupon if provided
   if (coupon) {
     await db.coupon.update({
       where: {
@@ -251,7 +253,7 @@ export async function createInvoice({
       },
     });
 
-    // Create client coupon
+    // Create a client coupon entry
     await db.clientCoupon.create({
       data: {
         clientId: clientId!,
@@ -260,6 +262,7 @@ export async function createInvoice({
     });
   }
 
+  // Revalidate the path to update the cache
   revalidatePath("/estimate");
 
   return {

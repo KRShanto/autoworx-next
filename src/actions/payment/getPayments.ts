@@ -17,9 +17,15 @@ export interface ReturnPayment {
   paid: boolean;
 }
 
+/**
+ * Retrieves all payments for the authenticated user's company.
+ * 
+ * @returns {Promise<ReturnPayment[]>} - A list of payments.
+ */
 export async function getPayments(): Promise<ReturnPayment[]> {
   const companyId = await getCompanyId();
 
+  // Fetch all payments for the company and include related data
   const payments = await db.payment.findMany({
     where: {
       companyId,
@@ -42,6 +48,7 @@ export async function getPayments(): Promise<ReturnPayment[]> {
     },
   });
 
+  // Map the payments to the return format
   return payments.map((payment) => {
     return {
       id: payment.id,
@@ -62,6 +69,12 @@ export async function getPayments(): Promise<ReturnPayment[]> {
   });
 }
 
+/**
+ * Determines the payment method based on the payment data.
+ * 
+ * @param {any} payment - The payment data.
+ * @returns {string} - The payment method.
+ */
 function getPaymentMethod(payment: any) {
   if (payment.card) {
     return "Card";

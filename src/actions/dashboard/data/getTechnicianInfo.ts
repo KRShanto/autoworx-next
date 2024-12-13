@@ -13,6 +13,8 @@ import {
 
 /**
  * Get technician information including performance, monthly payout, and current projects.
+ *
+ * @returns An object containing various technician information metrics.
  */
 export async function getTechnicianInfo() {
   const performance = await getPerformance();
@@ -28,6 +30,8 @@ export async function getTechnicianInfo() {
 
 /**
  * Get current projects for the technician.
+ *
+ * @returns An array of current projects with details.
  */
 export interface CurrentProject {
   id: string;
@@ -38,6 +42,7 @@ export interface CurrentProject {
   yearMakeModel: string;
   totalPayout: number;
 }
+
 async function getCurrentProjects() {
   const { companyId, userId } = await getEssentials();
 
@@ -89,6 +94,8 @@ async function getCurrentProjects() {
 
 /**
  * Get performance metrics for the technician.
+ *
+ * @returns An object containing performance metrics such as total jobs, on-time completion rate, and redo jobs.
  */
 async function getPerformance() {
   const { userId } = await getEssentials();
@@ -167,6 +174,8 @@ async function getPerformance() {
 
 /**
  * Get monthly payout for the technician.
+ *
+ * @returns An object containing the total payout, pending payout, and growth rate.
  */
 async function getMonthlyPayout() {
   const { userId } = await getEssentials();
@@ -233,6 +242,8 @@ async function getMonthlyPayout() {
 
 /**
  * Get essential information including companyId and userId.
+ *
+ * @returns An object containing the companyId and userId.
  */
 async function getEssentials() {
   const companyId = await getCompanyId();

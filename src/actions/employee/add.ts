@@ -27,6 +27,12 @@ interface EmployeeData {
   confirmPassword: string;
 }
 
+/**
+ * Add a new employee.
+ *
+ * @param employeeData - The data of the employee to add.
+ * @returns A success or error message.
+ */
 export async function addEmployee({
   firstName,
   lastName,
@@ -46,7 +52,7 @@ export async function addEmployee({
 }: EmployeeData): Promise<ServerAction> {
   const companyId = await getCompanyId();
 
-  // Check if any field is missing
+  // Check if any required field is missing
   if (!firstName || !email || !password || !confirmPassword) {
     return {
       type: "error",
@@ -54,7 +60,7 @@ export async function addEmployee({
     };
   }
 
-  // check if the user already created
+  // Check if the user already exists
   const user = await db.user.findUnique({
     where: { email },
   });
@@ -62,11 +68,11 @@ export async function addEmployee({
   if (user) {
     return {
       type: "error",
-      message: "User already exist!",
+      message: "User already exists!",
     };
   }
 
-  // check if the email is valid
+  // Check if the email is valid
   if (!EmailValidator.validate(email)) {
     return {
       type: "error",
@@ -74,15 +80,15 @@ export async function addEmployee({
     };
   }
 
-  // check if the password is long enough
+  // Check if the password is long enough
   if (password.length < MIN_PASSWORD_LENGTH) {
     return {
       type: "error",
-      message: "Password must be at least 6 characters long",
+      message: `Password must be at least ${MIN_PASSWORD_LENGTH} characters long`,
     };
   }
 
-  // check if the password and confirm password match
+  // Check if the password and confirm password match
   if (password !== confirmPassword) {
     return {
       type: "error",
@@ -90,10 +96,10 @@ export async function addEmployee({
     };
   }
 
-  // hash the password
+  // Hash the password
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // create the employee
+  // Create the employee
   const newEmployee = await db.user.create({
     data: {
       firstName,
@@ -115,8 +121,10 @@ export async function addEmployee({
     },
   });
 
+  // Revalidate the employee page
   revalidatePath("/employee");
 
+  // Return a success message
   return {
     type: "success",
     message: "Employee added successfully",

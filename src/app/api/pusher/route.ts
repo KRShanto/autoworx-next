@@ -15,13 +15,17 @@ type TMessageDate = {
 
 const pusher = getPusherInstance();
 
-// POST /api/pusher/trigger
-// Trigger a message to the client
-// Body: { message, roomId }
+/**
+ * Handles POST requests to trigger a message to the client.
+ *
+ * @param req - The request object.
+ * @returns A response indicating the result of the operation.
+ */
 export async function POST(req: Request) {
   const body = await req.json();
   const { to, message, type, attachmentFiles, requestEstimate } = body;
   try {
+    // Authenticate the user and get the session
     const session = (await auth()) as AuthSession | null;
     if (!session) throw new Error("Unauthorized");
     const userId = parseInt(session.user.id);
@@ -35,7 +39,8 @@ export async function POST(req: Request) {
       message,
       requestEstimateId: requestEstimate ? requestEstimate?.id : null,
     };
-    // send a message for group
+
+    // Send a message for group
     if (type === sendType.Group) {
       const isUserInExistGroup = await db.group.findFirst({
         where: {
@@ -64,13 +69,13 @@ export async function POST(req: Request) {
       };
     }
 
-    // Save to the database
+    // Save the message to the database
     const createdMessage = await db.message.create({
       data: messageData,
     });
 
     let attachments = null;
-    // attachment file upload
+    // Handle attachment file upload
     if (attachmentFiles) {
       const attachmentFromDB = await db.message.update({
         where: {
@@ -93,7 +98,7 @@ export async function POST(req: Request) {
       attachments = attachmentFromDB.attachment;
     }
 
-    // send the raw message to the room
+    // Send the raw message to the room
     pusher.trigger(channel, "message", {
       groupId: type === sendType.Group ? to : null,
       to: type !== sendType.Group ? to : null,
@@ -108,9 +113,11 @@ export async function POST(req: Request) {
       requestEstimate: requestEstimate ? requestEstimate : null,
     });
 
+    // Revalidate paths to update the cache
     revalidatePath("/communication/internal");
     revalidatePath("/communication/collaboration");
-    // send json
+
+    // Send JSON response
     return new Response(
       JSON.stringify({
         success: true,

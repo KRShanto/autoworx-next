@@ -20,21 +20,18 @@ type TEstimateData = {
   messageText?: string;
 };
 
+/**
+ * Requests an estimate by creating necessary records in the database.
+ *
+ * @param formDataForPhoto - The form data containing photos.
+ * @param requestEstimateData - The data for the estimate request.
+ * @returns A response indicating the result of the operation.
+ */
 export const requestEstimate = async (
   formDataForPhoto: FormData,
   requestEstimateData: TEstimateData,
 ) => {
   try {
-    // const isAlreadyExistsEstimate = await db.client.findFirst({
-    //   where: {
-    //     companyId: requestEstimateData.receiverCompanyId,
-    //   },
-    // });
-
-    // if (!!isAlreadyExistsEstimate) {
-    //   throw new Error("Estimate for this client already exists");
-    // }
-
     const { requestEstimateFromDB } = await db.$transaction(async (prisma) => {
       const origin = headers().get("origin");
 
@@ -64,20 +61,18 @@ export const requestEstimate = async (
         fromRequestedCompanyId: requestEstimateData.senderCompanyId,
       };
 
-      // if the client already exist
+      // If the client already exists
       let client = await prisma.client.findFirst({
         where: {
           fromRequestedCompanyId: requestEstimateData.senderCompanyId,
         },
       });
       if (!client) {
-        // create client in the db
+        // Create client in the database
         client = await prisma.client.create({
           data: clientInfo,
         });
       }
-
-      // console.log("Company id: ", requestEstimateData.receiverCompanyId);
 
       const vehicleInfo = {
         model: requestEstimateData.model,
@@ -89,9 +84,7 @@ export const requestEstimate = async (
         fromRequestedCompanyId: requestEstimateData.senderCompanyId,
       };
 
-      console.log("Vehicle info: ", vehicleInfo);
-
-      // create vehicle in the db
+      // Create vehicle in the database
       const vehicle = await prisma.vehicle.create({
         data: vehicleInfo,
       });
@@ -108,10 +101,10 @@ export const requestEstimate = async (
         clientId: client?.id,
       };
 
-      // create a invoice estimate in db
+      // Create an invoice estimate in the database
       const estimate = await prisma.invoice.create({ data: estimateInfo });
 
-      // create a service for estimate
+      // Create a service for the estimate
       const service = await prisma.service.create({
         data: {
           name: requestEstimateData.serviceRequest,
@@ -121,7 +114,7 @@ export const requestEstimate = async (
         },
       });
 
-      // create invoice in db or set service id or invoice id
+      // Create invoice item in the database
       await prisma.invoiceItem.create({
         data: {
           invoiceId: estimate.id,
@@ -138,12 +131,13 @@ export const requestEstimate = async (
         serviceId: service.id,
         vehicleId: vehicle.id,
       };
-      // create a new request for estimate
+
+      // Create a new request for estimate
       const requestEstimateFromDB = await prisma.requestEstimate.create({
         data: requestedEstimateInfo,
       });
 
-      // update invoice with request estimate id
+      // Update invoice with request estimate ID
       await prisma.invoice.update({
         where: {
           id: estimate.id,
@@ -153,7 +147,7 @@ export const requestEstimate = async (
         },
       });
 
-      //  upload image
+      // Upload image
       const photoPaths = [];
       const res = await fetch(`${origin}/api/upload`, {
         method: "POST",

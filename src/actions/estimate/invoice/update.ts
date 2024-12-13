@@ -7,14 +7,14 @@ import { InvoiceType, Labor, Material, Service, Tag } from "@prisma/client";
 import fs from "fs";
 import { revalidatePath } from "next/cache";
 
+/**
+ * Interface for the input data required to update an estimate.
+ */
 interface UpdateEstimateInput {
   id: string;
-
   clientId: number | undefined;
   vehicleId: number | undefined;
-
   columnId: number | undefined;
-
   subtotal: number;
   discount: number;
   tax: number;
@@ -23,13 +23,11 @@ interface UpdateEstimateInput {
   depositMethod: string;
   grandTotal: number;
   due: number;
-
   internalNotes: string;
   terms: string;
   policy: string;
   customerNotes: string;
   customerComments: string;
-
   photos: string[];
   items: {
     service: Service | null;
@@ -41,6 +39,11 @@ interface UpdateEstimateInput {
   type: InvoiceType;
 }
 
+/**
+ * Updates an invoice with the provided data.
+ * @param data - The data to update the invoice with.
+ * @returns A promise that resolves to a ServerAction indicating success or error.
+ */
 export async function updateInvoice(
   data: UpdateEstimateInput,
 ): Promise<ServerAction> {
@@ -120,7 +123,7 @@ export async function updateInvoice(
   });
 
   if (invoice?.type === "Invoice") {
-    // merge all the same products and sum the quantity
+    // Merge all the same products and sum the quantity
     let materials: Material[] = [];
 
     for (const item in data.items) {
@@ -166,10 +169,7 @@ export async function updateInvoice(
           return;
         }
 
-        // const newQuantity = Math.abs(
-        //   inventoryProduct.quantity - product.quantity,
-        // );
-
+        // Fetch old materials associated with the invoice and product
         const oldMaterials = await db.material.findMany({
           where: {
             invoiceId: data.id,
@@ -177,6 +177,7 @@ export async function updateInvoice(
           },
         });
 
+        // Calculate the old quantity of materials
         const oldQuantity = oldMaterials.reduce((acc, material) => {
           return acc + material.quantity!;
         }, 0);
@@ -184,6 +185,7 @@ export async function updateInvoice(
         console.log("old quantity: ", oldQuantity);
         console.log("new quantity: ", product.quantity);
 
+        // Calculate the difference in quantity
         const diffQuantity = oldQuantity - product.quantity;
 
         console.log("difference: : ", diffQuantity);
@@ -225,7 +227,8 @@ export async function updateInvoice(
       data.type = "Estimate";
     }
   }
-  // re-calculating the profit
+
+  // Recalculate the profit
   const totalCost = data.items.reduce((acc, item) => {
     const materials = item.materials;
     const labor = item.labor;
@@ -239,7 +242,7 @@ export async function updateInvoice(
     return acc + materialCost + laborCost;
   }, 0);
 
-  // update invoice itself
+  // Update the invoice itself
   const updatedInvoice = await db.invoice.update({
     where: {
       id: data.id,
@@ -266,14 +269,14 @@ export async function updateInvoice(
     },
   });
 
-  // get existing photos
+  // Get existing photos
   const previousPhotos = await db.invoicePhoto.findMany({
     where: {
       invoiceId: data.id,
     },
   });
 
-  // remove the files
+  // Remove the files
   previousPhotos.forEach(async (photo) => {
     const photoPath = `images/uploads/${photo.photo}`;
     if (fs.existsSync(photoPath)) {
@@ -281,14 +284,14 @@ export async function updateInvoice(
     }
   });
 
-  // delete existing photos
+  // Delete existing photos
   await db.invoicePhoto.deleteMany({
     where: {
       invoiceId: data.id,
     },
   });
 
-  // create new photos
+  // Create new photos
   data.photos.forEach(async (photo) => {
     await db.invoicePhoto.create({
       data: {
@@ -298,13 +301,14 @@ export async function updateInvoice(
     });
   });
 
-  // delete existing items
+  // Delete existing items
   await db.invoiceItem.deleteMany({
     where: {
       invoiceId: data.id,
     },
   });
 
+  // Create new items, materials, labor, and tags associated with the invoice
   data.items.forEach(async (item) => {
     const service = item.service;
     const materials = item.materials;
@@ -312,7 +316,7 @@ export async function updateInvoice(
     const tags = item.tags;
 
     let laborId;
-    // delete existing labors
+    // Delete existing labors
     if (labor) {
       const existingLabor = await db.labor.findUnique({
         where: {
@@ -329,7 +333,7 @@ export async function updateInvoice(
       }
     }
 
-    // create new labor
+    // Create new labor
     if (labor) {
       const newLabor = await db.labor.create({
         data: {
@@ -346,7 +350,7 @@ export async function updateInvoice(
       laborId = newLabor.id;
     }
 
-    // create new items
+    // Create new items
     const invoiceItem = await db.invoiceItem.create({
       data: {
         invoiceId: data.id,
@@ -384,6 +388,7 @@ export async function updateInvoice(
       });
     });
 
+    // Create tags associated with the invoice item
     tags.forEach(async (tag) => {
       await db.itemTag.create({
         data: {
@@ -394,8 +399,9 @@ export async function updateInvoice(
     });
   });
 
+  // Create or update tasks associated with the invoice
   data.tasks.forEach(async (task) => {
-    // if task.id is undefined, create a new task
+    // If task.id is undefined, create a new task
     if (task.id === undefined) {
       await createTask({
         title: task.task.split(":")[0],
@@ -406,7 +412,7 @@ export async function updateInvoice(
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
     } else {
-      // if task.id is not undefined, update the task
+      // If task.id is not undefined, update the task
       await db.task.update({
         where: {
           id: task.id,
@@ -419,6 +425,7 @@ export async function updateInvoice(
     }
   });
 
+  // Revalidate the path to update the cache
   revalidatePath("/estimate");
 
   return {

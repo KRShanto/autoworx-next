@@ -10,11 +10,18 @@ interface TLeaveRequestData {
   endDate: string;
 }
 
+/**
+ * Creates a new leave request.
+ * @param {TLeaveRequestData} leaveRequestData - The data for the new leave request.
+ * @returns {Promise<{success: boolean, message: string, data?: any}>} - The result of the operation.
+ */
 export const createLeaveRequest = async (
   leaveRequestData: TLeaveRequestData,
 ) => {
   try {
     const user = await getUser();
+
+    // Create the leave request
     const leaveRequest = await db.leaveRequest.create({
       data: {
         ...leaveRequestData,
@@ -25,6 +32,8 @@ export const createLeaveRequest = async (
         endDate: new Date(leaveRequestData.endDate),
       },
     });
+
+    // Revalidate the path
     revalidatePath("/settings/my-account/leave-requests");
 
     return {

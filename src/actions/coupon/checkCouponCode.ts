@@ -3,6 +3,12 @@
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 
+/**
+ * Check if a coupon code is valid and can be used by the client
+ * @param code - The coupon code to check
+ * @param clientId - The ID of the client
+ * @returns The result of the check
+ */
 export async function checkCouponCode({
   code,
   clientId,

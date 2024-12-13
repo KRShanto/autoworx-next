@@ -8,6 +8,15 @@ type THolidays = {
   companyId: number;
   date: string;
 };
+
+/**
+ * Creates holidays for a given company, month, and year.
+ *
+ * @param holidays - The list of holidays to create.
+ * @param selectedMonth - The selected month.
+ * @param selectedYear - The selected year.
+ * @returns The created holidays.
+ */
 export async function createHoliday(
   holidays: THolidays[],
   selectedMonth: string,
@@ -38,6 +47,8 @@ export async function createHoliday(
         return holiday;
       }),
     );
+
+    // Delete holidays that are not in the provided list
     await db.holiday.deleteMany({
       where: {
         date: {
@@ -47,6 +58,7 @@ export async function createHoliday(
         year: selectedYear,
       },
     });
+
     revalidatePath("/task/month");
     return {
       status: 200,
@@ -54,6 +66,7 @@ export async function createHoliday(
       data: holidaysFromDB,
     };
   } catch (err: any) {
+    // Handle errors
     throw new Error("Failed to create holiday: ", err);
   }
 }

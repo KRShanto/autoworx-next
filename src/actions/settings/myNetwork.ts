@@ -9,6 +9,12 @@ import bcrypt from "bcrypt";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+/**
+ * Connects the user's company with another company.
+ * @param {number} targetCompanyId - The ID of the company to connect with.
+ * @param {string} [revalidatePathName] - The path to revalidate.
+ * @returns {Promise<{success: boolean, message: string}>} - The result of the operation.
+ */
 export async function connectWithCompany(
   targetCompanyId: number,
   revalidatePathName?: string | undefined,
@@ -56,6 +62,10 @@ export async function connectWithCompany(
   }
 }
 
+/**
+ * Toggles the business visibility status of the user's company.
+ * @returns {Promise<{success: boolean, message: string}>} - The result of the operation.
+ */
 export async function toggleBusinessVisibility(): Promise<{
   success: boolean;
   message: string;
@@ -95,6 +105,10 @@ export async function toggleBusinessVisibility(): Promise<{
   }
 }
 
+/**
+ * Toggles the phone visibility status of the user's company.
+ * @returns {Promise<{success: boolean, message: string}>} - The result of the operation.
+ */
 export async function togglePhoneVisibility(): Promise<{
   success: boolean;
   message: string;
@@ -134,6 +148,10 @@ export async function togglePhoneVisibility(): Promise<{
   }
 }
 
+/**
+ * Toggles the address visibility status of the user's company.
+ * @returns {Promise<{success: boolean, message: string}>} - The result of the operation.
+ */
 export async function toggleAddressVisibility(): Promise<{
   success: boolean;
   message: string;
@@ -175,6 +193,12 @@ export async function toggleAddressVisibility(): Promise<{
 
 //location
 
+/**
+ * Sets the latitude and longitude of the user's company.
+ * @param {number | null} latitude - The latitude to set.
+ * @param {number | null} longitude - The longitude to set.
+ * @returns {Promise<{success: boolean, message: string}>} - The result of the operation.
+ */
 export async function setLatLong(
   latitude: number | null,
   longitude: number | null,
@@ -227,7 +251,13 @@ function deg2rad(deg: number): number {
   return deg * (Math.PI / 180);
 }
 
-// Function to find nearby unconnected companies
+/**
+ * Finds nearby unconnected companies within a specified distance range.
+ * @param {number} latitude - The latitude of the user's company.
+ * @param {number} longitude - The longitude of the user's company.
+ * @param {[number, number]} range - The distance range [minDistance, maxDistance] in miles.
+ * @returns {Promise<{success: boolean, data: Company[] | []}>} - The result of the operation.
+ */
 export async function findNearbyCompanies(
   latitude: number,
   longitude: number,

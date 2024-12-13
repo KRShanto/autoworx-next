@@ -36,6 +36,12 @@ interface PaymentData {
     | OtherPaymentData;
 }
 
+/**
+ * Updates an existing payment record in the database.
+ *
+ * @param {PaymentData} paymentData - The payment data to update.
+ * @returns {Promise<ServerAction>} - The result of the update operation.
+ */
 export async function updatePayment({
   id,
   type,
@@ -46,6 +52,7 @@ export async function updatePayment({
 }: PaymentData): Promise<ServerAction> {
   let updatedPayment;
 
+  // Determine the type of payment and update accordingly
   switch (type) {
     case "CARD":
       updatedPayment = await db.payment.update({
@@ -117,7 +124,7 @@ export async function updatePayment({
       throw new Error("Invalid payment type");
   }
 
-  // Update invoice
+  // Update the associated invoice
   const invoice = await db.invoice.findUnique({
     where: { id: updatedPayment.invoiceId! },
   });
@@ -130,6 +137,7 @@ export async function updatePayment({
     },
   });
 
+  // Revalidate the path to ensure the changes are reflected
   revalidatePath("/estimate");
 
   return { type: "success", data: updatedPayment };

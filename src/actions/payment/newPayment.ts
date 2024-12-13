@@ -36,6 +36,12 @@ interface PaymentData {
     | OtherPaymentData;
 }
 
+/**
+ * Creates a new payment record in the database.
+ *
+ * @param {PaymentData} paymentData - The payment data to create.
+ * @returns {Promise<ServerAction>} - The result of the creation operation.
+ */
 export async function newPayment({
   invoiceId,
   type,
@@ -103,6 +109,7 @@ export async function newPayment({
     }
   }
 
+  // Update inventory and create history entries
   await Promise.all(
     productsWithQuantity.map(async (product) => {
       // create a new history entry
@@ -137,6 +144,7 @@ export async function newPayment({
 
   let newPayment;
 
+  // Determine the type of payment and create accordingly
   switch (type) {
     case "CARD":
       newPayment = await db.payment.create({
@@ -231,7 +239,7 @@ export async function newPayment({
       };
   }
 
-  // update the invoice
+  // Update the invoice
   await db.invoice.update({
     where: {
       id: invoiceId,

@@ -11,14 +11,26 @@ import {
 } from "@prisma/client";
 import { env } from "next-runtime-env";
 
+/**
+ * Creates a new user feedback entry in the database and sends notifications.
+ *
+ * @param {Object} data - The feedback details.
+ * @param {string} data.whatHappened - Description of what happened.
+ * @param {string} data.whatExpected - Description of what was expected.
+ * @param {string} [data.snapshotImage] - URL of the snapshot image.
+ * @param {string[]} [data.attachments] - List of attachment URLs.
+ * @returns {Promise<Object>} The result of the operation.
+ */
 export async function newUserFeedback(data: {
   whatHappened: string;
   whatExpected: string;
   snapshotImage?: string;
   attachments?: string[];
 }) {
+  // Get the current user
   const user = await getUser();
 
+  // Create a new user feedback entry in the database
   const feedback = await db.userFeedback.create({
     data: {
       whatHappened: data.whatHappened,
@@ -39,6 +51,7 @@ export async function newUserFeedback(data: {
     },
   });
 
+  // Create a new task in Asana for the feedback
   await createAsanaTask(feedback);
 
   return {
@@ -47,7 +60,15 @@ export async function newUserFeedback(data: {
   };
 }
 
-// Create a new task in Asana
+/**
+ * Creates a new task in Asana for the user feedback.
+ *
+ * @param {Object} data - The feedback data.
+ * @param {UserFeedback} data - The user feedback data.
+ * @param {UserFeedbackAttachment[]} data.UserFeedbackAttachment - List of feedback attachments.
+ * @param {User} data.user - The user who submitted the feedback.
+ * @param {Company} data.company - The company of the user.
+ */
 async function createAsanaTask(
   data: UserFeedback & {
     UserFeedbackAttachment: UserFeedbackAttachment[];
@@ -57,6 +78,7 @@ async function createAsanaTask(
 ) {
   console.log("Creating Asana task...");
 
+  // Send a request to Asana to create a new task
   const res = await fetch(`${ASANA_BASE_URL}/tasks`, {
     method: "POST",
     headers: {
@@ -85,6 +107,7 @@ async function createAsanaTask(
   const json = await res.json();
   console.log("Asana task created:", json);
 
+  // Send email notifications to the specified recipients
   USER_FEEDBACK_EMAILS.forEach(async (email) => {
     sendEmail({
       to: email,
@@ -95,6 +118,16 @@ async function createAsanaTask(
   });
 }
 
+/**
+ * Generates the HTML content for the user feedback email.
+ *
+ * @param {Object} feedback - The feedback data.
+ * @param {UserFeedback} feedback - The user feedback data.
+ * @param {UserFeedbackAttachment[]} feedback.UserFeedbackAttachment - List of feedback attachments.
+ * @param {User} feedback.user - The user who submitted the feedback.
+ * @param {Company} feedback.company - The company of the user.
+ * @returns {Promise<Object>} The generated HTML content.
+ */
 export async function generateFeedbackHTML(
   feedback: UserFeedback & {
     UserFeedbackAttachment: UserFeedbackAttachment[];
@@ -112,6 +145,7 @@ export async function generateFeedbackHTML(
     createdAt,
   } = feedback;
 
+  // Generate HTML for the attachments
   const attachmentsHTML = UserFeedbackAttachment?.length
     ? UserFeedbackAttachment.map(
         (attachment) =>
@@ -119,6 +153,7 @@ export async function generateFeedbackHTML(
       ).join("")
     : "<li>No attachments</li>";
 
+  // Generate the body HTML content
   const bodyHTML = `
     <body>
       <div>
@@ -147,6 +182,7 @@ export async function generateFeedbackHTML(
     </body>
   `;
 
+  // Generate the full HTML content
   const fullHTML = `
     <html>
       <head>

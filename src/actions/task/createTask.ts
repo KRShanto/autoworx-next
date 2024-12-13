@@ -22,6 +22,12 @@ export interface TaskType {
   timezone?: string;
 }
 
+/**
+ * Creates a new task and assigns it to users.
+ *
+ * @param task - The task data to create.
+ * @returns A server action indicating success or error.
+ */
 export async function createTask(task: TaskType): Promise<ServerAction> {
   try {
     const session = (await auth()) as AuthSession;
@@ -38,11 +44,12 @@ export async function createTask(task: TaskType): Promise<ServerAction> {
       date: task?.date || undefined,
     };
 
+    // Create the new task in the database
     let newTask = await db.task.create({
       data: taskData,
     });
 
-    // Loop the assigned users and add them to the Google Calendar
+    // Loop through the assigned users and add them to the Google Calendar
     for (const user of task.assignedUsers) {
       const assignedUser = await db.user.findUnique({
         where: {
@@ -65,15 +72,15 @@ export async function createTask(task: TaskType): Promise<ServerAction> {
     revalidatePath("/task");
     revalidatePath("/communication/client");
 
-    // if the task has date, start time and end time, then insert it in google calendar
-    // also need to check if google calendar token exists or not, if not, then no need of inserting
+    // If the task has date, start time and end time, then insert it in Google Calendar
+    // Also need to check if Google Calendar token exists or not, if not, then no need of inserting
     const cookie = await cookies();
     let googleCalendarToken = cookie.get("googleCalendarToken")?.value;
 
     if (googleCalendarToken && task.startTime && task.endTime && task.date) {
       let event = await createGoogleCalendarEvent(task);
 
-      // if event is successfully created in google calendar, then save the event id in task model
+      // If event is successfully created in Google Calendar, then save the event ID in task model
       if (event && event.id) {
         newTask = await db.task.update({
           where: {

@@ -4,6 +4,22 @@ import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { Tag } from "@prisma/client";
 
+/**
+ * Updates an existing material in the database.
+ *
+ * @param {Object} params - The parameters for updating the material.
+ * @param {number} params.id - The ID of the material to update.
+ * @param {string} params.name - The new name of the material.
+ * @param {number} [params.categoryId] - The new category ID of the material (optional).
+ * @param {number} [params.vendorId] - The new vendor ID of the material (optional).
+ * @param {Tag[]} [params.tags] - The new tags for the material (optional).
+ * @param {string} [params.notes] - The new notes for the material (optional).
+ * @param {number} [params.quantity] - The new quantity of the material (optional).
+ * @param {number} [params.cost] - The new cost of the material (optional).
+ * @param {number} [params.sell] - The new sell price of the material (optional).
+ * @param {number} [params.discount] - The new discount on the material (optional).
+ * @returns {Promise<ServerAction>} The result of the update operation.
+ */
 export async function updateMeterial({
   id,
   name,
@@ -27,6 +43,7 @@ export async function updateMeterial({
   sell?: number;
   discount?: number;
 }): Promise<ServerAction> {
+  // Update the material in the database
   const updatedMaterial = await db.material.update({
     where: { id },
     data: {
@@ -41,14 +58,14 @@ export async function updateMeterial({
     },
   });
 
-  // delete all material tags
+  // Delete all existing tags for the material
   await db.materialTag.deleteMany({
     where: {
       materialId: id,
     },
   });
 
-  // create material tags
+  // Create new tags for the material
   if (tags) {
     await Promise.all(
       tags.map((tag) =>
@@ -61,7 +78,8 @@ export async function updateMeterial({
       ),
     );
   }
-  // return the material with tags
+
+  // Retrieve the updated tags for the material
   const updatedMaterialTags = await db.materialTag.findMany({
     where: {
       materialId: id,
@@ -69,6 +87,7 @@ export async function updateMeterial({
     include: { tag: true },
   });
 
+  // Return the result of the update operation
   return {
     type: "success",
     data: {

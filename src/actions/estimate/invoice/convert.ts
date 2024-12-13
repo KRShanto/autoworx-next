@@ -5,6 +5,11 @@ import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { revalidatePath } from "next/cache";
 
+/**
+ * Converts an invoice from Estimate to Invoice or vice versa.
+ * @param id - The ID of the invoice to convert.
+ * @returns A promise that resolves to a ServerAction indicating success or error.
+ */
 export async function convertInvoice(id: string): Promise<ServerAction> {
   const companyId = await getCompanyId();
   const invoice = await db.invoice.findUnique({ where: { id } });
@@ -13,7 +18,7 @@ export async function convertInvoice(id: string): Promise<ServerAction> {
     return { type: "error", message: "Invoice not found" };
   }
 
-  // get all the product materials
+  // Get all the product materials
   const materials = await db.material.findMany({
     where: {
       invoiceId: id,
@@ -26,7 +31,7 @@ export async function convertInvoice(id: string): Promise<ServerAction> {
     },
   });
 
-  // merge all the same products and sum the quantity
+  // Merge all the same products and sum the quantity
   const productsWithQuantity = materials.reduce(
     (acc: { id: number; quantity: number }[], material) => {
       const product = acc.find((p) => p.id === material.productId);
@@ -89,7 +94,7 @@ export async function convertInvoice(id: string): Promise<ServerAction> {
 
   await Promise.all(
     productsWithQuantity.map(async (product) => {
-      // create a new history entry
+      // Create a new history entry
       await db.inventoryProductHistory.create({
         data: {
           companyId,

@@ -7,6 +7,16 @@ import { cookies } from "next/headers";
 import createGoogleCalendarEvent from "../task/google-calendar/createGoogleCalendarEvent";
 import updateGoogleCalendarEvent from "../task/google-calendar/updateGoogleCalendarEvent";
 
+/**
+ * Assigns a date and time to an existing appointment.
+ *
+ * @param id - The ID of the appointment to update.
+ * @param date - The new date for the appointment.
+ * @param startTime - The new start time for the appointment.
+ * @param endTime - The new end time for the appointment.
+ * @param timezone - The timezone for the appointment.
+ * @returns A promise that resolves to a ServerAction indicating the result.
+ */
 export async function assignAppointmentDate({
   id,
   date,
@@ -21,6 +31,7 @@ export async function assignAppointmentDate({
   timezone: string;
 }): Promise<ServerAction> {
   try {
+    // Update the appointment in the database
     let updatedAppointment = await db.appointment.update({
       where: {
         id,
@@ -32,10 +43,10 @@ export async function assignAppointmentDate({
       },
     });
 
+    // Revalidate the path to update the cache
     revalidatePath("/task");
 
-    // if the task has date, start time and end time, then insert it in google calendar
-    // also need to check if google calendar token exists or not, if not, then no need of inserting
+    // Check if Google Calendar token exists and update or create Google Calendar event
     const cookie = await cookies();
     let googleCalendarToken = cookie.get("googleCalendarToken")?.value;
 
@@ -79,7 +90,7 @@ export async function assignAppointmentDate({
 
       let event = await createGoogleCalendarEvent(appointmentForGoogleCalendar);
 
-      // if event is successfully created in google calendar, then save the event id in task model
+      // Save the event ID in the database if the event is successfully created in Google Calendar
       if (event && event.id) {
         await db.appointment.update({
           where: {
@@ -92,11 +103,13 @@ export async function assignAppointmentDate({
       }
     }
 
+    // Return a success action
     return {
       type: "success",
     };
   } catch (error) {
     console.log("🚀 ~ error:", error);
+    // Return an error action
     return {
       type: "error",
     };

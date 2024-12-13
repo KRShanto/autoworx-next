@@ -4,6 +4,10 @@ import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 
+/**
+ * Fetch all work orders for the authenticated user's company.
+ * @returns A list of work orders (invoices).
+ */
 export async function getWorkOrders() {
   const companyId = await getCompanyId();
   const invoices = await db.invoice.findMany({
@@ -36,6 +40,13 @@ export async function getWorkOrders() {
 
   return invoices;
 }
+
+/**
+ * Update the user assigned to an invoice.
+ * @param invoiceId - The ID of the invoice.
+ * @param userId - The ID of the user to assign.
+ * @returns An object indicating success.
+ */
 export const updateAssignedTo = async (invoiceId: string, userId: number) => {
   try {
     await db.invoice.update({

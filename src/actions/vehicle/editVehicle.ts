@@ -7,6 +7,12 @@ import { AuthSession } from "@/types/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+/**
+ * Edits an existing vehicle's details.
+ *
+ * @param {Object} data - The vehicle data to update.
+ * @returns {Promise<ServerAction>} The server action containing the updated vehicle data.
+ */
 export async function editVehicle(data: {
   year: number;
   make: string;
@@ -23,6 +29,7 @@ export async function editVehicle(data: {
   clientId: number;
 }): Promise<ServerAction> {
   try {
+    // Authenticate the user and get the session
     const session = (await auth()) as AuthSession;
     const companyId = session.user.companyId;
 
@@ -55,13 +62,16 @@ export async function editVehicle(data: {
       data: updateData,
     });
 
+    // Revalidate the client path to reflect changes
     revalidatePath("/client");
 
+    // Return the updated vehicle data in a success response
     return {
       type: "success",
       data: vehicle,
     };
   } catch (error: any) {
+    // Handle validation errors
     if (error instanceof z.ZodError) {
       return {
         type: "error",
@@ -69,12 +79,14 @@ export async function editVehicle(data: {
         field: error.errors[0].path[0] as string,
       };
     } else if (error.code === "P2002") {
+      // Handle unique constraint errors
       return {
         type: "error",
         message: "Vehicle already exists",
         field: "vin",
       };
     } else {
+      // Handle other errors
       return {
         type: "error",
         message: error.message,
