@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/cn";
 
+import { IoMdArrowDropdown } from "react-icons/io";
+
 type TProps = {
   changesValue?: string;
   dropDownValues: string[];
@@ -44,8 +46,15 @@ export function DropdownSelection({
         {children ? (
           children
         ) : (
-          <Button variant="outline" className={buttonClassName}>
+          <Button
+            variant="outline"
+            className={cn(
+              "flex items-center justify-center gap-x-2",
+              buttonClassName,
+            )}
+          >
             {changesValue || defaultValue}
+            <IoMdArrowDropdown />
           </Button>
         )}
       </DropdownMenuTrigger>
