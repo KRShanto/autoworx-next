@@ -26,8 +26,7 @@ export async function deleteAppointment(id: number): Promise<ServerAction> {
     revalidatePath("/task");
 
     // Delete the corresponding Google Calendar event if it exists
-    const cookie = await cookies();
-    let googleCalendarToken = cookie.get("googleCalendarToken")?.value;
+    const googleCalendarToken = cookies().get("googleCalendarToken")?.value;
 
     if (googleCalendarToken && deletedAppointment.googleEventId) {
       await deleteGoogleCalendarEvent(deletedAppointment.googleEventId);
@@ -38,10 +37,11 @@ export async function deleteAppointment(id: number): Promise<ServerAction> {
       type: "success",
     };
   } catch (error) {
-    console.log("🚀 ~ deleteAppointment ~ error:", error);
+    console.error("Error deleting appointment:", error);
     // Return an error action
     return {
       type: "error",
+      message: "Failed to delete the appointment.",
     };
   }
 }

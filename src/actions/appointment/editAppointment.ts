@@ -44,7 +44,7 @@ export async function editAppointment({
   try {
     // Authenticate the user and get the session
     const session = (await auth()) as AuthSession;
-    const companyId = session.user.companyId;
+    const { companyId, id: userId } = session.user;
 
     // Check if the draftEstimate is different from the existing one
     if (appointment.draftEstimate) {
@@ -127,48 +127,61 @@ export async function editAppointment({
     const cookie = await cookies();
     let googleCalendarToken = cookie.get("googleCalendarToken")?.value;
 
-    if (
-      googleCalendarToken &&
-      updatedAppointment.googleEventId &&
-      updatedAppointment.startTime &&
-      updatedAppointment.endTime &&
-      updatedAppointment.date
-    ) {
-      await updateGoogleCalendarEvent(
-        updatedAppointment.googleEventId,
-        appointment,
-      );
-    } else if (
-      googleCalendarToken &&
-      !updatedAppointment.googleEventId &&
-      updatedAppointment.startTime &&
-      updatedAppointment.endTime &&
-      updatedAppointment.date
-    ) {
-      let event = await createGoogleCalendarEvent(appointment);
-
-      // Save the event ID in the database if the event is successfully created in Google Calendar
-      if (event && event.id) {
-        await db.appointment.update({
-          where: {
-            id: updatedAppointment.id,
-          },
-          data: {
-            googleEventId: event.id,
-          },
-        });
-      }
-    }
+    // Handle Google Calendar Event
+    await handleGoogleCalendarEvent(
+      updatedAppointment,
+      appointment,
+      googleCalendarToken,
+    );
 
     // Return a success action
     return {
       type: "success",
     };
   } catch (error) {
-    console.log("🚀 ~ error:", error);
+    // Removed useless console.log
+    // console.log("🚀 ~ error:", error);
+
+    // Added proper error logging
+    console.error("Error editing appointment:", error);
+
     // Return an error action
     return {
       type: "error",
     };
+  }
+}
+
+// Helper function
+async function handleGoogleCalendarEvent(
+  updatedAppointment: any,
+  appointment: AppointmentToUpdate,
+  googleCalendarToken: string | undefined,
+) {
+  if (
+    googleCalendarToken &&
+    updatedAppointment.googleEventId &&
+    updatedAppointment.startTime &&
+    updatedAppointment.endTime &&
+    updatedAppointment.date
+  ) {
+    await updateGoogleCalendarEvent(
+      updatedAppointment.googleEventId,
+      appointment,
+    );
+  } else if (
+    googleCalendarToken &&
+    !updatedAppointment.googleEventId &&
+    updatedAppointment.startTime &&
+    updatedAppointment.endTime &&
+    updatedAppointment.date
+  ) {
+    const event = await createGoogleCalendarEvent(appointment);
+    if (event?.id) {
+      await db.appointment.update({
+        where: { id: updatedAppointment.id },
+        data: { googleEventId: event.id },
+      });
+    }
   }
 }

@@ -23,23 +23,31 @@ export async function addTemplate({
   message: string;
   type: EmailTemplateType;
 }): Promise<ServerAction> {
-  // Authenticate the user and get the session
-  const session = (await auth()) as AuthSession;
-  const companyId = session.user.companyId;
+  try {
+    // Authenticate the user and get the session
+    const session = (await auth()) as AuthSession;
+    const { companyId } = session.user;
 
-  // Create a new email template in the database
-  const newTemplate = await db.emailTemplate.create({
-    data: {
-      subject,
-      message,
-      type,
-      companyId,
-    },
-  });
+    // Create a new email template in the database
+    const newTemplate = await db.emailTemplate.create({
+      data: {
+        subject,
+        message,
+        type,
+        companyId,
+      },
+    });
 
-  // Return a success action with the new template data
-  return {
-    type: "success",
-    data: newTemplate,
-  };
+    // Return a success action with the new template data
+    return {
+      type: "success",
+      data: newTemplate,
+    };
+  } catch (error) {
+    console.error("Error adding template:", error);
+    return {
+      type: "error",
+      message: "Failed to add the template.",
+    };
+  }
 }

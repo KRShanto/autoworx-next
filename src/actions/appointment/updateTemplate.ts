@@ -20,14 +20,22 @@ export async function updateTemplate({
   subject: string;
   message: string;
 }): Promise<ServerAction> {
-  // Update the email template in the database
-  await db.emailTemplate.update({
-    where: { id },
-    data: { subject, message },
-  });
+  try {
+    // Update the email template in the database
+    await db.emailTemplate.update({
+      where: { id },
+      data: { subject, message },
+    });
 
-  // Return an object signaling a successful action
-  return {
-    type: "success",
-  };
+    // Return an object signaling a successful action
+    return {
+      type: "success",
+    };
+  } catch (error) {
+    console.error("Error updating template:", error);
+    return {
+      type: "error",
+      message: "Failed to update the template.",
+    };
+  }
 }

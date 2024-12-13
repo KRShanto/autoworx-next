@@ -11,15 +11,20 @@ import { ServerAction } from "@/types/action";
  * @returns An object of type ServerAction indicating the result of the operation.
  */
 export async function deleteTemplate(id: number): Promise<ServerAction> {
-  // Invoke the delete method on the emailTemplate model with the specified ID
-  await db.emailTemplate.delete({
-    where: {
-      id, // The ID of the email template to be deleted
-    },
-  });
+  try {
+    // Invoke the delete method on the emailTemplate model with the specified ID
+    await db.emailTemplate.delete({
+      where: {
+        id, // The ID of the email template to be deleted
+      },
+    });
 
-  // Return an object signaling a successful action
-  return {
-    type: "success",
-  };
+    // Return an object signaling a successful action
+    return {
+      type: "success",
+    };
+  } catch (error) {
+    console.error("Error deleting template:", error);
+    return { type: "error", message: "Failed to delete the template." };
+  }
 }

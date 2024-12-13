@@ -19,35 +19,24 @@ export async function updateCalendarSettings(data: {
   weekend1: string;
   weekend2: string;
 }): Promise<ServerAction> {
-  // Authenticate the user and get the session
-  const session = (await auth()) as AuthSession;
-  const companyId = session.user.companyId;
+  try {
+    // Authenticate the user and get the session
+    const session = (await auth()) as AuthSession;
+    const { companyId } = session.user;
 
-  // Create or Update the calendar settings in the database
-  const newCalendarSettings = await db.calendarSettings.upsert({
-    where: {
-      companyId,
-    },
-    update: {
-      weekStart: data.weekStart,
-      dayStart: data.dayStart,
-      dayEnd: data.dayEnd,
-      weekend1: data.weekend1,
-      weekend2: data.weekend2,
-    },
-    create: {
-      companyId,
-      weekStart: data.weekStart,
-      dayStart: data.dayStart,
-      dayEnd: data.dayEnd,
-      weekend1: data.weekend1,
-      weekend2: data.weekend2,
-    },
-  });
+    // Create or Update the calendar settings in the database
+    await db.calendarSettings.upsert({
+      where: { companyId },
+      update: { ...data },
+      create: { companyId, ...data },
+    });
 
-  // Revalidate the path to update the cache
-  revalidatePath("/task");
+    // Revalidate the path to update the cache
+    revalidatePath("/task");
 
-  // Return a success action
-  return { type: "success" };
+    return { type: "success" };
+  } catch (error) {
+    console.error("Error updating calendar settings:", error);
+    return { type: "error", message: "Failed to update calendar settings." };
+  }
 }
