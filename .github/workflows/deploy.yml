@@ -11,6 +11,12 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
+
+      - name: Install libssl1.1
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libssl1.1
+
       - name: Create .env file
         run: |
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
@@ -35,10 +41,13 @@ jobs:
           echo "AWS_BUCKET_REGION=${{ secrets.AWS_BUCKET_REGION }}" >> .env
           echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env
           echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}" >> .env
+
       - name: Build docker image
         run: docker build -t krshanto/autworx-production-1 .
+
       - name: Login to docker hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Push docker image
         run: docker push krshanto/autworx-production-1:latest
 
@@ -48,7 +57,9 @@ jobs:
     steps:
       - name: Pull image from docker hub
         run: docker pull krshanto/autworx-production-1:latest
+
       - name: Delete existing container
         run: docker rm -f autworx-production-1
+
       - name: Run the container
         run: docker run -d -p 3000:3000 --name autworx-production-1 krshanto/autworx-production-1
