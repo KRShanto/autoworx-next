@@ -7,7 +7,7 @@ import Pipelines from "../components/Pipelines";
 import WorkOrders from "../components/WorkOrders";
 
 import SessionUserType from "@/types/sessionUserType";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getCompanyId } from "@/lib/companyId";
 import { getLeads } from "@/actions/pipelines/getLeads";
 
@@ -27,10 +27,10 @@ interface Column {
 }
 
 const Page = (props: Props) => {
-  const searchParam = useSearchParams();
-  const activeView = searchParam.get("view") ?? "workOrders";
-  const columnType = "sales";
+  const router = useRouter();
 
+  const columnType = "sales";
+  const [activeView, setActiveView] = useState("workOrders");
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
   const [currentUser, setCurrentUser] = useState<SessionUserType>();
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -98,6 +98,12 @@ const Page = (props: Props) => {
   }, [leads, pipelineColumns]);
   const handleColumnsUpdate = async ({ columns }: { columns: Column[] }) => {
     setPipelineColumns(columns);
+    
+  };
+
+  const handleViewChange = (view: string) => {
+    setActiveView(view);
+    router.push(`?view=${view}`);
   };
   const type = "Sales Pipelines";
 
@@ -110,6 +116,7 @@ const Page = (props: Props) => {
         onColumnsUpdate={handleColumnsUpdate}
         type={columnType}
         currentUser={currentUser}
+        onViewChange={handleViewChange}
       />
 
       {activeView === "pipelines" ? (
