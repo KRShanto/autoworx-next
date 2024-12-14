@@ -97,12 +97,18 @@ const MyAccount = ({ user }: { user: User }) => {
       ...userInfo,
       image: imageUrl,
     });
+    console.log("🚀 ~ handleUserInfoSave ~ result:", result);
     setUserInfo({
       ...userInfo,
-      image: imageUrl,
+      image: imageUrl || user?.image,
     });
     if (result?.success) {
       successToast("Account details updated successfully");
+    } else {
+      errorToast(
+        result?.message || "An error occurred. Please try again later.",
+      );
+      console.log("user info",userInfo)
     }
   };
 
