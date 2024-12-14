@@ -49,7 +49,7 @@ export default async function WorkforceReportPage({ searchParams }: TProps) {
   const employees = await db.user.findMany({
     where: {
       companyId: session?.user?.companyId,
-      employeeType: "Technician",
+      // employeeType: "Technician",
     },
     include: {
       Technician: true,

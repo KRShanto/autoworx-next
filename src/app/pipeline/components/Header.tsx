@@ -20,6 +20,7 @@ interface HeaderProps {
   columns: Column[];
   type: string;
   currentUser: SessionUserType | undefined;
+  onViewChange: (view: string) => void;
 
   [key: string]: any;
 }
@@ -37,6 +38,7 @@ export default function Header({
   columns,
   type,
   currentUser,
+  onViewChange,
 
   ...restProps
 }: Readonly<HeaderProps>) {
@@ -56,7 +58,7 @@ export default function Header({
   const hasManagePipelineAccess =
     currentUser?.employeeType === "Admin" ||
     currentUser?.employeeType === "Manager";
-  console.log("Active view of pipelines", activeView);
+  // console.log("Active view of pipelines", activeView);
   return (
     <div className="flex items-center justify-between p-4" {...restProps}>
       <div className="flex items-center">
@@ -65,7 +67,7 @@ export default function Header({
         </h1>
         <div className="flex">
           <button
-            onClick={() => onToggleView("workOrders")}
+            onClick={() => onViewChange("workOrders")} 
             className={`mr-2 rounded border px-4 py-2 ${activeView === "workOrders" ? "bg-[#6571FF] text-white" : "border-[#6571FF] bg-white text-[#6571FF]"}`}
           >
             {/* Work Orders */}
@@ -73,7 +75,7 @@ export default function Header({
             {pathname.includes("/sales") ? "Leads" : "Work Orders"}
           </button>
           <button
-            onClick={() => onToggleView("pipelines")}
+            onClick={() => onViewChange("pipelines")}
             className={`rounded border px-4 py-2 ${activeView === "pipelines" ? "bg-[#6571FF] text-white" : "border-[#6571FF] bg-white text-[#6571FF]"}`}
           >
             Pipelines

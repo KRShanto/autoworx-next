@@ -7,9 +7,9 @@ import WorkOrders from "../components/WorkOrders";
 
 import { useServerGet } from "@/hooks/useServerGet";
 import SessionUserType from "@/types/sessionUserType";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import getDataForNewAppointment from "@/actions/pipelines/getDataForNewAppointment";
-import { User } from "@prisma/client";
+import { Technician, User } from "@prisma/client";
 import {
   InvoiceWithRelations,
   ShopLead,
@@ -30,9 +30,8 @@ interface Column {
 }
 
 const Page = (props: Props) => {
-  const searchParam = useSearchParams();
-  const initialView = searchParam.get("view") ?? "workOrders";
-  const [activeView, setActiveView] = useState(initialView);
+  const router = useRouter();
+  const [activeView, setActiveView] = useState("workOrders");
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
 
   //leads start
@@ -70,6 +69,7 @@ const Page = (props: Props) => {
       const transformedLeads: ShopLead[] = invoices.map((invoice) => {
         const completedServices: string[] = [];
         const incompleteServices: string[] = [];
+        const allTechnicians: Technician[] = [];
 
         invoice.invoiceItems.forEach((item) => {
           const technicians = item.service?.Technician || [];
@@ -92,9 +92,11 @@ const Page = (props: Props) => {
           } else {
             incompleteServices.push(item.service?.name ?? "");
           }
+          allTechnicians.push(...technicians);
         });
         const columnStatusId = invoice.columnId;
         const dueBalance = Number(invoice.due);
+        // const technicians=invoice.;
 
         return {
           invoiceId: invoice.id,
@@ -116,6 +118,7 @@ const Page = (props: Props) => {
           createdAt: new Date(invoice.createdAt).toDateString(),
           columnId: columnStatusId,
           dueBalance: dueBalance,
+          technicians: allTechnicians,
         };
       });
 
@@ -124,8 +127,6 @@ const Page = (props: Props) => {
         title: column.title,
         leads: transformedLeads.filter((lead) => lead.columnId === column.id),
       }));
-
-      // console.log("Current user:", currentUser);
 
       // Only filter for technicians
       if (currentUser?.employeeType === "Technician") {
@@ -165,16 +166,15 @@ const Page = (props: Props) => {
     fetchUser();
   }, []);
 
-  useEffect(() => {
-    const newView = searchParam.get("view") ?? "workOrders";
-    setActiveView(newView);
-  }, [searchParam]);
+  const handleViewChange = (view: string) => {
+    setActiveView(view);
+    router.push(`?view=${view}`);
+  };
 
   const handleColumnsUpdate = async ({ columns }: { columns: Column[] }) => {
     setPipelineColumns(columns);
   };
   const type = "Shop Pipelines";
-  
 
   return (
     <div className="space-y-8">
@@ -185,6 +185,7 @@ const Page = (props: Props) => {
         onColumnsUpdate={handleColumnsUpdate}
         type={columnType}
         currentUser={currentUser}
+        onViewChange={handleViewChange}
       />
       {activeView === "pipelines" ? (
         <Pipelines
