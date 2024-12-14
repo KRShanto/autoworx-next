@@ -1,10 +1,6 @@
 import React, { Suspense } from "react";
 import Calculation from "../../components/Calculation";
-import FilterBySearchBox from "../../components/filter/FilterBySearchBox";
-import FilterByDateRange from "../../components/filter/FilterByDateRange";
-import FilterBySelection from "../../components/filter/FilterBySelection";
 import Analytics from "./Analytics";
-import FilterByMultiple from "../../components/filter/FilterByMultiple";
 import { db } from "@/lib/db";
 import RevenueTableRow from "./RevenueTableRow";
 import moment from "moment";
@@ -186,7 +182,7 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
         const laborCostPrice =
           Number(cur.labor?.charge || 0) * cur?.labor?.hours! || 0;
         const costPrice = materialCostPrice + laborCostPrice;
-        acc.costPrice = costPrice;
+        acc.costPrice += costPrice;
         acc.profitPrice = Number(invoice.grandTotal) - acc.costPrice;
         return acc;
       },
