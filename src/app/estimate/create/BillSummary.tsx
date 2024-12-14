@@ -58,7 +58,7 @@ export function BillSummary() {
         );
       }, 0);
       const laborCost = labor?.charge
-        ? parseFloat(labor.charge.toString()) * labor.hours!
+        ? parseFloat(labor.charge.toString()) * Number(labor.hours)
         : 0;
 
       newServicesTotal += materialCost + laborCost;
@@ -164,7 +164,7 @@ export function BillSummary() {
 
       <div className="space-y-1 rounded-md bg-[#006d77] p-2 px-4 text-sm text-white">
         <dl className="flex justify-between">
-          <dt>Grand Total</dt> <dd>${subtotal}</dd>
+          <dt>Grand Total</dt> <dd>${grandTotal}</dd>
         </dl>
 
         {/* Coupon code */}

@@ -22,6 +22,7 @@ import { NewAppointment_Pipeline } from "./NewAppointment_Pipeline";
 import ServiceSelector from "./ServiceSelector";
 import TaskForm from "./TaskForm";
 import toast from "react-hot-toast";
+import { updateTechnicianStatustoComplete } from "@/actions/estimate/invoice/updateTechnicianStatustoComplete";
 
 interface PipelinesProps {
   pipelinesTitle: string;
@@ -268,7 +269,20 @@ export default function Pipelines({
 
     const [removed] = sourceItems.splice(source.index, 1);
 
-    //check before moving to delivered if due balance is zero or not
+    if (destinationColumn && destinationColumn.title === "Delivered") {
+      // Update technician status to 'Complete' in the backend
+      try {
+        const response = await updateTechnicianStatustoComplete(
+          removed.invoiceId,
+        );
+        if (response) {
+          console.log("Updated technician status:", response);
+        }
+      } catch (error) {
+        console.error("Error updating technician status:", error);
+      }
+      console.log("removed invoice id", removed.invoiceId);
+    }
     if (destinationColumn.title === "Delivered") {
       if (removed.dueBalance !== 0) {
         toast.error("Please clear due balance before moving to delivered.");
@@ -276,6 +290,7 @@ export default function Pipelines({
         sourceItems.splice(source.index, 0, removed);
         return;
       }
+      console.log("The invoice id :", removed.invoiceId);
     }
 
     destinationItems.splice(destination.index, 0, removed);

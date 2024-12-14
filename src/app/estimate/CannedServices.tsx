@@ -3,6 +3,15 @@ import { deleteService } from "@/actions/estimate/service/deleteService";
 import { updateService } from "@/actions/estimate/service/updateService";
 import NewVehicle from "@/components/Lists/NewVehicle";
 import SelectCategory from "@/components/Lists/SelectCategory";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { cn } from "@/lib/cn";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { useListsStore } from "@/stores/lists";
@@ -14,7 +23,6 @@ import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { RiEditFill } from "react-icons/ri";
 import NewLabor from "./NewLabor";
 import NewService from "./NewService";
-
 export default function CannedServices({
   services,
 }: {
@@ -35,23 +43,22 @@ export default function CannedServices({
         />
       </div>
       {/* TODO: make it scrollable */}
-      <div className="">
-        <table className="w-full">
-          <thead>
-            <tr className="h-10 border-b">
-              <th className="px-4 text-left 2xl:px-10">Service Name</th>
-              <th className="px-4 text-left 2xl:px-10">Category</th>
-              <th className="px-4 text-left 2xl:px-10">Description</th>
-              <th className="px-4 text-left 2xl:px-10">Edit</th>
-            </tr>
-          </thead>
-
-          <tbody className="border border-gray-200">
+      <div className="max-h-[500px]">
+        <Table className="h-full">
+          <TableHeader className="sticky top-0 bg-white">
+            <TableRow>
+              <TableHead>Services Name</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Edit</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="custom-scrollbar h-full">
             {services.map((service, index) => (
               <ServiceComponent key={index} service={service} />
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
@@ -91,8 +98,8 @@ const ServiceComponent = ({
     }
   }, [currentSelectedCategoryId]);
   return (
-    <tr className={cn("cursor-pointer rounded-md py-3")}>
-      <td className="text-nowrap px-4 py-1 text-left align-top 2xl:px-10">
+    <TableRow className={cn("cursor-pointer rounded-md py-3")}>
+      <TableCell>
         {!isEdit ? (
           <span>{service.name}</span>
         ) : (
@@ -104,8 +111,8 @@ const ServiceComponent = ({
             className="#text-xs max-w-[150px] rounded-md border-2 border-slate-400 p-1 px-4"
           />
         )}
-      </td>
-      <td className="text-nowrap px-4 py-1 text-left align-top 2xl:px-10">
+      </TableCell>
+      <TableCell>
         {!isEdit ? (
           <span>{service.category?.name}</span>
         ) : (
@@ -117,8 +124,8 @@ const ServiceComponent = ({
             setCategoryOpen={setCategoryOpen}
           />
         )}
-      </td>
-      <td className="px-4 py-1 text-left 2xl:px-10">
+      </TableCell>
+      <TableCell>
         {!isEdit ? (
           <span className="max-w-[2rem]">{service.description}</span>
         ) : (
@@ -131,8 +138,8 @@ const ServiceComponent = ({
             />
           </div>
         )}
-      </td>
-      <td className="flex items-center gap-x-4 px-4 py-1 text-left 2xl:px-10">
+      </TableCell>
+      <TableCell>
         {isEdit && (
           <button onClick={handleUpdateService} className="mr-4 text-green-500">
             <IoMdCheckmarkCircleOutline />
@@ -143,12 +150,12 @@ const ServiceComponent = ({
           <RiEditFill />
         </button>
         <button
-          className="text-red-400"
+          className="ml-4 text-red-400"
           onClick={() => deleteService(service.id)}
         >
           <FaTimes />
         </button>
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   );
 };

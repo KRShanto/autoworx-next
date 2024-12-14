@@ -2,9 +2,9 @@
 "use client"; // This makes the component a Client Component
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
+import { useEstimateNavigationStore } from "@/stores/estimateNavigationStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useEstimateNavigationStore } from "@/stores/estimateNavigationStore";
 
 interface NavigationsTabProps {
   activeTab: string;
@@ -17,7 +17,7 @@ export default function NavigationTabs({
   const router = useRouter();
   const setType = useEstimateNavigationStore((state) => state.setType);
   const resetType = useEstimateNavigationStore((state) => state.resetType);
- 
+
   useEffect(() => {
     // Prefetch the dashboard page
     router.prefetch("/estimate/canned");
@@ -38,9 +38,9 @@ export default function NavigationTabs({
     setType("estimate");
     router.push("/estimate");
   };
-  
+
   return (
-    <Tabs defaultValue={activeTab} className="mt-5">
+    <Tabs defaultValue={activeTab} className="mt-5 h-full overflow-hidden">
       <TabsList>
         <TabsTrigger value="c-canned" onClick={handleCannedClick}>
           Canned
@@ -52,8 +52,10 @@ export default function NavigationTabs({
           Estimates
         </TabsTrigger>
       </TabsList>
-      <div className="h-[70vh] flex-auto overflow-y-auto overflow-x-clip rounded-lg bg-background p-4 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-        <TabsContent value={activeTab}>{children}</TabsContent>
+      <div className="#h-[70vh] h-full flex-auto overflow-y-auto overflow-x-clip rounded-lg bg-background p-4 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+        <TabsContent className="h-full" value={activeTab}>
+          {children}
+        </TabsContent>
       </div>
     </Tabs>
   );

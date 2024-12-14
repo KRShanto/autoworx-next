@@ -237,7 +237,7 @@ export async function updateInvoice(
       return acc + Number(material?.cost) * Number(material?.quantity);
     }, 0);
 
-    const laborCost = Number(labor?.charge) * labor?.hours!;
+    const laborCost = Number(labor?.charge) * Number(labor?.hours);
 
     return acc + materialCost + laborCost;
   }, 0);

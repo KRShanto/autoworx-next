@@ -35,7 +35,7 @@ export function InvoiceItems({
     }, 0);
 
     const laborCost = item.labor?.charge
-      ? parseFloat(item.labor?.charge.toString()) * item.labor?.hours!
+      ? parseFloat(item.labor?.charge.toString()) * Number(item.labor?.hours)
       : 0;
 
     return (
@@ -93,7 +93,7 @@ export function InvoiceItems({
                   $
                   {item.labor?.charge
                     ? parseFloat(item.labor?.charge.toString()) *
-                      item.labor?.hours!
+                      Number(item.labor?.hours)
                     : 0}
                 </p>
               </div>

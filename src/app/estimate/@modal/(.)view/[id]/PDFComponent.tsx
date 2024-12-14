@@ -448,7 +448,7 @@ const PDFInvoiceItems = ({
     }, 0);
 
     const laborCost = item.labor?.charge
-      ? parseFloat(item.labor?.charge.toString()) * (item.labor.hours ?? 0)
+      ? parseFloat(item.labor?.charge.toString()) * (Number(item.labor.hours) ?? 0)
       : 0;
 
     return (

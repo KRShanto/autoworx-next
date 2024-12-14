@@ -23,9 +23,12 @@ import bcrypt from "bcrypt";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import { Prisma } from "@prisma/client";
+
 export async function editMyAccountInfo({
   firstName,
   lastName,
+  email,
   image,
   phone,
   address,
@@ -35,6 +38,7 @@ export async function editMyAccountInfo({
 }: {
   firstName: string;
   lastName: string;
+  email: string;
   image: string;
   phone: string;
   address: string;
@@ -43,15 +47,14 @@ export async function editMyAccountInfo({
   zip: string;
 }): Promise<{
   success: boolean;
+  message?: string;
 }> {
   try {
     const session = (await auth()) as AuthSession;
     const userId = session.user.id;
 
-    console.log("edit profile", { image });
 
-    // Update the user information in the database
-    const user = await db.user.update({
+    await db.user.update({
       where: {
         id: +userId,
       },
@@ -64,6 +67,7 @@ export async function editMyAccountInfo({
         city,
         state,
         zip,
+        email,
       },
     });
 
@@ -72,9 +76,23 @@ export async function editMyAccountInfo({
 
     return { success: true };
   } catch (error) {
-    console.log(error);
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      const targetFields = error.meta?.target as string[] | undefined;
+      if (targetFields?.includes("email")) {
+        return {
+          success: false,
+          message: "Email already exists. Please use a different email.",
+        };
+      }
+    }
+
+    console.error("Unexpected error:", error);
     return {
       success: false,
+      message: "An unexpected error occurred. Please try again later.",
     };
   }
 }
