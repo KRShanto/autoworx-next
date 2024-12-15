@@ -93,8 +93,8 @@ model Labor {
     name         String
     categoryId   Int?          @map("category_id")
     notes        String?
-    hours        Int?
-    charge       Decimal? // per hour
+    hours        Decimal?      @db.Decimal(13, 3)
+    charge       Decimal?
     discount     Decimal?
     companyId    Int           @map("company_id")
     cannedLabor  Boolean?      @default(false) @map("canned_labor")

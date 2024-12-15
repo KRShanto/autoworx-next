@@ -180,7 +180,7 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
         );
         // labor cost price is assumed to be per hour
         const laborCostPrice =
-          Number(cur.labor?.charge || 0) * cur?.labor?.hours! || 0;
+          Number(cur.labor?.charge || 0) * Number(cur?.labor?.hours) || 0;
         const costPrice = materialCostPrice + laborCostPrice;
         acc.costPrice += costPrice;
         acc.profitPrice = Number(invoice.grandTotal) - acc.costPrice;

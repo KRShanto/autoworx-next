@@ -9,6 +9,7 @@ import { Category, Tag, Vendor } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { newMaterial } from "../../../actions/estimate/material/newMaterial";
 import Close from "./CloseEstimate";
+import { useActionStoreCreateEdit } from "@/stores/createEditStore";
 
 export default function MaterialCreate() {
   const { categories } = useListsStore();
@@ -35,6 +36,8 @@ export default function MaterialCreate() {
   const [vendorOpen, setVendorOpen] = useState(false);
   const [tagsOpen, setTagsOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
+
+  const { actionType } = useActionStoreCreateEdit();
 
   useEffect(() => {
     if (data.material && data.edit) {
@@ -95,7 +98,7 @@ export default function MaterialCreate() {
       vendorId: vendor?.id,
       tags,
       notes,
-      quantity: quantity || 0,
+      quantity: quantity ?? 1,
       cost: cost || 0,
       sell: sell || 0,
       discount: discount || 0,
@@ -327,10 +330,10 @@ export default function MaterialCreate() {
         <input
           type="number"
           id="qt"
-          value={quantity}
+          value={actionType === "edit" ? quantity : undefined}
           onChange={(e) => setQuantity(parseFloat(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
-          placeholder="0"
+          placeholder="1"
         />
       </div>
 
