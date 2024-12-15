@@ -10,7 +10,7 @@ import { errorToast, successToast } from "@/lib/toast";
 import { User } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 
 const MyAccount = ({ user }: { user: User }) => {
   const [profilePic, setProfilePic] = useState<File | null>(null);

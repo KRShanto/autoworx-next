@@ -1,3 +1,4 @@
+import { Invoice } from "@prisma/client";
 import type { Dispatch, SetStateAction } from "react";
 
 export type SelectProps<T> = {
@@ -11,6 +12,7 @@ export type SelectProps<T> = {
   setDropdownsOpen?: any;
   type?: string;
   openStates?: [boolean, Dispatch<SetStateAction<boolean>>];
+  invoice?: Invoice | null;
 } & (
   | { value?: T; setValue?: undefined }
   | { value: T; setValue: Dispatch<SetStateAction<T>> }

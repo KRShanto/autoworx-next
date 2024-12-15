@@ -4,10 +4,11 @@ import { IoSearchOutline } from "react-icons/io5";
 import DateRange from "../../../components/DateRange";
 import AddNewEmployee from "../../../components/Lists/NewEmployee";
 import { useEmployeeFilterStore } from "@/stores/employeeFilter";
+import { DropdownSelection } from "@/components/DropDownSelection";
 
 // filter component for /employee page
 export default function EmployeeFilter() {
-  const { setFilter } = useEmployeeFilterStore();
+  const { setFilter, type } = useEmployeeFilterStore();
 
   return (
     <div className="flex items-center justify-between">
@@ -28,16 +29,13 @@ export default function EmployeeFilter() {
           onOk={(start, end) => setFilter({ dateRange: [start, end] })}
           onCancel={() => setFilter({ dateRange: [null, null] })}
         />
-        <select
-          className="app-shadow rounded-md bg-white p-2 text-[#797979]"
-          onChange={(e) => setFilter({ type: e.target.value as any })}
-        >
-          {["All", "Sales", "Technician", "Manager", "Other"].map((x) => (
-            <option key={x} value={x}>
-              {x}
-            </option>
-          ))}
-        </select>
+        <DropdownSelection
+          dropDownValues={["All", "Sales", "Technician", "Manager", "Other"]}
+          onValueChange={(value) => setFilter({ type: value as any })}
+          changesValue={type}
+          buttonClassName="min-w-[100px] shadow-md"
+        />
+        
       </div>
       <AddNewEmployee />
     </div>
