@@ -24,6 +24,7 @@ import dayjs from "dayjs";
 import moment from "moment";
 import { useRouter } from "next/navigation";
 import { deleteTask } from "../../../../../actions/task/deleteTask";
+import AssignTaskDropDown from "./AssignTaskDropDown";
 
 export default function UpdateTask() {
   const { popup, data, close } = usePopupStore();
@@ -31,7 +32,6 @@ export default function UpdateTask() {
     companyUsers: User[];
     task: CalendarTask;
   };
-
 
   const router = useRouter();
 
@@ -49,6 +49,9 @@ export default function UpdateTask() {
   const [date, setDate] = useState<string>(
     moment(task.date).format("YYYY-MM-DD"),
   );
+
+  console.log({ assignedUsers });
+  console.log({ task });
 
   async function handleSubmit() {
     try {
@@ -91,7 +94,7 @@ export default function UpdateTask() {
 
   return (
     <Dialog open={popup === "UPDATE_TASK"} onOpenChange={close}>
-      <DialogContent>
+      <DialogContent className="no-visible-scrollbar overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Update Task</DialogTitle>
         </DialogHeader>
@@ -151,6 +154,13 @@ export default function UpdateTask() {
 
           {/* custom radio. show user name and image (column)*/}
           {/* TODO */}
+
+          <AssignTaskDropDown
+            assignedUsers={assignedUsers}
+            companyUsers={companyUsers}
+            setAssignedUsers={setAssignedUsers}
+            fromUpdate
+          />
           <div className="mb-4 flex flex-col">
             <label htmlFor="assigned_users">Assign</label>
 
