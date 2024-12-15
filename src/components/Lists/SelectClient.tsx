@@ -16,6 +16,7 @@ export function SelectClient({
   setValue,
   openDropdown,
   setOpenDropdown,
+  invoice,
 }: SelectProps<Client | null>) {
   const state = useState(value);
   const [client, setClient] = setValue ? [value, setValue] : state;
@@ -24,6 +25,9 @@ export function SelectClient({
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
+  const params = new URLSearchParams(searchParams);
+
+  const clientId = params.get("clientId");
 
   useEffect(() => {
     if (newAddedCustomer && setOpenDropdown) {
@@ -33,8 +37,16 @@ export function SelectClient({
   }, [newAddedCustomer]);
 
   useEffect(() => {
+    if (!invoice) {
+      const getClient = clientList.find(
+        (client) => client?.id === Number(clientId),
+      );
+      setClient(getClient!);
+    }
+  }, [clientList]);
+
+  useEffect(() => {
     if (client) {
-      const params = new URLSearchParams(searchParams);
       params.set("clientId", client.id.toString());
       replace(`${pathname}?${params.toString()}`);
 
