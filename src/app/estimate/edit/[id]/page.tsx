@@ -120,6 +120,7 @@ export default async function Page({
       .filter((productTag) => productTag.inventoryId === product.id)
       .map((productTag) => productTag.tag);
   });
+
   materials.forEach((material) => {
     material.tags = materialTags
       .filter((materialTag) => materialTag.materialId === material.id)
@@ -193,6 +194,7 @@ export default async function Page({
         client={client!}
         vehicle={vehicle!}
         status={status!}
+        invoice={invoice}
       />
 
       <Tabs

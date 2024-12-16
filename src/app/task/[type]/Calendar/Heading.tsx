@@ -16,6 +16,7 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { NewAppointment } from "../components/appointment/NewAppointment";
 import Settings from "../components/appointment/Settings";
 import dynamic from "next/dynamic";
+import { DropdownSelection } from "@/components/DropDownSelection.tsx";
 
 const ALLOWED_ROLES_FOR_NEW_APPOINTMENT = ["Admin", "Manager", "Sales"];
 
@@ -110,7 +111,11 @@ export default function Heading({
               weekend1 ? weekend1 : "",
               weekend2 ? weekend2 : "",
             );
-            console.log(validDate.format(moment.HTML5_FMT[q.toUpperCase() as Uppercase<typeof q>]));
+            console.log(
+              validDate.format(
+                moment.HTML5_FMT[q.toUpperCase() as Uppercase<typeof q>],
+              ),
+            );
             router.push(
               `/task/${type}?${q}=${(date.isValid() ? validDate : moment()).format(moment.HTML5_FMT[q.toUpperCase() as Uppercase<typeof q>])}`,
             );
@@ -143,17 +148,12 @@ export default function Heading({
         </button>
 
         {/* Type selector */}
-        <select
-          className="app-shadow rounded-md bg-white p-2 text-[#797979]"
-          value={type}
-          onChange={(event) => router.push(event.currentTarget.value)}
-        >
-          {["day", "week", "month"].map((x) => (
-            <option key={x} value={x}>
-              {sentenceCase(x)}
-            </option>
-          ))}
-        </select>
+        <DropdownSelection
+          dropDownValues={["day", "week", "month"]}
+          onValueChange={(value) => router.push(value)}
+          changesValue={type}
+          buttonClassName="app-shadow rounded-md bg-white px-3 py-2 text-[#797979] "
+        />
 
         {/* New Appointment button */}
         {ALLOWED_ROLES_FOR_NEW_APPOINTMENT.includes(user.employeeType) && (

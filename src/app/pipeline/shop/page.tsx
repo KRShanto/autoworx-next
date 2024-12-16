@@ -31,7 +31,9 @@ interface Column {
 
 const Page = (props: Props) => {
   const router = useRouter();
-  const [activeView, setActiveView] = useState("workOrders");
+  const searchParams = useSearchParams();
+  const initialView = searchParams.get("view") || "workOrders";
+  const [activeView, setActiveView] = useState(initialView);
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
 
   //leads start
@@ -155,20 +157,11 @@ const Page = (props: Props) => {
     fetchShopColumns();
   }, []);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const response = await fetch("/api/getUser");
-      if (response.ok) {
-        const data = await response.json();
-        setCurrentUser(data);
-      }
-    };
-    fetchUser();
-  }, []);
+ 
 
   const handleViewChange = (view: string) => {
     setActiveView(view);
-    router.push(`?view=${view}`);
+    router.replace(`?view=${view}`);
   };
 
   const handleColumnsUpdate = async ({ columns }: { columns: Column[] }) => {

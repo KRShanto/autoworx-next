@@ -7,6 +7,7 @@ import DashboardManager from "./DashboardManager";
 import DashboardOther from "./DashboardOther";
 import DashboardSales from "./DashboardSales";
 import DashboardTechnician from "./DashboardTechnician";
+import { planObject } from "@/utils/planObject";
 
 export default async function Dashboard() {
   const user = await getUser();
@@ -159,7 +160,7 @@ export default async function Dashboard() {
     return (
       <DashboardAdmin
         tasks={taskWithAssignedUsers}
-        companyUsers={companyUsers}
+        companyUsers={planObject(companyUsers)}
         appointments={calendarAppointments}
         pendingLeaveRequests={filteredLeaveRequests}
       />
@@ -168,7 +169,7 @@ export default async function Dashboard() {
     return (
       <DashboardManager
         tasks={taskWithAssignedUsers}
-        companyUsers={companyUsers}
+        companyUsers={planObject(companyUsers)}
         appointments={calendarAppointments}
         pendingLeaveRequests={filteredLeaveRequests}
       />
@@ -177,7 +178,7 @@ export default async function Dashboard() {
     return (
       <DashboardSales
         tasks={taskWithAssignedUsers}
-        companyUsers={companyUsers}
+        companyUsers={planObject(companyUsers)}
         appointments={calendarAppointments}
       />
     );
@@ -187,7 +188,7 @@ export default async function Dashboard() {
     return (
       <DashboardTechnician
         tasks={taskWithAssignedUsers}
-        companyUsers={companyUsers}
+        companyUsers={planObject(companyUsers)}
         appointments={calendarAppointments}
         lastClockInOut={lastClockInOut}
       />
@@ -198,7 +199,7 @@ export default async function Dashboard() {
     return (
       <DashboardOther
         tasks={taskWithAssignedUsers}
-        companyUsers={companyUsers}
+        companyUsers={planObject(companyUsers)}
         appointments={calendarAppointments}
         lastClockInOut={lastClockInOut}
       />

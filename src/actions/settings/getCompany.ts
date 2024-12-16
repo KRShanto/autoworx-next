@@ -16,6 +16,5 @@ export async function getCompany() {
       id: companyId,
     },
   });
-
-  return company;
+  return JSON.parse(JSON.stringify(company));
 }

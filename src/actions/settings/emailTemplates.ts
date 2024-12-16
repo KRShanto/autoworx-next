@@ -2,6 +2,7 @@
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import getUser from "@/lib/getUser";
+import { planObject } from "@/utils/planObject";
 import { CompanyEmailTemplate, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -224,11 +225,11 @@ export const getCompanyTermsAndPolicyTax = async (): Promise<{
       throw new Error("Company not found");
     }
 
-    return {
+  return planObject({
       terms: companyData.terms ?? "",
       policy: companyData.policy ?? "",
       tax: companyData.tax ?? new Prisma.Decimal(0),
-    };
+    });
   } catch (error) {
     console.error("Error fetching company terms and policy:", error);
     throw error;

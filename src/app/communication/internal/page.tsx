@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { AuthSession } from "@/types/auth";
 import Body from "./Body";
 import { Metadata } from "next";
+import { planObject } from "@/utils/planObject";
 
 export const metadata: Metadata = {
   title: "Communication Hub - Internal",
@@ -28,8 +29,12 @@ export default async function InternalPage() {
   });
 
   return (
-    <div className="sm:mt-5 flex gap-5">
-      <Body users={users} currentUser={session.user} groups={groups} />
+    <div className="flex gap-5 sm:mt-5">
+      <Body
+        users={planObject(users)}
+        currentUser={session.user}
+        groups={planObject(groups)}
+      />
     </div>
   );
 }

@@ -19,6 +19,7 @@ import { useState } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { FaCheck, FaPlus } from "react-icons/fa6";
 import { createTask } from "../../../../../actions/task/createTask";
+import AssignTaskDropDown from "./AssignTaskDropDown";
 
 export default function NewTask({
   companyUsers,
@@ -41,7 +42,7 @@ export default function NewTask({
   const [date, setDate] = useState<string>("");
 
   async function handleSubmit() {
-    const res = await createTask({
+    await createTask({
       title,
       description,
       assignedUsers,
@@ -142,54 +143,13 @@ export default function NewTask({
           </div>
 
           {/* custom radio. show user name and image (column)*/}
-          {/* TODO */}
-          <div className="mb-4 flex flex-col">
-            <label htmlFor="assigned_users">Assign</label>
-
-            <button
-              onClick={() => setShowUsers(!showUsers)}
-              type="button"
-              className="flex w-full items-center justify-end rounded-md border-2 border-gray-500 p-2"
-            >
-              {showUsers ? (
-                <FaChevronUp className="text-[#797979]" />
-              ) : (
-                <FaChevronDown className="text-[#797979]" />
-              )}
-            </button>
-
-            {!onlyOneUser && showUsers && (
-              <div className="mt-2 flex h-40 flex-col gap-2 overflow-y-auto p-2 font-bold">
-                {companyUsers.map((user) => (
-                  <label
-                    htmlFor={user.id.toString()}
-                    key={user.id}
-                    className="flex items-center gap-2"
-                  >
-                    <input
-                      type="checkbox"
-                      name="assigned_users"
-                      id={user.id.toString()}
-                      value={user.id}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setAssignedUsers([...assignedUsers, user.id]);
-                        } else {
-                          setAssignedUsers(
-                            assignedUsers.filter((id) => id !== user.id),
-                          );
-                        }
-                      }}
-                    />
-                    <Avatar photo={user.image} width={40} height={40} />
-                    <span>
-                      {user.firstName} {user.lastName}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* TODO: */}
+          <AssignTaskDropDown
+            assignedUsers={assignedUsers}
+            companyUsers={companyUsers}
+            setAssignedUsers={setAssignedUsers}
+            onlyOneUser={onlyOneUser}
+          />
 
           <div className="mb-4 flex flex-col">
             <label>Priority</label>

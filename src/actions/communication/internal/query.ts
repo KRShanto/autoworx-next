@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { planObject } from "@/utils/planObject";
 
 /**
  * Retrieves a group by its ID and checks if the user is part of the group.
@@ -19,7 +20,7 @@ export const getGroupById = async (groupId: number, userId: number) => {
       users: true,
     },
   });
-  return group;
+  return planObject(group);
 };
 
 /**
