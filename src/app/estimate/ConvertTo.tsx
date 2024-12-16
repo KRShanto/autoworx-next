@@ -7,8 +7,6 @@ import { useRouter } from "next/navigation";
 import { convertInvoice } from "../../actions/estimate/invoice/convert";
 
 export default function ConvertTo({ id }: { id: string }) {
-  const router = useRouter();
-
   async function convert() {
     const res = await convertInvoice(id);
 
@@ -20,7 +18,12 @@ export default function ConvertTo({ id }: { id: string }) {
   }
 
   return (
-    <button onClick={convert} type="button">
+    <button
+      className="flex items-center gap-x-2 md:inline-block"
+      onClick={convert}
+      type="button"
+    >
+      <span className="md:hidden">Convert</span>
       <SiConvertio />
     </button>
   );
