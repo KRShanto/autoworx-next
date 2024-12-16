@@ -28,6 +28,7 @@ export default function Collaboration({
   return (
     <div className="flex gap-5 sm:mt-5">
       <List
+        className={cn(selectedUsersList.length === 0 ? "block" : "hidden")}
         selectedUsersList={selectedUsersList}
         companyAdmins={companyAdmins}
         setCompanyAdmins={setCompanyAdmins}
@@ -35,6 +36,7 @@ export default function Collaboration({
         setSelectedUsersList={setSelectedUsersList}
       />
       <UsersArea
+        className={cn(selectedUsersList.length === 0 ? "hidden" : "block")}
         previousMessages={messages}
         currentUser={currentUser}
         totalMessageBoxLength={selectedUsersList.length}
