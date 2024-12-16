@@ -3,7 +3,6 @@
 import Selector from "@/components/Selector";
 import { useListsStore } from "@/stores/lists";
 import { Client } from "@prisma/client";
-import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NewCustomer from "./NewCustomer";
