@@ -1,6 +1,5 @@
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcrypt";
-import NextAuth, { CredentialsSignin, NextAuthConfig } from "next-auth";
+import NextAuth, { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import "server-only";

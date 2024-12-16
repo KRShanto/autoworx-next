@@ -3,7 +3,7 @@
 import Selector from "@/components/Selector";
 import { useListsStore } from "@/stores/lists";
 import { Vehicle } from "@prisma/client";
-import { useSearchParams } from "next/navigation";
+import {  useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NewVehicle from "./NewVehicle";
 import { SelectProps } from "./select-props";
@@ -14,6 +14,7 @@ export function SelectVehicle({
   setValue,
   openDropdown,
   setOpenDropdown,
+  invoice = null,
 }: SelectProps<Vehicle | null>) {
   const state = useState(value);
   const [vehicle, setVehicle] = setValue ? [value, setValue] : state;
@@ -39,16 +40,31 @@ export function SelectVehicle({
   // Select vehicle when client changes
   // Select the first vehicle that belongs to the client
   // If there are no vehicles, set vehicle to null
+
   useEffect(() => {
-    if (clientId && !vehicle) {
-      // console.log("vehicle list", vehicleList);
-      const clientVehicles = vehicleList.filter(
-        (vehicle) => vehicle.clientId === +clientId,
-      );
+    const clientVehicles = clientId
+      ? vehicleList.filter((vehicle) => vehicle.clientId === +clientId)
+      : [];
+    if (clientId && !invoice) {
       if (clientVehicles.length > 0) {
         setVehicle(clientVehicles[0]);
       } else {
         setVehicle(null);
+      }
+    } else if (invoice && clientId) {
+      // TODO: Fetch vehicle from estimate
+      const findVehicleInEstimate = vehicleList.find(
+        (vehicle) =>
+          vehicle.id === invoice?.vehicleId && vehicle.clientId === +clientId,
+      );
+      if (findVehicleInEstimate) {
+        setVehicle(findVehicleInEstimate);
+      } else {
+        if (clientVehicles.length > 0) {
+          setVehicle(clientVehicles[0]);
+        } else {
+          setVehicle(null);
+        }
       }
     }
   }, [clientId, vehicleList]);

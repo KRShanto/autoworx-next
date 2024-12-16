@@ -30,6 +30,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "jest.config.ts"
-, "src/app/(home)/components/first"  ],
+, "src/app/(home)/components/first", "src/app/pipeline/shop/shopPipelineLayout.tsc"  ],
   "exclude": ["node_modules"]
 }

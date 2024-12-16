@@ -1,18 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import ManagePipelines from "./ManagePipelines";
-import { usePathname, useRouter } from "next/navigation";
-import { EmployeeType } from "@prisma/client";
 import SessionUserType from "@/types/sessionUserType";
-interface UserTypes {
-  id: number;
-  email: string;
-  firstName: string;
-  lastName: string | null;
-  employeeType: EmployeeType;
-  companyId: number;
-}
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+import ManagePipelines from "./ManagePipelines";
+
 interface HeaderProps {
   activeView: string;
   pipelinesTitle: string;
@@ -51,10 +43,6 @@ export default function Header({
     onColumnsUpdate({ columns: updatedColumns });
   };
 
-  const onToggleView = (view: string) => {
-    router.push(`?view=${view}`);
-  };
-
   const hasManagePipelineAccess =
     currentUser?.employeeType === "Admin" ||
     currentUser?.employeeType === "Manager";
@@ -67,7 +55,7 @@ export default function Header({
         </h1>
         <div className="flex">
           <button
-            onClick={() => onViewChange("workOrders")} 
+            onClick={() => onViewChange("workOrders")}
             className={`mr-2 rounded border px-4 py-2 ${activeView === "workOrders" ? "bg-[#6571FF] text-white" : "border-[#6571FF] bg-white text-[#6571FF]"}`}
           >
             {/* Work Orders */}

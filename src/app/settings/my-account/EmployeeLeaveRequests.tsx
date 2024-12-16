@@ -5,7 +5,6 @@ import { errorToast, successToast } from "@/lib/toast";
 import formatDateToReadable from "@/utils/formatDate";
 import { LeaveRequest } from "@prisma/client";
 import React from "react";
-import { FaExternalLinkAlt } from "react-icons/fa";
 
 const EmployeeLeaveRequests = ({
   leaveRequests = [],

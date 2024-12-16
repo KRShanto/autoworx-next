@@ -7,7 +7,7 @@ import { Company } from "@prisma/client";
 import { fetchImageAsFile } from "@/app/estimate/create/SyncEstimate";
 
 type TProps = {
-  company: Company;
+  company: Company | null;
 };
 
 export default function BusinessForm({ company }: TProps) {
@@ -19,7 +19,7 @@ export default function BusinessForm({ company }: TProps) {
 
   useEffect(() => {
     const photoFiles = async () => {
-      if (company.image) {
+      if (company && company.image) {
         const url = company.image;
         const filename = company.image.split("/").pop() || "image.jpg";
         const file = await fetchImageAsFile(url, filename);
@@ -27,20 +27,20 @@ export default function BusinessForm({ company }: TProps) {
       }
     };
     photoFiles();
-  }, [company.image]);
+  }, [company?.image]);
 
   const [businessSettings, setBusinessSettings] = useState({
-    legalBusinessName: company.name || "",
-    businessRegistrationIDNumber: company.businessId || "",
-    businessType: company.businessType || "",
-    businessPhone: company.phone || "",
-    industrySpecialization: company.industry || "",
-    businessEmail: company.email ?? "",
-    businessWebsite: company.website || "",
-    companyAddress: company.address || "",
-    city: company.city || "",
-    state: company.state || "",
-    zip: company.zip || "",
+    legalBusinessName: company?.name || "",
+    businessRegistrationIDNumber: company?.businessId || "",
+    businessType: company?.businessType || "",
+    businessPhone: company?.phone || "",
+    industrySpecialization: company?.industry || "",
+    businessEmail: company?.email ?? "",
+    businessWebsite: company?.website || "",
+    companyAddress: company?.address || "",
+    city: company?.city || "",
+    state: company?.state || "",
+    zip: company?.zip || "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -1,5 +1,6 @@
 "use client";
 
+import { DropdownSelection } from "@/components/DropDownSelection";
 import { useInventoryFilterStore } from "@/stores/inventoryFilter";
 import { useListsStore } from "@/stores/lists";
 import { useSearchParams } from "next/navigation";
@@ -26,25 +27,20 @@ export default function SearchFilter() {
           onChange={(e) => setFilter({ search: e.target.value })}
         />
       </div>
-      <select
-        className="w-[30%] flex-shrink-0 rounded-md border-2 border-slate-400 bg-white p-1 px-3 md:text-lg"
-        value={category}
-        onChange={(e) =>
+      <DropdownSelection
+        dropDownValues={[
+          "All Categories",
+          ...Array.from(new Set(categories.map((cate) => cate.name))),
+        ]}
+        onValueChange={(value) =>
           setFilter({
-            category: e.target.value === "All Categories" ? "" : e.target.value,
+            category: value === "All Categories" ? "" : value,
           })
         }
-      >
-        {[{ name: "All Categories" }, ...categories].map((category, index) => (
-          <option
-            key={index}
-            value={category.name}
-            className="text-sm md:text-base"
-          >
-            {category.name}
-          </option>
-        ))}
-      </select>
+        changesValue={category || "All Categories"}
+        buttonClassName="md:w-60 shadow-md"
+      />
+      
     </div>
   );
 }

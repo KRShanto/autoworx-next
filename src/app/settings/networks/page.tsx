@@ -2,6 +2,7 @@ import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import React from "react";
 import NetworksPage from "./NetworksPage";
+import { planObject } from "@/utils/planObject";
 
 type Props = {};
 
@@ -50,10 +51,10 @@ const page = async (props: Props) => {
 
   return (
     <NetworksPage
-      connectedCompanies={connectedCompanies}
+      connectedCompanies={planObject(connectedCompanies)}
       collaborationDates={collaborationDates}
-      unconnectedCompanies={unconnectedCompanies}
-      currentCompany={currentCompany}
+      unconnectedCompanies={planObject(unconnectedCompanies)}
+      currentCompany={planObject(currentCompany)}
     />
   );
 };

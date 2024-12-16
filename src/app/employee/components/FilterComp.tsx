@@ -1,5 +1,6 @@
 "use client";
 
+import { DropdownSelection } from "@/components/DropDownSelection";
 import DateRange from "../../../components/DateRange";
 import Filter from "./Filter";
 import Search from "./Search";
@@ -11,7 +12,11 @@ type TProps = {
 };
 
 export default function FilterComp({ service, category }: TProps) {
-  const { setFilter } = useEmployeeWorkFilterStore();
+  const {
+    setFilter,
+    category: selectedCategory,
+    service: selectedService,
+  } = useEmployeeWorkFilterStore();
 
   return (
     <div className="mt-5 flex w-full items-center justify-between">
@@ -32,32 +37,22 @@ export default function FilterComp({ service, category }: TProps) {
         </div>
       </div>
 
-      <div className="mr-4 flex gap-4">
+      <div className="mr-4 flex gap-10">
         <div className="relative">
-          <select
-            onChange={(e) => setFilter({ category: e.target.value })}
-            className="rounded border border-gray-300 p-2"
-          >
-            <option value="">Category</option>
-            {category.map((categoryName, index) => (
-              <option key={index} value={categoryName}>
-                {categoryName}
-              </option>
-            ))}
-          </select>
+          <DropdownSelection
+            dropDownValues={category}
+            onValueChange={(value) => setFilter({ category: value })}
+            changesValue={selectedCategory}
+            defaultValue="Category"
+          />
         </div>
         <div className="relative">
-          <select
-            onChange={(e) => setFilter({ service: e.target.value })}
-            className="rounded border border-gray-300 p-2"
-          >
-            <option value="">Service</option>
-            {service.map((serviceName, index) => (
-              <option key={index} value={serviceName}>
-                {serviceName}
-              </option>
-            ))}
-          </select>
+          <DropdownSelection
+            dropDownValues={service}
+            onValueChange={(value) => setFilter({ service: value })}
+            changesValue={selectedService}
+            defaultValue="Service"
+          />
         </div>
       </div>
     </div>

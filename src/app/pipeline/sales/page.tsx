@@ -3,18 +3,15 @@
 import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
-import Pipelines from "../components/Pipelines";
-import WorkOrders from "../components/WorkOrders";
 
+import { getLeads } from "@/actions/pipelines/getLeads";
 import SessionUserType from "@/types/sessionUserType";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getCompanyId } from "@/lib/companyId";
-import { getLeads } from "@/actions/pipelines/getLeads";
 
+import { SalesLead, SalesPipelineData } from "@/types/invoiceLead";
 import { Lead } from "@prisma/client";
-import { SalesPipelineData, SalesLead } from "@/types/invoiceLead";
-import SalesPipeline from "../components/SalesPipeline";
 import Leads from "../components/Leads";
+import SalesPipeline from "../components/SalesPipeline";
 type Props = {
   searchParams?: { view?: string };
 };
@@ -28,9 +25,12 @@ interface Column {
 
 const Page = (props: Props) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const columnType = "sales";
-  const [activeView, setActiveView] = useState("workOrders");
+
+  const initialView = searchParams.get("view") || "workOrders";
+  const [activeView, setActiveView] = useState(initialView);
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
   const [currentUser, setCurrentUser] = useState<SessionUserType>();
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -98,12 +98,11 @@ const Page = (props: Props) => {
   }, [leads, pipelineColumns]);
   const handleColumnsUpdate = async ({ columns }: { columns: Column[] }) => {
     setPipelineColumns(columns);
-    
   };
 
   const handleViewChange = (view: string) => {
     setActiveView(view);
-    router.push(`?view=${view}`);
+    router.replace(`?view=${view}`);
   };
   const type = "Sales Pipelines";
 
