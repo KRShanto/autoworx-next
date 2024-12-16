@@ -31,7 +31,7 @@ export default function MobileNavList({ item, setOpenNav }: TProps) {
           <Link
             onClick={() => setOpenNav(false)}
             href={item.link}
-            className="text-xl text-white"
+            className="flex-shrink-0 text-base text-white"
           >
             {item.title}
           </Link>
@@ -39,7 +39,7 @@ export default function MobileNavList({ item, setOpenNav }: TProps) {
           <>
             <p
               onClick={() => setIsOpenSubNav((prev) => !prev)}
-              className="flex items-center space-x-2 text-xl text-white"
+              className="flex flex-shrink-0 items-center space-x-2 text-base text-white"
             >
               <span>{item.title}</span>
 

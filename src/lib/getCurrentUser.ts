@@ -12,4 +12,3 @@ export async function getUserFromSession() {
 
   return session.user;
 }
-

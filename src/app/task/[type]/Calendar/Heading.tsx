@@ -1,6 +1,12 @@
 import { CalendarType } from "@/types/calendar";
 import type { EmailTemplate } from "@prisma/client";
-import { CalendarSettings, Client, User, Vehicle } from "@prisma/client";
+import {
+  CalendarSettings,
+  Client,
+  EmployeeType,
+  User,
+  Vehicle,
+} from "@prisma/client";
 import { sentenceCase } from "change-case";
 import moment, { Moment } from "moment";
 import Link from "next/link";
@@ -9,6 +15,14 @@ import { Suspense } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { NewAppointment } from "../components/appointment/NewAppointment";
 import Settings from "../components/appointment/Settings";
+import dynamic from "next/dynamic";
+import { DropdownSelection } from "@/components/DropDownSelection.tsx";
+
+const ALLOWED_ROLES_FOR_NEW_APPOINTMENT = ["Admin", "Manager", "Sales"];
+
+const HolidayButton = dynamic(() => import("./HolidayButton.tsx"), {
+  ssr: false,
+});
 
 function DisplayDate({ type }: { type: CalendarType }) {
   const searchParams = useSearchParams();
@@ -27,12 +41,12 @@ function getNextValidDate(
   weekend2: string,
 ): Moment {
   let nextDate = moment(date);
-  while (
-    nextDate.format("dddd") === weekend1 ||
-    nextDate.format("dddd") === weekend2
-  ) {
-    nextDate.add(direction, "days");
-  }
+  // while (
+  //   nextDate.format("dddd") === weekend1 ||
+  //   nextDate.format("dddd") === weekend2
+  // ) {
+  //   nextDate.add(direction, "days");
+  // }
   return nextDate;
 }
 
@@ -43,6 +57,7 @@ export default function Heading({
   settings,
   employees,
   templates,
+  user,
 }: {
   type: CalendarType;
   customers: Client[];
@@ -50,11 +65,14 @@ export default function Heading({
   settings: CalendarSettings;
   employees: User[];
   templates: EmailTemplate[];
+  user: User;
 }) {
   const router = useRouter();
   const q = type === "day" ? "date" : type;
   const weekend1 = settings ? settings.weekend1 : null;
   const weekend2 = settings ? settings.weekend2 : null;
+
+  const isAdmin = user.employeeType === EmployeeType.Admin;
 
   return (
     <div className="flex items-center justify-between">
@@ -67,10 +85,12 @@ export default function Heading({
 
       {/* Calendar options */}
       <div className="flex items-center gap-3">
+        {/* holiday set */}
+        {isAdmin && <HolidayButton />}
         {/* Highlight day's date in Month section */}
         <Link
           className="app-shadow rounded-md p-2 text-[#797979]"
-          href="/task/month"
+          href={`/task/${type}`}
         >
           Today
         </Link>
@@ -81,12 +101,20 @@ export default function Heading({
           className="app-shadow rounded-md p-2 text-[#797979]"
           onClick={() => {
             const searchParams = new URLSearchParams(window.location.search);
-            const date = moment(searchParams.get(q));
+            const date = moment(searchParams.get(q)).isValid()
+              ? moment(searchParams.get(q))
+              : moment();
+
             const validDate = getNextValidDate(
               date.subtract(1, `${type}s`),
               -1,
               weekend1 ? weekend1 : "",
               weekend2 ? weekend2 : "",
+            );
+            console.log(
+              validDate.format(
+                moment.HTML5_FMT[q.toUpperCase() as Uppercase<typeof q>],
+              ),
             );
             router.push(
               `/task/${type}?${q}=${(date.isValid() ? validDate : moment()).format(moment.HTML5_FMT[q.toUpperCase() as Uppercase<typeof q>])}`,
@@ -102,7 +130,9 @@ export default function Heading({
           className="app-shadow rounded-md p-2 text-[#797979]"
           onClick={() => {
             const searchParams = new URLSearchParams(window.location.search);
-            const date = moment(searchParams.get(q));
+            const date = moment(searchParams.get(q)).isValid()
+              ? moment(searchParams.get(q))
+              : moment();
             const validDate = getNextValidDate(
               date.add(1, `${type}s`),
               1,
@@ -118,24 +148,22 @@ export default function Heading({
         </button>
 
         {/* Type selector */}
-        <select
-          className="app-shadow rounded-md bg-white p-2 text-[#797979]"
-          value={type}
-          onChange={(event) => router.push(event.currentTarget.value)}
-        >
-          {["day", "week", "month"].map((x) => (
-            <option key={x} value={x}>
-              {sentenceCase(x)}
-            </option>
-          ))}
-        </select>
+        <DropdownSelection
+          dropDownValues={["day", "week", "month"]}
+          onValueChange={(value) => router.push(value)}
+          changesValue={type}
+          buttonClassName="app-shadow rounded-md bg-white px-3 py-2 text-[#797979] "
+        />
 
         {/* New Appointment button */}
-        <NewAppointment
-          settings={settings}
-          employees={employees}
-          templates={templates}
-        />
+        {ALLOWED_ROLES_FOR_NEW_APPOINTMENT.includes(user.employeeType) && (
+          // TODO: template time set dynamic
+          <NewAppointment
+            settings={settings}
+            employees={employees}
+            templates={templates}
+          />
+        )}
 
         <Settings settings={settings} />
       </div>

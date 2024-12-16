@@ -2,6 +2,7 @@
 
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
+import getUser from "@/lib/getUser";
 import { ServerAction } from "@/types/action";
 import { InventoryProductType } from "@prisma/client";
 import { revalidatePath } from "next/cache";
@@ -25,6 +26,7 @@ export async function createProduct(
   data: z.infer<typeof CreateProductInputSchema>,
 ): Promise<ServerAction> {
   try {
+    const user = await getUser();
     const validatedData = CreateProductInputSchema.parse(data);
 
     const companyId = await getCompanyId();
@@ -33,6 +35,7 @@ export async function createProduct(
       data: {
         ...validatedData,
         companyId,
+        userId: user.id,
       },
     });
 
@@ -45,6 +48,7 @@ export async function createProduct(
     // create a history record
     await db.inventoryProductHistory.create({
       data: {
+        companyId,
         productId: newProduct.id,
         date: new Date(),
         quantity: newProduct.quantity || 1,

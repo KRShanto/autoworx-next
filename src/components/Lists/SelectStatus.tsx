@@ -1,12 +1,13 @@
 "use client";
-
-import { deleteStatus } from "@/actions/status/deleteStatus";
-import newStatus from "@/actions/status/newStatus";
+import {
+  createColumn,
+  deleteColumn,
+} from "@/actions/pipelines/pipelinesColumn";
 import useOutsideClick from "@/hooks/useOutsideClick";
 import { INVOICE_COLORS } from "@/lib/consts";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
-import { Status } from "@prisma/client";
+import { Column, Status } from "@prisma/client";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronUp, FaSearch, FaTimes } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
@@ -20,6 +21,15 @@ import {
 import FormError from "../FormError";
 import Submit from "../Submit";
 import { SelectProps } from "./select-props";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/Dialog";
 
 type SelectedColor = { textColor: string; bgColor: string } | null;
 
@@ -28,11 +38,13 @@ export function SelectStatus({
   value = null,
   open,
   setOpen,
-}: SelectProps<Status | null>) {
-  const [status, setStatus] = useState<Status | null>(null);
+}: SelectProps<Column | null>) {
+  const [status, setStatus] = useState<Column | null>(null);
   const statusList = useListsStore((x) => x.statuses);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [statusToDelete, setStatusToDelete] = useState<number | null>(null);
 
   useEffect(() => {
     if (value) {
@@ -51,26 +63,33 @@ export function SelectStatus({
       useListsStore.setState({ status: null });
     }
   }, [statusList]);
-
-  async function handleDelete(id: number) {
-    const res = await deleteStatus(id);
-
-    if (res.type === "success") {
-      useListsStore.setState(({ statuses }) => ({
-        statuses: statuses.filter((status) => status.id !== id),
-      }));
-      if (status?.id === id) {
-        setStatus(null);
+  const filteredShopStatus = statusList.filter(
+    (status) => status.type === "shop",
+  );
+  async function handleDelete(event: React.MouseEvent<HTMLButtonElement>) {
+    event.stopPropagation();
+    if (statusToDelete !== null) {
+      const res = await deleteColumn(statusToDelete);
+      if (res) {
+        useListsStore.setState(({ statuses }) => ({
+          statuses: statuses.filter((status) => status.id !== statusToDelete),
+        }));
+        if (status?.id === statusToDelete) {
+          setStatus(null);
+        }
       }
+      setDeleteConfirmOpen(false);
     }
   }
   useOutsideClick(() => {
     // alert("outside click");
     setOpen && setOpen(false);
   });
+  const restrictedColumns = ["Pending", "In Progress", "Completed"];
+  console.log("Status to delete", statusToDelete);
   return (
     <div>
-      <input type="hidden" name={name} value={status?.id ?? ""} />
+      <input type="hidden" name={name} value={status?.title ?? ""} />
       <DropdownMenu
         open={open}
         onOpenChange={(open) => {
@@ -78,17 +97,17 @@ export function SelectStatus({
         }}
       >
         <DropdownMenuTrigger
-          className="flex h-10 items-center gap-2 rounded-md bg-slate-100 px-2 py-1"
+          className="flex h-10 items-center gap-2 rounded-md border-2 border-gray-400 bg-slate-100 px-4 py-1"
           style={{
-            backgroundColor: status?.bgColor,
-            color: status?.textColor,
+            backgroundColor: status?.bgColor || undefined,
+            color: status?.textColor || undefined,
           }}
           onClick={() => {
             setOpen && setOpen(!open);
           }}
         >
           <PiPulse />
-          {status?.name ?? "Status"}
+          {status?.title ?? "Status"}
         </DropdownMenuTrigger>
 
         <DropdownMenuContent
@@ -114,7 +133,7 @@ export function SelectStatus({
             </button>
           </div>
           <div className="space-y-1">
-            {statusList.map((statusItem) => (
+            {filteredShopStatus.map((statusItem) => (
               <div
                 key={statusItem.id}
                 onClick={() => {
@@ -123,21 +142,27 @@ export function SelectStatus({
                 }}
                 className="flex w-full cursor-pointer items-center justify-between rounded border-none px-4 py-2"
                 style={{
-                  backgroundColor: statusItem?.bgColor,
-                  color: statusItem?.textColor,
+                  backgroundColor: statusItem?.bgColor ?? undefined,
+                  color: statusItem?.textColor ?? undefined,
                   border:
                     statusItem?.id === status?.id
                       ? `1px solid ${status.textColor}`
                       : "",
                 }}
               >
-                {statusItem.name}
-                <button
-                  className="text-lg text-[#66738C]"
-                  onClick={() => handleDelete(statusItem.id)}
-                >
-                  <IoMdClose />
-                </button>
+                {statusItem.title}
+                {!restrictedColumns.includes(statusItem.title) && (
+                  <button
+                    className="px-2 text-lg text-[#66738C] hover:text-gray-900"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setStatusToDelete(statusItem.id);
+                      setDeleteConfirmOpen(true);
+                    }}
+                  >
+                    <IoMdClose />
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -179,6 +204,26 @@ export function SelectStatus({
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+      {/* Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Status</DialogTitle>
+          </DialogHeader>
+          <p>Are you sure you want to delete this status?</p>
+          <DialogFooter>
+            <DialogClose className="rounded-lg border-2 border-slate-400 p-2">
+              Cancel
+            </DialogClose>
+            <button
+              className="z-50 rounded-lg border bg-red-500 px-5 py-2 text-white hover:bg-red-600"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -188,32 +233,31 @@ function QuickAddForm({
   setPickerOpen,
   selectedColor,
 }: {
-  onSuccess?: (value: Status) => void;
+  onSuccess?: (value: Column) => void;
   setPickerOpen: any;
   selectedColor: SelectedColor;
 }) {
   const { showError } = useFormErrorStore();
   const formRef = useRef<HTMLFormElement | null>(null);
   async function handleSubmit(data: FormData) {
-    const name = data.get("name") as string;
+    const title = data.get("name") as string;
 
-    const res = await newStatus({
-      name,
-      ...selectedColor,
-    });
+    try {
+      const newColumn = await createColumn(
+        title,
+        "shop",
+        selectedColor?.textColor || undefined,
+        selectedColor?.bgColor || undefined,
+      );
 
-    if (res.type === "error") {
-      console.log(res);
-      showError({
-        field: res.field || "name",
-        message: res.message || "",
-      });
-    } else {
-      useListsStore.setState(({ statuses }) => ({
-        statuses: [...statuses, res.data],
-      }));
       formRef.current?.reset();
-      onSuccess?.(res.data);
+      onSuccess?.(newColumn);
+    } catch (error: any) {
+      console.log(error);
+      showError({
+        field: "name",
+        message: error.message || "An error occurred",
+      });
     }
   }
 

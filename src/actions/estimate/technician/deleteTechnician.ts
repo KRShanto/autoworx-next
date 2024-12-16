@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { updateWorkOrderStatus } from "./updateWorkOrderStatus";
+import { revalidatePath } from "next/cache";
 
 export async function deleteTechnician({
   id,
@@ -11,13 +12,35 @@ export async function deleteTechnician({
   id: number;
   invoiceId: string;
 }): Promise<ServerAction> {
-  await db.technician.delete({
-    where: {
-      id,
-    },
-  });
+  try {
+    const isExistInvoiceRedo = await db.invoiceRedo.findFirst({
+      where: {
+        invoiceId,
+        technicianId: id,
+      },
+    });
+    if (isExistInvoiceRedo) {
+      await db.invoiceRedo.delete({
+        where: {
+          id: isExistInvoiceRedo.id,
+        },
+      });
+    }
+    await db.technician.delete({
+      where: {
+        id,
+        invoiceId,
+      },
+    });
 
-  await updateWorkOrderStatus(invoiceId);
+    await updateWorkOrderStatus(invoiceId);
+    revalidatePath("/estimate/view");
 
-  return { type: "success" };
+    return { type: "success" };
+  } catch (err) {
+    return {
+      type: "error",
+      message: "Failed to delete technician",
+    };
+  }
 }

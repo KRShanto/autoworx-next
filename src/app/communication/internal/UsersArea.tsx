@@ -2,14 +2,14 @@ import React, { SetStateAction, useEffect, useState } from "react";
 import MessageBox from "../MessageBox";
 import { User } from "next-auth";
 import { pusher } from "@/lib/pusher/client";
-import { Attachment, Message as DbMessage, Group } from "@prisma/client";
+import { Attachment, Message as DbMessage, Group, RequestEstimate } from "@prisma/client";
 import { cn } from "@/lib/cn";
 import GroupMessageBox from "./GroupMessageBox";
 import UserMessageBox from "./UserMessageBox";
 
 export interface MessageQue {
   user: number;
-  messages: (Message & { attachment: Attachment | null })[];
+  messages: (Message & { attachment: Attachment[] | null })[];
 }
 
 export interface TGroupMessage {
@@ -21,7 +21,8 @@ export interface Message {
   userId?: number;
   message: string;
   sender: "CLIENT" | "USER";
-  attachment: Attachment | null;
+  attachment?: Attachment[] | null;
+  requestEstimate?: RequestEstimate | null;
 }
 
 export default function UsersArea({
@@ -44,7 +45,7 @@ export default function UsersArea({
   return (
     <div
       className={cn(
-        "w-full gap-3 sm:grid",
+        "h-[88vh] w-full gap-3 sm:grid",
         totalMessageBoxLength > 1 ? "grid-cols-2" : "grid-cols-1",
         className,
       )}
@@ -74,7 +75,7 @@ export default function UsersArea({
         <div
           className={cn(
             "app-shadow flex w-full border-spacing-4 flex-col overflow-hidden rounded-lg max-[1400px]:w-[100%]",
-            totalMessageBoxLength > 2 && "h-[44vh]",
+            totalMessageBoxLength > 2 && "sm:h-[44vh]",
           )}
           style={{
             borderWidth: "4px",

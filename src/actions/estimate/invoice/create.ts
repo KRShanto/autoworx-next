@@ -1,17 +1,17 @@
 "use server";
 
-import { auth } from "@/app/auth";
 import { createTask } from "@/actions/task/createTask";
+import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
 import {
-  InvoiceType,
-  Service,
-  Material,
-  Labor,
-  Tag,
   Coupon,
+  InvoiceType,
+  Labor,
+  Material,
+  Service,
+  Tag,
 } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
@@ -21,7 +21,6 @@ export async function createInvoice({
 
   clientId,
   vehicleId,
-  statusId,
 
   subtotal,
   discount,
@@ -43,13 +42,13 @@ export async function createInvoice({
   tasks,
 
   coupon,
+  columnId,
 }: {
   invoiceId: string;
   type: InvoiceType;
 
   clientId?: number;
   vehicleId?: number;
-  statusId?: number;
 
   subtotal: number;
   discount: number;
@@ -77,9 +76,54 @@ export async function createInvoice({
   tasks: { id: undefined | number; task: string }[];
 
   coupon?: Coupon | null;
+  columnId?: number;
 }): Promise<ServerAction> {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
+  let finalColumnId = columnId;
+  if (!finalColumnId) {
+    const defaultColumnId = await db.column.findFirst({
+      where: {
+        title: "Pending",
+
+        type: "shop",
+        companyId,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (defaultColumnId) {
+      finalColumnId = defaultColumnId.id;
+    } else {
+      throw new Error("Default column not found");
+    }
+  }
+
+  if (finalColumnId) {
+    const column = await db.column.findUnique({
+      where: {
+        id: finalColumnId,
+      },
+    });
+
+    if (column) {
+      type = column.title === "In Progress" ? "Invoice" : type;
+    } else {
+      throw new Error("Column not found to create inovice convertions");
+    }
+  }
+
+  // calculate the total cost. This is the sum of all the costs of the materials and labor
+  const totalCost = items.reduce((acc, item) => {
+    const materialCostPrice = item.materials.reduce(
+      (acc, cur) => acc + Number(cur?.cost) * Number(cur?.quantity),
+      0,
+    );
+    const laborCostPrice = Number(item.labor?.charge) * Number(item.labor?.hours);
+
+    return acc + materialCostPrice + laborCostPrice;
+  }, 0);
 
   const invoice = await db.invoice.create({
     data: {
@@ -87,7 +131,7 @@ export async function createInvoice({
       type,
       clientId,
       vehicleId,
-      statusId,
+      profit: grandTotal - totalCost,
       subtotal,
       discount,
       tax,
@@ -103,6 +147,7 @@ export async function createInvoice({
       customerComments,
       companyId,
       userId: session.user.id as any,
+      columnId: finalColumnId,
     },
   });
 
@@ -122,11 +167,29 @@ export async function createInvoice({
     const labor = item.labor;
     const tags = item.tags;
 
+    // Create new labor
+    let laborId;
+    if (labor) {
+      const newLabor = await db.labor.create({
+        data: {
+          name: labor.name,
+          categoryId: labor.categoryId,
+          notes: labor.notes,
+          hours: labor.hours,
+          charge: labor.charge,
+          discount: labor.discount,
+          companyId,
+        },
+      });
+
+      laborId = newLabor.id;
+    }
+
     const invoiceItem = await db.invoiceItem.create({
       data: {
         invoiceId: invoice.id,
         serviceId: service?.id,
-        laborId: labor?.id,
+        laborId: laborId,
       },
     });
 
@@ -173,6 +236,7 @@ export async function createInvoice({
       priority: "Medium",
       assignedUsers: [],
       invoiceId: invoice.id,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
   });
 

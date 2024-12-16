@@ -1,10 +1,9 @@
-import { usePopupStore } from "../../../../stores/popup";
-import { Appointment, Task, User } from "@prisma/client";
-import TaskComponent from "./Task";
-import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
-import { MinimizeButton } from "./MinimiseButton";
 import { cn } from "@/lib/cn";
+import { useCalendarSidebarStore } from "@/stores/calendarSidebar";
+import { Task, User } from "@prisma/client";
 import NewTask from "../components/task/NewTask";
+import { MinimizeButton } from "./MinimiseButton";
+import TaskComponent from "./Task";
 
 export default function Tasks({
   tasks,
@@ -14,7 +13,6 @@ export default function Tasks({
   users: User[];
 }) {
   const minimized = useCalendarSidebarStore((x) => x.minimized);
-
   return (
     <div
       className={cn(
@@ -32,7 +30,10 @@ export default function Tasks({
           {tasks.map((task) => (
             <TaskComponent key={task.id} task={task} />
           ))}
-
+        </div>
+      )}
+      {!minimized && (
+        <div className="mt-auto">
           <NewTask companyUsers={users} />
         </div>
       )}

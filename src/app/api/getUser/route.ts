@@ -1,6 +1,5 @@
-
-import { NextResponse } from 'next/server';
-import { getUserFromSession } from '@/lib/getCurrentUser';
+import { NextResponse } from "next/server";
+import { getUserFromSession } from "@/lib/getCurrentUser";
 
 export async function GET() {
   try {

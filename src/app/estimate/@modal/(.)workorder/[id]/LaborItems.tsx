@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from "react";
+"use client";
+import React, { useEffect, useState, useTransition } from "react";
 import { TiDeleteOutline } from "react-icons/ti";
-import Link from "next/link";
 import { Technician } from "@prisma/client";
 import { getTechnicians } from "../../../../../actions/estimate/technician/getTechnicians";
 import { deleteTechnician } from "../../../../../actions/estimate/technician/deleteTechnician";
 import CreateAndEditLabor from "./CreateAndEditLabor";
+
+// type TProps = {
+//   technicians: (Technician & { name: string })[];
+//   setTechnicians: Dispatch<SetStateAction<(Technician & { name: string })[]>>;
+// };
 
 export default function LaborItems({
   invoiceId,
@@ -17,6 +22,7 @@ export default function LaborItems({
     (Technician & { name: string })[]
   >([]);
   const [error, setError] = useState("");
+  const [pending, startTransition] = useTransition();
 
   useEffect(() => {
     const fetchTechnicians = async () => {
@@ -31,7 +37,7 @@ export default function LaborItems({
       }
     };
     fetchTechnicians();
-  }, []);
+  }, [invoiceId, serviceId]);
 
   const handleTechnicianDelete = async (technicianId: number) => {
     try {
@@ -60,7 +66,7 @@ export default function LaborItems({
           setTechnicians={setTechnicians}
         />
 
-        {technicians.map((technician, index) => (
+        {technicians.map((technician) => (
           <button
             key={technician.id}
             className="flex items-center justify-evenly space-x-1 text-nowrap rounded-full border bg-[#6571FF] px-3 py-0.5"
@@ -71,10 +77,14 @@ export default function LaborItems({
               technician={technician}
               setTechnicians={setTechnicians}
             />
-            <TiDeleteOutline
-              onClick={() => handleTechnicianDelete(technician.id)}
-              className="text-xl text-white"
-            />
+            <button
+              disabled={pending}
+              onClick={() =>
+                startTransition(() => handleTechnicianDelete(technician.id))
+              }
+            >
+              <TiDeleteOutline className="text-xl text-white" />
+            </button>
           </button>
         ))}
       </div>

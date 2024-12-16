@@ -1,10 +1,9 @@
+import EditVendor from "@/components/Lists/EditVendor";
 import Title from "@/components/Title";
 import { cn } from "@/lib/cn";
 import { db } from "@/lib/db";
 import moment from "moment";
 import Link from "next/link";
-import React from "react";
-import { HiExternalLink } from "react-icons/hi";
 import { IoIosArrowBack } from "react-icons/io";
 
 const evenColor = "bg-white";
@@ -15,46 +14,30 @@ export default async function Page({
 }: {
   params: { id: string };
 }) {
-  const vendor = await db.vendor.findUnique({
-    where: { id: parseInt(id) },
+  const histories = await db.inventoryProductHistory.findMany({
+    where: {
+      vendorId: parseInt(id),
+      type: "Purchase",
+    },
     include: {
-      inventoryProducts: {
-        include: {
-          InventoryProductHistory: {
-            include: {
-              product: true,
-            },
-          },
-        },
-      },
+      product: true,
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 
-  const totalPurchaseAmount = vendor?.inventoryProducts.reduce(
-    (acc, product) => {
-      return (
-        acc +
-        product.InventoryProductHistory.filter(
-          (h) => h.type === "Purchase",
-        ).reduce((acc, history) => {
-          return acc + (history.product.price as any) * history.quantity;
-        }, 0)
-      );
+  const vendor = await db.vendor.findUnique({
+    where: {
+      id: parseInt(id),
     },
-    0,
-  );
+  });
 
-  const totalAmountSpent = vendor?.inventoryProducts.reduce((acc, product) => {
-    return (
-      acc +
-      product.InventoryProductHistory.filter((h) => h.type === "Sale").reduce(
-        (acc, history) => {
-          return acc + (history.product.price as any) * history.quantity;
-        },
-        0,
-      )
-    );
+  const totalPurchaseAmount = histories.reduce((acc, history) => {
+    return acc + (history.product.price as any) * history.quantity;
   }, 0);
+
+  const totalAmountSpent = 0;
 
   return (
     <div className="h-full">
@@ -77,48 +60,36 @@ export default async function Page({
                 <th className="px-10 text-left">Quantity</th>
                 <th className="px-10 text-left">Total</th>
                 <th className="px-10 text-left">Date</th>
-                <th className="px-5 text-left">Invoice</th>
+                <th className="px-5 text-left">Receipt</th>
               </tr>
             </thead>
 
             <tbody>
-              {vendor?.inventoryProducts.map((product, index) => (
-                <>
-                  {product.InventoryProductHistory.map((history) => (
-                    <tr
-                      key={history.id}
-                      className={cn(
-                        "py-3",
-                        index % 2 === 0 ? evenColor : oddColor,
-                      )}
-                    >
-                      <td className="h-12 px-10 text-left">
-                        <p>{product.id}</p>
-                      </td>
-                      <td className="text-nowrap px-10 text-left">
-                        {vendor.name}
-                      </td>
-                      <td className="text-nowrap px-10 text-left">
-                        {product.price as any}
-                      </td>
-                      <td className="px-10 text-left">{history.quantity}</td>
-                      <td className="px-10 text-left">
-                        {(history.product.price as any) * history.quantity}
-                      </td>
-                      <td className="px-10 text-left">
-                        {moment(history.createdAt).format(
-                          // date.month.year
-                          "DD.MM.YYYY",
-                        )}
-                      </td>
-                      <td className="mt-2 flex gap-3 px-5">
-                        <Link href="#" className="mx-auto">
-                          <HiExternalLink />
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </>
+              {histories.map((history, index) => (
+                <tr
+                  key={history.id}
+                  className={cn("py-3", index % 2 === 0 ? evenColor : oddColor)}
+                >
+                  <td className="h-12 px-10 text-left">
+                    <p>{history.id}</p>
+                  </td>
+                  <td className="text-nowrap px-10 text-left">
+                    {history.product.name}
+                  </td>
+                  <td className="text-nowrap px-10 text-left">
+                    {Number(history.price)}
+                  </td>
+                  <td className="px-10 text-left">{history.quantity}</td>
+                  <td className="px-10 text-left">
+                    {Number(history.price) * history.quantity}
+                  </td>
+                  <td className="px-10 text-left">
+                    {moment.utc(history.createdAt).format("DD.MM.YYYY")}
+                  </td>
+                  <td className="mt-2 flex gap-3 px-5">
+                    {history.product.receipt}
+                  </td>
+                </tr>
               ))}
             </tbody>
           </table>
@@ -149,8 +120,15 @@ export default async function Page({
           </div>
 
           <div className="app-shadow mt-5 w-full rounded-lg bg-white p-5">
-            <h3 className="text-xl font-bold">Vendor Details</h3>
-
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-bold">Vendor Details</h3>
+              <EditVendor
+                button={
+                  <button className="rounded-sm border-2 px-4 py-1">Edit</button>
+                }
+                vendor={vendor!}
+              />
+            </div>
             <div className="flex flex-col gap-1 p-3">
               <p>Contact Name: {vendor?.name}</p>
               <p>Company Name: {vendor?.companyName}</p>

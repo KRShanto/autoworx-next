@@ -4,6 +4,7 @@ import { auth } from "@/app/auth";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
+import { revalidatePath } from "next/cache";
 
 export default async function newTag({
   name,
@@ -25,6 +26,9 @@ export default async function newTag({
       bgColor: bgColor || "white",
     },
   });
+
+  revalidatePath("/estimate/create");
+  revalidatePath("/estimate/edit");
 
   return {
     type: "success",

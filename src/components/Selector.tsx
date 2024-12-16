@@ -108,7 +108,7 @@ export default function Selector<T>({
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className="basis-full md:basis-96">
+      <div className="w-full max-w-96">
         <DropdownMenuTrigger
           disabled={disabledDropdown}
           onClick={() => setIsOpen(true)}
@@ -121,13 +121,13 @@ export default function Selector<T>({
           <p className="text-sm font-medium text-slate-400">
             {selected ? label(selected) : label(null)}
           </p>
-          <FaChevronDown className="text-[#797979]" />
+          {!disabledDropdown && <FaChevronDown className="text-[#797979]" />}
         </DropdownMenuTrigger>
 
         <DropdownMenuContent
           align="start"
           sideOffset={-40}
-          className="z-50 w-full rounded-lg border-2 border-slate-400 bg-white"
+          className="z-50 w-[300px] rounded-lg border-2 border-slate-400 bg-white md:w-full"
           style={{
             minWidth: "var(--radix-popper-anchor-width)",
             // maxWidth: "var(--radix-popper-anchor-width)",
@@ -148,7 +148,7 @@ export default function Selector<T>({
           </div>
 
           {/* Display list of items */}
-          <div className="mb-5 max-h-40 overflow-y-auto">
+          <div className="mb-5 flex max-h-40 flex-col overflow-y-auto">
             {filteredItems.map((item, index) => {
               if (clickabled) {
                 return (

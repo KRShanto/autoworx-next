@@ -2,26 +2,24 @@ import { useState, useEffect, SetStateAction } from "react";
 import MessageBox from "../MessageBox";
 import { useSession } from "next-auth/react";
 import { getUserMessagesById } from "@/actions/communication/internal/query";
-import { Attachment } from "@prisma/client";
+import { Attachment, RequestEstimate } from "@prisma/client";
 import { pusher } from "@/lib/pusher/client";
 
 type TProps = {
   user: any;
   setUsersList: React.Dispatch<SetStateAction<any[]>>;
   totalMessageBoxLength: number;
-  companyName?: string | null;
 };
 
 export default function UserMessageBox({
   user,
   setUsersList,
   totalMessageBoxLength,
-  companyName,
 }: TProps) {
   const [messages, setMessages] = useState<any[]>([]);
-  const [realTimeMessage, setRealTimeMessage] = useState({});
   const { data: session } = useSession();
 
+  // message from db
   useEffect(() => {
     const fetchMessages = async function () {
       const findUserMessage = await getUserMessagesById(
@@ -30,6 +28,7 @@ export default function UserMessageBox({
       const userMessages = findUserMessage.filter(
         (m) => m.from === user.id || m.to === user.id,
       );
+
       setMessages(
         userMessages.map((m) => {
           return {
@@ -37,6 +36,7 @@ export default function UserMessageBox({
             // @ts-ignore
             sender: m.from === session?.user.id ? "USER" : "CLIENT",
             attachment: m.attachment,
+            requestEstimate: m.requestEstimate,
           };
         }),
       );
@@ -44,27 +44,33 @@ export default function UserMessageBox({
     fetchMessages();
   }, []);
 
+  // real-time message from pusher
   useEffect(() => {
     const channel = pusher
       .subscribe(`user-${user?.id}`)
       .bind(
         "message",
         ({
+          to,
           from,
           message,
           attachment,
+          requestEstimate,
         }: {
+          to: number;
           from: number;
           message: string;
           attachment: Partial<Attachment>;
+          requestEstimate: RequestEstimate | null;
         }) => {
+          console.log({ to, attachment });
           if (from !== parseInt(session?.user?.id!)) {
             const newMessage = {
               message,
               sender: "CLIENT",
               attachment,
+              requestEstimate,
             };
-            setRealTimeMessage(newMessage);
             setMessages((prevGroupMessages) => [
               ...prevGroupMessages,
               newMessage,
@@ -80,7 +86,6 @@ export default function UserMessageBox({
   return (
     <MessageBox
       user={user}
-      companyName={companyName}
       setUsersList={setUsersList}
       messages={messages}
       setMessages={setMessages}

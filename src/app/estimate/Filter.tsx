@@ -14,12 +14,13 @@ import Submit from "@/components/Submit";
 import { cn } from "@/lib/cn";
 import { useEstimateFilterStore } from "@/stores/estimate-filter";
 import { useListsStore } from "@/stores/lists";
-import { Status } from "@prisma/client";
+import { Column } from "@prisma/client";
 import { matchSorter } from "match-sorter";
 import moment from "moment";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
+import { BiXCircle } from "react-icons/bi";
 import { FaTimes } from "react-icons/fa";
 import { HiMagnifyingGlass, HiOutlineFunnel } from "react-icons/hi2";
 
@@ -27,6 +28,7 @@ export function Filter() {
   const searchParams = useSearchParams();
   const today = useMemo(() => moment().format(moment.HTML5_FMT.DATE), []);
   const [start, setStart] = useState(searchParams.get("start") ?? "");
+  const [end, setEnd] = useState(searchParams.get("endDate") ?? "");
   const [statusSearch, setStatusSearch] = useState(
     searchParams.get("start") ?? "",
   );
@@ -39,10 +41,9 @@ export function Filter() {
     [allStatuses, statusSearch],
   );
   const paramStatus = +(searchParams.get("status") ?? "");
-  const [status, setStatus] = useState<Status | null>(
+  const [status, setStatus] = useState<Column | null>(
     allStatuses.find((x) => x.id === paramStatus) ?? null,
   );
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const { setFilter } = useEstimateFilterStore();
 
@@ -71,7 +72,14 @@ export function Filter() {
                 id="startDate"
                 type="date"
                 value={start}
-                onChange={(event) => setStart(event.currentTarget.value)}
+                onChange={(event) => {
+                  setStart(event.currentTarget.value);
+                  setEnd(
+                    moment(event.currentTarget.value)
+                      .add(1, "day")
+                      .format("YYYY-MM-DD"),
+                  );
+                }}
                 className={slimInputClassName}
               />
               <button
@@ -91,9 +99,12 @@ export function Filter() {
                 name="endDate"
                 id="endDate"
                 type="date"
-                defaultValue={searchParams.get("endDate") ?? ""}
+                onChange={(event) => {
+                  setEnd(event.currentTarget.value);
+                }}
+                value={end}
                 min={start}
-                max={today}
+                // max={today}
                 className={slimInputClassName}
               />
               <button
@@ -113,40 +124,52 @@ export function Filter() {
           <div className="col-span-full">
             <label className="mb-1 px-2 font-medium">Status</label>
             <div className="relative rounded border border-solid border-slate-500 p-2">
-              <HiMagnifyingGlass className="absolute m-2" />
-              <input
-                type="search"
-                value={statusSearch}
-                onChange={(event) => setStatusSearch(event.currentTarget.value)}
-                className={cn(slimInputClassName, "w-1/2 ps-8")}
-              />
-              {status && (
-                <button
-                  type="button"
-                  className="mx-2 my-1 rounded px-2"
-                  style={{
-                    color: status.textColor,
-                    backgroundColor: status.bgColor,
-                  }}
-                  onClick={() => {
-                    setStatus(null);
-                  }}
-                >
-                  {status.name}
-                </button>
-              )}
+              <div className="flex items-center gap-x-2">
+                <HiMagnifyingGlass className="absolute m-2" />
+                <input
+                  type="search"
+                  value={statusSearch}
+                  onChange={(event) =>
+                    setStatusSearch(event.currentTarget.value)
+                  }
+                  className={cn(slimInputClassName, "w-1/2 ps-8")}
+                />
+                {status && (
+                  <button
+                    type="button"
+                    className="mx-2 my-1 flex cursor-default items-center gap-x-1 rounded px-2"
+                    style={{
+                      color: status.textColor || undefined,
+                      backgroundColor: status.bgColor || undefined,
+                    }}
+                  >
+                    {status.title}
+
+                    <BiXCircle
+                      onClick={() => {
+                        setStatus(null);
+                      }}
+                      size={18}
+                      className="cursor-pointer text-red-400"
+                    />
+                  </button>
+                )}
+              </div>
               <div className="mt-2 flex flex-wrap gap-2">
                 {searchedStatuses.map((x) => (
                   <button
                     type="button"
                     key={x.id}
                     className="rounded px-2"
-                    style={{ color: x.textColor, backgroundColor: x.bgColor }}
+                    style={{
+                      color: x.textColor || undefined,
+                      backgroundColor: x.bgColor || undefined,
+                    }}
                     onClick={() => {
                       setStatus(x);
                     }}
                   >
-                    {x.name}
+                    {x.title}
                   </button>
                 ))}
               </div>
@@ -164,7 +187,7 @@ export function Filter() {
                   start ? new Date(start) : null,
                   end ? new Date(end) : null,
                 ],
-                status: status?.name,
+                status: status?.title,
               });
               setOpen(false);
             }}

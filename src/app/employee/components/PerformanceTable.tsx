@@ -2,6 +2,10 @@ import { CiCircleInfo } from "react-icons/ci";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { useState } from "react";
 import BarChartComponent from "./BarChartComponent";
+import { useParams } from "next/navigation";
+import { useServerGet } from "@/hooks/useServerGet";
+import { getPerformanceInfo } from "@/actions/employee/getPerformanceInfo";
+import { cn } from "@/lib/cn";
 
 interface AttendanceData {
   day: string;
@@ -20,27 +24,49 @@ interface MetricData {
   value: string;
   percentage: number;
   isPositive: boolean;
+  isZeroGrowth: boolean;
 }
-
-const metricData: MetricData[] = [
-  {
-    label: "Average Time to Complete a Job",
-    value: "45 Hours",
-    percentage: 4,
-    isPositive: true,
-  },
-  {
-    label: "Return Work Rate by Service Category",
-    value: "45%",
-    percentage: -4,
-    isPositive: false,
-  },
-];
 
 const arrayOfPerformanceWord = ["Average", "Return"];
 
 export default function PerformanceTable() {
+  const params = useParams();
+  const { data } = useServerGet(getPerformanceInfo, Number(params.id));
+  const {
+    averageJobTime,
+    averageJobTimeGrowthRate,
+    returnWorkRate,
+    returnWorkRateGrowthRate,
+    totalJobs,
+    totalJobsCompletedOnTime,
+    totalJobsCompletedLate,
+  } = data || {};
+
+  console.log("Average Job Time: ", averageJobTime);
+  console.log("Return Work Rate: ", returnWorkRate);
+  console.log("Total Jobs: ", totalJobs);
+  console.log("Total Jobs Completed On Time: ", totalJobsCompletedOnTime);
+  console.log("Total Jobs Completed Late: ", totalJobsCompletedLate);
+
   const [infoIndex, setInfoIndex] = useState<number | null>(null);
+
+  const metricData: MetricData[] = [
+    {
+      label: "Average Time to Complete a Job",
+      value: Math.floor(averageJobTime || 0) + " hours",
+      percentage: averageJobTimeGrowthRate!,
+      isPositive: (averageJobTimeGrowthRate || 0) > 0,
+      isZeroGrowth: averageJobTimeGrowthRate === 0,
+    },
+    {
+      label: "Return Work Rate by Service Category",
+      // value: returnWorkRate + "%",
+      value: Math.floor(returnWorkRate || 0) + "%",
+      percentage: returnWorkRateGrowthRate!,
+      isPositive: (returnWorkRateGrowthRate || 0) > 0,
+      isZeroGrowth: returnWorkRateGrowthRate === 0,
+    },
+  ];
 
   const getPerformanceContent = (label: string): string | undefined => {
     const labelword = label.split(" ");
@@ -81,18 +107,19 @@ export default function PerformanceTable() {
                 <div className="w-[80%] text-xl font-semibold text-gray-800">
                   {metric.value}
                 </div>
-                <div
-                  className={`flex items-center gap-1 text-sm font-medium ${metric.isPositive ? "text-green-500" : "text-red-500"}`}
-                >
-                  <div>
-                    {metric.isPositive ? (
-                      <IoMdArrowDropup />
-                    ) : (
-                      <IoMdArrowDropdown />
+                {!metric.isZeroGrowth && (
+                  <div
+                    className={cn(
+                      "font-inter text-xl font-semibold",
+                      metric.percentage ? "text-green-500" : "text-red-500",
                     )}
+                  >
+                    {metric.percentage}%
                   </div>
-                  <div>{Math.abs(metric.percentage)}%</div>
-                </div>
+                )}
+                {metric.isZeroGrowth && (
+                  <div className="font-inter text-4xl font-semibold">-</div>
+                )}
 
                 {infoIndex === index && (
                   <div
@@ -113,6 +140,10 @@ export default function PerformanceTable() {
             <BarChartComponent
               height={300}
               title="Total Number of Jobs Assigned"
+              data={totalJobs?.map((job) => ({
+                category: job.categoryName,
+                jobs: job.count,
+              }))}
             />
           </div>
         </div>
@@ -125,6 +156,10 @@ export default function PerformanceTable() {
             <BarChartComponent
               height={230}
               title="Total Number of Jobs Completed on Time"
+              data={totalJobsCompletedOnTime?.map((job) => ({
+                category: job.categoryName,
+                jobs: job.count,
+              }))}
             />
           </div>
           <div
@@ -134,6 +169,10 @@ export default function PerformanceTable() {
             <BarChartComponent
               height={230}
               title="Total Number of Jobs Completed Late"
+              data={totalJobsCompletedLate?.map((job) => ({
+                category: job.categoryName,
+                jobs: job.count,
+              }))}
             />
           </div>
         </div>

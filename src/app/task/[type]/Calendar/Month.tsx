@@ -9,30 +9,58 @@ import {
 import { cn } from "@/lib/cn";
 import { TASK_COLOR } from "@/lib/consts";
 import { usePopupStore } from "@/stores/popup";
+import { AuthSession } from "@/types/auth";
 import type {
   AppointmentFull,
   CalendarAppointment,
   CalendarTask,
 } from "@/types/db";
-import type {
-  CalendarSettings,
-  Client,
-  EmailTemplate,
-  Task,
-  User,
-  Vehicle,
+import {
+  EmployeeType,
+  type CalendarSettings,
+  type Client,
+  type EmailTemplate,
+  type Holiday,
+  type Task,
+  type User,
+  type Vehicle,
 } from "@prisma/client";
 import moment from "moment";
+import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDrop } from "react-dnd";
 import { FaPen } from "react-icons/fa6";
 import { assignAppointmentDate } from "../../../../actions/appointment/assignAppointmentDate";
 import { dragTask } from "../../../../actions/task/dragTask";
+import HolidayDeleteConfirmation from "./HolidayDeleteConfiramtion";
 
 function useMonth() {
   const searchParams = useSearchParams();
-  const month = moment(searchParams.get("month"), moment.HTML5_FMT.MONTH);
+  const month = moment.utc(searchParams.get("month"), moment.HTML5_FMT.MONTH);
   return (month.isValid() ? month : moment().startOf("month")).toDate();
+}
+
+function rotatedDays(startDay: number) {
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  // Rotate the daysOfWeek array based on the selected start day
+  const rotatedDays = daysOfWeek
+    .slice(startDay)
+    .concat(daysOfWeek.slice(0, startDay));
+  return rotatedDays;
+}
+
+function getDayNumber(dayName: string) {
+  const dayNumber = moment().day(dayName).day(); // `day()` accepts the day name
+  return isNaN(dayNumber) ? -1 : dayNumber;
 }
 
 export default function Month({
@@ -41,6 +69,7 @@ export default function Month({
   tasksWithoutTime,
   appointments,
   appointmentsFull,
+  holidays,
   customers,
   vehicles,
   settings,
@@ -50,6 +79,7 @@ export default function Month({
   companyUsers: User[];
   tasksWithoutTime: Task[];
   appointments: CalendarAppointment[];
+  holidays: Holiday[];
   appointmentsFull: AppointmentFull[];
   customers: Client[];
   vehicles: Vehicle[];
@@ -57,6 +87,12 @@ export default function Month({
   templates: EmailTemplate[];
 }) {
   const router = useRouter();
+
+  const { data: session } = useSession();
+
+  const isAdmin =
+    (session as AuthSession)?.user.employeeType === EmployeeType.Admin;
+
   const [{ canDrop, isOver }, dropRef] = useDrop({
     accept: ["task", "tag", "appointment"],
     drop: (item, monitor) => {
@@ -78,58 +114,116 @@ export default function Month({
   const endOfMonth = moment(month).endOf("month").toDate();
 
   // Initialize an array to hold the dates
-  const dates: [Date | null, CalendarTask[], CalendarAppointment[]][] = [];
+  const dates: [
+    Date | null,
+    CalendarTask[],
+    CalendarAppointment[],
+    Holiday[],
+  ][] = [];
 
   // Generate the dates to display
   let currentDate = startOfMonth;
-  while (currentDate.getDay() !== 0) {
-    dates.push([null, [], []]); // Filling initial empty days
-    currentDate = moment(currentDate).subtract(1, "days").toDate();
+  const startDay = settings?.weekStart ? getDayNumber(settings?.weekStart) : 0;
+
+  // check total offset date for this month
+  const offset = (currentDate.getDay() - startDay + 7) % 7;
+
+  for (let i = 0; i < offset; i++) {
+    dates.push([null, [], [], []]);
   }
+
   currentDate = startOfMonth; // Reset to the start of the month
 
   while (currentDate <= endOfMonth) {
     const tasks = getTasks(currentDate);
     const appointments = getAppointments(currentDate);
-    dates.push([currentDate, tasks, appointments]);
+    const holidays = getHolidays(currentDate);
+    dates.push([currentDate, tasks, appointments, holidays]);
     currentDate = moment(currentDate).add(1, "days").toDate();
   }
 
   while (dates.length % 7 !== 0) {
-    dates.push([null, [], []]); // Filling remaining empty days
+    dates.push([null, [], [], []]); // Filling remaining empty days
   }
 
   while (dates.length < 35) {
-    dates.push([null, [], []]); // Ensure 5 rows of 7 days means 35 days
+    dates.push([null, [], [], []]); // Ensure 5 rows of 7 days means 35 days
   }
+
+  // function getTasks(date: Date) {
+  //   return tasks.filter(
+  //     (task) =>
+  //       new Date(task.date).getFullYear() === date.getFullYear() &&
+  //       new Date(task.date).getMonth() === date.getMonth() &&
+  //       new Date(task.date).getDate() === date.getDate(),
+  //   );
+  // }
+
+  // function getTasks(date: Date) {
+  //   const targetDate = moment.utc(date);
+  //   return tasks.filter((task) => {
+  //     const taskDate = moment(task.date);
+  //     return taskDate.isSame(targetDate, "day");
+  //   });
+  // }
+
+  // function getAppointments(date: Date) {
+  //   return appointments.filter(
+  //     (appointment) =>
+  //       new Date(appointment.date!).getFullYear() === date.getFullYear() &&
+  //       new Date(appointment.date!).getMonth() === date.getMonth() &&
+  //       new Date(appointment.date!).getDate() === date.getDate(),
+  //   );
+  // }
+
+  // function getHolidays(date: Date) {
+  //   return holidays.filter(
+  //     (holiday) =>
+  //       new Date(holiday.date!).getFullYear() === date.getFullYear() &&
+  //       new Date(holiday.date!).getMonth() === date.getMonth() &&
+  //       new Date(holiday.date!).getDate() === date.getDate(),
+  //   );
+  // }
+
   function getTasks(date: Date) {
-    return tasks.filter(
-      (task) =>
-        new Date(task.date).getFullYear() === date.getFullYear() &&
-        new Date(task.date).getMonth() === date.getMonth() &&
-        new Date(task.date).getDate() === date.getDate(),
-    );
+    return tasks.filter((task) => {
+      const taskDate = new Date(task.date);
+
+      // Normalize both dates to UTC for comparison
+      return (
+        taskDate.getUTCFullYear() === date.getUTCFullYear() &&
+        taskDate.getUTCMonth() === date.getUTCMonth() &&
+        taskDate.getUTCDate() === date.getUTCDate()
+      );
+    });
   }
 
   function getAppointments(date: Date) {
-    return appointments.filter(
-      (appointment) =>
-        new Date(appointment.date!).getFullYear() === date.getFullYear() &&
-        new Date(appointment.date!).getMonth() === date.getMonth() &&
-        new Date(appointment.date!).getDate() === date.getDate(),
-    );
+    return appointments.filter((appointment) => {
+      const appointmentDate = new Date(appointment.date!);
+
+      // Normalize both dates to UTC for comparison
+      return (
+        appointmentDate.getUTCFullYear() === date.getUTCFullYear() &&
+        appointmentDate.getUTCMonth() === date.getUTCMonth() &&
+        appointmentDate.getUTCDate() === date.getUTCDate()
+      );
+    });
+  }
+  function getHolidays(date: Date) {
+    return holidays.filter((holiday) => {
+      const holidayDate = new Date(holiday.date!);
+
+      // Normalize both dates to UTC for comparison
+      return (
+        holidayDate.getUTCFullYear() === date.getUTCFullYear() &&
+        holidayDate.getUTCMonth() === date.getUTCMonth() &&
+        holidayDate.getUTCDate() === date.getUTCDate()
+      );
+    });
   }
 
-  const cells = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    ...dates,
-  ];
+  const cells = [...rotatedDays(startDay), ...dates];
 
   async function handleDrop(event: React.DragEvent, date: string) {
     // 10 am
@@ -160,6 +254,7 @@ export default function Month({
           date: new Date(date),
           startTime,
           endTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       }
     } else {
@@ -180,10 +275,16 @@ export default function Month({
           date,
           startTime,
           endTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       }
     }
   }
+
+  const handleRedirectToDay = (date: string) => {
+    router.push(`/task/day?date=${moment(date).format("YYYY-MM-DD")}`);
+  };
+  const clientTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   return (
     <div
@@ -197,7 +298,7 @@ export default function Month({
             key={i}
             className="flex w-full items-center justify-center border-b border-r border-neutral-200 p-2 text-[17px] font-bold text-[#797979] max-[1300px]:text-[15px] max-[1150px]:text-[12px]"
           >
-            {cell.toLocaleString()}
+            {cell.toLocaleString("en-US", { timeZone: clientTimezone })}
           </div>
         ))}
       </div>
@@ -209,7 +310,7 @@ export default function Month({
             <TooltipTrigger
               type="button"
               className={cn(
-                "relative flex h-full flex-col items-end gap-2 border-b border-r border-neutral-200 p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
+                "relative flex h-full cursor-default flex-col items-end gap-2 border-b border-r border-neutral-200 p-2 text-[23px] font-bold max-[1300px]:text-[17px]",
                 today.getFullYear() === cell[0]?.getFullYear() &&
                   today.getMonth() === cell[0]?.getMonth() &&
                   today.getDate() === cell[0]?.getDate()
@@ -221,10 +322,11 @@ export default function Month({
                   cell[0] &&
                   event.target instanceof Node &&
                   event.currentTarget.contains(event.target)
-                )
-                  router.push(
-                    `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`,
-                  );
+                ) {
+                  // router.push(
+                  //   `/task/day?date=${moment(cell[0]).format("YYYY-MM-DD")}`,
+                  // );
+                }
               }}
               onDrop={(event) =>
                 handleDrop(
@@ -246,7 +348,10 @@ export default function Month({
                       return (
                         <Tooltip key={i}>
                           <TooltipTrigger asChild>
-                            <div className="h-10 max-h-10 rounded border-2 border-gray-300 text-sm text-slate-500">
+                            <div
+                              onClick={() => handleRedirectToDay(cell[0])}
+                              className="h-10 max-h-10 cursor-pointer rounded border-2 border-gray-300 text-sm text-slate-500"
+                            >
                               {appointment.title}
                             </div>
                           </TooltipTrigger>
@@ -334,7 +439,8 @@ export default function Month({
                     <Tooltip key={i}>
                       <TooltipTrigger asChild>
                         <div
-                          className="h-2 max-h-[33.33%] rounded"
+                          onClick={() => handleRedirectToDay(cell[0])}
+                          className="h-2 max-h-[33.33%] cursor-pointer rounded"
                           style={{
                             backgroundColor: TASK_COLOR[task.priority],
                           }}
@@ -389,6 +495,23 @@ export default function Month({
                       +{cell[1].length - 3} more...
                     </button>
                   )}
+                  {/* TODO: holiday button will be add */}
+                  {cell[3].map((holiday: Holiday) => (
+                    <div
+                      key={holiday.id}
+                      className={cn(
+                        "app-shadow absolute left-1/2 z-10 flex -translate-x-1/2 items-center gap-x-2 rounded-md !bg-[#006D77] px-3 py-1.5 text-left text-lg font-semibold text-white",
+                        cell[1].length || cell[2].length
+                          ? "-bottom-12"
+                          : "-bottom-24",
+                      )}
+                    >
+                      <span>Holiday</span>
+                      {isAdmin && (
+                        <HolidayDeleteConfirmation holidayId={holiday.id} />
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </TooltipTrigger>

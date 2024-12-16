@@ -14,17 +14,25 @@ import { useRef, useState } from "react";
 import { RiEditFill } from "react-icons/ri";
 import { RxAvatar } from "react-icons/rx";
 
-import SelectEmployeeType from "./SelectEmployeeType";
+import { updateEmployee } from "@/actions/employee/update";
+import { getCompany } from "@/actions/settings/getCompany";
+import { useServerGet } from "@/hooks/useServerGet";
+import { DEFAULT_IMAGE_URL } from "@/lib/consts";
+import { useFormErrorStore } from "@/stores/form-error";
 import { EmployeeType, User } from "@prisma/client";
 import moment from "moment";
-import { useServerGet } from "@/hooks/useServerGet";
-import { getCompany } from "@/actions/settings/getCompany";
-import { useFormErrorStore } from "@/stores/form-error";
-import { updateEmployee } from "@/actions/employee/update";
-import { DEFAULT_IMAGE_URL } from "@/lib/consts";
 import { FaPen } from "react-icons/fa";
+import { FaPenToSquare } from "react-icons/fa6";
+import { IoMdSettings } from "react-icons/io";
+import SelectEmployeeType from "./SelectEmployeeType";
 
-export default function EditEmployee({ employee }: { employee: User }) {
+export default function EditEmployee({
+  employee,
+  settingIcon = false,
+}: {
+  employee: User;
+  settingIcon?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [employeeTypeOpen, setEmployeeTypeOpen] = useState(false);
   const [profilePic, setProfilePic] = useState<string | null>(
@@ -103,8 +111,10 @@ export default function EditEmployee({ employee }: { employee: User }) {
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <button className="text-[#6571FF]">
-            <RiEditFill />
+          <button
+            className={`${settingIcon ? "text-gray-600" : ""} text-[#6571FF]"`}
+          >
+            {settingIcon ? <IoMdSettings /> : <FaPenToSquare />}
           </button>
         </DialogTrigger>
         <DialogContent
@@ -114,7 +124,7 @@ export default function EditEmployee({ employee }: { employee: User }) {
           <div className="mt-8 flex items-center justify-between">
             <h1 className="text-2xl font-bold">Edit Employee</h1>
 
-            {profilePic ? (
+            {newProfilePic || profilePic ? (
               <label
                 className="relative cursor-pointer"
                 htmlFor="profilePicture"
@@ -124,7 +134,7 @@ export default function EditEmployee({ employee }: { employee: User }) {
                   src={
                     newProfilePic
                       ? URL.createObjectURL(newProfilePic)
-                      : `/api/images/${profilePic}`
+                      : profilePic || ""
                   }
                   alt="profile"
                   className="h-20 w-20 rounded-full border border-slate-400 hover:border-dashed hover:opacity-80"
@@ -160,6 +170,7 @@ export default function EditEmployee({ employee }: { employee: User }) {
                   accept="image/*"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
+
                     if (file) {
                       setNewProfilePic(file);
                     }
@@ -217,7 +228,7 @@ export default function EditEmployee({ employee }: { employee: User }) {
                 required={false}
               />
               <SlimInput
-                name="commission%"
+                name="commission"
                 defaultValue={Number(employee.commission!)}
                 required={false}
               />
@@ -234,7 +245,10 @@ export default function EditEmployee({ employee }: { employee: User }) {
                 rootClassName="grow"
                 type="date"
                 required={false}
-                defaultValue={moment(employee.joinDate).format("YYYY-MM-DD")}
+                defaultValue={moment
+                  .utc(employee.joinDate)
+                  .utc()
+                  .format("YYYY-MM-DD")}
               />
             </div>
           </div>

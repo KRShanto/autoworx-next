@@ -1,28 +1,43 @@
 "use client";
 
+import { EmployeeType } from "@prisma/client";
 import { useSearchParams } from "next/navigation";
-import FilterComp from "./FilterComp";
-import EmployeeInfoTable from "./EmployeeInfoTable";
 import AttendancePerformance from "./AttendancePerformance";
-import { Client, Invoice, Technician, Vehicle } from "@prisma/client";
+import EmployeeInfoTable from "./EmployeeInfoTable";
 import { EmployeeWorkInfo } from "./employeeWorkInfoType";
+import FilterComp from "./FilterComp";
 
 export default function EmployeeWorkInformation({
   info,
+  employeeType,
 }: {
   info: EmployeeWorkInfo;
+  employeeType: EmployeeType;
 }) {
   const searchParams = useSearchParams();
   const activeView = searchParams.get("view") || "details";
 
+  const { service, category } = info.reduce(
+    (acc, technician: any) => {
+      acc.service = technician.invoice.invoiceItems.map(
+        (item: any) => item.service.name,
+      );
+      acc.category = technician.invoice.invoiceItems.map(
+        (item: any) => item.service.category.name,
+      );
+      return acc;
+    },
+    { service: [], category: [] },
+  );
+
   if (activeView === "details") {
     return (
       <>
-        <FilterComp />
+        <FilterComp service={service} category={category} />
         <EmployeeInfoTable info={info} />
       </>
     );
   }
 
-  return <AttendancePerformance />;
+  return <AttendancePerformance employeeType={employeeType} />;
 }

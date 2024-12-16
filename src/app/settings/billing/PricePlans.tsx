@@ -23,9 +23,13 @@ export function PricePlans({
   };
 
   return (
-    <section className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black/50 py-20">
+    <section className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black/50 py-20"
+    onClick={setClose}
+    >
       <div className="max-w-8xl relative mx-auto px-4">
-        <div className="flex w-[1000px] justify-center space-x-6">
+        <div className="flex w-[1000px] justify-center space-x-6"
+         onClick={(e) => e.stopPropagation()}
+        >
           {/* Plan 1 */}
           <div className="w-full max-w-xl rounded-md bg-white shadow-lg">
             <div className="flex flex-col items-center p-6 pt-0">

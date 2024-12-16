@@ -37,7 +37,7 @@ export function useInvoiceCreate(type: InvoiceType) {
     let photoPaths = [];
     const clientId = client?.id;
     const vehicleId = vehicle?.id;
-    const statusId = status?.id;
+    const columnId = status?.id;
     const isEditPage = pathaname.includes("/estimate/edit/");
 
     // upload photos
@@ -69,7 +69,7 @@ export function useInvoiceCreate(type: InvoiceType) {
         id: invoiceId,
         clientId: clientId ? clientId : undefined,
         vehicleId: vehicleId ? vehicleId : undefined,
-        statusId: statusId ? statusId : undefined,
+        columnId: columnId || undefined,
         subtotal,
         discount,
         tax,
@@ -86,6 +86,7 @@ export function useInvoiceCreate(type: InvoiceType) {
         photos: photoPaths,
         items,
         tasks,
+        type,
       });
     } else {
       res = await createInvoice({
@@ -93,7 +94,8 @@ export function useInvoiceCreate(type: InvoiceType) {
         type,
         clientId: clientId ? +clientId : undefined,
         vehicleId: vehicleId ? +vehicleId : undefined,
-        statusId: statusId ? +statusId : undefined,
+
+        columnId: columnId ? +columnId : undefined,
         subtotal,
         discount,
         tax,

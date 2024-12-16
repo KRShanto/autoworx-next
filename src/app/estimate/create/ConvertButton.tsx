@@ -23,9 +23,13 @@ export default function ConvertButton({
 
   async function handleSubmit() {
     const res = await createInvoice();
+    console.log("Responee", res);
 
-    // Redirect to the index
-    router.push("/estimate");
+    if (type === "Estimate") {
+      router.push("/estimate");
+    } else {
+      router.push("/estimate/invoices");
+    }
   }
 
   return (

@@ -5,6 +5,7 @@ import EstimateBarChartContainer from "./chart/EstimateBarChartContainer";
 import InvoicesBarChartContainer from "./chart/InvoicesBarChartContainer";
 import SalesActivityChartContainer from "./chart/SalesActivityChartContainer";
 import FilterByMultiple from "../../components/filter/FilterByMultiple";
+import FilterHeader from "./FilterHeader";
 
 type TProps = {
   searchParams: {
@@ -47,16 +48,10 @@ export default function PipelinePage({ searchParams }: TProps) {
   return (
     <div className="grid grid-cols-3 gap-x-6">
       <div className="col-span-1 space-y-5">
-        <div className="flex items-center space-x-4">
-          <FilterDateRange
-            startDate={decodeURIComponent(searchParams?.startDate as string)}
-            endDate={decodeURIComponent(searchParams?.endDate as string)}
-          />
-          <FilterByMultiple
-            filterSliders={filterMultipleSliders}
-            searchParamsValue={searchParams}
-          />
-        </div>
+        <FilterHeader
+          searchParams={searchParams}
+          filterMultipleSliders={filterMultipleSliders}
+        />
         <PipelineCardContainer />
       </div>
       <div className="col-span-2 grid grid-cols-2 gap-x-6 gap-y-10">

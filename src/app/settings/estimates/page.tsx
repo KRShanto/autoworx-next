@@ -1,14 +1,14 @@
 "use client";
+import {
+  getCompanyTermsAndPolicyTax,
+  updateTaxCurrency,
+  updateTermsPolicy,
+} from "@/actions/settings/emailTemplates";
 import { SlimInput } from "@/components/SlimInput";
+import { Prisma } from "@prisma/client";
 import { Select } from "antd";
 import { useEffect, useState } from "react";
 import EmailTemplates from "./EmailTemplates";
-import {
-  updateTaxCurrency,
-  updateTermsPolicy,
-  getCompanyTermsAndPolicy,
-} from "@/actions/settings/emailTemplates";
-import { Prisma } from "@prisma/client";
 
 interface CurrencyData {
   Code: string;
@@ -21,7 +21,7 @@ export default function EstimateAndInvoicePage() {
     terms?: string;
     policy?: string;
   }>({});
-  const [tax, setTax] = useState<Prisma.Decimal>(new Prisma.Decimal(0));
+  const [tax, setTax] = useState<string>("0");
 
   useEffect(() => {
     fetch(
@@ -55,8 +55,9 @@ export default function EstimateAndInvoicePage() {
 
     const fetchTermsPolicy = async () => {
       try {
-        const data = await getCompanyTermsAndPolicy();
+        const data = await getCompanyTermsAndPolicyTax();
         setTermPolicy(data);
+        setTax(String(data.tax));
       } catch (error) {
         console.log("Error fetching terms and policy in page:", error);
       }
@@ -96,10 +97,11 @@ export default function EstimateAndInvoicePage() {
             <div className="flex items-center justify-evenly gap-2">
               <SlimInput
                 name="taxAmount"
+                value={tax.toString()}
                 label="Tax Amount"
                 className="w-[320px]"
                 onChange={(e) => {
-                  setTax(new Prisma.Decimal(String(e.target.value)));
+                  setTax(String(e.target.value));
                 }}
               />
               <div className="flex flex-col items-start">
@@ -136,7 +138,7 @@ export default function EstimateAndInvoicePage() {
               <label className="block">
                 <div className="mb-1 px-2 font-medium">Terms & Conditions</div>
                 <textarea
-                  className="h-60 w-full resize-none rounded-sm border border-primary-foreground bg-white px-2 py-0.5 text-sm leading-6 outline-none"
+                  className="h-60 w-full resize-none rounded-sm border border-primary-foreground border-slate-400 bg-white px-2 py-0.5 text-sm leading-6 outline-none"
                   name="terms"
                   value={termPolicy && termPolicy.terms ? termPolicy.terms : ""}
                   onChange={(e) =>
@@ -147,7 +149,7 @@ export default function EstimateAndInvoicePage() {
               <label className="block">
                 <div className="mb-1 px-2 font-medium">Policy</div>
                 <textarea
-                  className="h-60 w-full resize-none rounded-sm border border-primary-foreground bg-white px-2 py-0.5 text-sm leading-6 outline-none"
+                  className="h-60 w-full resize-none rounded-sm border border-primary-foreground border-slate-400 bg-white px-2 py-0.5 text-sm leading-6 outline-none"
                   name="policy"
                   value={termPolicy?.policy}
                   onChange={(e) =>
@@ -164,13 +166,6 @@ export default function EstimateAndInvoicePage() {
                 Save
               </button>
             </div>
-          </div>
-        </div>
-        {/* Authorization */}
-        <div>
-          <h2 className="mb-2 text-xl font-semibold">Authorization</h2>
-          <div className="space-y-3 rounded-sm border bg-white p-5">
-            {/* TODO: future added */}
           </div>
         </div>
       </div>

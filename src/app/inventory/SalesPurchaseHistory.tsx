@@ -1,15 +1,21 @@
 import { db } from "@/lib/db";
+import { AuthSession } from "@/types/auth";
+import { Client, InventoryProductHistory, User, Vendor } from "@prisma/client";
 import SalesPurchaseHistoryClient from "./SalesPurchaseHistoryClient";
-import { Client, InventoryProductHistory, Vendor } from "@prisma/client";
 
 export default async function SalesPurchaseHistory({
+  user,
   productId,
+  invoiceIds,
 }: {
+  user: User;
   productId: number | undefined;
+  invoiceIds: string[];
 }) {
   const product = productId
     ? await db.inventoryProduct.findUnique({
         where: { id: productId },
+        include: { User: true },
       })
     : undefined;
   // @ts-ignore
@@ -36,6 +42,11 @@ export default async function SalesPurchaseHistory({
   }
 
   return (
-    <SalesPurchaseHistoryClient histories={histories} product={product!} />
+    <SalesPurchaseHistoryClient
+      user={user}
+      histories={histories}
+      product={product!}
+      invoiceIds={invoiceIds}
+    />
   );
 }

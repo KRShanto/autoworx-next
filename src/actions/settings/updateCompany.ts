@@ -8,6 +8,7 @@ type TCompanyData = {
   businessId: string | null;
   businessType: string | null;
   phone: string | null;
+  email: string | null;
   industry: string | null;
   website: string | null;
   address: string | null;
@@ -18,7 +19,7 @@ type TCompanyData = {
 };
 
 export const updateCompany = async (
-  companyId: number,
+  companyId: number | undefined,
   companyData: TCompanyData,
 ) => {
   const {
@@ -26,6 +27,7 @@ export const updateCompany = async (
     businessId,
     businessType,
     phone,
+    email,
     industry,
     website,
     address,
@@ -44,6 +46,7 @@ export const updateCompany = async (
         businessId,
         businessType,
         phone,
+        email,
         industry,
         website,
         address,

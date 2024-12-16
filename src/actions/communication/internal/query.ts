@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { planObject } from "@/utils/planObject";
 
 export const getGroupById = async (groupId: number, userId: number) => {
   const group = await db.group.findUnique({
@@ -12,7 +13,7 @@ export const getGroupById = async (groupId: number, userId: number) => {
       users: true,
     },
   });
-  return group;
+  return planObject(group);
 };
 
 export const getGroupMessagesById = async (groupId: number) => {
@@ -38,6 +39,7 @@ export const getUserMessagesById = async (userId: number) => {
     },
     include: {
       attachment: true,
+      requestEstimate: true,
     },
   });
   return messages;

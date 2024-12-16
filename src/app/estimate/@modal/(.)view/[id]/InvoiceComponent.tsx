@@ -1,11 +1,19 @@
 "use client";
 import {
+  authorizeInvoice,
+  deleteInvoiceAuthorize,
+} from "@/actions/estimate/invoice/authorize";
+import { sendInvoiceEmail } from "@/actions/estimate/invoice/sendInvoiceEmail";
+import { getCompany } from "@/actions/settings/getCompany";
+import {
   DialogClose,
   DialogContentBlank,
   DialogOverlay,
   DialogPortal,
 } from "@/components/Dialog";
+import { errorToast, successToast } from "@/lib/toast";
 import {
+  Column,
   Company,
   Invoice,
   InvoiceItem,
@@ -13,34 +21,38 @@ import {
   Labor,
   Material,
   Service,
-  Status,
+  Technician,
   User,
   Vehicle,
 } from "@prisma/client";
-import { sendInvoiceEmail } from "@/actions/estimate/invoice/sendInvoiceEmail";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef } from "react";
-import { FaPrint, FaRegFile, FaShare } from "react-icons/fa";
+import { useEffect, useRef, useState } from "react";
+import { FaPrint, FaRegEdit, FaRegFile, FaShare } from "react-icons/fa";
 import { FaRegShareFromSquare } from "react-icons/fa6";
 import { HiXMark } from "react-icons/hi2";
+import { IoClose } from "react-icons/io5";
+import { MdEdit, MdOutlineDelete } from "react-icons/md";
+import { TiTick } from "react-icons/ti";
 import { useReactToPrint } from "react-to-print";
 import { InvoiceItems } from "./InvoiceItems";
 import PDFComponent from "./PDFComponent";
+import { useEstimateNavigationStore } from "@/stores/estimateNavigationStore";
 
 const InvoiceComponent = ({
   id,
   clientId,
   invoice,
   vehicle,
+  invoiceTechnicians,
 }: {
   id: string;
   clientId: any;
   invoice: Invoice & {
-    status: Status | null;
+    column: Column | null;
     company: Company;
     invoiceItems: (InvoiceItem & {
       materials: Material[] | [];
@@ -52,30 +64,67 @@ const InvoiceComponent = ({
     user: User;
   };
   vehicle: Vehicle | null;
+  invoiceTechnicians: Technician[];
 }) => {
+  console.log({ InvoicePhotos: invoice.photos });
   const router = useRouter();
   const componentRef = useRef(null);
+  const [showAuthorizedName, setShowAuthorizedName] = useState(false);
+  const [authorizedName, setAuthorizedName] = useState(
+    invoice?.authorizedName || "",
+  );
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
 
-  const handleEmail = () => {
-    sendInvoiceEmail({ invoiceId: invoice.id });
+  const handleEdit = () => {
+    router.push(`/estimate/edit/${id}`);
+  };
+
+  const [companyDetails, setCompanyDetails] = useState<Company | null>(null);
+
+  const handleEmail = async () => {
+    let res = await sendInvoiceEmail({ invoiceId: invoice.id });
+    if (!res?.success) {
+      errorToast(res?.message || "Error sharing invoice");
+      return;
+    }
+    successToast("Invoice sent successfully");
     // close the dialog
     router.back();
   };
+
+  useEffect(() => {
+    const getCompanyDetails = async () => {
+      const companyDetailsnow = await getCompany();
+      setCompanyDetails(companyDetailsnow);
+    };
+    getCompanyDetails();
+  }, []);
+
+  const isWorkOrderCreate = invoiceTechnicians.length > 0 ? true : false;
+
+  const type = useEstimateNavigationStore((state) => state.type);
 
   return (
     <div>
       <DialogPortal>
         <DialogOverlay />
-        <DialogContentBlank className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] fixed left-[50%] top-[50%] z-50 flex max-h-full translate-x-[-50%] translate-y-[-50%] justify-center gap-4 duration-200">
+        <DialogContentBlank className="fixed left-[50%] top-[50%] z-50 flex max-h-full translate-x-[-50%] translate-y-[-50%] justify-center gap-4 duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
           <div
             ref={componentRef}
-            className="#shadow-lg relative grid h-[90vh] w-[740px] shrink grow-0 gap-4 overflow-y-auto border bg-background p-6"
+            className="#shadow-lg relative grid h-[90vh] w-[740px] shrink grow-0 gap-4 overflow-y-auto rounded-md border bg-background p-6"
           >
             <div className="flex items-center justify-center print:hidden">
               <div className="flex items-center gap-3">
+                <button
+                  className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
+                  onClick={handleEdit}
+                >
+                  <FaRegEdit />
+                  Edit
+                </button>
+
                 <button
                   className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
                   onClick={handlePrint}
@@ -92,10 +141,13 @@ const InvoiceComponent = ({
                         invoice={invoice}
                         clientId={clientId}
                         vehicle={vehicle}
+                        companyDetails={companyDetails}
+                        authorizedName={authorizedName}
                       />
                     }
                     fileName="Invoice.pdf"
                   >
+                    {/* @ts-ignore TODO */}
                     {({ blob, url, loading, error }) =>
                       loading ? (
                         "Loading PDF..."
@@ -119,14 +171,27 @@ const InvoiceComponent = ({
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <div className="flex aspect-square w-32 items-center justify-center bg-slate-500 text-center font-bold text-white">
-                Logo
+              <div className="flex aspect-square w-32 items-center justify-center text-center font-bold text-white">
+                {companyDetails?.image ? (
+                  <Image
+                    src={companyDetails.image}
+                    alt="company logo"
+                    width={128}
+                    height={128}
+                    // className="object-contain"
+                  />
+                ) : (
+                  "Logo"
+                )}
               </div>
               <div className="text-right text-xs">
                 <h2 className="font-bold">Contact Information:</h2>
-                <p>Full Address</p>
-                <p>Mobile Number</p>
-                <p>Email</p>
+                <p>
+                  {companyDetails?.address} {companyDetails?.city}{" "}
+                  {companyDetails?.state} {companyDetails?.zip}
+                </p>
+                <p>{companyDetails?.phone}</p>
+                <p>{companyDetails?.email}</p>
               </div>
             </div>
             <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground print:hidden">
@@ -142,7 +207,7 @@ const InvoiceComponent = ({
             <div className="flex">
               <div className="grid grow grid-cols-3 gap-4 text-xs">
                 <h1 className="col-span-full text-3xl font-bold uppercase text-slate-500">
-                  Estimate
+                  {type?.toUpperCase()}
                 </h1>
                 <div>
                   <h2 className="font-bold text-slate-500">Estimate To:</h2>
@@ -172,11 +237,11 @@ const InvoiceComponent = ({
                   <p
                     className="max-w-32 rounded-md px-2 py-[1px] text-xs font-semibold"
                     style={{
-                      color: invoice.status?.textColor,
-                      backgroundColor: invoice?.status?.bgColor,
+                      color: invoice.column?.textColor || undefined,
+                      backgroundColor: invoice?.column?.bgColor || undefined,
                     }}
                   >
-                    {invoice.status?.name}
+                    {invoice.column?.title}
                   </p>
                 </div>
               </div>
@@ -238,9 +303,84 @@ const InvoiceComponent = ({
                   {invoice.user.firstName} {invoice.user.lastName}
                 </p>
               </div>
-              <button className="rounded bg-[#6571FF] px-8 text-white">
-                Authorize
-              </button>
+              <div>
+                {showAuthorizedName && (
+                  <div className="flex items-center gap-x-4">
+                    <input
+                      className="rounded-md border border-gray-300 px-2 py-1 text-sm"
+                      placeholder="Your Name"
+                      value={authorizedName}
+                      onChange={(e) => setAuthorizedName(e.target.value)}
+                    />
+
+                    <button
+                      onClick={async () => {
+                        const res = await authorizeInvoice(
+                          invoice.id,
+                          authorizedName,
+                        );
+                        if (res?.type === "success") {
+                          successToast("Invoice Authorized");
+                        }
+                        setShowAuthorizedName(false);
+                      }}
+                      className="text-lg text-green-500 print:hidden"
+                    >
+                      <TiTick />
+                    </button>
+                    <button
+                      className="text-lg text-red-500 print:hidden"
+                      onClick={() => setShowAuthorizedName(false)}
+                    >
+                      <IoClose />
+                    </button>
+                  </div>
+                )}
+                {invoice.authorizedName && !showAuthorizedName && (
+                  <div className="flex flex-col items-center gap-y-2">
+                    <span className="font-semibold italic">
+                      {invoice.authorizedName}
+                    </span>
+
+                    <hr className="border-slate-500 bg-slate-500" />
+                    <div className="flex items-center gap-x-4">
+                      <span className="rounded-sm border border-[#6571ff] px-4 py-1 text-sm text-[#6571ff]">
+                        Authorized
+                      </span>
+                      <button
+                        className="text-lg text-[#6571ff] print:hidden"
+                        onClick={async () => {
+                          setShowAuthorizedName(true);
+                        }}
+                      >
+                        <MdEdit />
+                      </button>
+                      <button
+                        className="text-lg text-red-500 print:hidden"
+                        onClick={async () => {
+                          const res = await deleteInvoiceAuthorize(invoice.id);
+                          if (res?.type === "success") {
+                            successToast("Deleted Invoice Authorize");
+                          }
+                          setShowAuthorizedName(false);
+                        }}
+                      >
+                        <MdOutlineDelete />
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {!showAuthorizedName && !invoice.authorizedName && (
+                  <button
+                    onClick={() => {
+                      setShowAuthorizedName(true);
+                    }}
+                    className="rounded bg-[#6571FF] px-8 text-white print:hidden"
+                  >
+                    Authorize
+                  </button>
+                )}
+              </div>
             </div>
             <p>Thank you for shopping with Autoworx</p>
           </div>
@@ -250,32 +390,44 @@ const InvoiceComponent = ({
               invoice={invoice}
               clientId={clientId}
               vehicle={vehicle}
+              companyDetails={companyDetails}
+              authorizedName={authorizedName}
             />
           </PDFViewer> */}
           <div className="flex h-[90vh] w-[394px] shrink grow-0 flex-col gap-4 print:hidden">
-            <div className="#shadow-lg grid flex-1 grid-cols-1 gap-4 overflow-y-auto border bg-background p-6">
+            <div className="#shadow-lg grid flex-1 grid-cols-1 gap-4 overflow-y-auto rounded-md border bg-background p-6">
               <h2 className="col-span-full text-3xl font-bold uppercase text-slate-500">
                 Attachments
               </h2>
-              {invoice.photos.map(async (x) => {
+              {invoice.photos.map((x) => {
                 return (
-                  <div key={x.id} className="relative aspect-square">
+                  <Link
+                    href={`/estimate/photo?url=${x.photo}`}
+                    key={x.id}
+                    className="relative aspect-square"
+                  >
                     <Image
-                      src={`/api/images/${x.photo}`}
+                      src={x.photo}
                       alt="attachment"
                       fill
+                      className="cursor-pointer"
                     />
-                  </div>
+                  </Link>
                 );
               })}
             </div>
-            <Link
-              href={`/estimate/workorder/${id}`}
-              className="rounded-md bg-[#6571FF] py-2 text-center text-white disabled:bg-gray-400"
+            {type === "invoice" && (
+              <Link
+                href={`/estimate/workorder/${id}`}
+                className="rounded-md bg-[#6571FF] py-2 text-center text-white disabled:bg-gray-400"
+              >
+                {isWorkOrderCreate ? "View Work Order" : "Create Work Order"}
+              </Link>
+            )}
+            <button
+              onClick={handleEmail}
+              className="flex items-center justify-center gap-2 rounded-md bg-white py-2 text-[#6571FF]"
             >
-              View Work Order
-            </Link>
-            <button className="flex items-center justify-center gap-2 rounded-md bg-white py-2 text-[#6571FF]">
               Share Invoice
               <FaRegShareFromSquare />
             </button>

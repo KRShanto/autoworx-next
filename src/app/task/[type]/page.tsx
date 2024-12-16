@@ -6,6 +6,7 @@ import { AuthSession } from "@/types/auth";
 import { CalendarType } from "@/types/calendar";
 import { AppointmentFull } from "@/types/db";
 import { CalendarSettings, User } from "@prisma/client";
+import moment from "moment";
 import { Metadata } from "next";
 import TaskPage from "./TaskPage";
 
@@ -13,7 +14,13 @@ export const metadata: Metadata = {
   title: "Task and Activity Management",
 };
 
-export default async function Page({ params }: { params: { type: string } }) {
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: { type: string };
+  searchParams: { month: string };
+}) {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
   let user = (await db.user.findFirst({
@@ -25,18 +32,64 @@ export default async function Page({ params }: { params: { type: string } }) {
   let appointments;
   let tasks;
 
+  // get selected month
+  const getMonth = searchParams.month
+    ? moment(searchParams.month, "YYYY-MM").format("MMMM")
+    : moment().format("MMMM");
+
+  // get selected year
+  const getYear = searchParams.month
+    ? moment(searchParams.month, "YYYY-MM").year()
+    : moment().year();
+
+  const holidays = await db.holiday.findMany({
+    where: {
+      companyId: companyId,
+      month: getMonth,
+      year: getYear,
+    },
+  });
+
   if (user.employeeType == "Admin" || user.employeeType == "Manager") {
     // only admin and manager can see all appointments
+    // appointments = await db.appointment.findMany({
+    //   where: {
+    //     companyId,
+    //   },
+    // });
+    // Get all the tasks for the company
+    // where startTime, endTime, and date are not null
+    // tasks = await db.task.findMany({
+    //   where: {
+    //     companyId,
+    //   },
+    // });
     appointments = await db.appointment.findMany({
       where: {
         companyId,
+        appointmentUsers: {
+          some: {
+            userId: +user.id,
+          },
+        },
       },
     });
-    // Get all the tasks for the company
-    // where startTime, endTime, and date are not null
+
     tasks = await db.task.findMany({
       where: {
         companyId,
+        OR: [
+          {
+            taskUser: {
+              some: {
+                userId: +user.id,
+              },
+            },
+          },
+          {
+            userId: +user.id,
+          },
+        ],
       },
     });
   } else {
@@ -260,13 +313,14 @@ export default async function Page({ params }: { params: { type: string } }) {
           taskWithAssignedUsers={taskWithAssignedUsers}
           companyUsers={companyUsers}
           usersWithTasks={usersWithTasks}
-          tasks={tasks}
           customers={customers}
           vehicles={vehicles}
           settings={settings}
+          holidays={holidays}
           appointments={calendarAppointments!}
           templates={emailTemplates}
           appointmentsFull={appointmentsFull}
+          user={user}
         />
       </div>
     </>

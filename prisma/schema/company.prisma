@@ -1,0 +1,176 @@
+// Company model.
+// Every user belongs to a company.
+// For now, every user has to create their own company when registering.
+// In the future, we can add a feature to join a company.
+model Company {
+    id                      Int                       @id @default(autoincrement())
+    name                    String
+    businessId              String?                   @map("business_id")
+    businessType            String?                   @map("business_type")
+    phone                   String?
+    email                   String?
+    industry                String?
+    website                 String?
+    address                 String?
+    city                    String?
+    state                   String?
+    zip                     String?
+    image                   String?
+    businessVisibility      Boolean?                  @default(true) @map("business_visibility")
+    phoneVisibility         Boolean?                  @default(true) @map("phone_visibility")
+    addressVisibility       Boolean?                  @default(true) @map("address_visibility")
+    tax                     Decimal?                  @default(0)
+    currency                String?                   @default("USD")
+    terms                   String?
+    policy                  String?
+    googleEmail             String?                   @map("google_email")
+    googleRefreshToken      String?                   @map("google_refresh_token")
+    createdAt               DateTime                  @default(now()) @map("created_at")
+    updatedAt               DateTime                  @default(now()) @updatedAt @map("updated_at")
+    companyLatitude         Float?
+    companyLongitude        Float?
+    zapierToken             String?                   @unique @db.VarChar(240)
+    users                   User[]
+    tasks                   Task[]
+    clients                 Client[]
+    services                Service[]
+    vehicles                Vehicle[]
+    invoices                Invoice[]
+    calendarSettings        CalendarSettings[]
+    appointments            Appointment[]
+    emailTemplates          EmailTemplate[]
+    materials               Material[]
+    vendors                 Vendor[]
+    labors                  Labor[]
+    tags                    Tag[]
+    categories              Category[]
+    statuses                Status[]
+    paymentMethods          PaymentMethod[]
+    inventoryProducts       InventoryProduct[]
+    VehicleColor            VehicleColor[]
+    Source                  Source[]
+    Payment                 Payment[]
+    Coupon                  Coupon[]
+    Technician              Technician[]
+    companyJoinsAsOne       CompanyJoin[]             @relation("CompanyOne")
+    companyJoinsAsTwo       CompanyJoin[]             @relation("CompanyTwo")
+    companyEmailTemplate    CompanyEmailTemplate[]
+    permissionForManager    PermissionForManager[]
+    permissionForSales      PermissionForSales[]
+    permissionForTechnician PermissionForTechnician[]
+    permissionForOther      PermissionForOther[]
+    permissions             Permission[]
+    Lead                    Lead[]
+    LeaveRequest            LeaveRequest[]
+    RequestEstimateSent     RequestEstimate[]         @relation("SenderCompany")
+    RequestEstimateReceived RequestEstimate[]         @relation("ReceiverCompany")
+    Column                  Column[]
+    ClockInOut              ClockInOut[]
+    Holiday                 Holiday[]
+    InventoryProductHistory InventoryProductHistory[]
+    UserFeedback            UserFeedback[]
+}
+
+// create model that will handle multiple companies join and collaboration
+model CompanyJoin {
+    id           Int      @id @default(autoincrement())
+    companyOneId Int
+    companyTwoId Int
+    createdAt    DateTime @default(now()) @map("created_at")
+    updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+    companyOne   Company  @relation(fields: [companyOneId], references: [id], onDelete: Cascade, name: "CompanyOne")
+    companyTwo   Company  @relation(fields: [companyTwoId], references: [id], onDelete: Cascade, name: "CompanyTwo")
+}
+
+// Calendar settings for a company.
+model CalendarSettings {
+    id        Int      @id @default(autoincrement())
+    companyId Int      @unique @map("company_id")
+    weekStart String
+    dayStart  String
+    dayEnd    String
+    weekend1  String   @default("Saturday")
+    weekend2  String   @default("Sunday")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+    company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model Holiday {
+    id        Int      @id @default(autoincrement())
+    companyId Int      @map("company_id")
+    date      DateTime
+    month     String
+    year      Int
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+    company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+// Email template for a company.
+model EmailTemplate {
+    id        Int               @id @default(autoincrement())
+    subject   String
+    message   String?           @db.Text
+    type      EmailTemplateType
+    companyId Int               @map("company_id")
+    createdAt DateTime          @default(now()) @map("created_at")
+    updatedAt DateTime          @default(now()) @updatedAt @map("updated_at")
+    company   Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+enum EmailTemplateType {
+    Confirmation
+    Reminder
+}
+
+model Lead {
+    id          Int      @id @default(autoincrement())
+    clientName  String   @map("client_name")
+    clientEmail String?  @map("client_email")
+    clientPhone String?  @map("client_phone")
+    vehicleInfo String   @map("vehicle_info")
+    services    String
+    source      String
+    comments    String?
+    companyId   Int      @map("company_id")
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+    company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    columnId    Int?     @map("column_id")
+    column      Column?  @relation(fields: [columnId], references: [id], onDelete: Cascade)
+}   
+
+model LeaveRequest {
+    id          Int                @id @default(autoincrement())
+    userId      Int                @map("user_id")
+    startDate   DateTime           @map("start_date")
+    endDate     DateTime           @map("end_date")
+    status      LeaveRequestStatus
+    title       String
+    description String
+    companyId   Int                @map("company_id")
+    createdAt   DateTime           @default(now()) @map("created_at")
+    updatedAt   DateTime           @default(now()) @updatedAt @map("updated_at")
+    user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+    company     Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+enum LeaveRequestStatus {
+    Pending
+    Approved
+    Rejected
+}
+
+// TODO: this might need to be renamed
+model CompanyEmailTemplate {
+    id        Int      @id @default(autoincrement())
+    subject   String
+    message   String?  @db.Text
+    companyId Int      @map("company_id")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+    company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+    @@map("companyEmailTemplate")
+}

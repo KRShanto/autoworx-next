@@ -1,15 +1,17 @@
 import Calculation from "../../components/Calculation";
-import FilterBySearchBox from "../../components/filter/FilterBySearchBox";
-import FilterByDateRange from "../../components/filter/FilterByDateRange";
+
 import { cn } from "@/lib/cn";
 import { getClientsData } from "../../data";
-import FilterBySelection from "../../components/filter/FilterBySelection";
+
 import Analytics from "./Analytics";
-import FilterByMultiple from "../../components/filter/FilterByMultiple";
+
 import { db } from "@/lib/db";
 import { formatDate } from "@/utils/taskAndActivity";
 import moment from "moment";
 import { Suspense } from "react";
+import FilterHeader from "./FilterHeader";
+import { auth } from "@/app/auth";
+import { AuthSession } from "@/types/auth";
 type TProps = {
   searchParams: {
     category?: string;
@@ -50,6 +52,7 @@ const filterMultipleSliders: TSliderData[] = [
 ];
 export default async function PaymentReportPage({ searchParams }: TProps) {
   const filterOR = [];
+  const session = (await auth()) as AuthSession | null;
   if (searchParams.search) {
     filterOR.push({ invoiceId: { contains: searchParams.search?.trim() } });
   } else if (searchParams.startDate && searchParams.endDate) {
@@ -76,6 +79,7 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
   const paymentInfo = await db.payment.findMany({
     where: {
       OR: filterOR.length ? filterOR : undefined,
+      companyId: session?.user?.companyId,
       invoice: {
         client: {
           OR: searchParams.search
@@ -102,38 +106,33 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
       },
     },
   });
+
+  // find the average value
+  const totalAmount = paymentInfo.reduce(
+    (acc, payment) => acc + Number(payment.amount),
+    0,
+  );
+
+  const averageValue =
+    totalAmount && paymentInfo.length ? totalAmount / paymentInfo.length : 0;
+
+  // find the outstanding payment (total due)
+  const totalDue = paymentInfo.reduce(
+    (acc, payment) => acc + Number(payment.invoice?.due),
+    0,
+  );
+
   return (
     <div className="space-y-5">
       {/* filter section */}
-      <div className="flex w-full items-center justify-between gap-x-3">
-        <div className="flex flex-1 items-center space-x-4">
-          <FilterBySearchBox searchText={searchParams.search as string} />
-          <FilterByDateRange
-            startDate={decodeURIComponent(searchParams?.startDate as string)}
-            endDate={decodeURIComponent(searchParams?.endDate as string)}
-          />
-        </div>
-        <div className="flex items-center space-x-4">
-          <FilterByMultiple
-            searchParamsValue={searchParams}
-            filterSliders={filterMultipleSliders}
-          />
-          <FilterBySelection
-            selectedItem={searchParams?.category as string}
-            items={["product", "parts", "wheel"]}
-            type="category"
-          />
-          <FilterBySelection
-            selectedItem={searchParams?.service as string}
-            items={["washing", "changing wheel", "full service"]}
-            type="service"
-          />
-        </div>
-      </div>
+      <FilterHeader
+        filterMultipleSliders={filterMultipleSliders}
+        searchParams={searchParams}
+      />
       <div className="my-7 grid grid-cols-5 gap-4">
-        <Calculation content="AVERAGE VALUE" amount={0} />
-        <Calculation content="OUTSTANDING PAYMENT" amount={0} />
-        <Calculation content="TOTAL PAYMENT" amount={0} />
+        <Calculation content="AVERAGE VALUE" amount={averageValue} />
+        <Calculation content="OUTSTANDING PAYMENT" amount={totalDue} />
+        <Calculation content="TOTAL PAYMENT" amount={totalAmount} />
         <Calculation content="REFUND RATE" amount={0} />
       </div>
       {/* Table */}
@@ -141,13 +140,13 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
         <table className="w-full shadow-md">
           <thead className="bg-white">
             <tr className="h-10 border-b">
-              <th className="border-b px-4 py-2 text-center">Date</th>
-              <th className="border-b px-4 py-2 text-center">Invoice # </th>
-              <th className="border-b px-4 py-2 text-center">Client Name</th>
-              <th className="border-b px-4 py-2 text-center">Vehicle Info</th>
-              <th className="border-b px-4 py-2 text-center">Payment Method</th>
-              <th className="border-b px-4 py-2 text-center">Total Amount</th>
-              <th className="border-b px-4 py-2 text-center">Status</th>
+              <th className="border-b px-4 py-2 text-left">Date</th>
+              <th className="border-b px-4 py-2 text-left">Invoice # </th>
+              <th className="border-b px-4 py-2 text-left">Client Name</th>
+              <th className="border-b px-4 py-2 text-left">Vehicle Info</th>
+              <th className="border-b px-4 py-2 text-left">Payment Method</th>
+              <th className="border-b px-4 py-2 text-left">Total Amount</th>
+              <th className="border-b px-4 py-2 text-left">Status</th>
             </tr>
           </thead>
 
@@ -163,30 +162,30 @@ export default async function PaymentReportPage({ searchParams }: TProps) {
                     index % 2 === 0 ? "bg-white" : "bg-blue-100",
                   )}
                 >
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     {payment?.date && formatDate(payment.date)}
                   </td>
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     {payment.invoiceId}
                   </td>
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     {payment.invoice?.client?.firstName}{" "}
                     {payment.invoice?.client?.lastName}
                   </td>
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     {payment.invoice?.vehicle?.year} -{" "}
                     {payment.invoice?.vehicle?.make} -{" "}
                     {payment.invoice?.vehicle?.model}
                   </td>
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     {payment.type}
                   </td>
-                  <td className="border-b px-4 py-2 text-center">
+                  <td className="border-b px-4 py-2 text-left">
                     {Number(payment.amount)}
                   </td>
                   <td
                     className={cn(
-                      `border-b px-4 py-2 text-center`,
+                      `border-b px-4 py-2 text-left`,
                       paymentStatus === "due" && "text-red-500",
                       paymentStatus === "paid" && "text-green-500",
                     )}

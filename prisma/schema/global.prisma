@@ -1,0 +1,58 @@
+// notification settings model
+model NotificationSettings {
+    id            Int      @id @default(autoincrement())
+    type          String   @unique @default("notification")
+    notifications Json
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+}
+
+// Category of a invoice.
+// Category is a part of Service, Material and Labor.
+// It's an independant model. So, one category can be in multiple services, materials and labors.
+model Category {
+    id                Int                @id @default(autoincrement())
+    name              String
+    companyId         Int                @map("company_id")
+    createdAt         DateTime           @default(now()) @map("created_at")
+    updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at")
+    services          Service[]
+    materials         Material[]
+    labors            Labor[]
+    inventoryProducts InventoryProduct[]
+    company           Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+// Status of a invoice.
+// Status is an independant model. So, one status can be in multiple invoices.
+model Status {
+    id        Int       @id @default(autoincrement())
+    name      String
+    textColor String // hex (with #)
+    bgColor   String // hex (with #)
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+    companyId Int       @map("company_id")
+    company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    Invoice   Invoice[]
+}
+
+enum Priority {
+    Low
+    Medium
+    High
+}
+
+model Column {
+    id        Int     @id @default(autoincrement())
+    title     String
+    type      String // "sales" or "shop"
+    order     Int
+    textColor String?
+    bgColor   String?
+    companyId Int     @map("company_id")
+
+    company  Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    invoices Invoice[]
+    lead     Lead[] 
+}

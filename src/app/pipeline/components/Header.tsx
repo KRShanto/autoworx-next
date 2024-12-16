@@ -1,25 +1,18 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import SessionUserType from "@/types/sessionUserType";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import ManagePipelines from "./ManagePipelines";
-import { useRouter } from "next/navigation";
-import { EmployeeType } from "@prisma/client";
 
-interface UserTypes {
-  id: number;
-  email: string;
-  firstName: string;
-  lastName: string | null;
-  employeeType: EmployeeType;
-  companyId: number;
-}
 interface HeaderProps {
   activeView: string;
   pipelinesTitle: string;
   onColumnsUpdate: (data: { columns: Column[] }) => void;
   columns: Column[];
   type: string;
-  usersType: UserTypes[];
+  currentUser: SessionUserType | undefined;
+  onViewChange: (view: string) => void;
 
   [key: string]: any;
 }
@@ -36,31 +29,24 @@ export default function Header({
   onColumnsUpdate,
   columns,
   type,
-  usersType,
+  currentUser,
+  onViewChange,
+
   ...restProps
 }: Readonly<HeaderProps>) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const [isPipelineManaged, setPipelineManaged] = useState(false);
-  const [currentColumns, setCurrentColumns] = useState<Column[]>(columns);
 
   const handleSaveColumns = (updatedColumns: Column[]) => {
-    setCurrentColumns(updatedColumns);
     onColumnsUpdate({ columns: updatedColumns });
   };
 
-  useEffect(() => {
-    setCurrentColumns(columns);
-  }, [columns]);
-
-  const onToggleView = (view: string) => {
-    router.push(`?view=${view}`);
-  };
-
-  const hasManagePipelineAccess = usersType?.some(
-    (user) => user.employeeType === "Admin" || user.employeeType === "Manager",
-  );
-  // console.log(hasManagePipelineAccess)
+  const hasManagePipelineAccess =
+    currentUser?.employeeType === "Admin" ||
+    currentUser?.employeeType === "Manager";
+  // console.log("Active view of pipelines", activeView);
   return (
     <div className="flex items-center justify-between p-4" {...restProps}>
       <div className="flex items-center">
@@ -69,13 +55,15 @@ export default function Header({
         </h1>
         <div className="flex">
           <button
-            onClick={() => onToggleView("workOrders")}
+            onClick={() => onViewChange("workOrders")}
             className={`mr-2 rounded border px-4 py-2 ${activeView === "workOrders" ? "bg-[#6571FF] text-white" : "border-[#6571FF] bg-white text-[#6571FF]"}`}
           >
-            Work Orders
+            {/* Work Orders */}
+
+            {pathname.includes("/sales") ? "Leads" : "Work Orders"}
           </button>
           <button
-            onClick={() => onToggleView("pipelines")}
+            onClick={() => onViewChange("pipelines")}
             className={`rounded border px-4 py-2 ${activeView === "pipelines" ? "bg-[#6571FF] text-white" : "border-[#6571FF] bg-white text-[#6571FF]"}`}
           >
             Pipelines
@@ -98,7 +86,7 @@ export default function Header({
 
       {isPipelineManaged && (
         <ManagePipelines
-          columns={currentColumns}
+          columns={columns}
           onSave={handleSaveColumns}
           onClose={() => setPipelineManaged(false)}
           pipelineType={type}

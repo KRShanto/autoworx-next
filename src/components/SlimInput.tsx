@@ -9,7 +9,7 @@ export type SlimInputProps = {
 };
 
 export const slimInputClassName =
-  "border-primary-foreground bg-white w-full rounded-sm border px-2 py-0.5 leading-6 outline-none";
+  "border-slate-400 bg-white w-full rounded-sm border px-2 py-0.5 leading-6 outline-none";
 export function SlimInput({
   label,
   className,

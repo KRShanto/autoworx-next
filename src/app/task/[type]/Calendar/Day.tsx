@@ -14,7 +14,7 @@ import type {
   Vehicle,
 } from "@prisma/client";
 import mergeRefs from "merge-refs";
-import moment from "moment";
+import moment, { Moment } from "moment";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDrop } from "react-dnd";
@@ -23,10 +23,19 @@ import { updateTask } from "../../../../actions/task/dragTask";
 import DayRow from "../components/day/DayRow";
 import DayTask from "../components/day/DayTask";
 
-function useDate() {
+export function useDate() {
   const searchParams = useSearchParams();
-  const date = moment(searchParams.get("date"), moment.HTML5_FMT.DATE);
+  const date = moment.utc(searchParams.get("date"), moment.HTML5_FMT.DATE);
   return date.isValid() ? date : moment();
+}
+
+function doesTaskOrAppointmentEndNextDay(startTime: Moment, endTime: Moment) {
+  // Parse the start and end times as moment objects with specific time format
+  const start = moment(startTime, "HH:mm");
+  const end = moment(endTime, "HH:mm");
+
+  // If the end time is before the start time, it means the appointment ends the next day
+  return end.isBefore(start);
 }
 
 export default function Day({
@@ -111,7 +120,8 @@ export default function Day({
         .filter((event: CalendarTask | CalendarAppointment) => {
           // return today's tasks
           // also filter by month and year
-          const taskDate = moment(event.date);
+          const taskDate = moment.utc(event.date);
+
           return (
             taskDate.date() === date.date() &&
             taskDate.month() === date.month() &&
@@ -154,9 +164,12 @@ export default function Day({
         // Add task to database
         await updateTask({
           id: taskFoundWithoutTime.id,
-          date: date ? date.toDate() : new Date(),
+          date: taskFoundWithoutTime?.date
+            ? taskFoundWithoutTime.date
+            : date.toDate(),
           startTime: oldTask?.startTime || startTime,
           endTime: oldTask?.endTime || endTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       } else {
         const { newStartTime, newEndTime } = updateTimeSpace(
@@ -170,6 +183,7 @@ export default function Day({
             date: new Date(oldTask.date),
             startTime: newStartTime,
             endTime: newEndTime,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           });
         }
       }
@@ -191,6 +205,7 @@ export default function Day({
           date: oldAppointment.date as Date | string,
           startTime: newStartTime,
           endTime: newEndTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       }
     }
@@ -262,8 +277,6 @@ export default function Day({
     return aBigIndex - bBigIndex;
   });
 
-  console.log({ events });
-
   return (
     <div
       ref={mergeRefs(dropRef, parentRef, containerRef)}
@@ -283,16 +296,34 @@ export default function Day({
 
       {/* Tasks */}
       {sortedEvents.map((event, index) => {
+        console.log("🚀 ~ {sortedEvents.map ~ event:", event);
         const eventStartTime = moment(event.startTime, "HH:mm");
         const eventEndTime = moment(event.endTime, "HH:mm");
+
+        const isEventEndNextDay = doesTaskOrAppointmentEndNextDay(
+          eventStartTime,
+          eventEndTime,
+        );
+
+        const dayEnd = moment("23:59", "HH:mm");
+
         const tasksInRow = sortedEvents.filter((task) => {
           const taskStartTime = moment(task.startTime, "HH:mm");
           const taskEndTime = moment(task.endTime, "HH:mm");
+          const isTaskEndNextDay = doesTaskOrAppointmentEndNextDay(
+            taskStartTime,
+            taskEndTime,
+          );
           if (
             event.rowStartIndex === task.rowStartIndex ||
             (eventStartTime.isBefore(taskEndTime) &&
               eventEndTime.isAfter(taskStartTime)) ||
-            eventStartTime.isBefore(taskStartTime)
+            (isEventEndNextDay &&
+              eventStartTime.isBefore(taskEndTime) &&
+              dayEnd.isAfter(taskStartTime)) ||
+            (isTaskEndNextDay &&
+              eventStartTime.isBefore(dayEnd) &&
+              eventEndTime.isAfter(taskStartTime))
           ) {
             return true;
           }

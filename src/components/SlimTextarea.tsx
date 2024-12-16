@@ -9,7 +9,7 @@ export type SlimTextareaProps = {
 };
 
 export const slimTextareaClassName =
-  "border-primary-foreground bg-white w-full rounded-sm border px-2 py-0.5 leading-6 outline-none";
+  "border-primary-foreground bg-white w-full rounded-sm border border-slate-400 px-2 py-0.5 leading-6 outline-none";
 
 export function SlimTextarea({
   label,

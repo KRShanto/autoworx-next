@@ -50,6 +50,7 @@ export function SelectClient({
         label={(client: Client | null) =>
           client ? `${client.firstName} ${client.lastName}` : "Client"
         }
+        disabledDropdown={client?.fromRequest!}
         newButton={<NewCustomer />}
         displayList={(client: Client) => (
           <div className="flex gap-3">

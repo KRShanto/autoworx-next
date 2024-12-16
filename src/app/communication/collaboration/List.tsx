@@ -4,27 +4,29 @@ import { Company, User } from "@prisma/client";
 import SearchCollaborationModal from "./SearchCollaborationModal";
 import { cn } from "@/lib/cn";
 
-export default function List({
-  companyAdmins,
-  setSelectedUsersList,
-  setCompanyName,
-  companies,
-  setCompanyAdmins,
-  className,
-}: {
+type TProps = {
   companyAdmins: Partial<User>[];
   setCompanyAdmins: React.Dispatch<React.SetStateAction<Partial<User>[]>>;
   setSelectedUsersList: React.Dispatch<React.SetStateAction<any[]>>;
-  setCompanyName: React.Dispatch<React.SetStateAction<string | null>>;
   companies: (Company & { users: User[] })[];
+  selectedUsersList: User[];
   className?: string;
-}) {
+};
+
+export default function List({
+  selectedUsersList,
+  companyAdmins,
+  setSelectedUsersList,
+  companies,
+  setCompanyAdmins,
+  className,
+}: TProps) {
   const [selectedCompany, setSelectedCompany] = useState<any>(null); // TODO: type this
   const [searchTerm, setSearchTerm] = useState("");
   return (
     <div
       className={cn(
-        "app-shadow h-screen w-full overflow-y-auto rounded-lg bg-white p-3 sm:h-[83vh] sm:w-[23%] sm:block",
+        "app-shadow h-screen w-full overflow-y-auto rounded-lg bg-white p-3 sm:block sm:h-[83vh] sm:w-[23%]",
         className,
       )}
     >
@@ -56,7 +58,7 @@ export default function List({
           type="text"
           placeholder="Search here... company name or admin name"
           name="searchTerm"
-          className="my-3 mr-2 w-full rounded-md border-none p-2 text-[12px] text-[#797979] max-[1822px]:w-full"
+          className="my-3 mr-2 w-full rounded-md border-2 border-[#006D77] p-2 text-[12px] text-[#797979] max-[1822px]:w-full"
         />
       </form>
 
@@ -85,9 +87,7 @@ export default function List({
                   >
                     <Image
                       src={
-                        company.image
-                          ? `/api/images/${company.image!}`
-                          : "/icons/business.png"
+                        company.image ? company.image : "/icons/business.png"
                       }
                       alt={company.name}
                       width={50}
@@ -102,18 +102,27 @@ export default function List({
 
                   <div className="flex flex-col items-center gap-1">
                     {company.users.map((user: User) => {
+                      const isSelectedUser = !!selectedUsersList.find(
+                        (u) => u.id === user.id,
+                      );
                       return (
                         <button
                           key={user.id}
-                          className="flex min-h-[61px] w-full items-center gap-2 rounded-md bg-[#F2F2F2] p-1"
+                          className={cn(
+                            "flex min-h-[61px] w-full items-center gap-2 rounded-md bg-[#F2F2F2] p-1 hover:bg-gray-300",
+                            isSelectedUser && "bg-[#2C2C54] hover:bg-stone-400",
+                          )}
                           onClick={() => {
-                            setCompanyName(company.name);
                             // add this user to the list (if not already in it)
                             setSelectedUsersList((usersList) => {
+                              if (usersList.length >= 4) return usersList;
                               if (usersList.find((u) => u.id === user.id)) {
                                 return usersList;
                               }
-                              return [...usersList, user];
+                              return [
+                                ...usersList,
+                                { ...user, companyName: company.name },
+                              ];
                             });
                           }}
                         >
@@ -121,7 +130,7 @@ export default function List({
                             src={
                               user.image?.includes("default.png")
                                 ? user.image
-                                : `/api/images/${user.image!}`
+                                : user.image
                             }
                             alt={user.firstName}
                             width={50}
@@ -129,7 +138,12 @@ export default function List({
                             className="rounded-full max-[1400px]:h-[40px] max-[1400px]:w-[40px]"
                           />
                           <div className="flex flex-col">
-                            <p className="text-[12px] font-bold text-[#797979]">
+                            <p
+                              className={cn(
+                                "text-[12px] font-bold text-[#797979]",
+                                isSelectedUser && "text-white",
+                              )}
+                            >
                               {user.firstName} {user.lastName}
                             </p>
                           </div>
@@ -148,11 +162,7 @@ export default function List({
                 onClick={() => setSelectedCompany(company)}
               >
                 <Image
-                  src={
-                    company.image
-                      ? `/api/images/${company.image!}`
-                      : "/icons/business.png"
-                  }
+                  src={company.image ? company.image : "/icons/business.png"}
                   alt={company.name}
                   width={50}
                   height={50}

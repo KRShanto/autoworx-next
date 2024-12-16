@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function CollaborationPage() {
   const session = (await auth()) as AuthSession;
-  const userCompanyId = session.user.companyId;
+  const userCompanyId = session?.user?.companyId;
 
   const connectedCompanies = await db.companyJoin.findMany({
     where: {

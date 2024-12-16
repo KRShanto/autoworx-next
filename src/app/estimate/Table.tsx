@@ -7,6 +7,7 @@ import moment from "moment";
 import { cn } from "@/lib/cn";
 import { useEstimateFilterStore } from "@/stores/estimate-filter";
 import { useEffect, useState } from "react";
+import { useActionStoreCreateEdit } from "@/stores/createEditStore";
 
 interface InvoiceData {
   id: string;
@@ -27,6 +28,7 @@ const oddColor = "bg-[#F8FAFF]";
 export default function Table({ data }: { data: InvoiceData[] }) {
   const { dateRange, status, search } = useEstimateFilterStore();
   const [filteredData, setFilteredData] = useState<InvoiceData[]>(data);
+  const { setActionType } = useActionStoreCreateEdit();
 
   useEffect(() => {
     const filtered = data.filter((row) => {
@@ -43,7 +45,7 @@ export default function Table({ data }: { data: InvoiceData[] }) {
       }
       return true;
     });
-
+    console.log("Filtered::::", filtered);
     const filteredStatus = filtered.filter((row) => {
       if (status) {
         return row.status === status;
@@ -157,13 +159,13 @@ export default function Table({ data }: { data: InvoiceData[] }) {
                   className="block h-full w-full"
                 >
                   <p
-                    className="rounded-md text-center text-white"
+                    className="rounded-md text-left"
                     style={{
                       backgroundColor: data.bgColor,
                       color: data.textColor,
                     }}
                   >
-                    {data.status}
+                    {data.status || ""}
                   </p>
                 </Link>
               </td>
@@ -172,6 +174,7 @@ export default function Table({ data }: { data: InvoiceData[] }) {
                 <Link
                   href={`/estimate/edit/${data.id}`}
                   className="text-2xl text-blue-600"
+                  onClick={() => setActionType('edit')}
                 >
                   <CiEdit />
                 </Link>

@@ -7,7 +7,7 @@ import { Category } from "@prisma/client";
 import { useEffect, useState } from "react";
 
 export default function SelectCategory({
-  categoryData,
+  categoryData = null,
   onCategoryChange,
   labelPosition = "top",
   categoryOpen,
@@ -20,7 +20,8 @@ export default function SelectCategory({
   setCategoryOpen?: any;
 }) {
   const { categories } = useListsStore();
-  const [category, setCategory] = useState<Category | null>(null);
+  const [category, setCategory] = useState<Category | null>(categoryData);
+
   const [categoryInput, setCategoryInput] = useState("");
   // const [categoryOpen, setCategoryOpen] = useState(false);
 
@@ -56,7 +57,7 @@ export default function SelectCategory({
   return (
     <div
       className={cn({
-        "flex items-center gap-2": labelPosition === "left",
+        "flex w-full items-center gap-2": labelPosition === "left",
       })}
     >
       {labelPosition !== "none" && (

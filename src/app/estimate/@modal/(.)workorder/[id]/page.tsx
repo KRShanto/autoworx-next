@@ -3,12 +3,19 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { InvoiceItems } from "./InvoiceItems";
 import moment from "moment";
-import SaveWorkOrderBtn from "../../(.)view/[id]/(..)(..)create-work-order/[id1]/SaveWorkOrderBtn";
+import SaveWorkOrderBtn from "./SaveWorkOrderBtn";
+import Image from "next/image";
+import { getTechnicians } from "@/actions/estimate/technician/getTechnicians";
+import DueDate from "./DueDateInput";
 
 export default async function WorkOrderPage({
   params: { id },
+  searchParams,
 }: {
   params: { id: string };
+  searchParams: {
+    dueDate: string | null;
+  };
 }) {
   const invoice = await db.invoice.findUnique({
     where: { id },
@@ -23,14 +30,20 @@ export default async function WorkOrderPage({
       },
       photos: true,
       tasks: true,
-      status: true,
       user: true,
       client: true,
+      column: true,
       vehicle: true,
     },
   });
 
   if (!invoice) notFound();
+
+  const companyDetails = await db.company.findUnique({
+    where: { id: invoice.companyId },
+  });
+
+  const invoiceTechnicians = await getTechnicians({ invoiceId: invoice.id });
 
   return (
     <InterceptedDialog>
@@ -40,13 +53,30 @@ export default async function WorkOrderPage({
          */}
         <div className="flex items-center justify-between">
           <div className="flex aspect-square w-32 items-center justify-center bg-slate-500 text-center font-bold text-white">
-            Logo
+            {companyDetails?.image ? (
+              <Image
+                src={companyDetails.image}
+                alt="company logo"
+                width={128}
+                height={128}
+                // className="object-contain"
+              />
+            ) : (
+              "Logo"
+            )}
           </div>
           <div className="text-right text-xs">
             <h2 className="font-bold">Contact Information:</h2>
-            <p>Full Address</p>
-            <p>Mobile Number</p>
-            <p>Email</p>
+            <p>
+              {companyDetails?.address} {companyDetails?.city}{" "}
+              {companyDetails?.state} {companyDetails?.zip}
+            </p>
+            <p>{companyDetails?.phone}</p>
+            <p>{companyDetails?.email}</p>
+            <DueDate
+              invoiceDueDate={invoice?.dueDate}
+              dueDateParams={searchParams.dueDate}
+            />
           </div>
         </div>
 
@@ -84,11 +114,11 @@ export default async function WorkOrderPage({
               <p
                 className="max-w-32 rounded-md px-2 py-[1px] text-xs font-semibold"
                 style={{
-                  color: invoice.status?.textColor,
-                  backgroundColor: invoice.status?.bgColor,
+                  color: invoice.column?.textColor || undefined,
+                  backgroundColor: invoice.column?.bgColor || undefined,
                 }}
               >
-                {invoice.status?.name}
+                {invoice.column?.title}
               </p>
             </div>
           </div>
@@ -97,6 +127,7 @@ export default async function WorkOrderPage({
         <div className="space-y-2">
           <InvoiceItems
             items={JSON.parse(JSON.stringify(invoice.invoiceItems))}
+            invoiceTechnicians={invoiceTechnicians}
           />
         </div>
 
@@ -104,7 +135,10 @@ export default async function WorkOrderPage({
          * Submit
          */}
         <div className="flex">
-          <SaveWorkOrderBtn />
+          <SaveWorkOrderBtn
+            invoiceId={invoice.id}
+            dueDate={searchParams.dueDate}
+          />
         </div>
         <div>
           <p className="font-bold text-slate-500">{invoice.company.name}</p>

@@ -10,14 +10,14 @@ import {
   DialogTrigger,
 } from "@/components/Dialog";
 import FormError from "@/components/FormError";
+import NewVendor from "@/components/Lists/NewVendor";
 import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { useState } from "react";
-import { Vendor } from "@prisma/client";
-import { replenish } from "../../actions/inventory/replenish";
 import { useListsStore } from "@/stores/lists";
-import NewVendor from "@/components/Lists/NewVendor";
+import { Vendor } from "@prisma/client";
+import { useState } from "react";
+import { replenish } from "../../actions/inventory/replenish";
 
 export default function ReplenishProductForm({
   productId,
@@ -61,7 +61,10 @@ export default function ReplenishProductForm({
         </button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-full w-[30rem] max-w-xl" form>
+      <DialogContent
+        className="max-h-full w-[96%] max-w-xl overflow-y-auto md:w-[30rem]"
+        form
+      >
         <DialogHeader>
           <DialogTitle>Replenish Product</DialogTitle>
         </DialogHeader>
@@ -81,7 +84,9 @@ export default function ReplenishProductForm({
 
             <Selector
               label={(vendor: Vendor | null) =>
-                vendor ? vendor.name || `Vendor ${vendor.id}` : "Vendor"
+                vendor
+                  ? vendor?.companyName || vendor?.name || `Vendor ${vendor.id}`
+                  : "Vendor"
               }
               newButton={
                 <NewVendor
@@ -96,11 +101,17 @@ export default function ReplenishProductForm({
                   }
                 />
               }
-              displayList={(vendor: Vendor) => <p>{vendor.name}</p>}
+              displayList={(vendor: Vendor) => (
+                <p>{vendor?.companyName || vendor.name}</p>
+              )}
               items={vendors}
               onSearch={(search: string) =>
-                vendors.filter((vendor) =>
-                  vendor.name.toLowerCase().includes(search.toLowerCase()),
+                vendors.filter(
+                  (vendor) =>
+                    vendor?.companyName
+                      ?.toLowerCase()
+                      ?.includes(search.toLowerCase()) ||
+                    vendor.name.toLowerCase().includes(search.toLowerCase()),
                 )
               }
               openState={[vendorOpen, setVendorOpen]}
@@ -109,19 +120,19 @@ export default function ReplenishProductForm({
             />
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3 md:flex-nowrap">
             <SlimInput name="quantity" required={false} />
 
             <div>
               <label htmlFor="price" className="px-2 font-medium">
                 Price
               </label>
-              <div className="mt-1 flex gap-1 rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6">
+              <div className="#mt-1 flex gap-1 rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6">
                 <span className="text-lg">$</span>
                 <input
                   type="text"
                   name="price"
-                  className="w-full outline-none"
+                  className="w-full rounded-sm border border-slate-400 px-2 py-0.5 outline-none"
                   id="price"
                 />
               </div>
@@ -136,7 +147,7 @@ export default function ReplenishProductForm({
             <textarea
               id="notes"
               name="notes"
-              className="h-28 w-full rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6 outline-none"
+              className="h-28 w-full rounded-sm border border-primary-foreground border-slate-400 bg-white px-2 py-0.5 leading-6 outline-none"
             />
           </div>
         </div>

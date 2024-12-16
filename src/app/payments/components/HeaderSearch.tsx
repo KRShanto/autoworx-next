@@ -7,6 +7,7 @@ import { IoPieChartOutline } from "react-icons/io5";
 import FilterforPayment from "./FilterforPayment";
 import { useState } from "react";
 import { usePaymentFilterStore } from "@/stores/paymentFilter";
+import Link from "next/link";
 
 export default function HeaderSearch() {
   const { setFilter } = usePaymentFilterStore();
@@ -37,12 +38,14 @@ export default function HeaderSearch() {
       </div>
 
       <div className="mr-4 flex gap-4">
-        <div>
-          <button className="flex items-center gap-x-2 rounded border border-[#66738C] bg-white p-2 px-5 text-[#6571FF] shadow-md">
-            <IoPieChartOutline />
-            <span>Payment Reporting</span>
-          </button>
-        </div>
+        <Link href="/reporting/payments">
+          <div>
+            <button className="flex items-center gap-x-2 rounded border border-[#66738C] bg-white p-2 px-5 text-[#6571FF] shadow-md">
+              <IoPieChartOutline />
+              Payment Reporting
+            </button>
+          </div>
+        </Link>
       </div>
     </div>
   );

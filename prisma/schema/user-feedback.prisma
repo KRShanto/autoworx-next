@@ -1,0 +1,22 @@
+model UserFeedback {
+    id                     Int                      @id @default(autoincrement())
+    userId                 Int                      @map("user_id")
+    companyId              Int                      @map("company_id")
+    whatHappened           String
+    whatExpected           String
+    snapshotImage          String?
+    createdAt              DateTime                 @default(now()) @map("created_at")
+    updatedAt              DateTime                 @default(now()) @updatedAt @map("updated_at")
+    user                   User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    UserFeedbackAttachment UserFeedbackAttachment[]
+    company                Company                  @relation(fields: [companyId], references: [id])
+}
+
+model UserFeedbackAttachment {
+    id             Int          @id @default(autoincrement())
+    fileName       String
+    userFeedbackId Int          @map("user_feedback_id")
+    createdAt      DateTime     @default(now())
+    updatedAt      DateTime     @default(now()) @updatedAt @map("updated_at")
+    userFeedback   UserFeedback @relation(fields: [userFeedbackId], references: [id])
+}

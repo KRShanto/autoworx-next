@@ -14,21 +14,23 @@ export const searchUsers = async (
     withoutNeedUser = [...withoutNeedUser, ...notNeededUser];
   }
   try {
-    const users = await db.user.findMany({
+    const usersFromDB = await db.user.findMany({
       where: {
         companyId: session?.user?.companyId,
         NOT: withoutNeedUser,
-        OR: [
-          { firstName: { contains: searchTerm } },
-          { lastName: { contains: searchTerm } },
-          { email: { contains: searchTerm } },
-          { phone: { contains: searchTerm } },
-        ],
       },
+    });
+    const filteredUsers = usersFromDB.filter((user) => {
+      const fullName = `${user.firstName} ${user.lastName}`;
+      return (
+        fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.phone?.includes(searchTerm)
+      );
     });
     return {
       success: true,
-      data: users,
+      data: filteredUsers,
     };
   } catch (err: any) {
     throw new Error(err);

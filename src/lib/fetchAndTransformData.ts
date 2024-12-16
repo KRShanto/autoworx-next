@@ -4,7 +4,7 @@ import { InvoiceType } from "@prisma/client";
 export async function fetchAndTransformData(
   type: InvoiceType,
   companyId: number,
-  searchParams: { startDate?: string; endDate?: string; status?: string }
+  searchParams: { startDate?: string; endDate?: string; status?: string },
 ) {
   const { startDate, endDate, status } = searchParams;
 
@@ -16,7 +16,7 @@ export async function fetchAndTransformData(
         gte: startDate ? new Date(`${startDate}T00:00:00`) : undefined,
         lte: endDate ? new Date(`${endDate}T23:59:59.999`) : undefined,
       },
-      statusId: status ? parseInt(status) : undefined,
+      columnId: status ? parseInt(status) : undefined,
     },
   });
 
@@ -32,9 +32,9 @@ export async function fetchAndTransformData(
             where: { id: item.clientId },
           })
         : null;
-      const status = item.statusId
-        ? await db.status.findFirst({
-            where: { id: item.statusId },
+      const status = item.columnId
+        ? await db.column.findFirst({
+            where: { id: item.columnId },
           })
         : null;
 
@@ -46,10 +46,10 @@ export async function fetchAndTransformData(
         phone: client?.mobile || "",
         grandTotal: item.grandTotal as any,
         createdAt: item.createdAt,
-        status: status?.name || "",
+        status: status?.title || "",
         textColor: status?.textColor || "",
         bgColor: status?.bgColor || "",
       };
-    })
+    }),
   );
 }

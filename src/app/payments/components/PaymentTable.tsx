@@ -3,6 +3,8 @@ import { usePaymentFilterStore } from "@/stores/paymentFilter";
 import moment from "moment";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import ManageRefund from "./ManageRefund";
+import NewRefund from "./NewRefund";
 
 export default function PaymentTable({ data }: { data: ReturnPayment[] }) {
   const { search, dateRange, amount, paidStatus, paymentMethod } =
@@ -76,6 +78,8 @@ export default function PaymentTable({ data }: { data: ReturnPayment[] }) {
             <th className="border-b px-4 py-2 text-left">Transaction Date</th>
             <th className="border-b px-4 py-2 text-left">Amount</th>
             <th className="border-b px-4 py-2 text-left">Method</th>
+            {/* TODO: skip for now. */}
+            {/* <th className="border-b px-4 py-2 text-left">Refund</th> */}
           </tr>
         </thead>
 
@@ -88,25 +92,35 @@ export default function PaymentTable({ data }: { data: ReturnPayment[] }) {
               <td className="border-b px-4 py-2">
                 <Link
                   href={`/estimate/view/${item.invoiceId}`}
-                  className="text-blue-500 hover:underline"
+                  className="text-blue-500"
                 >
                   {item.invoiceId}
                 </Link>
               </td>
               <td className="border-b px-4 py-2">
                 <Link
-                  href={`/client/${item.client.id}`}
-                  className="text-blue-500 hover:underline"
+                  href={`/client/${item?.client?.id && item?.client?.id !== undefined ? item?.client?.id : ""}`}
+                  className="text-blue-500"
                 >
-                  {item.client.name}
+                  {item?.client?.name && item?.client?.name !== undefined
+                    ? item?.client?.name
+                    : "- - -"}
                 </Link>
               </td>
-              <td className="border-b px-4 py-2">{item.vehicle}</td>
               <td className="border-b px-4 py-2">
-                {moment(item.date).format("YYYY-MM-DD")}
+                {item?.vehicle && item?.vehicle !== undefined
+                  ? item?.vehicle
+                  : "- - -"}
+              </td>
+              <td className="border-b px-4 py-2">
+                {moment.utc(item.date).format("YYYY-MM-DD")}
               </td>
               <td className="border-b px-4 py-2">${item.amount}</td>
               <td className="border-b px-4 py-2">{item.method}</td>
+              {/* TODO: skip for now. */}
+              {/* <td className="border-b px-4 py-2">
+                {item.paid ? <ManageRefund /> : <NewRefund />}
+              </td> */}
             </tr>
           ))}
         </tbody>

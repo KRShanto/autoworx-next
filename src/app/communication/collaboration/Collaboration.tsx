@@ -21,24 +21,20 @@ export default function Collaboration({
   companyWithAdmin: Partial<User>[];
   companies: (Company & { users: User[] })[];
   currentUser: NextAuthUser;
-  messages: (DbMessage & { attachment: Attachment | null })[];
+  messages: (DbMessage & { attachment: Attachment[] | null })[];
 }) {
   const [selectedUsersList, setSelectedUsersList] = useState<User[]>([]);
-  const [companyName, setCompanyName] = useState<string | null>(null);
   const [companyAdmins, setCompanyAdmins] = useState(companyWithAdmin);
   return (
     <div className="flex gap-5 sm:mt-5">
       <List
-        className={cn(selectedUsersList.length === 0 ? "block" : "hidden")}
+        selectedUsersList={selectedUsersList}
         companyAdmins={companyAdmins}
         setCompanyAdmins={setCompanyAdmins}
         companies={companies}
         setSelectedUsersList={setSelectedUsersList}
-        setCompanyName={setCompanyName}
       />
       <UsersArea
-        className={cn(selectedUsersList.length === 0 ? "hidden" : "block")}
-        companyName={companyName}
         previousMessages={messages}
         currentUser={currentUser}
         totalMessageBoxLength={selectedUsersList.length}

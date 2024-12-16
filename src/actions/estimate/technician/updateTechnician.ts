@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { Priority, Technician } from "@prisma/client";
+import { Priority } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { updateWorkOrderStatus } from "./updateWorkOrderStatus";
 
@@ -26,10 +26,21 @@ export const updateTechnician = async (
       return { type: "error", message: "Invalid payload" };
     }
 
+    // Ensure the date includes both date and time
+    const dateWithTime = new Date(payload.date);
+    const currentTime = new Date();
+    dateWithTime.setHours(
+      currentTime.getHours(),
+      currentTime.getMinutes(),
+      currentTime.getSeconds(),
+      currentTime.getMilliseconds(),
+    );
+
     const updatedTechnician = await db.technician.update({
       where: { id: technicianId },
       data: {
         ...payload,
+        date: dateWithTime,
         dateClosed: payload.status === "Complete" ? new Date() : null,
       },
     });
@@ -39,7 +50,8 @@ export const updateTechnician = async (
     });
 
     await updateWorkOrderStatus(payload.invoiceId);
-
+    revalidatePath("/estimate/workorder");
+    revalidatePath("/employee");
     return {
       type: "success",
       data: {

@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import RevenueSalesLineChartContainer from "../revenue/chart/RevenueLineChartContainer";
+// import RevenueSalesLineChartContainer from "../revenue/chart/RevenueLineChartContainer";
 import ChartNavigateButtons from "./ChartNavigateButtons";
 import { InventoryProductHistoryType } from "@prisma/client";
 import InventorySalesBarChartContainer from "./chart/InventorySalesBarChartContainer";
@@ -33,14 +33,14 @@ export default async function Analytics({ leftChart, rightChart }: TProps) {
   // inventory data fetch
   const inventoryProducts = await db.inventoryProduct.findMany({
     where: {
-      AND: [
-        {
-          createdAt: {
+      InventoryProductHistory: {
+        every: {
+          date: {
             gte: new Date(`${formattedLast30Days}T00:00:00.000Z`), // Start of the day
             lte: new Date(`${formattedToday}T23:59:59.999Z`), // End of the day
           },
         },
-      ],
+      },
     },
     select: {
       category: true,
@@ -72,32 +72,45 @@ export default async function Analytics({ leftChart, rightChart }: TProps) {
     );
   });
 
-  // full month of days sales data
-  const daysSales = Array.from({ length: 31 }, (_, i) => {
+  const daysSalesOrPurchasesObj = Array.from({ length: 31 }, (_, i) => {
     let day = moment().subtract(i, "days").format("MMM Do, YYYY");
-    return inventoryProducts.reduce(
-      (acc, cur) => {
-        const formattedDate = moment(cur.createdAt).format("MMM Do, YYYY");
-        if (formattedDate === day) {
-          const sale = cur.InventoryProductHistory.reduce((acc, history) => {
-            if ((history.type as InventoryProductHistoryType) === "Sale") {
-              acc += history.quantity * Number(history.price);
-            }
-            return acc;
-          }, 0);
-          acc.sale = sale;
-        }
-        return acc;
-      },
-      {
-        day: day,
-        sale: 0,
-      },
-    );
-  }).reverse();
+    return day;
+  }).reduce(
+    (acc, day) => {
+      acc[day] = { day: day, purchase: 0, sales: 0 };
+      return acc;
+    },
+    {} as Record<string, { day: string; purchase: number; sales: 0 }>,
+  );
+
+  inventoryProducts.forEach((inventory) => {
+    inventory.InventoryProductHistory.forEach((history) => {
+      const day = moment(history.date).format("MMM Do, YYYY");
+      if (
+        (history.type as InventoryProductHistoryType) === "Purchase" &&
+        daysSalesOrPurchasesObj[day as any]
+      ) {
+        daysSalesOrPurchasesObj[day as any].purchase +=
+          history.quantity * Number(history.price);
+      }
+      if (
+        (history.type as InventoryProductHistoryType) === "Sale" &&
+        daysSalesOrPurchasesObj[day as any]
+      ) {
+        daysSalesOrPurchasesObj[day as any].sales +=
+          history.quantity * Number(history.price);
+      }
+    });
+  });
+
+  const daysSalesOrPurchasesArr = Object.values(
+    daysSalesOrPurchasesObj,
+  ).reverse();
 
   let leftSideChart = <InventorySalesBarChartContainer salesData={salesData} />;
-  let rightSideChart = <InventorySalesLineChartContainer days={daysSales} />;
+  let rightSideChart = (
+    <InventorySalesLineChartContainer days={daysSalesOrPurchasesArr} />
+  );
 
   // left side Chart selection
   if (leftSideChartString.Sales === leftChart) {
@@ -128,34 +141,12 @@ export default async function Analytics({ leftChart, rightChart }: TProps) {
 
   // right side chart selection
   if (rightSideChartString.Sales === rightChart) {
-    rightSideChart = <InventorySalesLineChartContainer days={daysSales} />;
-  } else if (rightSideChartString.Purchases === rightChart) {
-    const daysPurchases = Array.from({ length: 31 }, (_, i) => {
-      let day = moment().subtract(i, "days").format("MMM Do, YYYY");
-      return inventoryProducts.reduce(
-        (acc, cur) => {
-          const formattedDate = moment(cur.createdAt).format("MMM Do, YYYY");
-          if (formattedDate === day) {
-            const sale = cur.InventoryProductHistory.reduce((acc, history) => {
-              if (
-                (history.type as InventoryProductHistoryType) === "Purchase"
-              ) {
-                acc += history.quantity * Number(history.price);
-              }
-              return acc;
-            }, 0);
-            acc.purchase = sale;
-          }
-          return acc;
-        },
-        {
-          day: day,
-          purchase: 0,
-        },
-      );
-    }).reverse();
     rightSideChart = (
-      <InventoryPurchasesLineChartContainer days={daysPurchases} />
+      <InventorySalesLineChartContainer days={daysSalesOrPurchasesArr} />
+    );
+  } else if (rightSideChartString.Purchases === rightChart) {
+    rightSideChart = (
+      <InventoryPurchasesLineChartContainer days={daysSalesOrPurchasesArr} />
     );
   }
 

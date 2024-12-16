@@ -14,7 +14,9 @@ import { PiPaletteBold } from "react-icons/pi";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuPortal,
   DropdownMenuTrigger,
 } from "../DropdownMenu";
 import FormError from "../FormError";
@@ -40,9 +42,11 @@ export function SelectTags({
   const [open, setOpen] = openStates || useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<SelectedColor>(null);
+
   useOutsideClick(() => {
     setOpen(false);
   });
+
   useEffect(() => {
     if (type) {
       if (
@@ -55,8 +59,9 @@ export function SelectTags({
       }
     }
   }, [dropdownsOpen]);
+
   return (
-    <div>
+    <div className="flex flex-col">
       <input
         type="hidden"
         name={name}
@@ -109,17 +114,11 @@ export function SelectTags({
                 });
               } else {
                 setDropdownsOpen({
-                  SERVICE: type === "SERVICE" ? [...index] : [-1,-1],
-                  MATERIAL: type === "MATERIAL" ? [...index] : [-1,-1],
-                  LABOR: type === "LABOR" ? [...index] : [-1,-1],
-                  TAG: type === "TAG" ? [...index] : [-1,-1],
+                  SERVICE: type === "SERVICE" ? [...index] : [-1, -1],
+                  MATERIAL: type === "MATERIAL" ? [...index] : [-1, -1],
+                  LABOR: type === "LABOR" ? [...index] : [-1, -1],
+                  TAG: type === "TAG" ? [...index] : [-1, -1],
                 });
-                // setDropdownsOpen({
-                //   SERVICE: type === "SERVICE" ? [...index] : -1,
-                //   MATERIAL: type === "MATERIAL" ? [...index] : -1,
-                //   LABOR: type === "LABOR" ? [...index] : -1,
-                //   TAG: type === "TAG" ? [...index] : -1,
-                // });
               }
             }
           }}
@@ -128,77 +127,112 @@ export function SelectTags({
           <p className="text-sm font-medium text-slate-400">Tags</p>
           <FaChevronDown className="text-[#797979]" />
         </DropdownMenuTrigger>
-
-        <DropdownMenuContent
-          side="bottom"
-          align="start"
-          sideOffset={8}
-          className="space-y-1 p-0"
-        >
-          {/* Search */}
-          <div className="relative m-2">
-            <FaSearch className="absolute left-2 top-1/2 -translate-y-1/2 transform text-[#797979]" />
-            <input
-              type="text"
-              placeholder="Search"
-              className="w-full rounded-md border-2 border-slate-400 p-1 pl-6 pr-10 focus:outline-none"
-            />
-            <button onClick={() => setOpen && setOpen(false)}>
-              <FaChevronUp className="absolute right-2 top-1/2 -translate-y-1/2 transform text-[#797979]" />
-            </button>
-          </div>
-          <div className="space-y-1">
-            {tagList
-              .filter((x) => !tagIds.has(x.id))
-              .map((tag) => (
-                <DropdownMenuItem
-                  key={tag.id}
-                  onClick={() => setTags((tags) => [...tags, tag])}
-                  className="mx-4 cursor-pointer"
-                  style={{
-                    backgroundColor: tag.bgColor,
-                    color: tag.textColor,
-                  }}
-                >
-                  {tag.name}
-                </DropdownMenuItem>
-              ))}
-          </div>
-          <FormError />
-          <QuickAddForm
-            onSuccess={(tag) => {
-              setTags((tags) => [...tags, tag]);
-            }}
-            setPickerOpen={setPickerOpen}
-            selectedColor={selectedColor}
-          />
-          {pickerOpen && (
-            <div className="grid grid-cols-4 gap-2 p-2">
-              {INVOICE_COLORS.map((color, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    setSelectedColor({
-                      textColor: color.textColor,
-                      bgColor: color.bgColor,
-                    });
-                  }}
-                  style={{
-                    backgroundColor: color.bgColor,
-                    color: color.textColor,
-                    border:
-                      selectedColor?.textColor === color.textColor
-                        ? `1px solid ${color.textColor}`
-                        : "none",
-                  }}
-                  className="rounded-md p-2"
-                >
-                  Aa
+        {/* <div> */}
+        <DropdownMenuPortal>
+          <DropdownMenuContent
+            side="bottom"
+            align="start"
+            sideOffset={8}
+            className="ll space-y-1 p-0"
+          >
+            <DropdownMenuGroup className="">
+              {" "}
+              {/* Search */}
+              <div className="relative m-2">
+                <FaSearch className="absolute left-2 top-1/2 -translate-y-1/2 transform text-[#797979]" />
+                <input
+                  type="text"
+                  placeholder="Search"
+                  className="w-full rounded-md border-2 border-slate-400 p-1 pl-6 pr-10 focus:outline-none"
+                  onKeyDown={(e) => e.stopPropagation()}
+                />
+                <button onClick={() => setOpen && setOpen(false)}>
+                  <FaChevronUp className="absolute right-2 top-1/2 -translate-y-1/2 transform text-[#797979]" />
                 </button>
-              ))}
-            </div>
-          )}
-        </DropdownMenuContent>
+              </div>
+              <div className="max-h-[calc(100vh-60vh)] space-y-1 overflow-y-scroll">
+                {tagList
+                  .filter((x) => !tagIds.has(x.id))
+                  .map((tag) => (
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        setTags((tags) => [...tags, tag]);
+                        setDropdownsOpen &&
+                          setDropdownsOpen({
+                            SERVICE: [-1, -1],
+                            MATERIAL: [-1, -1],
+                            LABOR: [-1, -1],
+                            TAG: [-1, -1],
+                          });
+                        setOpen(false);
+                      }}
+                      key={tag.id}
+                    >
+                      <div
+                        className="mx-4 cursor-pointer"
+                        style={{
+                          backgroundColor: tag.bgColor,
+                          color: tag.textColor,
+                        }}
+                      >
+                        <span> {tag.name}</span>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+              </div>
+            </DropdownMenuGroup>
+            <FormError />
+            <DropdownMenuGroup>
+              {" "}
+              <div>
+                <div>
+                  <QuickAddForm
+                    onSuccess={(tag) => {
+                      setTags((tags) => [...tags, tag]);
+                      setDropdownsOpen &&
+                        setDropdownsOpen({
+                          SERVICE: [-1, -1],
+                          MATERIAL: [-1, -1],
+                          LABOR: [-1, -1],
+                          TAG: [-1, -1],
+                        });
+                      setOpen(false);
+                    }}
+                    setPickerOpen={setPickerOpen}
+                    selectedColor={selectedColor}
+                  />
+                </div>
+                {pickerOpen && (
+                  <div className="grid grid-cols-4 gap-2 p-2">
+                    {INVOICE_COLORS.map((color, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          setSelectedColor({
+                            textColor: color.textColor,
+                            bgColor: color.bgColor,
+                          });
+                        }}
+                        style={{
+                          backgroundColor: color.bgColor,
+                          color: color.textColor,
+                          border:
+                            selectedColor?.textColor === color.textColor
+                              ? `1px solid ${color.textColor}`
+                              : "none",
+                        }}
+                        className="rounded-md p-2"
+                      >
+                        Aa
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenuPortal>
+        {/* </div> */}
       </DropdownMenu>
     </div>
   );
@@ -237,29 +271,36 @@ function QuickAddForm({
   }
 
   return (
-    <form ref={formRef} className="flex gap-2 p-2">
-      <input
-        name="name"
-        type="text"
-        required
-        className="flex-1 rounded-sm border border-solid border-black p-1"
-      />
+    <div>
+      {" "}
+      <form ref={formRef} className="flex gap-2 p-2">
+        <span>
+          {" "}
+          <input
+            name="name"
+            type="text"
+            required
+            className="flex-1 rounded-sm border border-solid border-black p-1"
+            onKeyDown={(e) => e.stopPropagation()}
+          />
+        </span>
 
-      <button
-        className="rounded bg-[#6470FF] p-2 text-white"
-        onClick={() => setPickerOpen((prev: boolean) => !prev)}
-        type="button"
-      >
-        <PiPaletteBold />
-      </button>
+        <button
+          className="rounded bg-[#6470FF] p-2 text-white"
+          onClick={() => setPickerOpen((prev: boolean) => !prev)}
+          type="button"
+        >
+          <PiPaletteBold />
+        </button>
 
-      <Submit
-        className="rounded bg-slate-500 p-1 text-xs leading-3 text-white"
-        formAction={handleSubmit}
-      >
-        Quick
-        <br /> Add
-      </Submit>
-    </form>
+        <Submit
+          className="rounded bg-slate-500 p-1 text-xs leading-3 text-white"
+          formAction={handleSubmit}
+        >
+          Quick
+          <br /> Add
+        </Submit>
+      </form>
+    </div>
   );
 }

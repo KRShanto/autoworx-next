@@ -29,13 +29,13 @@ export function InvoiceItems({
         acc +
         (material && material.sell
           ? parseFloat(material.sell.toString()) * material.quantity! -
-            parseFloat(material.discount?.toString()!)
+            parseFloat(material.discount?.toString() ?? "0")
           : 0)
       );
     }, 0);
 
     const laborCost = item.labor?.charge
-      ? parseFloat(item.labor?.charge.toString()) * item.labor?.hours!
+      ? parseFloat(item.labor?.charge.toString()) * Number(item.labor?.hours)
       : 0;
 
     return (
@@ -43,7 +43,12 @@ export function InvoiceItems({
         key={item.id}
         className="rounded-md border border-[#6571FF] px-5 py-1"
       >
-        <div className="flex w-full justify-between text-[#6571FF]">
+        <div
+          onClick={() =>
+            setOpenService(openService === item.id ? null : item.id)
+          }
+          className="flex w-full cursor-pointer justify-between text-[#6571FF]"
+        >
           <p>{item.service.name}</p>
           <button
             type="button"
@@ -72,7 +77,7 @@ export function InvoiceItems({
                         {material.sell
                           ? parseFloat(material.sell.toString()) *
                               material.quantity! -
-                            parseFloat(material.discount?.toString()!)
+                            parseFloat(material.discount?.toString() ?? "0")
                           : 0}
                       </p>
                     </div>
@@ -88,7 +93,7 @@ export function InvoiceItems({
                   $
                   {item.labor?.charge
                     ? parseFloat(item.labor?.charge.toString()) *
-                      item.labor?.hours!
+                      Number(item.labor?.hours)
                     : 0}
                 </p>
               </div>

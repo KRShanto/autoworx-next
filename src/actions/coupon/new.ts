@@ -57,3 +57,69 @@ export async function newCoupon(data: NewCouponData) {
     data: newCoupon,
   };
 }
+//update
+interface UpdateCouponData {
+  id: string;
+  couponName: string;
+  couponCode: string;
+  discountType: string;
+  discountValue: number;
+  startDate: string;
+  endDate: string;
+  couponType: string;
+}
+
+export async function updateCoupon(data: UpdateCouponData) {
+  const companyId = await getCompanyId();
+
+  const existingCoupon = await db.coupon.findUnique({
+    where: { id: +data.id },
+  });
+
+  if (!existingCoupon || existingCoupon.companyId !== companyId) {
+    throw new Error(
+      "Coupon not found or you do not have permission to update it.",
+    );
+  }
+
+  const updatedCoupon = await db.coupon.update({
+    where: {
+      id: +data.id,
+    },
+    data: {
+      name: data.couponName,
+      code: data.couponCode,
+      discountType: data.discountType === "$" ? "Fixed" : "Percentage",
+      discount: data.discountValue,
+      startDate: new Date(data.startDate),
+      endDate: new Date(data.endDate),
+      type: data.couponType,
+    },
+  });
+
+  revalidatePath("/payments");
+
+  return {
+    type: "success",
+    data: updatedCoupon,
+  };
+}
+
+//delete
+export const deleteCoupon = async (couponId: number) => {
+  const companyId = await getCompanyId();
+  const existingCoupon = await db.coupon.findUnique({
+    where: { id: +couponId },
+  });
+  if (!existingCoupon || existingCoupon.companyId !== companyId) {
+    throw new Error(
+      "Coupon not found or you do not have permission to delete it.",
+    );
+  }
+
+  await db.coupon.delete({
+    where: { id: +couponId },
+  });
+  revalidatePath("/payments");
+  return { type: "success", message: "Coupon deleted successfully" };
+};

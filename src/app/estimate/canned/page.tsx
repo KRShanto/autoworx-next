@@ -1,19 +1,18 @@
-
-import { AuthSession } from "@/types/auth";
-import Header from "../Header";
 import { auth } from "@/app/auth";
 import { SyncLists } from "@/components/SyncLists";
-import { db } from "@/lib/db";
-import NavigationTabs from "../NavigationTabs";
-import CannedTable from "../CannedTable";
 import Title from "@/components/Title";
+import { db } from "@/lib/db";
+import { AuthSession } from "@/types/auth";
+import CannedTable from "../CannedTable";
+import Header from "../Header";
+import NavigationTabs from "../NavigationTabs";
 
 export default async function CannedPage() {
   const session = (await auth()) as AuthSession;
   const companyId = session.user.companyId;
 
   const labors = await db.labor.findMany({
-    where: { companyId },
+    where: { companyId, cannedLabor: true },
     include: { category: true },
   });
 
@@ -24,10 +23,10 @@ export default async function CannedPage() {
 
   const categories = await db.category.findMany({ where: { companyId } });
   const tags = await db.tag.findMany({ where: { companyId } });
-  const statuses = await db.status.findMany({ where: { companyId } });
+  const statuses = await db.column.findMany({ where: { companyId } });
 
   return (
-    <div>
+    <div className="h-full">
       <Title>Canned</Title>
 
       <SyncLists categories={categories} tags={tags} statuses={statuses} />

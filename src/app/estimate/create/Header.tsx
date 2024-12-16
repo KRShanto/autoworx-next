@@ -4,7 +4,7 @@ import { SelectClient } from "@/components/Lists/SelectClient";
 import { SelectStatus } from "@/components/Lists/SelectStatus";
 import { SelectVehicle } from "@/components/Lists/SelectVehicle";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
-import { Client, Status, Vehicle } from "@prisma/client";
+import { Client, Column, Invoice, Vehicle } from "@prisma/client";
 import { customAlphabet } from "nanoid";
 import { useEffect, useState } from "react";
 import { CreateEstimateActionsButtons } from "./CreateEstimateActionButtons";
@@ -14,20 +14,24 @@ export default function Header({
   vehicle,
   client,
   status,
+  invoice,
 }: {
   id?: string;
   vehicle?: Vehicle;
   client?: Client;
-  status?: Status;
+  status?: Column;
+  invoice?: Invoice;
 }) {
   const { invoiceId, setInvoiceId } = useEstimateCreateStore();
   //dropdown states
   const [clientOpenDropdown, setClientOpenDropdown] = useState(false);
   const [vehicleOpenDropdown, setVehicleOpenDropdown] = useState(false);
   const [statusOpenDropdown, setStatusOpenDropdown] = useState(false);
+
   useEffect(() => {
     if (!id) setInvoiceId(customAlphabet("1234567890", 10)());
   }, [id]);
+
   useEffect(() => {
     if (clientOpenDropdown && (vehicleOpenDropdown || statusOpenDropdown)) {
       setVehicleOpenDropdown(false);
@@ -59,12 +63,15 @@ export default function Header({
           value={client}
           openDropdown={clientOpenDropdown}
           setOpenDropdown={setClientOpenDropdown}
+          invoice={invoice}
         />
         <SelectVehicle
           value={vehicle}
           openDropdown={vehicleOpenDropdown}
           setOpenDropdown={setVehicleOpenDropdown}
+          invoice={invoice}
         />
+
         <SelectStatus
           value={status}
           open={statusOpenDropdown}

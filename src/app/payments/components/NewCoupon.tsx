@@ -17,7 +17,6 @@ import CouponDateComponent from "./CouponDatePicker";
 import { useState } from "react";
 import { CouponCode, DiscountInput } from "./CodeDiscount";
 import { newCoupon } from "@/actions/coupon/new";
-import { useRouter } from "next/navigation";
 import { Coupon } from "@prisma/client";
 
 export default function NewCoupon({

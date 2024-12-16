@@ -7,7 +7,7 @@ import { Company } from "@prisma/client";
 import { fetchImageAsFile } from "@/app/estimate/create/SyncEstimate";
 
 type TProps = {
-  company: Company;
+  company: Company | null;
 };
 
 export default function BusinessForm({ company }: TProps) {
@@ -19,27 +19,28 @@ export default function BusinessForm({ company }: TProps) {
 
   useEffect(() => {
     const photoFiles = async () => {
-      if (company.image) {
-        const url = `/api/images/${company.image}`;
+      if (company && company.image) {
+        const url = company.image;
         const filename = company.image.split("/").pop() || "image.jpg";
         const file = await fetchImageAsFile(url, filename);
         setImageSrc(file);
       }
     };
     photoFiles();
-  }, [company.image]);
+  }, [company?.image]);
 
   const [businessSettings, setBusinessSettings] = useState({
-    legalBusinessName: company.name || "",
-    businessRegistrationIDNumber: company.businessId || "",
-    businessType: company.businessType || "",
-    businessPhone: company.phone || "",
-    industrySpecialization: company.industry || "",
-    businessWebsite: company.website || "",
-    companyAddress: company.address || "",
-    city: company.city || "",
-    state: company.state || "",
-    zip: company.zip || "",
+    legalBusinessName: company?.name || "",
+    businessRegistrationIDNumber: company?.businessId || "",
+    businessType: company?.businessType || "",
+    businessPhone: company?.phone || "",
+    industrySpecialization: company?.industry || "",
+    businessEmail: company?.email ?? "",
+    businessWebsite: company?.website || "",
+    companyAddress: company?.address || "",
+    city: company?.city || "",
+    state: company?.state || "",
+    zip: company?.zip || "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,6 +86,7 @@ export default function BusinessForm({ company }: TProps) {
         businessId: businessSettings.businessRegistrationIDNumber,
         businessType: businessSettings.businessType,
         phone: businessSettings.businessPhone,
+        email: businessSettings.businessEmail,
         industry: businessSettings.industrySpecialization,
         website: businessSettings.businessWebsite,
         address: businessSettings.companyAddress,
@@ -145,10 +147,9 @@ export default function BusinessForm({ company }: TProps) {
             onChange={handleChange}
             label="Business Phone*"
             name="businessPhone"
-            type="number"
           />
         </div>
-        {/* industry and website */}
+        {/* industry and email */}
         <div className="grid grid-cols-2 gap-x-8">
           <SlimInput
             required={false}
@@ -157,6 +158,15 @@ export default function BusinessForm({ company }: TProps) {
             label="Industry/Specialization"
             name="industrySpecialization"
           />
+          <SlimInput
+            required={false}
+            value={businessSettings.businessEmail}
+            onChange={handleChange}
+            label="Business Email*"
+            name="businessEmail"
+          />
+        </div>
+        <div className="grid grid-cols-1">
           <SlimInput
             required={false}
             value={businessSettings.businessWebsite}

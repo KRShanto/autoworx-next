@@ -1,20 +1,24 @@
 "use client";
-import NewVehicle from "@/components/Lists/NewVehicle";
+import { deleteLabor } from "@/actions/estimate/labor/deleteLabor";
+import { updateLabor } from "@/actions/estimate/labor/updateLabor";
 import SelectCategory from "@/components/Lists/SelectCategory";
-import { cn } from "@/lib/cn";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
 import { useListsStore } from "@/stores/lists";
-import { Category, Labor, Vehicle } from "@prisma/client";
-import { setHours } from "date-fns";
-import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { Category, Labor } from "@prisma/client";
+import { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { RiEditFill } from "react-icons/ri";
 import NewLabor from "./NewLabor";
-import { IoMdCheckmarkCircleOutline } from "react-icons/io";
-import { updateLabor } from "@/actions/estimate/labor/updateLabor";
-import { deleteLabor } from "@/actions/estimate/labor/deleteLabor";
-
 export default function CannedLabor({
   labors,
 }: {
@@ -32,26 +36,25 @@ export default function CannedLabor({
               + Add Labor
             </button>
           }
+          isCanned={true}
         />
       </div>
-      {/* TODO: make it scrollable */}
       <div className="">
-        <table className="w-full">
-          <thead>
-            <tr className="h-10 border-b">
-              <th className="px-4 text-left 2xl:px-10">Labor Name</th>
-              <th className="px-4 text-left 2xl:px-10">Category</th>
-              <th className="px-4 text-left 2xl:px-10">$/Hour</th>
-              <th className="px-4 text-left 2xl:px-10">Edit</th>
-            </tr>
-          </thead>
-
-          <tbody className="border border-gray-200">
+        <Table className="h-full">
+          <TableHeader className="sticky top-0 bg-white">
+            <TableRow>
+              <TableHead>Labor Name</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>$/Hour</TableHead>
+              <TableHead>Edit</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="custom-scrollbar h-full">
             {labors.map((labor) => (
               <LaborComponent key={labor.id} labor={labor} />
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
@@ -63,7 +66,9 @@ const LaborComponent = ({
   labor: Labor & { category?: Category };
 }) => {
   const [isEdit, setIsEdit] = useState(false);
-  const [category, setCategory] = useState<Category | null>(null);
+  const [category, setCategory] = useState<Category | null>(
+    labor?.category || null,
+  );
   const { categories } = useListsStore();
   const { currentSelectedCategoryId } = useEstimateCreateStore();
   const [categoryOpen, setCategoryOpen] = useState(false);
@@ -90,8 +95,9 @@ const LaborComponent = ({
   };
 
   return (
-    <tr className={cn("cursor-pointer rounded-md py-3")}>
-      <td className="text-nowrap px-4 py-1 text-left 2xl:px-10">
+    <TableRow>
+      <TableCell>
+        {" "}
         {!isEdit ? (
           <span className="px-4">{labor.name}</span>
         ) : (
@@ -104,8 +110,8 @@ const LaborComponent = ({
             placeholder="Labor Name"
           />
         )}
-      </td>
-      <td className="text-nowrap px-4 py-1 text-left 2xl:px-10">
+      </TableCell>
+      <TableCell>
         {!isEdit ? (
           <span className="px-4">{labor.category?.name}</span>
         ) : (
@@ -117,8 +123,9 @@ const LaborComponent = ({
             setCategoryOpen={setCategoryOpen}
           />
         )}
-      </td>
-      <td className="px-4 py-1 text-left align-middle 2xl:px-10">
+      </TableCell>
+      <TableCell>
+        {" "}
         {!isEdit ? (
           <span className="px-4">{`$${labor.charge}`}</span>
         ) : (
@@ -133,14 +140,14 @@ const LaborComponent = ({
             />
           </div>
         )}
-      </td>
-      <td className="px-4 py-1 text-left 2xl:px-10">
+      </TableCell>
+      <TableCell>
+        {" "}
         {isEdit && (
           <button onClick={() => handleEdit()} className="mr-4 text-green-500">
             <IoMdCheckmarkCircleOutline />
           </button>
         )}
-
         <button
           onClick={() => setIsEdit(!isEdit)}
           className="mr-4 text-[#6571FF]"
@@ -150,7 +157,7 @@ const LaborComponent = ({
         <button className="text-red-400" onClick={() => deleteLabor(labor.id)}>
           <FaTimes />
         </button>
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   );
 };

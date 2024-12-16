@@ -23,25 +23,25 @@ export async function getWorkOrders() {
         },
       },
       tags: {
-      
         select: {
-          id:true,
+          id: true,
           tag: true,
         },
       },
       tasks: true,
       assignedTo: true,
+      column: true,
     },
   });
 
   return invoices;
 }
- export const updateAssignedTo = async(invoiceId:string,userId:number)=>{
+export const updateAssignedTo = async (invoiceId: string, userId: number) => {
   try {
     await db.invoice.update({
       where: { id: invoiceId },
       data: {
-        assignedToId: userId, 
+        assignedToId: userId,
       },
     });
     return { success: true };
@@ -49,5 +49,4 @@ export async function getWorkOrders() {
     console.error("Error updating assignedTo:", error);
     throw new Error("Error updating assignedTo: " + error);
   }
-
- }
+};

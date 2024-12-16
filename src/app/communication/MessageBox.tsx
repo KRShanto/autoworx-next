@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Message as TMessage } from "./internal/UsersArea";
 import { FiMessageCircle } from "react-icons/fi";
 import { IoIosArrowBack, IoMdSend, IoMdSettings } from "react-icons/io";
-import { TiDeleteOutline } from "react-icons/ti";
+import { TiDeleteOutline, TiPlusOutline } from "react-icons/ti";
 import { MdModeEdit } from "react-icons/md";
 import { sendType } from "@/types/Chat";
 import { Attachment, Group, User } from "@prisma/client";
@@ -17,10 +17,11 @@ import toast from "react-hot-toast";
 import { usePathname } from "next/navigation";
 import InvoiceEstimateModal from "./collaboration/InvoiceEstimateModal";
 import { getUserInGroup } from "@/actions/communication/internal/query";
+import AddUsersInGroupModal from "./internal/AddUsersInGroupModal";
 // import Message from "./Message";
 
 export default function MessageBox({
-  user,
+  user: receiverUser,
   setUsersList,
   messages,
   totalMessageBox,
@@ -28,13 +29,11 @@ export default function MessageBox({
   fromGroup,
   group,
   setGroupsList,
-  companyName,
 }: {
   user?: User; // TODO: type this
   setUsersList?: React.Dispatch<React.SetStateAction<any[]>>;
   setGroupsList?: React.Dispatch<React.SetStateAction<any[]>>;
   messages: (TMessage & { attachment: Attachment | null })[];
-  companyName?: string | null;
   totalMessageBox: number;
   setMessages: React.Dispatch<React.SetStateAction<any[]>>;
   fromGroup?: boolean;
@@ -46,9 +45,14 @@ export default function MessageBox({
   const messageBoxRef = useRef<HTMLDivElement>(null);
   const [openSettings, setOpenSettings] = useState(false);
   const { data: session } = useSession();
-  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [multiAttachmentFile, setMultiAttachmentFile] = useState<File[] | null>(
+    null,
+  );
   const [showAttachment, setShowAttachment] = useState(false);
   const pathname = usePathname();
+
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+
   const isEstimateAttachmentShow = pathname.includes(
     "/communication/collaboration",
   );
@@ -57,19 +61,22 @@ export default function MessageBox({
     if (messageBoxRef.current) {
       messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
       // messageBoxRef.current.scrollIntoView({ behavior: "smooth" });
+      setIsImageLoaded(false);
     }
-  }, [messages]);
+  }, [messages, isImageLoaded]);
 
-  async function handleSubmit(e: any) {
+  async function handleSendMessage(e: any) {
     e.preventDefault();
     try {
-      if (!message && !attachmentFile) return;
+      if (!message && !multiAttachmentFile) return;
 
       let attachmentFileUrl = null;
 
-      if (attachmentFile) {
+      if (multiAttachmentFile && multiAttachmentFile?.length > 0) {
         const formData = new FormData();
-        formData.append("photos", attachmentFile);
+        multiAttachmentFile.forEach((photo) => {
+          formData.append("photos", photo);
+        });
         const uploadRes = await fetch("/api/upload", {
           method: "POST",
           body: formData,
@@ -81,7 +88,7 @@ export default function MessageBox({
         }
 
         const json = await uploadRes.json();
-        attachmentFileUrl = json.data[0];
+        attachmentFileUrl = json.data;
       }
 
       const res = await fetch("/api/pusher", {
@@ -90,32 +97,37 @@ export default function MessageBox({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          to: fromGroup ? group?.id : user?.id,
+          to: fromGroup ? group?.id : receiverUser?.id,
           type: fromGroup ? sendType.Group : sendType.User,
           message,
-          attachmentFile: attachmentFile
-            ? {
-                fileName: attachmentFile?.name,
-                fileType: attachmentFile?.type,
-                fileUrl: attachmentFileUrl,
-                fileSize: attachmentFile?.size,
-              }
-            : null,
+          attachmentFiles:
+            attachmentFileUrl && attachmentFileUrl.length > 0
+              ? (attachmentFileUrl as string[]).map((fileUrl, urlIndex) => {
+                  const findFileIntoMultiFile = multiAttachmentFile?.find(
+                    (_, fileIndex) => fileIndex === urlIndex,
+                  );
+                  return {
+                    fileName: findFileIntoMultiFile?.name,
+                    fileType: findFileIntoMultiFile?.type,
+                    fileUrl: fileUrl,
+                    fileSize: findFileIntoMultiFile?.size,
+                  };
+                })
+              : null,
         }),
       });
 
       const json = await res.json();
-
       if (json.success) {
         const newMessage: TMessage = {
           // userId: parseInt(session?.user?.id!),
           message,
           sender: "USER",
-          attachment: json.attachment,
+          attachment: json.attachments,
         };
         setMessages((messages) => [...messages, newMessage]);
         setMessage("");
-        setAttachmentFile(null);
+        setMultiAttachmentFile(null);
       } else {
         toast.error(json.message);
       }
@@ -131,7 +143,9 @@ export default function MessageBox({
 
   const handleUserClose = () => {
     setUsersList &&
-      setUsersList((usersList) => usersList.filter((u) => u.id !== user?.id));
+      setUsersList((usersList) =>
+        usersList.filter((u) => u.id !== receiverUser?.id),
+      );
   };
 
   const handleDeleteUserFromGroupList = async (userId: number) => {
@@ -165,13 +179,13 @@ export default function MessageBox({
   };
 
   const handleAttachment = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event?.target?.files?.[0];
-    setAttachmentFile(file!);
+    const files = Array.from(event.target.files!).map((file) => file);
     setShowAttachment(false);
+    setMultiAttachmentFile(files);
   };
 
   const handleDownload = async (fileUrl: string | null) => {
-    const response = await fetch(`/api/download/${fileUrl}`);
+    const response = await fetch(fileUrl as string);
     const responseBlob = await response.blob();
     const blobURL = URL.createObjectURL(responseBlob);
     const link = document.createElement("a");
@@ -187,12 +201,18 @@ export default function MessageBox({
     setUsersList && setUsersList([]);
     setGroupsList && setGroupsList([]);
   };
+
+  const handleRemoveAttachment = (fileName: string) => {
+    setMultiAttachmentFile(
+      (multiFiles) =>
+        multiFiles && multiFiles?.filter((file) => file?.name !== fileName),
+    );
+  };
   return (
     <div
       className={cn(
-        "app-shadow flex h-[calc(100vh-50px)] w-full flex-col overflow-hidden border bg-white max-[1400px]:w-[100%] sm:h-[88vh] sm:rounded-lg",
+        "app-shadow flex h-[calc(100vh-50px)] w-full flex-col overflow-hidden border bg-white max-[1400px]:w-[100%] sm:h-full sm:rounded-lg",
         totalMessageBox > 2 && "sm:h-[44vh]",
-        isEstimateAttachmentShow && "sm:h-[83vh]",
       )}
     >
       {/* name and delete */}
@@ -230,13 +250,17 @@ export default function MessageBox({
                 ))}
             </div>
           ) : (
-            <Avatar photo={user?.image} width={50} height={50} />
+            <Avatar photo={receiverUser?.image} width={50} height={50} />
           )}
           <div className="flex flex-col">
             <p className="flex flex-col text-[18px] font-bold sm:text-[20px]">
-              {fromGroup ? group?.name : `${user?.firstName} ${user?.lastName}`}
-              {companyName && (
-                <span className="text-sm font-light">{companyName}</span>
+              {fromGroup
+                ? group?.name
+                : `${receiverUser?.firstName} ${receiverUser?.lastName}`}
+              {receiverUser?.companyName && (
+                <span className="text-sm font-light">
+                  {receiverUser?.companyName}
+                </span>
               )}
             </p>
           </div>
@@ -279,6 +303,11 @@ export default function MessageBox({
                 />
               </div>
             ))}
+            <AddUsersInGroupModal
+              users={group?.users || []}
+              groupId={group?.id}
+              setGroupsList={setGroupsList || null}
+            />
           </div>
           <p>
             <TiDeleteOutline
@@ -299,42 +328,59 @@ export default function MessageBox({
           return (
             <Message
               key={index}
+              fromGroup={fromGroup}
               message={message}
               onDownload={handleDownload}
+              setIsImageLoaded={setIsImageLoaded}
             />
           );
         })}
       </div>
 
       {/* attachments */}
-      {attachmentFile && (
-        <div className="h-32 bg-[#D9D9D9]">
-          <div className="p-4">
-            <div className="relative w-fit">
-              <TiDeleteOutline
-                onClick={() => setAttachmentFile(null)}
-                className="absolute -right-2 -top-2 cursor-pointer rounded-full bg-white"
-                size={20}
-              />
-              {attachmentFile.type.includes("image") ? (
-                <Image
-                  src={URL.createObjectURL(attachmentFile)}
-                  alt=""
-                  className="rounded-sm"
-                  width={100}
-                  height={100}
-                />
-              ) : (
-                <div className="space-y-1 rounded-md bg-[#006D77] px-5 py-2 text-white">
-                  <p>{attachmentFile.name}</p>
-                  <p>
-                    file size:{" "}
-                    {(attachmentFile.size / 1024 / 1024).toPrecision(2)} MB
-                  </p>
+      {multiAttachmentFile && multiAttachmentFile.length > 0 && (
+        <div className="relative h-32 bg-[#D9D9D9]">
+          <TiDeleteOutline
+            onClick={() => setMultiAttachmentFile(null)}
+            className="absolute right-2 top-2 cursor-pointer rounded-full text-red-500"
+            size={40}
+          />
+          <div className="grid grid-cols-10 items-start space-x-3 overflow-x-auto p-4">
+            {multiAttachmentFile?.map((attachmentFile) => {
+              return (
+                <div key={attachmentFile.name}>
+                  <div key={attachmentFile.name} className="relative w-fit">
+                    <TiDeleteOutline
+                      onClick={() =>
+                        handleRemoveAttachment(attachmentFile.name)
+                      }
+                      className="absolute -right-2 -top-2 cursor-pointer rounded-full bg-white"
+                      size={20}
+                    />
+                    {attachmentFile.type.includes("image") ? (
+                      <Image
+                        src={URL.createObjectURL(attachmentFile)}
+                        // placeholder="blur"
+                        alt=""
+                        className="rounded-sm"
+                        width={100}
+                        height={100}
+                      />
+                    ) : (
+                      <div className="space-y-1 rounded-md bg-[#006D77] px-5 py-2 text-white">
+                        <p>{attachmentFile.name}</p>
+                        <p>
+                          file size:{" "}
+                          {(attachmentFile.size / 1024 / 1024).toPrecision(2)}{" "}
+                          MB
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <p className="line-clamp-2 text-sm">{attachmentFile.name}</p>
                 </div>
-              )}
-            </div>
-            <p className="text-sm">{attachmentFile.name}</p>
+              );
+            })}
           </div>
         </div>
       )}
@@ -342,7 +388,7 @@ export default function MessageBox({
       {/* Input */}
       <form
         className="relative flex h-[8%] items-center gap-2 bg-[#D9D9D9] p-2"
-        onSubmit={(e) => startTransition(() => handleSubmit(e))}
+        onSubmit={(e) => startTransition(() => handleSendMessage(e))}
       >
         {/* attachment or estimate dropdown */}
         {showAttachment && (
@@ -358,7 +404,13 @@ export default function MessageBox({
             >
               Attach Document/Media
             </p>
-            {isEstimateAttachmentShow && <InvoiceEstimateModal />}
+            {isEstimateAttachmentShow && (
+              <InvoiceEstimateModal
+                setShowAttachment={setShowAttachment}
+                setMessages={setMessages}
+                receiverUser={receiverUser!}
+              />
+            )}
           </div>
         )}
         <Image
@@ -370,6 +422,7 @@ export default function MessageBox({
           alt="attachment"
         />
         <input
+          multiple
           accept="*"
           ref={attachmentRef}
           onChange={handleAttachment}

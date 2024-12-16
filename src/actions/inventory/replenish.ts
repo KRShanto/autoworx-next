@@ -1,5 +1,6 @@
 "use server";
 
+import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { revalidatePath } from "next/cache";
@@ -23,6 +24,7 @@ export async function replenish({
   lot?: string;
   notes?: string;
 }): Promise<ServerAction> {
+  const companyId = await getCompanyId();
   const product = await db.inventoryProduct.findUnique({
     where: { id: productId },
   });
@@ -35,6 +37,7 @@ export async function replenish({
 
   const newHistory = await db.inventoryProductHistory.create({
     data: {
+      companyId,
       productId,
       date,
       quantity,

@@ -1,14 +1,13 @@
 import React, { Suspense } from "react";
 import Calculation from "../../components/Calculation";
-import FilterBySearchBox from "../../components/filter/FilterBySearchBox";
-import FilterByDateRange from "../../components/filter/FilterByDateRange";
-import FilterBySelection from "../../components/filter/FilterBySelection";
 import Analytics from "./Analytics";
-import FilterByMultiple from "../../components/filter/FilterByMultiple";
 import { db } from "@/lib/db";
 import RevenueTableRow from "./RevenueTableRow";
 import moment from "moment";
 import { Prisma } from "@prisma/client";
+import FilterHeader from "./FilterHeader";
+import { auth } from "@/app/auth";
+import { AuthSession } from "@/types/auth";
 
 type TProps = {
   searchParams: {
@@ -23,7 +22,7 @@ type TProps = {
   };
 };
 
-type TSliderData = {
+export type TSliderData = {
   id: number;
   min: number;
   max: number;
@@ -56,6 +55,7 @@ export type TInvoice = Prisma.InvoiceGetPayload<{
 }>;
 
 export default async function RevenueReportPage({ searchParams }: TProps) {
+  const session = (await auth()) as AuthSession | null;
   const filterOR = [];
 
   if (searchParams.startDate && searchParams.endDate) {
@@ -81,6 +81,7 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
 
   const invoicesPromise = db.invoice.findMany({
     where: {
+      companyId: session?.user?.companyId,
       invoiceItems: {
         some:
           searchParams.category || searchParams.service
@@ -95,14 +96,6 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
                 ],
               }
             : undefined,
-      },
-      client: {
-        OR: searchParams.search
-          ? [
-              { firstName: { contains: searchParams.search?.trim() } },
-              { lastName: { contains: searchParams.search?.trim() } },
-            ]
-          : undefined,
       },
       OR: filterOR.length > 0 ? filterOR : undefined,
     },
@@ -143,17 +136,33 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
     categoriesPromise,
   ]);
 
+  const filteredInvoices =
+    searchParams?.search && invoices
+      ? invoices.filter((invoice) => {
+          if (!invoice.client && !invoice.id) {
+            return false;
+          }
+          const fullName = `${invoice?.client!.firstName} ${invoice?.client?.lastName}`;
+          return (
+            fullName
+              .toLowerCase()
+              .includes(searchParams?.search?.trim()?.toLowerCase() || "") ||
+            invoice.id.toString().includes(searchParams?.search?.trim() || "")
+          );
+        })
+      : invoices;
+
   const getService = services.map((service) => service.name);
   const getCategory = categories.map((category) => category.name);
 
   const maxPrice = Math.max(
-    ...invoices.map((invoice) => Number(invoice.grandTotal)),
+    ...filteredInvoices.map((invoice) => Number(invoice.grandTotal)),
   );
 
   let maxCost = 0;
   let maxProfit = 0;
 
-  const filteredInvoice = invoices.filter((invoice) => {
+  const filteredInvoice = filteredInvoices.filter((invoice) => {
     const { costPrice, profitPrice } = invoice.invoiceItems.reduce(
       (
         acc,
@@ -165,13 +174,15 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
         }>,
       ) => {
         const materialCostPrice = cur.materials.reduce(
-          (acc, cur) => acc + Number(cur?.cost) * Number(cur?.quantity),
+          (acc, cur) =>
+            acc + Number(cur?.cost || 0) * Number(cur?.quantity || 0),
           0,
         );
         // labor cost price is assumed to be per hour
-        const laborCostPrice = Number(cur.labor?.charge) * cur?.labor?.hours!;
+        const laborCostPrice =
+          Number(cur.labor?.charge || 0) * Number(cur?.labor?.hours) || 0;
         const costPrice = materialCostPrice + laborCostPrice;
-        acc.costPrice = costPrice;
+        acc.costPrice += costPrice;
         acc.profitPrice = Number(invoice.grandTotal) - acc.costPrice;
         return acc;
       },
@@ -213,7 +224,7 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
     }
   });
 
-  // multiple filters 
+  // multiple filters
   const filterMultipleSliders: TSliderData[] = [
     {
       id: 1,
@@ -236,52 +247,76 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
     },
   ];
 
+  // Calculate the total week profit (Invoice has a `profit` field)
+  const now = new Date();
+  const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+  const endOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 6));
+
+  const weeklyInvoices = filteredInvoice.filter(
+    (invoice) =>
+      new Date(invoice.createdAt) >= startOfWeek &&
+      new Date(invoice.createdAt) <= endOfWeek,
+  );
+
+  const totalWeekProfit = weeklyInvoices.reduce(
+    (total, invoice) => total + ((invoice as any).profitPrice || 0),
+    0,
+  );
+
+  // Calculate the total month profit (Invoice has a `profit` field)
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+  const monthlyInvoices = filteredInvoice.filter(
+    (invoice) =>
+      new Date(invoice.createdAt) >= startOfMonth &&
+      new Date(invoice.createdAt) <= endOfMonth,
+  );
+
+  const totalMonthProfit = monthlyInvoices.reduce(
+    (total, invoice) => total + ((invoice as any).profitPrice || 0),
+    0,
+  );
+
+  // Calculate the all time profit (Invoice has a `profit` field)
+  const totalProfit = filteredInvoice.reduce(
+    (total, invoice) => total + ((invoice as any).profitPrice || 0),
+    0,
+  );
+
+  // profit for the filtered invoices
+  const totalFilteredProfit = filteredInvoice.reduce(
+    (total, invoice) => total + ((invoice as any).profitPrice || 0),
+    0,
+  );
+
   return (
     <div className="space-y-5">
       <div className="my-7 grid grid-cols-5 gap-4">
-        <Calculation content="WEEK" amount={0} />
-        <Calculation content="MONTH" amount={0} />
-        <Calculation content="YTD" amount={0} />
-        <Calculation content="REVENUE" amount={0} />
+        <Calculation content="WEEK" amount={totalWeekProfit} />
+        <Calculation content="MONTH" amount={totalMonthProfit} />
+        <Calculation content="YTD" amount={totalProfit} />
+        <Calculation content="REVENUE" amount={totalFilteredProfit} />
       </div>
       {/* filter section */}
-      <div className="flex w-full items-center justify-between gap-x-3">
-        <div className="flex flex-1 items-center space-x-4">
-          <FilterBySearchBox searchText={searchParams.search as string} />
-          <FilterByDateRange
-            startDate={decodeURIComponent(searchParams.startDate as string)}
-            endDate={decodeURIComponent(searchParams.endDate as string)}
-          />
-        </div>
-        <div className="flex items-center space-x-4">
-          <FilterByMultiple
-            searchParamsValue={searchParams}
-            filterSliders={filterMultipleSliders}
-          />
-          <FilterBySelection
-            selectedItem={searchParams?.category as string}
-            items={getCategory}
-            type="category"
-          />
-          <FilterBySelection
-            selectedItem={searchParams?.service as string}
-            items={getService}
-            type="service"
-          />
-        </div>
-      </div>
+      <FilterHeader
+        searchParams={searchParams}
+        filterMultipleSliders={filterMultipleSliders}
+        getCategory={getCategory}
+        getService={getService}
+      />
       {/* table */}
       <div>
         <table className="w-full shadow-md">
           <thead className="bg-white">
             <tr className="h-10 border-b">
-              <th className="border-b px-4 py-2 text-center">Customer</th>
-              <th className="border-b px-4 py-2 text-center">Vehicle Info </th>
-              <th className="border-b px-4 py-2 text-center">Invoice #</th>
-              <th className="border-b px-4 py-2 text-center">Date Delivered</th>
-              <th className="border-b px-4 py-2 text-center">Price</th>
-              <th className="border-b px-4 py-2 text-center">Cost</th>
-              <th className="border-b px-4 py-2 text-center">Profit</th>
+              <th className="border-b px-4 py-2 text-left">Customer</th>
+              <th className="border-b px-4 py-2 text-left">Vehicle Info </th>
+              <th className="border-b px-4 py-2 text-left">Invoice #</th>
+              <th className="border-b px-4 py-2 text-left">Date Delivered</th>
+              <th className="border-b px-4 py-2 text-left">Price</th>
+              <th className="border-b px-4 py-2 text-left">Cost</th>
+              <th className="border-b px-4 py-2 text-left">Profit</th>
             </tr>
           </thead>
 

@@ -2,14 +2,8 @@ import { cn } from "@/lib/cn";
 import { Item } from "@/stores/estimate-create";
 import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
-import React, { useEffect, useRef, useState } from "react";
-import {
-  FaChevronDown,
-  FaChevronUp,
-  FaEdit,
-  FaSearch,
-  FaTimes,
-} from "react-icons/fa";
+import { useEffect, useRef, useState } from "react";
+import { FaChevronDown, FaChevronUp, FaSearch, FaTimes } from "react-icons/fa";
 import { FaPen } from "react-icons/fa6";
 import { DropdownMenu, DropdownMenuTrigger } from "./DropdownMenu";
 
@@ -59,6 +53,11 @@ export default function ItemSelector<T>({
     } else {
       setOpen(false);
     }
+
+    if (onSearch) {
+      const results = onSearch("");
+      setItemIist(results);
+    }
   }, [dropdownsOpen]);
 
   useEffect(() => {
@@ -102,6 +101,7 @@ export default function ItemSelector<T>({
             MATERIAL: [-1, -1],
             LABOR: [-1, -1],
             TAG: [-1, -1],
+            [type]: [index[0], index[1]],
           });
         } else {
           setDropdownsOpen({
@@ -110,6 +110,7 @@ export default function ItemSelector<T>({
             LABOR: type === "LABOR" ? [...index] : [-1, -1],
             TAG: [-1, -1],
           });
+
           // setDropdownsOpen({
           //   SERVICE: type === "SERVICE" ? [...index] : -1,
           //   MATERIAL: type === "MATERIAL" ? [...index] : -1,
@@ -126,7 +127,8 @@ export default function ItemSelector<T>({
             <button
               className="absolute -right-2 -top-2"
               type="button"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setSelected(null);
                 onDelete && onDelete();
               }}
@@ -179,6 +181,13 @@ export default function ItemSelector<T>({
                 className="absolute -right-2 -top-2"
                 type="button"
                 onClick={() => {
+                  if (searchRef?.current?.value) searchRef.current.value = "";
+
+                  if (onSearch) {
+                    const results = onSearch("");
+                    setItemIist(results);
+                  }
+
                   onDelete && onDelete();
                   setSelected(null);
                 }}
@@ -217,7 +226,7 @@ export default function ItemSelector<T>({
               </button>
             </div>
 
-            <div className="mb-5">
+            <div className="mb-5 max-h-[calc(100vh-60vh)] overflow-y-auto">
               {itemIist.slice(0, 4).map((item, i) => (
                 <button
                   className="mx-auto my-1 flex w-[95%] cursor-pointer items-center justify-between gap-1 rounded-md border border-[#6571FF] p-1 text-[#6571FF] hover:bg-gray-100"
@@ -242,12 +251,19 @@ export default function ItemSelector<T>({
             <div className="border-t-2 border-slate-400 p-2">
               <button
                 type="button"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   openPopup(type, {
                     itemId: item.id,
                     materialIndex,
                   });
                   setOpen(false);
+                  setDropdownsOpen({
+                    SERVICE: [-1, -1],
+                    MATERIAL: [-1, -1],
+                    LABOR: [-1, -1],
+                    TAG: [-1, -1],
+                  });
                 }}
               >
                 + New {label}

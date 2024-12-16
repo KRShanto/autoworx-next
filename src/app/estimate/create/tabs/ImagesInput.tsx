@@ -12,10 +12,11 @@ export function ImagesInput() {
           type="file"
           hidden
           accept="image/*"
+          multiple
           onChange={(event) => {
-            const file = event.currentTarget.files?.[0];
-            if (!file) return;
-            setPhotos([...photos, file]);
+            const files = event.currentTarget.files;
+            if (!files?.length) return;
+            setPhotos([...photos, ...Array.from(files)]);
           }}
         />
         <svg

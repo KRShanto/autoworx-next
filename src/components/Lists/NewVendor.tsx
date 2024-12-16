@@ -1,7 +1,6 @@
 "use client";
 
-import { Vendor } from "@prisma/client";
-import { useState } from "react";
+import { newVendor } from "@/actions/vendor/newVendor";
 import {
   Dialog,
   DialogClose,
@@ -11,11 +10,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/Dialog";
-import Submit from "../Submit";
-import { SlimInput } from "../SlimInput";
 import { useListsStore } from "@/stores/lists";
-import { newVendor } from "@/actions/vendor/newVendor";
+import { Vendor } from "@prisma/client";
+import { useState } from "react";
+import { SlimInput } from "../SlimInput";
 import { SlimTextarea } from "../SlimTextarea";
+import Submit from "../Submit";
 
 export default function NewVendor({
   bgShadow,
@@ -87,7 +87,7 @@ export default function NewVendor({
             <SlimInput name="state" required={false} />
             <SlimInput name="zip" required={false} />
           </div>
-          <div className="sm:col-span-2">
+          <div className="space-y-2 sm:col-span-2">
             <SlimInput name="website" required={false} />
             <SlimTextarea name="notes" required={false} />
           </div>

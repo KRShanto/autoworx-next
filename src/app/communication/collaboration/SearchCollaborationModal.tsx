@@ -15,6 +15,7 @@ import { FaPlus } from "react-icons/fa";
 import { errorToast, successToast } from "@/lib/toast";
 import { connectWithCompany } from "@/actions/settings/myNetwork";
 import SearchBox from "./SearchBox";
+import { searchCompanyQuery } from "@/actions/communication/collaboration/searchQuery";
 
 type TProps = {
   companyAdmins: Partial<
@@ -56,6 +57,7 @@ export default function SearchCollaborationModal({
   useEffect(() => {
     if (inputRef?.current) {
       inputRef.current.focus();
+      handleSubmit();
     }
   }, [openUserList]);
 
@@ -70,7 +72,9 @@ export default function SearchCollaborationModal({
         return prevAdmin.map((admin) => {
           if (admin.companyId === companyId) {
             return { ...admin, isConnected: true };
-          } else admin;
+          } else {
+            return admin;
+          }
         });
       });
       if (result.success) {
@@ -80,6 +84,30 @@ export default function SearchCollaborationModal({
       }
     } catch (err: any) {
       setError(err.message);
+      errorToast(err.message);
+    }
+  }
+
+  async function handleSubmit(event?: React.ChangeEvent<HTMLInputElement>) {
+    // event && event.preventDefault();
+    try {
+      const inputValue = event?.target?.value || "";
+      const response = await searchCompanyQuery(inputValue?.trim());
+      if (response.success) {
+        const updateCompanyAdmins = response.data
+          .map((company) => {
+            return company.users.map((user) => {
+              return {
+                ...user,
+                companyName: company.name,
+                isConnected: companies.some((c) => c.id === user.companyId),
+              };
+            });
+          })
+          .flat();
+        setCompanyAdmins(updateCompanyAdmins);
+      }
+    } catch (err: any) {
       errorToast(err.message);
     }
   }
@@ -101,6 +129,7 @@ export default function SearchCollaborationModal({
               <div className="h-fit w-full space-y-4 rounded-md border border-gray-500 p-4">
                 {/* Search box */}
                 <SearchBox
+                  onSearch={handleSubmit}
                   setCompanyAdmins={setCompanyAdmins}
                   companies={companies}
                   ref={inputRef}
@@ -108,42 +137,48 @@ export default function SearchCollaborationModal({
                 />
                 {/* user list */}
                 <div className="flex h-72 flex-col items-start space-y-2 overflow-y-auto p-1">
-                  {companyAdmins.map((user) => (
-                    <div
-                      key={user.id}
-                      className="flex w-full cursor-pointer items-center justify-between space-x-2 p-1"
-                    >
-                      <Avatar photo={user.image} width={60} height={60} />
-                      <div className="flex flex-col overflow-hidden">
-                        <div className="flex items-center space-x-8">
-                          <p className="text-sm font-bold text-[#797979]">
-                            {user.firstName} {user.lastName}
-                          </p>
-                          <p className="text-sm font-bold capitalize text-[#006D77]">
-                            {user.companyName}
+                  {companyAdmins &&
+                    companyAdmins?.length > 0 &&
+                    companyAdmins.map((user) => (
+                      <div
+                        key={user?.id}
+                        className="flex w-full cursor-pointer items-center justify-between space-x-2 p-1"
+                      >
+                        <Avatar
+                          className="flex-shrink-0"
+                          photo={user?.image}
+                          width={60}
+                          height={60}
+                        />
+                        <div className="flex w-full flex-wrap items-start gap-x-4 overflow-hidden">
+                          <div className="mb-1 flex flex-col items-start">
+                            <p className="text-sm font-bold text-[#797979]">
+                              {user?.firstName} {user?.lastName}
+                            </p>
+                            <div className="flex items-center text-[10px]">
+                              {user?.phone && <p>{user?.phone}</p>}
+                              <p>{user?.email}</p>
+                            </div>
+                          </div>
+                          <p className="flex-shrink-0 text-sm font-bold capitalize text-[#006D77]">
+                            {user?.companyName}
                           </p>
                         </div>
-
-                        <div className="flex items-center space-x-3 text-[10px]">
-                          {user.phone && <p>{user.phone}</p>}
-                          <p>{user.email}</p>
+                        <div className="flex-shrink-0">
+                          {!user?.isConnected && (
+                            <button
+                              onClick={() =>
+                                handleConnectCompany(user?.companyId!)
+                              }
+                              className="flex items-center space-x-1 rounded-md bg-[#006D77] px-1 py-1 text-[14px] text-white shadow-md"
+                            >
+                              <FaPlus size={8} />
+                              <span className="text-sm">Send Invite</span>
+                            </button>
+                          )}
                         </div>
                       </div>
-                      <div>
-                        {!user?.isConnected && (
-                          <button
-                            onClick={() =>
-                              handleConnectCompany(user?.companyId!)
-                            }
-                            className="flex items-center space-x-1 rounded-md bg-[#006D77] px-1 py-1 text-[14px] text-white shadow-md"
-                          >
-                            <FaPlus size={8} />
-                            <span className="text-sm">Send Invite</span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
             </>

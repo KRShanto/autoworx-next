@@ -1,210 +1,57 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { EmployeeType, Prisma, Task, User } from "@prisma/client";
-import React, { SetStateAction, useEffect, useState } from "react";
+import { getEmployees } from "@/actions/employee/get";
+import { updateInvoiceStatus } from "@/actions/estimate/invoice/updateInvoiceStatus";
+
+import { updateAssignedTo } from "@/actions/pipelines/getWorkOrders";
+import {
+  removeInvoiceTag,
+  saveInvoiceTag,
+} from "@/actions/pipelines/invoiceTag";
+import { Column, Employee, ShopPipelineData } from "@/types/invoiceLead";
+import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
+import { Tag, User } from "@prisma/client";
+import Link from "next/link";
+import { SetStateAction, useEffect, useState } from "react";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { PiWechatLogoLight } from "react-icons/pi";
-import { CiCalendar } from "react-icons/ci";
+import { TbInvoice } from "react-icons/tb";
 import { EmployeeSelector } from "./EmployeeSelector";
-import Link from "next/link";
-import { Tag } from "@prisma/client";
 import { EmployeeTagSelector } from "./EmployeeTagSelector";
-import TaskForm from "./TaskForm";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { NewAppointment_Pipeline } from "./NewAppointment_Pipeline";
 import ServiceSelector from "./ServiceSelector";
-import {
-  getWorkOrders,
-  updateAssignedTo,
-} from "@/actions/pipelines/getWorkOrders";
-import { updateInvoiceStatus } from "@/actions/estimate/invoice/updateInvoiceStatus";
-import { getEmployees } from "@/actions/employee/get";
-import {
-  saveInvoiceTag,
-  removeInvoiceTag,
-} from "@/actions/pipelines/invoiceTag";
-import SessionUserType from "@/types/sessionUserType";
-import { getUserFromSession } from "@/lib/getCurrentUser";
-//dummy services
-
-//interfaces
-
-interface Employee {
-  id: number;
-  firstName: string;
-  lastName: string | null;
-}
-interface Lead {
-  invoiceId: string;
-  name: string;
-  email: string;
-  phone: string;
-  clientId: number | null;
-  vehicle: string;
-  services: {
-    completed: string[];
-    incomplete: string[];
-  };
-  createdAt: string;
-  workOrderStatus?: string;
-  tags: InvoiceTag[];
-
-  tasks?: Task[];
-  assignedTo: User | Employee | null;
-}
-interface InvoiceTag {
-  id: number;
-  tag: Tag;
-}
-interface PipelineData {
-  title: string;
-  leads: Lead[];
-}
-
-type Column = {
-  id: number | null;
-  title: string;
-  type: string;
-};
+import TaskForm from "./TaskForm";
+import toast from "react-hot-toast";
+import { updateTechnicianStatustoComplete } from "@/actions/estimate/invoice/updateTechnicianStatustoComplete";
 
 interface PipelinesProps {
   pipelinesTitle: string;
   columns?: Column[];
-  usersType: UserTypes[];
+  shopPipelineDataProp: ShopPipelineData[];
 }
-interface UserTypes {
-  id: number;
-  email: string;
-  firstName: string;
-  lastName: string | null;
-  employeeType: EmployeeType;
-  companyId: number;
-}
-type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
-  include: {
-    client: true;
-    vehicle: true;
-    invoiceItems: {
-      include: {
-        service: {
-          include: {
-            Technician: true;
-          };
-        };
-      };
-    };
-    tags: {
-      select: {
-        id: true;
-        tag: true;
-      };
-    };
-    tasks: true;
-    assignedTo: true;
-  };
-}>;
+
 export default function Pipelines({
   pipelinesTitle: pipelineType,
   columns,
-  usersType,
-}: Readonly<PipelinesProps>) {
-  const [pipelineData, setPipelineData] = useState<PipelineData[]>([]);
-  const [invoices, setInvoices] = useState<InvoiceWithRelations[]>([]);
-
+  shopPipelineDataProp,
+}: PipelinesProps) {
+  const [pipelineData, setPipelineData] =
+    useState<ShopPipelineData[]>(shopPipelineDataProp);
   const [companyUsers, setCompanyUsers] = useState<User[]>([]);
-  const [currentUser, setCurrentUser] = useState<SessionUserType>();
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const response = await fetch("/api/getUser");
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        setCurrentUser(data);
-      }
-    };
-    fetchUser();
-  }, []);
+    setPipelineData(shopPipelineDataProp);
+  }, [shopPipelineDataProp]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const fetchedInvoices = await getWorkOrders();
-        setInvoices(fetchedInvoices);
-        const fetchedCompanyUsers = await getEmployees({
-          excludeCurrentUser: true,
-        });
-        setCompanyUsers(fetchedCompanyUsers);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    if (invoices && columns) {
-      const transformedLeads: Lead[] = invoices.map((invoice) => {
-        const completedServices: string[] = [];
-        const incompleteServices: string[] = [];
-
-        invoice.invoiceItems.forEach((item) => {
-          const technicians = item.service?.Technician || [];
-          const statuses = technicians.map((tech) =>
-            tech.status?.toLowerCase(),
-          );
-          const isServiceComplete = statuses.every(
-            (status) => status === "complete",
-          );
-
-          if (isServiceComplete) {
-            completedServices.push(item.service?.name ?? "");
-          } else {
-            incompleteServices.push(item.service?.name ?? "");
-          }
-        });
-
-        return {
-          invoiceId: invoice.id,
-          name: `${invoice.client?.firstName ?? ""} ${invoice.client?.lastName ?? ""}`.trim(),
-          email: invoice.client?.email ?? "",
-          phone: invoice.client?.mobile ?? "",
-          clientId: invoice.clientId,
-          vehicle:
-            `${invoice.vehicle?.year ?? ""} ${invoice.vehicle?.make ?? ""} ${invoice.vehicle?.model ?? ""}`.trim(),
-          workOrderStatus: invoice.workOrderStatus ?? "Pending",
-          services: {
-            completed: completedServices,
-            incomplete: incompleteServices,
-          },
-          tags: invoice.tags.map((tag) => ({ id: tag.id, tag: tag.tag })),
-          tasks: invoice.tasks,
-          assignedTo: invoice.assignedTo,
-          createdAt: new Date(invoice.createdAt).toDateString(),
-        };
+    const fetchCompanyUsers = async () => {
+      const fetchedCompanyUsers = await getEmployees({
+        excludeCurrentUser: true,
       });
-
-      let updatedPipelineData = columns.map((column) => ({
-        title: column.title,
-        leads: transformedLeads.filter(
-          (lead) => lead.workOrderStatus?.trim() === column.title.trim(),
-        ),
-      }));
-
-      console.log("Current user:", currentUser);
-
-      // Only filter for technicians
-      if (currentUser?.employeeType === "Technician") {
-        updatedPipelineData = updatedPipelineData.map((column) => ({
-          ...column,
-          leads: column.leads.filter(
-            (lead) => lead.assignedTo?.id === Number(currentUser.id),
-          ),
-        }));
-      }
-
-      setPipelineData(updatedPipelineData);
-    }
-  }, [invoices, columns]);
+      setCompanyUsers(fetchedCompanyUsers);
+    };
+    fetchCompanyUsers();
+  }, []);
 
   const [selectedEmployees, setSelectedEmployees] = useState<{
     [key: string]: Employee | null;
@@ -421,6 +268,31 @@ export default function Pipelines({
     const destinationItems = [...destinationColumn.leads];
 
     const [removed] = sourceItems.splice(source.index, 1);
+
+    if (destinationColumn && destinationColumn.title === "Delivered") {
+      // Update technician status to 'Complete' in the backend
+      try {
+        const response = await updateTechnicianStatustoComplete(
+          removed.invoiceId,
+        );
+        if (response) {
+          console.log("Updated technician status:", response);
+        }
+      } catch (error) {
+        console.error("Error updating technician status:", error);
+      }
+      console.log("removed invoice id", removed.invoiceId);
+    }
+    if (destinationColumn.title === "Delivered") {
+      if (removed.dueBalance !== 0) {
+        toast.error("Please clear due balance before moving to delivered.");
+        // Revert the item back to its original position
+        sourceItems.splice(source.index, 0, removed);
+        return;
+      }
+      console.log("The invoice id :", removed.invoiceId);
+    }
+
     destinationItems.splice(destination.index, 0, removed);
 
     const updatedData = pipelineData.map((column, index) => {
@@ -435,16 +307,20 @@ export default function Pipelines({
     setPipelineData(updatedData);
 
     const invoiceId = removed.invoiceId;
-    const newStatus = destinationColumn.title;
-
-    try {
-      const response = await updateInvoiceStatus(invoiceId, newStatus);
-      if (response.type === "success") {
-      } else {
-        console.error("Failed to update invoice status:", response.message);
+    const newStatusId = destinationColumn.id;
+    if (newStatusId !== null) {
+      try {
+        const response = await updateInvoiceStatus(invoiceId, newStatusId);
+        if (response.type === "success") {
+          console.log("Invoice status updated successfully");
+        } else {
+          console.error("Failed to update invoice status:", response.message);
+        }
+      } catch (error) {
+        console.error("Error updating invoice status:", error);
       }
-    } catch (error) {
-      console.error("Error updating invoice status:", error);
+    } else {
+      console.error("newStatusId is null");
     }
   };
 
@@ -476,6 +352,7 @@ export default function Pipelines({
                     style={{ maxHeight: "70vh" }}
                   >
                     {item.leads.map((lead, leadIndex) => {
+                      console.log("🚀 ~ {item.leads.map ~ lead:", lead);
                       const key = `${categoryIndex}-${leadIndex}`;
 
                       const isDropdownOpen =
@@ -500,50 +377,54 @@ export default function Pipelines({
                               {...provided.dragHandleProps}
                               ref={provided.innerRef}
                               key={lead.invoiceId}
-                              className="max-w-auto relative mx-1 my-1 h-fit rounded-xl border bg-white p-1"
+                              className="max-w-auto relative mx-1 my-1 h-fit animate-none rounded-xl border bg-white p-1 duration-300"
                             >
                               <div className="flex items-center justify-between">
                                 <h3 className="font-inter overflow-auto pb-2 font-semibold text-black">
                                   {lead.name}
                                 </h3>
-                                {!isDropdownOpen && (
-                                  <div
-                                    role="button"
-                                    onClick={() =>
-                                      handleDropdownToggle(
-                                        categoryIndex,
-                                        leadIndex,
-                                      )
-                                    }
-                                  >
-                                    {selectedEmployee ? (
-                                      <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-gray-600 bg-white text-xs text-black">
-                                        {getInitials(selectedEmployee)}
+                                {pipelineType === "Sales Pipelines" && (
+                                  <div>
+                                    {!isDropdownOpen && (
+                                      <div
+                                        role="button"
+                                        onClick={() =>
+                                          handleDropdownToggle(
+                                            categoryIndex,
+                                            leadIndex,
+                                          )
+                                        }
+                                      >
+                                        {selectedEmployee ? (
+                                          <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-gray-600 bg-white text-xs text-black">
+                                            {getInitials(selectedEmployee)}
+                                          </div>
+                                        ) : (
+                                          <IoAddCircleOutline size={26} />
+                                        )}
                                       </div>
-                                    ) : (
-                                      <IoAddCircleOutline size={26} />
+                                    )}
+
+                                    {isDropdownOpen && (
+                                      <div className="absolute right-0 top-8 z-10">
+                                        <EmployeeSelector
+                                          name="employeeId"
+                                          value={selectedEmployee}
+                                          setValue={createEmployeeSelectHandler(
+                                            categoryIndex,
+                                            leadIndex,
+                                          )}
+                                          openDropdown={true}
+                                          setOpenDropdown={() =>
+                                            setOpenDropdownIndex(null)
+                                          }
+                                          companyUsers={companyUsers}
+                                        />
+                                      </div>
                                     )}
                                   </div>
                                 )}
-                                {isDropdownOpen && (
-                                  <div className="absolute right-0 top-8 z-10">
-                                    <EmployeeSelector
-                                      name="employeeId"
-                                      value={selectedEmployee}
-                                      setValue={createEmployeeSelectHandler(
-                                        categoryIndex,
-                                        leadIndex,
-                                      )}
-                                      openDropdown={true}
-                                      setOpenDropdown={() =>
-                                        setOpenDropdownIndex(null)
-                                      }
-                                      companyUsers={companyUsers}
-                                    />
-                                  </div>
-                                )}
                               </div>
-
                               <div className="mb-1 flex flex-wrap items-center gap-1">
                                 {pipelineData[categoryIndex].leads[
                                   leadIndex
@@ -558,7 +439,7 @@ export default function Pipelines({
                                   >
                                     {invoiceTag.tag.name}
                                     <div
-                                      className="ml-1 text-xs text-white"
+                                      className="ml-1 cursor-pointer text-xs text-white"
                                       onClick={() =>
                                         handleTagRemove(
                                           categoryIndex,
@@ -645,26 +526,20 @@ export default function Pipelines({
                                     </span>
                                   </Link>
                                   <Link
-                                    href={`/estimate/view/${lead.invoiceId}`}
+                                    href={`/estimate/workorder/${lead.invoiceId}`}
                                     className="group relative"
                                   >
-                                    <img
-                                      src="/icons/invoice.png"
-                                      alt=""
-                                      width={12}
-                                      height={12}
-                                      style={{ marginBottom: "0px" }}
-                                    />
+                                    <TbInvoice size={18} color="#94a3b8 " />
                                     <span className="invisible absolute bottom-full left-14 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
                                       View Work Order
                                     </span>
                                   </Link>
-                                  <Link href="/" className="group relative">
-                                    <CiCalendar size={18} />
-                                    <span className="invisible absolute bottom-full left-16 mb-1 w-max -translate-x-1/2 transform whitespace-nowrap rounded-md border-2 border-white bg-[#66738C] px-2 py-1 text-xs text-white shadow-lg transition-opacity group-hover:visible">
-                                      Create Appointment
-                                    </span>
-                                  </Link>
+                                  {lead?.clientId && lead?.vehicleId && (
+                                    <NewAppointment_Pipeline
+                                      clientId={lead.clientId}
+                                      vehicleId={lead?.vehicleId}
+                                    />
+                                  )}
                                 </div>
                                 <div className="group relative">
                                   <TaskForm

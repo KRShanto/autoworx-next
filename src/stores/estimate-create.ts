@@ -156,7 +156,11 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
   removeMaterial({ itemIndex, materialIndex }) {
     set((state) => {
       const items = state.items.map((item, index) => {
-        if (index === itemIndex && item.materials.length > 1) {
+        if (index === itemIndex && item.materials.length > 0) {
+          console.log("ifff itemIndex materialIndex", {
+            itemIndex,
+            materialIndex,
+          });
           const materials = item.materials.filter(
             (_, i) => i !== materialIndex,
           );
@@ -165,6 +169,7 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
         }
         return item;
       });
+
       return { items };
     });
   },

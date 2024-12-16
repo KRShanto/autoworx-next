@@ -1,19 +1,20 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Header from "../components/Header";
-import WorkOrders from "../components/WorkOrders";
-import Pipelines from "../components/Pipelines";
 import { getColumnsByType } from "@/actions/pipelines/pipelinesColumn";
-import { getCompanyUser } from "@/actions/user/getCompanyUser";
+import { useEffect, useState } from "react";
+import Header from "../components/Header";
 
-import UserTypes from "@/types/userTypes";
+import { getLeads } from "@/actions/pipelines/getLeads";
+import SessionUserType from "@/types/sessionUserType";
+import { useRouter, useSearchParams } from "next/navigation";
+
+import { SalesLead, SalesPipelineData } from "@/types/invoiceLead";
+import { Lead } from "@prisma/client";
+import Leads from "../components/Leads";
+import SalesPipeline from "../components/SalesPipeline";
 type Props = {
   searchParams?: { view?: string };
 };
-
-
-
 
 interface Column {
   id: number | null;
@@ -23,15 +24,21 @@ interface Column {
 }
 
 const Page = (props: Props) => {
-  const activeView = props.searchParams?.view ?? "workOrders";
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const columnType = "sales";
 
+  const initialView = searchParams.get("view") || "workOrders";
+  const [activeView, setActiveView] = useState(initialView);
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
-  const [usersType, setUsersType] = useState<UserTypes[]>([]);
+  const [currentUser, setCurrentUser] = useState<SessionUserType>();
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [pipelineData, setPipelineData] = useState<SalesPipelineData[]>([]);
 
   useEffect(() => {
     const fetchShopColumns = async () => {
-      const columns = await getColumnsByType("sales");
+      const columns = await getColumnsByType(columnType);
       setPipelineColumns(columns);
     };
 
@@ -39,18 +46,63 @@ const Page = (props: Props) => {
   }, []);
 
   useEffect(() => {
-    const fetchUserTypes = async () => {
-      const fetchedUsersType = await getCompanyUser();
-
-      setUsersType(fetchedUsersType);
+    const fetchUser = async () => {
+      const response = await fetch("/api/getUser");
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setCurrentUser(data);
+      }
     };
-
-    fetchUserTypes();
+    fetchUser();
   }, []);
 
-  console.warn(usersType);
+  useEffect(() => {
+    const fetchLeads = async () => {
+      const responseLead = await getLeads();
+      setLeads(responseLead);
+    };
+
+    fetchLeads(); // initial fetch
+
+    const intervalId = setInterval(fetchLeads, 3000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+  // console.warn(usersType);
+  console.log("leads", leads);
+
+  useEffect(() => {
+    if (leads && pipelineColumns) {
+      const transformedLeads: SalesLead[] = leads.map((lead) => ({
+        leadId: lead.id,
+        name: lead.clientName ?? "".trim(),
+        email: lead.clientEmail ?? "",
+        phone: lead.clientPhone ?? "",
+        vehicle: lead.vehicleInfo ?? "".trim(),
+        services: lead.services,
+        source: lead.source,
+        comments: lead.comments,
+        createdAt: new Date(lead.createdAt).toDateString(),
+        companyId: lead.companyId,
+      }));
+
+      const updatedPipelineData = pipelineColumns.map((column) => ({
+        id: column.id,
+        title: column.title,
+        leads: column.title === "New Leads" ? transformedLeads : [],
+      }));
+
+      setPipelineData(updatedPipelineData);
+    }
+  }, [leads, pipelineColumns]);
   const handleColumnsUpdate = async ({ columns }: { columns: Column[] }) => {
     setPipelineColumns(columns);
+  };
+
+  const handleViewChange = (view: string) => {
+    setActiveView(view);
+    router.replace(`?view=${view}`);
   };
   const type = "Sales Pipelines";
 
@@ -62,17 +114,17 @@ const Page = (props: Props) => {
         columns={pipelineColumns}
         onColumnsUpdate={handleColumnsUpdate}
         type={columnType}
-        usersType={usersType}
+        currentUser={currentUser}
+        onViewChange={handleViewChange}
       />
 
       {activeView === "pipelines" ? (
-        <Pipelines
+        <SalesPipeline
           pipelinesTitle={type}
-          columns={pipelineColumns}
-          usersType={usersType}
+          salesPipelineDataProp={pipelineData}
         />
       ) : (
-        <WorkOrders type={columnType} />
+        <Leads type={columnType} />
       )}
     </div>
   );

@@ -10,12 +10,12 @@ import {
   DialogTrigger,
 } from "@/components/Dialog";
 import FormError from "@/components/FormError";
+import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { useState } from "react";
-import { useProduct as productUse } from "../../actions/inventory/useProduct";
-import Selector from "@/components/Selector";
 import { InventoryProductType } from "@prisma/client";
+import { useEffect, useState } from "react";
+import { useProduct as productUse } from "../../actions/inventory/useProduct";
 
 export default function UseProductForm({
   productId,
@@ -47,8 +47,14 @@ export default function UseProductForm({
 
     if (res.type === "success") {
       setOpen(false);
+      setInvoiceId(null);
     }
   }
+
+  // Whenever `open` changes, set `invoiceId` to null
+  useEffect(() => {
+    setInvoiceId(null);
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -58,9 +64,11 @@ export default function UseProductForm({
         </button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-full w-[30rem] max-w-xl" form>
+      <DialogContent className="max-h-full w-[96%] max-w-xl md:w-[30rem]" form>
         <DialogHeader>
-          <DialogTitle>Use Product</DialogTitle>
+          <DialogTitle>
+            {productType === "Product" ? "Loss" : "Use"} Product
+          </DialogTitle>
         </DialogHeader>
 
         <FormError />
@@ -99,7 +107,7 @@ export default function UseProductForm({
               id="notes"
               name="notes"
               required={false}
-              className="h-28 w-full rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6 outline-none"
+              className="h-28 w-full rounded-sm border border-primary-foreground border-slate-400 bg-white px-2 py-0.5 leading-6 outline-none"
             />
           </div>
         </div>

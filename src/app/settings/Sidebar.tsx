@@ -38,10 +38,6 @@ const businessSettings = [
     label: "Payments",
   },
   {
-    link: "/settings/calendar",
-    label: "Calendar",
-  },
-  {
     link: "/settings/estimates",
     label: "Estimates & Invoice",
   },

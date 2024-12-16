@@ -1,8 +1,11 @@
 "use server";
-import { db } from "@/lib/db";
-import { z } from "zod";
 import { getCompanyId } from "@/lib/companyId";
+import { db } from "@/lib/db";
+import getUser from "@/lib/getUser";
+import { planObject } from "@/utils/planObject";
 import { CompanyEmailTemplate, Prisma } from "@prisma/client";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 const EmailTemplateSchema = z.object({
   subject: z.string().min(1, "Subject is required"),
@@ -42,8 +45,28 @@ export const getOrCreateEmailTemplate =
       throw error;
     }
   };
+
+export const getEmailTemplate =
+  async (): Promise<CompanyEmailTemplate | null> => {
+    try {
+      const companyId = await getCompanyId(); // Get the company ID
+      let template = await db.companyEmailTemplate.findFirst({
+        where: { companyId },
+      });
+
+      if (!template) {
+        return null;
+      }
+
+      return template;
+    } catch (error) {
+      console.error("Error fetching/creating email template:", error);
+      throw error;
+    }
+  };
+
 export const updateEmailTemplate = async (
-  id: number,
+  id: number | null,
   emailTemplateData: unknown,
 ) => {
   try {
@@ -51,16 +74,27 @@ export const updateEmailTemplate = async (
       EmailTemplateSchema,
       emailTemplateData,
     );
-    const companyId = await getCompanyId();
-    const updatedTemplate = await db.companyEmailTemplate.update({
-      where: { id },
-      data: {
-        subject: validatedData.subject,
-        message: validatedData.message,
-        companyId,
-      },
-    });
-
+    const user = await getUser();
+    let updatedTemplate;
+    if (id) {
+      updatedTemplate = await db.companyEmailTemplate.update({
+        where: { id },
+        data: {
+          subject: validatedData.subject,
+          message: validatedData.message,
+          companyId: user.companyId,
+        },
+      });
+    } else {
+      updatedTemplate = await db.companyEmailTemplate.create({
+        data: {
+          subject: validatedData.subject,
+          message: validatedData.message,
+          companyId: user.companyId,
+        },
+      });
+    }
+    revalidatePath("/estimate");
     return updatedTemplate;
   } catch (error: any) {
     console.error("Error updating email template:", error);
@@ -69,19 +103,21 @@ export const updateEmailTemplate = async (
 };
 
 const companyTaxUpdatesTSchema = z.object({
-  tax: z.string().transform((val) => {
+  tax: z.union([z.string(), z.number()]).transform((val) => {
     return new Prisma.Decimal(val);
   }),
   currency: z.string().min(1, "Currency is required"),
 });
 
-export const updateTaxCurrency = async (
-  data: z.infer<typeof companyTaxUpdatesTSchema>,
-) => {
+export const updateTaxCurrency = async (data: {
+  tax: string | number;
+  currency: string;
+}) => {
   const dataValidation = companyTaxUpdatesTSchema.safeParse(data);
 
   if (!dataValidation.success) {
     console.log("Update tax policy error", dataValidation.error);
+    throw new Error("Invalid input data");
   }
 
   const validatedData = dataValidation.data;
@@ -129,27 +165,49 @@ export const updateTermsPolicy = async (
   }
 };
 
-export const getCompanyTermsAndPolicy = async (): Promise<{
+export const getCompanyTermsAndPolicyTax = async (): Promise<{
   terms: string;
   policy: string;
+  tax: Prisma.Decimal;
 }> => {
   try {
     const companyId = await getCompanyId();
     const companyData = await db.company.findUnique({
       where: { id: companyId },
-      select: { terms: true, policy: true },
+      select: { terms: true, policy: true, tax: true },
     });
 
     if (!companyData) {
       throw new Error("Company not found");
     }
 
-    return {
+  return planObject({
       terms: companyData.terms ?? "",
       policy: companyData.policy ?? "",
-    };
+      tax: companyData.tax ?? new Prisma.Decimal(0),
+    });
   } catch (error) {
     console.error("Error fetching company terms and policy:", error);
+    throw error;
+  }
+};
+
+export const getCompanyTaxCurrency = async (): Promise<{ tax: number }> => {
+  try {
+    const companyId = await getCompanyId();
+    const companyData = await db.company.findUnique({
+      where: { id: companyId },
+      select: { tax: true },
+    });
+    if (!companyData) {
+      throw new Error("Company not found");
+    }
+
+    return {
+      tax: companyData.tax ? companyData.tax.toNumber() : 0,
+    };
+  } catch (error) {
+    console.error("Error fetching company tax:", error);
     throw error;
   }
 };

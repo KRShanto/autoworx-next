@@ -1,14 +1,22 @@
 "use client";
 
-import { SearchOutlined } from "@ant-design/icons";
-
+import { DropdownSelection } from "@/components/DropDownSelection";
 import DateRange from "../../../components/DateRange";
 import Filter from "./Filter";
 import Search from "./Search";
 import { useEmployeeWorkFilterStore } from "@/stores/employeeWorkFilter";
 
-export default function FilterComp() {
-  const { setFilter } = useEmployeeWorkFilterStore();
+type TProps = {
+  service: string[];
+  category: string[];
+};
+
+export default function FilterComp({ service, category }: TProps) {
+  const {
+    setFilter,
+    category: selectedCategory,
+    service: selectedService,
+  } = useEmployeeWorkFilterStore();
 
   return (
     <div className="mt-5 flex w-full items-center justify-between">
@@ -29,20 +37,22 @@ export default function FilterComp() {
         </div>
       </div>
 
-      <div className="mr-4 flex gap-4">
+      <div className="mr-4 flex gap-10">
         <div className="relative">
-          <select className="rounded border border-gray-300 p-2">
-            <option value="">Category</option>
-            <option value="option1">Option 1</option>
-            <option value="option2">Option 2</option>
-          </select>
+          <DropdownSelection
+            dropDownValues={category}
+            onValueChange={(value) => setFilter({ category: value })}
+            changesValue={selectedCategory}
+            defaultValue="Category"
+          />
         </div>
         <div className="relative">
-          <select className="rounded border border-gray-300 p-2">
-            <option value="">Service</option>
-            <option value="option1">Option 1</option>
-            <option value="option2">Option 2</option>
-          </select>
+          <DropdownSelection
+            dropDownValues={service}
+            onValueChange={(value) => setFilter({ service: value })}
+            changesValue={selectedService}
+            defaultValue="Service"
+          />
         </div>
       </div>
     </div>

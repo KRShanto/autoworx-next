@@ -1,10 +1,10 @@
 "use server";
-import fs from "fs";
 import { createTask } from "@/actions/task/createTask";
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
-import { Labor, Material, Service, Tag } from "@prisma/client";
+import { InvoiceType, Labor, Material, Service, Tag } from "@prisma/client";
+import fs from "fs";
 import { revalidatePath } from "next/cache";
 
 interface UpdateEstimateInput {
@@ -12,7 +12,8 @@ interface UpdateEstimateInput {
 
   clientId: number | undefined;
   vehicleId: number | undefined;
-  statusId: number | undefined;
+
+  columnId: number | undefined;
 
   subtotal: number;
   discount: number;
@@ -37,6 +38,7 @@ interface UpdateEstimateInput {
     tags: Tag[];
   }[];
   tasks: { id: undefined | number; task: string }[];
+  type: InvoiceType;
 }
 
 export async function updateInvoice(
@@ -143,6 +145,32 @@ export async function updateInvoice(
     );
   }
 
+  if (data.columnId) {
+    const column = await db.column.findUnique({
+      where: { id: data.columnId },
+    });
+
+    if (column) {
+      data.type = column.title === "In Progress" ? "Invoice" : data.type;
+    } else {
+      data.columnId = undefined;
+      data.type = "Estimate";
+    }
+  }
+  // re-calculating the profit
+  const totalCost = data.items.reduce((acc, item) => {
+    const materials = item.materials;
+    const labor = item.labor;
+
+    const materialCost = materials.reduce((acc, material) => {
+      return acc + Number(material?.cost) * Number(material?.quantity);
+    }, 0);
+
+    const laborCost = Number(labor?.charge) * Number(labor?.hours);
+
+    return acc + materialCost + laborCost;
+  }, 0);
+
   // update invoice itself
   const updatedInvoice = await db.invoice.update({
     where: {
@@ -151,7 +179,8 @@ export async function updateInvoice(
     data: {
       clientId: data.clientId,
       vehicleId: data.vehicleId,
-      statusId: data.statusId,
+      profit: data.grandTotal - totalCost,
+      columnId: data.columnId ?? null,
       subtotal: data.subtotal,
       discount: data.discount,
       tax: data.tax,
@@ -165,6 +194,7 @@ export async function updateInvoice(
       policy: data.policy,
       customerNotes: data.customerNotes,
       customerComments: data.customerComments,
+      type: data.type,
     },
   });
 
@@ -213,12 +243,47 @@ export async function updateInvoice(
     const labor = item.labor;
     const tags = item.tags;
 
+    let laborId;
+    // delete existing labors
+    if (labor) {
+      const existingLabor = await db.labor.findUnique({
+        where: {
+          id: labor.id,
+        },
+      });
+
+      if (existingLabor) {
+        await db.labor.delete({
+          where: {
+            id: labor.id,
+          },
+        });
+      }
+    }
+
+    // create new labor
+    if (labor) {
+      const newLabor = await db.labor.create({
+        data: {
+          name: labor.name,
+          categoryId: labor.categoryId,
+          notes: labor.notes,
+          hours: labor.hours,
+          charge: labor.charge,
+          discount: labor.discount,
+          companyId,
+        },
+      });
+
+      laborId = newLabor.id;
+    }
+
     // create new items
     const invoiceItem = await db.invoiceItem.create({
       data: {
         invoiceId: data.id,
         serviceId: service?.id,
-        laborId: labor?.id,
+        laborId,
       },
     });
 
@@ -270,6 +335,7 @@ export async function updateInvoice(
         assignedUsers: [],
         priority: "Medium",
         invoiceId: data.id,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
     } else {
       // if task.id is not undefined, update the task

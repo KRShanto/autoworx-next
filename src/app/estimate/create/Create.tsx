@@ -1,12 +1,12 @@
 "use client";
 
-import { useEstimatePopupStore } from "@/stores/estimate-popup";
-import ServiceCreate from "./ServiceCreate";
-import MaterialCreate from "./MaterialCreate";
-import LaborCreate from "./LaborCreate";
 import { useEstimateCreateStore } from "@/stores/estimate-create";
+import { useEstimatePopupStore } from "@/stores/estimate-popup";
 import { useState } from "react";
-import { FaChevronUp, FaChevronDown } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import LaborCreate from "./LaborCreate";
+import MaterialCreate from "./MaterialCreate";
+import ServiceCreate from "./ServiceCreate";
 
 export default function Create() {
   const { type } = useEstimatePopupStore();
@@ -25,14 +25,14 @@ export default function Create() {
           return (
             acc +
             (material && material.sell
-              ? parseFloat(material.sell.toString()) * material.quantity! -
-                parseFloat(material.discount?.toString()!)
+              ? parseFloat(material.sell.toString()) * material.quantity!
               : 0)
           );
         }, 0);
 
         const laborCost = item.labor?.charge
-          ? parseFloat(item.labor?.charge.toString()) * item.labor?.hours!
+          ? parseFloat(item.labor?.charge.toString()) *
+            Number(item.labor?.hours)
           : 0;
 
         return (
@@ -70,8 +70,7 @@ export default function Create() {
                             ${" "}
                             {material.sell
                               ? parseFloat(material.sell.toString()) *
-                                  material.quantity! -
-                                parseFloat(material.discount?.toString()!)
+                                material.quantity!
                               : 0}
                           </p>
                         </div>
@@ -87,7 +86,7 @@ export default function Create() {
                       $
                       {item.labor?.charge
                         ? parseFloat(item.labor?.charge.toString()) *
-                          item.labor?.hours!
+                          Number(item.labor?.hours)
                         : 0}
                     </p>
                   </div>

@@ -3,10 +3,10 @@
 import Selector from "@/components/Selector";
 import { useListsStore } from "@/stores/lists";
 import { Vehicle } from "@prisma/client";
+import {  useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NewVehicle from "./NewVehicle";
 import { SelectProps } from "./select-props";
-import { useSearchParams } from "next/navigation";
 
 export function SelectVehicle({
   name = "vehicleId",
@@ -14,6 +14,7 @@ export function SelectVehicle({
   setValue,
   openDropdown,
   setOpenDropdown,
+  invoice = null,
 }: SelectProps<Vehicle | null>) {
   const state = useState(value);
   const [vehicle, setVehicle] = setValue ? [value, setValue] : state;
@@ -39,28 +40,45 @@ export function SelectVehicle({
   // Select vehicle when client changes
   // Select the first vehicle that belongs to the client
   // If there are no vehicles, set vehicle to null
-  useEffect(() => {
-    if (clientId) {
-      const clientVehicles = vehicleList.filter(
-        (vehicle) => vehicle.clientId === +clientId,
-      );
 
+  useEffect(() => {
+    const clientVehicles = clientId
+      ? vehicleList.filter((vehicle) => vehicle.clientId === +clientId)
+      : [];
+    if (clientId && !invoice) {
       if (clientVehicles.length > 0) {
         setVehicle(clientVehicles[0]);
       } else {
         setVehicle(null);
       }
+    } else if (invoice && clientId) {
+      // TODO: Fetch vehicle from estimate
+      const findVehicleInEstimate = vehicleList.find(
+        (vehicle) =>
+          vehicle.id === invoice?.vehicleId && vehicle.clientId === +clientId,
+      );
+      if (findVehicleInEstimate) {
+        setVehicle(findVehicleInEstimate);
+      } else {
+        if (clientVehicles.length > 0) {
+          setVehicle(clientVehicles[0]);
+        } else {
+          setVehicle(null);
+        }
+      }
     }
-  }, [clientId]);
+  }, [clientId, vehicleList]);
 
   return (
     <>
       <input type="hidden" name={name} value={vehicle?.id ?? ""} />
 
       <Selector
-        disabledDropdown={clientId ? false : true}
+        disabledDropdown={clientId && !vehicle?.fromRequest ? false : true}
         label={(vehicle: Vehicle | null) =>
-          vehicle ? vehicle.model || `Vehicle ${vehicle.id}` : "Vehicle"
+          vehicle
+            ? `${vehicle.year?.toString()} ${vehicle?.make} ${vehicle?.model}`
+            : "Vehicle"
         }
         newButton={<NewVehicle />}
         items={vehicleList.filter((vehicle) => vehicle.clientId === +clientId!)}
@@ -75,7 +93,11 @@ export function SelectVehicle({
         ]}
         selectedItem={vehicle}
         setSelectedItem={setVehicle}
-        displayList={(item) => <p>{item.model}</p>}
+        displayList={(item) => {
+          return (
+            <p>{`${item.year?.toString()} ${item?.make} ${item?.model}`}</p>
+          );
+        }}
       />
     </>
   );

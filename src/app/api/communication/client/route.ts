@@ -132,9 +132,8 @@ function webStreamToNodeStream(
 }
 
 // Helper function to create the email content (with attachment if needed)
-function makeEmail({ to, from, subject, text, file }: any) {
+function makeEmail({ to, subject, text, file }: any) {
   let message = [
-    `From: ${from}`,
     `To: ${to}`,
     `Subject: ${subject}`,
     "MIME-Version: 1.0",
@@ -210,7 +209,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       process.env.GMAIL_CLIENT_SECRET,
       `${env("NEXT_PUBLIC_APP_URL")}/communication/client/auth`,
     );
-    // let refreshToken = (cookies().get("gmail_refresh_token")?.value || "") as string;
 
     const company = await db.company.findFirst({
       where: { id: client.companyId },
@@ -230,7 +228,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Create the email content
     const rawMessage = makeEmail({
       to: client.email,
-      from: process.env.GMAIL_USER as string,
       subject: subject,
       text: text,
       file: file

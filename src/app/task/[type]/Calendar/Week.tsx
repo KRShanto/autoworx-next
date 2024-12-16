@@ -35,16 +35,64 @@ import DraggableTaskTooltip from "../components/day/draggable/DraggableTaskToolt
 
 function useWeek() {
   const searchParams = useSearchParams();
-  const week = moment(searchParams.get("week"), moment.HTML5_FMT.WEEK);
+  const week = moment.utc(searchParams.get("week"), moment.HTML5_FMT.WEEK);
   return week.isValid() ? week : moment();
 }
 
 // Generate the hourly rows
-const hourlyRows = Array.from({ length: 24 }, (_, i) => [
-  `${i + 1 > 12 ? i + 1 - 12 : i + 1} ${i + 1 >= 12 ? "PM" : "AM"}`,
-  // empty cells
-  ...Array.from({ length: 7 }, () => ""),
-]);
+const hourlyRows = Array.from({ length: 24 }, (_, i) => {
+  const emptyCells = Array.from({ length: 7 }, () => "");
+  if (i === 0) {
+    return ["12 AM", ...emptyCells];
+  } else if (i < 12) {
+    return [`${i} AM`, ...emptyCells]; // 1 AM to 11 AM
+  } else if (i === 12) {
+    return ["12 PM", ...emptyCells]; // Noon
+  } else if (i < 24) {
+    return [`${i - 12} PM`, ...emptyCells]; // 1 PM to 11 PM
+  } else {
+    return ["12 AM", ...emptyCells]; // Midnight of the next day
+  }
+});
+
+function getNext7Days(startDayName: string, today: Date) {
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  const currentDate = new Date(today);
+  const currentDayIndex = currentDate.getDay(); // Day index of today
+  const targetDayIndex = daysOfWeek.findIndex(
+    (day) => day.toLowerCase() === startDayName.toLowerCase(),
+  );
+
+  if (targetDayIndex === -1) {
+    throw new Error("Invalid day name!");
+  }
+
+  // Find the starting date for the given day name
+  const daysUntilTarget = (targetDayIndex - currentDayIndex) % 7; // Distance to the next target day
+  const startDate = new Date(today);
+  startDate.setDate(currentDate.getDate() + daysUntilTarget); // Adjust to the start day
+
+  // Generate next 7 days with names and dates
+  const weekWithDates = [];
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(startDate);
+    day.setDate(startDate.getDate() + i); // Increment by `i` days
+    weekWithDates.push({
+      dayName: daysOfWeek[day.getDay()],
+      date: day.toDateString(),
+    });
+  }
+
+  return weekWithDates;
+}
 
 export default function Week({
   tasks,
@@ -105,42 +153,40 @@ export default function Week({
 
   const weekStart = settings?.weekStart || "Sunday";
   const parentRef = useRef<HTMLDivElement>(null);
+  const clientTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   // Get the days of the week based on the weekStart
   const days = useMemo(() => {
-    const days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-
-    const start = days.indexOf(weekStart);
-
-    return [...days.slice(start), ...days.slice(0, start)] as typeof days;
-  }, [weekStart]);
+    let sevenDaysWeek = getNext7Days(weekStart, today);
+    const weekStartDate = sevenDaysWeek[0].date;
+    const weekEndDate = sevenDaysWeek[6].date;
+    if (!week.isBetween(weekStartDate, weekEndDate, "day", "[]")) {
+      const back7Days = week.clone().subtract(7, "days").toDate();
+      sevenDaysWeek = getNext7Days(weekStart, back7Days);
+    }
+    return sevenDaysWeek;
+  }, [weekStart, today]);
 
   // Generate the all-day row
   const allDayRow = [
     "",
     // Generate the days of the week with the date
-    ...Array.from({ length: 7 }, (_, i) => {
-      const date = new Date(today);
-      date.setDate(today.getDate() - today.getDay() + i);
+    ...days.map((day) => {
+      const date = new Date(day.date);
       return (
         <div
-          key={i}
+          key={day.dayName}
           className="flex flex-col items-center justify-center text-sm"
         >
-          <span className="text-[17px] font-semibold">
-            {days[date.getDay()]}
-          </span>
+          <span className="text-[17px] font-semibold">{day.dayName}</span>
           <div className="space-x-1 text-sm font-normal">
             <span>{date.getDate()}</span>
-            <span>{date.toLocaleDateString("en-US", { month: "short" })}</span>
+            <span>
+              {date.toLocaleString("en-US", {
+                timeZone: clientTimezone,
+                month: "short",
+              })}
+            </span>
           </div>
         </div>
       );
@@ -163,8 +209,8 @@ export default function Week({
     })[]
   >(() => {
     // Get the start and end of the current week
-    const startOfWeek = week.startOf("week").toDate();
-    const endOfWeek = week.endOf("week").toDate();
+    const startOfWeek = moment(days[0].date);
+    const endOfWeek = moment(days[days.length - 1].date);
 
     return [
       ...tasks.map((task) => ({ ...task, type: "task" as any })),
@@ -174,12 +220,20 @@ export default function Week({
       })),
     ]
       .filter((task) => {
-        const taskDate = new Date(task.date as any);
-        return taskDate >= startOfWeek && taskDate <= endOfWeek;
+        const taskDate = moment.utc(task.date as any);
+        return taskDate.isBetween(startOfWeek, endOfWeek, "day", "[]");
       })
       .map((event) => {
-        const taskDate = new Date(event.date as any);
-        const columnIndex = taskDate.getDay() - startOfWeek.getDay();
+        const taskDate = moment.utc(event.date as any);
+        const taskDayName = taskDate.format("dddd");
+        const weekStartDayName = startOfWeek.format("dddd");
+        const findTaskDayIndex = days.findIndex(
+          (day) => day.dayName === taskDayName,
+        );
+        const findWeekStartDayIndex = days.findIndex(
+          (day) => day.dayName === weekStartDayName,
+        );
+        const columnIndex = findTaskDayIndex - findWeekStartDayIndex;
 
         // Convert the taskStartTime and taskEndTime to a format like "1 PM" or "11 AM"
         const taskStartTime = moment(event.startTime, "HH:mm").format("h A");
@@ -195,7 +249,7 @@ export default function Week({
 
         return { ...event, columnIndex, rowStartIndex, rowEndIndex };
       });
-  }, [tasks, appointments, week]);
+  }, [tasks, appointments, week, days]);
 
   async function handleDrop(
     event: React.DragEvent,
@@ -206,11 +260,9 @@ export default function Week({
     if (rowTime === "All Day" || columnIndex === 0) return;
     const startTime = formatTime(hourlyRows[rowIndex - 1]?.[0]);
     const endTime = formatTime(hourlyRows[rowIndex][0]);
-    const date = formatDate(
-      new Date(
-        today.setDate(today.getDate() - today.getDay() + columnIndex - 1),
-      ),
-    );
+
+    const findDate = days.find((day, index) => index === columnIndex - 1);
+    const date = formatDate(new Date(findDate?.date!));
     // Get the task type
     const attributeData = event.dataTransfer.getData("text/plain").split("|");
     const type = attributeData[0];
@@ -228,13 +280,13 @@ export default function Week({
       );
       const oldTask = tasks.find((task) => task.id === taskId);
       if (taskFoundWithoutTime) {
-        // Add task to database
+        // TODO: Add task to database
         await updateTask({
           id: taskFoundWithoutTime.id,
           date: date ? new Date(date) : new Date(),
-
           startTime: oldTask?.startTime || startTime,
           endTime: oldTask?.endTime || endTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       } else {
         const { newStartTime, newEndTime } = updateTimeSpace(
@@ -242,11 +294,13 @@ export default function Week({
           oldTask?.endTime as string,
           rowTime,
         );
+        // TODO:
         await updateTask({
           id: oldTask?.id!,
           date: new Date(date),
           startTime: newStartTime,
           endTime: newEndTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       }
     } else if (type === "appointment") {
@@ -267,10 +321,12 @@ export default function Week({
           date,
           startTime: newStartTime,
           endTime: newEndTime,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
       }
     }
   }
+  // event sorted by type
   const sortedEvents = events.slice().sort((a, b) => {
     const aRowStartIndex = a.rowStartIndex;
     const aRowEndIndex = a.rowEndIndex;

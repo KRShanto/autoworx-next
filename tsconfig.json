@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -29,6 +30,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "jest.config.ts"
-  ],
+, "src/app/(home)/components/first", "src/app/pipeline/shop/shopPipelineLayout.tsc"  ],
   "exclude": ["node_modules"]
 }

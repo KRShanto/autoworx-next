@@ -6,10 +6,10 @@ import React, { useState } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import LaborItems from "./LaborItems";
 import ReDoModal from "./ReDoModal";
+import { Technician } from "@prisma/client";
 
-export function InvoiceItems({
-  items,
-}: {
+type TProps = {
+  invoiceTechnicians: (Technician & { name: string })[];
   items: Awaited<
     ReturnType<
       typeof db.invoiceItem.findMany<{
@@ -21,7 +21,9 @@ export function InvoiceItems({
       }>
     >
   >;
-}) {
+};
+
+export function InvoiceItems({ items, invoiceTechnicians }: TProps) {
   const [openService, setOpenService] = useState<number | null>(null);
   return items.map((item) => {
     if (!item.service) return null;
@@ -32,13 +34,22 @@ export function InvoiceItems({
       >
         <div
           className={cn(
-            "flex w-full justify-between text-[#6571FF]",
+            "flex w-full cursor-pointer justify-between text-[#6571FF]",
             openService && "border-b py-2",
           )}
+          onClick={() =>
+            setOpenService(openService === item.id ? null : item.id)
+          }
         >
           <p className="px-5">{item.service.name}</p>
           <div className="mr-5 flex items-center space-x-3">
-            <ReDoModal />
+            {invoiceTechnicians.length > 0 && (
+              <ReDoModal
+                invoiceId={item?.invoiceId as string}
+                serviceId={item?.serviceId as number}
+                technicians={invoiceTechnicians}
+              />
+            )}
             <button
               type="button"
               onClick={() =>
@@ -64,7 +75,7 @@ export function InvoiceItems({
             </div>
 
             <LaborItems
-              invoiceId={item.invoiceId as string}
+              invoiceId={item?.invoiceId as string}
               serviceId={item?.serviceId as number}
             />
           </div>

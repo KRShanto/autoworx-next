@@ -1,17 +1,13 @@
-import Calculation from "../../components/Calculation";
-import FilterBySearchBox from "../../components/filter/FilterBySearchBox";
-import FilterByDateRange from "../../components/filter/FilterByDateRange";
-import Link from "next/link";
-import { cn } from "@/lib/cn";
-import FilterBySelection from "../../components/filter/FilterBySelection";
 import Analytics from "./Analytics";
-import FilterByMultiple from "../../components/filter/FilterByMultiple";
 import { db } from "@/lib/db";
 import { InventoryProductType } from "@prisma/client";
 import moment from "moment";
 import CalculationContainer from "./CalculationContainer";
 import { Suspense } from "react";
 import InventoryTableRow from "./InventoryTableRow";
+import FilterHeader from "./FilterHeader";
+import { auth } from "@/app/auth";
+import { AuthSession } from "@/types/auth";
 type TProps = {
   searchParams: {
     category?: string;
@@ -54,18 +50,11 @@ const filterMultipleSliders: TSliderData[] = [
   },
 ];
 
-const ProductType = {
-  supply: "Supply",
-  product: "Product",
-};
-
 export default async function InventoryReportPage({ searchParams }: TProps) {
+  const session = (await auth()) as AuthSession | null;
+
   const filterOR = [];
-  if (searchParams.category) {
-    filterOR.push({
-      type: searchParams.category as InventoryProductType,
-    });
-  } else if (searchParams.startDate && searchParams.endDate) {
+  if (searchParams.startDate && searchParams.endDate) {
     const formattedStartDate =
       searchParams.startDate &&
       moment(decodeURIComponent(searchParams.startDate!), "MM-DD-YYYY").format(
@@ -90,8 +79,13 @@ export default async function InventoryReportPage({ searchParams }: TProps) {
     where: {
       OR: filterOR.length ? filterOR : undefined,
       name: { contains: searchParams.search },
+      companyId: session?.user?.companyId,
+      category: {
+        name: searchParams?.category ? searchParams.category : undefined,
+      },
     },
     include: {
+      category: true,
       InventoryProductHistory: {
         where: {
           type: "Sale",
@@ -99,50 +93,35 @@ export default async function InventoryReportPage({ searchParams }: TProps) {
       },
     },
   });
+
+  const getCategory = Array.from(
+    new Set(inventoryProducts.map((product) => `${product?.category?.name}`)),
+  ).map((uniqueName) => uniqueName);
+
   return (
     <div className="space-y-5">
       <Suspense fallback="loading...">
         <CalculationContainer />
       </Suspense>
       {/* filter section */}
-      <div className="flex w-full items-center justify-between gap-x-3">
-        <div className="flex flex-1 items-center space-x-4">
-          <FilterBySearchBox searchText={searchParams.search as string} />
-          <FilterByDateRange
-            startDate={decodeURIComponent(searchParams.startDate as string)}
-            endDate={decodeURIComponent(searchParams.endDate as string)}
-          />
-        </div>
-        <div className="flex items-center space-x-4">
-          <FilterByMultiple
-            searchParamsValue={searchParams}
-            filterSliders={filterMultipleSliders}
-          />
-          <FilterBySelection
-            selectedItem={searchParams?.category as string}
-            items={Object.values(ProductType)}
-            type="category"
-          />
-          <FilterBySelection
-            selectedItem={searchParams?.service as string}
-            items={["washing", "changing wheel", "full service"]}
-            type="service"
-          />
-        </div>
-      </div>
+      <FilterHeader
+        searchParams={searchParams}
+        filterMultipleSliders={filterMultipleSliders}
+        getCategory={getCategory}
+      />
       {/* Table */}
       <div>
         <table className="w-full shadow-md">
           <thead className="bg-white">
             <tr className="h-10 border-b">
-              <th className="border-b px-4 py-2 text-center">Product #</th>
-              <th className="border-b px-4 py-2 text-center">Name </th>
-              <th className="border-b px-4 py-2 text-center">Average Cost</th>
-              <th className="border-b px-4 py-2 text-center">Average Sell</th>
-              <th className="border-b px-4 py-2 text-center">Stock Qty.</th>
-              <th className="border-b px-4 py-2 text-center">Qty. Sold</th>
-              <th className="border-b px-4 py-2 text-center">Type</th>
-              <th className="border-b px-4 py-2 text-center">ROI Average</th>
+              <th className="border-b px-4 py-2 text-left">Product #</th>
+              <th className="border-b px-4 py-2 text-left">Name </th>
+              <th className="border-b px-4 py-2 text-left">Average Cost</th>
+              <th className="border-b px-4 py-2 text-left">Average Sell</th>
+              <th className="border-b px-4 py-2 text-left">Stock Qty.</th>
+              <th className="border-b px-4 py-2 text-left">Qty. Sold</th>
+              <th className="border-b px-4 py-2 text-left">Type</th>
+              <th className="border-b px-4 py-2 text-left">ROI Average</th>
             </tr>
           </thead>
 

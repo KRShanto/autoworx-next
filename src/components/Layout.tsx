@@ -1,11 +1,13 @@
 "use client";
 
+import { EmployeeType } from "@prisma/client";
 import { Session } from "next-auth";
 import { redirect, usePathname } from "next/navigation";
+import MobileNav from "./mobile-responsive/MobileNav";
 import PopupState from "./PopupState";
+import PrivateRoute from "./PrivateRoute";
 import SideNavbar from "./SideNavbar";
 import TopNavbar from "./TopNavbar";
-import MobileNav from "./mobile-responsive/MobileNav";
 
 const navList = [
   {
@@ -40,7 +42,7 @@ const navList = [
         link: "/pipeline/shop",
       },
       {
-        title: "Seles Pipeline",
+        title: "Sales Pipeline",
         link: "/pipeline/sales",
       },
     ],
@@ -104,21 +106,26 @@ export default function Layout({
   session,
 }: {
   children: React.ReactNode;
-  session: Session | null;
+  session: (Session & { user: { employeeType: string } }) | null;
 }) {
   const pathname = usePathname();
 
   // Check if the user is logged in
-  if (!session && pathname !== "/login" && pathname !== "/register")
+  if (
+    !session &&
+    pathname !== "/login" &&
+    pathname !== "/register" &&
+    pathname !== "/"
+  )
     redirect("/login");
 
-  // Don't show the navbar if the user is on the login or register page
-  if (pathname === "/login" || pathname === "/register")
-    return (
-      <main className="relative h-[93vh] bg-[#F8F9FA] p-2 px-4">
-        {children}
-      </main>
-    );
+  // Don't show the navbar if the user is on the login or register page or in the home page but not logged in
+  if (
+    pathname === "/login" ||
+    pathname === "/register" ||
+    (pathname === "/" && !session)
+  )
+    return <main>{children}</main>;
 
   return (
     <div className="w-full overflow-y-hidden">
@@ -127,9 +134,8 @@ export default function Layout({
       <div className="sm:ml-[5%]">
         <TopNavbar />
         <PopupState />
-
-        <main className="relative h-[93vh] bg-[#F8F9FA] sm:p-2 sm:px-4">
-          {children}
+        <main className="relative overflow-y-auto bg-[#F8F9FA] sm:p-2 sm:px-4 md:h-[93vh]">
+          <PrivateRoute session={session}>{children}</PrivateRoute>
         </main>
       </div>
     </div>

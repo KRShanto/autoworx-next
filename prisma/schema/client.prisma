@@ -1,0 +1,54 @@
+// Client of a company.
+// Client is just data, they can't login.
+model Client {
+    id                     Int            @id @default(autoincrement())
+    firstName              String         @map("first_name")
+    lastName               String?        @map("last_name")
+    mobile                 String?
+    email                  String?
+    address                String?
+    city                   String?
+    state                  String?
+    zip                    String?
+    photo                  String         @default("/images/default.png")
+    fromRequest            Boolean?       @default(false) @map("from_request")
+    fromRequestedCompanyId Int?           @map("from_requested_company_id")
+    sourceId               Int?           @map("source_id")
+    companyId              Int            @map("company_id")
+    createdAt              DateTime       @default(now()) @map("created_at")
+    updatedAt              DateTime       @default(now()) @updatedAt @map("updated_at")
+    company                Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    customerCompany        String?        @map("customer_company")
+    tagId                  Int?           @map("tag_id")
+    notes                  String?
+    appointments           Appointment[]
+    source                 Source?        @relation(fields: [sourceId], references: [id])
+    tag                    Tag?           @relation(fields: [tagId], references: [id])
+    Vehicle                Vehicle[]
+    Invoice                Invoice[]
+    ClientCoupon           ClientCoupon[]
+    Task                   Task[]
+
+    @@index([companyId], name: "fk_customers_company")
+    @@map("Client")
+}
+
+model Source {
+    id        Int      @id @default(autoincrement())
+    name      String
+    companyId Int      @map("company_id")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+    company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    Client    Client[]
+}
+
+model ClientCoupon {
+    id        Int      @id @default(autoincrement())
+    couponId  Int      @map("coupon_id")
+    clientId  Int      @map("client_id")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+    coupon    Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+    client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}

@@ -28,7 +28,7 @@ import type {
 } from "@prisma/client";
 import { TimePicker } from "antd";
 import moment from "moment";
-import Image from "next/image";
+import { customAlphabet } from "nanoid";
 import { useCallback, useEffect, useState } from "react";
 import {
   FaChevronLeft,
@@ -39,11 +39,11 @@ import {
 import { TbBell, TbCalendar } from "react-icons/tb";
 import { addAppointment } from "../../../../../actions/appointment/addAppointment";
 import { Reminder } from "./Reminder";
-import { customAlphabet } from "nanoid";
 // @ts-ignore
+import Avatar from "@/components/Avatar";
 import dayjs from "dayjs";
 import { usePathname, useRouter } from "next/navigation";
-import Avatar from "@/components/Avatar";
+import { IoCloseSharp } from "react-icons/io5";
 
 enum Tab {
   Schedule = 0,
@@ -183,6 +183,7 @@ export function NewAppointment({
       confirmationEmailTemplateStatus: confirmationTemplateStatus,
       reminderEmailTemplateStatus: reminderTemplateStatus,
       times,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
 
     if (res.type === "error") {
@@ -212,7 +213,7 @@ export function NewAppointment({
     setReminderTemplateStatus(true);
     setTimes([]);
     // remove the clientId from the url
-    router.push(pathname);
+    // router.push(pathname);
   }
 
   useEffect(() => {
@@ -290,12 +291,12 @@ export function NewAppointment({
             <DialogTitle>New Appointment</DialogTitle>
 
             {/* Options */}
-            <div className="flex items-center justify-self-center rounded-full bg-primary p-1">
+            <div className="flex items-center justify-self-center rounded-full bg-gray-300 p-1">
               <button
                 type="button"
                 className={cn(
                   "rounded-full px-4 py-1 font-semibold",
-                  tab === Tab.Schedule && "bg-background",
+                  tab === Tab.Schedule && "bg-white",
                 )}
                 onClick={() => setTab(Tab.Schedule)}
               >
@@ -307,7 +308,7 @@ export function NewAppointment({
                 type="button"
                 className={cn(
                   "rounded-full px-4 py-1 font-semibold",
-                  tab === Tab.Reminder && "bg-background",
+                  tab === Tab.Reminder && "bg-white",
                 )}
                 onClick={() => setTab(Tab.Reminder)}
               >
@@ -330,7 +331,7 @@ export function NewAppointment({
                   rootClassName="grow"
                   type="date"
                   value={date ?? ""}
-                  required={false}
+                  required
                   onChange={(event) => setDate(event.currentTarget.value)}
                 />
 
@@ -342,6 +343,7 @@ export function NewAppointment({
                       document.getElementById("timer-parent")!
                     }
                     use12Hours
+                    required
                     format="h:mm a"
                     className="rounded-md border border-gray-500 p-1 placeholder-slate-800"
                     needConfirm={false}
@@ -382,11 +384,26 @@ export function NewAppointment({
               {
                 // Assigned users
                 assignedUsers.map((user) => (
-                  <div key={user.id} className="flex items-center gap-4">
-                    <Avatar photo={user.image} width={30} height={30} />
-                    <p>
-                      {user.firstName} {user.lastName}
-                    </p>
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between gap-x-4 rounded-md border border-gray-300 px-4 py-2"
+                  >
+                    <div className="flex items-center gap-x-4">
+                      <Avatar photo={user.image} width={30} height={30} />
+                      <p>
+                        {user.firstName} {user.lastName}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        let filteredAssignedUser = assignedUsers.filter(
+                          (assignedUser) => user.id != assignedUser.id,
+                        );
+                        setAssignedUsers(filteredAssignedUser);
+                      }}
+                    >
+                      <IoCloseSharp size={16} />
+                    </button>
                   </div>
                 ))
               }
@@ -410,7 +427,11 @@ export function NewAppointment({
                   </div>
 
                   {employeesToDisplay
-                    .filter((employee) => !assignedUsers.includes(employee))
+                    .filter(
+                      (employee) =>
+                        !assignedUsers.includes(employee) &&
+                        employee.employeeType == "Sales",
+                    )
                     .map((employee) => (
                       <button
                         key={employee.id}

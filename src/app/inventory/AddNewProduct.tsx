@@ -15,11 +15,11 @@ import SelectCategory from "@/components/Lists/SelectCategory";
 import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
+import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
 import { Category, InventoryProductType, Vendor } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { createProduct } from "../../actions/inventory/create";
-import { useFormErrorStore } from "@/stores/form-error";
 
 export default function AddNewProduct() {
   const [open, setOpen] = useState(false);
@@ -80,7 +80,7 @@ export default function AddNewProduct() {
           </button>
         </DialogTrigger>
         <DialogContent
-          className="max-h-full max-w-xl grid-rows-[auto,1fr,auto]"
+          className="max-h-[80%] max-w-[96%] grid-rows-[auto,1fr,auto] md:max-w-xl"
           form
         >
           <DialogHeader>
@@ -89,7 +89,7 @@ export default function AddNewProduct() {
 
           <FormError />
 
-          <div className="grid grid-cols-2 gap-5 overflow-y-auto">
+          <div className="grid-cols-2 gap-5 overflow-y-auto md:grid">
             <div>
               <SelectCategory
                 onCategoryChange={setCategory}
@@ -122,10 +122,18 @@ export default function AddNewProduct() {
                     />
                   }
                   items={vendors}
-                  displayList={(vendor: Vendor) => <p>{vendor.name}</p>}
+                  displayList={(vendor: Vendor) => (
+                    <p>{vendor?.companyName || vendor.name}</p>
+                  )}
                   onSearch={(search: string) =>
-                    vendors.filter((vendor) =>
-                      vendor.name.toLowerCase().includes(search.toLowerCase()),
+                    vendors.filter(
+                      (vendor) =>
+                        vendor?.companyName
+                          ?.toLowerCase()
+                          ?.includes(search.toLowerCase()) ||
+                        vendor.name
+                          .toLowerCase()
+                          .includes(search.toLowerCase()),
                     )
                   }
                   openState={[vendorOpen, setVendorOpen]}
@@ -139,7 +147,7 @@ export default function AddNewProduct() {
               <textarea
                 name="description"
                 required={false}
-                className="h-28 w-[95%] rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6"
+                className="h-28 w-[95%] rounded-sm border border-primary-foreground border-slate-400 bg-white px-2 py-0.5 leading-6"
               />
               <div>
                 <div>
@@ -164,19 +172,19 @@ export default function AddNewProduct() {
                 </div>
               </div>
             </div>
-            <div className="col-span-3 mt-5 flex w-[90%] gap-5">
+            <div className="col-span-3 mt-5 flex w-[90%] flex-wrap gap-5 md:flex-nowrap">
               <SlimInput name="quantity" type="number" required={false} />
 
               <div>
                 <label htmlFor="price" className="px-2 font-medium">
                   Price
                 </label>
-                <div className="mt-1 flex gap-1 rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6">
+                <div className="#mt-1 flex gap-1 rounded-sm border border-primary-foreground bg-white px-2 py-0.5 leading-6">
                   <span className="text-lg">$</span>
                   <input
                     type="text"
                     name="price"
-                    className="w-full outline-none"
+                    className="w-full rounded-sm border border-slate-400 px-2 py-0.5 outline-none"
                     id="price"
                   />
                 </div>
@@ -188,7 +196,7 @@ export default function AddNewProduct() {
             <div>
               <SlimInput name="receipt" label="Receipt#" required={false} />
             </div>
-            <div className="rounded-md bg-[#6571FF5E] p-2">
+            <div className="mt-5 rounded-md bg-[#6571FF5E] p-2 md:mt-0">
               <p className="font-semibold">Quantity for Low Inventory</p>
               <i className="text-xs">(Leave blank to disable notifications)</i>
               <SlimInput

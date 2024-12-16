@@ -6,9 +6,11 @@ import { Filter } from "./Filter";
 import Link from "next/link";
 import { useEstimateFilterStore } from "@/stores/estimate-filter";
 import { usePathname } from "next/navigation";
+import { useActionStoreCreateEdit } from "@/stores/createEditStore";
 
 export default function Header() {
   const { setFilter } = useEstimateFilterStore();
+  const { setActionType } = useActionStoreCreateEdit();
   const pathname = usePathname();
 
   const shouldShowCreateEstimate = pathname != "/estimate/canned";
@@ -34,6 +36,7 @@ export default function Header() {
         <Link
           href="/estimate/create"
           className="app-shadow flex h-10 items-center rounded-md bg-[#6571FF] px-5 text-white"
+          onClick={() => setActionType("create")}
         >
           + Create Estimate
         </Link>

@@ -29,6 +29,7 @@ export default function Table({
           <tr className="h-10 border-b">
             <th className="px-10 text-left">#</th>
             <th className="px-10 text-left">Name</th>
+            <th className="px-10 text-left">Company Name</th>
             <th className="px-10 text-left">Phone</th>
             <th className="px-10 text-left">Website</th>
             <th className="px-10 text-left">Join Date</th>
@@ -53,10 +54,13 @@ export default function Table({
                 <p>{vendor.id}</p>
               </td>
               <td className="text-nowrap px-10 text-left">{vendor.name}</td>
+              <td className="text-nowrap px-10 text-left">
+                {vendor.companyName}
+              </td>
               <td className="text-nowrap px-10 text-left">{vendor.phone}</td>
               <td className="px-10 text-left">{vendor.website}</td>
               <td className="px-10 text-left">
-                {moment(vendor.createdAt).format("DD MMM YYYY, hh:mm A")}
+                {moment.utc(vendor.createdAt).format("DD MMM YYYY, hh:mm A")}
               </td>
               <td className="mt-2 flex gap-3 px-10">
                 <EditVendor

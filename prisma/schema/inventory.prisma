@@ -1,0 +1,89 @@
+model InventoryProduct {
+    id                      Int                       @id @default(autoincrement())
+    name                    String
+    description             String?                   @db.Text
+    categoryId              Int?                      @map("category_id")
+    quantity                Int?                      @default(1)
+    price                   Decimal?                  @default(0)
+    unit                    String?                   @default("pc")
+    lot                     String?
+    vendorId                Int?                      @map("vendor_id")
+    userId                  Int?                      @map("user_id")
+    User                    User?                     @relation(fields: [userId], references: [id], onDelete: SetNull)
+    type                    InventoryProductType
+    receipt                 String?
+    lowInventoryAlert       Int?                      @map("low_inventory_alert")
+    companyId               Int                       @map("company_id")
+    createdAt               DateTime                  @default(now()) @map("created_at")
+    updatedAt               DateTime                  @default(now()) @updatedAt @map("updated_at")
+    company                 Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    category                Category?                 @relation(fields: [categoryId], references: [id])
+    vendor                  Vendor?                   @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+    InventoryProductHistory InventoryProductHistory[]
+    // InvoiceItemMaterial     InvoiceItemMaterial[]
+    Material                Material[]
+    InventoryProductTag     InventoryProductTag[]
+}
+
+model InventoryProductTag {
+    inventoryId Int              @map("inventory_id")
+    tagId       Int              @map("tag_id")
+    inventory   InventoryProduct @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+    tag         Tag              @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+    @@id([inventoryId, tagId])
+}
+
+model InventoryProductHistory {
+    id        Int                         @id @default(autoincrement())
+    price     Decimal?                    @default(0)
+    quantity  Int
+    date      DateTime?                   @default(now())
+    notes     String?
+    type      InventoryProductHistoryType
+    productId Int                         @map("inventory_id")
+    invoiceId String?                     @map("invoice_id")
+    vendorId  Int?                        @map("vendor_id")
+    createdAt DateTime                    @default(now()) @map("created_at")
+    updatedAt DateTime                    @default(now()) @updatedAt @map("updated_at")
+    product   InventoryProduct            @relation(fields: [productId], references: [id], onDelete: Cascade)
+    invoice   Invoice?                    @relation(fields: [invoiceId], references: [id])
+    vendor    Vendor?                     @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+    companyId Int                         @map("company_id")
+    company   Company                     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+enum InventoryProductHistoryType {
+    Purchase
+    Sale
+}
+
+enum InventoryProductType {
+    Supply
+    Product
+}
+
+// Vendor of a company.
+// Vendor is just data, they can't login.
+// Vendor is a part of Material.
+model Vendor {
+    id                      Int                       @id @default(autoincrement())
+    name                    String
+    website                 String?
+    email                   String?
+    phone                   String?
+    address                 String?
+    city                    String?
+    state                   String?
+    zip                     String?
+    // company name for vendor. Its not related to company model.
+    companyName             String?
+    notes                   String?
+    companyId               Int                       @map("company_id")
+    createdAt               DateTime                  @default(now()) @map("created_at")
+    updatedAt               DateTime                  @default(now()) @updatedAt @map("updated_at")
+    company                 Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    material                Material[]
+    inventoryProducts       InventoryProduct[]
+    InventoryProductHistory InventoryProductHistory[]
+}

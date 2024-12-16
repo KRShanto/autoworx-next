@@ -13,11 +13,13 @@ import {
 import Submit from "@/components/Submit";
 import { Priority, User } from "@prisma/client";
 import { TimePicker } from "antd";
+import moment from "moment";
 import Image from "next/image";
 import { useState } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { FaCheck, FaPlus } from "react-icons/fa6";
 import { createTask } from "../../../../../actions/task/createTask";
+import AssignTaskDropDown from "./AssignTaskDropDown";
 
 export default function NewTask({
   companyUsers,
@@ -37,9 +39,10 @@ export default function NewTask({
   const [assignedUsers, setAssignedUsers] = useState<number[]>([]);
   const [priority, setPriority] = useState<Priority>("Low");
   const [time, setTime] = useState<{ startTime: string; endTime: string }>();
+  const [date, setDate] = useState<string>("");
 
   async function handleSubmit() {
-    const res = await createTask({
+    await createTask({
       title,
       description,
       assignedUsers,
@@ -47,6 +50,8 @@ export default function NewTask({
       startTime: time?.startTime,
       endTime: time?.endTime,
       clientId,
+      date: date ? new Date(date).toISOString() : undefined,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
 
     // reset form
@@ -99,6 +104,7 @@ export default function NewTask({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               autoFocus
+              required
             />
           </div>
 
@@ -115,66 +121,35 @@ export default function NewTask({
 
           <div id="timer-parent" className="mb-4 flex flex-col">
             <label htmlFor="time">Time</label>
-            <TimePicker.RangePicker
-              id="time"
-              onChange={onChange}
-              getPopupContainer={() => document.getElementById("timer-parent")!}
-              use12Hours
-              format="h:mm a"
-              className="mt-2 rounded-md border-2 border-gray-500 p-1 placeholder-slate-800"
-              needConfirm={false}
-            />
+            <div className="flex items-center space-x-2">
+              <input
+                id="time"
+                onChange={(e) => setDate(e.target.value)}
+                className="mt-2 w-full rounded-md border-2 border-gray-500 p-0.5 placeholder-slate-800"
+                type="date"
+              />
+              <TimePicker.RangePicker
+                id="time"
+                onChange={onChange}
+                getPopupContainer={() =>
+                  document.getElementById("timer-parent")!
+                }
+                use12Hours
+                format="h:mm a"
+                className="mt-2 w-full rounded-md border-2 border-gray-500 p-1 placeholder-slate-800"
+                needConfirm={false}
+              />
+            </div>
           </div>
 
           {/* custom radio. show user name and image (column)*/}
-          {/* TODO */}
-          <div className="mb-4 flex flex-col">
-            <label htmlFor="assigned_users">Assign</label>
-
-            <button
-              onClick={() => setShowUsers(!showUsers)}
-              type="button"
-              className="flex w-full items-center justify-end rounded-md border-2 border-gray-500 p-2"
-            >
-              {showUsers ? (
-                <FaChevronUp className="text-[#797979]" />
-              ) : (
-                <FaChevronDown className="text-[#797979]" />
-              )}
-            </button>
-
-            {!onlyOneUser && showUsers && (
-              <div className="mt-2 flex h-40 flex-col gap-2 overflow-y-auto p-2 font-bold">
-                {companyUsers.map((user) => (
-                  <label
-                    htmlFor={user.id.toString()}
-                    key={user.id}
-                    className="flex items-center gap-2"
-                  >
-                    <input
-                      type="checkbox"
-                      name="assigned_users"
-                      id={user.id.toString()}
-                      value={user.id}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setAssignedUsers([...assignedUsers, user.id]);
-                        } else {
-                          setAssignedUsers(
-                            assignedUsers.filter((id) => id !== user.id),
-                          );
-                        }
-                      }}
-                    />
-                    <Avatar photo={user.image} width={40} height={40} />
-                    <span>
-                      {user.firstName} {user.lastName}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* TODO: */}
+          <AssignTaskDropDown
+            assignedUsers={assignedUsers}
+            companyUsers={companyUsers}
+            setAssignedUsers={setAssignedUsers}
+            onlyOneUser={onlyOneUser}
+          />
 
           <div className="mb-4 flex flex-col">
             <label>Priority</label>

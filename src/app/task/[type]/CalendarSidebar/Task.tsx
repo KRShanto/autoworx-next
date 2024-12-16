@@ -1,11 +1,13 @@
 import { TASK_COLOR } from "@/lib/consts";
-import React, { LegacyRef } from "react";
 import { Task } from "@prisma/client";
+import moment from "moment";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { LegacyRef } from "react";
 import { useDrag } from "react-dnd";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { deleteTask } from "../../../../actions/task/deleteTask";
-import moment from "moment";
-import Link from "next/link";
+import { useDate } from "../Calendar/Day";
 
 export default function TaskComponent({ task }: { task: Task }) {
   const [{ isDragging }, drag] = useDrag({
@@ -16,6 +18,9 @@ export default function TaskComponent({ task }: { task: Task }) {
     }),
   });
 
+  const router = useRouter();
+  const queryDate = useDate();
+
   const handleDragStart = (event: React.DragEvent) => {
     event.dataTransfer.setData("text/plain", `task|${task.id}`);
   };
@@ -23,25 +28,41 @@ export default function TaskComponent({ task }: { task: Task }) {
   const handleDelete = async () => {
     await deleteTask(task.id);
   };
-  const existingDate = moment(task?.date).format("YYYY-MM-DD");
+
+  const existingDate = task?.date
+    ? moment.utc(task?.date).format("YYYY-MM-DD")
+    : queryDate.format("YYYY-MM-DD");
+
+  const handleDragEnd = () => {
+    router.push(`/task/day?date=${existingDate}`);
+  };
   return (
     <div
       className="flex items-center rounded-md px-4 py-2 text-[17px] text-white max-[1300px]:px-2 max-[1300px]:py-1 max-[1300px]:text-[14px]"
       style={{
         backgroundColor: TASK_COLOR[task.priority],
-        cursor: task.date ? "pointer" : "move",
+        cursor: task.startTime && task.endTime ? "pointer" : "move",
       }}
       ref={
-        task.date ? undefined : (drag as unknown as LegacyRef<HTMLDivElement>)
+        task.startTime && task.endTime
+          ? undefined
+          : (drag as unknown as LegacyRef<HTMLDivElement>)
       }
-      draggable={task.date ? false : true}
-      onDragStart={task.date ? undefined : handleDragStart}
+      draggable={task.startTime && task.endTime ? false : true}
+      onDragStart={task.startTime && task.endTime ? undefined : handleDragStart}
+      onDragEnd={handleDragEnd}
     >
-      <Link href={`/task/day?date=${existingDate}`} className="w-[90%]">
+      <Link
+        style={{
+          cursor: task.startTime && task.endTime ? "pointer" : "move",
+        }}
+        href={`/task/day?date=${existingDate}`}
+        className="w-[90%]"
+      >
         {task.title}
       </Link>
       <FaRegCheckCircle
-        className="cursor-pointer text-xl text-white hover:text-gray-400"
+        className="text-xl text-white hover:text-gray-400"
         onClick={handleDelete}
       />
     </div>

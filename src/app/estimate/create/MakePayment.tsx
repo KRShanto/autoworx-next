@@ -103,42 +103,26 @@ export default function MakePayment() {
     const res1 = await createInvoice();
     let res2;
 
-    if (isEditPage && payment) {
-      res2 = await updatePayment({
-        id: payment.id,
-        type: tab as PaymentType,
-        date,
-        notes,
-        amount: Number(amount),
-        additionalData: {
-          creditCard: card,
-          cardType: cardType ? (cardType as CardType) : "MASTERCARD",
-          checkNumber: check,
-          receivedCash: Number(cash),
-          paymentMethodId: paymentMethod?.id,
-        },
-      });
-    } else {
-      res2 = await newPayment({
-        invoiceId: res1.data.id,
-        type: tab as PaymentType,
-        date,
-        notes,
-        amount: Number(amount),
-        additionalData: {
-          creditCard: card,
-          cardType: cardType ? (cardType as CardType) : "MASTERCARD",
-          checkNumber: check,
-          receivedCash: Number(cash),
-          paymentMethodId: paymentMethod?.id,
-        },
-      });
-    }
+    //create payment each time you make payment
+    res2 = await newPayment({
+      invoiceId: res1.data.id,
+      type: tab as PaymentType,
+      date,
+      notes,
+      amount: Number(amount),
+      additionalData: {
+        creditCard: card,
+        cardType: cardType ? (cardType as CardType) : "MASTERCARD",
+        checkNumber: check,
+        receivedCash: Number(cash),
+        paymentMethodId: paymentMethod?.id,
+      },
+    });
 
     if (res2.type === "success") {
       setOpen(false);
       // Redirect to the index
-      router.push("/estimate");
+      router.push("/estimate/invoices");
     }
   }
 

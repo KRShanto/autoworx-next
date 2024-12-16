@@ -3,19 +3,8 @@ import { db } from "@/lib/db";
 
 import { notFound } from "next/navigation";
 
-import {
-  Company,
-  Invoice,
-  InvoiceItem,
-  InvoicePhoto,
-  Labor,
-  Material,
-  Service,
-  Status,
-} from "@prisma/client";
-import { User } from "next-auth";
 import InvoiceComponent from "./InvoiceComponent";
-import PDFComponent from "./PDFComponent";
+import { getTechnicians } from "@/actions/estimate/technician/getTechnicians";
 
 export default async function ViewEstimate({
   params: { id },
@@ -28,14 +17,18 @@ export default async function ViewEstimate({
       company: true,
       invoiceItems: {
         include: {
-          service: true,
+          service: {
+            include: {
+              Technician: true,
+            },
+          },
           materials: true,
           labor: true,
         },
       },
       photos: true,
       tasks: true,
-      status: true,
+      column: true,
       user: true,
     },
   });
@@ -52,6 +45,8 @@ export default async function ViewEstimate({
         where: { id: invoice.vehicleId },
       })
     : null;
+  
+const invoiceTechnicians = await getTechnicians({ invoiceId: invoice.id });
 
   return (
     <InterceptedDialog>
@@ -62,6 +57,7 @@ export default async function ViewEstimate({
           invoice={invoice}
           clientId={clientId}
           vehicle={vehicle}
+          invoiceTechnicians={invoiceTechnicians}
         />
       )}
     </InterceptedDialog>
