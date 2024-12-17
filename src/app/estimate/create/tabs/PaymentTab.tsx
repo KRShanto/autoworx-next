@@ -104,7 +104,7 @@ export default async function PaymentTab({
   return (
     <div className="h-full">
       {/* Section 1 */}
-      <div className="flex h-[25%] items-center justify-evenly">
+      <div className="flex h-[25%] flex-wrap items-center justify-evenly gap-4 md:flex-nowrap md:gap-0">
         <CurrentInvoicePayment />
 
         <div className="border border-slate-400 text-sm">
@@ -130,12 +130,12 @@ export default async function PaymentTab({
         </div>
 
         <div className="flex border border-slate-400">
-          <div className="bg-[#F8FAFF] p-5 px-10 font-semibold">
+          <div className="bg-[#F8FAFF] p-5 px-2 font-semibold md:px-10">
             <h3>Total Paid</h3>
             <p className="text-center">${totalPaid}</p>
           </div>
 
-          <div className="p-5 px-10 font-semibold">
+          <div className="p-5 px-2 font-semibold md:px-10">
             <h3>Total Transactions</h3>
             <p className="text-center">{invoices.length}</p>
           </div>

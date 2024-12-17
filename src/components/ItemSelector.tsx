@@ -236,6 +236,12 @@ export default function ItemSelector<T>({
                     setSelected(item);
                     onSelect && onSelect(item);
                     setOpen(false);
+                    setDropdownsOpen(() => {
+                      return {
+                        ...dropdownsOpen,
+                        [type]: [-1, -1],
+                      };
+                    });
                   }}
                 >
                   <p className="w-full text-left">
