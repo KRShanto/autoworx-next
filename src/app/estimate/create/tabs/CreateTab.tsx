@@ -48,7 +48,7 @@ export function CreateTab() {
                   switch (itemKey) {
                     case "service":
                       return (
-                        <td>
+                        <td className="align-top">
                           <ItemSelector
                             type="SERVICE"
                             label="Service"
@@ -103,7 +103,7 @@ export function CreateTab() {
                       );
                     case "materials":
                       return item.materials.length >= 0 ? (
-                        <td className="relative">
+                        <td className="relative align-top">
                           {item.materials.length > 0 &&
                             item.materials.map((material, j) => (
                               <div
@@ -276,7 +276,7 @@ export function CreateTab() {
                       );
                     case "labor":
                       return (
-                        <td>
+                        <td className="align-top">
                           <ItemSelector
                             type="LABOR"
                             label="Labor"
@@ -336,7 +336,7 @@ export function CreateTab() {
                       );
                     case "tags":
                       return (
-                        <td>
+                        <td className="align-top">
                           <SelectTags
                             type="TAG"
                             value={item.tags}
@@ -358,7 +358,7 @@ export function CreateTab() {
                       );
                   }
                 })}
-                <td>
+                <td className="align-top">
                   <button
                     type="button"
                     onClick={() => {
