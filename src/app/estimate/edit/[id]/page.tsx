@@ -5,7 +5,7 @@ import Title from "@/components/Title";
 import { db } from "@/lib/db";
 import { AuthSession } from "@/types/auth";
 import { InventoryProduct, Labor, Material, Tag } from "@prisma/client";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { FaSave } from "react-icons/fa";
 import { BillSummary } from "../../create/BillSummary";
 import ConvertButton from "../../create/ConvertButton";
@@ -33,6 +33,7 @@ export default async function Page({
   });
 
   if (!invoice) return notFound();
+
   if (session.user.companyId === invoice.fromRequestedCompanyId)
     return notFound();
 
