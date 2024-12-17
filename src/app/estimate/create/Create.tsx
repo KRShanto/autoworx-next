@@ -7,15 +7,19 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import LaborCreate from "./LaborCreate";
 import MaterialCreate from "./MaterialCreate";
 import ServiceCreate from "./ServiceCreate";
+import { useMediaQuery } from "react-responsive";
 
 export default function Create() {
   const { type } = useEstimatePopupStore();
   const [openService, setOpenService] = useState<string | null>(null);
   const items = useEstimateCreateStore((x) => x.items);
+  const is640Max = useMediaQuery({ query: `(max-width: 640px)` });
 
-  if (type === "SERVICE") return <ServiceCreate />;
-  if (type === "MATERIAL") return <MaterialCreate />;
-  if (type === "LABOR") return <LaborCreate />;
+  if (!is640Max) {
+    if (type === "SERVICE") return <ServiceCreate />;
+    if (type === "MATERIAL") return <MaterialCreate />;
+    if (type === "LABOR") return <LaborCreate />;
+  }
 
   return (
     <div className="w-full space-y-3 overflow-y-auto p-3">

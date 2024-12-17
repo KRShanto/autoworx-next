@@ -63,6 +63,7 @@ export default function Header({
           value={client}
           openDropdown={clientOpenDropdown}
           setOpenDropdown={setClientOpenDropdown}
+          invoice={invoice}
         />
         <SelectVehicle
           value={vehicle}

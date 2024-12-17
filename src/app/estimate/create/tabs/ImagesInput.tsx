@@ -34,9 +34,9 @@ export function ImagesInput() {
             strokeLinejoin="round"
           />
         </svg>
-        <span className="font-medium">Attach Photo/Video</span>
+        <span className="text-sm font-medium">Attach Photo/Video</span>
       </label>
-      <div className="-m-2 grid aspect-square grid-cols-3 content-start gap-4 overflow-y-auto p-2">
+      <div className="-m-2 grid aspect-square grid-cols-2 content-start gap-4 overflow-y-auto p-2 md:grid-cols-3">
         {photos.map((photo, i) => (
           <div
             className="relative flex aspect-square rounded border border-solid border-slate-500 object-contain"

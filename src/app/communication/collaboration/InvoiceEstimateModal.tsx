@@ -133,12 +133,12 @@ export default function InvoiceEstimateModal({
       <DialogContent
         form
         onSubmit={(e) => startTransaction(handleEstimateSubmit)}
-        className="overflow-y-auto"
+        className="max-h-[500px] w-[96%] overflow-y-auto md:max-h-max"
       >
         {error && <p className="text-center text-sm text-red-400">{error}</p>}
         <h2 className="mb-5 text-2xl font-bold">Request an Invoice/Estimate</h2>
         <div className="flex flex-col justify-center space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <SlimInput
               onChange={handleChange}
               label="Year"
