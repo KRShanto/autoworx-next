@@ -1,22 +1,20 @@
 "use client";
 
-import { Priority, Task, User } from "@prisma/client";
-import { useState } from "react";
+import { createTask } from "@/actions/task/createTask";
+import AssignTaskDropDown from "@/app/task/[type]/components/task/AssignTaskDropDown";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
-  DialogClose,
 } from "@/components/Dialog";
-import { FaCheck, FaPlus } from "react-icons/fa";
-import Image from "next/image";
-import { FaChevronUp, FaChevronDown } from "react-icons/fa";
+import { Priority, Task, User } from "@prisma/client";
 import { TimePicker } from "antd";
-import Avatar from "@/components/Avatar";
-import { createTask } from "@/actions/task/createTask";
+import { useState } from "react";
+import { FaCheck } from "react-icons/fa";
 
 export default function TaskForm({
   companyUsers,
@@ -141,7 +139,7 @@ export default function TaskForm({
           </div>
 
           <div id="timer-parent" className="mb-4 flex flex-col">
-          <label htmlFor="time">Time</label>
+            <label htmlFor="time">Time</label>
             <div className="flex items-center space-x-2">
               <input
                 id="time"
@@ -163,54 +161,11 @@ export default function TaskForm({
             </div>
           </div>
 
-          <div className="mb-4 flex flex-col">
-            <label htmlFor="assigned_users">Assign</label>
-            <button
-              onClick={() => setShowUsers(!showUsers)}
-              type="button"
-              className="flex w-full items-center justify-end rounded-md border-2 border-gray-500 p-2"
-            >
-              {showUsers ? (
-                <FaChevronUp className="text-[#797979]" />
-              ) : (
-                <FaChevronDown className="text-[#797979]" />
-              )}
-            </button>
-
-            {!onlyOneUser && showUsers && (
-              <div className="mt-2 flex h-40 flex-col gap-2 overflow-y-auto p-2 font-bold">
-                {companyUsers &&
-                  companyUsers.map((user) => (
-                    <label
-                      htmlFor={user.id.toString()}
-                      key={user.id}
-                      className="flex items-center gap-2"
-                    >
-                      <input
-                        type="checkbox"
-                        name="assigned_users"
-                        id={user.id.toString()}
-                        value={user.id}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setAssignedUsers([...assignedUsers, user.id]);
-                          } else {
-                            setAssignedUsers(
-                              assignedUsers.filter((id) => id !== user.id),
-                            );
-                          }
-                        }}
-                      />
-
-                      <Avatar photo={user.image} width={40} height={40} />
-                      <span>
-                        {user?.firstName} {user?.lastName}
-                      </span>
-                    </label>
-                  ))}
-              </div>
-            )}
-          </div>
+          <AssignTaskDropDown
+            assignedUsers={assignedUsers}
+            companyUsers={companyUsers!}
+            setAssignedUsers={setAssignedUsers}
+          />
 
           <div className="mb-4 flex flex-col">
             <label>Priority</label>
