@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaChevronDown, FaChevronUp, FaSearch, FaTimes } from "react-icons/fa";
 import { FaPen } from "react-icons/fa6";
 import { DropdownMenu, DropdownMenuTrigger } from "./DropdownMenu";
+import { useMediaQuery } from "react-responsive";
 
 export default function ItemSelector<T>({
   label,
@@ -43,11 +44,13 @@ export default function ItemSelector<T>({
   const [selected, setSelected] = useState<T | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const { open: openPopup } = useEstimatePopupStore();
+  const isMax640 = useMediaQuery({ query: "(max-width: 640px)" });
 
   useEffect(() => {
     if (
       dropdownsOpen[type][0] === index[0] &&
-      dropdownsOpen[type][1] === index[1]
+      dropdownsOpen[type][1] === index[1] &&
+      !isMax640
     ) {
       setOpen(true);
     } else {
