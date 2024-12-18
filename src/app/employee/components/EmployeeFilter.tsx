@@ -1,19 +1,19 @@
 "use client";
 
+import { DropdownSelection } from "@/components/DropDownSelection";
+import { useEmployeeFilterStore } from "@/stores/employeeFilter";
 import { IoSearchOutline } from "react-icons/io5";
 import DateRange from "../../../components/DateRange";
 import AddNewEmployee from "../../../components/Lists/NewEmployee";
-import { useEmployeeFilterStore } from "@/stores/employeeFilter";
-import { DropdownSelection } from "@/components/DropDownSelection";
 
 // filter component for /employee page
 export default function EmployeeFilter() {
   const { setFilter, type } = useEmployeeFilterStore();
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-x-8">
-        <div className="flex w-[500px] items-center gap-x-2 rounded-md border border-gray-300 px-4 py-1 text-gray-400">
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+        <div className="flex items-center gap-x-2 rounded-md border border-gray-300 px-4 py-1 text-gray-400 lg:w-[500px]">
           <span>
             <IoSearchOutline />
           </span>
@@ -35,7 +35,6 @@ export default function EmployeeFilter() {
           changesValue={type}
           buttonClassName="min-w-[100px] shadow-md"
         />
-        
       </div>
       <AddNewEmployee />
     </div>
