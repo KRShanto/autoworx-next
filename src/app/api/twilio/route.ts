@@ -61,7 +61,7 @@ export async function DELETE(req: NextRequest) {
       { message: "Webhook unsubscribed successfully", data: body },
       { status: 200 },
     );
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error("Unsubscribe error:", error);
     return Response.json(
       { message: "Webhook unsubscribe failed", error: error?.message },
