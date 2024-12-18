@@ -12,6 +12,7 @@ type TProps = {
   onlyOneUser?: boolean;
   assignedUsers: number[];
   setAssignedUsers: React.Dispatch<React.SetStateAction<number[]>>;
+  fromUpdate?: boolean;
 };
 
 export default function AssignTaskDropDown({
@@ -19,6 +20,7 @@ export default function AssignTaskDropDown({
   onlyOneUser,
   assignedUsers,
   setAssignedUsers,
+  fromUpdate,
 }: TProps) {
   const [users, setUsers] = useState(companyUsers);
   const [showUsers, setShowUsers] = useState(false);
@@ -39,8 +41,15 @@ export default function AssignTaskDropDown({
   }, [showUsers]);
 
   useEffect(() => {
+    if (fromUpdate) {
+      setUsers((prevUsers) =>
+        prevUsers.filter((user) => {
+          return !assignedUsers.includes(user.id);
+        }),
+      );
+    }
     return () => {
-      setAssignedUsers([]);
+      !fromUpdate && setAssignedUsers([]);
     };
   }, []);
 
@@ -53,7 +62,7 @@ export default function AssignTaskDropDown({
   };
   return (
     <>
-      <div className="mb-4 flex flex-col">
+      <div className="mb-3 flex flex-col">
         <label htmlFor="assigned_users">Assign</label>
         <div className="no-visible-scrollbar my-2 flex max-h-40 flex-wrap items-center gap-1 overflow-y-auto">
           {assignedUsers.map((userId) => {

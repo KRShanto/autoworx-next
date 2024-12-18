@@ -1,7 +1,7 @@
 import { InterceptedDialog } from "@/components/Dialog";
 import { db } from "@/lib/db";
 
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import InvoiceComponent from "./InvoiceComponent";
 import { getTechnicians } from "@/actions/estimate/technician/getTechnicians";
@@ -33,7 +33,7 @@ export default async function ViewEstimate({
     },
   });
 
-  if (!invoice) notFound();
+  if (!invoice) redirect('/estimate');
 
   const clientId = invoice.clientId
     ? await db.client.findUnique({
@@ -45,8 +45,8 @@ export default async function ViewEstimate({
         where: { id: invoice.vehicleId },
       })
     : null;
-  
-const invoiceTechnicians = await getTechnicians({ invoiceId: invoice.id });
+
+  const invoiceTechnicians = await getTechnicians({ invoiceId: invoice.id });
 
   return (
     <InterceptedDialog>

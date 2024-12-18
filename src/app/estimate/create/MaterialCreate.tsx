@@ -213,7 +213,7 @@ export default function MaterialCreate() {
   // console.log("MaterialCreateDiscount", discount);
   // console.log("MaterialCreateQuantity", quantity);
   return (
-    <div className="flex flex-col gap-2 p-5">
+    <div className="flex flex-col gap-2 p-10 md:p-5">
       <h3 className="w-full text-xl font-semibold">
         {/* Materials/Parts Information */}
         {data.edit ? "Edit Materials/Parts" : "Materials/Parts Information"}

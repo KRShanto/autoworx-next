@@ -10,6 +10,7 @@ import {
   Attachment,
 } from "@prisma/client";
 import { User as NextAuthUser } from "next-auth";
+import { cn } from "@/lib/cn";
 
 export default function Collaboration({
   companyWithAdmin,
@@ -25,8 +26,9 @@ export default function Collaboration({
   const [selectedUsersList, setSelectedUsersList] = useState<User[]>([]);
   const [companyAdmins, setCompanyAdmins] = useState(companyWithAdmin);
   return (
-    <div className="mt-5 flex gap-5">
+    <div className="flex gap-5 sm:mt-5">
       <List
+        className={cn(selectedUsersList.length === 0 ? "block" : "hidden")}
         selectedUsersList={selectedUsersList}
         companyAdmins={companyAdmins}
         setCompanyAdmins={setCompanyAdmins}
@@ -34,6 +36,7 @@ export default function Collaboration({
         setSelectedUsersList={setSelectedUsersList}
       />
       <UsersArea
+        className={cn(selectedUsersList.length === 0 ? "hidden" : "block")}
         previousMessages={messages}
         currentUser={currentUser}
         totalMessageBoxLength={selectedUsersList.length}

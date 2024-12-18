@@ -29,7 +29,7 @@ export default function FilterBySearchBox({ searchText }: TProps) {
   };
   const handleSearchChange = useDebounce(handleInputChange, 500);
   return (
-    <div className="relative min-w-[693px]">
+    <div className="relative w-full min-w-[300] max-w-[693px]">
       <CiSearch className="absolute left-[10px] top-[9px]" />
       <input
         onChange={(e) => {

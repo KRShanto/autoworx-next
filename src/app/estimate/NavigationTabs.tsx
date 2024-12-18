@@ -42,7 +42,11 @@ export default function NavigationTabs({
   return (
     <Tabs defaultValue={activeTab} className="mt-5 h-full overflow-hidden">
       <TabsList>
-        <TabsTrigger value="c-canned" onClick={handleCannedClick}>
+        <TabsTrigger
+          className="hidden md:block"
+          value="c-canned"
+          onClick={handleCannedClick}
+        >
           Canned
         </TabsTrigger>
         <TabsTrigger value="b-invoice" onClick={handleInvoiceClick}>
@@ -52,7 +56,7 @@ export default function NavigationTabs({
           Estimates
         </TabsTrigger>
       </TabsList>
-      <div className="#h-[70vh] h-full flex-auto overflow-y-auto overflow-x-clip rounded-lg bg-background p-4 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+      <div className="#h-[70vh] h-full flex-auto overflow-y-auto overflow-x-clip rounded-lg bg-background ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:p-4">
         <TabsContent className="h-full" value={activeTab}>
           {children}
         </TabsContent>

@@ -21,7 +21,7 @@ export function AttachmentTab() {
   return (
     <>
       <h2 className="mb-3 font-bold">Internal</h2>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <ImagesInput />
         <TasksInput />
 

@@ -172,7 +172,7 @@ export default function LaborCreate() {
   }
 
   return (
-    <div className="flex flex-col gap-2 p-5">
+    <div className="flex flex-col gap-2 p-10 md:p-5">
       <h3 className="w-full text-xl font-semibold">
         {data?.edit ? "Edit Labor Information" : "Labor Information"}
       </h3>
