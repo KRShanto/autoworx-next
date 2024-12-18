@@ -3,33 +3,31 @@ import {
   createColumn,
   deleteColumn,
 } from "@/actions/pipelines/pipelinesColumn";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/Dialog";
 import useOutsideClick from "@/hooks/useOutsideClick";
 import { INVOICE_COLORS } from "@/lib/consts";
 import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
-import { Column, Status } from "@prisma/client";
+import { Column } from "@prisma/client";
 import { useEffect, useRef, useState } from "react";
-import { FaChevronUp, FaSearch, FaTimes } from "react-icons/fa";
+import { FaChevronUp, FaSearch } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { PiPaletteBold, PiPulse } from "react-icons/pi";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../DropdownMenu";
 import FormError from "../FormError";
 import Submit from "../Submit";
 import { SelectProps } from "./select-props";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogClose,
-} from "@/components/Dialog";
 
 type SelectedColor = { textColor: string; bgColor: string } | null;
 
@@ -86,7 +84,6 @@ export function SelectStatus({
     setOpen && setOpen(false);
   });
   const restrictedColumns = ["Pending", "In Progress", "Completed"];
-  console.log("Status to delete", statusToDelete);
   return (
     <div>
       <input type="hidden" name={name} value={status?.title ?? ""} />
