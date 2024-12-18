@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 
 export async function deleteInvoice(id: string): Promise<ServerAction> {
   await db.invoice.delete({
@@ -13,7 +13,6 @@ export async function deleteInvoice(id: string): Promise<ServerAction> {
   });
 
   revalidatePath("/estimate");
-  redirect("/estimate");
 
   return {
     type: "success",

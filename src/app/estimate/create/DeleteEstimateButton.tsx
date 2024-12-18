@@ -26,6 +26,7 @@ export default function DeleteEstimateButton() {
     if (pathname.includes("/estimate/edit/")) {
       const { id } = params as { id: string };
       await deleteInvoice(id);
+      router.push("/estimate");
     }
     useEstimateCreateStore.getState().reset();
   }

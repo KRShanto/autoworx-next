@@ -66,7 +66,6 @@ const InvoiceComponent = ({
   vehicle: Vehicle | null;
   invoiceTechnicians: Technician[];
 }) => {
-  console.log({ InvoicePhotos: invoice.photos });
   const router = useRouter();
   const componentRef = useRef(null);
   const [showAuthorizedName, setShowAuthorizedName] = useState(false);
@@ -78,6 +77,7 @@ const InvoiceComponent = ({
   });
 
   const handleEdit = () => {
+    // window.location.href = `/estimate/edit/${id}`;
     router.push(`/estimate/edit/${id}`);
   };
 
