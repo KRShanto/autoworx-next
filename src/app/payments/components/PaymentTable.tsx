@@ -113,7 +113,7 @@ export default function PaymentTable({ data }: { data: ReturnPayment[] }) {
                   : "- - -"}
               </td>
               <td className="border-b px-4 py-2">
-                {moment.utc(item.date).format("YYYY-MM-DD")}
+                {moment.utc(item.date).format("MM/DD/YYYY")}
               </td>
               <td className="border-b px-4 py-2">${item.amount}</td>
               <td className="border-b px-4 py-2">{item.method}</td>

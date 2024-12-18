@@ -2,7 +2,9 @@ import { deleteTask } from "@/actions/task/deleteTask";
 import { cn } from "@/lib/cn";
 import { usePopupStore } from "@/stores/popup";
 import { Task as TaskType, User } from "@prisma/client";
+import moment from "moment";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { FaExternalLinkAlt, FaRegCheckCircle } from "react-icons/fa";
 import { MdOutlineEdit } from "react-icons/md";
@@ -53,17 +55,23 @@ const Task = ({
   companyUsers: User[];
 }) => {
   const { open } = usePopupStore();
+  const router = useRouter();
 
   return (
     <div
       className={cn(
-        "flex items-center justify-between gap-x-4 rounded px-3 py-2 text-sm text-white",
+        "flex items-center justify-between gap-x-4 rounded px-3 py-2 text-sm text-white cursor-pointer",
         {
           "bg-[#6571FF]": task.priority === "Low",
           "bg-[#25AADD]": task.priority === "Medium",
           "bg-[#006d77]": task.priority === "High",
         },
       )}
+      onClick={() => {
+        router.push(
+          `/task/day?date=${moment.utc(task?.date).format("YYYY-MM-DD")}`,
+        );
+      }}
     >
       <span>
         {task.title.length > 20 ? task.title.slice(0, 20) + "..." : task.title}
@@ -71,7 +79,8 @@ const Task = ({
       <span className="flex items-center gap-x-2">
         <MdOutlineEdit
           className="cursor-pointer"
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             open("UPDATE_TASK", {
               task,
               companyUsers,
@@ -81,7 +90,8 @@ const Task = ({
 
         <FaRegCheckCircle
           className="cursor-pointer"
-          onClick={async () => {
+          onClick={async (e) => {
+            e.stopPropagation();
             await deleteTask(task.id);
           }}
         />

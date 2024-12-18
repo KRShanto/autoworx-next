@@ -190,7 +190,7 @@ function Table({
             <td className="text-center">
               {moment.utc(history.date).format(
                 // date.month.year
-                "DD.MM.YYYY",
+                "MM/DD/YYYY",
               )}
             </td>
             {(user?.employeeType === "Admin" ||

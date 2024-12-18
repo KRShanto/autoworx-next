@@ -15,7 +15,7 @@ export default function Header() {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-x-8 bg-white">
-        <div className="flex w-[500px] items-center gap-x-2 rounded-md border border-gray-300 px-4 py-1 text-gray-400">
+        <div className="flex lg:w-[500px] items-center gap-x-2 rounded-md border border-gray-300 px-4 py-1 text-gray-400">
           <span className="">
             <IoSearchOutline />
           </span>
