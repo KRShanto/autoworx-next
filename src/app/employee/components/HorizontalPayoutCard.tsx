@@ -19,8 +19,10 @@ const HorizontalPayoutCard = ({
     <div
       className={`sm: box-border flex items-center gap-x-4 rounded-lg border border-gray-300 bg-white p-5 ${customStyles}`}
     >
-      <div className="font-inter text-2xl font-bold text-gray-500">{title}</div>
-      <div className="font-inter text-2xl font-semibold text-gray-500">
+      <div className="font-inter font-bold text-gray-500 lg:text-2xl">
+        {title}
+      </div>
+      <div className="font-inter font-semibold text-gray-500 lg:text-2xl">
         ${amount}
       </div>
       {percentage != 0 && (
@@ -34,7 +36,7 @@ const HorizontalPayoutCard = ({
         </div>
       )}
       {percentage == 0 && (
-        <div className="font-inter text-4xl font-semibold">-</div>
+        <div className="font-inter text-2xl font-semibold lg:text-4xl">-</div>
       )}
     </div>
   );
