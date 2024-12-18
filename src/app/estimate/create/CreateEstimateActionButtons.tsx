@@ -28,7 +28,7 @@ export function CreateEstimateActionsButtons({ status }: { status: Column }) {
         <HiChatBubbleOvalLeftEllipsis />
         Message
       </button>
-      {status.title !== "Delivered" && <DeleteEstimateButton />}
+      {status?.title !== "Delivered" && <DeleteEstimateButton />}
     </div>
   );
 }
