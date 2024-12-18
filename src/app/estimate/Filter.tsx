@@ -49,7 +49,7 @@ export function Filter() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="flex h-10 items-center gap-2 rounded-md border-2 border-slate-400 p-1">
+      <DialogTrigger className="hidden h-10 items-center gap-2 rounded-md border-2 border-slate-400 p-1 md:flex">
         <Image
           src="/icons/Filter.svg"
           alt="Filter"

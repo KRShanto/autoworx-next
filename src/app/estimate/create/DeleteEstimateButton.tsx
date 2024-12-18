@@ -28,7 +28,6 @@ export default function DeleteEstimateButton() {
       await deleteInvoice(id);
     }
     useEstimateCreateStore.getState().reset();
-    router.push("/estimate");
   }
 
   return (

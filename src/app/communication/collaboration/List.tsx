@@ -10,6 +10,7 @@ type TProps = {
   setSelectedUsersList: React.Dispatch<React.SetStateAction<any[]>>;
   companies: (Company & { users: User[] })[];
   selectedUsersList: User[];
+  className?: string;
 };
 
 export default function List({
@@ -18,14 +19,22 @@ export default function List({
   setSelectedUsersList,
   companies,
   setCompanyAdmins,
+  className,
 }: TProps) {
   const [selectedCompany, setSelectedCompany] = useState<any>(null); // TODO: type this
   const [searchTerm, setSearchTerm] = useState("");
   return (
-    <div className="app-shadow h-[83vh] w-[23%] rounded-lg bg-white p-3">
+    <div
+      className={cn(
+        "app-shadow h-screen w-full overflow-y-auto rounded-lg bg-white p-3 sm:block sm:h-[83vh] sm:w-[23%]",
+        className,
+      )}
+    >
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-[14px] text-[#797979]">User List</h2>
+        <h2 className="text-xl font-bold text-[#797979] sm:text-[14px] sm:font-normal">
+          User List
+        </h2>
         <SearchCollaborationModal
           companies={companies}
           setCompanyAdmins={setCompanyAdmins}

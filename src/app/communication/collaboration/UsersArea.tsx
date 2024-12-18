@@ -8,18 +8,21 @@ export default function UsersArea({
   selectedUsersList,
   setSelectedUsersList,
   totalMessageBoxLength,
+  className,
 }: {
   previousMessages: (Message & { attachment: Attachment[] | null })[];
   currentUser: NextAuthUser;
   selectedUsersList: any[];
   setSelectedUsersList: React.Dispatch<React.SetStateAction<any[]>>;
   totalMessageBoxLength: number;
+  className?: string;
 }) {
   return (
     <div
       className={cn(
-        "grid h-[83vh] w-full gap-3",
+        "grid w-full gap-3 md:h-[83vh]",
         totalMessageBoxLength > 1 ? "grid-cols-2" : "grid-cols-1",
+        className,
       )}
     >
       {selectedUsersList &&
