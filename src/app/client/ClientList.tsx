@@ -32,7 +32,7 @@ export default function ClientList({
 
   return (
     <div>
-      <div className="app-shadow w-full rounded-lg bg-white p-3">
+      <div className="app-shadow w-full rounded-lg bg-white p-3 overflow-x-auto">
         <table className="w-full">
           <thead className="">
             <tr className="h-10 border-b">

@@ -139,7 +139,16 @@ model Lead {
     company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
     columnId    Int?     @map("column_id")
     column      Column?  @relation(fields: [columnId], references: [id], onDelete: Cascade)
-}   
+}
+
+model TwilioMessage {
+    id        Int    @id @default(autoincrement())
+    from      String
+    to        String
+    message   String
+    companyId Int    @map("company_id")
+    timestamp String
+}
 
 model LeaveRequest {
     id          Int                @id @default(autoincrement())

@@ -1,14 +1,14 @@
 import Title from "@/components/Title";
+import { getCompanyId } from "@/lib/companyId";
+import { db } from "@/lib/db";
+import Link from "next/link";
 import React from "react";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
 import { IoPieChartOutline } from "react-icons/io5";
-import { db } from "@/lib/db";
-import { getCompanyId } from "@/lib/companyId";
 import EmployeeFilter from "./components/EmployeeFilter";
 import EmployeeTable from "./EmployeeTable";
 import TotalPayouts from "./TotalPayouts";
-import Link from "next/link";
 
 export default async function Page() {
   const companyId = await getCompanyId();
@@ -37,10 +37,10 @@ export default async function Page() {
   });
 
   return (
-    <div className="h-full w-full space-y-8">
+    <div className="h-full w-full space-y-8 px-2">
       <Title>Employee List</Title>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-y-8">
         <TotalPayouts />
         <div>
           {/* /reporting/workforce */}

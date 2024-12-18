@@ -9,6 +9,7 @@ import { db } from "@/lib/db";
 import NavigationTabs from "./NavigationTabs";
 import Table from "./Table";
 import Title from "@/components/Title";
+import { planObject } from "@/utils/planObject";
 
 async function fetchAndTransformData(
   type: InvoiceType,
@@ -92,7 +93,7 @@ export default async function EstimatesPage({
 
       {/* Use the NavigationTabs component with the 'a-estimate' tab as active */}
       <NavigationTabs activeTab="a-estimate">
-        <Table data={estimates} />
+        <Table data={planObject(estimates)} />
       </NavigationTabs>
     </div>
   );
