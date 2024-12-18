@@ -1,10 +1,10 @@
 import { InterceptedDialog } from "@/components/Dialog";
 import { db } from "@/lib/db";
 
-import { notFound, redirect } from "next/navigation";
 
-import InvoiceComponent from "./InvoiceComponent";
 import { getTechnicians } from "@/actions/estimate/technician/getTechnicians";
+import InvoiceComponent from "./InvoiceComponent";
+import ProtectedRouteForViewInvoice from "./ProtectedRouteForViewInvoice";
 
 export default async function ViewEstimate({
   params: { id },
@@ -33,33 +33,37 @@ export default async function ViewEstimate({
     },
   });
 
-  if (!invoice) redirect('/estimate');
+  // if (!invoice) {
+  //   return notFound();
+  // }
 
-  const clientId = invoice.clientId
+  const clientId = invoice?.clientId
     ? await db.client.findUnique({
         where: { id: invoice.clientId },
       })
     : null;
-  const vehicle = invoice.vehicleId
+  const vehicle = invoice?.vehicleId
     ? await db.vehicle.findUnique({
-        where: { id: invoice.vehicleId },
+        where: { id: invoice?.vehicleId },
       })
     : null;
 
-  const invoiceTechnicians = await getTechnicians({ invoiceId: invoice.id });
+  const invoiceTechnicians = await getTechnicians({ invoiceId: invoice?.id });
 
   return (
     <InterceptedDialog>
-      {invoice && (
-        <InvoiceComponent
-          id={id}
-          //@ts-ignore
-          invoice={invoice}
-          clientId={clientId}
-          vehicle={vehicle}
-          invoiceTechnicians={invoiceTechnicians}
-        />
-      )}
+      <ProtectedRouteForViewInvoice hasInvoice={!!invoice}>
+        {invoice && (
+          <InvoiceComponent
+            id={id}
+            //@ts-ignore
+            invoice={invoice}
+            clientId={clientId}
+            vehicle={vehicle}
+            invoiceTechnicians={invoiceTechnicians}
+          />
+        )}
+      </ProtectedRouteForViewInvoice>
     </InterceptedDialog>
   );
 }

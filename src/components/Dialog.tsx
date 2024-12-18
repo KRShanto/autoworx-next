@@ -157,8 +157,6 @@ export function InterceptedDialog({ children }: { children: ReactNode }) {
     setOpen(false);
   }
 
-  console.log({ isEstimateEditRoute });
-
   return (
     <Dialog open={open} onOpenChange={close}>
       {children}
