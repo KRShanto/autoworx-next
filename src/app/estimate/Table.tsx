@@ -49,7 +49,7 @@ export default function Table({ data }: { data: InvoiceData[] }) {
       }
       return true;
     });
-    
+
     const filteredStatus = filtered.filter((row) => {
       if (status) {
         return row.status === status;
@@ -165,7 +165,7 @@ export default function Table({ data }: { data: InvoiceData[] }) {
                     href={`/estimate/view/${data.id}`}
                     className="block h-full w-full"
                   >
-                    {moment(data.createdAt).format("DD.MM.YYYY")}
+                    {moment(data.createdAt).format("MM/DD/YYYY")}
                   </Link>
                 </td>
                 <td className="px-4 py-2 text-left">
