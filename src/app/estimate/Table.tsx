@@ -73,7 +73,7 @@ export default function Table({ data }: { data: InvoiceData[] }) {
     });
 
     setFilteredData(filteredDate);
-  }, [search, dateRange, status]);
+  }, [search, dateRange, status, data]);
 
   return (
     <div className="min-h-[65vh] overflow-x-scroll rounded-md bg-white xl:overflow-hidden">
