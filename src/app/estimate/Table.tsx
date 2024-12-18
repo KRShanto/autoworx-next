@@ -69,7 +69,7 @@ export default function Table({ data }: { data: InvoiceData[] }) {
     });
 
     setFilteredData(filteredDate);
-  }, [search, dateRange, status]);
+  }, [search, dateRange, status, data]);
 
   return (
     <div className="min-h-[65vh] overflow-x-scroll rounded-md bg-white xl:overflow-hidden">
@@ -174,7 +174,7 @@ export default function Table({ data }: { data: InvoiceData[] }) {
                 <Link
                   href={`/estimate/edit/${data.id}`}
                   className="text-2xl text-blue-600"
-                  onClick={() => setActionType('edit')}
+                  onClick={() => setActionType("edit")}
                 >
                   <CiEdit />
                 </Link>
