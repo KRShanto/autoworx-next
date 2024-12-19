@@ -41,6 +41,7 @@ import { useReactToPrint } from "react-to-print";
 import { InvoiceItems } from "./InvoiceItems";
 import PDFComponent from "./PDFComponent";
 import { useEstimateNavigationStore } from "@/stores/estimateNavigationStore";
+import { cn } from "@/lib/cn";
 
 const InvoiceComponent = ({
   id,
@@ -66,7 +67,6 @@ const InvoiceComponent = ({
   vehicle: Vehicle | null;
   invoiceTechnicians: Technician[];
 }) => {
-  console.log({ InvoicePhotos: invoice.photos });
   const router = useRouter();
   const componentRef = useRef(null);
   const [showAuthorizedName, setShowAuthorizedName] = useState(false);
@@ -78,6 +78,7 @@ const InvoiceComponent = ({
   });
 
   const handleEdit = () => {
+    // window.location.href = `/estimate/edit/${id}`;
     router.push(`/estimate/edit/${id}`);
   };
 
@@ -110,13 +111,13 @@ const InvoiceComponent = ({
     <div>
       <DialogPortal>
         <DialogOverlay />
-        <DialogContentBlank className="fixed left-[50%] top-[50%] z-50 flex max-h-full translate-x-[-50%] translate-y-[-50%] justify-center gap-4 duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
+        <DialogContentBlank className="fixed left-[50%] top-[50%] z-50 flex max-h-full max-w-[98%] translate-x-[-50%] translate-y-[-50%] flex-col justify-center gap-1 duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] md:flex-row md:gap-4">
           <div
             ref={componentRef}
-            className="#shadow-lg relative grid h-[90vh] w-[740px] shrink grow-0 gap-4 overflow-y-auto rounded-md border bg-background p-6"
+            className="#shadow-lg no-visible-scrollbar relative grid h-[90vh] shrink grow-0 flex-col items-center justify-center gap-4 overflow-y-auto rounded-md border bg-background p-6 md:w-[740px] md:flex-row"
           >
             <div className="flex items-center justify-center print:hidden">
-              <div className="flex items-center gap-3">
+              <div className="grid grid-cols-2 items-center gap-3 md:flex">
                 <button
                   className="flex items-center gap-1 rounded bg-[#6571FF] px-4 py-1 text-white"
                   onClick={handleEdit}
@@ -171,7 +172,12 @@ const InvoiceComponent = ({
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <div className="flex aspect-square w-32 items-center justify-center text-center font-bold text-white">
+              <div
+                className={cn(
+                  "flex aspect-square w-32 items-center justify-center text-center font-bold text-white",
+                  !companyDetails?.image && "bg-gray-500",
+                )}
+              >
                 {companyDetails?.image ? (
                   <Image
                     src={companyDetails.image}
@@ -204,10 +210,10 @@ const InvoiceComponent = ({
             {/**
              * Information
              */}
-            <div className="flex">
-              <div className="grid grow grid-cols-3 gap-4 text-xs">
-                <h1 className="col-span-full text-3xl font-bold uppercase text-slate-500">
-                  {type?.toUpperCase()}
+            <div className="flex flex-col space-y-3 md:flex-row md:space-y-0">
+              <div className="grid grow grid-cols-2 gap-4 text-xs md:grid-cols-3">
+                <h1 className="col-span-full text-xl font-bold uppercase text-slate-500 md:text-3xl">
+                  {invoice?.type?.toUpperCase()}
                 </h1>
                 <div>
                   <h2 className="font-bold text-slate-500">Estimate To:</h2>
@@ -235,7 +241,7 @@ const InvoiceComponent = ({
                   <p>{moment(invoice.createdAt).format("MMM DD, YYYY")}</p>
                   <p>Bill Status</p>
                   <p
-                    className="max-w-32 rounded-md px-2 py-[1px] text-xs font-semibold"
+                    className="mt-2 max-w-32 rounded-md px-2 py-[1px] text-xs font-semibold md:mt-0"
                     style={{
                       color: invoice.column?.textColor || undefined,
                       backgroundColor: invoice?.column?.bgColor || undefined,
@@ -394,39 +400,41 @@ const InvoiceComponent = ({
               authorizedName={authorizedName}
             />
           </PDFViewer> */}
-          <div className="flex h-[90vh] w-[394px] shrink grow-0 flex-col gap-4 print:hidden">
-            <div className="#shadow-lg grid flex-1 grid-cols-1 gap-4 overflow-y-auto rounded-md border bg-background p-6">
-              <h2 className="col-span-full text-3xl font-bold uppercase text-slate-500">
+          <div className="h-[300px] w-full shrink grow-0 flex-col gap-4 space-y-1 overflow-y-auto md:flex md:h-[90vh] md:w-[394px] md:space-y-0 print:hidden">
+            <div className="#shadow-lg h-[calc(100%-50px)] flex-1 overflow-y-auto rounded-md border bg-background p-3 md:p-6">
+              <h2 className="col-span-full mb-3 text-xl font-bold uppercase text-slate-500 md:text-3xl">
                 Attachments
               </h2>
-              {invoice.photos.map((x) => {
-                return (
-                  <Link
-                    href={`/estimate/photo?url=${x.photo}`}
-                    key={x.id}
-                    className="relative aspect-square"
-                  >
-                    <Image
-                      src={x.photo}
-                      alt="attachment"
-                      fill
-                      className="cursor-pointer"
-                    />
-                  </Link>
-                );
-              })}
+              <div className="flex grid-cols-1 gap-4 overflow-x-auto md:grid">
+                {invoice.photos.map((x) => {
+                  return (
+                    <Link
+                      href={`/estimate/photo?url=${x.photo}`}
+                      key={x.id}
+                      className="relative aspect-square size-36 md:h-full md:w-full"
+                    >
+                      <Image
+                        src={x.photo}
+                        alt="attachment"
+                        fill
+                        className="cursor-pointer"
+                      />
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
             {type === "invoice" && (
               <Link
                 href={`/estimate/workorder/${id}`}
-                className="rounded-md bg-[#6571FF] py-2 text-center text-white disabled:bg-gray-400"
+                className="block w-full rounded-md bg-[#6571FF] py-2 text-center text-white disabled:bg-gray-400 md:inline-block"
               >
                 {isWorkOrderCreate ? "View Work Order" : "Create Work Order"}
               </Link>
             )}
             <button
               onClick={handleEmail}
-              className="flex items-center justify-center gap-2 rounded-md bg-white py-2 text-[#6571FF]"
+              className="flex w-full items-center justify-center gap-2 rounded-md bg-white py-2 text-[#6571FF]"
             >
               Share Invoice
               <FaRegShareFromSquare />
