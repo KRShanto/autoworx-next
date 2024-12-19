@@ -6,8 +6,8 @@ import moment from "moment";
 import { useEffect, useState } from "react";
 import { FaTimes, FaTrash } from "react-icons/fa";
 import { TbUserX } from "react-icons/tb";
-import NewTemplate from "../../../../../components/Lists/NewTemplate";
 import { deleteTemplate } from "../../../../../actions/appointment/deleteTemplate";
+import NewTemplate from "../../../../../components/Lists/NewTemplate";
 import UpdateTemplate from "./UpdateTemplateComponent";
 
 export function Reminder({
@@ -108,7 +108,7 @@ export function Reminder({
           newButton={
             <NewTemplate
               type="Confirmation"
-              clientName={client.firstName + " " + client.lastName}
+              clientName={client?.firstName + " " + client?.lastName}
               vehicleModel={vehicle?.model!}
               setTemplate={setConfirmationTemplate}
               setOpenTemplate={setOpenConfirmation}
@@ -178,7 +178,7 @@ export function Reminder({
           newButton={
             <NewTemplate
               type="Reminder"
-              clientName={client.firstName + " " + client.lastName}
+              clientName={client?.firstName + " " + client?.lastName}
               vehicleModel={vehicle?.model!}
               setTemplate={setReminderTemplate}
               setOpenTemplate={setOpenReminder}

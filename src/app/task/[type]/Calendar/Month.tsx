@@ -185,16 +185,51 @@ export default function Month({
   //   );
   // }
 
-  function getTasks(date: Date) {
-    return tasks.filter((task) => {
-      const taskDate = new Date(task.date);
+  // function getTasks(date: Date) {
+  //   return tasks.filter((task) => {
+  //     const taskDate = new Date(task.date);
+  //     console.log("🚀 ~ returntasks.filter ~ taskDate:", taskDate);
 
-      // Normalize both dates to UTC for comparison
-      return (
-        taskDate.getUTCFullYear() === date.getUTCFullYear() &&
-        taskDate.getUTCMonth() === date.getUTCMonth() &&
-        taskDate.getUTCDate() === date.getUTCDate()
-      );
+  //     // Normalize both dates to UTC for comparison
+  //     return (
+  //       taskDate.getUTCFullYear() === date.getUTCFullYear() &&
+  //       taskDate.getUTCMonth() === date.getUTCMonth() &&
+  //       taskDate.getUTCDate() === date.getUTCDate()
+  //     );
+  //   });
+  // }
+  // function getTasks(date: Date) {
+  //   console.log("🚀 ~ getTasks ~ date:", date);
+  //   return tasks.filter((task) => {
+  //     const taskDate = new Date(
+  //       new Date(task.date).toISOString().split("T")[0],
+  //     );
+  //     console.log("🚀 ~ returntasks.filter ~ taskDate:", taskDate);
+
+  //     let currDate = new Date(new Date(date).toISOString().split("T")[0]);
+  //     console.log("🚀 ~ returntasks.filter ~ currDate:", currDate);
+
+  //     // Normalize taskDate and comparison date to the same UTC date string
+  //     const taskDateString = taskDate.toISOString().split("T")[0]; // Format: YYYY-MM-DD
+  //     const dateString = currDate.toISOString().split("T")[0]; // Normalize input date
+
+  //     console.log("🚀 ~ Comparing Dates:", taskDateString, dateString);
+
+  //     return taskDateString === dateString;
+  //   });
+  // }
+
+  function getTasks(date: Date) {
+
+    return tasks.filter((task) => {
+      // Extract task date in UTC, ignoring time zone
+      const taskDateString = task.date.toISOString().split("T")[0];
+
+      // Convert current date to UTC string (ignoring time zone)
+      const currDateString = date.toLocaleDateString("en-CA"); // This gives you 'YYYY-MM-DD' format directly
+
+
+      return taskDateString === currDateString;
     });
   }
 

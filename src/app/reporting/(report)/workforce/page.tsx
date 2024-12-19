@@ -1,7 +1,7 @@
-import Calculation from "../../components/Calculation";
+import { auth } from "@/app/auth";
 import { cn } from "@/lib/cn";
 import { db } from "@/lib/db";
-import { auth } from "@/app/auth";
+import Calculation from "../../components/Calculation";
 
 import FilterHeader from "./FilterHeader";
 type TProps = {
@@ -152,7 +152,7 @@ export default async function WorkforceReportPage({ searchParams }: TProps) {
                     ${totalPayout}
                   </td>
                   <td className="border-b px-4 py-2 text-left"></td>
-                  <td className={cn("border-b px-4 py-2 text-center")}>
+                  <td className={cn("border-b px-4 py-2 text-left")}>
                     {jobsCompleted}
                   </td>
                 </tr>
