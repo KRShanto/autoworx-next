@@ -3,8 +3,11 @@ import RevenueBarChartContainer from "./chart/RevenueBarChartContainer";
 import RevenueLineChartContainer from "./chart/RevenueLineChartContainer";
 import moment from "moment";
 import { Prisma } from "@prisma/client";
+import { auth } from "@/app/auth";
+import { AuthSession } from "@/types/auth";
 
 export default async function Analytics() {
+  const session = (await auth()) as AuthSession | null;
   let last30Days = moment().subtract(30, "days");
   let today = moment();
 
@@ -13,6 +16,7 @@ export default async function Analytics() {
 
   const last30DaysInvoice = await db.invoice.findMany({
     where: {
+      companyId: session?.user.companyId,
       AND: [
         {
           createdAt: {
@@ -30,7 +34,17 @@ export default async function Analytics() {
               category: true,
             },
           },
+          service: {
+            include: {
+              Technician: true,
+            },
+          },
           labor: true,
+        },
+      },
+      technician: {
+        select: {
+          amount: true,
         },
       },
     },
@@ -40,13 +54,16 @@ export default async function Analytics() {
     let day = moment().subtract(i, "days").format("MMM Do, YYYY");
     return last30DaysInvoice.reduce(
       (acc, invoice) => {
+        const laborCost = invoice?.technician.reduce((acc, technician) => {
+          acc += Number(technician?.amount);
+          return acc;
+        }, 0);
         const profitInfo = invoice.invoiceItems.reduce(
           (
             acc,
             cur: Prisma.InvoiceItemGetPayload<{
               include: {
                 materials: true;
-                labor: true;
               };
             }>,
           ) => {
@@ -56,9 +73,9 @@ export default async function Analytics() {
               0,
             );
             // labor cost price is assumed to be per hour
-            const laborCostPrice =
-              Number(cur.labor?.charge || 0) * Number(cur?.labor?.hours) || 0;
-            const costPrice = materialCostPrice + laborCostPrice;
+            // const laborCostPrice =
+            //   Number(cur.labor?.charge || 0) * Number(cur?.labor?.hours) || 0;
+            const costPrice = materialCostPrice;
             const formattedDate = moment(invoice.createdAt).format(
               "MMM Do, YYYY",
             );
@@ -72,7 +89,7 @@ export default async function Analytics() {
           },
         );
         if (profitInfo.day === day) {
-          acc.profit += profitInfo.profit;
+          acc.profit += profitInfo.profit - laborCost;
         }
         return acc;
       },
@@ -111,8 +128,9 @@ export default async function Analytics() {
         // labor cost price is assumed to be per hour
         const laborCostPrice =
           Number(cur.labor?.charge || 0) * Number(cur?.labor?.hours) || 0;
-        const costPrice = materialCostPrice + laborCostPrice;
-        cur.materials.forEach((material, i) => {
+        acc.costPrice += materialCostPrice + laborCostPrice;
+        const profit = Number(invoice.grandTotal) - acc.costPrice;
+        cur.materials.forEach((material) => {
           const categoryIndex = categoryByCalculation.findIndex(
             (category) => category.categoryName === material.category?.name,
           );
@@ -120,16 +138,15 @@ export default async function Analytics() {
           if (categoryIndex === -1) {
             categoryByCalculation.push({
               categoryName: material.category?.name!,
-              salePrice: acc + Number(invoice.grandTotal || 0) - costPrice,
+              salePrice: profit,
             });
           } else {
-            categoryByCalculation[categoryIndex].salePrice +=
-              acc + Number(invoice.grandTotal || 0) - costPrice;
+            categoryByCalculation[categoryIndex].salePrice += profit;
           }
         });
-        return acc + Number(invoice.grandTotal) - costPrice;
+        return acc;
       },
-      0,
+      { costPrice: 0 },
     );
   });
 

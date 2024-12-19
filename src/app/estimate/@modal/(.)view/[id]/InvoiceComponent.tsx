@@ -18,6 +18,7 @@ import {
   Invoice,
   InvoiceItem,
   InvoicePhoto,
+  InvoiceType,
   Labor,
   Material,
   Service,
@@ -424,7 +425,7 @@ const InvoiceComponent = ({
                 })}
               </div>
             </div>
-            {type === "invoice" && (
+            {invoice?.type === InvoiceType.Invoice && (
               <Link
                 href={`/estimate/workorder/${id}`}
                 className="block w-full rounded-md bg-[#6571FF] py-2 text-center text-white disabled:bg-gray-400 md:inline-block"

@@ -66,7 +66,7 @@ export async function updateInvoice(
 
     const productsWithQuantity = materials.reduce(
       (acc: { id: number; quantity: number }[], material) => {
-        const product = acc.find((p) => p.id === material.productId);
+        const product = acc.find((p) => p.id === material?.productId);
 
         if (product) {
           if (material.quantity !== null) {
