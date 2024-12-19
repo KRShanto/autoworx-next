@@ -51,6 +51,7 @@ export type TInvoice = Prisma.InvoiceGetPayload<{
         lastName: true;
       };
     };
+    technician: true;
   };
 }>;
 
@@ -119,6 +120,7 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
           lastName: true,
         },
       },
+      technician: true,
     },
   });
 
@@ -142,7 +144,7 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
           if (!invoice.client && !invoice.id) {
             return false;
           }
-          const fullName = `${invoice?.client!.firstName} ${invoice?.client?.lastName}`;
+          const fullName = `${invoice?.client?.firstName} ${invoice?.client?.lastName}`;
           return (
             fullName
               .toLowerCase()
@@ -163,6 +165,10 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
   let maxProfit = 0;
 
   const filteredInvoice = filteredInvoices.filter((invoice) => {
+    const laborCost = invoice?.technician.reduce((acc, technician) => {
+      acc += Number(technician?.amount);
+      return acc;
+    }, 0);
     const { costPrice, profitPrice } = invoice.invoiceItems.reduce(
       (
         acc,
@@ -179,9 +185,9 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
           0,
         );
         // labor cost price is assumed to be per hour
-        const laborCostPrice =
-          Number(cur.labor?.charge || 0) * Number(cur?.labor?.hours) || 0;
-        const costPrice = materialCostPrice + laborCostPrice;
+        // const laborCostPrice =
+        //   Number(cur.labor?.charge || 0) * Number(cur?.labor?.hours) || 0;
+        const costPrice = materialCostPrice;
         acc.costPrice += costPrice;
         acc.profitPrice = Number(invoice.grandTotal) - acc.costPrice;
         return acc;
@@ -191,8 +197,9 @@ export default async function RevenueReportPage({ searchParams }: TProps) {
         profitPrice: 0,
       },
     );
-    (invoice as any).costPrice = costPrice;
-    (invoice as any).profitPrice = profitPrice;
+
+    (invoice as any).costPrice = costPrice + laborCost;
+    (invoice as any).profitPrice = profitPrice - laborCost;
     maxCost = Math.max(maxCost, costPrice);
     maxProfit = Math.max(maxProfit, profitPrice);
     if (!searchParams.price && !searchParams.cost && !searchParams.profit) {
