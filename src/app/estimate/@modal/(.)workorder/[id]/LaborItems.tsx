@@ -12,9 +12,11 @@ import CreateAndEditLabor from "./CreateAndEditLabor";
 // };
 
 export default function LaborItems({
+  invoiceItemId,
   invoiceId,
   serviceId,
 }: {
+  invoiceItemId: number;
   invoiceId: string;
   serviceId: number;
 }) {
@@ -29,7 +31,7 @@ export default function LaborItems({
       try {
         const technicians = await getTechnicians({
           invoiceId,
-          serviceId,
+          invoiceItemId,
         });
         setTechnicians(technicians);
       } catch (err: any) {
@@ -61,6 +63,7 @@ export default function LaborItems({
 
       <div className="flex flex-wrap items-center gap-2">
         <CreateAndEditLabor
+          invoiceItemId={invoiceItemId}
           invoiceId={invoiceId}
           serviceId={serviceId}
           setTechnicians={setTechnicians}
@@ -72,6 +75,7 @@ export default function LaborItems({
             className="flex items-center justify-evenly space-x-1 text-nowrap rounded-full border bg-[#6571FF] px-3 py-0.5"
           >
             <CreateAndEditLabor
+              invoiceItemId={invoiceItemId}
               invoiceId={invoiceId}
               serviceId={serviceId}
               technician={technician}

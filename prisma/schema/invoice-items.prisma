@@ -4,17 +4,18 @@
 // And one InvoiceItem can have one service, material and labor.
 // Its dependant on invoice. So, invoiceItem can't be in multiple invoices.
 model InvoiceItem {
-    id        Int        @id @default(autoincrement())
-    invoiceId String?    @map("invoice_id")
-    serviceId Int?       @map("service_id")
-    laborId   Int?       @map("labor_id")
-    createdAt DateTime   @default(now()) @map("created_at")
-    updatedAt DateTime   @default(now()) @updatedAt @map("updated_at")
-    invoice   Invoice?   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-    service   Service?   @relation(fields: [serviceId], references: [id])
-    labor     Labor?     @relation(fields: [laborId], references: [id])
-    materials Material[]
-    ItemTag   ItemTag[]
+    id           Int          @id @default(autoincrement())
+    invoiceId    String?      @map("invoice_id")
+    serviceId    Int?         @map("service_id")
+    laborId      Int?         @map("labor_id")
+    createdAt    DateTime     @default(now()) @map("created_at")
+    updatedAt    DateTime     @default(now()) @updatedAt @map("updated_at")
+    invoice      Invoice?     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+    service      Service?     @relation(fields: [serviceId], references: [id])
+    labor        Labor?       @relation(fields: [laborId], references: [id])
+    materials    Material[]
+    ItemTag      ItemTag[]
+    technicians  Technician[]
 }
 
 enum InvoiceItemMaterialType {

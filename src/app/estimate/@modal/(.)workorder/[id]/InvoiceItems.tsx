@@ -75,6 +75,7 @@ export function InvoiceItems({ items, invoiceTechnicians }: TProps) {
             </div>
 
             <LaborItems
+              invoiceItemId={item.id}
               invoiceId={item?.invoiceId as string}
               serviceId={item?.serviceId as number}
             />
