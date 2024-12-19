@@ -98,7 +98,7 @@ export default function MaterialCreate() {
       vendorId: vendor?.id,
       tags,
       notes,
-      quantity: quantity ?? 1,
+      quantity: quantity || 1,
       cost: cost || 0,
       sell: sell || 0,
       discount: discount || 0,
@@ -330,7 +330,7 @@ export default function MaterialCreate() {
         <input
           type="number"
           id="qt"
-          value={actionType === "edit" ? quantity : undefined}
+          value={actionType === "create" && data.edit === false ? 1 : quantity}
           onChange={(e) => setQuantity(parseFloat(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
           placeholder="1"
