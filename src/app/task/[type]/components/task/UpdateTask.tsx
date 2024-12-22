@@ -24,6 +24,7 @@ import dayjs from "dayjs";
 import moment from "moment";
 import { useRouter } from "next/navigation";
 import { deleteTask } from "../../../../../actions/task/deleteTask";
+import AssignTaskDropDown from "./AssignTaskDropDown";
 
 export default function UpdateTask() {
   const { popup, data, close } = usePopupStore();
@@ -31,7 +32,6 @@ export default function UpdateTask() {
     companyUsers: User[];
     task: CalendarTask;
   };
-
 
   const router = useRouter();
 
@@ -49,6 +49,9 @@ export default function UpdateTask() {
   const [date, setDate] = useState<string>(
     moment(task.date).format("YYYY-MM-DD"),
   );
+
+  console.log({ assignedUsers });
+  console.log({ task });
 
   async function handleSubmit() {
     try {
@@ -91,7 +94,7 @@ export default function UpdateTask() {
 
   return (
     <Dialog open={popup === "UPDATE_TASK"} onOpenChange={close}>
-      <DialogContent>
+      <DialogContent className="no-visible-scrollbar overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Update Task</DialogTitle>
         </DialogHeader>
@@ -151,54 +154,13 @@ export default function UpdateTask() {
 
           {/* custom radio. show user name and image (column)*/}
           {/* TODO */}
-          <div className="mb-4 flex flex-col">
-            <label htmlFor="assigned_users">Assign</label>
 
-            <button
-              onClick={() => setShowUsers(!showUsers)}
-              type="button"
-              className="flex w-full items-center justify-end rounded-md border-2 border-gray-500 p-2"
-            >
-              {showUsers ? (
-                <FaChevronUp className="text-[#797979]" />
-              ) : (
-                <FaChevronDown className="text-[#797979]" />
-              )}
-            </button>
-
-            {showUsers && (
-              <div className="mt-2 flex h-40 flex-col gap-2 overflow-y-auto p-2 font-bold">
-                {companyUsers.map((user) => (
-                  <label
-                    htmlFor={user.id.toString()}
-                    key={user.id}
-                    className="flex items-center gap-2"
-                  >
-                    <input
-                      type="checkbox"
-                      name="assigned_users"
-                      id={user.id.toString()}
-                      value={user.id}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setAssignedUsers([...assignedUsers, user.id]);
-                        } else {
-                          setAssignedUsers(
-                            assignedUsers?.filter((id) => id !== user.id),
-                          );
-                        }
-                      }}
-                      checked={assignedUsers?.includes(user.id)}
-                    />
-                    <Avatar photo={user.image} width={40} height={40} />
-                    <span>
-                      {user.firstName} {user.lastName}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
+          <AssignTaskDropDown
+            assignedUsers={assignedUsers}
+            companyUsers={companyUsers}
+            setAssignedUsers={setAssignedUsers}
+            fromUpdate
+          />
 
           <div className="mb-4 flex flex-col">
             <label>Priority</label>

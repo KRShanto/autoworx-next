@@ -33,6 +33,7 @@ export default async function Page({
   });
 
   if (!invoice) return notFound();
+
   if (session.user.companyId === invoice.fromRequestedCompanyId)
     return notFound();
 
@@ -157,7 +158,7 @@ export default async function Page({
     },
   });
   return (
-    <div className="-my-2 grid h-[93vh] gap-3 overflow-clip py-2 md:grid-cols-[1fr,24rem] md:grid-rows-[auto,auto,1fr]">
+    <div className="gap-3 space-y-4 overflow-clip py-2 md:-my-2 md:min-h-[93vh] lg:grid lg:grid-cols-[1fr,24rem] lg:grid-rows-[auto,auto,1fr] lg:space-y-0">
       <Title>Estimate</Title>
 
       <SyncLists
@@ -201,11 +202,19 @@ export default async function Page({
         defaultValue="create"
         className="col-start-1 flex min-h-0 flex-col overflow-clip"
       >
-        <TabsList>
-          <TabsTrigger value="payments">Payments</TabsTrigger>
-          <TabsTrigger value="inspections">Inspections</TabsTrigger>
-          <TabsTrigger value="attachment">Attachment</TabsTrigger>
-          <TabsTrigger value="create">Create</TabsTrigger>
+        <TabsList className="grid grid-cols-4 md:inline-flex">
+          <TabsTrigger value="payments" className="order-4 md:order-1">
+            Payments
+          </TabsTrigger>
+          <TabsTrigger value="inspections" className="order-3 md:order-2">
+            Inspections
+          </TabsTrigger>
+          <TabsTrigger value="attachment" className="order-2 md:order-3">
+            Attachment
+          </TabsTrigger>
+          <TabsTrigger value="create" className="order-1 md:order-4">
+            Create
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="create">
@@ -228,7 +237,7 @@ export default async function Page({
         </TabsContent>
       </Tabs>
 
-      <div className="app-shadow col-start-2 row-start-2 row-end-4 grid h-[85vh] grid-rows-[1fr,auto,auto] divide-y rounded-md">
+      <div className="app-shadow col-start-2 row-start-2 row-end-4 grid grid-rows-[1fr,auto,auto] divide-y rounded-md md:h-[85vh]">
         <Create />
         <BillSummary />
       </div>

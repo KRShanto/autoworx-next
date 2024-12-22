@@ -18,6 +18,7 @@ type TechnicianInput = {
   userId: number;
   serviceId: number;
   invoiceId: string;
+  invoiceItemId: number;
 };
 
 /**

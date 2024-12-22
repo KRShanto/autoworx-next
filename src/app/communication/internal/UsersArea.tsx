@@ -2,7 +2,12 @@ import React, { SetStateAction, useEffect, useState } from "react";
 import MessageBox from "../MessageBox";
 import { User } from "next-auth";
 import { pusher } from "@/lib/pusher/client";
-import { Attachment, Message as DbMessage, Group, RequestEstimate } from "@prisma/client";
+import {
+  Attachment,
+  Message as DbMessage,
+  Group,
+  RequestEstimate,
+} from "@prisma/client";
 import { cn } from "@/lib/cn";
 import GroupMessageBox from "./GroupMessageBox";
 import UserMessageBox from "./UserMessageBox";
@@ -45,7 +50,7 @@ export default function UsersArea({
   return (
     <div
       className={cn(
-        "h-[88vh] w-full gap-3 sm:grid",
+        "w-full gap-3 sm:grid md:h-[88vh]",
         totalMessageBoxLength > 1 ? "grid-cols-2" : "grid-cols-1",
         className,
       )}

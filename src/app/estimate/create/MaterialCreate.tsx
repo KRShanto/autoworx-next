@@ -98,7 +98,7 @@ export default function MaterialCreate() {
       vendorId: vendor?.id,
       tags,
       notes,
-      quantity: quantity ?? 1,
+      quantity: quantity || 1,
       cost: cost || 0,
       sell: sell || 0,
       discount: discount || 0,
@@ -213,7 +213,7 @@ export default function MaterialCreate() {
   // console.log("MaterialCreateDiscount", discount);
   // console.log("MaterialCreateQuantity", quantity);
   return (
-    <div className="flex flex-col gap-2 p-5">
+    <div className="flex flex-col gap-2 p-10 md:p-5">
       <h3 className="w-full text-xl font-semibold">
         {/* Materials/Parts Information */}
         {data.edit ? "Edit Materials/Parts" : "Materials/Parts Information"}
@@ -330,7 +330,7 @@ export default function MaterialCreate() {
         <input
           type="number"
           id="qt"
-          value={actionType === "edit" ? quantity : undefined}
+          value={actionType === "create" && data.edit === false ? 1 : quantity}
           onChange={(e) => setQuantity(parseFloat(e.target.value))}
           className="w-full rounded-md border-2 border-slate-400 p-1 text-xs"
           placeholder="1"

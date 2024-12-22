@@ -50,19 +50,21 @@ export default function Header({
       setVehicleOpenDropdown(false);
     }
   }, [statusOpenDropdown, clientOpenDropdown, vehicleOpenDropdown]);
+
   return (
     <div className="app-shadow col-start-1 flex flex-wrap items-center gap-3 rounded-md p-3">
       <div className="mr-auto flex gap-1">
         <p>{invoiceId}</p>
       </div>
 
-      <CreateEstimateActionsButtons />
+      <CreateEstimateActionsButtons status={status!} />
 
       <div className="flex basis-full flex-wrap items-center gap-3">
         <SelectClient
           value={client}
           openDropdown={clientOpenDropdown}
           setOpenDropdown={setClientOpenDropdown}
+          invoice={invoice}
         />
         <SelectVehicle
           value={vehicle}

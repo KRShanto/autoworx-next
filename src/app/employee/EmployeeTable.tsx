@@ -1,12 +1,12 @@
 "use client";
 import { cn } from "@/lib/cn";
+import { useEmployeeFilterStore } from "@/stores/employeeFilter";
 import { User } from "@prisma/client";
 import moment from "moment";
 import Link from "next/link";
-import EditEmployee from "./EditEmployee";
-import DeleteEmployee from "./DeleteEmployee";
-import { useEmployeeFilterStore } from "@/stores/employeeFilter";
 import { useEffect, useState } from "react";
+import DeleteEmployee from "./DeleteEmployee";
+import EditEmployee from "./EditEmployee";
 
 export default function EmployeeTable({ employees }: { employees: User[] }) {
   const { dateRange, search, type } = useEmployeeFilterStore();
@@ -37,7 +37,7 @@ export default function EmployeeTable({ employees }: { employees: User[] }) {
   }, [dateRange, search, type, employees]);
 
   return (
-    <div className="app-shadow rounded-lg bg-white p-2">
+    <div className="app-shadow overflow-x-auto rounded-lg bg-white p-2">
       <table className="w-full">
         <thead>
           <tr className="h-10 border-b">

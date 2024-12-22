@@ -3,6 +3,7 @@ import moment from "moment";
 import Link from "next/link";
 import React from "react";
 import { TInvoice } from "./page";
+import { formatNumber } from "@/utils/formatNumber";
 
 type TProps = {
   invoice: TInvoice & { costPrice: number; profitPrice: number };
@@ -34,10 +35,13 @@ export default function RevenueTableRow({ invoice, index }: TProps) {
       </td>
       <td className="border-b px-4 py-2 text-left">{formattedDate}</td>
       <td className="border-b px-4 py-2 text-left">
-        {Number(invoice.grandTotal)}
+        {formatNumber(invoice.grandTotal?.toString() || 0)}
       </td>
-      <td className="border-b px-4 py-2 text-left">{invoice.costPrice}</td>
-      <td className="border-b px-4 py-2 text-left">{invoice.profitPrice}</td>
+      <td className="border-b px-4 py-2 text-left">{formatNumber(invoice.costPrice)}
+      </td>
+      <td className="border-b px-4 py-2 text-left">
+        {formatNumber(invoice.profitPrice.toString())}
+      </td>
     </tr>
   );
 }

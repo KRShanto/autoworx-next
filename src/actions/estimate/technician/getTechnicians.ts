@@ -10,17 +10,17 @@ import { Technician } from "@prisma/client";
  */
 export const getTechnicians = async ({
   invoiceId,
-  serviceId,
+  invoiceItemId,
 }: {
   invoiceId?: string;
-  serviceId?: number;
+  invoiceItemId?: number;
 }) => {
   try {
     // Fetch technicians from the database based on the provided invoiceId and/or serviceId
     const technicians = (await db.technician.findMany({
       where: {
         invoiceId,
-        serviceId,
+        invoiceItemId,
       },
     })) as (Technician & { name: string })[];
 

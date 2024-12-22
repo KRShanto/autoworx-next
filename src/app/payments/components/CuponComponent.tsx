@@ -1,13 +1,13 @@
 "use client";
-import React, { useState } from "react";
-import NewCoupon from "./NewCoupon";
-import QrCodeForCoupon from "./QrCodeForCoupon";
+import { deleteCoupon } from "@/actions/coupon/new";
 import { Coupon } from "@prisma/client";
 import moment from "moment";
+import React, { useState } from "react";
 import { CiEdit } from "react-icons/ci";
 import { FaTimes } from "react-icons/fa";
 import EditCoupon from "./EditCoupon";
-import { deleteCoupon } from "@/actions/coupon/new";
+import NewCoupon from "./NewCoupon";
+import QrCodeForCoupon from "./QrCodeForCoupon";
 
 // Define the props for the CouponTable component
 interface CouponTableProps {
@@ -115,7 +115,7 @@ const CuponComponet = ({ coupons, setCoupons }: CouponTableProps) => {
                     {coupon.discountType === "Fixed" ? "$" : "%"}
                   </td>
                   <td className="border-b border-gray-200 px-4 py-2">
-                    {moment.utc(coupon.startDate).format("DD/MM/YYYY")}
+                    {moment.utc(coupon.startDate).format("MM/DD/YYYY")}
                   </td>
                   <td className="border-b border-gray-200 px-4 py-2">
                     {coupon.status}

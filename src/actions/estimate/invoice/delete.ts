@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { revalidatePath } from "next/cache";
+import { redirect, RedirectType } from "next/navigation";
 
 /**
  * Deletes an invoice by its ID.

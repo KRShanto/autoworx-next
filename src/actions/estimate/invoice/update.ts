@@ -137,6 +137,10 @@ export async function updateInvoice(
 
     const productsWithQuantity = materials.reduce(
       (acc: { id: number; quantity: number }[], material) => {
+        //handle null or undefined product id error
+        if (!material || material.productId === undefined) {
+          return acc;
+        }
         const product = acc.find((p) => p.id === material.productId);
 
         if (product) {

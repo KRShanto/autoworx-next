@@ -22,6 +22,7 @@ import { updateTechnician } from "../../../../../actions/estimate/technician/upd
 import { getEmployees } from "@/actions/employee/get";
 
 type TProps = {
+  invoiceItemId: number; 
   invoiceId: string;
   serviceId: number;
   technician?: Technician & { name: string };
@@ -31,6 +32,7 @@ type TProps = {
 type TStatus = "Pending" | "In Progress" | "Complete" | "Cancel";
 
 export default function CreateAndEditLabor({
+  invoiceItemId,
   invoiceId,
   serviceId,
   technician,
@@ -157,6 +159,7 @@ export default function CreateAndEditLabor({
           priority,
           status,
           invoiceId,
+          invoiceItemId,
         };
         const response = await addTechnician(payload);
         if (response.type === "success") {
