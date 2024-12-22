@@ -69,3 +69,19 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
+// const twilio = require("twilio");
+// const accountSid = "";
+// const authToken = "";
+// const client = twilio(accountSid, authToken);
+
+// async function createMessage() {
+//   const message = await client.messages.create({
+//     body: "Test",
+//     from: "+",
+//     to: "+",
+//   });
+
+//   console.log(message.body);
+// }
+
+// createMessage();
