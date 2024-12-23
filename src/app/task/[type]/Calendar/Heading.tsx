@@ -1,3 +1,4 @@
+import { DropdownSelection } from "@/components/DropDownSelection.tsx";
 import { CalendarType } from "@/types/calendar";
 import type { EmailTemplate } from "@prisma/client";
 import {
@@ -7,16 +8,14 @@ import {
   User,
   Vehicle,
 } from "@prisma/client";
-import { sentenceCase } from "change-case";
 import moment, { Moment } from "moment";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { NewAppointment } from "../components/appointment/NewAppointment";
 import Settings from "../components/appointment/Settings";
-import dynamic from "next/dynamic";
-import { DropdownSelection } from "@/components/DropDownSelection.tsx";
 
 const ALLOWED_ROLES_FOR_NEW_APPOINTMENT = ["Admin", "Manager", "Sales"];
 
@@ -150,9 +149,10 @@ export default function Heading({
         {/* Type selector */}
         <DropdownSelection
           dropDownValues={["day", "week", "month"]}
-          onValueChange={(value) => router.push(value)}
+          onValueChange={(value) => router.push(value.toLowerCase())}
           changesValue={type}
-          buttonClassName="app-shadow rounded-md bg-white px-3 py-2 text-[#797979] "
+          buttonClassName="app-shadow rounded-md bg-white px-3 py-2 text-[#797979] capitalize"
+          contentClassName="capitalize"
         />
 
         {/* New Appointment button */}

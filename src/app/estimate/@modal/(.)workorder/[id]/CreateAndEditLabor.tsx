@@ -8,21 +8,16 @@ import {
 } from "@/components/Dialog";
 import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
-import {
-  Dispatch,
-  MouseEvent,
-  SetStateAction,
-  useEffect,
-  useState,
-} from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Priority, Status, Technician, User } from "@prisma/client";
 import { addTechnician } from "../../../../../actions/estimate/technician/addTechnician";
 import moment from "moment";
 import { updateTechnician } from "../../../../../actions/estimate/technician/updateTechnician";
 import { getEmployees } from "@/actions/employee/get";
+import { DropdownSelection } from "@/components/DropDownSelection";
 
 type TProps = {
-  invoiceItemId: number; 
+  invoiceItemId: number;
   invoiceId: string;
   serviceId: number;
   technician?: Technician & { name: string };
@@ -272,7 +267,13 @@ export default function CreateAndEditLabor({
           <div>
             <label htmlFor="status">Status</label>
             {/* TODO: use better UI */}
-            <select
+            <DropdownSelection
+              dropDownValues={["Pending", "In Progress", "Complete", "Cancel"]}
+              onValueChange={(value) => setStatus(value as any)}
+              changesValue={status}
+              buttonClassName="cursor-pointer rounded-md border-2 border-slate-400 p-2 outline-none w-full py-2"
+            />
+            {/* <select
               value={status}
               onChange={(e) => setStatus(e.target.value as any)}
               className="cursor-pointer rounded-md border-2 border-slate-400 p-2 outline-none"
@@ -282,7 +283,7 @@ export default function CreateAndEditLabor({
               <option value="In Progress">In Progress</option>
               <option value="Complete">Complete</option>
               <option value="Cancel">Cancel</option>
-            </select>
+            </select> */}
           </div>
         </div>
         <div>
