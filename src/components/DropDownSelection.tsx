@@ -26,6 +26,7 @@ type TProps = {
   contentClassName?: string;
   buttonClassName?: string;
   children?: React.ReactNode;
+  dropdownIcon?: React.ReactNode;
 };
 
 export function DropdownSelection({
@@ -37,9 +38,8 @@ export function DropdownSelection({
   contentClassName,
   buttonClassName,
   children,
+  dropdownIcon,
 }: TProps) {
-  //   const [position, setPosition] = React.useState("bottom");
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -54,7 +54,7 @@ export function DropdownSelection({
             )}
           >
             {changesValue || defaultValue}
-            <IoMdArrowDropdown />
+            {dropdownIcon ? dropdownIcon : <IoMdArrowDropdown />}
           </Button>
         )}
       </DropdownMenuTrigger>
