@@ -100,7 +100,9 @@ export default function MakePayment() {
   useEffect(() => setAmount(due), [due]);
 
   async function handleSubmit() {
+    console.log("Start of the handleSubmit function");
     const res1 = await createInvoice();
+    console.log("Invoice created");
     let res2;
 
     if (res1.type === "error") {
@@ -124,6 +126,8 @@ export default function MakePayment() {
         paymentMethodId: paymentMethod?.id,
       },
     });
+
+    console.log("Payment created");
 
     if (res2.type === "success") {
       setOpen(false);
@@ -460,6 +464,7 @@ export default function MakePayment() {
 
             <DialogFooter className="mt-5 flex justify-center gap-5">
               <button
+                type="button"
                 className="rounded-md border-2 border-slate-400 p-2 px-5"
                 onClick={() => setOpen(false)}
               >

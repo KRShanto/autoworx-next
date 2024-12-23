@@ -47,6 +47,8 @@ interface UpdateEstimateInput {
 export async function updateInvoice(
   data: UpdateEstimateInput,
 ): Promise<ServerAction> {
+  console.log("Start of the updateInvoice function");
+
   const companyId = await getCompanyId();
 
   // If updating to an Invoice, check inventory quantities
@@ -122,8 +124,12 @@ export async function updateInvoice(
     },
   });
 
+  console.log("Company ID: ", companyId);
+  console.log("Invoice: ", invoice);
+
   if (invoice?.type === "Invoice") {
-    // Merge all the same products and sum the quantity
+    console.log("Invoice type is 'Invoice'");
+    // merge all the same products and sum the quantity
     let materials: Material[] = [];
 
     for (const item in data.items) {
@@ -134,6 +140,8 @@ export async function updateInvoice(
         materials = [...materials, ...itemMaterials];
       }
     }
+
+    console.log("All materials: ", materials);
 
     const productsWithQuantity = materials.reduce(
       (acc: { id: number; quantity: number }[], material) => {
@@ -158,6 +166,8 @@ export async function updateInvoice(
       },
       [],
     );
+
+    console.log("Products with quantity: ", productsWithQuantity);
 
     await Promise.all(
       productsWithQuantity.map(async (product) => {
@@ -204,6 +214,8 @@ export async function updateInvoice(
           },
         });
 
+        console.log("Updated the history quantity");
+
         // Update the inventoryProduct quantity
         await db.inventoryProduct.update({
           where: {
@@ -215,6 +227,8 @@ export async function updateInvoice(
             },
           },
         });
+
+        console.log("Updated the inventoryProduct quantity");
       }),
     );
   }
@@ -230,9 +244,11 @@ export async function updateInvoice(
       data.columnId = undefined;
       data.type = "Estimate";
     }
+    console.log("Column: ", column);
   }
 
-  // Recalculate the profit
+  console.log("Re-calculating the profit");
+  // re-calculating the profit
   const totalCost = data.items.reduce((acc, item) => {
     const materials = item.materials;
     const labor = item.labor;
@@ -246,7 +262,9 @@ export async function updateInvoice(
     return acc + materialCost + laborCost;
   }, 0);
 
-  // Update the invoice itself
+  console.log("Total cost: ", totalCost);
+
+  // update invoice itself
   const updatedInvoice = await db.invoice.update({
     where: {
       id: data.id,
@@ -273,7 +291,9 @@ export async function updateInvoice(
     },
   });
 
-  // Get existing photos
+  console.log("Updated the invoice");
+
+  // get existing photos
   const previousPhotos = await db.invoicePhoto.findMany({
     where: {
       invoiceId: data.id,
@@ -305,14 +325,16 @@ export async function updateInvoice(
     });
   });
 
-  // Delete existing items
+  console.log("Updated the photos");
+  // delete existing items
   await db.invoiceItem.deleteMany({
     where: {
       invoiceId: data.id,
     },
   });
 
-  // Create new items, materials, labor, and tags associated with the invoice
+  console.log("Deleted the existing items");
+
   data.items.forEach(async (item) => {
     const service = item.service;
     const materials = item.materials;
@@ -334,6 +356,8 @@ export async function updateInvoice(
             id: labor.id,
           },
         });
+
+        console.log("Deleted the existing labor");
       }
     }
 
@@ -352,6 +376,8 @@ export async function updateInvoice(
       });
 
       laborId = newLabor.id;
+
+      console.log("Created the new labor");
     }
 
     // Create new items
@@ -363,12 +389,16 @@ export async function updateInvoice(
       },
     });
 
+    console.log("Created the new invoice item");
+
     // Delete existing materials
     await db.material.deleteMany({
       where: {
         invoiceItemId: invoiceItem.id,
       },
     });
+
+    console.log("Deleted the existing materials");
 
     // Create materials
     materials.forEach(async (material) => {
@@ -390,6 +420,8 @@ export async function updateInvoice(
           productId: material.productId,
         },
       });
+
+      console.log("Created the new material");
     });
 
     // Create tags associated with the invoice item
