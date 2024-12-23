@@ -1,9 +1,7 @@
 name: Deploy production
 
 on:
-  push:
-    branches:
-      - production
+  workflow_dispatch:
 
 jobs:
   build:
@@ -52,3 +50,19 @@ jobs:
         run: docker rm -f autworx-production-1
       - name: Run the container
         run: docker run -d -p 3000:3000 --name autworx-production-1 krshanto/autworx-production-1
+
+  merge:
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout production branch
+        uses: actions/checkout@v4
+        with:
+          ref: production
+      - name: Merge master into production
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git merge master
+      - name: Push to production
+        run: git push origin production
