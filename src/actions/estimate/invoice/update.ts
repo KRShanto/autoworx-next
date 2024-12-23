@@ -47,13 +47,15 @@ export async function updateInvoice(
   console.log("Start of the updateInvoice function");
 
   const companyId = await getCompanyId();
+
+  console.log("Company ID: ", companyId);
+
   const invoice = await db.invoice.findUnique({
     where: {
       id: data.id,
     },
   });
 
-  console.log("Company ID: ", companyId);
   console.log("Invoice: ", invoice);
 
   if (invoice?.type === "Invoice") {
