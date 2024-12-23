@@ -44,6 +44,8 @@ interface UpdateEstimateInput {
 export async function updateInvoice(
   data: UpdateEstimateInput,
 ): Promise<ServerAction> {
+  console.log("Start of the updateInvoice function");
+
   const companyId = await getCompanyId();
   const invoice = await db.invoice.findUnique({
     where: {
@@ -51,7 +53,11 @@ export async function updateInvoice(
     },
   });
 
+  console.log("Company ID: ", companyId);
+  console.log("Invoice: ", invoice);
+
   if (invoice?.type === "Invoice") {
+    console.log("Invoice type is 'Invoice'");
     // merge all the same products and sum the quantity
     let materials: Material[] = [];
 
@@ -63,6 +69,8 @@ export async function updateInvoice(
         materials = [...materials, ...itemMaterials];
       }
     }
+
+    console.log("All materials: ", materials);
 
     const productsWithQuantity = materials.reduce(
       (acc: { id: number; quantity: number }[], material) => {
@@ -87,6 +95,8 @@ export async function updateInvoice(
       },
       [],
     );
+
+    console.log("Products with quantity: ", productsWithQuantity);
 
     await Promise.all(
       productsWithQuantity.map(async (product) => {
@@ -134,6 +144,8 @@ export async function updateInvoice(
           },
         });
 
+        console.log("Updated the history quantity");
+
         // Update the inventoryProduct quantity
         await db.inventoryProduct.update({
           where: {
@@ -145,6 +157,8 @@ export async function updateInvoice(
             },
           },
         });
+
+        console.log("Updated the inventoryProduct quantity");
       }),
     );
   }
@@ -160,7 +174,10 @@ export async function updateInvoice(
       data.columnId = undefined;
       data.type = "Estimate";
     }
+    console.log("Column: ", column);
   }
+
+  console.log("Re-calculating the profit");
   // re-calculating the profit
   const totalCost = data.items.reduce((acc, item) => {
     const materials = item.materials;
@@ -174,6 +191,8 @@ export async function updateInvoice(
 
     return acc + materialCost + laborCost;
   }, 0);
+
+  console.log("Total cost: ", totalCost);
 
   // update invoice itself
   const updatedInvoice = await db.invoice.update({
@@ -201,6 +220,8 @@ export async function updateInvoice(
       type: data.type,
     },
   });
+
+  console.log("Updated the invoice");
 
   // get existing photos
   const previousPhotos = await db.invoicePhoto.findMany({
@@ -234,12 +255,15 @@ export async function updateInvoice(
     });
   });
 
+  console.log("Updated the photos");
   // delete existing items
   await db.invoiceItem.deleteMany({
     where: {
       invoiceId: data.id,
     },
   });
+
+  console.log("Deleted the existing items");
 
   data.items.forEach(async (item) => {
     const service = item.service;
@@ -262,6 +286,8 @@ export async function updateInvoice(
             id: labor.id,
           },
         });
+
+        console.log("Deleted the existing labor");
       }
     }
 
@@ -280,6 +306,8 @@ export async function updateInvoice(
       });
 
       laborId = newLabor.id;
+
+      console.log("Created the new labor");
     }
 
     // create new items
@@ -291,12 +319,16 @@ export async function updateInvoice(
       },
     });
 
+    console.log("Created the new invoice item");
+
     // Delete existing materials
     await db.material.deleteMany({
       where: {
         invoiceItemId: invoiceItem.id,
       },
     });
+
+    console.log("Deleted the existing materials");
 
     // Create materials
     materials.forEach(async (material) => {
@@ -318,6 +350,8 @@ export async function updateInvoice(
           productId: material.productId,
         },
       });
+
+      console.log("Created the new material");
     });
 
     tags.forEach(async (tag) => {
