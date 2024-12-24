@@ -48,7 +48,7 @@ export const defaultShopColumn = [
     title: "Pending",
     type: "shop",
     order: 0,
-    bgColor: "#F8F9FA",
+    bgColor: "#636363",
     textColor: "#FF8C00",
   },
   {

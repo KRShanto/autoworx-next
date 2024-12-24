@@ -53,7 +53,6 @@ export default function ManagePipelines({
   );
   const [deletedColumns, setDeletedColumns] = useState<Column[]>([]);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const router = useRouter();
 
   useEffect(() => {
     if (localColumns.length > columns.length) {
