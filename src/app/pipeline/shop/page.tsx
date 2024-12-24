@@ -5,18 +5,15 @@ import Header from "../components/Header";
 import Pipelines from "../components/Pipelines";
 import WorkOrders from "../components/WorkOrders";
 
-import { useServerGet } from "@/hooks/useServerGet";
-import SessionUserType from "@/types/sessionUserType";
-import { useRouter, useSearchParams } from "next/navigation";
-import getDataForNewAppointment from "@/actions/pipelines/getDataForNewAppointment";
-import { Technician, User } from "@prisma/client";
+import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
 import {
   InvoiceWithRelations,
   ShopLead,
   ShopPipelineData,
 } from "@/types/invoiceLead";
-import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
-import { getEmployees } from "@/actions/employee/get";
+import SessionUserType from "@/types/sessionUserType";
+import { Technician } from "@prisma/client";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type Props = {
   searchParams?: { view?: string };

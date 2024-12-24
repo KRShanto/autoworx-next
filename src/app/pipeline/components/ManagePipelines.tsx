@@ -37,7 +37,7 @@ interface DragItem {
   id: string;
   type: string;
 }
-const restrictedColumns = ["Pending", "In Progress", "Completed"];
+const restrictedColumns = ["Pending", "In Progress", "Completed", "Delivered"];
 
 export default function ManagePipelines({
   columns,

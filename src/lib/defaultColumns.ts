@@ -48,22 +48,22 @@ export const defaultShopColumn = [
     title: "Pending",
     type: "shop",
     order: 0,
-    bgColor: "#FFF9C4", // Light Yellow Background
-    textColor: "#F57F17", // Dark Yellow Text
+    bgColor: "#F8F9FA",
+    textColor: "#FF8C00",
   },
   {
     title: "In Progress",
     type: "shop",
     order: 1,
-    bgColor: "#BBDEFB", // Light Blue Background
-    textColor: "#1565C0", // Blue Text
+    bgColor: "#FFEFD5",
+    textColor: "#6C757D",
   },
   {
     title: "Completed",
     type: "shop",
     order: 2,
-    bgColor: "#C8E6C9", // Light Green Background
-    textColor: "#2E7D32", // Dark Green Text
+    bgColor: "#DDEEFF", // Light Green Background
+    textColor: "#004085", // Dark Green Text
   },
 
   {
@@ -79,6 +79,13 @@ export const defaultShopColumn = [
     order: 4,
     bgColor: "#FFCDD2", // Light Red Background
     textColor: "#C62828", // Red Text
+  },
+  {
+    title: "Delivered",
+    type: "shop",
+    order: 5,
+    bgColor: "#D4EDDA", // Light Red Background
+    textColor: "#155724", // Red Text
   },
 ];
 function createColumnWithColor() {
