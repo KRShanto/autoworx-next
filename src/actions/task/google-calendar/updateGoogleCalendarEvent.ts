@@ -108,22 +108,22 @@ async function updateGoogleCalendarEvent(
 
   const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
+
+
   const startDateTime = new Date(
-    `${task.date.split("T")[0]}T${task.startTime}:00.000Z`,
+    `${task.date.split("T")[0]}T${task.startTime}:00`,
   );
-  const endDateTime = new Date(
-    `${task.date.split("T")[0]}T${task.endTime}:00.000Z`,
-  );
+  const endDateTime = new Date(`${task.date.split("T")[0]}T${task.endTime}:00`);
 
   const event = {
     summary: task.title,
     start: {
       dateTime: startDateTime.toISOString(),
-      timeZone: "UTC",
+      timeZone: "Etc/GMT",
     },
     end: {
       dateTime: endDateTime.toISOString(),
-      timeZone: "UTC",
+      timeZone: "Etc/GMT",
     },
     description:
       "description" in task && task.description ? task.description : undefined,

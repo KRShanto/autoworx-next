@@ -296,7 +296,6 @@ export default function Day({
 
       {/* Tasks */}
       {sortedEvents.map((event, index) => {
-        console.log("🚀 ~ {sortedEvents.map ~ event:", event);
         const eventStartTime = moment(event.startTime, "HH:mm");
         const eventEndTime = moment(event.endTime, "HH:mm");
 
