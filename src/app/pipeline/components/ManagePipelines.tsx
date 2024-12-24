@@ -37,7 +37,7 @@ interface DragItem {
   id: string;
   type: string;
 }
-const restrictedColumns = ["Pending", "In Progress", "Completed"];
+const restrictedColumns = ["Pending", "In Progress", "Completed", "Delivered"];
 
 export default function ManagePipelines({
   columns,
@@ -53,7 +53,6 @@ export default function ManagePipelines({
   );
   const [deletedColumns, setDeletedColumns] = useState<Column[]>([]);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const router = useRouter();
 
   useEffect(() => {
     if (localColumns.length > columns.length) {

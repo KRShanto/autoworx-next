@@ -34,7 +34,6 @@ export default function Header({
 
   ...restProps
 }: Readonly<HeaderProps>) {
-  const router = useRouter();
   const pathname = usePathname();
 
   const [isPipelineManaged, setPipelineManaged] = useState(false);
