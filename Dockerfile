@@ -1,10 +1,10 @@
-FROM node:20-alpine
+FROM node:20-bullseye
 
 # Set working directory
 WORKDIR /app
 
 # Install required dependencies
-RUN apk add --no-cache openssl1.1-compat
+RUN apt update && apt install -y openssl
 
 # Copy package files and install dependencies
 COPY package*.json ./
