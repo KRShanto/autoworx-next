@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import twilio from "twilio";
+// import twilio from "twilio";
 
 // const accountSid = process.env.TWILIO_SID;
 // const authToken = process.env.TWILIO_TOKEN;
@@ -27,15 +27,23 @@ import twilio from "twilio";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    await db.twilioMessage.create({
+    const client = await db.client.findFirst({
+      where: {
+        mobile: body.from,
+      },
+    });
+   if (client){
+    const dbMessage = await db.clientSMS.create({
       data: {
         from: body.from,
         to: body.to,
         message: body.body,
-        timestamp: body.timestamp,
-        companyId: 1,
+        sentBy: "Client",
+        clientId: client.id,
+        companyId: client.companyId,
       },
     });
+   }
     console.log("Webhook Subscription Data:", body);
 
     // Send response
@@ -51,37 +59,21 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-export async function DELETE(req: NextRequest) {
-  try {
-    const body = await req.json();
-    console.log("Webhook Unsubscribe Data:", body);
+// export async function DELETE(req: NextRequest) {
+//   try {
+//     const body = await req.json();
+//     console.log("Webhook Unsubscribe Data:", body);
 
-    // Send response
-    return Response.json(
-      { message: "Webhook unsubscribed successfully", data: body },
-      { status: 200 },
-    );
-  } catch (error: any) {
-    console.error("Unsubscribe error:", error);
-    return Response.json(
-      { message: "Webhook unsubscribe failed", error: error?.message },
-      { status: 500 },
-    );
-  }
-}
-// const twilio = require("twilio");
-// const accountSid = "";
-// const authToken = "";
-// const client = twilio(accountSid, authToken);
-
-// async function createMessage() {
-//   const message = await client.messages.create({
-//     body: "Test",
-//     from: "+",
-//     to: "+",
-//   });
-
-//   console.log(message.body);
+//     // Send response
+//     return Response.json(
+//       { message: "Webhook unsubscribed successfully", data: body },
+//       { status: 200 },
+//     );
+//   } catch (error: any) {
+//     console.error("Unsubscribe error:", error);
+//     return Response.json(
+//       { message: "Webhook unsubscribe failed", error: error?.message },
+//       { status: 500 },
+//     );
+//   }
 // }
-
-// createMessage();

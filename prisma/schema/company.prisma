@@ -69,6 +69,7 @@ model Company {
     Holiday                 Holiday[]
     InventoryProductHistory InventoryProductHistory[]
     UserFeedback            UserFeedback[]
+    ClientSMS               ClientSMS[]
 }
 
 // create model that will handle multiple companies join and collaboration
@@ -141,14 +142,7 @@ model Lead {
     column      Column?  @relation(fields: [columnId], references: [id], onDelete: Cascade)
 }
 
-model TwilioMessage {
-    id        Int    @id @default(autoincrement())
-    from      String
-    to        String
-    message   String
-    companyId Int    @map("company_id")
-    timestamp String
-}
+
 
 model LeaveRequest {
     id          Int                @id @default(autoincrement())
