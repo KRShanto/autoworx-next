@@ -49,7 +49,6 @@ export default async function Page({
       year: getYear,
     },
   });
-
   if (user.employeeType == "Admin" || user.employeeType == "Manager") {
     // only admin and manager can see all appointments
     // appointments = await db.appointment.findMany({
@@ -67,11 +66,11 @@ export default async function Page({
     appointments = await db.appointment.findMany({
       where: {
         companyId,
-        appointmentUsers: {
-          some: {
-            userId: +user.id,
-          },
-        },
+        // appointmentUsers: {
+        //   some: {
+        //     userId: +user.id,
+        //   },
+        // },
       },
     });
 
@@ -295,6 +294,8 @@ export default async function Page({
       type: "Estimate",
     },
   });
+
+  console.log({ calendarAppointments, appointmentsFull });
 
   return (
     <>
