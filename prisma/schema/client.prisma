@@ -28,6 +28,7 @@ model Client {
     Invoice                Invoice[]
     ClientCoupon           ClientCoupon[]
     Task                   Task[]
+    ClientSMS              ClientSMS[]
 
     @@index([companyId], name: "fk_customers_company")
     @@map("Client")
