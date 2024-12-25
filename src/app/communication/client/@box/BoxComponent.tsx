@@ -1,6 +1,6 @@
 "use client";
 
-import { Client } from "@prisma/client";
+import { Client, ClientSMS } from "@prisma/client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Conversation } from "../utils/types";
@@ -9,10 +9,12 @@ import SMS from "./SMS";
 
 export default function BoxComponent({
   conversations,
+  allSms,
   clientId,
   client,
 }: {
   conversations: Conversation[];
+  allSms: ClientSMS[];
   clientId: number;
   client: Client;
 }) {
@@ -98,7 +100,7 @@ export default function BoxComponent({
           setConversations={setConversationState}
         />
       )}
-      {selected === "SMS" && <SMS clientId={clientId} />}
+      {selected === "SMS" && <SMS clientId={clientId} allSms={allSms} />}
     </div>
   );
 }

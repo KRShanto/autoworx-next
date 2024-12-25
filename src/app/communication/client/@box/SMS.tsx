@@ -1,12 +1,20 @@
 import { sendMessage } from "@/actions/communication/client/sendMessage";
 import { cn } from "@/lib/cn";
+import { ClientSMS } from "@prisma/client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Conversation } from "../utils/types";
 
-export default function SMS({ clientId }: { clientId: number }) {
+export default function SMS({
+  clientId,
+  allSms = [],
+}: {
+  clientId: number;
+  allSms: ClientSMS[];
+}) {
   const fileRef = useRef<HTMLInputElement>(null);
+  const [messages, setMessages] = useState(allSms);
   const containerRef = useRef<HTMLDivElement>(null);
   const [messageInput, setMessageInput] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -16,41 +24,39 @@ export default function SMS({ clientId }: { clientId: number }) {
   return (
     <div className="mb-2 h-[75%] 2xl:h-[85%]">
       <div ref={containerRef} className="h-[95%] w-full overflow-y-scroll">
-        {[]
-          .filter((convo: any) => convo.body)
-          .map((message: any, index: number) => (
-            <div
-              key={index}
-              className={`flex w-full items-center p-1 ${
-                message.labelIds[0] !== "SENT" ? "justify-start" : "justify-end"
-              }`}
-            >
-              <div className="flex w-full items-start gap-2 p-1">
-                {message.labelIds[0] !== "SENT" && (
-                  <Image
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNL_ZnOTpXSvhf1UaK7beHey2BX42U6solRA&s"
-                    alt="user"
-                    width={30}
-                    height={30}
-                    className="rounded-full"
-                  />
-                )}
+        {messages.map((message: any, index: number) => (
+          <div
+            key={index}
+            className={`flex w-full items-center p-1 ${
+              message.sentBy !== "Company" ? "justify-start" : "justify-end"
+            }`}
+          >
+            <div className="flex w-full items-start gap-2 p-1">
+              {message.sentBy !== "Company" && (
+                <Image
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNL_ZnOTpXSvhf1UaK7beHey2BX42U6solRA&s"
+                  alt="user"
+                  width={30}
+                  height={30}
+                  className="rounded-full"
+                />
+              )}
 
-                <p
-                  className={cn(
-                    "#max-w-[220px] max-w-[90%] break-words rounded-xl p-2 text-[14px]",
-                    message.labelIds[0] !== "SENT"
-                      ? "bg-[#D9D9D9] text-slate-800"
-                      : "ml-auto bg-[#006D77] text-white",
-                    // conversations[index - 1]?.labelIds[0] !== "SENT" &&
-                    //   "ml-[58px]",
-                  )}
-                >
-                  {message.body}
-                </p>
-              </div>
+              <p
+                className={cn(
+                  "#max-w-[220px] max-w-[90%] break-words rounded-xl p-2 text-[14px]",
+                  message.sentBy !== "Company"
+                    ? "bg-[#D9D9D9] text-slate-800"
+                    : "ml-auto bg-[#006D77] text-white",
+                  // conversations[index - 1]?.sentBy !== "SENT" &&
+                  //   "ml-[58px]",
+                )}
+              >
+                {message.message}
+              </p>
             </div>
-          ))}
+          </div>
+        ))}
       </div>
 
       <form
