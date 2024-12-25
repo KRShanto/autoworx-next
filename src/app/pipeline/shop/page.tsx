@@ -5,18 +5,15 @@ import Header from "../components/Header";
 import Pipelines from "../components/Pipelines";
 import WorkOrders from "../components/WorkOrders";
 
-import { useServerGet } from "@/hooks/useServerGet";
-import SessionUserType from "@/types/sessionUserType";
-import { useRouter, useSearchParams } from "next/navigation";
-import getDataForNewAppointment from "@/actions/pipelines/getDataForNewAppointment";
-import { Technician, User } from "@prisma/client";
+import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
 import {
   InvoiceWithRelations,
   ShopLead,
   ShopPipelineData,
 } from "@/types/invoiceLead";
-import { getWorkOrders } from "@/actions/pipelines/getWorkOrders";
-import { getEmployees } from "@/actions/employee/get";
+import SessionUserType from "@/types/sessionUserType";
+import { Technician } from "@prisma/client";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type Props = {
   searchParams?: { view?: string };
@@ -32,8 +29,8 @@ interface Column {
 const Page = (props: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialView = searchParams.get("view") || "workOrders";
-  const [activeView, setActiveView] = useState(initialView);
+  const view = searchParams.get("view") ?? "workOrders";
+
   const [pipelineColumns, setPipelineColumns] = useState<Column[]>([]);
 
   //leads start
@@ -157,11 +154,8 @@ const Page = (props: Props) => {
     fetchShopColumns();
   }, []);
 
- 
-
-  const handleViewChange = (view: string) => {
-    setActiveView(view);
-    router.replace(`?view=${view}`);
+  const handleViewChange = (newView: string) => {
+    router.push(`?view=${newView}`, { scroll: false });
   };
 
   const handleColumnsUpdate = async ({ columns }: { columns: Column[] }) => {
@@ -172,7 +166,7 @@ const Page = (props: Props) => {
   return (
     <div className="space-y-8">
       <Header
-        activeView={activeView}
+        activeView={view}
         pipelinesTitle={type}
         columns={pipelineColumns}
         onColumnsUpdate={handleColumnsUpdate}
@@ -180,15 +174,15 @@ const Page = (props: Props) => {
         currentUser={currentUser}
         onViewChange={handleViewChange}
       />
-      {activeView === "pipelines" ? (
+      {view === "pipelines" ? (
         <Pipelines
-          key={activeView}
+          key={view}
           pipelinesTitle={type}
           columns={pipelineColumns}
           shopPipelineDataProp={pipelineData}
         />
       ) : (
-        <WorkOrders type={columnType} key={activeView} />
+        <WorkOrders type={columnType} key={view} />
       )}
     </div>
   );
