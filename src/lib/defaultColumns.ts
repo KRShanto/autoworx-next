@@ -48,35 +48,42 @@ export const defaultShopColumn = [
     title: "Pending",
     type: "shop",
     order: 0,
-    bgColor: "#FFF9C4", // Light Yellow Background
-    textColor: "#F57F17", // Dark Yellow Text
+    bgColor: "#636363",
+    textColor: "#FF8C00",
   },
   {
     title: "In Progress",
     type: "shop",
     order: 1,
-    bgColor: "#BBDEFB", // Light Blue Background
-    textColor: "#1565C0", // Blue Text
+    bgColor: "#FFEFD5",
+    textColor: "#6C757D",
   },
   {
     title: "Completed",
     type: "shop",
     order: 2,
-    bgColor: "#C8E6C9", // Light Green Background
-    textColor: "#2E7D32", // Dark Green Text
+    bgColor: "#DDEEFF",
+    textColor: "#004085",
+  },
+  {
+    title: "Delivered",
+    type: "shop",
+    order: 3,
+    bgColor: "#D4EDDA",
+    textColor: "#155724",
   },
 
   {
     title: "Re-Dos",
     type: "shop",
-    order: 3,
+    order: 4,
     bgColor: "#FFE0B2", // Light Orange Background
     textColor: "#EF6C00", // Orange Text
   },
   {
     title: "Cancelled",
     type: "shop",
-    order: 4,
+    order: 5,
     bgColor: "#FFCDD2", // Light Red Background
     textColor: "#C62828", // Red Text
   },
