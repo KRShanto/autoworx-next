@@ -17,13 +17,19 @@ export default function FormError() {
     }, 400);
   };
 
-  if (error && error.field === "all") {
+  if (error && !error.success) {
     return (
       <div
         className="mb-4 flex items-center justify-between rounded-md bg-red-700 px-4 py-1 text-white"
         ref={buttonRef}
       >
-        <p>{error.message}</p>
+        {error.errorSource && error?.errorSource?.length > 0 ? (
+          <p key={error.errorSource[0].path} className="text-sm">
+            {error.errorSource[0].message}
+          </p>
+        ) : (
+          <p>{error.message}</p>
+        )}
 
         <div>
           <button type="button" onClick={handleClose}>

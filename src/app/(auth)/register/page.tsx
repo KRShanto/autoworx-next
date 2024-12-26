@@ -26,7 +26,7 @@ export default function Page() {
             type="text"
             name="firstName"
             className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
+            // required
             autoFocus
           />
         </div>
@@ -40,7 +40,6 @@ export default function Page() {
             type="text"
             name="lastName"
             className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
           />
         </div>
 
@@ -53,7 +52,6 @@ export default function Page() {
             type="email"
             name="email"
             className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
           />
         </div>
 
@@ -66,7 +64,7 @@ export default function Page() {
             type="text"
             name="company"
             className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
+            // required
           />
         </div>
 
@@ -78,7 +76,7 @@ export default function Page() {
           <Password
             name="password"
             className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
+            // required
           />
         </div>
 

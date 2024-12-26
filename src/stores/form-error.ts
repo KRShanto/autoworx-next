@@ -1,9 +1,9 @@
-import { FormErrorType } from "@/types/form-errror";
+import { TErrorHandler } from "@/types/globalError";
 import { create } from "zustand";
 
 interface FormErrorState {
-  error: FormErrorType | null;
-  showError: (error: FormErrorType | null) => void;
+  error: TErrorHandler | null;
+  showError: (error: TErrorHandler | null) => void;
   clearError: () => void;
 }
 

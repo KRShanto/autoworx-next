@@ -16,6 +16,7 @@ model User {
     address           String?
     city              String?
     state             String?
+    
     zip               String?
     companyName       String?            @map("company_name")
     commission        Decimal?           @default(0) @db.Decimal(10, 3)
