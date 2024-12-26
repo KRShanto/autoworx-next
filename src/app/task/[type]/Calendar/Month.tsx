@@ -233,30 +233,55 @@ export default function Month({
     });
   }
 
+  // function getAppointments(date: Date) {
+  //   return appointments.filter((appointment) => {
+  //     const appointmentDate = new Date(appointment.date!);
+
+  //     // Normalize both dates to UTC for comparison
+  //     return (
+  //       appointmentDate.getUTCFullYear() === date.getUTCFullYear() &&
+  //       appointmentDate.getUTCMonth() === date.getUTCMonth() &&
+  //       appointmentDate.getUTCDate() === date.getUTCDate()
+  //     );
+  //   });
+  // }
+
   function getAppointments(date: Date) {
     return appointments.filter((appointment) => {
-      const appointmentDate = new Date(appointment.date!);
+      // Extract appointment date in UTC, ignoring time zone
+      const appointmentDateString = appointment?.date?.toISOString().split("T")[0];
 
-      // Normalize both dates to UTC for comparison
-      return (
-        appointmentDate.getUTCFullYear() === date.getUTCFullYear() &&
-        appointmentDate.getUTCMonth() === date.getUTCMonth() &&
-        appointmentDate.getUTCDate() === date.getUTCDate()
-      );
+      // Convert current date to UTC string (ignoring time zone)
+      const currDateString = date.toLocaleDateString("en-CA"); // 'YYYY-MM-DD' format
+
+      return appointmentDateString === currDateString;
     });
   }
+
   function getHolidays(date: Date) {
     return holidays.filter((holiday) => {
-      const holidayDate = new Date(holiday.date!);
+      // Extract holiday date in UTC, ignoring time zone
+      const holidayDateString = holiday.date.toISOString().split("T")[0];
 
-      // Normalize both dates to UTC for comparison
-      return (
-        holidayDate.getUTCFullYear() === date.getUTCFullYear() &&
-        holidayDate.getUTCMonth() === date.getUTCMonth() &&
-        holidayDate.getUTCDate() === date.getUTCDate()
-      );
+      // Convert current date to UTC string (ignoring time zone)
+      const currDateString = date.toLocaleDateString("en-CA"); // 'YYYY-MM-DD' format
+
+      return holidayDateString === currDateString;
     });
   }
+
+  // function getHolidays(date: Date) {
+  //   return holidays.filter((holiday) => {
+  //     const holidayDate = new Date(holiday.date!);
+
+  //     // Normalize both dates to UTC for comparison
+  //     return (
+  //       holidayDate.getUTCFullYear() === date.getUTCFullYear() &&
+  //       holidayDate.getUTCMonth() === date.getUTCMonth() &&
+  //       holidayDate.getUTCDate() === date.getUTCDate()
+  //     );
+  //   });
+  // }
 
   const cells = [...rotatedDays(startDay), ...dates];
 

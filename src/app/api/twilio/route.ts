@@ -32,19 +32,19 @@ export async function POST(req: NextRequest) {
         mobile: body.from,
       },
     });
-   if (client){
-    const dbMessage = await db.clientSMS.create({
-      data: {
-        from: body.from,
-        to: body.to,
-        message: body.body,
-        sentBy: "Client",
-        clientId: client.id,
-        companyId: client.companyId,
-      },
-    });
-   }
-    console.log("Webhook Subscription Data:", body);
+    if (client) {
+      const dbMessage = await db.clientSMS.create({
+        data: {
+          from: body.from,
+          to: body.to,
+          message: body.body,
+          sentBy: "Client",
+          clientId: client.id,
+          companyId: client.companyId,
+        },
+      });
+    }
+    console.log("Twilio Webhook Subscription Data:", body);
 
     // Send response
     return Response.json(
