@@ -10,8 +10,7 @@ import {
 import FormError from "@/components/FormError";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
-import { useRef, useState } from "react";
-import { RiEditFill } from "react-icons/ri";
+import { useState } from "react";
 import { RxAvatar } from "react-icons/rx";
 
 import { updateEmployee } from "@/actions/employee/update";

@@ -1,9 +1,11 @@
 import { TErrorSource } from "@/error-boundary/globalErrorHandler";
 
 export interface TErrorHandler {
-  success: boolean;
-  statusCode: any;
-  message: any;
-  errorSource: TErrorSource[];
-  stack?: any;
+  success?: boolean;
+  statusCode?: number;
+  message: string;
+  errorSource?: TErrorSource[];
+  stack?: string;
+  field?: string;
+  type?: "globalError";
 }

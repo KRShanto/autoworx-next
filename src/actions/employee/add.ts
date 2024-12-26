@@ -8,6 +8,10 @@ import * as EmailValidator from "email-validator";
 import { getCompanyId } from "@/lib/companyId";
 import { MIN_PASSWORD_LENGTH } from "@/lib/consts";
 import { revalidatePath } from "next/cache";
+import { TErrorHandler } from "@/types/globalError";
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
+import { createEmployeeValidationSchema } from "@/validations/schemas/employee/employee.validation";
+import { Decimal } from "@prisma/client/runtime/library";
 
 interface EmployeeData {
   firstName: string;
@@ -43,59 +47,11 @@ export async function addEmployee({
   profilePicture,
   password,
   confirmPassword,
-}: EmployeeData): Promise<ServerAction> {
-  const companyId = await getCompanyId();
+}: EmployeeData): Promise<ServerAction | TErrorHandler> {
+  try {
+    const companyId = await getCompanyId();
 
-  // Check if any field is missing
-  if (!firstName || !email || !password || !confirmPassword) {
-    return {
-      type: "error",
-      message: "You need to fill all the fields",
-    };
-  }
-
-  // check if the user already created
-  const user = await db.user.findUnique({
-    where: { email },
-  });
-
-  if (user) {
-    return {
-      type: "error",
-      message: "User already exist!",
-    };
-  }
-
-  // check if the email is valid
-  if (!EmailValidator.validate(email)) {
-    return {
-      type: "error",
-      message: "Invalid email address",
-    };
-  }
-
-  // check if the password is long enough
-  if (password.length < MIN_PASSWORD_LENGTH) {
-    return {
-      type: "error",
-      message: "Password must be at least 6 characters long",
-    };
-  }
-
-  // check if the password and confirm password match
-  if (password !== confirmPassword) {
-    return {
-      type: "error",
-      message: "Password and confirm password do not match",
-    };
-  }
-
-  // hash the password
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  // create the employee
-  const newEmployee = await db.user.create({
-    data: {
+    const employeeInfo = await createEmployeeValidationSchema.parseAsync({
       firstName,
       lastName,
       email,
@@ -105,21 +61,73 @@ export async function addEmployee({
       state,
       zip,
       companyName,
-      commission,
+      commission: new Decimal(commission || 0),
       joinDate: new Date(date || Date.now()),
       employeeType: type,
       image: profilePicture ? profilePicture : undefined,
-      password: hashedPassword,
-      companyId,
-      role: "employee",
-    },
-  });
+      password,
+    });
 
-  revalidatePath("/employee");
+    // Check if any field is missing
+    // if (!firstName || !email || !password || !confirmPassword) {
+    //   throw new Error("You need to fill all the fields");
+    // }
 
-  return {
-    type: "success",
-    message: "Employee added successfully",
-    data: newEmployee,
-  };
+    // check if the user already created
+    const user = await db.user.findUnique({
+      where: { email },
+    });
+
+    if (user) {
+      throw new Error("User already exist!");
+    }
+
+    // check if the email is valid
+    // if (!EmailValidator.validate(email)) {
+    //   return {
+    //     type: "error",
+    //     message: "Invalid email address",
+    //   };
+    // }
+
+    // check if the password is long enough
+    // if (password.length < MIN_PASSWORD_LENGTH) {
+    //   return {
+    //     type: "error",
+    //     message: "Password must be at least 6 characters long",
+    //   };
+    // }
+
+    // check if the password and confirm password match
+    if (password !== confirmPassword) {
+      return {
+        type: "error",
+        message: "Password and confirm password do not match",
+      };
+    }
+
+    // hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // create the employee
+    const newEmployee = await db.user.create({
+      data: {
+        ...employeeInfo,
+        password: hashedPassword,
+        companyId,
+        role: "employee",
+      },
+    });
+
+    revalidatePath("/employee");
+
+    return {
+      type: "success",
+      message: "Employee added successfully",
+      data: newEmployee,
+    };
+  } catch (err) {
+    console.log({ err });
+    return errorHandler(err);
+  }
 }

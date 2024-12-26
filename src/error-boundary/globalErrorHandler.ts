@@ -2,6 +2,8 @@ import { ZodError } from "zod";
 import handleZodError from "./handleZodErrors";
 import httpStatus from "http-status";
 import { AppError } from "./error";
+import { TErrorHandler } from "@/types/globalError";
+import { handlePrismaError } from "./handlePrismaError";
 
 export type TErrorSource = {
   path: string | number;
@@ -26,9 +28,10 @@ export const notFoundError = () => {
 };
 
 // global error handler
-export const errorHandler = (error: any) => {
-  let message = error?.message;
-  let statusCode = error?.statusCode || 500;
+export const errorHandler = (error: any): TErrorHandler => {
+  let message: string = error?.message;
+  let statusCode: number =
+    error?.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
   let errorSource: TErrorSource[] = [
     {
       path: error?.path || "",
@@ -51,8 +54,13 @@ export const errorHandler = (error: any) => {
         message: error.message,
       },
     ];
+  } else if (handlePrismaError(error) !== undefined) {
+    const prismaError = handlePrismaError(error);
+    message = prismaError?.message || "";
+    statusCode = prismaError?.statusCode || 500;
+    errorSource = [];
   }
-  // TODO: Future implementation
+  // TODO: Future more implementation
   //   if (error.name === "ValidationError") {
   //     const mongooseValidationError = handleValidationError(error);
   //     message = mongooseValidationError.message;
@@ -73,6 +81,7 @@ export const errorHandler = (error: any) => {
   // send error response to client
   return {
     success: false,
+    type: "globalError",
     statusCode,
     message,
     errorSource,
