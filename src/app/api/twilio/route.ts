@@ -27,6 +27,8 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    console.log("Twilio Webhook Subscription Data:", body);
+
     const client = await db.client.findFirst({
       where: {
         mobile: body.from,
@@ -44,7 +46,6 @@ export async function POST(req: NextRequest) {
         },
       });
     }
-    console.log("Twilio Webhook Subscription Data:", body);
 
     // Send response
     return Response.json(
