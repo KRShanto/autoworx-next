@@ -11,7 +11,7 @@ export default async function sendMail() {
   mg.messages
     .create("sandbox-123.mailgun.org", {
       from: "Excited User <mailgun@sandbox1035bad1137946f88f9ad42e2a329524.mailgun.org>",
-      to: ["sunmaxboom2@example.com"],
+      to: ["example@example.com"],
       subject: "Hello",
       text: "Testing some Mailgun awesomeness!",
       html: "<h1>Testing some Mailgun awesomeness!</h1>",
