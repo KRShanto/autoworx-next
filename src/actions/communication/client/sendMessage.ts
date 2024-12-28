@@ -3,11 +3,13 @@ import { db } from "@/lib/db";
 import getUser from "@/lib/getUser";
 import { env } from "next-runtime-env";
 import Twilio from "twilio";
-import { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
 
 const accountSid = env("TWILIO_ACCOUNT_SID");
+console.log("🚀 ~ accountSid:", accountSid);
 const authToken = env("TWILIO_AUTH_TOKEN");
+console.log("🚀 ~ authToken:", authToken);
 const fromNumber = env("TWILIO_PHONE_NUMBER");
+console.log("🚀 ~ fromNumber:", fromNumber);
 
 const twilio = Twilio(accountSid, authToken);
 
@@ -19,6 +21,7 @@ export async function sendMessage({
   clientId: number;
 }) {
   try {
+    console.log("🚀 ~ sendMessage ~ message:");
     const user = await getUser();
     const client = await db.client.findFirst({
       where: {
@@ -58,6 +61,7 @@ export async function sendMessage({
     console.log("Error sending message", error);
     return {
       success: false,
+      error,
     };
   }
 }
