@@ -10,6 +10,7 @@ import React, { useEffect, useState } from "react";
 import { newMaterial } from "../../../actions/estimate/material/newMaterial";
 import Close from "./CloseEstimate";
 import { useActionStoreCreateEdit } from "@/stores/createEditStore";
+import { errorToast } from "@/lib/toast";
 
 export default function MaterialCreate() {
   const { categories } = useListsStore();
@@ -87,10 +88,10 @@ export default function MaterialCreate() {
   }, [currentSelectedCategoryId]);
 
   async function handleSubmit() {
-    if (!name) {
-      alert("Material name is required");
-      return;
-    }
+    // if (!name) {
+    //   alert("Material name is required");
+    //   return;
+    // }
 
     const res = await newMaterial({
       name,
@@ -151,6 +152,10 @@ export default function MaterialCreate() {
       });
 
       close();
+    } else if (res.type === "globalError") {
+      errorToast(
+        res.errorSource?.length ? res.errorSource[0].message : res.message,
+      );
     }
   }
 

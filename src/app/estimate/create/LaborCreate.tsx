@@ -7,6 +7,9 @@ import { Category, Tag } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { newLabor } from "../../../actions/estimate/labor/newLabor";
 import Close from "./CloseEstimate";
+import { errorToast } from "@/lib/toast";
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
+import { laborCreateValidationSchema } from "@/validations/schemas/estimate/labor/labor.validation";
 
 export default function LaborCreate() {
   const { categories } = useListsStore();
@@ -67,13 +70,13 @@ export default function LaborCreate() {
   console.log("discount", discount);
 
   async function handleSubmit() {
-    if (!name) {
-      alert("Labor name is required");
-      return;
-    }
+    // if (!name) {
+    //   alert("Labor name is required");
+    //   return;
+    // }
 
-    if (addToCannedLabor) {
-      await newLabor({
+    try {
+      const validatedLaborData = await laborCreateValidationSchema.parseAsync({
         name,
         categoryId: category?.id,
         tags,
@@ -83,20 +86,51 @@ export default function LaborCreate() {
         discount: discount ?? 0,
         cannedLabor: addToCannedLabor,
       });
-    }
+      if (addToCannedLabor) {
+        const res = await newLabor(validatedLaborData);
+        if (res.type === "globalError") {
+          errorToast(
+            res.errorSource?.length ? res.errorSource[0].message : res.message,
+          );
+        }
+      }
 
-    // if (res.type === "success") {
-    //   console.log("Labor has been created", res.data);
+      // if (res.type === "success") {
+      //   console.log("Labor has been created", res.data);
 
-    // Change the service where itemId is the same
-    // @ts-ignore
-    useEstimateCreateStore.setState((state) => {
-      const items = state.items.map((item) => {
-        if (item.id === itemId) {
-          return {
-            ...item,
-            labor: {
-              ...item.labor,
+      // Change the service where itemId is the same
+      // @ts-ignore
+      useEstimateCreateStore.setState((state) => {
+        const items = state.items.map((item) => {
+          if (item.id === itemId) {
+            return {
+              ...item,
+              labor: {
+                ...item.labor,
+                name,
+                categoryId: Number(category?.id),
+                tags,
+                notes,
+                hours: Number(hours),
+                charge: Number(charge),
+                discount: Number(discount),
+                addToCannedLabor,
+              },
+            };
+          }
+          return item;
+        });
+        return { items };
+      });
+
+      // Add to listsStore
+      // @ts-ignore
+      useListsStore.setState((state) => {
+        return {
+          labors: [
+            ...state.labors,
+            {
+              id: 1,
               name,
               categoryId: Number(category?.id),
               tags,
@@ -106,35 +140,19 @@ export default function LaborCreate() {
               discount: Number(discount),
               addToCannedLabor,
             },
-          };
-        }
-        return item;
+          ],
+        };
       });
-      return { items };
-    });
 
-    // Add to listsStore
-    // @ts-ignore
-    useListsStore.setState((state) => {
-      return {
-        labors: [
-          ...state.labors,
-          {
-            id: 1,
-            name,
-            categoryId: Number(category?.id),
-            tags,
-            notes,
-            hours: Number(hours),
-            charge: Number(charge),
-            discount: Number(discount),
-            addToCannedLabor,
-          },
-        ],
-      };
-    });
-
-    close();
+      close();
+    } catch (error) {
+      const formattedError = errorHandler(error);
+      errorToast(
+        formattedError.errorSource?.length
+          ? formattedError.errorSource[0].message
+          : formattedError.message,
+      );
+    }
   }
   // }
 
