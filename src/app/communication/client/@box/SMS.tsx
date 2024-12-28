@@ -68,6 +68,7 @@ export default function SMS({
           try {
             setIsPending(true);
             const res = await sendMessage({ clientId, message: messageInput });
+            console.log("🚀 ~ onSubmit={ ~ res:", res);
             if (res?.success && res?.data) {
               setMessages([...messages, res.data]);
               setMessageInput("");
