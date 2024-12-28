@@ -45,7 +45,7 @@ export default function ListComponent({
       </form>
 
       {/* List */}
-      <div className="mt-2 flex h-[87%] flex-col gap-2 overflow-y-auto max-[1835px]:h-[82%]">
+      <div className="mt-2 flex h-[84%] flex-col gap-2 overflow-y-auto max-[1835px]:h-[82%]">
         {filteredClients?.map((client: any) => {
           const selected = id == client.id;
 
