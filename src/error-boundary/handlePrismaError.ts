@@ -1,7 +1,11 @@
 import { Prisma } from "@prisma/client";
 import httpStatus from "http-status";
 
-export function handlePrismaError(error: any) {
+export function handlePrismaError(
+  error:
+    | Prisma.PrismaClientKnownRequestError
+    | Prisma.PrismaClientValidationError,
+): { statusCode: number; message: string } | undefined {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     // Unique constraint violation
     if (error.code === "P2002") {
@@ -34,5 +38,4 @@ export function handlePrismaError(error: any) {
       message: "Validation error",
     };
   }
-  return undefined;
 }

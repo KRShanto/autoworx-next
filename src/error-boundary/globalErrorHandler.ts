@@ -4,6 +4,7 @@ import httpStatus from "http-status";
 import { AppError } from "./error";
 import { TErrorHandler } from "@/types/globalError";
 import { handlePrismaError } from "./handlePrismaError";
+import { Prisma } from "@prisma/client";
 
 export type TErrorSource = {
   path: string | number;
@@ -44,8 +45,7 @@ export const errorHandler = (error: any): TErrorHandler => {
     message = zodError.message;
     statusCode = zodError.statusCode;
     errorSource = zodError.errorSource;
-  }
-  if (error instanceof AppError) {
+  } else if (error instanceof AppError) {
     message = error.message;
     statusCode = error.statusCode;
     errorSource = [
@@ -54,7 +54,10 @@ export const errorHandler = (error: any): TErrorHandler => {
         message: error.message,
       },
     ];
-  } else if (handlePrismaError(error) !== undefined) {
+  } else if (
+    error instanceof Prisma.PrismaClientKnownRequestError ||
+    error instanceof Prisma.PrismaClientValidationError
+  ) {
     const prismaError = handlePrismaError(error);
     message = prismaError?.message || "";
     statusCode = prismaError?.statusCode || 500;
