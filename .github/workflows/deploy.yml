@@ -26,7 +26,7 @@ jobs:
           echo "GMAIL_CLIENT_SECRET=${{ secrets.GMAIL_CLIENT_SECRET }}" >> .env
           echo "TWILIO_SID=${{ secrets.TWILIO_SID }}" >> .env
           echo "TWILIO_TOKEN=${{ secrets.TWILIO_TOKEN }}" >> .env
-          echo "TWILIO_NUMBER=${{ secrets.TWILIO_PHONE }}" >> .env
+          echo "TWILIO_NUMBER=${{ secrets.TWILIO_NUMBER }}" >> .env
           echo "ASANA_PERSONAL_TOKEN=${{ secrets.ASANA_PERSONAL_TOKEN }}" >> .env
           echo "ASANA_WORKSPACE=${{ secrets.ASANA_WORKSPACE }}" >> .env
           echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> .env

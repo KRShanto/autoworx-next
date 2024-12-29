@@ -8,7 +8,7 @@ const accountSid = env("TWILIO_SID") || process.env.TWILIO_SID;
 console.log("🚀 ~ accountSid:", accountSid);
 const authToken = env("TWILIO_TOKEN") || process.env.TWILIO_TOKEN;
 console.log("🚀 ~ authToken:", authToken);
-const fromNumber = env("TWILIO_PHONE") || process.env.TWILIO_PHONE;
+const fromNumber = env("TWILIO_NUMBER") || process.env.TWILIO_NUMBER;
 console.log("🚀 ~ fromNumber:", fromNumber);
 
 const twilio = Twilio(accountSid, authToken);
