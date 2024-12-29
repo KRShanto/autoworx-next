@@ -26,7 +26,7 @@ jobs:
           echo "GMAIL_CLIENT_SECRET=${{ secrets.GMAIL_CLIENT_SECRET }}" >> .env
           echo "TWILIO_SID=${{ secrets.TWILIO_SID }}" >> .env
           echo "TWILIO_TOKEN=${{ secrets.TWILIO_TOKEN }}" >> .env
-          echo "TWILIO_NUMBER=${{ secrets.TWILIO_PHONE }}" >> .env
+          echo "TWILIO_NUMBER=${{ secrets.TWILIO_NUMBER }}" >> .env
           echo "ASANA_PERSONAL_TOKEN=${{ secrets.ASANA_PERSONAL_TOKEN }}" >> .env
           echo "ASANA_WORKSPACE=${{ secrets.ASANA_WORKSPACE }}" >> .env
           echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> .env
@@ -50,19 +50,3 @@ jobs:
         run: docker rm -f autworx-production-1
       - name: Run the container
         run: docker run -d -p 3000:3000 --name autworx-production-1 krshanto/autworx-production-1
-
-  merge:
-    needs: [build, deploy]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout production branch
-        uses: actions/checkout@v4
-        with:
-          ref: production
-      - name: Merge master into production
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git merge master
-      - name: Push to production
-        run: git push origin production

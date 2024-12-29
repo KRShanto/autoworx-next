@@ -194,7 +194,6 @@ async function getExpectedRevenue() {
     },
   });
 
-  console.log("currentMonthInvoices", currentMonthInvoices);
 
   // const currentMonthExpectedRevenue = currentMonthInvoices.reduce(
   //   (acc, invoice) => acc + (invoice.profit || 0),

@@ -1,24 +1,27 @@
 "use client";
 
-import { Client } from "@prisma/client";
+import { Client, ClientSMS } from "@prisma/client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { FaSms } from "react-icons/fa";
+import { IoCall } from "react-icons/io5";
+import { MdAlternateEmail } from "react-icons/md";
 import { Conversation } from "../utils/types";
 import Email from "./Email";
-import Messages from "./Messages";
+import SMS from "./SMS";
 
 export default function BoxComponent({
   conversations,
+  allSms,
   clientId,
   client,
 }: {
   conversations: Conversation[];
+  allSms: ClientSMS[];
   clientId: number;
   client: Client;
 }) {
-  const [selected, setSelected] = useState<"MESSAGES" | "EMAILS" | "PHONE">(
-    "MESSAGES",
-  );
+  const [selected, setSelected] = useState<"SMS" | "EMAIL" | "PHONE">("EMAIL");
   const [conversationState, setConversationState] =
     useState<Conversation[]>(conversations);
 
@@ -59,25 +62,27 @@ export default function BoxComponent({
 
         <div className="mr-5 flex items-center">
           <button
-            onClick={() => setSelected("MESSAGES")}
+            onClick={() => setSelected("EMAIL")}
             className="rounded-full p-3"
             style={{
               backgroundColor:
-                selected === "MESSAGES" ? "rgba(255, 255, 255, 0.34)" : "",
+                selected === "EMAIL" ? "rgba(255, 255, 255, 0.34)" : "",
             }}
           >
-            <Image src="/icons/Chat.png" alt="chat" width={20} height={20} />
+            <MdAlternateEmail className="text-xl text-white" />
+            {/* <Image src="/icons/Chat.png" alt="chat" width={20} height={20} /> */}
           </button>
 
           <button
-            onClick={() => setSelected("EMAILS")}
+            onClick={() => setSelected("SMS")}
             className="rounded-full p-3"
             style={{
               backgroundColor:
-                selected === "EMAILS" ? "rgba(255, 255, 255, 0.34)" : "",
+                selected === "SMS" ? "rgba(255, 255, 255, 0.34)" : "",
             }}
           >
-            <Image src="/icons/Email.png" alt="chat" width={20} height={20} />
+            <FaSms className="text-xl text-white" />
+            {/* <Image src="/icons/Email.png" alt="chat" width={20} height={20} /> */}
           </button>
 
           <button
@@ -88,19 +93,20 @@ export default function BoxComponent({
                 selected === "PHONE" ? "rgba(255, 255, 255, 0.34)" : "",
             }}
           >
-            <Image src="/icons/Phone.png" alt="phone" width={20} height={20} />
+            <IoCall className="text-xl text-white" />
+            {/* <Image src="/icons/Phone.png" alt="phone" width={20} height={20} /> */}
           </button>
         </div>
       </div>
 
-      {selected === "MESSAGES" && (
-        <Messages
+      {selected === "EMAIL" && (
+        <Email
           clientId={clientId}
           conversations={conversationState}
           setConversations={setConversationState}
         />
       )}
-      {selected === "EMAILS" && <Email />}
+      {selected === "SMS" && <SMS clientId={clientId} allSms={allSms} />}
     </div>
   );
 }

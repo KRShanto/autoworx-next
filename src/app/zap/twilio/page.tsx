@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 export default async function TwilioSMSPage() {
   const companyId = await getCompanyId();
   // get all the leads
-  const messages = await db.twilioMessage.findMany();
+  // const messages = await db.twilioMessage.findMany();
 
   return (
     <div className="p-4">
@@ -24,14 +24,22 @@ export default async function TwilioSMSPage() {
             </tr>
           </thead>
           <tbody>
-            {messages.map((message) => (
-              <tr key={message.id} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-2">{message.from}</td>
-                <td className="px-4 py-2">{message.to}</td>
-                <td className="px-4 py-2">{message.message}</td>
-                <td className="px-4 py-2">{message.timestamp}</td>
-              </tr>
-            ))}
+            {[].map(
+              (message: {
+                id: number;
+                from: string;
+                to: string;
+                message: string;
+                timestamp: string;
+              }) => (
+                <tr key={message.id} className="border-b hover:bg-gray-50">
+                  <td className="px-4 py-2">{message.from}</td>
+                  <td className="px-4 py-2">{message.to}</td>
+                  <td className="px-4 py-2">{message.message}</td>
+                  <td className="px-4 py-2">{message.timestamp}</td>
+                </tr>
+              ),
+            )}
           </tbody>
         </table>
       </div>
