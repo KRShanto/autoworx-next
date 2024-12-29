@@ -131,7 +131,7 @@ model Technician {
     invoice     Invoice?      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
     company     Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
     InvoiceRedo InvoiceRedo[]
-    invoiceItem InvoiceItem   @relation(fields: [invoiceItemId], references: [id])
+    invoiceItem InvoiceItem   @relation(fields: [invoiceItemId], references: [id], onDelete: Cascade)
 }
 
 model InvoiceRedo {

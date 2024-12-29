@@ -5,9 +5,9 @@ import { env } from "next-runtime-env";
 import Twilio from "twilio";
 import { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
 
-const accountSid = env("TWILIO_ACCOUNT_SID");
-const authToken = env("TWILIO_AUTH_TOKEN");
-const fromNumber = env("TWILIO_PHONE_NUMBER");
+const accountSid = env("TWILIO_SID");
+const authToken = env("TWILIO_TOKEN");
+const fromNumber = env("TWILIO_NUMBER");
 
 const twilio = Twilio(accountSid, authToken);
 

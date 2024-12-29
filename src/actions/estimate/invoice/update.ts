@@ -258,6 +258,9 @@ export async function updateInvoice(
   });
 
   console.log("Updated the photos");
+
+
+  
   // delete existing items
   await db.invoiceItem.deleteMany({
     where: {
