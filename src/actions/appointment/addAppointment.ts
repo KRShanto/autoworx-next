@@ -196,29 +196,29 @@ export async function addAppointment(
 
       const times = appointment.times;
 
-      if (!times || times.length === 0) return { type: "success" };
+      if (times && times.length > 0) {
+        for (const time of times) {
+          const date = new Date(time.date);
+          const splitTime = time.time.split(":");
+          date.setHours(parseInt(splitTime[0]));
+          date.setMinutes(parseInt(splitTime[1]));
 
-      for (const time of times) {
-        const date = new Date(time.date);
-        const splitTime = time.time.split(":");
-        date.setHours(parseInt(splitTime[0]));
-        date.setMinutes(parseInt(splitTime[1]));
+          // schedule the reminder email
+          if (appointment.reminderEmailTemplateStatus) {
+            // calculate the cron expression for the date and time
+            const cronExpression = `${date.getMinutes()} ${date.getHours()} ${date.getDate()} ${date.getMonth() + 1} *`;
 
-        // schedule the reminder email
-        if (appointment.reminderEmailTemplateStatus) {
-          // calculate the cron expression for the date and time
-          const cronExpression = `${date.getMinutes()} ${date.getHours()} ${date.getDate()} ${date.getMonth() + 1} *`;
-
-          // schedule the email
-          cron.schedule(cronExpression, () => {
-            if (client) {
-              sendEmail({
-                to: client.email || "",
-                subject: reminderSubject,
-                text: reminderMessage,
-              });
-            }
-          });
+            // schedule the email
+            cron.schedule(cronExpression, () => {
+              if (client) {
+                sendEmail({
+                  to: client.email || "",
+                  subject: reminderSubject,
+                  text: reminderMessage,
+                });
+              }
+            });
+          }
         }
       }
     }

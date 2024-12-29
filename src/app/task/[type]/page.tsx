@@ -295,7 +295,6 @@ export default async function Page({
     },
   });
 
-  console.log({ calendarAppointments, appointmentsFull });
 
   return (
     <>
