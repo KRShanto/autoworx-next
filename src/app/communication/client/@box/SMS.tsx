@@ -1,11 +1,10 @@
 import { sendMessage } from "@/actions/communication/client/sendMessage";
 import { cn } from "@/lib/cn";
+import { errorToast } from "@/lib/toast";
 import { ClientSMS } from "@prisma/client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Conversation } from "../utils/types";
-
 export default function SMS({
   clientId,
   allSms = [],
@@ -18,9 +17,13 @@ export default function SMS({
   const containerRef = useRef<HTMLDivElement>(null);
   const [messageInput, setMessageInput] = useState("");
   const [file, setFile] = useState<File | null>(null);
-
+  const [isPending, setIsPending] = useState(false);
   const router = useRouter();
-
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight + 100;
+    }
+  }, [messages]);
   return (
     <div className="mb-2 h-[75%] 2xl:h-[85%]">
       <div ref={containerRef} className="h-[95%] w-full overflow-y-scroll">
@@ -60,7 +63,22 @@ export default function SMS({
       </div>
 
       <form
-        onSubmit={() => sendMessage({ clientId, message: "TEST" })}
+        onSubmit={async (e) => {
+          e.preventDefault();
+          try {
+            setIsPending(true);
+            const res = await sendMessage({ clientId, message: messageInput });
+            console.log("🚀 ~ onSubmit={ ~ res:", res);
+            if (res?.success && res?.data) {
+              setMessages([...messages, res.data]);
+              setMessageInput("");
+            }
+          } catch (err) {
+            errorToast("Error sending message");
+          } finally {
+            setIsPending(false);
+          }
+        }}
         className="flex h-[5%] items-center gap-x-2 rounded-b-md bg-[#D9D9D9] px-2 py-1"
       >
         <div className="flex h-full w-full items-center gap-x-2 rounded-md bg-white">
@@ -71,7 +89,7 @@ export default function SMS({
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
           />
-          <button type="submit" className="px-2">
+          <button disabled={isPending} type="submit" className="px-2">
             <Image src="/icons/Send.svg" alt="send" width={20} height={20} />
           </button>
         </div>
