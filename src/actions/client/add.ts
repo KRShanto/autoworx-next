@@ -7,6 +7,9 @@ import { revalidatePath } from "next/cache";
 import { AuthSession } from "@/types/auth";
 import { Source, Tag } from "@prisma/client";
 import { ServerAction } from "@/types/action";
+import { createClientValidationSchema } from "@/validations/schemas/client/client.validation";
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
+import { TErrorHandler } from "@/types/globalError";
 
 const CustomerSchema = z.object({
   // TODO: Add validation
@@ -27,9 +30,9 @@ export async function addCustomer(data: {
   tagId?: number;
   photo?: string;
   sourceId?: number;
-}): Promise<ServerAction> {
+}): Promise<ServerAction | TErrorHandler> {
   try {
-    CustomerSchema.parse(data);
+    await createClientValidationSchema.parseAsync(data);
 
     const session = (await auth()) as AuthSession;
     const companyId = session.user.companyId;
@@ -46,25 +49,6 @@ export async function addCustomer(data: {
 
     return { type: "success", data: newCustomer };
   } catch (error: any) {
-    console.log(error);
-
-    if (error instanceof z.ZodError) {
-      return {
-        message: error.errors[0].message,
-        type: "error",
-        field: error.errors[0].path[0] as string,
-      };
-    } else if (error.code === "P2002") {
-      return {
-        type: "error",
-        message: "Mobile already exists",
-        field: "mobile",
-      };
-    } else {
-      return {
-        type: "error",
-        message: error.message,
-      };
-    }
+    return errorHandler(error);
   }
 }

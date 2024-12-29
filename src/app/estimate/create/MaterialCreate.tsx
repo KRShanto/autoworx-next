@@ -201,6 +201,7 @@ export default function MaterialCreate() {
 
     close();
   }
+  
   useEffect(() => {
     if (categoryOpen && (vendorOpen || tagsOpen)) {
       setVendorOpen(false);

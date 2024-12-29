@@ -16,6 +16,7 @@ import { useState } from "react";
 import { SlimInput } from "../SlimInput";
 import { SlimTextarea } from "../SlimTextarea";
 import Submit from "../Submit";
+import { errorToast } from "@/lib/toast";
 
 export default function NewVendor({
   bgShadow,
@@ -59,9 +60,14 @@ export default function NewVendor({
       });
 
       afterSubmit && afterSubmit(res.data);
+      setOpen(false);
+    } else if (res.type === "globalError") {
+      errorToast(
+        res.errorSource && res.errorSource?.length > 0
+          ? res.errorSource[0].message
+          : res.message,
+      );
     }
-
-    setOpen(false);
   }
 
   return (
@@ -77,7 +83,7 @@ export default function NewVendor({
         </DialogHeader>
 
         <div className="grid gap-2 overflow-y-auto sm:grid-cols-2">
-          <SlimInput name="contactName" />
+          <SlimInput name="contactName" required={false} />
           <SlimInput name="companyName" required={false} />
           <SlimInput name="phone" required={false} />
           <SlimInput name="email" required={false} />

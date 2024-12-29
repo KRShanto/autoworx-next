@@ -34,7 +34,7 @@ export default function NewCustomer({
   const [tag, setTag] = useState<Tag>();
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const [clientSources, setClientSources] = useState<Source[]>([]);
-  const { showError } = useFormErrorStore();
+  const { showError, clearError } = useFormErrorStore();
 
   async function getClientSources() {
     const data = await getSources();
@@ -103,16 +103,17 @@ export default function NewCustomer({
       photo,
     });
 
-    if (res.type !== "success") {
+    if (res.type === "globalError") {
       showError({
-        field: res.field || "make",
-        message: res.message || "Failed to add customer",
+        errorSource: res.errorSource,
+        message: res.message,
       });
-    } else {
+    } else if (res.type === "success") {
       useListsStore.setState(({ customers }) => ({
         customers: [...customers, res.data],
         newAddedCustomer: res.data,
       }));
+      clearError();
       setOpen(false);
     }
   }

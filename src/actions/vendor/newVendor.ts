@@ -5,6 +5,10 @@ import { auth } from "@/app/auth";
 import { AuthSession } from "@/types/auth";
 import { ServerAction } from "@/types/action";
 import { revalidatePath } from "next/cache";
+import { createVendorValidationSchema } from "@/validations/schemas/vendor/vendor.validation";
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
+import { validate } from "node-cron";
+import { TErrorHandler } from "@/types/globalError";
 
 export async function newVendor({
   name,
@@ -28,12 +32,12 @@ export async function newVendor({
   company?: string;
   website?: string;
   notes?: string;
-}): Promise<ServerAction> {
-  const session = (await auth()) as AuthSession;
-  const companyId = session?.user?.companyId;
+}): Promise<ServerAction | TErrorHandler> {
+  try {
+    const session = (await auth()) as AuthSession;
+    const companyId = session?.user?.companyId;
 
-  const newVendor = await db.vendor.create({
-    data: {
+    const validatedVendorData = await createVendorValidationSchema.parseAsync({
       name,
       email,
       phone,
@@ -44,14 +48,31 @@ export async function newVendor({
       companyName: company,
       website,
       notes,
-      companyId,
-    },
-  });
+    });
 
-  revalidatePath("/inventory/vendor");
+    const newVendor = await db.vendor.create({
+      data: {
+        name: validatedVendorData.name,
+        email: validatedVendorData.email,
+        phone: validatedVendorData.phone,
+        address: validatedVendorData.address,
+        city: validatedVendorData.city,
+        state: validatedVendorData.state,
+        zip: validatedVendorData.zip,
+        companyName: validatedVendorData.companyName,
+        website: validatedVendorData.website,
+        notes: validatedVendorData.notes,
+        companyId,
+      },
+    });
 
-  return {
-    type: "success",
-    data: newVendor,
-  };
+    revalidatePath("/inventory/vendor");
+
+    return {
+      type: "success",
+      data: newVendor,
+    };
+  } catch (err) {
+    return errorHandler(err);
+  }
 }

@@ -1,13 +1,13 @@
+import { requiredEmailValidationSchema } from "@/validations/utils/email.validation";
+import { phoneValidationSchema } from "@/validations/utils/phone.validation";
 import { Decimal } from "@prisma/client/runtime/library";
 import { z } from "zod";
 
 export const createEmployeeValidationSchema = z.object({
   firstName: z.string().trim().min(1, { message: "firstName cannot be empty" }),
   lastName: z.string().nullable(),
-  email: z.string().email({ message: "Invalid email address" }),
-  phone: z
-    .string()
-    .regex(/^\+(?:[0-9] ?){6,14}[0-9]$/, { message: "Invalid phone number" }),
+  email: requiredEmailValidationSchema,
+  phone: phoneValidationSchema.optional(),
   password: z.string({ message: "password must be required" }).min(6),
   address: z.string().trim().min(1, { message: "address cannot be empty" }),
   city: z.string().trim().min(1, { message: "city cannot be empty" }),
