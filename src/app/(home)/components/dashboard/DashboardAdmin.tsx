@@ -160,12 +160,8 @@ const Dashboard = ({
       </div>
 
       {/* col 3 */}
-      <div className="flex h-full w-full flex-col space-y-4 lg:w-[23%]">
-        {/* appointments */}
-        <div className="#h-full flex-1">
-          {" "}
-          <Appointments appointments={appointments} fullHeight />
-        </div>
+      <div className="flex h-full w-full flex-1 flex-col space-y-4 lg:w-[23%]">
+        <Appointments appointments={appointments} fullHeight />
       </div>
       {/* col 4*/}
       <div className="flex h-full w-full flex-1 flex-col space-y-4 lg:w-[30%]">
