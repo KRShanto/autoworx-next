@@ -39,6 +39,7 @@ export const errorHandler = (error: any): TErrorHandler => {
       message: error?.message,
     },
   ];
+  console.log({ message });
   // check zod error instance
   if (error instanceof ZodError) {
     const zodError = handleZodError(error);
@@ -55,11 +56,13 @@ export const errorHandler = (error: any): TErrorHandler => {
       },
     ];
   } else if (
-    error instanceof Prisma.PrismaClientKnownRequestError ||
-    error instanceof Prisma.PrismaClientValidationError
+    error &&
+    typeof error === "object" &&
+    "code" in error &&
+    handlePrismaError(error)
   ) {
     const prismaError = handlePrismaError(error);
-    message = prismaError?.message || "";
+    message = prismaError?.message || "Internal server error";
     statusCode = prismaError?.statusCode || 500;
     errorSource = [];
   }

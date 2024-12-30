@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import {
   Dialog,
   DialogContent,
@@ -23,6 +23,8 @@ import { useInvoiceCreate } from "@/hooks/useInvoiceCreate";
 import { usePathname, useRouter } from "next/navigation";
 import moment from "moment";
 import { updatePayment } from "../../../actions/payment/updatePayment";
+import { errorToast } from "@/lib/toast";
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
 
 function TabTrigger({
   value,
@@ -54,6 +56,7 @@ export default function MakePayment() {
   const createInvoice = useInvoiceCreate("Invoice");
   const router = useRouter();
   const pathaname = usePathname();
+  const [pending, startTransition] = useTransition();
   const isEditPage = pathaname.includes("/estimate/edit/");
 
   const [open, setOpen] = useState(false);
@@ -100,47 +103,81 @@ export default function MakePayment() {
   useEffect(() => setAmount(due), [due]);
 
   async function handleSubmit() {
-    console.log("Start of the handleSubmit function");
-    const res1 = await createInvoice();
-    console.log("Invoice created");
-    let res2;
+    try {
+      console.log("Start of the handleSubmit function");
+      const res1 = await createInvoice();
+      if (res1.type === "globalError") {
+        errorToast(
+          res1?.errorSource?.length
+            ? res1.errorSource[0].message
+            : res1.message,
+        );
+        return;
+      }
+      let res2;
+      if (res1.type === "success") {
+        //create payment each time you make payment
+        res2 = await newPayment({
+          invoiceId: res1.data.id,
+          type: tab as PaymentType,
+          date,
+          notes,
+          amount: Number(amount),
+          additionalData: {
+            creditCard: card,
+            cardType: cardType ? (cardType as CardType) : "MASTERCARD",
+            checkNumber: check,
+            receivedCash: Number(cash),
+            paymentMethodId: paymentMethod?.id,
+          },
+        });
+      }
 
-    //create payment each time you make payment
-    res2 = await newPayment({
-      invoiceId: res1.data.id,
-      type: tab as PaymentType,
-      date,
-      notes,
-      amount: Number(amount),
-      additionalData: {
-        creditCard: card,
-        cardType: cardType ? (cardType as CardType) : "MASTERCARD",
-        checkNumber: check,
-        receivedCash: Number(cash),
-        paymentMethodId: paymentMethod?.id,
-      },
-    });
-
-    console.log("Payment created");
-
-    if (res2.type === "success") {
-      setOpen(false);
-      // Redirect to the index
-      router.push("/estimate/invoices");
+      if (res2?.type === "success") {
+        setOpen(false);
+        // Redirect to the index
+        router.push("/estimate/invoices");
+      } else if (res2?.type === "globalError") {
+        errorToast(
+          res2?.errorSource?.length
+            ? res2.errorSource[0].message
+            : res2.message,
+        );
+      }
+    } catch (err) {
+      const formattedError = errorHandler(err);
+      errorToast(
+        formattedError?.errorSource?.length
+          ? formattedError.errorSource[0].message
+          : formattedError.message,
+      );
     }
   }
 
   async function handleNewPaymentMethod() {
-    const res = await newPaymentMethod(paymentMethodInput);
+    try {
+      const res = await newPaymentMethod(paymentMethodInput);
 
-    if (res.type === "success") {
-      setPaymentMethodInput("");
-      setPaymentMethod(res.data);
-      setOpenPaymentMethod(false);
+      if (res.type === "success") {
+        setPaymentMethodInput("");
+        setPaymentMethod(res.data);
+        setOpenPaymentMethod(false);
 
-      useListsStore.setState({
-        paymentMethods: [...paymentMethods, res.data],
-      });
+        useListsStore.setState({
+          paymentMethods: [...paymentMethods, res.data],
+        });
+      } else if (res.type === "globalError") {
+        errorToast(
+          res?.errorSource?.length ? res.errorSource[0].message : res.message,
+        );
+      }
+    } catch (err) {
+      const formattedError = errorHandler(err);
+      errorToast(
+        formattedError?.errorSource?.length
+          ? formattedError.errorSource[0].message
+          : formattedError.message,
+      );
     }
   }
 
@@ -218,6 +255,7 @@ export default function MakePayment() {
                     label="Credit Card (Last 4 digits)"
                     value={card}
                     onChange={(e) => setCard(e.target.value)}
+                    required={false}
                   />
                 </div>
               </div>
@@ -462,8 +500,9 @@ export default function MakePayment() {
                 Cancel
               </button>
               <button
-                className="rounded-md bg-[#6571FF] p-2 px-5 text-white"
-                formAction={handleSubmit}
+                className="rounded-md bg-[#6571FF] p-2 px-5 text-white disabled:bg-gray-400"
+                formAction={() => startTransition(handleSubmit)}
+                disabled={pending}
                 type="submit"
               >
                 Record

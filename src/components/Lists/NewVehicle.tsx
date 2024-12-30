@@ -29,7 +29,7 @@ export default function NewVehicle({
 }) {
   const [open, setOpen] = useState(false);
   const [colorOpen, setColorOpen] = useState(false);
-  const { showError } = useFormErrorStore();
+  const { showError, clearError } = useFormErrorStore();
 
   const [colors, setColors] = useState<VehicleColor[]>([]);
   const [selectedColor, setSelectedColor] = useState<VehicleColor | null>(null);
@@ -88,18 +88,19 @@ export default function NewVehicle({
       clientId,
     });
 
-    if (res.type === "error") {
-      console.log(res);
+    if (res.type === "globalError") {
       showError({
         field: res.field || "make",
+        errorSource: res.errorSource,
         message: res.message || "",
       });
-    } else {
+    } else if (res.type === "success") {
       useListsStore.setState(({ vehicles }) => ({
         vehicles: [...vehicles, res.data],
         newAddedVehicle: res.data,
       }));
       setOpen(false);
+      clearError()
     }
   }
 
@@ -122,44 +123,46 @@ export default function NewVehicle({
         <DialogHeader>
           <DialogTitle>Create Vehicle</DialogTitle>
         </DialogHeader>
-
-        <div className="grid gap-2 overflow-y-auto sm:grid-cols-2">
+        <div>
           <FormError />
+          <div className="grid gap-2 overflow-y-auto sm:grid-cols-2">
+            <SlimInput name="year" type="number" required={false} />
+            <SlimInput name="make" required={false} />
+            <SlimInput name="model" required={false} />
+            <SlimInput name="submodel" required={false} label="Sub Model" />
+            <SlimInput name="type" required={false} />
 
-          <SlimInput name="year" type="number" />
-          <SlimInput name="make" />
-          <SlimInput name="model" />
-          <SlimInput name="submodel" required={false} label="Sub Model" />
-          <SlimInput name="type" required={false} />
+            <div>
+              <label className="mb-1 px-2 font-medium">Color</label>
+              <Selector
+                label={(color: VehicleColor | null) =>
+                  color ? color.name : ""
+                }
+                items={colors}
+                displayList={(color: VehicleColor) => <p>{color.name}</p>}
+                newButton={
+                  <NewVehicleColor
+                    setColors={setColors}
+                    setColor={setSelectedColor}
+                    setColorOpen={setColorOpen}
+                  />
+                }
+                selectedItem={selectedColor}
+                setSelectedItem={setSelectedColor}
+                openState={[colorOpen, setColorOpen]}
+              />
+            </div>
 
-          <div>
-            <label className="mb-1 px-2 font-medium">Color</label>
-            <Selector
-              label={(color: VehicleColor | null) => (color ? color.name : "")}
-              items={colors}
-              displayList={(color: VehicleColor) => <p>{color.name}</p>}
-              newButton={
-                <NewVehicleColor
-                  setColors={setColors}
-                  setColor={setSelectedColor}
-                  setColorOpen={setColorOpen}
-                />
-              }
-              selectedItem={selectedColor}
-              setSelectedItem={setSelectedColor}
-              openState={[colorOpen, setColorOpen]}
+            <SlimInput name="transmission" required={false} />
+            <SlimInput name="engineSize" required={false} />
+            <SlimInput name="license" required={false} label="License Plate" />
+            <SlimInput name="vin" required={false} />
+            <SlimInput
+              name="notes"
+              required={false}
+              rootClassName="col-span-full"
             />
           </div>
-
-          <SlimInput name="transmission" required={false} />
-          <SlimInput name="engineSize" required={false} />
-          <SlimInput name="license" required={false} label="License Plate" />
-          <SlimInput name="vin" required={false} />
-          <SlimInput
-            name="notes"
-            required={false}
-            rootClassName="col-span-full"
-          />
         </div>
 
         <DialogFooter>

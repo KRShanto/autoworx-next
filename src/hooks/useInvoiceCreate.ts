@@ -6,6 +6,7 @@ import { createInvoice } from "@/actions/estimate/invoice/create";
 import { updateInvoice } from "@/actions/estimate/invoice/update";
 import { ServerAction } from "@/types/action";
 import { useListsStore } from "@/stores/lists";
+import { TErrorHandler } from "@/types/globalError";
 
 export function useInvoiceCreate(type: InvoiceType) {
   const {
@@ -33,7 +34,7 @@ export function useInvoiceCreate(type: InvoiceType) {
 
   const pathaname = usePathname();
 
-  async function handleSubmit(): Promise<ServerAction> {
+  async function handleSubmit(): Promise<ServerAction | TErrorHandler> {
     let photoPaths = [];
     const clientId = client?.id;
     const vehicleId = vehicle?.id;

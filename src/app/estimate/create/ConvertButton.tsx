@@ -6,6 +6,7 @@ import Submit from "@/components/Submit";
 import { cn } from "@/lib/cn";
 import { useRouter } from "next/navigation";
 import { useInvoiceCreate } from "@/hooks/useInvoiceCreate";
+import { errorToast } from "@/lib/toast";
 
 export default function ConvertButton({
   text,
@@ -23,6 +24,12 @@ export default function ConvertButton({
 
   async function handleSubmit() {
     const res = await createInvoice();
+    if (res.type === "globalError") {
+      errorToast(
+        res.errorSource?.length ? res.errorSource[0].message : res.message,
+      );
+      return;
+    }
     console.log("Responee", res);
 
     if (type === "Estimate") {

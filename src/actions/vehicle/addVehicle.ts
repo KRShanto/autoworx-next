@@ -6,6 +6,9 @@ import { db } from "@/lib/db";
 import { z } from "zod";
 import { ServerAction } from "@/types/action";
 import { revalidatePath } from "next/cache";
+import { createVehicleValidationSchema } from "@/validations/schemas/vehicle/vehicle.validation";
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
+import { TErrorHandler } from "@/types/globalError";
 
 export async function addVehicle(data: {
   year: number;
@@ -20,10 +23,11 @@ export async function addVehicle(data: {
   vin: string;
   notes: string;
   clientId: number;
-}): Promise<ServerAction> {
+}): Promise<ServerAction | TErrorHandler> {
   try {
     const session = (await auth()) as AuthSession;
     const companyId = session.user.companyId;
+    await createVehicleValidationSchema.parseAsync(data);
 
     // Add vehicle to the database
     const vehicle = await db.vehicle.create({
@@ -40,24 +44,6 @@ export async function addVehicle(data: {
       data: vehicle,
     };
   } catch (error: any) {
-    if (error instanceof z.ZodError) {
-      return {
-        type: "error",
-        message: error.errors[0].message,
-        field: error.errors[0].path[0] as string,
-      };
-    } else if (error.code === "P2002") {
-      return {
-        type: "error",
-        message: "Vehicle already exists",
-        field: "vin",
-      };
-    } else {
-      return {
-        type: "error",
-        message: error.message,
-        field: "all",
-      };
-    }
+    return errorHandler(error);
   }
 }
