@@ -1,10 +1,10 @@
-import { emailValidationSchema } from "@/validations/utils/email.validation";
+import { requiredEmailValidationSchema } from "@/validations/utils/email.validation";
 import { z } from "zod";
 
 const createUserValidation = z.object({
   firstName: z.string().trim().min(1, { message: "firstName cannot be empty" }),
   lastName: z.string().optional(),
-  email: emailValidationSchema,
+  email: requiredEmailValidationSchema,
   password: z
     .string({
       required_error: "Password is required",
