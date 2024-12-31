@@ -82,7 +82,8 @@ export async function createInvoice({
   columnId?: number;
 }): Promise<ServerAction | TErrorHandler> {
   try {
-    const validatedData = await estimateCreateValidationSchema.parseAsync({
+    console.log({ invoiceId });
+    await estimateCreateValidationSchema.parseAsync({
       invoiceId,
       type,
 
@@ -111,8 +112,6 @@ export async function createInvoice({
       coupon,
       columnId,
     });
-
-    console.log({ validatedData });
 
     const session = (await auth()) as AuthSession;
     const companyId = session.user.companyId;
@@ -304,6 +303,8 @@ export async function createInvoice({
       data: invoice,
     };
   } catch (err) {
-    return errorHandler(err);
+    const formattedError = errorHandler(err);
+    console.log({ error: formattedError.errorSource });
+    return formattedError;
   }
 }

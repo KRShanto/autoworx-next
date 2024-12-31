@@ -190,9 +190,9 @@ export default function MaterialCreate() {
                 tags,
                 notes,
                 quantity: quantity || 0,
-                cost: cost || 0,
-                sell: sell || 0,
-                discount: discount ?? 0,
+                cost: Number(cost || 0) as any,
+                sell: Number(sell || 0) as any,
+                discount: Number(discount || 0) as any,
                 addToInventory,
               };
             }

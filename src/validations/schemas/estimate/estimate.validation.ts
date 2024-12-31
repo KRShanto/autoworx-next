@@ -12,18 +12,16 @@ const InvoiceTypeEnum = z.enum(["Estimate", "Invoice"] as [
   ...InvoiceType[],
 ]);
 
-const itemValidationSchema = z.array(
-  z.object({
-    service: serviceModelDataValidationSchema.nullable(),
-    materials: materialModelSchemaValidation.nullable(),
-    labor: laborModelSchemaValidation.nullable(),
-    tags: z.array(tagModelValidationSchema),
-  }),
-);
+const itemValidationSchema = z.object({
+  service: serviceModelDataValidationSchema.nullable().optional(),
+  materials: z.array(materialModelSchemaValidation.nullable()),
+  labor: laborModelSchemaValidation.nullable().optional(),
+  tags: z.array(tagModelValidationSchema.nullable().optional()),
+});
 
 export const estimateCreateValidationSchema = z
   .object({
-    invoiceId: z.string(),
+    invoiceId: z.string().nonempty("generate Invoice Id must be required"),
     type: InvoiceTypeEnum,
 
     clientId: z.number().optional(),
@@ -56,7 +54,7 @@ export const estimateCreateValidationSchema = z
 
     photos: z.array(z.string().url()),
 
-    items: itemValidationSchema,
+    items: z.array(itemValidationSchema.optional()),
 
     tasks: z.array(
       z.object({
@@ -126,13 +124,15 @@ export const estimateEditValidationSchema = z
 
     photos: z.array(z.string().url()),
 
-    items: itemValidationSchema,
+    items: z.array(itemValidationSchema.optional()),
 
     tasks: z.array(
-      z.object({
-        id: z.number().optional(),
-        task: z.string(),
-      }),
+      z
+        .object({
+          id: z.number().optional(),
+          task: z.string(),
+        })
+        .optional(),
     ),
     columnId: z.number().optional(),
   })

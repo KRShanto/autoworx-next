@@ -22,14 +22,17 @@ export const otherPaymentValidation = z.object({
   amount: z.number().nonnegative("amount must be positive value"),
 });
 
-const additionalDataValidation = z.object({
+export const additionalDataValidation = z.object({
   creditCard: z.string().nonempty("credit card number must be required"),
   cardType: z.enum(["AMEX", "MASTERCARD", "VISA", "OTHER"] as [
     string,
     ...CardType[],
   ]),
   receiveCash: z.number().nonnegative("number must be positive").default(0),
-  paymentMethodId: z.number().positive("payment method Id must be positive"),
+  paymentMethodId: z
+    .number({ invalid_type_error: "payment method id must be number" })
+    .positive("payment method Id must be positive")
+    .optional(),
 });
 
 export const createPaymentValidationSchema = z.object({
@@ -41,5 +44,5 @@ export const createPaymentValidationSchema = z.object({
   date: z.date({ message: "Date must be required" }),
   notes: z.string().optional(),
   amount: z.number().nonnegative("number must be positive value"),
-  additionalData: additionalDataValidation.required(),
+  additionalData: additionalDataValidation,
 });

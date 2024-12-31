@@ -238,7 +238,8 @@ export async function newPayment({
       data: newPayment,
     };
   } catch (err) {
-    console.log({ err });
-    return errorHandler(err);
+    const formattedError = errorHandler(err);
+    console.log({ error: formattedError.errorSource });
+    return formattedError;
   }
 }

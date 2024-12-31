@@ -161,9 +161,16 @@ export const useEstimateCreateStore = create<EstimateCreateStore>((set) => ({
             itemIndex,
             materialIndex,
           });
-          const materials = item.materials.filter(
-            (_, i) => i !== materialIndex,
-          );
+          const materials = item.materials.filter((material, i) => {
+            if (i !== materialIndex) {
+              return {
+                ...material,
+                cost: Number(material?.cost || 0),
+                sell: Number(material?.sell || 0),
+                discount: Number(material?.discount || 0),
+              };
+            }
+          });
 
           return { ...item, materials };
         }

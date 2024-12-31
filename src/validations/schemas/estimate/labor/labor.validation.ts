@@ -2,7 +2,9 @@ import { z } from "zod";
 import { estimateTagsValidationSchema } from "../tags/tags.validation";
 export const laborCreateValidationSchema = z.object({
   name: z.string().nonempty("Labor name is required"),
-  categoryId: z.number().nonnegative("Category is required"),
+  categoryId: z
+    .number({ message: "category must be required" })
+    .nonnegative("Category is required"),
   notes: z.string().optional(),
   tags: z.array(estimateTagsValidationSchema).optional(),
   hours: z

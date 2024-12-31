@@ -25,6 +25,7 @@ import moment from "moment";
 import { updatePayment } from "../../../actions/payment/updatePayment";
 import { errorToast } from "@/lib/toast";
 import { errorHandler } from "@/error-boundary/globalErrorHandler";
+import { additionalDataValidation, createPaymentValidationSchema } from "@/validations/schemas/payment/payment.validation";
 
 function TabTrigger({
   value,
@@ -105,6 +106,13 @@ export default function MakePayment() {
   async function handleSubmit() {
     try {
       console.log("Start of the handleSubmit function");
+      await additionalDataValidation.parseAsync({
+        creditCard: card,
+        cardType: cardType ? (cardType as CardType) : "MASTERCARD",
+        checkNumber: check,
+        receivedCash: Number(cash),
+        paymentMethodId: paymentMethod?.id,
+      });
       const res1 = await createInvoice();
       if (res1.type === "globalError") {
         errorToast(

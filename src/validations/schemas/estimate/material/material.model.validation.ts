@@ -2,19 +2,30 @@ import { z } from "zod";
 
 export const materialModelSchemaValidation = z
   .object({
-    id: z.number().int().positive(),
-    name: z.string().min(1, "name must be required"),
-    vendorId: z.number().int().positive().nullable(),
-    categoryId: z.number().int().positive().nullable(),
-    notes: z.string().nullable(),
-    quantity: z.number().int().nullable(),
-    cost: z.number().nullable().default(0), // For Decimal
-    sell: z.number().nullable().default(0), // For Decimal
-    discount: z.number().nullable().default(0), // For Decimal
-    companyId: z.number().int().positive(),
-    invoiceId: z.string().nullable(),
-    invoiceItemId: z.number().int().positive().nullable(),
-    productId: z.number().int().positive().nullable(),
+    id: z
+      .number({ message: "material Id must be required" })
+      .int()
+      .positive()
+      .optional(),
+    name: z
+      .string({ message: "name Id must be required" })
+      .min(1, "name must be required")
+      .optional(),
+    vendorId: z.number().int().positive().nullable().optional(),
+    categoryId: z.number().int().positive().nullable().optional(),
+    notes: z.string().optional(),
+    quantity: z.number().int().optional(),
+    cost: z.number().optional().default(0), // For Decimal
+    sell: z.number().optional().default(0), // For Decimal
+    discount: z.number().optional().default(0), // For Decimal
+    companyId: z
+      .number({ message: "company Id must be required" })
+      .int()
+      .positive()
+      .optional(),
+    invoiceId: z.string().nullable().nullable().optional(),
+    invoiceItemId: z.number().int().positive().nullable().optional(),
+    productId: z.number().int().positive().nullable().optional(),
     createdAt: z.date().default(() => new Date()),
     updatedAt: z.date().default(() => new Date()),
   })
@@ -57,8 +68,8 @@ export const materialModelSchemaValidation = z
   .refine(
     (data) => {
       // Quantity should be positive if provided
-      if (data.quantity !== null) {
-        return data.quantity >= 0;
+      if (data.quantity) {
+        return data?.quantity >= 0;
       }
       return true;
     },
@@ -67,3 +78,7 @@ export const materialModelSchemaValidation = z
       path: ["quantity"],
     },
   );
+
+export type TMaterialModelSchemaValidation = z.infer<
+  typeof materialModelSchemaValidation
+>;

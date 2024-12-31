@@ -62,8 +62,6 @@ export async function updateInvoice(
       },
     });
 
-    console.log("Invoice: ", invoice);
-
     if (invoice?.type === "Invoice") {
       console.log("Invoice type is 'Invoice'");
       // merge all the same products and sum the quantity
@@ -405,7 +403,8 @@ export async function updateInvoice(
       data: updatedInvoice,
     };
   } catch (err) {
-    console.log(err);
-    return errorHandler(err);
+    const formattedError = errorHandler(err);
+    console.log({ error: formattedError.errorSource, formattedError });
+    return formattedError;
   }
 }
