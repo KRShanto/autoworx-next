@@ -65,9 +65,9 @@ export async function newMaterial({
         type: "Product",
       });
 
-      if (res.type === "error") {
+      if (res.type === "globalError") {
         return res;
-      } else {
+      } else if (res.type === "success") {
         newMaterial = res.data;
       }
     } else {
