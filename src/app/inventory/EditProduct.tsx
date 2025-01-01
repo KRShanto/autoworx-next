@@ -25,6 +25,10 @@ import {
 import { useEffect, useState } from "react";
 import { CiEdit } from "react-icons/ci";
 import { editProduct } from "../../actions/inventory/edit";
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
+import { errorToast } from "@/lib/toast";
+import { useFormErrorStore } from "@/stores/form-error";
+import { UNITS } from "@/validations/schemas/inventory/inventoryProduct.validation";
 
 type TProps = {
   productData: InventoryProduct & { category: Category; vendor: Vendor };
@@ -48,10 +52,10 @@ export default function EditProduct({ productData }: TProps) {
   const [category, setCategory] = useState<Category | null>(
     productData.category,
   );
+
+  const { showError, clearError } = useFormErrorStore();
   const [vendorOpen, setVendorOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
-
-  const [error, setError] = useState<string | null>("");
 
   const [product, setProduct] = useState<TInputType>({
     productName: productData.name,
@@ -94,7 +98,7 @@ export default function EditProduct({ productData }: TProps) {
         price,
         categoryId,
         vendorId: vendor?.id,
-        unit,
+        unit: unit as (typeof UNITS)[number],
         lot,
         type,
         receipt,
@@ -103,10 +107,23 @@ export default function EditProduct({ productData }: TProps) {
 
       if (res.type === "success") {
         setOpen(false);
-        setError(null);
+        clearError();
+      } else if (res.type === "globalError") {
+        showError({
+          field: res.field ?? "all",
+          message:
+            res.errorSource && res.errorSource?.length > 0
+              ? res.errorSource[0].message
+              : res.message,
+        });
       }
-    } catch (err: any) {
-      setError(err.message as string);
+    } catch (err) {
+      const formattedError = errorHandler(err);
+      errorToast(
+        formattedError.errorSource && formattedError.errorSource.length > 0
+          ? formattedError.errorSource[0].message
+          : formattedError.message,
+      );
     }
   }
   return (
@@ -120,11 +137,6 @@ export default function EditProduct({ productData }: TProps) {
           form
         >
           <DialogHeader>
-            {error && (
-              <p className="bg-red-500 py-2 text-center text-sm text-white">
-                {error}
-              </p>
-            )}
             <DialogTitle>Edit product</DialogTitle>
           </DialogHeader>
 

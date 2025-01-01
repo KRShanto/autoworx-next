@@ -1,8 +1,13 @@
 "use server";
 
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
-import { InventoryProductType } from "@prisma/client";
+import { TErrorHandler } from "@/types/globalError";
+import {
+  TUpdateProductValidation,
+  updateProductValidationSchema,
+} from "@/validations/schemas/inventory/inventoryProduct.validation";
 import { revalidatePath } from "next/cache";
 
 export async function editProduct({
@@ -18,23 +23,10 @@ export async function editProduct({
   type,
   receipt,
   lowInventoryAlert,
-}: {
-  id: number;
-  name: string;
-  description?: string;
-  price?: number;
-  categoryId?: number;
-  vendorId?: number;
-  quantity?: number;
-  unit?: string;
-  lot?: string;
-  type?: InventoryProductType;
-  receipt?: string;
-  lowInventoryAlert?: number;
-}): Promise<ServerAction> {
-  const updatedProduct = await db.inventoryProduct.update({
-    where: { id },
-    data: {
+}: TUpdateProductValidation): Promise<ServerAction | TErrorHandler> {
+  try {
+    await updateProductValidationSchema.parseAsync({
+      id,
       name,
       description,
       price,
@@ -46,13 +38,31 @@ export async function editProduct({
       type,
       receipt,
       lowInventoryAlert,
-    },
-  });
+    });
+    const updatedProduct = await db.inventoryProduct.update({
+      where: { id },
+      data: {
+        name,
+        description,
+        price,
+        categoryId,
+        vendorId,
+        quantity,
+        unit,
+        lot,
+        type,
+        receipt,
+        lowInventoryAlert,
+      },
+    });
 
-  revalidatePath("/inventory");
+    revalidatePath("/inventory");
 
-  return {
-    type: "success",
-    data: updatedProduct,
-  };
+    return {
+      type: "success",
+      data: updatedProduct,
+    };
+  } catch (error) {
+    return errorHandler(error);
+  }
 }
