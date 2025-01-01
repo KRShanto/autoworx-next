@@ -6,6 +6,7 @@ import { IoSearchOutline } from "react-icons/io5";
 import ClientInformation from "../ClientInformation";
 import OrderList from "../OrderList";
 import VehicleList from "../VehicleList";
+import { getCompanyId } from "@/lib/companyId";
 
 type Props = {
   params: {
@@ -21,8 +22,9 @@ const Page = async (props: Props) => {
   const { clientId } = params;
   const { vehicleId } = searchParams;
 
+  const companyId = await getCompanyId();
   const client = await db.client.findUnique({
-    where: { id: Number(clientId) },
+    where: { id: Number(clientId), companyId },
     include: {
       source: true,
       tag: true,

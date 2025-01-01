@@ -20,10 +20,10 @@ export default function EmployeeWorkInformation({
   const { service, category } = info.reduce(
     (acc, technician: any) => {
       acc.service = technician.invoice.invoiceItems.map(
-        (item: any) => item.service.name,
+        (item: any) => item.service?.name,
       );
       acc.category = technician.invoice.invoiceItems.map(
-        (item: any) => item.service.category.name,
+        (item: any) => item.service.category?.name,
       );
       return acc;
     },
