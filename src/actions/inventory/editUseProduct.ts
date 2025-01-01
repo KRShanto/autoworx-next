@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { TErrorHandler } from "@/types/globalError";
 import {
-  TUpdateInventoryHistorySchema,
+  TUpdateSalesInventoryHistorySchema,
   updateSalesInventoryHistorySchema,
 } from "@/validations/schemas/inventory/useProduct.validation";
 import { revalidatePath } from "next/cache";
@@ -16,7 +16,7 @@ export async function editUseProduct({
   quantity,
   notes,
   inventoryProductHistoryId,
-}: TUpdateInventoryHistorySchema): Promise<ServerAction | TErrorHandler> {
+}: TUpdateSalesInventoryHistorySchema): Promise<ServerAction | TErrorHandler> {
   try {
     await updateSalesInventoryHistorySchema.parseAsync({
       productId,

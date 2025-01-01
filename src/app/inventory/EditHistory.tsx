@@ -15,7 +15,9 @@ import NewVendor from "@/components/Lists/NewVendor";
 import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
 import Submit from "@/components/Submit";
+import { useFormErrorStore } from "@/stores/form-error";
 import { useListsStore } from "@/stores/lists";
+import { UNITS } from "@/validations/schemas/inventory/inventoryProduct.validation";
 import { Vendor } from "@prisma/client";
 import { useState } from "react";
 import { FaEdit } from "react-icons/fa";
@@ -46,6 +48,8 @@ export default function EditHistory({
   const [vendor, setVendor] = useState<Vendor | null>(previousVendor);
   const [vendorOpen, setVendorOpen] = useState(false);
 
+  const { showError, clearError } = useFormErrorStore();
+
   async function handleSubmit(formData: FormData) {
     const date = formData.get("date") as string;
     const quantity = formData.get("quantity") as string;
@@ -62,12 +66,21 @@ export default function EditHistory({
       notes,
       vendorId: vendor?.id,
       price: parseFloat(price),
-      unit,
+      unit: unit as (typeof UNITS)[number],
       lot,
     });
 
     if (res.type === "success") {
       setOpen(false);
+      clearError();
+    } else if (res.type === "globalError") {
+      showError({
+        field: res.field,
+        message:
+          res.errorSource && res.errorSource.length > 0
+            ? res.errorSource[0].message
+            : res.message,
+      });
     }
   }
 
