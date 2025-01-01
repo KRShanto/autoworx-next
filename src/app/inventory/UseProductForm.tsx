@@ -16,6 +16,7 @@ import Submit from "@/components/Submit";
 import { InventoryProductType } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { useProduct as productUse } from "../../actions/inventory/useProduct";
+import { useFormErrorStore } from "@/stores/form-error";
 
 export default function UseProductForm({
   productId,
@@ -30,6 +31,7 @@ export default function UseProductForm({
 }) {
   const [open, setOpen] = useState(false);
   const [invoiceId, setInvoiceId] = useState<string | null>(null);
+  const { showError, clearError } = useFormErrorStore();
 
   // TODO: Add validation for quantity
   async function handleSubmit(formData: FormData) {
@@ -48,6 +50,15 @@ export default function UseProductForm({
     if (res.type === "success") {
       setOpen(false);
       setInvoiceId(null);
+      clearError();
+    } else if (res.type === "globalError") {
+      showError({
+        field: res.field || "all",
+        message:
+          res.errorSource && res.errorSource.length > 0
+            ? res.errorSource[0].message
+            : res.message,
+      });
     }
   }
 

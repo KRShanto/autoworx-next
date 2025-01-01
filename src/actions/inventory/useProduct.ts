@@ -1,8 +1,11 @@
 "use server";
 
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
+import { TErrorHandler } from "@/types/globalError";
+import { lossProductValidationSchema, TLossProductValidation } from "@/validations/schemas/inventory/useProduct.validation";
 import { revalidatePath } from "next/cache";
 
 export async function useProduct({
@@ -11,45 +14,51 @@ export async function useProduct({
   date,
   quantity,
   notes,
-}: {
-  productId: number;
-  invoiceId: string | null;
-  date: Date;
-  quantity: number;
-  notes: string;
-}): Promise<ServerAction> {
-  const companyId = await getCompanyId();
-  // update product quantity
-  const product = await db.inventoryProduct.findUnique({
-    where: { id: productId },
-    include: { vendor: true },
-  });
-
-  const newHistory = await db.inventoryProductHistory.create({
-    data: {
-      companyId,
+}: TLossProductValidation): Promise<ServerAction | TErrorHandler> {
+  try {
+    await lossProductValidationSchema.parseAsync({
       productId,
       invoiceId,
       date,
       quantity,
       notes,
-      type: "Sale",
-      price: product?.price,
-      vendorId: product?.vendor?.id,
-    },
-  });
+    });
 
-  const newQuantity = product!.quantity! - quantity;
+    const companyId = await getCompanyId();
+    // update product quantity
+    const product = await db.inventoryProduct.findUnique({
+      where: { id: productId },
+      include: { vendor: true },
+    });
 
-  await db.inventoryProduct.update({
-    where: { id: productId },
-    data: { quantity: newQuantity },
-  });
+    const newHistory = await db.inventoryProductHistory.create({
+      data: {
+        companyId,
+        productId,
+        invoiceId,
+        date,
+        quantity,
+        notes,
+        type: "Sale",
+        price: product?.price,
+        vendorId: product?.vendor?.id,
+      },
+    });
 
-  revalidatePath("/inventory");
+    const newQuantity = product!.quantity! - quantity;
 
-  return {
-    type: "success",
-    data: newHistory,
-  };
+    await db.inventoryProduct.update({
+      where: { id: productId },
+      data: { quantity: newQuantity },
+    });
+
+    revalidatePath("/inventory");
+
+    return {
+      type: "success",
+      data: newHistory,
+    };
+  } catch (err) {
+    return errorHandler(err);
+  }
 }
