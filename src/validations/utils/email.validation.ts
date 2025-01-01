@@ -1,6 +1,9 @@
 import { z } from "zod";
 export const requiredEmailValidationSchema = z
-  .string()
+  .string({
+    required_error: "Email is required",
+    invalid_type_error: "Email must be a string",
+  })
   .nonempty("Email is required")
   .refine(
     (val) => {
@@ -42,7 +45,9 @@ export const requiredEmailValidationSchema = z
     { message: "Invalid email format" },
   );
 export const optionalEmailValidationSchema = z
-  .string()
+  .string({
+    invalid_type_error: "Email must be a string",
+  })
   .optional()
   .refine(
     (val) => {

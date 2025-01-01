@@ -1,9 +1,12 @@
 "use server";
 
 import { auth } from "@/app/auth";
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
 import { db } from "@/lib/db";
 import { ServerAction } from "@/types/action";
 import { AuthSession } from "@/types/auth";
+import { TErrorHandler } from "@/types/globalError";
+import { updateVehicleValidationSchema } from "@/validations/schemas/vehicle/vehicle.validation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -21,11 +24,12 @@ export async function editVehicle(data: {
   notes: string;
   vehicleId: number;
   clientId: number;
-}): Promise<ServerAction> {
+}): Promise<ServerAction | TErrorHandler> {
   try {
-    const session = (await auth()) as AuthSession;
-    const companyId = session.user.companyId;
+    // const session = (await auth()) as AuthSession;
+    // const companyId = session.user.companyId;
 
+    await updateVehicleValidationSchema.parseAsync(data);
     // Prepare update data
     const updateData: any = {
       year: data.year,
@@ -61,25 +65,7 @@ export async function editVehicle(data: {
       type: "success",
       data: vehicle,
     };
-  } catch (error: any) {
-    if (error instanceof z.ZodError) {
-      return {
-        type: "error",
-        message: error.errors[0].message,
-        field: error.errors[0].path[0] as string,
-      };
-    } else if (error.code === "P2002") {
-      return {
-        type: "error",
-        message: "Vehicle already exists",
-        field: "vin",
-      };
-    } else {
-      return {
-        type: "error",
-        message: error.message,
-        field: "all",
-      };
-    }
+  } catch (error) {
+    return errorHandler(error);
   }
 }

@@ -31,15 +31,15 @@ export default function EditVehicle({
 }) {
   const [open, setOpen] = useState(false);
   const [colorOpen, setColorOpen] = useState(false);
-  const { showError } = useFormErrorStore();
+  const { showError, clearError } = useFormErrorStore();
 
   const [colors, setColors] = useState<VehicleColor[]>([]);
   const [selectedColor, setSelectedColor] = useState<VehicleColor | null>(
     vehicle?.color ? vehicle.color : null,
   );
 
-  const pathname = usePathname();
-  const search = useSearchParams();
+  // const pathname = usePathname();
+  // const search = useSearchParams();
 
   async function getColors() {
     const res = await getVehicleColors();
@@ -84,14 +84,18 @@ export default function EditVehicle({
       vehicleId: vehicle.id,
     });
 
-    if (res.type === "error") {
+    if (res.type === "globalError") {
       console.log(res);
       showError({
-        field: res.field || "make",
-        message: res.message || "",
+        field: res.field,
+        message:
+          res.errorSource && res.errorSource?.length > 0
+            ? res.errorSource[0].message
+            : res.message,
       });
-    } else {
+    } else if (res.type === "success") {
       setOpen(false);
+      clearError();
     }
   }
 
