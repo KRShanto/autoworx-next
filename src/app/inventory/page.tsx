@@ -1,12 +1,8 @@
-import { getPermissionsForRole } from "@/actions/settings/teamManagement";
 import { SyncLists } from "@/components/SyncLists";
 import Title from "@/components/Title";
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
-import getPermissions from "@/lib/getPermissions";
 import getUser from "@/lib/getUser";
-import { PermissionForManager, PermissionForSales } from "@prisma/client";
-import { redirect } from "next/navigation";
 import AddNewProduct from "./AddNewProduct";
 import InventoryList from "./InventoryList";
 import Sidebar from "./Sidebar";

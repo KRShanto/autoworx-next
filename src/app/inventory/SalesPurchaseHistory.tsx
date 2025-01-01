@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { AuthSession } from "@/types/auth";
 import { Client, InventoryProductHistory, User, Vendor } from "@prisma/client";
 import SalesPurchaseHistoryClient from "./SalesPurchaseHistoryClient";
 

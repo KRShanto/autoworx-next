@@ -11,12 +11,11 @@ export const lossProductValidationSchema = z.object({
 
   invoiceId: z.string().nullish(),
 
-  date: z
-    .date({
-      required_error: "Date is required",
-      invalid_type_error: "Invalid date format",
-    }),
-    // .refine((date) => date <= new Date(), "Date cannot be in the future"),
+  date: z.date({
+    required_error: "Date is required",
+    invalid_type_error: "Invalid date format",
+  }),
+  // .refine((date) => date <= new Date(), "Date cannot be in the future"),
 
   quantity: z
     .number({
@@ -38,4 +37,31 @@ export const lossProductValidationSchema = z.object({
     .nullable(),
 });
 
-export type TLossProductValidation = z.infer<typeof lossProductValidationSchema>;
+export const updateSalesInventoryHistorySchema = z.object({
+  productId: z
+    .number()
+    .int("Product ID must be an integer")
+    .positive("Product ID must be positive"),
+
+  invoiceId: z.string().nullish(),
+
+  quantity: z
+    .number()
+    .int("Quantity must be an integer")
+    .positive("Quantity must be positive")
+    .refine((q) => q !== 0, "Quantity cannot be zero"),
+
+  notes: z.string().trim().max(500, "Notes cannot exceed 500 characters"),
+
+  inventoryProductHistoryId: z
+    .number()
+    .int("History ID must be an integer")
+    .positive("History ID must be positive"),
+});
+
+export type TLossProductValidation = z.infer<
+  typeof lossProductValidationSchema
+>;
+export type TUpdateInventoryHistorySchema = z.infer<
+  typeof updateSalesInventoryHistorySchema
+>;
