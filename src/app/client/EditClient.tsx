@@ -47,7 +47,7 @@ export default function EditCustomer({
   );
   const [newProfilePic, setNewProfilePic] = useState<File | null>(null);
   const [clientSources, setClientSources] = useState<Source[]>([]);
-  const { showError } = useFormErrorStore();
+  const { showError, clearError } = useFormErrorStore();
 
   async function getClientSources() {
     const data = await getSources();
@@ -125,12 +125,16 @@ export default function EditCustomer({
       photo,
     });
 
-    if (res.type !== "success") {
+    if (res.type === "globalError") {
       showError({
         field: res.field || "make",
-        message: res.message || "Failed to add customer",
+        message:
+          res?.errorSource && res?.errorSource?.length > 0
+            ? res.errorSource[0].message
+            : res.message,
       });
-    } else {
+    } else if (res.type === "success") {
+      clearError();
       setOpen(false);
     }
   }

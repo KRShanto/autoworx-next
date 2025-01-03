@@ -6,6 +6,8 @@ import { createInvoice } from "@/actions/estimate/invoice/create";
 import { updateInvoice } from "@/actions/estimate/invoice/update";
 import { ServerAction } from "@/types/action";
 import { useListsStore } from "@/stores/lists";
+import { TErrorHandler } from "@/types/globalError";
+import { z } from "zod";
 
 export function useInvoiceCreate(type: InvoiceType) {
   const {
@@ -33,7 +35,7 @@ export function useInvoiceCreate(type: InvoiceType) {
 
   const pathaname = usePathname();
 
-  async function handleSubmit(): Promise<ServerAction> {
+  async function handleSubmit(): Promise<ServerAction | TErrorHandler> {
     let photoPaths = [];
     const clientId = client?.id;
     const vehicleId = vehicle?.id;
@@ -65,6 +67,7 @@ export function useInvoiceCreate(type: InvoiceType) {
     }
     let res;
     if (isEditPage) {
+      console.log({ items });
       res = await updateInvoice({
         id: invoiceId,
         clientId: clientId ? clientId : undefined,
@@ -84,7 +87,16 @@ export function useInvoiceCreate(type: InvoiceType) {
         customerNotes,
         customerComments,
         photos: photoPaths,
-        items,
+        //@ts-ignore
+        items: items.map(({ id, ...item }) => ({
+          ...item,
+          materials: item.materials.map((material) => ({
+            ...material,
+            cost: Number(material?.cost || 0),
+            sell: Number(material?.sell || 0),
+            discount: Number(material?.discount || 0),
+          })),
+        })),
         tasks,
         type,
       });
@@ -110,7 +122,16 @@ export function useInvoiceCreate(type: InvoiceType) {
         customerNotes,
         customerComments,
         photos: photoPaths,
-        items,
+        //@ts-ignore
+        items: items.map(({ id, ...item }) => ({
+          ...item,
+          materials: item.materials.map((material) => ({
+            ...material,
+            cost: Number(material?.cost || 0),
+            sell: Number(material?.sell || 0),
+            discount: Number(material?.discount || 0),
+          })),
+        })),
         tasks,
         coupon,
       });

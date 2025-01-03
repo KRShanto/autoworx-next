@@ -18,6 +18,8 @@ import { getCompany } from "@/actions/settings/getCompany";
 import { useFormErrorStore } from "@/stores/form-error";
 import { addEmployee } from "@/actions/employee/add";
 import { EmployeeType, User } from "@prisma/client";
+import { errorToast } from "@/lib/toast";
+import { TErrorHandler } from "@/types/globalError";
 
 export default function AddNewEmployee({
   onSuccess,
@@ -61,6 +63,7 @@ export default function AddNewEmployee({
 
       if (!res.ok) {
         showError({ field: "all", message: "An error occurred" });
+        errorToast("An error occurred");
         return;
       }
 
@@ -86,10 +89,14 @@ export default function AddNewEmployee({
       confirmPassword,
     });
 
-    if (res.type === "error") {
-      showError({ field: "all", message: res.message || "An error occurred" });
+    if (res.type === "globalError") {
+      console.error(res);
+      showError(res);
+      res.errorSource && res.errorSource.length > 0
+        ? errorToast(res.errorSource[0].message)
+        : errorToast(res.message);
       return;
-    } else {
+    } else if (res.type === "success") {
       setOpen(false);
       onSuccess && onSuccess(res.data);
     }

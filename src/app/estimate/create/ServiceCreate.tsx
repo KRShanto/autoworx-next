@@ -8,6 +8,8 @@ import Close from "./CloseEstimate";
 import SelectCategory from "@/components/Lists/SelectCategory";
 import { create } from "mutative";
 import { updateService } from "@/actions/estimate/service/updateService";
+import toast from "react-hot-toast";
+import { errorToast } from "@/lib/toast";
 
 export default function ServiceCreate() {
   const { close, data } = useEstimatePopupStore();
@@ -33,10 +35,10 @@ export default function ServiceCreate() {
   }, [data]);
 
   async function handleSubmit() {
-    if (!name) {
-      alert("Service name is required");
-      return;
-    }
+    // if (!name) {
+    //   alert("Service name is required");
+    //   return;
+    // }
 
     const res = await newService({
       name,
@@ -61,6 +63,11 @@ export default function ServiceCreate() {
       });
 
       close();
+    } else if (res.type === "globalError") {
+      console.error({ res });
+      errorToast(
+        res.errorSource?.length ? res.errorSource[0].message : res.message,
+      );
     }
   }
 

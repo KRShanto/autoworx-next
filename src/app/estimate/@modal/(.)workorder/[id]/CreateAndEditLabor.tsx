@@ -8,13 +8,20 @@ import {
 } from "@/components/Dialog";
 import Selector from "@/components/Selector";
 import { SlimInput } from "@/components/SlimInput";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+  useTransition,
+} from "react";
 import { Priority, Status, Technician, User } from "@prisma/client";
 import { addTechnician } from "../../../../../actions/estimate/technician/addTechnician";
 import moment from "moment";
 import { updateTechnician } from "../../../../../actions/estimate/technician/updateTechnician";
 import { getEmployees } from "@/actions/employee/get";
 import { DropdownSelection } from "@/components/DropDownSelection";
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
 
 type TProps = {
   invoiceItemId: number;
@@ -39,6 +46,7 @@ export default function CreateAndEditLabor({
   const [employeeOpen, setEmployeeOpen] = useState(false);
 
   const [employeeList, setEmployeeList] = useState<User[]>([]);
+  const [pending, startTransition] = useTransition();
 
   const [employee, setEmployee] = useState<User | null>(null);
   const [status, setStatus] = useState<TStatus>("Pending");
@@ -132,6 +140,8 @@ export default function CreateAndEditLabor({
           serviceId,
         };
 
+        console.log({ updatedPayload });
+
         const response = await updateTechnician(technician.id, updatedPayload);
 
         if (response.type === "success") {
@@ -141,6 +151,12 @@ export default function CreateAndEditLabor({
             prev.map((tech) =>
               tech.id === technician.id ? response.data : tech,
             ),
+          );
+        } else if (response.type === "globalError") {
+          setError(
+            response?.errorSource?.length
+              ? response.errorSource[0].message
+              : response.message,
           );
         }
       } else {
@@ -156,14 +172,26 @@ export default function CreateAndEditLabor({
           invoiceId,
           invoiceItemId,
         };
+        console.log({ payload });
         const response = await addTechnician(payload);
         if (response.type === "success") {
           setOpen(false);
           setTechnicians((prev) => [...prev, response.data]);
+        } else if (response.type === "globalError") {
+          setError(
+            response?.errorSource?.length
+              ? response.errorSource[0].message
+              : response.message,
+          );
         }
       }
     } catch (error) {
-      setError("Failed to update labor");
+      const formattedError = errorHandler(error);
+      setError(
+        formattedError?.errorSource?.length
+          ? formattedError.errorSource[0].message
+          : formattedError.message,
+      );
     }
   };
   const date = moment(technician?.createdAt);
@@ -325,21 +353,13 @@ export default function CreateAndEditLabor({
           <DialogClose className="rounded-lg border-2 border-slate-400 p-2">
             Cancel
           </DialogClose>
-          {technician ? (
-            <button
-              className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
-              onClick={handleSubmit}
-            >
-              Update
-            </button>
-          ) : (
-            <button
-              className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white"
-              onClick={handleSubmit}
-            >
-              Add
-            </button>
-          )}
+          <button
+            disabled={pending}
+            className="rounded-lg border bg-[#6571FF] px-5 py-2 text-white disabled:bg-gray-400"
+            onClick={() => startTransition(handleSubmit)}
+          >
+            {technician ? "Update" : "Add"}
+          </button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

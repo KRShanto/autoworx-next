@@ -7,6 +7,9 @@ import { Priority } from "@prisma/client";
 import { updateWorkOrderStatus } from "./updateWorkOrderStatus";
 import { revalidatePath } from "next/cache";
 import moment from "moment";
+import { createTechnicianValidationSchema } from "@/validations/schemas/technicians/technician.validation";
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
+import { TErrorHandler } from "@/types/globalError";
 
 type TechnicianInput = {
   date: Date;
@@ -23,13 +26,14 @@ type TechnicianInput = {
 
 export async function addTechnician(
   payload: TechnicianInput,
-): Promise<ServerAction> {
+): Promise<ServerAction | TErrorHandler> {
   const companyId = await getCompanyId();
 
   try {
-    if (!payload) {
-      return { type: "error", message: "Invalid payload" };
-    }
+    // if (!payload) {
+    //   return { type: "error", message: "Invalid payload" };
+    // }
+    await createTechnicianValidationSchema.parseAsync(payload);
 
     // Ensure the date includes both date and time
     const dateWithTime = new Date(payload.date);
@@ -66,6 +70,6 @@ export async function addTechnician(
       data: { ...newTechnician, name: user?.firstName + " " + user?.lastName },
     };
   } catch (error) {
-    throw error;
+    return errorHandler(error);
   }
 }

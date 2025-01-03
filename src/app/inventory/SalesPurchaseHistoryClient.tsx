@@ -15,8 +15,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { FaEdit } from "react-icons/fa";
-import { HiExternalLink } from "react-icons/hi";
-import { auth } from "../auth";
 import EditHistory from "./EditHistory";
 import EditProductForm from "./EditProductForm";
 

@@ -18,6 +18,8 @@ import { useListsStore } from "@/stores/lists";
 import { Vendor } from "@prisma/client";
 import { useState } from "react";
 import { replenish } from "../../actions/inventory/replenish";
+import { UNITS } from "@/validations/schemas/inventory/inventoryProduct.validation";
+import { useFormErrorStore } from "@/stores/form-error";
 
 export default function ReplenishProductForm({
   productId,
@@ -29,6 +31,7 @@ export default function ReplenishProductForm({
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [vendorOpen, setVendorOpen] = useState(false);
 
+  const { showError, clearError } = useFormErrorStore();
   async function handleSubmit(formData: FormData) {
     const date = formData.get("date") as string;
     const quantity = formData.get("quantity") as string;
@@ -40,17 +43,26 @@ export default function ReplenishProductForm({
     const res = await replenish({
       productId,
       date: new Date(date),
-      quantity: parseInt(quantity),
+      quantity: parseInt(quantity) || 0,
       notes,
       vendorId: vendor?.id,
-      price: parseFloat(price),
-      unit,
+      price: parseFloat(price) || 0,
+      unit: unit as (typeof UNITS)[number],
       lot,
     });
 
-    if (res.type === "success") {
-      setOpen(false);
+    if (res.type === "globalError") {
+      showError({
+        field: res.field || "all",
+        message:
+          res.errorSource && res.errorSource.length > 0
+            ? res.errorSource[0].message
+            : res.message,
+      });
+      return;
     }
+    setOpen(false);
+    clearError();
   }
 
   return (

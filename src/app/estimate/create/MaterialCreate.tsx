@@ -10,6 +10,8 @@ import React, { useEffect, useState } from "react";
 import { newMaterial } from "../../../actions/estimate/material/newMaterial";
 import Close from "./CloseEstimate";
 import { useActionStoreCreateEdit } from "@/stores/createEditStore";
+import { errorToast } from "@/lib/toast";
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
 
 export default function MaterialCreate() {
   const { categories } = useListsStore();
@@ -87,70 +89,83 @@ export default function MaterialCreate() {
   }, [currentSelectedCategoryId]);
 
   async function handleSubmit() {
-    if (!name) {
-      alert("Material name is required");
-      return;
-    }
+    // if (!name) {
+    //   alert("Material name is required");
+    //   return;
+    // }
 
-    const res = await newMaterial({
-      name,
-      categoryId: category?.id,
-      vendorId: vendor?.id,
-      tags,
-      notes,
-      quantity: quantity || 1,
-      cost: cost || 0,
-      sell: sell || 0,
-      discount: discount || 0,
-      addToInventory,
-    });
+    try {
+      const res = await newMaterial({
+        name,
+        categoryId: category?.id,
+        vendorId: vendor?.id,
+        tags,
+        notes,
+        quantity: quantity || 1,
+        cost: cost || 0,
+        sell: sell || 0,
+        discount: discount || 0,
+        addToInventory,
+      });
 
-    if (res.type === "success") {
-      // Change the service where itemId is the same and materialIndex is the same
-      useEstimateCreateStore.setState((state) => {
-        const items = state.items.map((item) => {
-          if (item.id === itemId) {
-            const materials = item.materials.map((material, i) => {
-              if (i === materialIndex) {
-                return {
-                  id: res.data.id,
-                  name,
-                  categoryId: category?.id || null,
-                  vendorId: vendor?.id || null,
-                  tags,
-                  notes,
-                  quantity: quantity || 0,
-                  cost: Number(cost || 0) as any,
-                  sell: Number(sell || 0) as any,
-                  discount: Number(discount || 0) as any,
-                  addToInventory,
-                  companyId: res.data.companyId,
-                  createdAt: res.data.createdAt,
-                  productId: res.data.productId,
-                  invoiceId: res.data.invoiceId,
-                  invoiceItemId: res.data.invoiceItemId,
-                  updatedAt: res.data.updatedAt,
-                };
-              }
-              return material;
-            });
+      if (res.type === "success") {
+        // Change the service where itemId is the same and materialIndex is the same
+        useEstimateCreateStore.setState((state) => {
+          const items = state.items.map((item) => {
+            if (item.id === itemId) {
+              const materials = item.materials.map((material, i) => {
+                if (i === materialIndex) {
+                  return {
+                    id: res.data.id,
+                    name,
+                    categoryId: category?.id || null,
+                    vendorId: vendor?.id || null,
+                    tags,
+                    notes,
+                    quantity: quantity || 0,
+                    cost: Number(cost || 0) as any,
+                    sell: Number(sell || 0) as any,
+                    discount: Number(discount || 0) as any,
+                    addToInventory,
+                    companyId: res.data.companyId,
+                    createdAt: res.data.createdAt,
+                    productId: res.data.productId,
+                    invoiceId: res.data.invoiceId,
+                    invoiceItemId: res.data.invoiceItemId,
+                    updatedAt: res.data.updatedAt,
+                  };
+                }
+                return material;
+              });
 
-            return {
-              ...item,
-              materials,
-            };
-          }
-          return item;
+              return {
+                ...item,
+                materials,
+              };
+            }
+            return item;
+          });
+          return { items };
         });
-        return { items };
-      });
 
-      // Add to listsStore
-      useListsStore.setState((state) => {
-        return { materials: [...state.materials, res.data] };
-      });
+        // Add to listsStore
+        useListsStore.setState((state) => {
+          return { materials: [...state.materials, res.data] };
+        });
 
-      close();
+        close();
+      } else if (res.type === "globalError") {
+        errorToast(
+          res.errorSource?.length ? res.errorSource[0].message : res.message,
+        );
+      }
+    } catch (err) {
+      const formattedError = errorHandler(err);
+      errorToast(
+        formattedError.errorSource?.length
+          ? formattedError.errorSource[0].message
+          : formattedError.message,
+      );
     }
   }
 
@@ -175,9 +190,9 @@ export default function MaterialCreate() {
                 tags,
                 notes,
                 quantity: quantity || 0,
-                cost: cost || 0,
-                sell: sell || 0,
-                discount: discount ?? 0,
+                cost: Number(cost || 0) as any,
+                sell: Number(sell || 0) as any,
+                discount: Number(discount || 0) as any,
                 addToInventory,
               };
             }
@@ -196,6 +211,7 @@ export default function MaterialCreate() {
 
     close();
   }
+
   useEffect(() => {
     if (categoryOpen && (vendorOpen || tagsOpen)) {
       setVendorOpen(false);

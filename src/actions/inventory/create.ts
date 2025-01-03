@@ -1,33 +1,34 @@
 "use server";
 
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
 import { getCompanyId } from "@/lib/companyId";
 import { db } from "@/lib/db";
 import getUser from "@/lib/getUser";
 import { ServerAction } from "@/types/action";
-import { InventoryProductType } from "@prisma/client";
+import { TErrorHandler } from "@/types/globalError";
+import { createProductValidationSchema, TCreateProductValidation } from "@/validations/schemas/inventory/inventoryProduct.validation";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 
-const CreateProductInputSchema = z.object({
-  name: z.string().min(3),
-  description: z.string().optional(),
-  price: z.number().nonnegative(),
-  categoryId: z.number().optional(),
-  vendorId: z.number().optional(),
-  quantity: z.number().nonnegative(),
-  unit: z.string().optional(),
-  lot: z.string().optional(),
-  type: z.enum([InventoryProductType.Product, InventoryProductType.Supply]),
-  receipt: z.string().optional(),
-  lowInventoryAlert: z.number().optional(),
-});
+// const CreateProductInputSchema = z.object({
+//   name: z.string().min(3),
+//   description: z.string().optional(),
+//   price: z.number().nonnegative(),
+//   categoryId: z.number().optional(),
+//   vendorId: z.number().optional(),
+//   quantity: z.number().nonnegative(),
+//   unit: z.string().optional(),
+//   lot: z.string().optional(),
+//   type: z.enum([InventoryProductType.Product, InventoryProductType.Supply]),
+//   receipt: z.string().optional(),
+//   lowInventoryAlert: z.number().optional(),
+// });
 
 export async function createProduct(
-  data: z.infer<typeof CreateProductInputSchema>,
-): Promise<ServerAction> {
+  data: TCreateProductValidation,
+): Promise<ServerAction | TErrorHandler> {
   try {
     const user = await getUser();
-    const validatedData = CreateProductInputSchema.parse(data);
+    const validatedData = await createProductValidationSchema.parseAsync(data);
 
     const companyId = await getCompanyId();
 
@@ -64,18 +65,7 @@ export async function createProduct(
       type: "success",
       data: newProduct,
     };
-  } catch (error: any) {
-    if (error instanceof z.ZodError) {
-      return {
-        type: "error",
-        message: error.errors[0].message ?? "Invalid data",
-        field: "all",
-      };
-    } else {
-      return {
-        type: "error",
-        message: "An error occurred",
-      };
-    }
+  } catch (error) {
+    return errorHandler(error);
   }
 }

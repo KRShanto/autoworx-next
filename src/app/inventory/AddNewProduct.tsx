@@ -20,6 +20,9 @@ import { useListsStore } from "@/stores/lists";
 import { Category, InventoryProductType, Vendor } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { createProduct } from "../../actions/inventory/create";
+import { UNITS } from "@/validations/schemas/inventory/inventoryProduct.validation";
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
+import { errorToast } from "@/lib/toast";
 
 export default function AddNewProduct() {
   const [open, setOpen] = useState(false);
@@ -28,7 +31,7 @@ export default function AddNewProduct() {
   const [category, setCategory] = useState<Category | null>();
   const [vendorOpen, setVendorOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
-  const { showError } = useFormErrorStore();
+  const { showError, clearError } = useFormErrorStore();
 
   async function handleSubmit(data: FormData) {
     const name = data.get("productName") as string;
@@ -44,27 +47,40 @@ export default function AddNewProduct() {
     const receipt = data.get("receipt") as string;
     const lowInventory = data.get("lowInventory") as string;
 
-    const res = await createProduct({
-      name,
-      description,
-      price,
-      categoryId,
-      vendorId: vendor?.id,
-      quantity,
-      unit,
-      lot,
-      type,
-      receipt,
-      lowInventoryAlert: lowInventory ? Number(lowInventory) : undefined,
-    });
-
-    if (res.type === "success") {
-      setOpen(false);
-    } else {
-      showError({
-        field: res.field ?? "all",
-        message: res.message ?? "An error occurred",
+    try {
+      const res = await createProduct({
+        name,
+        description,
+        price,
+        categoryId,
+        vendorId: vendor?.id,
+        quantity,
+        unit: unit as (typeof UNITS)[number],
+        lot,
+        type,
+        receipt,
+        lowInventoryAlert: lowInventory ? Number(lowInventory) : undefined,
       });
+
+      if (res.type === "success") {
+        setOpen(false);
+        clearError();
+      } else if (res.type === "globalError") {
+        showError({
+          field: res.field ?? "all",
+          message:
+            res.errorSource && res.errorSource?.length > 0
+              ? res.errorSource[0].message
+              : res.message,
+        });
+      }
+    } catch (error) {
+      const formattedError = errorHandler(error);
+      errorToast(
+        formattedError.errorSource && formattedError.errorSource.length > 0
+          ? formattedError.errorSource[0].message
+          : formattedError.message,
+      );
     }
   }
 

@@ -4,6 +4,13 @@ import { db } from "@/lib/db";
 import { Priority } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { updateWorkOrderStatus } from "./updateWorkOrderStatus";
+import {
+  createTechnicianValidationSchema,
+  updateTechnicianValidationSchema,
+} from "@/validations/schemas/technicians/technician.validation";
+import { ServerAction } from "@/types/action";
+import { TErrorHandler } from "@/types/globalError";
+import { errorHandler } from "@/error-boundary/globalErrorHandler";
 
 type TechnicianInput = {
   date: Date;
@@ -20,12 +27,14 @@ type TechnicianInput = {
 export const updateTechnician = async (
   technicianId: number,
   payload: TechnicianInput,
-) => {
+): Promise<ServerAction | TErrorHandler> => {
   try {
-    if (!payload) {
-      return { type: "error", message: "Invalid payload" };
-    }
+    // if (!payload) {
+    //   return { type: "error", message: "Invalid payload" };
+    // }
+    console.log({ payload });
 
+    await updateTechnicianValidationSchema.parseAsync(payload);
     // Ensure the date includes both date and time
     const dateWithTime = new Date(payload.date);
     const currentTime = new Date();
@@ -60,6 +69,6 @@ export const updateTechnician = async (
       },
     };
   } catch (err) {
-    throw err;
+    return errorHandler(err);
   }
 };
