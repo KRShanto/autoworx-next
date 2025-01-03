@@ -156,7 +156,6 @@ export default async function Dashboard() {
     });
   }
 
-  console.log({ calendarAppointments });
 
   if (user.employeeType === "Admin") {
     return (

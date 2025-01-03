@@ -1,18 +1,19 @@
 import { InterceptedDialog } from "@/components/Dialog";
 import { db } from "@/lib/db";
 
-
 import { getTechnicians } from "@/actions/estimate/technician/getTechnicians";
 import InvoiceComponent from "./InvoiceComponent";
 import ProtectedRouteForViewInvoice from "./ProtectedRouteForViewInvoice";
+import { getCompanyId } from "@/lib/companyId";
 
 export default async function ViewEstimate({
   params: { id },
 }: {
   params: { id: string };
 }) {
+  const companyId = await getCompanyId();
   const invoice = await db.invoice.findUnique({
-    where: { id },
+    where: { id, companyId },
     include: {
       company: true,
       invoiceItems: {

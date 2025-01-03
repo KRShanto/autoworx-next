@@ -25,7 +25,6 @@ async function createGoogleCalendarEvent(
 
   const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
-
   const startDateTime = new Date(
     `${task.date.split("T")[0]}T${task.startTime}:00`,
   );
@@ -52,7 +51,7 @@ async function createGoogleCalendarEvent(
       requestBody: event,
     });
 
-    // console.log("Google Calendar Event created:", response);
+    console.log("Google Calendar Event created:", response);
     return response.data;
   } catch (error) {
     console.log("🚀 ~ error:", error);

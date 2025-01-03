@@ -3,10 +3,12 @@ import { notFound } from "next/navigation";
 import EmployeeInformation from "../components/EmployeeInformation";
 import EmployeeWorkInformation from "../components/EmployeeWorkInformation";
 import Header from "../components/Header";
+import { getCompanyId } from "@/lib/companyId";
 
 export default async function Page({ params }: { params: { id: string } }) {
+  const companyId = await getCompanyId();
   const employee = await db.user.findUnique({
-    where: { id: parseInt(params.id) },
+    where: { id: parseInt(params.id), companyId },
   });
 
   if (!employee) return notFound();
