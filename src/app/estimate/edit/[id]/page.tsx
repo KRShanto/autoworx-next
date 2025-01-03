@@ -15,6 +15,7 @@ import SyncEstimate from "../../create/SyncEstimate";
 import { AttachmentTab } from "../../create/tabs/AttachmentTab";
 import { CreateTab } from "../../create/tabs/CreateTab";
 import PaymentTab from "../../create/tabs/PaymentTab";
+import { getCompanyId } from "@/lib/companyId";
 
 export default async function Page({
   params,
@@ -25,8 +26,9 @@ export default async function Page({
 }) {
   const session = (await auth()) as AuthSession;
   const { id } = params;
+  const companyId = await getCompanyId();
   const invoice = await db.invoice.findUnique({
-    where: { id },
+    where: { id, companyId },
     include: {
       requestEstimate: true,
     },
@@ -74,7 +76,7 @@ export default async function Page({
   const photos = await db.invoicePhoto.findMany({ where: { invoiceId: id } });
   const tasks = await db.task.findMany({ where: { invoiceId: id } });
 
-  const companyId = session.user.companyId;
+  // const companyId = session.user.companyId;
   const customers = await db.client.findMany({ where: { companyId } });
   const vehicles = await db.vehicle.findMany({ where: { companyId } });
   const categories = await db.category.findMany({ where: { companyId } });
